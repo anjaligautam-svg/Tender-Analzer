@@ -1,0 +1,2181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pre-Bid Queries — TenderAI Hub</title>
+  <meta name="description" content="Manage vendor queries and responses for published tenders." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>
+    tailwind.config = { theme: { extend: {
+      fontFamily: { sans: ['"DM Sans"', 'system-ui', 'sans-serif'] },
+      colors: {
+        primary: { DEFAULT: '#0F5EE8', light: '#EFF6FF', border: '#93C5FD' },
+        success: { DEFAULT: '#10B981', light: '#F0FDF4' },
+        warning: { DEFAULT: '#F59E0B', light: '#FFFBEB' },
+        danger:  { DEFAULT: '#EF4444', light: '#FEF2F2' },
+        ink: { 900: '#111827', 500: '#6B7280', 400: '#9CA3AF' },
+        line: '#E5E7EB', surface: '#F9FAFB',
+      },
+      boxShadow: { soft: '0 1px 3px rgba(0,0,0,0.08)', lift: '0 4px 12px rgba(0,0,0,0.12)' },
+    }}};
+  </script>
+  <style>
+    html, body { font-family: 'DM Sans', system-ui, sans-serif; color: #111827; background: #F9FAFB; }
+    *:focus-visible { outline: 2px solid #0F5EE8; outline-offset: 2px; border-radius: 4px; }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 8px; }
+    ::-webkit-scrollbar-thumb:hover { background: #D1D5DB; }
+    ::-webkit-scrollbar-track { background: transparent; }
+
+    @keyframes pulse-blue { 0%,100% { box-shadow: 0 0 0 0 rgba(15,94,232,.5);} 50% { box-shadow: 0 0 0 6px rgba(15,94,232,0);} }
+    .pulse-blue { animation: pulse-blue 1.6s ease-in-out infinite; }
+    @keyframes pulse-amber { 0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,.5);} 50% { box-shadow: 0 0 0 6px rgba(245,158,11,0);} }
+    .pulse-amber { animation: pulse-amber 1.6s ease-in-out infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .field { border: 1px solid #D1D5DB; border-radius: 8px; padding: 10px 14px; font-size: 14px; width: 100%; background: white; transition: all .15s ease; }
+    .field:focus { outline: none; border-color: #0F5EE8; box-shadow: 0 0 0 3px rgba(15,94,232,0.1); }
+
+    .pill-filter { transition: all .15s ease; cursor: pointer; }
+    .pill-filter.active { background: #0F5EE8; color: white; border-color: #0F5EE8; }
+
+    .toggle { position: relative; display: inline-block; width: 36px; height: 20px; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle .slider { position: absolute; cursor: pointer; inset: 0; background: #E5E7EB; transition: .2s; border-radius: 999px; }
+    .toggle .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; top: 3px; background: white; transition: .2s; border-radius: 50%; box-shadow: 0 1px 2px rgba(0,0,0,0.12); }
+    .toggle input:checked + .slider { background: #0F5EE8; }
+    .toggle input:checked + .slider:before { transform: translateX(16px); }
+
+    .radio-card { cursor: pointer; padding: 14px 16px; border: 1px solid #E5E7EB; border-radius: 10px; display: flex; gap: 10px; background: white; transition: all .15s; }
+    .radio-card:hover { border-color: #93C5FD; background: #F8FAFF; }
+    .radio-card input { accent-color: #0F5EE8; margin-top: 2px; }
+    .radio-card.selected { border: 2px solid #0F5EE8; background: #EFF6FF; padding: 13px 15px; }
+
+    .toast { transform: translateY(80px); opacity: 0; transition: transform .3s cubic-bezier(.2,.7,.2,1), opacity .25s ease; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* Query row */
+    .query-row { cursor: pointer; transition: background .15s ease, border-left-color .15s ease; border-left: 3px solid transparent; }
+    .query-row:hover { background: #F9FAFB; }
+    .query-row.active { background: #EFF6FF; border-left-color: #0F5EE8; }
+
+    /* Slide-in for added notes blocks */
+    @keyframes slide-down { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+    .slide-in { animation: slide-down .15s ease-out; }
+
+    [contenteditable]:empty:before { content: attr(data-placeholder); color: #9CA3AF; }
+    .notes-doc { font-size: 14px; line-height: 1.7; color: #111827; }
+    .notes-doc h4 { font-size: 14px; font-weight: 700; color: #111827; margin: 16px 0 8px; }
+    .notes-doc .qa-block { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; }
+    .notes-doc .q-label { color: #0F5EE8; font-weight: 700; }
+    .notes-doc .a-label { color: #10B981; font-weight: 700; }
+
+    /* Tabs */
+    .ev-tab { transition: all .15s ease; }
+
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+  </style>
+</head>
+<body class="min-h-screen">
+
+<div class="flex min-h-screen">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="w-[244px] shrink-0 bg-white border-r border-line flex flex-col" aria-label="Primary">
+    <div class="px-5 pt-5 pb-4 border-b border-line">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-[15px]">T</div>
+        <div>
+          <div class="text-[15px] font-semibold text-ink-900 leading-tight">TenderAI</div>
+          <div class="text-[11px] text-ink-500 leading-tight">Procurement Portal</div>
+        </div>
+      </div>
+      <button class="mt-4 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-line bg-surface hover:bg-white hover:shadow-soft transition" aria-label="Switch organisation">
+        <div class="w-7 h-7 rounded-md bg-primary-light text-primary flex items-center justify-center"><i data-lucide="building-2" class="w-4 h-4"></i></div>
+        <div class="text-left flex-1 min-w-0">
+          <div class="text-[12.5px] font-medium text-ink-900 truncate">Ahmedabad</div>
+          <div class="text-[10.5px] text-ink-500 truncate">Municipal Corporation</div>
+        </div>
+        <i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 text-ink-400"></i>
+      </button>
+    </div>
+    <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+      <div>
+        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">OVERVIEW</div>
+        <ul class="space-y-0.5">
+          <li><a href="index.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">TENDERING</div>
+        <ul class="space-y-0.5">
+          <li><a href="dpr-creation.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="clipboard-list" class="w-4 h-4"></i> DPR Creation</a></li>
+          <li><a href="tender-creation.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="file-plus-2" class="w-4 h-4"></i> Tender Creation</a></li>
+          <li><a href="prebid-queries.html" aria-current="page" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] bg-primary-light text-primary font-medium"><i data-lucide="messages-square" class="w-4 h-4"></i> Pre-Bid Queries
+            <span class="ml-auto bg-primary text-white text-[10px] font-semibold rounded-full px-1.5 py-0.5">32</span></a></li>
+          <li><a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="gavel" class="w-4 h-4"></i> Bid Management</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">EVALUATING</div>
+        <ul class="space-y-0.5">
+          <li><a href="evaluation.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="clipboard-check" class="w-4 h-4"></i> Evaluation</a></li>
+          <li><a href="evaluation.html#financial" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="git-compare" class="w-4 h-4"></i> Comparative Stateme…</a></li>
+          <li><a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="sparkles" class="w-4 h-4"></i> AI Assistant</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">POST AWARD</div>
+        <ul class="space-y-0.5">
+          <li><a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Analytics</a></li>
+        </ul>
+      </div>
+    </nav>
+    <div class="border-t border-line px-4 py-3 flex items-center gap-3">
+      <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div>
+      <div class="flex-1 min-w-0">
+        <div class="text-[12.5px] font-medium text-ink-900 truncate">Rajesh Kumar</div>
+        <div class="text-[10.5px] text-ink-500 truncate">Super Admin</div>
+      </div>
+      <button onclick="sessionStorage.clear(); location.href='login.html'" aria-label="Sign out" class="text-ink-400 hover:text-ink-900"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="flex-1 flex flex-col min-w-0">
+    <header class="h-16 bg-white border-b border-line px-6 flex items-center gap-4 sticky top-0 z-30">
+      <button aria-label="Toggle sidebar" class="text-ink-500 hover:text-ink-900"><i data-lucide="panel-left" class="w-5 h-5"></i></button>
+      <div class="flex-1 max-w-xl relative">
+        <i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+        <input type="search" placeholder="Search tenders, bids, vendors…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] placeholder:text-ink-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+      </div>
+      <button class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">FY 2026-27 <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+      <button aria-label="Calendar" class="hidden md:flex w-9 h-9 items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500"><i data-lucide="calendar" class="w-4 h-4"></i></button>
+      <button aria-label="Notifications" class="relative w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500">
+        <i data-lucide="bell" class="w-4 h-4"></i>
+        <span class="absolute -top-1 -right-1 bg-danger text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">6</span>
+      </button>
+      <div class="flex items-center gap-2 pl-2 border-l border-line">
+        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">U</div>
+        <div class="hidden md:block"><div class="text-[12.5px] font-medium text-ink-900 leading-tight">Admin User</div></div>
+        <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto px-8 py-6">
+
+      <!-- ============================================== -->
+      <!-- SCREEN 1 — LANDING LIST                          -->
+      <!-- ============================================== -->
+      <section id="screen-landing" class="space-y-6">
+        <div>
+          <h1 class="text-[24px] font-bold text-ink-900 leading-tight">Pre-Bid Queries</h1>
+          <p class="text-[14px] text-ink-500 mt-1">Manage vendor queries and responses for published tenders.</p>
+        </div>
+
+        <!-- ACTIVE -->
+        <section>
+          <div class="text-[11px] uppercase tracking-[0.08em] text-ink-500 font-semibold mb-2">Active</div>
+          <div class="relative mb-3">
+            <i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input id="landingSearch" oninput="renderActiveList(this.value)" placeholder="Search tenders…" class="w-full bg-white border border-line rounded-lg pl-9 pr-3 py-2.5 text-[13px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+          </div>
+          <div id="activeList" class="bg-white border border-line rounded-xl overflow-hidden"></div>
+        </section>
+
+        <!-- PAST -->
+        <section style="margin-top: 32px;">
+          <div class="text-[11px] uppercase tracking-[0.08em] text-ink-500 font-semibold mb-2">Past — Closed</div>
+          <button id="pastToggle" onclick="togglePast()" class="text-[13px] text-ink-500 hover:text-ink-900 inline-flex items-center gap-1">Show 8 past tenders <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i></button>
+          <div id="pastList" class="hidden mt-2 bg-white border border-line rounded-xl overflow-hidden"></div>
+        </section>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- SCREEN 2 — WORKSPACE                              -->
+      <!-- ============================================== -->
+      <section id="screen-workspace" class="hidden space-y-5">
+
+        <!-- Breadcrumb + back link -->
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <div class="text-[13px] text-ink-500">
+            <a href="index.html" class="hover:text-ink-900">Dashboard</a>
+            <span class="mx-1.5 text-ink-400">/</span>
+            <a href="#" onclick="showLanding(); return false;" class="hover:text-ink-900">Pre-Bid Queries</a>
+            <span class="mx-1.5 text-ink-400">/</span>
+            <span id="wsTndCrumb" class="text-ink-900 font-mono">TND-2026-001</span>
+          </div>
+          <a href="#" onclick="showLanding(); return false;" class="text-[13px] text-ink-500 hover:text-ink-900 inline-flex items-center gap-1.5"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back to all tenders</a>
+        </div>
+
+        <!-- Tender header bar -->
+        <div class="bg-white border border-line rounded-xl flex flex-col lg:flex-row lg:items-center justify-between gap-4" style="padding: 16px 20px;">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span id="wsTndBadge" class="text-[11.5px] font-bold text-primary font-mono" style="background:#EFF6FF; border-radius:6px; padding:2px 8px;">TND-2026-001</span>
+              <span id="wsTndName" class="text-[16px] font-bold text-ink-900">Supply of Desktop Computers for AMC Offices</span>
+            </div>
+            <div id="wsTndMeta" class="text-[12px] text-ink-500 mt-1">IT · Goods · ₹45,00,000</div>
+          </div>
+          <div class="text-right">
+            <div id="wsTimelineSummary" class="text-[12px] text-ink-500">Released: Apr 30 · Meeting: May 10 · Window closes: May 12 · Responses due: May 15</div>
+            <div class="mt-1.5"><span id="wsPhasePill" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-semibold" style="background:#FFFBEB; color:#92400E;"><span class="w-1.5 h-1.5 rounded-full pulse-amber" style="background:#F59E0B;"></span> Drafting Responses</span></div>
+          </div>
+        </div>
+
+        <!-- Timeline strip -->
+        <div class="bg-white border border-line rounded-xl p-5">
+          <div class="relative">
+            <!-- Track -->
+            <div class="absolute top-2 left-3 right-3 h-0.5 bg-line"></div>
+            <div class="absolute top-2 left-3 h-0.5 bg-primary" style="width: 78%;"></div>
+            <!-- Today tick -->
+            <div class="absolute" style="top: -6px; left: 78%;">
+              <div class="text-[9px] font-bold uppercase tracking-wider" style="color:#0F5EE8; margin-bottom: 2px; transform: translateX(-50%); white-space: nowrap;">TODAY</div>
+              <div class="h-3 w-px mx-auto" style="background:#0F5EE8; transform: translateX(-50%);"></div>
+            </div>
+
+            <div class="relative grid grid-cols-5">
+              <!-- 1 -->
+              <div class="flex flex-col items-start">
+                <span class="w-4 h-4 rounded-full bg-success ring-4 ring-white relative z-10 inline-flex items-center justify-center"><i data-lucide="check" class="w-2.5 h-2.5 text-white"></i></span>
+                <div class="mt-2 text-[11px] font-bold text-ink-900">Tender Released</div>
+                <div class="text-[11px] text-ink-500">Apr 30</div>
+              </div>
+              <!-- 2 -->
+              <div class="flex flex-col items-center">
+                <span class="w-4 h-4 rounded-full bg-success ring-4 ring-white relative z-10"></span>
+                <div class="mt-2 text-[11px] font-bold text-ink-900 text-center">Query Window</div>
+                <div class="text-[11px] text-ink-500">Apr 30–May 12</div>
+              </div>
+              <!-- 3 -->
+              <div class="flex flex-col items-center">
+                <span class="w-4 h-4 rounded-full bg-success ring-4 ring-white relative z-10"></span>
+                <div class="mt-2 text-[11px] font-bold text-ink-900 text-center">Pre-Bid Meeting</div>
+                <div class="text-[11px] text-ink-500">May 10</div>
+              </div>
+              <!-- 4 — Current -->
+              <div class="flex flex-col items-center">
+                <span class="w-4 h-4 rounded-full bg-primary pulse-blue ring-4 ring-white relative z-10"></span>
+                <div class="mt-2 text-[11px] font-bold text-ink-900 text-center">Window Closes</div>
+                <div class="text-[11px] text-ink-500">May 12</div>
+              </div>
+              <!-- 5 -->
+              <div class="flex flex-col items-end">
+                <span class="w-4 h-4 rounded-full bg-line ring-4 ring-white relative z-10"></span>
+                <div class="mt-2 text-[11px] font-bold text-ink-900">Responses Due</div>
+                <div class="text-[11px] text-ink-500">May 15</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div role="tablist" aria-label="Pre-bid workspace tabs" class="flex flex-wrap gap-2">
+          <button role="tab" aria-selected="true" data-tab="queries" class="ev-tab px-4 py-1.5 rounded-full text-[13px] border border-primary bg-primary text-white"><i data-lucide="message-square" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1"></i> Queries &amp; Responses</button>
+          <button role="tab" aria-selected="false" data-tab="mn" class="ev-tab px-4 py-1.5 rounded-full text-[13px] border border-line bg-white text-ink-500 hover:text-ink-900"><i data-lucide="calendar-check" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1"></i> Meeting &amp; Notes</button>
+          <button role="tab" aria-selected="false" data-tab="docs" class="ev-tab px-4 py-1.5 rounded-full text-[13px] border border-line bg-white text-ink-500 hover:text-ink-900"><i data-lucide="file-text" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1"></i> Documentation</button>
+        </div>
+
+        <!-- ===== TAB 1 — QUERIES & RESPONSES ===== -->
+        <section id="tab-queries" role="tabpanel" class="space-y-0">
+
+          <!-- SECTION 1 — UPLOAD BAR -->
+          <div class="bg-white border border-line rounded-[10px] mb-4" style="padding: 12px 16px;">
+            <div class="flex items-center justify-between gap-4 flex-wrap">
+              <div class="flex-1 min-w-[260px]">
+                <div class="text-[13px] text-ink-500">Import queries from document</div>
+                <div class="text-[11px] text-ink-400 mt-0.5">Upload a PDF, Excel, or email export containing vendor queries</div>
+              </div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <div id="uploadFileChip" class="hidden text-[12px] inline-flex items-center gap-2" style="background:#F9FAFB; border:1px solid #E5E7EB; border-radius:6px; padding:4px 10px;">
+                  <i data-lucide="file-text" class="w-3 h-3" style="color:#0F5EE8;"></i>
+                  <span id="uploadFileName" style="color:#374151; max-width:180px;" class="truncate">vendor_queries_may5.xlsx</span>
+                  <button onclick="removeUploadedFile()" aria-label="Remove" class="text-[11px] hover:text-danger" style="color:#9CA3AF;">×</button>
+                </div>
+                <button onclick="toggleUploadZone()" class="text-[13px] inline-flex items-center gap-1.5 hover:border-primary hover:text-primary" style="border:1px solid #E5E7EB; border-radius:8px; padding:7px 14px; color:#374151; background:white; transition: all 150ms ease;"><i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload Document</button>
+                <button id="extractBtn" onclick="extractQueries()" class="hidden px-3.5 py-1.5 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Extract &amp; Group Queries</button>
+              </div>
+            </div>
+            <!-- Inline drop zone -->
+            <div id="uploadDropZone" class="overflow-hidden" style="max-height: 0; transition: max-height 200ms ease;">
+              <div class="mt-3 rounded-lg text-center cursor-pointer transition" style="border: 2px dashed #D1D5DB; padding: 20px; background: #F9FAFB;" onclick="simulateUpload()" onmouseenter="this.style.borderColor='#0F5EE8'; this.style.background='#EFF6FF';" onmouseleave="this.style.borderColor='#D1D5DB'; this.style.background='#F9FAFB';">
+                <i data-lucide="upload-cloud" class="w-7 h-7 mx-auto" style="color:#0F5EE8;"></i>
+                <div class="text-[13px] text-ink-900 mt-2">Drag and drop or click to <span class="text-primary font-medium">browse</span></div>
+                <div class="text-[11px] text-ink-400 mt-0.5">PDF, DOCX, XLSX, .eml — max 10MB</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 2 — FILTER ROW -->
+          <div class="flex items-center gap-3 flex-wrap mb-4">
+            <button class="pill-filter active px-3 py-1 rounded-full text-[12px] border border-primary bg-primary text-white" data-qf="all">All (<span id="qcAll">24</span>)</button>
+            <button class="pill-filter px-3 py-1 rounded-full text-[12px] border border-line bg-white text-ink-500 hover:text-ink-900" data-qf="unanswered">Unanswered (<span id="qcUnanswered">16</span>)</button>
+            <button class="pill-filter px-3 py-1 rounded-full text-[12px] border border-line bg-white text-ink-500 hover:text-ink-900" data-qf="answered">Answered (<span id="qcAnswered">7</span>)</button>
+            <button class="pill-filter px-3 py-1 rounded-full text-[12px] border border-line bg-white text-ink-500 hover:text-ink-900" data-qf="assigned">Assigned (<span id="qcAssigned">3</span>)</button>
+            <button class="pill-filter px-3 py-1 rounded-full text-[12px] border border-line bg-white text-ink-500 hover:text-ink-900" data-qf="grouped">Grouped (<span id="qcGrouped">9</span>)</button>
+
+            <span id="sectionFilterChip" class="hidden inline-flex items-center gap-1 text-[12px] font-medium" style="background:#EFF6FF; color:#0F5EE8; border-radius:20px; padding:4px 10px;">
+              Section: <span id="sectionFilterChipLabel">All</span>
+              <button onclick="clearSectionFilter()" class="hover:underline ml-1" aria-label="Clear section filter">×</button>
+            </span>
+
+            <!-- Section dropdown -->
+            <div class="relative" style="min-width: 180px;">
+              <button onclick="toggleSectionDropdown(event)" id="sectionDropdownBtn" class="w-full inline-flex items-center justify-between text-[13px] bg-white" style="border:1px solid #E5E7EB; border-radius:8px; padding:7px 12px; color:#374151;">
+                <span>Section: <span id="sectionDropdownLabel">All</span></span>
+                <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400 ml-2"></i>
+              </button>
+              <div id="sectionDropdown" class="hidden absolute right-0 mt-1 bg-white border border-line rounded-lg z-30" style="min-width: 220px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 4px;">
+                <button onclick="setSectionFilter('')" class="w-full text-left text-[13px] hover:bg-surface rounded-md flex items-center justify-between" style="padding: 8px 12px;"><span>All Sections</span><i data-lucide="check" class="w-3.5 h-3.5 text-primary section-check" data-sf=""></i></button>
+                <button onclick="setSectionFilter('PQ / TQ &amp; Eligibility')" class="w-full text-left text-[13px] hover:bg-surface rounded-md flex items-center justify-between" style="padding: 8px 12px;"><span>PQ / TQ &amp; Eligibility</span><i data-lucide="check" class="w-3.5 h-3.5 text-primary hidden section-check" data-sf="PQ / TQ &amp; Eligibility"></i></button>
+                <button onclick="setSectionFilter('BOQ &amp; Quantities')" class="w-full text-left text-[13px] hover:bg-surface rounded-md flex items-center justify-between" style="padding: 8px 12px;"><span>BOQ &amp; Quantities</span><i data-lucide="check" class="w-3.5 h-3.5 text-primary hidden section-check" data-sf="BOQ &amp; Quantities"></i></button>
+                <button onclick="setSectionFilter('Dates &amp; Timeline')" class="w-full text-left text-[13px] hover:bg-surface rounded-md flex items-center justify-between" style="padding: 8px 12px;"><span>Dates &amp; Timeline</span><i data-lucide="check" class="w-3.5 h-3.5 text-primary hidden section-check" data-sf="Dates &amp; Timeline"></i></button>
+                <button onclick="setSectionFilter('Scope of Work')" class="w-full text-left text-[13px] hover:bg-surface rounded-md flex items-center justify-between" style="padding: 8px 12px;"><span>Scope of Work</span><i data-lucide="check" class="w-3.5 h-3.5 text-primary hidden section-check" data-sf="Scope of Work"></i></button>
+                <button onclick="setSectionFilter('Financial &amp; EMD')" class="w-full text-left text-[13px] hover:bg-surface rounded-md flex items-center justify-between" style="padding: 8px 12px;"><span>Financial &amp; EMD</span><i data-lucide="check" class="w-3.5 h-3.5 text-primary hidden section-check" data-sf="Financial &amp; EMD"></i></button>
+                <button onclick="setSectionFilter('Technical Specifications')" class="w-full text-left text-[13px] hover:bg-surface rounded-md flex items-center justify-between" style="padding: 8px 12px;"><span>Technical Specifications</span><i data-lucide="check" class="w-3.5 h-3.5 text-primary hidden section-check" data-sf="Technical Specifications"></i></button>
+                <button onclick="setSectionFilter('General / Other')" class="w-full text-left text-[13px] hover:bg-surface rounded-md flex items-center justify-between" style="padding: 8px 12px;"><span>General / Other</span><i data-lucide="check" class="w-3.5 h-3.5 text-primary hidden section-check" data-sf="General / Other"></i></button>
+              </div>
+            </div>
+
+            <!-- Search -->
+            <div class="relative" style="flex: 1; min-width: 200px; max-width: 280px;">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <input id="qsSearch" oninput="renderTab1()" placeholder="Search queries…" class="w-full text-[13px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" style="border:1px solid #E5E7EB; border-radius:8px; padding:8px 12px 8px 34px;" />
+            </div>
+            <label class="inline-flex items-center gap-1.5 text-[12px] text-ink-500">
+              <input id="hideNonMatching" type="checkbox" onchange="renderTab1()" class="accent-primary"> Hide non-matching
+            </label>
+          </div>
+
+          <!-- SECTION 3 — AI GROUPS -->
+          <div id="aiGroupsSection" class="rounded-xl" style="background:#F8FBFF; border:1px solid #DBEAFE; padding:16px; margin-bottom:16px;">
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <div class="inline-flex items-center gap-1.5 text-[13px] font-bold" style="color:#1D4ED8;">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> AI Grouped Queries
+                <span class="text-[12px] font-normal ml-1" style="color:#6B7280;">· <span id="aiGroupCount">9</span> queries in <span id="aiGroupNumGroups">3</span> groups</span>
+              </div>
+              <button onclick="regroupWithAI()" class="text-[12px] hover:underline inline-flex items-center gap-1" style="color:#0F5EE8;"><i data-lucide="sparkles" class="w-3 h-3"></i> Regroup with AI</button>
+            </div>
+
+            <!-- ===== AI QUERY INTELLIGENCE SUMMARY ===== -->
+            <div id="aiSummaryPanel" class="rounded-[10px] bg-white" style="border:1px solid #DBEAFE; padding:16px; margin-bottom:14px;">
+              <div class="flex items-center justify-between">
+                <div class="inline-flex items-center gap-1.5 text-[12px] font-bold" style="color:#1D4ED8;"><i data-lucide="sparkles" class="w-3 h-3"></i> Query Intelligence Summary</div>
+                <div class="flex items-center gap-3">
+                  <button onclick="refreshAISummary()" class="text-[11px] hover:underline" style="color:#0F5EE8;"><i data-lucide="refresh-ccw" class="w-3 h-3 inline-block -mt-0.5"></i> Refresh</button>
+                  <button id="aiSummaryToggle" onclick="toggleAISummary()" class="text-[11px] hover:underline" style="color:#9CA3AF;">Hide <i data-lucide="chevron-up" class="w-3 h-3 inline-block -mt-0.5"></i></button>
+                </div>
+              </div>
+              <div id="aiSummaryBody" class="overflow-hidden" style="max-height: 600px; transition: max-height 200ms ease;">
+                <div style="margin-top:12px;">
+                  <!-- Row 1 — Stat chips -->
+                  <div class="flex flex-wrap gap-2" style="margin-bottom: 12px;">
+                    <div class="inline-flex items-center gap-1.5" style="background:#F8FBFF; border:1px solid #DBEAFE; border-radius:6px; padding:5px 10px;"><span class="w-2 h-2 rounded-full" style="background:#0F5EE8;"></span><span class="text-[12px] text-ink-500">Total queries</span><span class="text-[12px] font-bold text-ink-900" id="sumTotal">24</span></div>
+                    <div class="inline-flex items-center gap-1.5" style="background:#F8FBFF; border:1px solid #DBEAFE; border-radius:6px; padding:5px 10px;"><span class="w-2 h-2 rounded-full" style="background:#F59E0B;"></span><span class="text-[12px] text-ink-500">Unanswered</span><span class="text-[12px] font-bold text-ink-900" id="sumUnanswered">16</span></div>
+                    <div class="inline-flex items-center gap-1.5" style="background:#F8FBFF; border:1px solid #DBEAFE; border-radius:6px; padding:5px 10px;"><span class="w-2 h-2 rounded-full" style="background:#10B981;"></span><span class="text-[12px] text-ink-500">Answered</span><span class="text-[12px] font-bold text-ink-900" id="sumAnswered">7</span></div>
+                    <div class="inline-flex items-center gap-1.5" style="background:#F8FBFF; border:1px solid #DBEAFE; border-radius:6px; padding:5px 10px;"><span class="w-2 h-2 rounded-full" style="background:#8B5CF6;"></span><span class="text-[12px] text-ink-500">Grouped by AI</span><span class="text-[12px] font-bold text-ink-900" id="sumGrouped">9</span></div>
+                    <div class="inline-flex items-center gap-1.5" style="background:#F8FBFF; border:1px solid #DBEAFE; border-radius:6px; padding:5px 10px;"><span class="w-2 h-2 rounded-full" style="background:#EF4444;"></span><span class="text-[12px] text-ink-500">Requests</span><span class="text-[12px] font-bold text-ink-900" id="sumRequests">9</span></div>
+                    <div class="inline-flex items-center gap-1.5" style="background:#F8FBFF; border:1px solid #DBEAFE; border-radius:6px; padding:5px 10px;"><span class="w-2 h-2 rounded-full" style="background:#3B82F6;"></span><span class="text-[12px] text-ink-500">Information queries</span><span class="text-[12px] font-bold text-ink-900" id="sumInformation">15</span></div>
+                  </div>
+
+                  <!-- Row 2 — Section breakdown -->
+                  <div style="margin-bottom: 12px;">
+                    <div class="text-[11px] uppercase tracking-wider font-medium" style="color:#9CA3AF; margin-bottom: 8px;">Queries by section:</div>
+                    <div id="sectionBar" class="flex relative overflow-hidden" style="height:8px; border-radius:4px;"></div>
+                    <div id="sectionLegend" class="flex flex-wrap gap-x-3 gap-y-1 text-[11px]" style="margin-top: 6px; color:#6B7280;"></div>
+                    <div id="sectionTooltip" class="hidden absolute bg-white text-[11px]" style="border-radius:6px; padding:5px 10px; box-shadow:0 2px 8px rgba(0,0,0,0.1); z-index:30; pointer-events:none;"></div>
+                  </div>
+
+                  <!-- Row 3 — AI natural language summary -->
+                  <div style="border-top:1px solid #EFF6FF; padding-top:12px;">
+                    <div style="background:#F8FBFF; border-radius:6px; padding:10px 12px;">
+                      <p id="aiSummaryParagraph" class="text-[12px] leading-relaxed" style="color:#374151;"><span style="color:#0F5EE8;">✦</span> Most queries (29%) relate to Technical Specifications, particularly around bitumen grade and material standards — suggesting vendors may find the spec ambiguous. 5 queries challenge PQ/TQ eligibility thresholds, which is higher than average for tenders of this value. 9 queries are classified as Requests (asking for changes or extensions) vs 15 Information queries (seeking clarification). 3 queries are potentially duplicates already grouped by AI. Recommend prioritising the Technical Specification group response as it will resolve the largest cluster.</p>
+                    </div>
+                    <div class="flex items-center justify-end gap-3" style="margin-top: 6px;">
+                      <span class="text-[10px]" style="color:#9CA3AF;">Generated just now</span>
+                      <button onclick="refreshAISummary()" class="text-[10px] hover:underline" style="color:#0F5EE8;">Regenerate summary</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="groupsList"></div>
+          </div>
+
+          <!-- SECTION 4 — INDIVIDUAL QUERIES -->
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <div class="text-[13px] uppercase tracking-wider font-bold" style="color:#6B7280;">Individual Queries</div>
+              <span class="text-[11px] font-medium" style="background:#F3F4F6; color:#6B7280; border-radius:14px; padding:2px 8px;"><span id="individualCount">15</span> queries</span>
+            </div>
+            <div id="queryList" role="region" aria-live="polite"></div>
+          </div>
+
+          <!-- SECTION 5 — STICKY GENERIC RESPONSE CTA -->
+          <div class="sticky bg-white flex items-center justify-between gap-2" style="bottom: 0; border-top: 1px solid #E5E7EB; padding: 12px 16px; margin: 16px -8px 0; z-index: 20; border-radius: 0 0 10px 10px;">
+            <div class="text-[13px] font-bold" style="color:#F59E0B;"><span id="genUnansweredCount">16</span> queries still unanswered</div>
+            <button onclick="openGenericModal()" class="text-[13px] hover:underline inline-flex items-center gap-1" style="color:#0F5EE8;">Apply generic response to all unanswered <i data-lucide="arrow-right" class="w-3 h-3"></i></button>
+          </div>
+        </section>
+
+        <!-- ===== TAB 2 — PRE-BID MEETING NOTES ===== -->
+        <!-- ===== TAB 2 — MEETING & NOTES (merged) ===== -->
+        <section id="tab-mn" role="tabpanel" class="hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-[42%_1fr] gap-5">
+
+            <!-- LEFT PANEL -->
+            <div class="bg-white border border-line rounded-xl flex flex-col" style="max-height: calc(100vh - 320px);">
+              <!-- Header -->
+              <div class="p-4 border-b border-line space-y-3">
+                <div>
+                  <h3 class="text-[14px] font-bold text-ink-900">Queries received so far (<span id="mnQueryCount">24</span>)</h3>
+                  <div id="mnDateLine" class="mt-1 inline-flex items-center gap-1.5 text-[12px]" style="color:#6B7280;">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                    <span id="mnDateLineText">Pre-Bid Meeting: May 10, 2026</span>
+                  </div>
+                </div>
+
+                <!-- Group by dropdown -->
+                <div class="relative">
+                  <button id="mnGroupByBtn" onclick="toggleGroupByMenu(event)" aria-expanded="false" class="w-full inline-flex items-center justify-between text-[13px] bg-white" style="border:1px solid #E5E7EB; border-radius:8px; padding:8px 12px; color:#374151;">
+                    <span>Group by: <span id="mnGroupByLabel">Similarity</span></span>
+                    <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400 ml-2"></i>
+                  </button>
+                  <div id="mnGroupByMenu" class="hidden absolute left-0 right-0 mt-1 bg-white z-30" style="border:1px solid #E5E7EB; border-radius:8px; padding:6px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                    <div class="px-3 py-1.5 text-[11px] uppercase tracking-wider font-medium" style="color:#9CA3AF;">Group by</div>
+                    <button onclick="setGroupBy('similarity')" class="w-full text-left rounded-md hover:bg-surface flex items-start gap-2" style="padding:10px 12px;">
+                      <span class="mt-0.5"><i data-lucide="dot" class="w-4 h-4" id="mnGbSim-radio" style="color:#0F5EE8;"></i></span>
+                      <div class="flex-1">
+                        <div class="text-[13px] font-medium text-ink-900">Similarity (AI grouped)</div>
+                        <div class="text-[11px]" style="color:#6B7280;">Topics · themes · duplicates</div>
+                      </div>
+                      <i data-lucide="check" class="w-3.5 h-3.5 text-primary" id="mnGbSim-check"></i>
+                    </button>
+                    <button onclick="setGroupBy('vendor')" class="w-full text-left rounded-md hover:bg-surface flex items-start gap-2" style="padding:10px 12px;">
+                      <span class="mt-0.5"><i data-lucide="circle" class="w-4 h-4" id="mnGbVen-radio" style="color:#D1D5DB;"></i></span>
+                      <div class="flex-1">
+                        <div class="text-[13px] font-medium text-ink-900">Vendor / Company</div>
+                        <div class="text-[11px]" style="color:#6B7280;">See all queries from one vendor</div>
+                      </div>
+                      <i data-lucide="check" class="w-3.5 h-3.5 text-primary hidden" id="mnGbVen-check"></i>
+                    </button>
+                    <div class="border-t border-line my-1"></div>
+                    <button onclick="setGroupBy('individual')" class="w-full text-left rounded-md hover:bg-surface flex items-start gap-2" style="padding:10px 12px;">
+                      <span class="mt-0.5"><i data-lucide="circle" class="w-4 h-4" id="mnGbInd-radio" style="color:#D1D5DB;"></i></span>
+                      <div class="flex-1">
+                        <div class="text-[13px] font-medium text-ink-900">Individual queries (no grouping)</div>
+                      </div>
+                      <i data-lucide="check" class="w-3.5 h-3.5 text-primary hidden" id="mnGbInd-check"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Vendor dropdown (only shown in Vendor mode) -->
+                <div id="mnVendorWrap" class="hidden overflow-hidden" style="transition: max-height 150ms ease; max-height: 0;">
+                  <div class="relative">
+                    <select id="mnVendorSelect" onchange="setVendorFilter(this.value)" class="w-full text-[13px] bg-white" style="border:1px solid #E5E7EB; border-radius:8px; padding:8px 12px; color:#374151;">
+                      <option value="">All vendors (24 queries)</option>
+                      <option value="Rajesh Constructions">Vendor A — Rajesh Constructions (6 queries)</option>
+                      <option value="Maharashtra Roads Co.">Vendor B — Maharashtra Roads Co. (5 queries)</option>
+                      <option value="BuildTech Solutions">Vendor C — BuildTech Solutions (4 queries)</option>
+                      <option value="NCC Infrastructure">Vendor D — NCC Infrastructure (5 queries)</option>
+                      <option value="Patil & Associates">Vendor E — Patil &amp; Associates (4 queries)</option>
+                    </select>
+                  </div>
+                  <div id="mnVendorChip" class="hidden mt-2 inline-flex items-center gap-1 text-[12px] font-medium" style="background:#EFF6FF; color:#0F5EE8; border-radius:20px; padding:4px 10px;">
+                    <span id="mnVendorChipLabel"></span>
+                    <button onclick="clearVendorFilter()" class="hover:underline ml-1" aria-label="Clear vendor filter">×</button>
+                  </div>
+                </div>
+
+                <!-- Search -->
+                <div class="relative">
+                  <i data-lucide="search" class="w-3.5 h-3.5 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                  <input id="mnSearch" oninput="renderMnLeft()" placeholder="Search queries…" class="w-full text-[13px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" style="border:1px solid #E5E7EB; border-radius:8px; padding:8px 12px 8px 34px;" />
+                </div>
+              </div>
+
+              <!-- Query list -->
+              <div id="mnQueryList" role="region" aria-live="polite" class="flex-1 overflow-y-auto"></div>
+
+              <!-- Manual entry sticky -->
+              <div class="border-t border-line bg-white" style="padding: 10px 12px;">
+                <button onclick="toggleManualEntryMN()" class="text-[13px] text-primary hover:underline inline-flex items-center gap-1.5"><i data-lucide="pencil" class="w-3.5 h-3.5"></i> Add question manually</button>
+                <div id="mnManualForm" class="hidden mt-3 rounded-lg space-y-3" style="background:#F9FAFB; border:1px solid #E5E7EB; padding:14px;">
+                  <div>
+                    <label class="block text-[12px] font-bold text-ink-900 mb-1.5">Question asked during meeting</label>
+                    <textarea id="mnManualQ" rows="3" placeholder="Type the question that was asked…" class="w-full text-[13px]" style="border:1px solid #D1D5DB; border-radius:6px; padding:8px 10px; min-height:60px;"></textarea>
+                  </div>
+                  <div>
+                    <label class="block text-[12px] font-bold text-ink-900 mb-1.5">Asked by (Vendor)</label>
+                    <select id="mnManualVendor" class="w-full text-[13px]" style="border:1px solid #D1D5DB; border-radius:6px; padding:7px 10px;">
+                      <option value="">Select vendor…</option>
+                      <option>Rajesh Constructions</option>
+                      <option>Maharashtra Roads Co.</option>
+                      <option>BuildTech Solutions</option>
+                      <option>NCC Infrastructure</option>
+                      <option>Patil &amp; Associates</option>
+                      <option value="__new">+ Add new vendor</option>
+                    </select>
+                  </div>
+                  <div class="flex items-center justify-end gap-2">
+                    <button onclick="toggleManualEntryMN()" class="text-[12px] text-ink-500 hover:text-ink-900">Cancel</button>
+                    <button onclick="saveManualEntryMN()" class="px-3 py-1.5 rounded-md bg-primary text-white text-[12px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5">Add Question <i data-lucide="arrow-right" class="w-3 h-3"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT PANEL -->
+            <div id="mnRightPanel" class="bg-white border border-line rounded-xl flex flex-col" style="max-height: calc(100vh - 320px);">
+              <!-- MODE 1 — Notes Document -->
+              <div id="mnNotesMode" class="flex-1 flex flex-col overflow-hidden">
+                <div class="p-4 border-b border-line flex items-center justify-between gap-2 flex-wrap">
+                  <div>
+                    <h3 class="text-[15px] font-bold text-ink-900">Pre-Bid Meeting Reference Notes</h3>
+                    <div class="text-[12px] text-ink-500">TND-2026-001 · For meeting: May 10, 2026</div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button onclick="autoPopulateNotes()" class="px-3 py-1.5 rounded-lg bg-primary text-white text-[12px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Auto-populate from AI groups</button>
+                    <button class="px-2.5 py-1.5 rounded-md border border-line text-[12px] text-ink-900 hover:bg-surface inline-flex items-center gap-1"><i data-lucide="file-down" class="w-3.5 h-3.5"></i> Export as PDF</button>
+                  </div>
+                </div>
+                <!-- Toolbar -->
+                <div class="flex items-center gap-1 px-3 py-2 border-b border-line bg-surface">
+                  <button onmousedown="event.preventDefault(); document.execCommand('bold')" aria-label="Bold" class="w-7 h-7 rounded hover:bg-white text-ink-500 flex items-center justify-center"><i data-lucide="bold" class="w-3.5 h-3.5"></i></button>
+                  <button onmousedown="event.preventDefault(); document.execCommand('italic')" aria-label="Italic" class="w-7 h-7 rounded hover:bg-white text-ink-500 flex items-center justify-center"><i data-lucide="italic" class="w-3.5 h-3.5"></i></button>
+                  <button onmousedown="event.preventDefault(); document.execCommand('insertUnorderedList')" aria-label="Bullet list" class="w-7 h-7 rounded hover:bg-white text-ink-500 flex items-center justify-center"><i data-lucide="list" class="w-3.5 h-3.5"></i></button>
+                  <button onmousedown="event.preventDefault(); document.execCommand('insertOrderedList')" aria-label="Numbered" class="w-7 h-7 rounded hover:bg-white text-ink-500 flex items-center justify-center"><i data-lucide="list-ordered" class="w-3.5 h-3.5"></i></button>
+                  <span class="w-px h-4 bg-line mx-1"></span>
+                  <button onclick="addBlankNoteBlock()" class="text-[12px] text-primary hover:underline inline-flex items-center gap-1 px-2"><i data-lucide="plus" class="w-3 h-3"></i> Add blank Q&amp;A</button>
+                </div>
+                <!-- Document body -->
+                <div class="flex-1 overflow-y-auto p-6">
+                  <div class="text-center mb-5 pb-4 border-b border-line">
+                    <div class="text-[11px] font-bold uppercase tracking-wider text-ink-500">PRE-BID MEETING REFERENCE NOTES</div>
+                    <div class="text-[15px] font-bold text-ink-900 mt-1">Supply of Desktop Computers for AMC Offices</div>
+                    <div class="text-[12px] text-ink-500 mt-0.5">TND-2026-001 | Ahmedabad Municipal Corporation</div>
+                    <div class="text-[12px] text-ink-500">Meeting Date: May 10, 2026</div>
+                    <div class="text-[12px] text-ink-500">Prepared by: Rajesh Kumar</div>
+                  </div>
+                  <div id="notesDoc" class="notes-doc" contenteditable="true" data-placeholder="Click &quot;Add to notes +&quot; on any query at the left, or click &quot;Auto-populate&quot; to start."></div>
+                  <button onclick="addBlankNoteBlock()" class="mt-4 text-[12.5px] text-primary hover:underline inline-flex items-center gap-1"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add section</button>
+
+                  <!-- MoM upload (Mode 1 only) -->
+                  <div class="mt-8 pt-4 border-t border-line">
+                    <div class="text-[13px] font-bold text-ink-900">Minutes of Meeting (MoM)</div>
+                    <div class="text-[12px] text-ink-500 mt-0.5">Upload the MoM document issued by the external meeting organiser.</div>
+                    <div id="momUploadZone" onclick="simulateMomUpload()" class="mt-3 cursor-pointer rounded-lg flex items-center gap-3 hover:border-primary hover:bg-primary-light/30 transition" style="border:1px dashed #D1D5DB; padding:16px;">
+                      <div class="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center"><i data-lucide="upload-cloud" class="w-4 h-4"></i></div>
+                      <div class="flex-1"><div class="text-[13px] font-medium text-ink-900">Upload PDF or DOCX</div><div class="text-[11.5px] text-ink-500">Drag and drop or <span class="text-primary">browse</span></div></div>
+                    </div>
+                    <div id="momUploaded" class="hidden mt-3 rounded-lg flex items-center gap-3" style="background:#F9FAFB; border:1px solid #E5E7EB; padding:8px 12px;">
+                      <i data-lucide="file-text" class="w-3 h-3 text-primary"></i>
+                      <div class="flex-1 truncate text-[12px] text-ink-900" style="color:#374151;">MoM_TND-2026-001_May10.pdf</div>
+                      <a href="#" class="text-[12px] text-primary hover:underline">View MoM</a>
+                      <span class="text-[11px]" style="color:#9CA3AF;">Uploaded May 10</span>
+                      <button onclick="replaceMom()" class="text-[12px] text-primary hover:underline">Replace</button>
+                    </div>
+                  </div>
+                </div>
+                <!-- Bottom CTAs -->
+                <div class="border-t border-line bg-surface px-4 py-3 flex items-center justify-end gap-2">
+                  <button class="px-3 py-2 rounded-lg border border-primary text-primary text-[12.5px] font-medium hover:bg-primary-light inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Download reference notes</button>
+                  <button class="px-3 py-2 rounded-lg border border-line text-ink-900 text-[12.5px] hover:bg-white inline-flex items-center gap-1.5"><i data-lucide="share-2" class="w-3.5 h-3.5"></i> Share with consultant</button>
+                </div>
+              </div>
+
+              <!-- MODE 2 — Query Response Workspace -->
+              <div id="mnQueryMode" class="hidden flex-1 flex flex-col overflow-hidden" aria-live="polite">
+                <!-- Back to notes -->
+                <div class="px-4 pt-3">
+                  <button id="mnBackToNotes" onclick="mnGoBackToNotes()" class="text-[12px] text-ink-500 hover:text-ink-900 inline-flex items-center gap-1"><i data-lucide="arrow-left" class="w-3 h-3"></i> Back to notes</button>
+                </div>
+                <div id="mnQueryBody" class="flex-1 overflow-y-auto"></div>
+                <!-- Sticky CTAs -->
+                <div class="border-t border-line bg-surface px-4 py-3 flex items-center justify-between gap-2">
+                  <button onclick="mnSaveToNotes()" class="px-3 py-2 rounded-lg border border-line text-[12.5px] text-ink-900 hover:bg-white inline-flex items-center gap-1.5"><i data-lucide="notebook-pen" class="w-3.5 h-3.5"></i> Save to Notes</button>
+                  <div class="flex items-center gap-2">
+                    <button onclick="mnSaveDraft()" class="px-3 py-2 rounded-lg border border-line text-[12.5px] text-ink-900 hover:bg-white">Save as Draft</button>
+                    <button onclick="mnSendForApproval()" class="px-3 py-2 rounded-lg bg-primary text-white text-[12.5px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5">Send for Approval <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== TAB 4 — DOCUMENTATION ===== -->
+        <section id="tab-docs" role="tabpanel" class="hidden space-y-6">
+          <!-- Section 1: Register -->
+          <section>
+            <div class="flex items-start justify-between gap-3 flex-wrap mb-3">
+              <div>
+                <h3 class="text-[15px] font-bold text-ink-900">Complete Query Response Register</h3>
+                <p class="text-[12px] text-ink-500 mt-0.5">Official record of all queries received and responses given. This is published publicly.</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button class="px-3 py-2 rounded-lg border border-line text-[12.5px] text-ink-900 hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Download Register (PDF)</button>
+                <button onclick="publishAllApproved()" class="px-3 py-2 rounded-lg bg-primary text-white text-[12.5px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5 shadow-soft">Publish All Approved <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-2 mb-3">
+              <button class="doc-filter pill-filter active px-3 py-1 rounded-full text-[12px] border border-line bg-white text-ink-500" data-df="all">All</button>
+              <button class="doc-filter pill-filter px-3 py-1 rounded-full text-[12px] border border-line bg-white text-ink-500 hover:text-ink-900" data-df="draft">Draft</button>
+              <button class="doc-filter pill-filter px-3 py-1 rounded-full text-[12px] border border-line bg-white text-ink-500 hover:text-ink-900" data-df="approved">Approved</button>
+              <button class="doc-filter pill-filter px-3 py-1 rounded-full text-[12px] border border-line bg-white text-ink-500 hover:text-ink-900" data-df="published">Published</button>
+            </div>
+            <div class="bg-white border border-line rounded-xl overflow-hidden">
+              <div class="flex items-center gap-2 px-4 py-2 bg-surface border-b border-line">
+                <label class="inline-flex items-center gap-2 text-[12px] text-ink-900"><input id="docSelectAll" type="checkbox" onchange="docToggleAll(this.checked)" class="accent-primary"> Select all</label>
+                <button class="ml-auto px-2.5 py-1 rounded-md bg-primary text-white text-[11.5px] font-medium hover:bg-primary/90">Publish selected</button>
+                <button class="px-2.5 py-1 rounded-md border border-line text-[11.5px] text-ink-900 hover:bg-white inline-flex items-center gap-1"><i data-lucide="download" class="w-3 h-3"></i> Export selected</button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-[12.5px]">
+                  <thead class="bg-surface text-[10.5px] uppercase tracking-wider text-ink-500 font-semibold">
+                    <tr>
+                      <th class="text-left px-3 py-2.5 w-8"></th>
+                      <th class="text-left px-3 py-2.5 w-16">Q.No</th>
+                      <th class="text-left px-3 py-2.5">Query</th>
+                      <th class="text-left px-3 py-2.5 w-20">Source</th>
+                      <th class="text-left px-3 py-2.5 w-32">Category</th>
+                      <th class="text-left px-3 py-2.5">Response</th>
+                      <th class="text-left px-3 py-2.5 w-24">Status</th>
+                      <th class="text-left px-3 py-2.5 w-24">Published</th>
+                    </tr>
+                  </thead>
+                  <tbody id="docTableBody" class="divide-y divide-line"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 2: Corrigendum -->
+          <section>
+            <h3 class="text-[15px] font-bold text-ink-900 mb-3">Corrigendum</h3>
+            <div id="corrigendumWrap"></div>
+          </section>
+
+          <!-- Section 3: Process Summary -->
+          <section>
+            <h3 class="text-[15px] font-bold text-ink-900 mb-3">Pre-Bid Process Summary</h3>
+            <div class="bg-white border border-line rounded-xl p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-3 gap-x-6 text-[13px]">
+              <div class="flex items-center justify-between"><span class="text-ink-500">Total queries received</span><span class="text-ink-900 font-semibold">24</span></div>
+              <div class="flex items-center justify-between"><span class="text-ink-500">Queries responded</span><span class="text-ink-900 font-semibold">22</span></div>
+              <div class="flex items-center justify-between"><span class="text-ink-500">Generic responses applied</span><span class="text-ink-900 font-semibold">3</span></div>
+              <div class="flex items-center justify-between"><span class="text-ink-500">Queries discussed in meeting</span><span class="text-ink-900 font-semibold">8</span></div>
+              <div class="flex items-center justify-between"><span class="text-ink-500">Corrigendum issued</span><span id="summaryCorrigendum" class="text-ink-900 font-semibold">No</span></div>
+              <div class="flex items-center justify-between"><span class="text-ink-500">MoM uploaded</span><span id="summaryMom" class="text-ink-900 font-semibold">No</span></div>
+              <div class="sm:col-span-2 lg:col-span-3 flex items-center justify-between pt-3 border-t border-line"><span class="text-ink-500">Process completed on</span><span class="text-ink-900 font-semibold">May 15, 2026</span></div>
+            </div>
+            <button class="mt-3 px-3.5 py-2 rounded-lg border border-primary text-primary text-[13px] font-medium hover:bg-primary-light inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Download Full Process Report</button>
+          </section>
+        </section>
+
+        <div class="h-6"></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- ============ GENERIC RESPONSE MODAL ============ -->
+<div id="genericModal" role="dialog" aria-modal="true" aria-label="Apply generic response" class="hidden fixed inset-0 z-50 bg-ink-900/40 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-lift w-full max-w-[600px]" style="padding: 32px;">
+    <div class="flex items-start justify-between gap-3 mb-1">
+      <h3 class="text-[20px] font-bold text-ink-900">Apply Generic Response</h3>
+      <button onclick="closeGenericModal()" aria-label="Close" class="text-ink-400 hover:text-ink-900"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+    <p class="text-[14px] text-ink-500">Choose a standard response to apply to all <span id="genUnTotal">11</span> unanswered queries at once. You can review each one individually afterwards.</p>
+
+    <div class="mt-5">
+      <div class="flex items-center justify-between mb-2">
+        <div class="text-[13px] font-bold text-ink-900">Unanswered queries</div>
+        <button onclick="toggleAllUnAnswered()" class="text-[12px] text-primary hover:underline">Deselect all</button>
+      </div>
+      <ul id="genQueryList" class="border border-line rounded-lg divide-y divide-line overflow-y-auto" style="max-height: 200px;"></ul>
+    </div>
+
+    <div class="mt-5">
+      <div class="text-[13px] font-bold text-ink-900 mb-2">Response to apply:</div>
+      <div id="genResponseOptions" class="space-y-2">
+        <label class="radio-card" data-gr="refer"><input type="radio" name="genRR" value="refer" checked><div><div class="text-[13.5px] font-medium text-ink-900">Refer to Tender Document</div><div class="text-[12px] text-ink-500 mt-0.5">The answer to this query is stated in the tender document. Please read carefully before raising further queries.</div></div></label>
+        <label class="radio-card" data-gr="review"><input type="radio" name="genRR" value="review"><div><div class="text-[13.5px] font-medium text-ink-900">Under Review</div><div class="text-[12px] text-ink-500 mt-0.5">This matter is under technical review. Updates will be published via corrigendum if applicable.</div></div></label>
+        <label class="radio-card" data-gr="nochange"><input type="radio" name="genRR" value="nochange"><div><div class="text-[13.5px] font-medium text-ink-900">No Change Required</div><div class="text-[12px] text-ink-500 mt-0.5">After due consideration, no changes to the tender document are required.</div></div></label>
+        <label class="radio-card" data-gr="cannot"><input type="radio" name="genRR" value="cannot"><div><div class="text-[13.5px] font-medium text-ink-900">Cannot Disclose</div><div class="text-[12px] text-ink-500 mt-0.5">The requested information is not available for public disclosure at this stage.</div></div></label>
+      </div>
+      <div class="mt-3 text-[12px] text-ink-500">Or write a custom generic response:</div>
+      <textarea id="genCustomText" rows="3" placeholder="Custom generic response…" class="field mt-2" style="font-size:13px;"></textarea>
+    </div>
+
+    <div class="mt-6 flex items-center justify-end gap-2">
+      <button onclick="closeGenericModal()" class="px-3.5 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">Cancel</button>
+      <button onclick="applyGenericResponse()" class="px-3.5 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5">Apply to <span id="genApplyCount">11</span> selected queries <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-ink-900 text-white text-[13px] px-4 py-3 rounded-xl shadow-lift inline-flex items-center gap-2.5">
+  <i data-lucide="check-circle-2" class="w-4 h-4 text-success"></i>
+  <span id="toastMsg">Done</span>
+</div>
+
+<script>
+  function refreshIcons(){ if (window.lucide) lucide.createIcons(); }
+  let toastTimer;
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(()=> t.classList.remove('show'), 3000);
+  }
+  refreshIcons();
+
+  // ===================== DATA =====================
+  const TODAY = new Date('2026-05-12'); // matches system date
+
+  const ACTIVE_TENDERS = [
+    { id:'TND-2026-001', name:'Supply of Desktop Computers for AMC Offices',    dept:'IT',             cat:'Goods',    cost:'₹45,00,000', queries:24, unanswered:11, dueDate:'May 15', daysText:'5 days left',  daysCls:'text-success',  status:'open',    meetingDate:'May 10' },
+    { id:'TND-2026-002', name:'Road Maintenance and Repair Services Phase 2',   dept:'Infrastructure', cat:'Works',    cost:'₹45,00,000', queries:18, unanswered:7,  dueDate:'May 15', daysText:'5 days left',  daysCls:'text-success',  status:'open',    meetingDate:'May 10' },
+    { id:'TND-2026-007', name:'Water Supply Pipeline Installation — Kalyan East', dept:'Water',        cat:'Works',    cost:'₹1,20,00,000', queries:12, unanswered:0,  dueDate:'May 14', daysText:'Completed',    daysCls:'text-success',  status:'done',    meetingDate:'May 8'  },
+    { id:'TND-2026-003', name:'LED Street Light Retrofit Zone 2',                dept:'Energy',         cat:'Goods',    cost:'₹28,50,000', queries:31, unanswered:14, dueDate:'May 10', daysText:'2 days overdue', daysCls:'text-danger',  status:'overdue', meetingDate:'May 5'  },
+  ];
+  const PAST_TENDERS = [
+    { id:'TND-2025-089', name:'Office Furniture Procurement',                    dept:'Admin',          cat:'Goods',    queries:8,  closedOn:'Apr 2, 2026' },
+    { id:'TND-2025-067', name:'Security Guard Services AMC',                     dept:'Admin',          cat:'Services', queries:15, closedOn:'Mar 15, 2026' },
+    { id:'TND-2025-054', name:'Vehicle Servicing AMC',                           dept:'Transport',      cat:'Services', queries:6,  closedOn:'Feb 22, 2026' },
+    { id:'TND-2025-041', name:'Stationery Annual Contract',                      dept:'Admin',          cat:'Goods',    queries:4,  closedOn:'Feb 5, 2026' },
+    { id:'TND-2025-032', name:'Garden Maintenance Services',                     dept:'Parks',          cat:'Services', queries:11, closedOn:'Jan 18, 2026' },
+    { id:'TND-2025-024', name:'IT Helpdesk AMC',                                 dept:'IT',             cat:'Services', queries:13, closedOn:'Jan 5, 2026' },
+    { id:'TND-2024-098', name:'Water Tankers Procurement',                       dept:'Water',          cat:'Goods',    queries:9,  closedOn:'Dec 15, 2025' },
+    { id:'TND-2024-087', name:'Solar Panel Installation',                        dept:'Energy',         cat:'Goods',    queries:18, closedOn:'Dec 1, 2025' },
+  ];
+
+  // 24 sample queries for TND-2026-001
+  const QUERIES = [
+    { num:'Q-001', section:'Scope of Work',            vendor:'Rajesh Constructions',  source:'Portal', type:'Clarification',       form:'Information', received:'Apr 30, 2:14 PM', text:'Please clarify whether the scope of work includes road markings or only surface repair.', status:'unanswered', response:'', assigned:null, group:null, published:'', imported:false, manual:false },
+    { num:'Q-002', section:'Technical Specifications', vendor:'Maharashtra Roads Co.', source:'Email',  type:'Spec Change Request', form:'Request',     received:'May 1, 9:42 AM',  text:'The specification for bitumen grade should be VG-30 instead of VG-10 for this climate zone.', status:'unanswered', response:'', assigned:null, group:'A', published:'', imported:false, manual:false },
+    { num:'Q-003', section:'Dates & Timeline',         vendor:'BuildTech Solutions',   source:'Portal', type:'Deadline Extension',  form:'Request',     received:'May 1, 11:18 AM', text:'The site visit window of 3 days is insufficient. Please extend to 7 days.', status:'assigned', response:'', assigned:'Priya Shah', group:'B', published:'', imported:false, manual:false },
+    { num:'Q-004', section:'PQ / TQ & Eligibility',    vendor:'NCC Infrastructure',    source:'Phone',  type:'Clarification',       form:'Information', received:'May 1, 3:55 PM',  text:'Can a JV (Joint Venture) between two firms meet the turnover eligibility criteria collectively?', status:'unanswered', response:'', assigned:null, group:'C', published:'', imported:false, manual:false },
+    { num:'Q-005', section:'PQ / TQ & Eligibility',    vendor:'Patil & Associates',    source:'Portal', type:'Eligibility Query',   form:'Information', received:'May 2, 10:11 AM', text:'Our firm was incorporated 4 years ago. The criteria asks for 5 years. Can we submit with a parent company certificate?', status:'answered', response:'Yes. Per Clause 4.2 of the tender document, a parent company guarantee covering financial standing and incorporation history may be submitted, provided the parent meets the 5-year criterion.', assigned:null, group:null, published:'May 4', imported:false, manual:false },
+    { num:'Q-006', section:'Technical Specifications', vendor:'Rajesh Constructions',  source:'Portal', type:'Spec Change Request', form:'Request',     received:'May 3, 3:45 PM',  text:'The specified pump capacity of 50 HP seems undersized for the given flow rates. We recommend 75 HP minimum.', status:'draft', response:'', assigned:null, group:null, published:'', imported:false, manual:false },
+    { num:'Q-007', section:'Technical Specifications', vendor:'Maharashtra Roads Co.', source:'Email',  type:'Spec Change Request', form:'Request',     received:'May 3, 9:00 AM',  text:'Request to use VG-30 grade bitumen in lieu of VG-10 specified in BOQ Item 5.', status:'unanswered', response:'', assigned:null, group:'A', published:'', imported:false, manual:false },
+    { num:'Q-008', section:'General / Other',          vendor:'NCC Infrastructure',    source:'Portal', type:'Clarification',       form:'Information', received:'May 3, 11:30 AM', text:'Is the site accessible by heavy vehicles throughout the project period?', status:'answered', response:'Yes. The access road can accommodate heavy goods vehicles up to 25 tonnes. Site visits are recommended to confirm conditions.', assigned:null, group:null, published:'May 5', imported:false, manual:false },
+    { num:'Q-009', section:'Dates & Timeline',         vendor:'BuildTech Solutions',   source:'Portal', type:'Deadline Extension',  form:'Request',     received:'May 3, 4:20 PM',  text:'Site visit duration should be increased to allow off-hours visits.', status:'unanswered', response:'', assigned:null, group:'B', published:'', imported:false, manual:false },
+    { num:'Q-010', section:'BOQ & Quantities',         vendor:'Patil & Associates',    source:'Email',  type:'Clarification',       form:'Information', received:'May 4, 10:00 AM', text:'The BOQ quantities for excavation seem high. Could you reconfirm the volume requirement against the drawings?', status:'answered', response:'BOQ quantities have been verified against drawings. Cross-check page 14 of the tender document for the volumetric breakdown.', assigned:null, group:null, published:'May 5', imported:false, manual:false },
+    { num:'Q-011', section:'Technical Specifications', vendor:'Rajesh Constructions',  source:'Portal', type:'Spec Change Request', form:'Request',     received:'May 4, 1:15 PM',  text:'Bitumen grade question — can we substitute with locally available higher-grade?', status:'unanswered', response:'', assigned:null, group:'A', published:'', imported:false, manual:false },
+    { num:'Q-012', section:'Technical Specifications', vendor:'Maharashtra Roads Co.', source:'Portal', type:'Clarification',       form:'Information', received:'May 4, 3:30 PM',  text:'What is the format and acceptable bank list for performance security?', status:'answered', response:'Performance security of 5% of contract value as Bank Guarantee from any nationalised or scheduled commercial bank, or as Demand Draft, per Clause 7.4 of GCC.', assigned:null, group:null, published:'May 6', imported:false, manual:false },
+    { num:'Q-013', section:'PQ / TQ & Eligibility',    vendor:'NCC Infrastructure',    source:'Phone',  type:'Clarification',       form:'Information', received:'May 5, 9:30 AM',  text:'JV eligibility — combined turnover acceptable?', status:'unanswered', response:'', assigned:null, group:'C', published:'', imported:false, manual:false },
+    { num:'Q-014', section:'Dates & Timeline',         vendor:'BuildTech Solutions',   source:'Portal', type:'Deadline Extension',  form:'Request',     received:'May 5, 11:45 AM', text:'Request to extend site visit window by 4 days.', status:'unanswered', response:'', assigned:null, group:'B', published:'', imported:false, manual:false },
+    { num:'Q-015', section:'BOQ & Quantities',         vendor:'Patil & Associates',    source:'Email',  type:'Clarification',       form:'Information', received:'May 5, 2:00 PM',  text:'Concrete grade in BOQ Item 7 (M20) vs drawing (M25) — please clarify which prevails.', status:'unanswered', response:'', assigned:null, group:null, published:'', imported:false, manual:false },
+    { num:'Q-016', section:'PQ / TQ & Eligibility',    vendor:'Rajesh Constructions',  source:'Portal', type:'Clarification',       form:'Information', received:'May 6, 10:30 AM', text:'Is the bidder required to submit a power of attorney with the bid?', status:'assigned', response:'', assigned:'Amit Patil', group:null, published:'', imported:false, manual:false },
+    { num:'Q-017', section:'PQ / TQ & Eligibility',    vendor:'Maharashtra Roads Co.', source:'Portal', type:'Clarification',       form:'Information', received:'May 6, 1:00 PM',  text:'For JV, who signs the bid documents — lead partner only or all?', status:'assigned', response:'', assigned:'Sunita Rao', group:null, published:'', imported:false, manual:false },
+    { num:'Q-018', section:'Technical Specifications', vendor:'BuildTech Solutions',   source:'Email',  type:'Spec Change Request', form:'Request',     received:'May 7, 9:15 AM',  text:'Bitumen specifications for kerb works — confirm VG grade.', status:'unanswered', response:'', assigned:null, group:'A', published:'', imported:false, manual:false },
+    { num:'Q-019', section:'Technical Specifications', vendor:'NCC Infrastructure',    source:'Portal', type:'Clarification',       form:'Information', received:'May 7, 11:00 AM', text:'Is a Class 3 digital signature required for online bid submission?', status:'answered', response:'Yes. Class 3 DSC is mandatory for e-tender submission per Maharashtra eProcurement portal requirements.', assigned:null, group:null, published:'May 8', imported:false, manual:false },
+    { num:'Q-020', section:'General / Other',          vendor:'Patil & Associates',    source:'Portal', type:'Clarification',       form:'Information', received:'May 8, 10:00 AM', text:'What is the procedure for system-generated bid receipt confirmation?', status:'answered', response:'A digitally-signed acknowledgement is auto-generated by the eProcurement portal on successful bid submission. Vendors should download and retain this for records.', assigned:null, group:null, published:'May 9', imported:false, manual:false },
+    { num:'Q-021', section:'General / Other',          vendor:'Rajesh Constructions',  source:'Portal', type:'Clarification',       form:'Information', received:'May 8, 2:30 PM',  text:'Can we submit an additional supporting affidavit with the bid?', status:'unanswered', response:'', assigned:null, group:null, published:'', imported:false, manual:false },
+    { num:'Q-022', section:'Scope of Work',            vendor:'Maharashtra Roads Co.', source:'Portal', type:'Clarification',       form:'Information', received:'May 9, 9:45 AM',  text:'Does the scope include drainage works or only surface treatment? Please clarify the scope boundary.', status:'unanswered', response:'', assigned:null, group:null, published:'', imported:false, manual:false },
+    { num:'Q-023', section:'BOQ & Quantities',         vendor:'NCC Infrastructure',    source:'Email',  type:'Clarification',       form:'Information', received:'May 9, 1:30 PM',  text:'Item 12 quantity (kerb stones) — 250 m vs 320 m in drawing. Please confirm which is correct.', status:'unanswered', response:'', assigned:null, group:null, published:'', imported:false, manual:false },
+    { num:'Q-024', section:'BOQ & Quantities',         vendor:'Rajesh Constructions',  source:'Portal', type:'Spec Change Request', form:'Request',     received:'May 10, 10:00 AM', text:"Item 3 unit shown as 'm²' in BOQ but should be 'm' for linear measurements. Please correct.", status:'unanswered', response:'', assigned:null, group:null, published:'', imported:false, manual:false },
+  ];
+  const VENDORS = [
+    'Rajesh Constructions',
+    'Maharashtra Roads Co.',
+    'BuildTech Solutions',
+    'NCC Infrastructure',
+    'Patil & Associates',
+  ];
+
+  const GROUPS = {
+    A: { topic:'Bitumen Specification', members:['Q-002','Q-007','Q-011','Q-018'].filter(q=>QUERIES.find(x=>x.num===q&&x.group==='A')), expanded:false },
+    B: { topic:'Site Visit Duration',   members:['Q-003','Q-009','Q-014'].filter(q=>QUERIES.find(x=>x.num===q&&x.group==='B')), expanded:false },
+    C: { topic:'JV Eligibility',        members:['Q-004','Q-013'].filter(q=>QUERIES.find(x=>x.num===q&&x.group==='C')), expanded:false },
+  };
+
+  // Recompute member lists from QUERIES.group to keep state in sync
+  function rebuildGroupMembers(){
+    Object.keys(GROUPS).forEach(g => {
+      GROUPS[g].members = QUERIES.filter(q => q.group === g).map(q => q.num);
+    });
+  }
+  rebuildGroupMembers();
+
+  // ============================================================
+  // LANDING SCREEN
+  // ============================================================
+  function statusDotColor(s){ return s === 'overdue' ? '#EF4444' : (s === 'done' ? '#10B981' : '#F59E0B'); }
+  function statusPulse(s){ return s === 'overdue' ? '' : (s === 'done' ? '' : 'pulse-amber'); }
+  function renderActiveList(filter){
+    const q = (filter || '').toLowerCase();
+    const wrap = document.getElementById('activeList');
+    const filtered = ACTIVE_TENDERS.filter(t => !q || t.name.toLowerCase().includes(q) || t.id.toLowerCase().includes(q) || t.dept.toLowerCase().includes(q));
+    if (!filtered.length){
+      wrap.innerHTML = '<div class="text-center text-[13px] text-ink-500 italic py-12">No tenders match this search</div>';
+      return;
+    }
+    wrap.innerHTML = filtered.map(t => {
+      const queriesStr = `${t.queries} queries`;
+      const subRight = t.unanswered > 0
+        ? `<div class="text-[12px] font-bold" style="color:#F59E0B;">${t.unanswered} unanswered</div>`
+        : `<div class="text-[12px]" style="color:#10B981;">All responded</div>`;
+      return `<div class="query-row" onclick="openWorkspace('${t.id}')" tabindex="0" role="button" aria-label="Open ${t.id} ${t.name}" style="padding:14px 16px; border-bottom: 1px solid #F3F4F6; display:flex; align-items:center; gap:16px;">
+        <span class="w-2 h-2 rounded-full ${statusPulse(t.status)} shrink-0" style="background:${statusDotColor(t.status)};"></span>
+        <span class="font-mono text-[12px] font-semibold text-primary shrink-0" style="background:#EFF6FF; border-radius:4px; padding:2px 6px; width:104px; text-align:center;">${t.id}</span>
+        <div class="flex-1 min-w-0">
+          <div class="text-[14px] font-medium text-ink-900 truncate">${t.name}</div>
+          <div class="text-[12px] text-ink-500">${t.dept} · ${t.cat}</div>
+        </div>
+        <div class="shrink-0 text-center" style="width:120px;">
+          <div class="text-[12px] text-ink-500">${queriesStr}</div>
+          ${subRight}
+        </div>
+        <div class="shrink-0 text-right" style="width:110px;">
+          <div class="text-[10px] text-ink-500 uppercase tracking-wider">Responses due</div>
+          <div class="text-[13px] font-bold text-ink-900">${t.dueDate}</div>
+          <div class="text-[11px] ${t.daysCls}">${t.daysText}</div>
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-ink-400 shrink-0"></i>
+      </div>`;
+    }).join('');
+    refreshIcons();
+  }
+  function renderPastList(){
+    const wrap = document.getElementById('pastList');
+    wrap.innerHTML = PAST_TENDERS.map(t => `
+      <div class="query-row" onclick="openWorkspace('${t.id}')" tabindex="0" role="button" style="padding:14px 16px; border-bottom: 1px solid #F3F4F6; display:flex; align-items:center; gap:16px;">
+        <span class="w-2 h-2 rounded-full shrink-0" style="background:#D1D5DB;"></span>
+        <span class="font-mono text-[12px] font-semibold shrink-0" style="background:#F3F4F6; color:#6B7280; border-radius:4px; padding:2px 6px; width:104px; text-align:center;">${t.id}</span>
+        <div class="flex-1 min-w-0">
+          <div class="text-[14px] font-medium truncate" style="color:#6B7280;">${t.name}</div>
+          <div class="text-[12px] text-ink-400">${t.dept} · ${t.cat}</div>
+        </div>
+        <div class="shrink-0 text-center" style="width:120px;">
+          <div class="text-[12px] text-ink-500">${t.queries} queries</div>
+        </div>
+        <div class="shrink-0 text-right text-[12px] text-ink-500" style="width:140px;">Closed ${t.closedOn}</div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-ink-400 shrink-0"></i>
+      </div>`).join('');
+    refreshIcons();
+  }
+  function togglePast(){
+    const list = document.getElementById('pastList');
+    const btn = document.getElementById('pastToggle');
+    const hidden = list.classList.toggle('hidden');
+    btn.innerHTML = hidden
+      ? 'Show 8 past tenders <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>'
+      : 'Hide past tenders <i data-lucide="chevron-up" class="w-3.5 h-3.5"></i>';
+    if (!hidden) renderPastList();
+    refreshIcons();
+  }
+
+  // ============================================================
+  // ROUTING — Landing <-> Workspace
+  // ============================================================
+  function showLanding(){
+    try { history.replaceState(null, '', location.pathname); } catch(e){}
+    document.getElementById('screen-workspace').classList.add('hidden');
+    document.getElementById('screen-landing').classList.remove('hidden');
+    renderActiveList(document.getElementById('landingSearch')?.value || '');
+    window.scrollTo({ top: 0 });
+  }
+  function openWorkspace(tndId){
+    try { history.replaceState(null, '', '?tender=' + encodeURIComponent(tndId)); } catch(e){}
+    const t = ACTIVE_TENDERS.find(x => x.id === tndId) || PAST_TENDERS.find(x => x.id === tndId);
+    if (t){
+      document.getElementById('wsTndBadge').textContent = t.id;
+      document.getElementById('wsTndCrumb').textContent = t.id;
+      document.getElementById('wsTndName').textContent = t.name;
+      document.getElementById('wsTndMeta').textContent = `${t.dept} · ${t.cat}${t.cost ? ' · ' + t.cost : ''}`;
+    }
+    document.getElementById('screen-landing').classList.add('hidden');
+    document.getElementById('screen-workspace').classList.remove('hidden');
+    setTab('queries');
+    selectQuery(null); // empty state
+    renderTab1();
+    renderDocsTable();
+    renderCorrigendum();
+    mnInit();
+    window.scrollTo({ top: 0 });
+    refreshIcons();
+  }
+
+  // ============================================================
+  // TABS
+  // ============================================================
+  const TABS = ['queries','mn','docs'];
+  function setTab(name){
+    // Legacy hash redirects
+    if (name === 'notes' || name === 'meeting' || name === 'meeting-day') name = 'mn';
+    TABS.forEach(t => { const el = document.getElementById('tab-'+t); if (el) el.classList.toggle('hidden', t !== name); });
+    document.querySelectorAll('.ev-tab').forEach(b => {
+      const active = b.dataset.tab === name;
+      b.setAttribute('aria-selected', active ? 'true' : 'false');
+      b.classList.toggle('bg-primary', active);
+      b.classList.toggle('text-white', active);
+      b.classList.toggle('border-primary', active);
+      b.classList.toggle('bg-white', !active);
+      b.classList.toggle('text-ink-500', !active);
+      b.classList.toggle('border-line', !active);
+    });
+    if (name === 'mn') { mnInit(); }
+    if (name === 'docs') renderDocsTable();
+    refreshIcons();
+  }
+  document.querySelectorAll('.ev-tab').forEach(b => b.addEventListener('click', () => setTab(b.dataset.tab)));
+
+  // ============================================================
+  // TAB 1 — QUERIES & RESPONSES
+  // ============================================================
+  let queryFilter = 'all';
+  let selectedQueryId = null;
+  let selectedGroupId = null;
+
+  document.querySelectorAll('.pill-filter[data-qf]').forEach(p => p.addEventListener('click', () => {
+    document.querySelectorAll('.pill-filter[data-qf]').forEach(x => { x.classList.remove('active','bg-primary','text-white','border-primary'); x.classList.add('bg-white','border-line','text-ink-500'); });
+    p.classList.add('active','bg-primary','text-white','border-primary');
+    p.classList.remove('bg-white','border-line','text-ink-500');
+    queryFilter = p.dataset.qf;
+    renderTab1();
+  }));
+
+  function typePillStyle(type){
+    if (type === 'Clarification')       return 'background:#EFF6FF; color:#0F5EE8;';
+    if (type === 'Spec Change Request') return 'background:#F5F3FF; color:#6D28D9;';
+    if (type === 'Deadline Extension')  return 'background:#FFFBEB; color:#92400E;';
+    if (type === 'Eligibility Query')   return 'background:#F0FDF4; color:#065F46;';
+    return 'background:#FEF2F2; color:#B91C1C;';
+  }
+  function formPillStyle(form){
+    return form === 'Request'
+      ? 'background:#FEF3C7; color:#92400E; border:1px solid #FCD34D;'
+      : 'background:#EFF6FF; color:#1D4ED8; border:1px solid #BFDBFE;';
+  }
+  function statusPillStyle(s){
+    if (s === 'answered')   return { label:'Answered',   style:'background:#F0FDF4; color:#10B981;' };
+    if (s === 'draft')      return { label:'Draft saved',style:'background:#FFFBEB; color:#92400E;' };
+    if (s === 'assigned')   return { label:'Assigned',   style:'background:#EFF6FF; color:#0F5EE8;' };
+    if (s === 'generic')    return { label:'Generic response applied', style:'background:#FFFBEB; color:#92400E;' };
+    return { label:'Unanswered', style:'background:#F3F4F6; color:#6B7280;' };
+  }
+
+  function isUnanswered(q){ return q.status === 'unanswered' || q.status === 'assigned'; }
+
+  function sectionPillStyle(){ return 'background:#F3F4F6; color:#6B7280; border-radius:4px; padding:2px 6px;'; }
+
+  let sectionFilter = '';
+  let expandedQueries = new Set();   // qid set
+  let expandedGroups  = new Set();   // gid set
+  let hideNonMatching = false;
+
+  function recountFilters(){
+    const all = QUERIES.length;
+    const unanswered = QUERIES.filter(isUnanswered).length;
+    const answered = QUERIES.filter(q => q.status === 'answered').length;
+    const assigned = QUERIES.filter(q => q.assigned).length;
+    const grouped = QUERIES.filter(q => q.group).length;
+    const standalone = QUERIES.filter(q => !q.group).length;
+    const ids = ['qcAll','qcUnanswered','qcAnswered','qcAssigned','qcGrouped','genUnansweredCount','genUnTotal','aiGroupCount','sumTotal','sumUnanswered','sumAnswered','sumGrouped','sumRequests','sumInformation','individualCount'];
+    const setIf = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    setIf('qcAll', all);
+    setIf('qcUnanswered', unanswered);
+    setIf('qcAnswered', answered);
+    setIf('qcAssigned', assigned);
+    setIf('qcGrouped', grouped);
+    setIf('genUnansweredCount', unanswered);
+    setIf('genUnTotal', unanswered);
+    setIf('aiGroupCount', grouped);
+    setIf('aiGroupNumGroups', Object.values(GROUPS).filter(g => g.members.length > 0).length);
+    setIf('sumTotal', all);
+    setIf('sumUnanswered', unanswered);
+    setIf('sumAnswered', answered);
+    setIf('sumGrouped', grouped);
+    setIf('sumRequests', QUERIES.filter(q => q.form === 'Request').length);
+    setIf('sumInformation', QUERIES.filter(q => q.form === 'Information').length);
+    setIf('individualCount', standalone);
+  }
+
+  function matchesSearchHighlight(text, q){
+    if (!q) return text;
+    const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+    return text.replace(re, '<mark style="background:#FEF3C7; color:inherit; padding:0 1px; border-radius:2px;">$1</mark>');
+  }
+  function queryMatchesFilters(q, search){
+    if (sectionFilter && q.section !== sectionFilter) return false;
+    if (queryFilter === 'unanswered' && !isUnanswered(q)) return false;
+    if (queryFilter === 'answered' && q.status !== 'answered') return false;
+    if (queryFilter === 'assigned' && !q.assigned) return false;
+    if (queryFilter === 'grouped' && !q.group) return false;
+    if (search && !(q.text.toLowerCase().includes(search) || q.num.toLowerCase().includes(search))) return false;
+    return true;
+  }
+
+  // ============= UPLOAD BAR =============
+  function toggleUploadZone(){
+    const z = document.getElementById('uploadDropZone');
+    const open = z.style.maxHeight !== '0px' && z.style.maxHeight !== '';
+    z.style.maxHeight = open ? '0' : '200px';
+  }
+  function simulateUpload(){
+    document.getElementById('uploadFileChip').classList.remove('hidden');
+    document.getElementById('uploadFileName').textContent = 'vendor_queries_may5.xlsx';
+    document.getElementById('extractBtn').classList.remove('hidden');
+    document.getElementById('uploadDropZone').style.maxHeight = '0';
+    refreshIcons();
+  }
+  function removeUploadedFile(){
+    document.getElementById('uploadFileChip').classList.add('hidden');
+    document.getElementById('extractBtn').classList.add('hidden');
+  }
+  function extractQueries(){
+    showToast('AI is reading your document and extracting queries…');
+    setTimeout(() => {
+      // Mark 3 randomly-chosen unanswered queries as 'imported' for demo
+      let imported = 0;
+      QUERIES.forEach(q => {
+        if (imported < 3 && !q.imported && q.status === 'unanswered'){ q.imported = true; imported++; }
+      });
+      showToast('12 queries extracted · 3 new groups formed');
+      renderTab1();
+    }, 1500);
+  }
+
+  // ============= SECTION FILTER =============
+  function toggleSectionDropdown(e){
+    if (e) e.stopPropagation();
+    document.getElementById('sectionDropdown').classList.toggle('hidden');
+  }
+  document.addEventListener('click', (e) => {
+    const dd = document.getElementById('sectionDropdown');
+    const btn = document.getElementById('sectionDropdownBtn');
+    if (dd && btn && !dd.classList.contains('hidden') && !dd.contains(e.target) && !btn.contains(e.target)) dd.classList.add('hidden');
+  });
+  function setSectionFilter(value){
+    sectionFilter = value;
+    document.getElementById('sectionDropdown').classList.add('hidden');
+    const label = value || 'All';
+    document.getElementById('sectionDropdownLabel').textContent = value ? value.split(' ').slice(0,2).join(' ') : 'All';
+    document.querySelectorAll('.section-check').forEach(c => {
+      c.classList.toggle('hidden', (c.dataset.sf || '') !== value);
+    });
+    const chip = document.getElementById('sectionFilterChip');
+    if (value){
+      chip.classList.remove('hidden');
+      document.getElementById('sectionFilterChipLabel').textContent = value;
+    } else {
+      chip.classList.add('hidden');
+    }
+    renderTab1();
+  }
+  function clearSectionFilter(){ setSectionFilter(''); }
+
+  // ============= AI SUMMARY =============
+  const SECTION_PALETTE = [
+    { key:'Technical Specifications', label:'Technical Spec', color:'#0F5EE8' },
+    { key:'PQ / TQ & Eligibility',    label:'PQ/TQ',         color:'#8B5CF6' },
+    { key:'BOQ & Quantities',         label:'BOQ',           color:'#F59E0B' },
+    { key:'Dates & Timeline',         label:'Dates',         color:'#10B981' },
+    { key:'Scope of Work',            label:'Scope',         color:'#F97316' },
+    { key:'General / Other',          label:'General',       color:'#6B7280' },
+    { key:'Financial & EMD',          label:'Financial',     color:'#EC4899' },
+  ];
+  function renderAISummaryBar(){
+    const counts = {};
+    SECTION_PALETTE.forEach(s => counts[s.key] = 0);
+    QUERIES.forEach(q => { if (counts[q.section] !== undefined) counts[q.section]++; });
+    const total = QUERIES.length;
+    const bar = document.getElementById('sectionBar');
+    const legend = document.getElementById('sectionLegend');
+    if (!bar) return;
+    bar.innerHTML = SECTION_PALETTE.filter(s => counts[s.key] > 0).map(s => {
+      const pct = (counts[s.key] / total) * 100;
+      const dim = sectionFilter && sectionFilter !== s.key;
+      return `<div data-sec="${s.key}" data-cnt="${counts[s.key]}" data-pct="${pct.toFixed(0)}" style="width:${pct}%; background:${s.color}; opacity:${dim?0.5:1}; transition: opacity 150ms ease;" class="section-seg"></div>`;
+    }).join('');
+    legend.innerHTML = SECTION_PALETTE.filter(s => counts[s.key] > 0).map(s => {
+      const dim = sectionFilter && sectionFilter !== s.key;
+      return `<span data-sec="${s.key}" class="section-leg inline-flex items-center gap-1.5" style="opacity:${dim?0.5:1}; transition: opacity 150ms ease;">
+        <span class="w-1.5 h-1.5 rounded-full" style="background:${s.color};"></span>
+        ${s.label} (${counts[s.key]})
+      </span>`;
+    }).join('');
+    // Hover handlers
+    bar.querySelectorAll('.section-seg').forEach(seg => {
+      seg.addEventListener('mouseenter', (e) => {
+        document.querySelectorAll('.section-seg, .section-leg').forEach(el => { if (el !== seg && el.dataset.sec !== seg.dataset.sec) el.style.opacity = 0.5; });
+        showSectionTooltip(seg);
+      });
+      seg.addEventListener('mouseleave', () => { renderAISummaryBar(); hideSectionTooltip(); });
+    });
+    legend.querySelectorAll('.section-leg').forEach(leg => {
+      leg.addEventListener('mouseenter', () => {
+        document.querySelectorAll('.section-seg, .section-leg').forEach(el => { if (el.dataset.sec !== leg.dataset.sec) el.style.opacity = 0.5; });
+      });
+      leg.addEventListener('mouseleave', () => renderAISummaryBar());
+    });
+  }
+  function showSectionTooltip(seg){
+    const tooltip = document.getElementById('sectionTooltip');
+    if (!tooltip) return;
+    tooltip.innerHTML = `${seg.dataset.sec} — ${seg.dataset.cnt} queries (${seg.dataset.pct}%)`;
+    tooltip.style.display = 'block';
+    tooltip.classList.remove('hidden');
+    const r = seg.getBoundingClientRect();
+    const pr = seg.parentElement.parentElement.getBoundingClientRect();
+    tooltip.style.left = (r.left + r.width/2 - pr.left - 100) + 'px';
+    tooltip.style.top = (r.top - pr.top - 30) + 'px';
+  }
+  function hideSectionTooltip(){
+    const tooltip = document.getElementById('sectionTooltip');
+    if (tooltip) tooltip.classList.add('hidden');
+  }
+  function refreshAISummary(){
+    const para = document.getElementById('aiSummaryParagraph');
+    if (!para) return;
+    if (sectionFilter){
+      const c = QUERIES.filter(q => q.section === sectionFilter);
+      const req = c.filter(q => q.form === 'Request').length;
+      const info = c.filter(q => q.form === 'Information').length;
+      para.innerHTML = `<span style="color:#0F5EE8;">✦</span> Showing ${sectionFilter} section — ${c.length} ${c.length===1?'query':'queries'}. ${req} ${req===1?'is a Request':'are Requests'} asking for changes${sectionFilter==='BOQ & Quantities'?' or quantity clarifications':''}, ${info} ${info===1?'is an Information query':'are Information queries'}. No duplicates detected in this section.`;
+    } else {
+      para.innerHTML = `<span style="color:#0F5EE8;">✦</span> Most queries (29%) relate to Technical Specifications, particularly around bitumen grade and material standards — suggesting vendors may find the spec ambiguous. 5 queries challenge PQ/TQ eligibility thresholds, which is higher than average for tenders of this value. 9 queries are classified as Requests (asking for changes or extensions) vs 15 Information queries (seeking clarification). 3 queries are potentially duplicates already grouped by AI. Recommend prioritising the Technical Specification group response as it will resolve the largest cluster.`;
+    }
+  }
+  function toggleAISummary(){
+    const body = document.getElementById('aiSummaryBody');
+    const btn = document.getElementById('aiSummaryToggle');
+    const open = body.style.maxHeight !== '0px' && body.style.maxHeight !== '';
+    if (open){
+      body.style.maxHeight = '0px';
+      btn.innerHTML = 'Show <i data-lucide="chevron-down" class="w-3 h-3 inline-block -mt-0.5"></i>';
+    } else {
+      body.style.maxHeight = '600px';
+      btn.innerHTML = 'Hide <i data-lucide="chevron-up" class="w-3 h-3 inline-block -mt-0.5"></i>';
+    }
+    refreshIcons();
+  }
+
+  // ============= RESPONSE EDITOR (shared markup) =============
+  function responseEditorHtml(scope, scopeData){
+    // scope = 'q' or 'g'
+    const isQuery = scope === 'q';
+    const editorId = isQuery ? `qEditor-${scopeData.num}` : `gEditor-${scopeData.gid}`;
+    const targetCount = isQuery ? 1 : scopeData.g.members.length;
+    const placeholder = isQuery
+      ? 'Draft your formal response to this query…'
+      : 'Type a response addressing the common theme across all queries in this group…';
+    const initialValue = isQuery ? (scopeData.q.response || '') : '';
+    return `
+      <div style="border-top: 1px solid #E5E7EB; padding: 14px 16px; background: #FAFAFA; border-radius: 0 0 10px 10px;">
+        <div class="flex items-center justify-between mb-2">
+          <label class="text-[13px] font-bold text-ink-900">${isQuery ? 'Your Response' : 'Group Response'}</label>
+          ${!isQuery ? `<span class="text-[12px] text-ink-500">will be sent to all ${targetCount} vendors</span>` : ''}
+        </div>
+        <div class="border border-line rounded-lg overflow-hidden bg-white">
+          <div class="flex items-center gap-1 px-2 py-1.5 border-b border-line bg-surface">
+            <button onmousedown="event.preventDefault(); document.execCommand('bold')" aria-label="Bold" class="w-7 h-7 rounded hover:bg-white text-ink-500 flex items-center justify-center"><i data-lucide="bold" class="w-3.5 h-3.5"></i></button>
+            <button onmousedown="event.preventDefault(); document.execCommand('italic')" aria-label="Italic" class="w-7 h-7 rounded hover:bg-white text-ink-500 flex items-center justify-center"><i data-lucide="italic" class="w-3.5 h-3.5"></i></button>
+            <button onmousedown="event.preventDefault(); document.execCommand('insertUnorderedList')" aria-label="Bullet" class="w-7 h-7 rounded hover:bg-white text-ink-500 flex items-center justify-center"><i data-lucide="list" class="w-3.5 h-3.5"></i></button>
+            <button onmousedown="event.preventDefault(); document.execCommand('insertOrderedList')" aria-label="Numbered" class="w-7 h-7 rounded hover:bg-white text-ink-500 flex items-center justify-center"><i data-lucide="list-ordered" class="w-3.5 h-3.5"></i></button>
+          </div>
+          <div id="${editorId}" contenteditable="true" data-placeholder="${placeholder}" style="min-height:100px; padding:10px 12px; font-size:13px; outline:none;" ${isQuery ? `oninput="(QUERIES.find(x=>x.num==='${scopeData.num}')||{}).response = this.innerHTML"` : ''}>${initialValue}</div>
+        </div>
+
+        <div class="mt-3 flex items-center gap-2 flex-wrap">
+          <button onclick="${isQuery ? `generateAIResponse('${scopeData.num}')` : `generateGroupAIResponse('${scopeData.gid}')`}" class="px-2.5 py-1.5 rounded-md border border-primary-border text-primary text-[12px] font-medium hover:bg-primary-light inline-flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Generate AI Response</button>
+          <button class="px-2.5 py-1.5 rounded-md border border-line text-ink-900 text-[12px] hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="library" class="w-3.5 h-3.5"></i> Standard response</button>
+          <button onclick="${isQuery ? `applyChip('${scopeData.num}','refer')` : `applyGroupChip('${scopeData.gid}','refer')`}" class="text-[12px] text-ink-900 hover:border-primary hover:text-primary" style="border:1px solid #E5E7EB; border-radius:20px; padding:4px 12px; background:white;">Refer to document</button>
+          <button onclick="${isQuery ? `applyChip('${scopeData.num}','cannot')` : `applyGroupChip('${scopeData.gid}','cannot')`}" class="text-[12px] text-ink-900 hover:border-primary hover:text-primary" style="border:1px solid #E5E7EB; border-radius:20px; padding:4px 12px; background:white;">Cannot disclose</button>
+          <button onclick="${isQuery ? `applyChip('${scopeData.num}','nochange')` : `applyGroupChip('${scopeData.gid}','nochange')`}" class="text-[12px] text-ink-900 hover:border-primary hover:text-primary" style="border:1px solid #E5E7EB; border-radius:20px; padding:4px 12px; background:white;">No change required</button>
+        </div>
+
+        <div class="mt-3 flex items-center justify-between gap-3 flex-wrap">
+          <div class="flex items-center gap-2 text-[12px] text-ink-900">
+            Requires corrigendum?
+            <label class="toggle"><input type="checkbox" onchange="toggleCorrigendum(this, '${editorId}')"><span class="slider"></span></label>
+            <span class="hidden text-[11px] font-medium" data-corrigendum-msg style="color:#92400E;">Corrigendum will be issued</span>
+          </div>
+          <div class="rounded-lg flex items-center gap-2 text-[11.5px]" style="background:#EFF6FF; border:1px solid #BFDBFE; padding:6px 10px; color:#1D4ED8;">
+            <i data-lucide="info" class="w-3 h-3"></i> This response will be published to all vendors
+          </div>
+        </div>
+
+        <div class="mt-3 flex items-center justify-end gap-2">
+          <button onclick="${isQuery ? `saveDraft('${scopeData.num}', '${editorId}')` : `saveGroupDraft('${scopeData.gid}', '${editorId}')`}" class="px-3 py-1.5 rounded-md border border-line text-[12px] text-ink-900 hover:bg-white">Save Draft</button>
+          <button onclick="${isQuery ? `sendForApproval('${scopeData.num}', '${editorId}')` : `sendGroupForApproval('${scopeData.gid}', '${editorId}')`}" class="px-3 py-1.5 rounded-md bg-primary text-white text-[12px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5">Send for Approval <i data-lucide="arrow-right" class="w-3 h-3"></i></button>
+        </div>
+      </div>`;
+  }
+  function toggleCorrigendum(toggle, editorId){
+    const msg = toggle.closest('.flex').querySelector('[data-corrigendum-msg]');
+    if (msg) msg.classList.toggle('hidden', !toggle.checked);
+  }
+
+  // ============= GROUPS RENDERER (with embedded editor) =============
+  function renderGroupsList(){
+    recountFilters();
+    const wrap = document.getElementById('groupsList');
+    const aiSection = document.getElementById('aiGroupsSection');
+    const search = (document.getElementById('qsSearch')?.value || '').toLowerCase();
+    const anyGroups = Object.values(GROUPS).some(g => g.members.length > 0);
+    if (!anyGroups){ if (aiSection) aiSection.style.display = 'none'; return; }
+    if (aiSection) aiSection.style.display = '';
+
+    // Determine group section (most common section among members)
+    function groupSection(g){
+      const counts = {};
+      g.members.forEach(qid => {
+        const q = QUERIES.find(x => x.num === qid);
+        if (q && q.section){ counts[q.section] = (counts[q.section] || 0) + 1; }
+      });
+      let best = '', bestCount = 0;
+      Object.entries(counts).forEach(([k,v]) => { if (v > bestCount){ bestCount = v; best = k; } });
+      return best;
+    }
+
+    wrap.innerHTML = Object.entries(GROUPS).filter(([gid,g]) => g.members.length > 0).map(([gid, g]) => {
+      const sec = groupSection(g);
+      // Apply section filter at group level
+      if (sectionFilter && sec !== sectionFilter) return '';
+      const expanded = expandedGroups.has(gid);
+      const subRows = g.members.map(qid => {
+        const q = QUERIES.find(x => x.num === qid);
+        if (!q) return '';
+        const isMatch = !search || q.text.toLowerCase().includes(search) || q.num.toLowerCase().includes(search);
+        const dim = (search && !isMatch && !hideNonMatching) ? 'opacity: 0.25;' : '';
+        if (search && !isMatch && hideNonMatching) return '';
+        const textRendered = search ? matchesSearchHighlight(q.text, search) : q.text;
+        return `<div class="flex items-start gap-3" style="padding:10px 16px 10px 44px; border-top:1px solid #F3F4F6; ${dim}" data-q="${q.num}">
+          <input type="checkbox" checked onchange="toggleQueryFromGroup('${qid}','${gid}', this.checked)" class="accent-primary" style="margin-top:2px;" />
+          <span class="text-[11px] font-bold font-mono shrink-0" style="background:#EFF6FF; color:#0F5EE8; border-radius:4px; padding:1px 6px;">${q.num}</span>
+          <span class="text-[13px] text-ink-900 flex-1" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${textRendered}</span>
+          <span class="text-[10.5px] font-medium shrink-0" style="${formPillStyle(q.form)}; border-radius:14px; padding:1px 7px;">${q.form}</span>
+        </div>`;
+      }).join('');
+
+      const headerHtml = `
+        <div class="flex items-center gap-3" style="padding:12px 16px; cursor:pointer;" onclick="toggleGroupExpand('${gid}', event)" onmouseenter="this.style.background='#F8FBFF';" onmouseleave="this.style.background='';">
+          <input type="checkbox" checked onclick="event.stopPropagation();" onchange="toggleEntireGroup('${gid}', this.checked)" class="accent-primary" />
+          <span class="text-[14px] font-bold text-ink-900">Group ${gid} · ${g.topic}</span>
+          <span class="text-[11px] font-medium" style="background:#EFF6FF; color:#0F5EE8; border-radius:20px; padding:2px 8px;" aria-live="polite">${g.members.length} queries</span>
+          ${sec ? `<span class="text-[10px] font-medium" style="${sectionPillStyle()}">${sec}</span>` : ''}
+          <button class="ml-auto text-ink-500 hover:text-ink-900" aria-expanded="${expanded}" aria-label="Toggle group" onclick="event.stopPropagation(); toggleGroupExpand('${gid}')"><i data-lucide="${expanded?'chevron-up':'chevron-down'}" class="w-4 h-4"></i></button>
+        </div>`;
+
+      const responseBlock = expanded ? responseEditorHtml('g', { gid, g }) : '';
+
+      return `<div style="background:white; border:1px solid #DBEAFE; border-radius:10px; margin-bottom:10px; overflow:hidden;" data-group="${gid}">
+        ${headerHtml}
+        ${expanded ? subRows : ''}
+        ${responseBlock}
+      </div>`;
+    }).join('') || '<div class="text-center text-[12.5px] text-ink-500 italic py-6">No groups match the current filter</div>';
+    refreshIcons();
+  }
+  function toggleGroupExpand(gid, e){
+    if (e) e.stopPropagation();
+    if (expandedGroups.has(gid)) expandedGroups.delete(gid); else expandedGroups.add(gid);
+    renderGroupsList();
+  }
+  function toggleEntireGroup(gid, checked){
+    if (checked) return;
+    const members = GROUPS[gid].members.slice();
+    members.forEach(qid => {
+      const q = QUERIES.find(x => x.num === qid);
+      if (q) q.group = null;
+    });
+    rebuildGroupMembers();
+    expandedGroups.delete(gid);
+    renderTab1();
+    showToast(`Group ${gid} disbanded — ${members.length} queries moved to individual list`);
+  }
+  function toggleQueryFromGroup(qid, gid, isInGroup){
+    const q = QUERIES.find(x => x.num === qid);
+    if (!q) return;
+    q.group = isInGroup ? gid : null;
+    rebuildGroupMembers();
+    renderTab1();
+    if (!isInGroup) showToast(`${qid} moved to individual list`);
+  }
+  function regroupWithAI(){
+    showToast('AI re-grouping… 9 queries grouped into 3 groups');
+    rebuildGroupMembers();
+    renderTab1();
+  }
+
+  // ============= INDIVIDUAL QUERIES RENDERER (with embedded editor) =============
+  function renderQueryList(){
+    recountFilters();
+    const list = document.getElementById('queryList');
+    if (!list) return;
+    const search = (document.getElementById('qsSearch')?.value || '').toLowerCase();
+    const arr = QUERIES.filter(q => {
+      if (q.group) return false;
+      if (!queryMatchesFilters(q, '')) return false;
+      return true;
+    });
+    if (!arr.length){
+      list.innerHTML = '<div class="text-center text-[13px] text-ink-500 italic py-12">No individual queries match the current filters</div>';
+      return;
+    }
+    list.innerHTML = arr.map(q => {
+      const isMatch = !search || q.text.toLowerCase().includes(search) || q.num.toLowerCase().includes(search);
+      if (search && !isMatch && hideNonMatching) return '';
+      const dimStyle = (search && !isMatch && !hideNonMatching) ? 'opacity: 0.25;' : '';
+      const stat = statusPillStyle(q.status);
+      const expanded = expandedQueries.has(q.num);
+
+      const headerHtml = `
+        <div class="flex items-center gap-2.5 flex-wrap" style="padding:12px 16px; cursor:pointer;" onclick="toggleQueryExpand('${q.num}')" onmouseenter="this.style.background='#F9FAFB';" onmouseleave="this.style.background='';">
+          <span class="text-[11.5px] font-bold font-mono shrink-0" style="background:#EFF6FF; color:#0F5EE8; border-radius:4px; padding:1px 6px;">${q.num}</span>
+          <span class="text-[10.5px] font-medium" style="${typePillStyle(q.type)}; border-radius:14px; padding:1px 7px;">${q.type}</span>
+          <span class="text-[10.5px] font-medium" style="${formPillStyle(q.form)}; border-radius:14px; padding:1px 7px;">${q.form}</span>
+          <span class="text-[10px] font-medium" style="${sectionPillStyle()}">${q.section}</span>
+          ${q.imported ? '<span class="text-[10px] font-medium" style="background:#F3F4F6; color:#6B7280; border-radius:4px; padding:1px 5px;">Imported</span>' : ''}
+          <span class="text-[11px]" style="color:#9CA3AF;">${q.received}</span>
+          <span class="ml-auto inline-flex items-center gap-2">
+            <span class="text-[10.5px] font-medium" style="${stat.style}; border-radius:14px; padding:1px 7px;">${stat.label}</span>
+            <i data-lucide="${expanded?'chevron-up':'chevron-down'}" class="w-3.5 h-3.5 text-ink-500" aria-expanded="${expanded}"></i>
+          </span>
+        </div>`;
+
+      let body = '';
+      if (expanded){
+        const textRendered = search ? matchesSearchHighlight(q.text, search) : q.text;
+        const assignedRow = q.assigned
+          ? `<div class="text-[12px]" style="color:#10B981;">Assigned to ${q.assigned} ✓ <button onclick="reassignQuery('${q.num}')" class="ml-2 text-[12px] text-primary hover:underline">Reassign</button></div>`
+          : `<div class="flex items-center gap-2 flex-wrap"><span class="text-[12px]" style="color:#6B7280;">Assign to:</span>
+              <select id="assignSel-${q.num}" class="text-[12px] border border-line rounded-md px-2 py-1.5 bg-white" style="width:180px;"><option value="">Select officer…</option><option>Priya Shah</option><option>Amit Patil</option><option>Sunita Rao</option></select>
+              <button onclick="assignQuery('${q.num}')" class="px-2.5 py-1 rounded-md border border-primary text-primary text-[12px] font-medium hover:bg-primary-light">Assign</button></div>`;
+        body = `
+          <div style="padding: 0 16px 12px 16px; border-top: 1px solid #F9FAFB;">
+            <p class="text-[13px] text-ink-900" style="line-height: 1.7; padding-top:12px;">${textRendered}</p>
+            <div class="text-[11px] mt-1" style="color:#9CA3AF;">Source: ${q.source} submission</div>
+          </div>
+          <div style="padding: 0 16px 12px 16px;">${assignedRow}</div>
+          ${responseEditorHtml('q', { num: q.num, q })}`;
+      }
+
+      return `<div style="background:white; border:1px solid #E5E7EB; border-radius:10px; margin-bottom:10px; overflow:hidden; ${dimStyle}" data-q="${q.num}">
+        ${headerHtml}
+        ${body}
+      </div>`;
+    }).join('');
+    refreshIcons();
+  }
+  function toggleQueryExpand(qid){
+    if (expandedQueries.has(qid)) expandedQueries.delete(qid); else expandedQueries.add(qid);
+    renderQueryList();
+  }
+
+  // ============= MASTER RENDER =============
+  function renderTab1(){
+    hideNonMatching = !!document.getElementById('hideNonMatching')?.checked;
+    renderGroupsList();
+    renderQueryList();
+    renderAISummaryBar();
+    refreshAISummary();
+  }
+
+  // Backwards-compat shim for legacy code that may still call selectQuery (no-op)
+  function selectQuery(qid){
+    if (qid){
+      expandedQueries.add(qid);
+      renderQueryList();
+      setTimeout(() => {
+        const card = document.querySelector(`#queryList [data-q="${qid}"]`);
+        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 50);
+    }
+  }
+  function selectGroup(gid){
+    expandedGroups.add(gid);
+    renderGroupsList();
+    setTimeout(() => {
+      const card = document.querySelector(`#groupsList [data-group="${gid}"]`);
+      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 50);
+  }
+
+  // ============= LEGACY EDITOR SHIM (kept for compat with notes tab) =============
+  function renderQueryResponseEditor(q){
+    // No-op: editor is now embedded inline in renderQueryList
+    return;
+  }
+  function renderGroupResponseEditor(gid, g){
+    // No-op: editor is now embedded inline in renderGroupsList
+    return;
+  }
+
+  // Editor I/O for embedded editors
+  function _getEditorContent(editorId){
+    const el = document.getElementById(editorId);
+    return el ? el.innerHTML : '';
+  }
+  function _setEditorContent(editorId, html){
+    const el = document.getElementById(editorId);
+    if (el) el.innerHTML = html;
+  }
+  function _flashElement(el){
+    if (!el) return;
+    el.style.transition = 'background 300ms ease';
+    el.style.background = '#D1FAE5';
+    setTimeout(() => { el.style.background = ''; }, 800);
+  }
+
+  function generateAIResponse(qid){
+    const q = QUERIES.find(x => x.num === qid); if (!q) return;
+    const html = `<p>Thank you for your query. After due consideration by the Technical Department:</p><ul><li>The matter has been reviewed against the published tender document and standard procurement guidelines.</li><li>A formal response will be issued as per GFR transparency requirements.</li></ul><p>Please refer to the relevant clauses of the NIT for further details. This response is binding on all bidders.</p>`;
+    _setEditorContent(`qEditor-${qid}`, html);
+    q.response = html;
+    if (q.status !== 'answered') q.status = 'draft';
+    showToast('AI response drafted');
+    recountFilters();
+  }
+  function generateGroupAIResponse(gid){
+    const html = `<p>This response addresses the common theme raised by multiple bidders. After review by the Technical Department:</p><ul><li>The Department has considered the points raised in light of project requirements and GFR guidelines.</li><li>A formal decision has been arrived at and is detailed below.</li></ul><p>This response is published under GFR transparency requirements and is binding on all bidders.</p>`;
+    _setEditorContent(`gEditor-${gid}`, html);
+    showToast('AI group response drafted');
+  }
+  const STANDARD_TEXT = {
+    refer:    'The answer to this query is clearly stated in the tender document. Vendors are requested to carefully read the tender document in its entirety before raising queries. No further clarification is available on this matter.',
+    cannot:   'The information requested is not available for public disclosure at this stage of the procurement process. All vendors have access to the same information through the published tender document.',
+    nochange: 'After due consideration, no changes to the tender document are required. The terms, conditions, and specifications as published remain unchanged.',
+  };
+  function applyChip(qid, kind){
+    const q = QUERIES.find(x => x.num === qid); if (!q) return;
+    const html = '<p>' + STANDARD_TEXT[kind] + '</p>';
+    _setEditorContent(`qEditor-${qid}`, html);
+    q.response = html;
+    if (q.status !== 'answered') q.status = 'draft';
+    recountFilters();
+  }
+  function applyGroupChip(gid, kind){
+    _setEditorContent(`gEditor-${gid}`, '<p>' + STANDARD_TEXT[kind] + '</p>');
+  }
+  function saveDraft(qid, editorId){
+    const q = QUERIES.find(x => x.num === qid); if (!q) return;
+    if (editorId) q.response = _getEditorContent(editorId);
+    q.status = (q.response && q.response.trim() && q.response !== '<br>') ? 'draft' : 'unanswered';
+    recountFilters();
+    showToast('Draft saved');
+  }
+  function sendForApproval(qid, editorId){
+    const q = QUERIES.find(x => x.num === qid); if (!q) return;
+    if (editorId) q.response = _getEditorContent(editorId);
+    if (!q.response || !q.response.trim()){ showToast('Write a response first'); return; }
+    q.status = 'answered';
+    q.published = 'Today';
+    recountFilters();
+    renderQueryList();
+    showToast(`${qid} sent for approval`);
+  }
+  function saveGroupDraft(gid, editorId){
+    showToast(`Group ${gid} draft saved`);
+  }
+  function sendGroupForApproval(gid, editorId){
+    const g = GROUPS[gid]; if (!g) return;
+    const content = _getEditorContent(editorId);
+    if (!content || !content.trim()){ showToast('Write a response first'); return; }
+    const today = 'Today';
+    g.members.forEach(qid => {
+      const q = QUERIES.find(x => x.num === qid);
+      if (q){ q.response = content; q.status = 'answered'; q.published = today; }
+    });
+    renderTab1();
+    showToast(`Group ${gid} sent for approval — ${g.members.length} vendors will receive this response`);
+  }
+  function assignQuery(qid){
+    const sel = document.getElementById(`assignSel-${qid}`);
+    if (!sel || !sel.value){ showToast('Pick an officer first'); return; }
+    const q = QUERIES.find(x => x.num === qid); if (!q) return;
+    q.assigned = sel.value; q.status = 'assigned';
+    showToast(`${qid} assigned to ${sel.value}`);
+    renderQueryList();
+  }
+  function reassignQuery(qid){
+    const q = QUERIES.find(x => x.num === qid); if (!q) return;
+    q.assigned = null; if (q.status === 'assigned') q.status = 'unanswered';
+    renderQueryList();
+  }
+
+  // ============================================================
+  // GENERIC RESPONSE MODAL
+  // ============================================================
+  let genSelectedIds = new Set();
+  function openGenericModal(){
+    genSelectedIds = new Set(QUERIES.filter(isUnanswered).map(q => q.num));
+    renderGenericQueries();
+    // Default radio "refer" selected
+    document.querySelectorAll('#genResponseOptions .radio-card').forEach(c => c.classList.remove('selected'));
+    document.querySelector('#genResponseOptions [data-gr="refer"]')?.classList.add('selected');
+    document.querySelectorAll('#genResponseOptions input[type="radio"]').forEach(r => r.addEventListener('change', () => {
+      document.querySelectorAll('#genResponseOptions .radio-card').forEach(c => c.classList.remove('selected'));
+      r.closest('.radio-card').classList.add('selected');
+    }));
+    document.getElementById('genCustomText').value = '';
+    document.getElementById('genericModal').classList.remove('hidden');
+    refreshIcons();
+  }
+  function closeGenericModal(){ document.getElementById('genericModal').classList.add('hidden'); }
+  function renderGenericQueries(){
+    const wrap = document.getElementById('genQueryList');
+    const list = QUERIES.filter(isUnanswered);
+    wrap.innerHTML = list.map(q => `
+      <li class="flex items-center gap-3" style="padding:10px 12px;">
+        <input type="checkbox" ${genSelectedIds.has(q.num)?'checked':''} onchange="toggleGenSel('${q.num}', this.checked)" class="accent-primary" />
+        <span class="text-[12px] font-bold text-primary font-mono" style="background:#EFF6FF; border-radius:4px; padding:1px 6px;">${q.num}</span>
+        <span class="text-[12.5px] text-ink-900 truncate flex-1">${q.text}</span>
+      </li>`).join('');
+    document.getElementById('genApplyCount').textContent = genSelectedIds.size;
+  }
+  function toggleGenSel(qid, checked){
+    if (checked) genSelectedIds.add(qid); else genSelectedIds.delete(qid);
+    document.getElementById('genApplyCount').textContent = genSelectedIds.size;
+  }
+  function toggleAllUnAnswered(){
+    if (genSelectedIds.size > 0){ genSelectedIds.clear(); }
+    else { genSelectedIds = new Set(QUERIES.filter(isUnanswered).map(q => q.num)); }
+    renderGenericQueries();
+  }
+  function applyGenericResponse(){
+    if (genSelectedIds.size === 0){ showToast('Select at least one query'); return; }
+    const sel = document.querySelector('#genResponseOptions input[type="radio"]:checked')?.value || 'refer';
+    const customText = document.getElementById('genCustomText').value.trim();
+    const standardMap = {
+      refer:    'The answer to this query is stated in the tender document. Please read carefully before raising further queries.',
+      review:   'This matter is under technical review. Updates will be published via corrigendum if applicable.',
+      nochange: 'After due consideration, no changes to the tender document are required.',
+      cannot:   'The requested information is not available for public disclosure at this stage.',
+    };
+    const text = customText || standardMap[sel];
+    let count = 0;
+    QUERIES.forEach(q => {
+      if (genSelectedIds.has(q.num)){
+        q.response = '<p>' + text + '</p>';
+        q.status = 'generic';
+        count++;
+      }
+    });
+    closeGenericModal();
+    renderQueryList();
+    showToast(`Generic response applied to ${count} queries`);
+  }
+
+  // ============================================================
+  // TAB 2 — PRE-BID MEETING NOTES
+  // ============================================================
+  // ============================================================
+  // TAB 2 — MEETING & NOTES (merged)
+  // ============================================================
+  const MEETING_DATE = new Date('2026-05-10');
+  let mnGroupBy = 'similarity';      // 'similarity' | 'vendor' | 'individual'
+  let mnVendor = '';
+  let mnSelectedQueryId = null;
+  let mnRightMode = 'notes';         // 'notes' | 'query'
+  let mnEditingExistingDraft = false;
+  let momUploaded = false;
+
+  function mnInit(){
+    renderMnDateLine();
+    renderMnLeft();
+    mnRightMode = mnSelectedQueryId ? 'query' : 'notes';
+    renderMnRight();
+    refreshIcons();
+  }
+
+  function renderMnDateLine(){
+    const wrap = document.getElementById('mnDateLine');
+    if (!wrap) return;
+    const same = TODAY.toDateString() === MEETING_DATE.toDateString();
+    if (same){
+      wrap.outerHTML = `<div id="mnDateLine" class="mt-1 inline-flex items-center gap-1.5 text-[12px] font-bold" style="background:#FFFBEB; border:1px solid #FCD34D; border-radius:6px; padding:4px 10px; color:#92400E;"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> Meeting Day — May 10, 2026</div>`;
+    } else if (TODAY < MEETING_DATE){
+      const days = Math.ceil((MEETING_DATE - TODAY) / (1000*60*60*24));
+      wrap.innerHTML = `<i data-lucide="calendar" class="w-3.5 h-3.5"></i> <span>Pre-Bid Meeting: May 10, 2026 — in ${days} ${days===1?'day':'days'}</span>`;
+    } else {
+      wrap.innerHTML = `<i data-lucide="check-circle-2" class="w-3.5 h-3.5" style="color:#10B981;"></i> <span>Meeting held: May 10, 2026</span>`;
+    }
+  }
+
+  // ----- Group-by dropdown -----
+  function toggleGroupByMenu(e){
+    if (e) e.stopPropagation();
+    const m = document.getElementById('mnGroupByMenu');
+    const btn = document.getElementById('mnGroupByBtn');
+    const open = !m.classList.contains('hidden');
+    m.classList.toggle('hidden');
+    btn.setAttribute('aria-expanded', String(!open));
+  }
+  document.addEventListener('click', (e) => {
+    const m = document.getElementById('mnGroupByMenu');
+    const btn = document.getElementById('mnGroupByBtn');
+    if (m && btn && !m.classList.contains('hidden') && !m.contains(e.target) && !btn.contains(e.target)){
+      m.classList.add('hidden');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  });
+  function setGroupBy(mode){
+    mnGroupBy = mode;
+    mnSelectedQueryId = null;
+    mnRightMode = 'notes';
+    document.getElementById('mnGroupByMenu').classList.add('hidden');
+    document.getElementById('mnGroupByLabel').textContent =
+      mode === 'similarity' ? 'Similarity' : mode === 'vendor' ? 'Vendor / Company' : 'Individual';
+    // Radio + check states
+    ['Sim','Ven','Ind'].forEach(k => {
+      const radio = document.getElementById('mnGb'+k+'-radio');
+      const check = document.getElementById('mnGb'+k+'-check');
+      const active = (k === 'Sim' && mode === 'similarity') || (k === 'Ven' && mode === 'vendor') || (k === 'Ind' && mode === 'individual');
+      if (radio){ radio.setAttribute('data-lucide', active ? 'dot' : 'circle'); radio.style.color = active ? '#0F5EE8' : '#D1D5DB'; }
+      if (check) check.classList.toggle('hidden', !active);
+    });
+    // Vendor dropdown slide
+    const vw = document.getElementById('mnVendorWrap');
+    if (vw){
+      vw.style.maxHeight = mode === 'vendor' ? '120px' : '0';
+    }
+    if (mode !== 'vendor') mnVendor = '';
+    renderMnLeft();
+    renderMnRight();
+    refreshIcons();
+  }
+  function setVendorFilter(v){
+    mnVendor = v;
+    const chip = document.getElementById('mnVendorChip');
+    const lbl = document.getElementById('mnVendorChipLabel');
+    if (v){
+      const count = QUERIES.filter(q => q.vendor === v).length;
+      lbl.textContent = `${v} (${count})`;
+      chip.classList.remove('hidden');
+    } else {
+      chip.classList.add('hidden');
+    }
+    renderMnLeft();
+  }
+  function clearVendorFilter(){
+    mnVendor = '';
+    document.getElementById('mnVendorSelect').value = '';
+    document.getElementById('mnVendorChip').classList.add('hidden');
+    renderMnLeft();
+  }
+
+  // ----- Left panel renderer -----
+  function renderMnLeft(){
+    const wrap = document.getElementById('mnQueryList');
+    if (!wrap) return;
+    const search = (document.getElementById('mnSearch')?.value || '').toLowerCase();
+    document.getElementById('mnQueryCount').textContent = QUERIES.length;
+    const matchesSearch = (q) => !search || q.text.toLowerCase().includes(search) || q.num.toLowerCase().includes(search) || (q.vendor||'').toLowerCase().includes(search);
+
+    const subRowHtml = (q, opts={}) => {
+      const selected = mnSelectedQueryId === q.num;
+      const dim = (search && !matchesSearch(q)) ? 'opacity:0.25;' : '';
+      const muted = opts.muted ? 'opacity:0.7;' : '';
+      const sel = selected ? 'background:#EFF6FF; border-left:2px solid #0F5EE8;' : '';
+      const manualBadge = q.manual ? '<span class="text-[10px] font-medium ml-1" style="background:#F0FDF4; color:#065F46; border-radius:4px; padding:1px 5px;">Manual entry</span>' : '';
+      const truncated = q.text.length > 55 ? q.text.slice(0,55) + '…' : q.text;
+      return `<div class="flex items-center gap-2" style="padding:8px 12px 8px 12px; border-bottom:1px solid #F9FAFB; cursor:pointer; ${dim}${muted}${sel}" data-q="${q.num}" tabindex="0" role="button" aria-label="${q.num}" onclick="mnSelectQuery('${q.num}')" onkeydown="if(event.key==='Enter'){mnSelectQuery('${q.num}')}">
+        <span class="text-[11px] font-bold shrink-0" style="background:#EFF6FF; color:#0F5EE8; border-radius:4px; padding:1px 5px;">${q.num}</span>
+        <span class="text-[12px] flex-1 truncate" style="color:#374151;">${truncated}</span>
+        ${manualBadge}
+        <button onclick="event.stopPropagation(); mnAddToNotes('${q.num}')" class="text-[11px] text-primary hover:underline shrink-0">Add to notes +</button>
+      </div>`;
+    };
+
+    if (mnGroupBy === 'similarity'){
+      const groupBlocks = Object.entries(GROUPS).filter(([gid, g]) => g.members.length > 0).map(([gid, g]) => {
+        const inner = g.members.map(qid => {
+          const qq = QUERIES.find(x => x.num === qid); if (!qq) return '';
+          return subRowHtml(qq);
+        }).join('');
+        return `<div style="border-bottom: 1px solid #F3F4F6;">
+          <div class="flex items-center justify-between" style="padding:10px 12px; border-bottom:1px solid #F3F4F6; cursor:pointer;" onclick="mnAddGroupToNotes('${gid}')">
+            <div>
+              <span class="text-[13px] font-bold" style="color:#0F5EE8;">Group ${gid} · ${g.topic}</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[11px]" style="color:#9CA3AF;">${g.members.length} queries</span>
+              <button onclick="event.stopPropagation(); mnAddGroupToNotes('${gid}')" class="text-[11px] text-primary hover:underline">Add group to notes +</button>
+            </div>
+          </div>
+          ${inner}
+        </div>`;
+      }).join('');
+      const individuals = QUERIES.filter(q => !q.group);
+      const indHtml = individuals.length ? `<div style="padding:8px 12px 4px; border-top:1px solid #F3F4F6;"><div class="text-[11px] uppercase tracking-wider" style="color:#9CA3AF;">Individual queries</div></div>${individuals.map(qq => subRowHtml(qq)).join('')}` : '';
+      wrap.innerHTML = groupBlocks + indHtml || '<div class="text-center text-[12.5px] text-ink-500 italic py-10">No queries</div>';
+    }
+    else if (mnGroupBy === 'vendor'){
+      if (mnVendor){
+        const pinned = QUERIES.filter(q => q.vendor === mnVendor);
+        const others = QUERIES.filter(q => q.vendor !== mnVendor);
+        const pinnedHtml = `<div class="rounded-lg" style="background:#EFF6FF; padding:10px 12px; margin:8px 12px;">
+          <div class="text-[13px] font-bold" style="color:#0F5EE8;">${mnVendor} — ${pinned.length} ${pinned.length===1?'query':'queries'}</div>
+          <div class="text-[11px]" style="color:#6B7280;">Pinned to top · filtered from ${QUERIES.length} total</div>
+        </div>${pinned.map(q => subRowHtml(q)).join('')}`;
+        const othersHtml = others.length ? `<div style="padding:10px 12px; border-top:1px solid #E5E7EB;"><div class="text-[11px] uppercase tracking-wider" style="color:#9CA3AF;">All other queries (${others.length})</div></div>${others.map(q => subRowHtml(q, {muted:true})).join('')}` : '';
+        wrap.innerHTML = pinnedHtml + othersHtml;
+      } else {
+        // No vendor selected — list by vendor blocks
+        wrap.innerHTML = VENDORS.map(v => {
+          const list = QUERIES.filter(q => q.vendor === v);
+          if (!list.length) return '';
+          return `<div>
+            <div class="flex items-center justify-between" style="padding:10px 12px; background:#F9FAFB; border-bottom:1px solid #E5E7EB;">
+              <span class="text-[13px] font-bold text-ink-900">${v}</span>
+              <span class="text-[11px]" style="color:#6B7280;">${list.length} queries</span>
+            </div>
+            ${list.map(q => subRowHtml(q)).join('')}
+          </div>`;
+        }).join('');
+      }
+    }
+    else {
+      // Individual: flat list
+      wrap.innerHTML = QUERIES.map(q => subRowHtml(q)).join('');
+    }
+    refreshIcons();
+  }
+
+  // ----- Right panel renderer -----
+  function renderMnRight(){
+    const notes = document.getElementById('mnNotesMode');
+    const queryMode = document.getElementById('mnQueryMode');
+    if (mnRightMode === 'notes'){
+      notes.classList.remove('hidden');
+      queryMode.classList.add('hidden');
+    } else {
+      notes.classList.add('hidden');
+      queryMode.classList.remove('hidden');
+      queryMode.style.opacity = '0';
+      queryMode.style.transform = 'translateX(8px)';
+      renderMnQueryBody();
+      setTimeout(() => {
+        queryMode.style.transition = 'opacity 150ms ease, transform 150ms ease';
+        queryMode.style.opacity = '1';
+        queryMode.style.transform = 'translateX(0)';
+      }, 10);
+    }
+    refreshIcons();
+  }
+  function mnGoBackToNotes(){
+    mnSelectedQueryId = null;
+    mnRightMode = 'notes';
+    mnEditingExistingDraft = false;
+    document.querySelectorAll('#mnQueryList [data-q]').forEach(r => r.style.background = '');
+    renderMnRight();
+    renderMnLeft();
+  }
+  function mnSelectQuery(qid){
+    mnSelectedQueryId = qid;
+    mnRightMode = 'query';
+    mnEditingExistingDraft = false;
+    // Highlight in left
+    document.querySelectorAll('#mnQueryList [data-q]').forEach(r => {
+      const isSel = r.dataset.q === qid;
+      r.style.background = isSel ? '#EFF6FF' : '';
+      r.style.borderLeft = isSel ? '2px solid #0F5EE8' : '';
+    });
+    renderMnRight();
+  }
+  function renderMnQueryBody(){
+    const q = QUERIES.find(x => x.num === mnSelectedQueryId);
+    if (!q) return;
+    const wrap = document.getElementById('mnQueryBody');
+    const hasDraft = (q.status === 'draft' || q.status === 'answered' || q.status === 'generic') && q.response && q.response.trim();
+    const manualLine = q.manual ? `<div class="text-[11px] mt-1" style="color:#92400E;">Manual entry · Added during meeting · May 10, 2026</div>` : '';
+    const respPreview = hasDraft ? q.response.replace(/<[^>]+>/g,'').slice(0, 120) + (q.response.length > 120 ? '…' : '') : '';
+    const statusStrip = hasDraft && !mnEditingExistingDraft
+      ? `<div class="rounded-lg" style="background:#F0FDF4; border:1px solid #BBF7D0; padding:12px 14px; margin-bottom:14px;">
+          <div class="flex items-center justify-between gap-2 flex-wrap">
+            <div class="text-[13px] font-bold" style="color:#065F46;"><i data-lucide="check" class="w-3.5 h-3.5 inline-block -mt-0.5"></i> Response already drafted</div>
+            <div class="flex items-center gap-2">
+              <button onclick="mnTogglePreview('${q.num}')" class="text-[12px] text-primary hover:underline">View full response</button>
+              <button onclick="mnEditExistingDraft()" class="px-2.5 py-1 rounded-md border border-primary text-primary text-[12px] font-medium hover:bg-primary-light">Edit response</button>
+            </div>
+          </div>
+          <div id="mnRespPreview" class="text-[12px] italic mt-1" style="color:#374151;">${respPreview}</div>
+          <div class="text-[11px] mt-1" style="color:#9CA3AF;">…drafted on May 8 · ${q.status==='answered'?'Approved':'Pending approval'}</div>
+        </div>`
+      : (mnEditingExistingDraft
+          ? `<div class="rounded-md text-[12px]" style="background:#FFFBEB; padding:8px 12px; margin-bottom:12px; color:#92400E;">Editing existing draft — changes will update the response in Queries &amp; Responses tab</div>`
+          : `<div class="rounded-lg" style="background:#FFFBEB; border:1px solid #FCD34D; padding:12px 14px; margin-bottom:14px;">
+              <div class="text-[13px] font-bold" style="color:#92400E;">No response drafted yet</div>
+              <div class="text-[12px] mt-0.5" style="color:#78350F;">Draft a meeting response below. It will be saved as a draft — publish later.</div>
+            </div>`);
+    const editorContent = (hasDraft && mnEditingExistingDraft) ? q.response : (hasDraft ? '' : '');
+    const vendorField = q.manual
+      ? `<div class="mt-3"><label class="block text-[12px]" style="color:#6B7280;">Vendor who asked this:</label>
+          <select class="mt-1 text-[13px]" style="border:1px solid #D1D5DB; border-radius:6px; padding:7px 10px;" onchange="QUERIES.find(x=>x.num==='${q.num}').vendor = this.value">
+            ${VENDORS.map(v => `<option ${v===q.vendor?'selected':''}>${v}</option>`).join('')}
+          </select>
+        </div>`
+      : '';
+    wrap.innerHTML = `
+      <div class="p-4">
+        <!-- Query display -->
+        <div class="rounded-lg" style="background:#F9FAFB; padding:14px 16px; margin-bottom:16px;">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-[12px] font-bold text-primary font-mono" style="background:#EFF6FF; border-radius:4px; padding:1px 6px;">${q.num}</span>
+            <span class="text-[10.5px] font-medium" style="${typePillStyle(q.type)}; border-radius:14px; padding:2px 8px;">${q.type}</span>
+            <span class="text-[10.5px] font-medium" style="${formPillStyle(q.form)}; border-radius:14px; padding:2px 8px;">${q.form}</span>
+            <span class="ml-auto text-[11px] text-ink-500">Received ${q.received}</span>
+          </div>
+          <div class="text-[11px] mt-1" style="color:#9CA3AF;">Source: ${q.source} submission · ${q.vendor || 'Unknown vendor'}</div>
+          ${manualLine}
+          <p class="text-[14px] mt-2 text-ink-900" style="line-height:1.7;">${q.text}</p>
+        </div>
+
+        ${statusStrip}
+
+        ${(!hasDraft || mnEditingExistingDraft) ? `
+        <label class="block text-[13px] font-bold text-ink-900 mb-2">Meeting Response</label>
+        <div class="border border-line rounded-lg overflow-hidden">
+          <div class="flex items-center gap-1 px-2 py-1.5 border-b border-line bg-surface">
+            <button onmousedown="event.preventDefault(); document.execCommand('bold')" aria-label="Bold" class="w-7 h-7 rounded hover:bg-white text-ink-500 flex items-center justify-center"><i data-lucide="bold" class="w-3.5 h-3.5"></i></button>
+            <button onmousedown="event.preventDefault(); document.execCommand('italic')" aria-label="Italic" class="w-7 h-7 rounded hover:bg-white text-ink-500 flex items-center justify-center"><i data-lucide="italic" class="w-3.5 h-3.5"></i></button>
+            <button onmousedown="event.preventDefault(); document.execCommand('insertUnorderedList')" aria-label="Bullet" class="w-7 h-7 rounded hover:bg-white text-ink-500 flex items-center justify-center"><i data-lucide="list" class="w-3.5 h-3.5"></i></button>
+            <button onmousedown="event.preventDefault(); document.execCommand('insertOrderedList')" aria-label="Numbered" class="w-7 h-7 rounded hover:bg-white text-ink-500 flex items-center justify-center"><i data-lucide="list-ordered" class="w-3.5 h-3.5"></i></button>
+          </div>
+          <div id="mnEditor-${q.num}" contenteditable="true" data-placeholder="Draft a response based on the meeting discussion…" style="min-height:120px; padding:12px; font-size:13px; outline:none;" oninput="(QUERIES.find(x=>x.num==='${q.num}')||{}).response = this.innerHTML; if((QUERIES.find(x=>x.num==='${q.num}')||{}).status === 'unanswered'){QUERIES.find(x=>x.num==='${q.num}').status='draft';}">${editorContent}</div>
+        </div>
+
+        <!-- Row 1: AI + standard -->
+        <div class="mt-3 flex items-center gap-2 flex-wrap">
+          <button onclick="mnGenerateAI('${q.num}')" class="px-2.5 py-1.5 rounded-md border border-primary-border text-primary text-[12px] font-medium hover:bg-primary-light inline-flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Generate AI Response</button>
+          <button class="px-2.5 py-1.5 rounded-md border border-line text-ink-900 text-[12px] hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="library" class="w-3.5 h-3.5"></i> Standard response</button>
+          <button onclick="mnApplyChip('${q.num}','refer')" class="text-[12px] text-ink-900 hover:border-primary hover:text-primary" style="border:1px solid #E5E7EB; border-radius:20px; padding:4px 12px; background:white;">Refer to document</button>
+          <button onclick="mnApplyChip('${q.num}','cannot')" class="text-[12px] text-ink-900 hover:border-primary hover:text-primary" style="border:1px solid #E5E7EB; border-radius:20px; padding:4px 12px; background:white;">Cannot disclose</button>
+          <button onclick="mnApplyChip('${q.num}','nochange')" class="text-[12px] text-ink-900 hover:border-primary hover:text-primary" style="border:1px solid #E5E7EB; border-radius:20px; padding:4px 12px; background:white;">No change required</button>
+        </div>
+
+        <!-- Row 2: meta -->
+        <div class="mt-3 flex items-center justify-between gap-3 flex-wrap">
+          <div class="flex items-center gap-2 text-[12px] text-ink-900">
+            Requires corrigendum?
+            <label class="toggle"><input type="checkbox" onchange="mnToggleCorrigendum(this)"><span class="slider"></span></label>
+            <span class="hidden text-[11px] font-medium" data-corrigendum-msg style="color:#92400E;">Corrigendum will be issued</span>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-[12px]" style="color:#6B7280;">Assign to:</span>
+            <select id="mnAssignSel-${q.num}" class="text-[12px]" style="border:1px solid #D1D5DB; border-radius:6px; padding:6px 10px; width:160px;">
+              <option value="">Select officer…</option>
+              <option ${q.assigned==='Priya Shah'?'selected':''}>Priya Shah</option>
+              <option ${q.assigned==='Amit Patil'?'selected':''}>Amit Patil</option>
+              <option ${q.assigned==='Sunita Rao'?'selected':''}>Sunita Rao</option>
+            </select>
+            <button onclick="mnAssign('${q.num}')" class="px-2.5 py-1 rounded-md border border-primary text-primary text-[12px] font-medium hover:bg-primary-light">Assign</button>
+          </div>
+        </div>
+
+        ${vendorField}
+
+        <!-- Publication notice -->
+        <div class="mt-3 rounded-lg flex items-start gap-2 text-[12px]" style="background:#EFF6FF; border:1px solid #BFDBFE; padding:8px 12px; color:#1D4ED8;">
+          <i data-lucide="info" class="w-3 h-3 mt-0.5"></i>
+          <span>This response is saved as a draft. Publish it from the Queries &amp; Responses tab.</span>
+        </div>
+        ` : ''}
+      </div>`;
+    refreshIcons();
+  }
+
+  function mnTogglePreview(qid){
+    // Expand preview to full text
+    const q = QUERIES.find(x => x.num === qid); if (!q) return;
+    const el = document.getElementById('mnRespPreview');
+    if (!el) return;
+    el.innerHTML = q.response.replace(/<[^>]+>/g,'');
+    el.style.fontStyle = 'normal';
+  }
+  function mnEditExistingDraft(){
+    mnEditingExistingDraft = true;
+    renderMnQueryBody();
+  }
+  function mnToggleCorrigendum(toggle){
+    const msg = toggle.closest('.flex').querySelector('[data-corrigendum-msg]');
+    if (msg) msg.classList.toggle('hidden', !toggle.checked);
+  }
+  function mnGenerateAI(qid){
+    const q = QUERIES.find(x => x.num === qid); if (!q) return;
+    const html = `<p>Based on the meeting discussion, the Department response is as follows:</p><ul><li>The matter has been considered in light of the BOQ, drawings and standard procurement guidelines.</li><li>A formal response will be issued via the official channel after meeting minutes are confirmed.</li></ul>`;
+    const ed = document.getElementById('mnEditor-' + qid);
+    if (ed){ ed.innerHTML = html; }
+    q.response = html;
+    if (q.status === 'unanswered' || q.status === 'assigned') q.status = 'draft';
+    showToast('AI response drafted');
+  }
+  function mnApplyChip(qid, kind){
+    const q = QUERIES.find(x => x.num === qid); if (!q) return;
+    const map = {
+      refer:    'The answer to this query is clearly stated in the tender document. Vendors are requested to refer to the relevant clauses before raising further queries.',
+      cannot:   'The information requested is not available for public disclosure at this stage. All vendors have access to the same information through the published tender document.',
+      nochange: 'After due consideration during the meeting, no changes to the tender document are required. The terms, conditions, and specifications as published remain unchanged.',
+    };
+    const html = '<p>' + map[kind] + '</p>';
+    const ed = document.getElementById('mnEditor-' + qid);
+    if (ed){ ed.innerHTML = html; }
+    q.response = html;
+    if (q.status === 'unanswered' || q.status === 'assigned') q.status = 'draft';
+  }
+  function mnAssign(qid){
+    const sel = document.getElementById('mnAssignSel-' + qid);
+    if (!sel || !sel.value){ showToast('Pick an officer first'); return; }
+    const q = QUERIES.find(x => x.num === qid); if (!q) return;
+    q.assigned = sel.value;
+    if (q.status === 'unanswered') q.status = 'assigned';
+    showToast(`${qid} assigned to ${sel.value}`);
+  }
+  function mnSaveDraft(){
+    const qid = mnSelectedQueryId; if (!qid) return;
+    const q = QUERIES.find(x => x.num === qid); if (!q) return;
+    const ed = document.getElementById('mnEditor-' + qid);
+    if (ed) q.response = ed.innerHTML;
+    if (q.response && q.response.trim() && q.status === 'unanswered') q.status = 'draft';
+    showToast('Draft saved — synced to Queries & Responses');
+  }
+  function mnSendForApproval(){
+    const qid = mnSelectedQueryId; if (!qid) return;
+    const q = QUERIES.find(x => x.num === qid); if (!q) return;
+    const ed = document.getElementById('mnEditor-' + qid);
+    if (ed) q.response = ed.innerHTML;
+    if (!q.response || !q.response.trim()){ showToast('Write a response first'); return; }
+    q.status = 'answered';
+    q.published = 'Today';
+    showToast(`${qid} sent for approval`);
+  }
+  function mnSaveToNotes(){
+    const qid = mnSelectedQueryId; if (!qid) return;
+    const q = QUERIES.find(x => x.num === qid); if (!q) return;
+    // Append to notes doc
+    const doc = document.getElementById('notesDoc');
+    if (doc){
+      const block = document.createElement('div');
+      block.className = 'qa-block slide-in';
+      const ans = q.response ? q.response.replace(/<[^>]+>/g,'') : '[To be discussed in meeting]';
+      block.innerHTML = `<div><span class="q-label">Q.</span> <span>${q.text}</span></div>
+        <div class="mt-1"><span class="a-label">Ans.</span> <span>${ans}</span></div>`;
+      doc.appendChild(block);
+    }
+    // Pulse the back-to-notes link
+    const backLink = document.getElementById('mnBackToNotes');
+    if (backLink){
+      backLink.style.transition = 'color 150ms ease';
+      backLink.style.color = '#0F5EE8';
+      setTimeout(() => { backLink.style.color = ''; }, 600);
+    }
+    showToast('Added to meeting notes');
+  }
+
+  // ----- Add to notes (from left panel) -----
+  function mnAddToNotes(qid){
+    const q = QUERIES.find(x => x.num === qid); if (!q) return;
+    const doc = document.getElementById('notesDoc');
+    if (!doc) return;
+    const block = document.createElement('div');
+    block.className = 'qa-block slide-in';
+    const ans = q.response ? q.response.replace(/<[^>]+>/g,'') : '<em class="text-ink-400">[To be discussed in meeting]</em>';
+    block.innerHTML = `<div><span class="q-label">Q.</span> <span>${q.text}</span></div>
+      <div class="mt-1"><span class="a-label">Ans.</span> <span>${ans}</span></div>`;
+    doc.appendChild(block);
+    showToast(`${qid} added to notes`);
+  }
+  function mnAddGroupToNotes(gid){
+    const g = GROUPS[gid]; if (!g) return;
+    const doc = document.getElementById('notesDoc');
+    if (!doc) return;
+    const heading = document.createElement('h4');
+    heading.textContent = `${g.topic} Queries`;
+    heading.classList.add('slide-in');
+    doc.appendChild(heading);
+    g.members.forEach(qid => {
+      const q = QUERIES.find(x => x.num === qid); if (!q) return;
+      const block = document.createElement('div');
+      block.className = 'qa-block slide-in';
+      const ans = q.response ? q.response.replace(/<[^>]+>/g,'') : '<em class="text-ink-400">[To be discussed in meeting]</em>';
+      block.innerHTML = `<div><span class="q-label">Q.</span> <span>${q.text}</span></div>
+        <div class="mt-1"><span class="a-label">Ans.</span> <span>${ans}</span></div>`;
+      doc.appendChild(block);
+    });
+    showToast(`Group ${gid} added to notes`);
+  }
+  function addBlankNoteBlock(){
+    const doc = document.getElementById('notesDoc');
+    if (!doc) return;
+    const block = document.createElement('div');
+    block.className = 'qa-block slide-in';
+    block.innerHTML = `<div><span class="q-label">Q.</span> <span class="text-ink-400" contenteditable="true">[Type the question here]</span></div>
+      <div class="mt-1"><span class="a-label">Ans.</span> <span class="text-ink-400" contenteditable="true">[Type the response here]</span></div>`;
+    doc.appendChild(block);
+  }
+  function autoPopulateNotes(){
+    const doc = document.getElementById('notesDoc');
+    if (!doc) return;
+    doc.innerHTML = '';
+    Object.entries(GROUPS).filter(([gid, g]) => g.members.length > 0).forEach(([gid, g]) => {
+      const heading = document.createElement('h4');
+      heading.textContent = `${g.topic} Queries`;
+      doc.appendChild(heading);
+      g.members.forEach(qid => {
+        const q = QUERIES.find(x => x.num === qid); if (!q) return;
+        const block = document.createElement('div');
+        block.className = 'qa-block slide-in';
+        const ans = q.response ? q.response.replace(/<[^>]+>/g,'') : '<em class="text-ink-400">[To be discussed in meeting]</em>';
+        block.innerHTML = `<div><span class="q-label">Q.</span> <span>${q.text}</span></div>
+          <div class="mt-1"><span class="a-label">Ans.</span> <span>${ans}</span></div>`;
+        doc.appendChild(block);
+      });
+    });
+    showToast('Notes auto-populated from AI groups');
+  }
+
+  // ----- Manual entry (from sticky bottom of left panel) -----
+  function toggleManualEntryMN(){
+    const f = document.getElementById('mnManualForm');
+    if (f) f.classList.toggle('hidden');
+  }
+  function saveManualEntryMN(){
+    const text = document.getElementById('mnManualQ').value.trim();
+    const vendorSel = document.getElementById('mnManualVendor').value;
+    if (!text){ showToast('Type the question first'); return; }
+    if (!vendorSel || vendorSel === '__new'){ showToast('Pick a vendor'); return; }
+    // Generate new Q-number
+    const maxNum = QUERIES.reduce((m, q) => {
+      const n = parseInt(q.num.replace(/[^0-9]/g,''), 10);
+      return n > m ? n : m;
+    }, 0);
+    const num = 'Q-' + String(maxNum + 1).padStart(3, '0');
+    const now = new Date().toLocaleString('en-IN', { day:'numeric', month:'short', hour:'numeric', minute:'2-digit' });
+    const newQuery = {
+      num, section:'General / Other', vendor: vendorSel, source:'Phone', type:'Clarification', form:'Information',
+      received: now, text, status:'unanswered', response:'', assigned:null, group:null, published:'',
+      imported:false, manual:true,
+    };
+    QUERIES.unshift(newQuery);
+    // Reset form
+    document.getElementById('mnManualQ').value = '';
+    document.getElementById('mnManualVendor').value = '';
+    document.getElementById('mnManualForm').classList.add('hidden');
+    // Select and load the new query in the right panel
+    mnSelectQuery(num);
+    renderMnLeft();
+    // Also re-render Tab 1 if those functions exist
+    if (typeof renderQueryList === 'function') renderQueryList();
+    if (typeof recountFilters === 'function') recountFilters();
+    showToast(`${num} added — drafted from manual entry`);
+  }
+
+  // ----- MoM upload -----
+  function simulateMomUpload(){
+    if (momUploaded) return;
+    momUploaded = true;
+    document.getElementById('momUploadZone').classList.add('hidden');
+    document.getElementById('momUploaded').classList.remove('hidden');
+    const sm = document.getElementById('summaryMom'); if (sm) sm.textContent = 'Yes';
+    showToast('MoM document uploaded');
+  }
+  function replaceMom(){
+    momUploaded = false;
+    document.getElementById('momUploadZone').classList.remove('hidden');
+    document.getElementById('momUploaded').classList.add('hidden');
+    showToast('Upload a new MoM document');
+  }
+
+  // ============================================================
+  // TAB 4 — DOCUMENTATION
+  // ============================================================
+  let docFilter = 'all';
+  document.querySelectorAll('.doc-filter').forEach(p => p.addEventListener('click', () => {
+    document.querySelectorAll('.doc-filter').forEach(x => x.classList.remove('active'));
+    p.classList.add('active');
+    docFilter = p.dataset.df;
+    renderDocsTable();
+  }));
+  function renderDocsTable(){
+    const body = document.getElementById('docTableBody');
+    let rows = QUERIES.slice();
+    if (docFilter === 'draft')     rows = rows.filter(q => q.status === 'draft' || q.status === 'generic');
+    else if (docFilter === 'approved')  rows = rows.filter(q => q.status === 'answered' && !q.published);
+    else if (docFilter === 'published') rows = rows.filter(q => q.published);
+    body.innerHTML = rows.map(q => {
+      const stat = q.status === 'answered' && q.published ? { label:'Published', style:'background:#F0FDF4; color:#10B981;' }
+                  : q.status === 'answered' ? { label:'Approved', style:'background:#EFF6FF; color:#0F5EE8;' }
+                  : q.status === 'draft' || q.status === 'generic' ? { label:'Draft', style:'background:#FFFBEB; color:#92400E;' }
+                  : { label:'Unanswered', style:'background:#F3F4F6; color:#6B7280;' };
+      const respText = q.response ? q.response.replace(/<[^>]+>/g,'').slice(0, 80) + (q.response.length > 80 ? '…' : '') : '<em class="text-ink-400">—</em>';
+      return `<tr class="hover:bg-surface">
+        <td class="px-3 py-2.5"><input type="checkbox" class="accent-primary doc-row-check" data-q="${q.num}"></td>
+        <td class="px-3 py-2.5 font-mono text-[11.5px] font-bold text-primary">${q.num}</td>
+        <td class="px-3 py-2.5 text-ink-900" style="max-width:260px;"><div class="truncate">${q.text}</div><a href="#" class="text-[11px] text-primary hover:underline">Read more</a></td>
+        <td class="px-3 py-2.5 text-ink-500">${q.source}</td>
+        <td class="px-3 py-2.5"><span class="text-[10.5px] font-medium" style="${typePillStyle(q.type)}; border-radius:14px; padding:1px 7px;">${q.type}</span></td>
+        <td class="px-3 py-2.5 text-ink-900" style="max-width:240px;"><div class="truncate">${respText}</div></td>
+        <td class="px-3 py-2.5"><span class="text-[10.5px] font-medium" style="${stat.style}; border-radius:14px; padding:1px 7px;">${stat.label}</span></td>
+        <td class="px-3 py-2.5 text-ink-500 text-[11.5px]">${q.published || '—'}</td>
+      </tr>`;
+    }).join('');
+    refreshIcons();
+  }
+  function docToggleAll(checked){
+    document.querySelectorAll('.doc-row-check').forEach(c => c.checked = checked);
+  }
+  function publishAllApproved(){
+    let n = 0;
+    QUERIES.forEach(q => { if (q.status === 'answered' && !q.published){ q.published = 'May 15'; n++; } });
+    renderDocsTable();
+    renderQueryList();
+    showToast(n ? `Published ${n} approved responses` : 'No approved responses pending publication');
+  }
+
+  function renderCorrigendum(){
+    const wrap = document.getElementById('corrigendumWrap');
+    const hasAmend = QUERIES.some(q => q.status === 'draft' && q.response.toLowerCase().includes('corrigendum'));
+    if (hasAmend){
+      wrap.innerHTML = `<div class="bg-warning-light border border-warning/40 rounded-xl p-5">
+        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-warning text-white text-[10.5px] font-bold uppercase tracking-wide">Pending Corrigendum</span>
+        <h4 class="text-[14px] font-bold text-ink-900 mt-2">Amendments triggered by response drafts</h4>
+        <p class="text-[12.5px] text-ink-900 mt-1">One or more draft responses trigger amendments to the tender document. Issue a corrigendum to finalise.</p>
+        <div class="mt-3"><a href="tender-creation.html#corrigendum?tnd=TND-2026-001" class="px-3 py-1.5 rounded-lg bg-primary text-white text-[12.5px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5">Issue Corrigendum <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></a></div>
+      </div>`;
+      document.getElementById('summaryCorrigendum').textContent = 'Yes';
+    } else {
+      wrap.innerHTML = `<div class="rounded-xl p-4 inline-flex items-start gap-2" style="background:#F0FDF4; border:1px solid #BBF7D0;">
+        <i data-lucide="check-circle-2" class="w-4 h-4 shrink-0 mt-0.5" style="color:#10B981;"></i>
+        <span class="text-[13px]" style="color:#065F46;">No corrigendum required for this tender.</span>
+      </div>`;
+      document.getElementById('summaryCorrigendum').textContent = 'No';
+    }
+    refreshIcons();
+  }
+
+  // ============================================================
+  // BOOT
+  // ============================================================
+  (function boot(){
+    const params = new URLSearchParams(location.search);
+    const tnd = params.get('tender');
+    if (tnd){
+      openWorkspace(tnd);
+    } else {
+      renderActiveList('');
+    }
+  })();
+
+  // Close modal on backdrop click + Escape
+  document.getElementById('genericModal').addEventListener('click', (e) => {
+    if (e.target.id === 'genericModal') closeGenericModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !document.getElementById('genericModal').classList.contains('hidden')) closeGenericModal();
+  });
+</script>
+</body>
+</html>

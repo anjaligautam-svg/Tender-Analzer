@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Procurement Dashboard — TenderAI Hub</title>
+  <meta name="description" content="Ahmedabad Municipal Corporation procurement dashboard — manage tenders, bids, evaluations and approvals." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>
+    tailwind.config = { theme: { extend: {
+      fontFamily: { sans: ['"DM Sans"', 'system-ui', 'sans-serif'] },
+      colors: {
+        primary: { DEFAULT: '#0F5EE8', light: '#EFF6FF', border: '#93C5FD' },
+        success: { DEFAULT: '#10B981', light: '#F0FDF4' },
+        warning: { DEFAULT: '#F59E0B', light: '#FFFBEB' },
+        danger:  { DEFAULT: '#EF4444', light: '#FEF2F2' },
+        ink: { 900: '#111827', 500: '#6B7280', 400: '#9CA3AF' },
+        line: '#E5E7EB', surface: '#F9FAFB',
+      },
+      boxShadow: { soft: '0 1px 3px rgba(0,0,0,0.08)', lift: '0 4px 12px rgba(0,0,0,0.12)' },
+    }}};
+  </script>
+  <style>
+    html, body { font-family: 'DM Sans', system-ui, sans-serif; color: #111827; background: #F9FAFB; }
+    *:focus-visible { outline: 2px solid #0F5EE8; outline-offset: 2px; border-radius: 4px; }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 8px; }
+    ::-webkit-scrollbar-thumb:hover { background: #D1D5DB; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    .stat-card { transition: all .15s ease; }
+    .stat-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); transform: translateY(-1px); }
+    .pickup-card { transition: all .15s ease; }
+    .pickup-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); transform: translateY(-2px); }
+    .quick-tile { transition: all .15s ease; cursor: pointer; }
+    .quick-tile:hover { background: #F0F7FF; border-color: #0F5EE8; transform: scale(1.02); }
+    .quick-tile:active { transform: scale(0.98); }
+    /* Hide scrollbar on horizontal pickup row */
+    .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .pickup-fade {
+      position: absolute; top: 0; right: 0; bottom: 0; width: 60px;
+      background: linear-gradient(to right, rgba(249,250,251,0), #F9FAFB 80%);
+      pointer-events: none;
+    }
+    /* Toggle pills */
+    .toggle-pill { transition: all .15s ease; }
+    /* Calendar cells */
+    .cal-cell { transition: background .15s ease; cursor: pointer; }
+    .cal-cell:hover { background: #F9FAFB; border-radius: 6px; }
+    .cal-today {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: #0F5EE8; color: white;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-weight: 600;
+    }
+    /* View fade swap */
+    .view-fade { transition: opacity .15s ease, transform .15s ease; }
+    .view-fade.hidden-view { opacity: 0; transform: translateY(4px); pointer-events: none; position: absolute; }
+    /* Toast */
+    .toast { transform: translateY(80px); opacity: 0; transition: transform .3s cubic-bezier(.2,.7,.2,1), opacity .25s ease; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    /* Schedule panel slide */
+    #schedulePanel { transition: transform .25s ease, width .25s ease; }
+    #schedulePanel.collapsed { transform: translateX(100%); width: 0; }
+    .dropdown-shadow { box-shadow: 0 12px 32px rgba(17,24,39,0.14), 0 2px 6px rgba(17,24,39,0.06); }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+  </style>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="w-[244px] shrink-0 bg-white border-r border-line flex flex-col" aria-label="Primary">
+    <div class="px-5 pt-5 pb-4 border-b border-line">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-[15px]">T</div>
+        <div>
+          <div class="text-[15px] font-semibold text-ink-900 leading-tight">TenderAI</div>
+          <div class="text-[11px] text-ink-500 leading-tight">Procurement Portal</div>
+        </div>
+      </div>
+      <button class="mt-4 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-line bg-surface hover:bg-white hover:shadow-soft transition" aria-label="Switch organisation">
+        <div class="w-7 h-7 rounded-md bg-primary-light text-primary flex items-center justify-center"><i data-lucide="building-2" class="w-4 h-4"></i></div>
+        <div class="text-left flex-1 min-w-0">
+          <div class="text-[12.5px] font-medium text-ink-900 truncate">Ahmedabad</div>
+          <div class="text-[10.5px] text-ink-500 truncate">Municipal Corporation</div>
+        </div>
+        <i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 text-ink-400"></i>
+      </button>
+    </div>
+    <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+      <div>
+        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">OVERVIEW</div>
+        <ul class="space-y-0.5">
+          <li><a href="index.html" aria-current="page" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] bg-primary-light text-primary font-medium"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">TENDERING</div>
+        <ul class="space-y-0.5">
+          <li><a href="dpr-creation.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="clipboard-list" class="w-4 h-4"></i> DPR Creation</a></li>
+          <li><a href="tender-creation.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="file-plus-2" class="w-4 h-4"></i> Tender Creation</a></li>
+          <li><a href="prebid-queries.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="messages-square" class="w-4 h-4"></i> Pre-Bid Queries
+            <span class="ml-auto bg-primary text-white text-[10px] font-semibold rounded-full px-1.5 py-0.5">11</span></a></li>
+          <li><a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="gavel" class="w-4 h-4"></i> Bid Management</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">EVALUATING</div>
+        <ul class="space-y-0.5">
+          <li><a href="evaluation.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="clipboard-check" class="w-4 h-4"></i> Evaluation</a></li>
+          <li><a href="evaluation.html#financial" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="git-compare" class="w-4 h-4"></i> Comparative Stateme…</a></li>
+          <li><a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="sparkles" class="w-4 h-4"></i> AI Assistant</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">POST AWARD</div>
+        <ul class="space-y-0.5">
+          <li><a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Analytics</a></li>
+        </ul>
+      </div>
+    </nav>
+    <div class="border-t border-line px-4 py-3 flex items-center gap-3">
+      <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div>
+      <div class="flex-1 min-w-0">
+        <div class="text-[12.5px] font-medium text-ink-900 truncate">Rajesh Kumar</div>
+        <div class="text-[10.5px] text-ink-500 truncate">Super Admin</div>
+      </div>
+      <button onclick="sessionStorage.clear(); location.href=&apos;login.html&apos;" aria-label="Sign out" class="text-ink-400 hover:text-ink-900"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN COLUMN ============ -->
+  <div class="flex-1 flex flex-col min-w-0">
+
+    <!-- Topnav -->
+    <header class="h-16 bg-white border-b border-line px-6 flex items-center gap-4 sticky top-0 z-30">
+      <button aria-label="Toggle sidebar" class="text-ink-500 hover:text-ink-900"><i data-lucide="panel-left" class="w-5 h-5"></i></button>
+      <div class="flex-1 max-w-xl relative">
+        <i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+        <input type="search" placeholder="Search tenders, bids, vendors…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] placeholder:text-ink-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+      </div>
+      <button class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">FY 2026-27 <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+      <button id="schedToggle" aria-label="Toggle schedule panel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500 hover:text-ink-900"><i data-lucide="calendar" class="w-4 h-4"></i></button>
+      <div class="relative">
+        <button id="bellBtn" aria-label="Notifications" class="relative w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500">
+          <i data-lucide="bell" class="w-4 h-4"></i>
+          <span class="absolute -top-1 -right-1 bg-danger text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">6</span>
+        </button>
+        <div id="bellMenu" class="hidden absolute right-0 mt-2 w-[360px] bg-white border border-line rounded-xl dropdown-shadow z-40">
+          <div class="px-4 py-3 border-b border-line flex items-center justify-between"><div class="text-[14px] font-semibold text-ink-900">Notifications</div><a href="#" class="text-[12px] text-primary hover:underline">Mark all read</a></div>
+          <ul class="max-h-[420px] overflow-y-auto divide-y divide-line">
+            <li class="px-4 py-3 hover:bg-surface"><div class="flex gap-2.5"><div class="w-8 h-8 rounded-full bg-warning-light text-warning flex items-center justify-center shrink-0"><i data-lucide="alert-triangle" class="w-4 h-4"></i></div><div class="flex-1 min-w-0"><div class="text-[13px] text-ink-900"><strong>2 queries</strong> on TND-2026-002 are past response deadline.</div><div class="text-[11px] text-ink-500 mt-0.5">2h ago</div></div></div></li>
+            <li class="px-4 py-3 hover:bg-surface"><div class="flex gap-2.5"><div class="w-8 h-8 rounded-full bg-primary-light text-primary flex items-center justify-center shrink-0"><i data-lucide="inbox" class="w-4 h-4"></i></div><div class="flex-1 min-w-0"><div class="text-[13px] text-ink-900"><strong>3 new bids</strong> received for TND-2026-001.</div><div class="text-[11px] text-ink-500 mt-0.5">4h ago</div></div></div></li>
+            <li class="px-4 py-3 hover:bg-surface"><div class="flex gap-2.5"><div class="w-8 h-8 rounded-full bg-success-light text-success flex items-center justify-center shrink-0"><i data-lucide="check-circle-2" class="w-4 h-4"></i></div><div class="flex-1 min-w-0"><div class="text-[13px] text-ink-900">DPR-2026-001 received Administrative Approval.</div><div class="text-[11px] text-ink-500 mt-0.5">Yesterday</div></div></div></li>
+            <li class="px-4 py-3 hover:bg-surface"><div class="flex gap-2.5"><div class="w-8 h-8 rounded-full bg-danger-light text-danger flex items-center justify-center shrink-0"><i data-lucide="alert-octagon" class="w-4 h-4"></i></div><div class="flex-1 min-w-0"><div class="text-[13px] text-ink-900">Fraud flag pending response on TND-2026-001 evaluation.</div><div class="text-[11px] text-ink-500 mt-0.5">Yesterday</div></div></div></li>
+            <li class="px-4 py-3 hover:bg-surface"><div class="flex gap-2.5"><div class="w-8 h-8 rounded-full bg-primary-light text-primary flex items-center justify-center shrink-0"><i data-lucide="clipboard-check" class="w-4 h-4"></i></div><div class="flex-1 min-w-0"><div class="text-[13px] text-ink-900">Priya Shah signed Evaluation Committee minutes.</div><div class="text-[11px] text-ink-500 mt-0.5">2 days ago</div></div></div></li>
+            <li class="px-4 py-3 hover:bg-surface"><div class="flex gap-2.5"><div class="w-8 h-8 rounded-full bg-warning-light text-warning flex items-center justify-center shrink-0"><i data-lucide="clock" class="w-4 h-4"></i></div><div class="flex-1 min-w-0"><div class="text-[13px] text-ink-900">DPR-2026-002 AA approval is overdue by 8 days.</div><div class="text-[11px] text-ink-500 mt-0.5">3 days ago</div></div></div></li>
+          </ul>
+          <a href="#" class="block px-4 py-3 text-center text-[12.5px] text-primary hover:bg-surface border-t border-line">View all notifications →</a>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 pl-2 border-l border-line">
+        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">U</div>
+        <div class="hidden md:block"><div class="text-[12.5px] font-medium text-ink-900 leading-tight">Admin User</div></div>
+        <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i>
+      </div>
+    </header>
+
+    <div class="flex-1 flex min-w-0">
+      <!-- Main scrollable area -->
+      <main class="flex-1 overflow-y-auto px-8 py-6 space-y-8 min-w-0">
+
+        <!-- Page header -->
+        <section>
+          <div class="text-[13px] text-ink-500 mb-2">Dashboard</div>
+          <h1 class="text-[24px] font-bold text-ink-900 leading-tight">Procurement Dashboard</h1>
+          <p class="text-[14px] text-ink-500 mt-1">Ahmedabad Municipal Corporation</p>
+        </section>
+
+        <!-- 4 stat cards -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="stat-card bg-white border border-line rounded-xl p-5">
+            <div class="flex items-center justify-between mb-2"><div class="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center"><i data-lucide="file-text" class="w-4 h-4"></i></div><span class="text-[10.5px] uppercase tracking-wider text-ink-400 font-semibold">Active</span></div>
+            <div class="text-[26px] font-bold text-ink-900 leading-none">12</div>
+            <div class="text-[12px] text-ink-500 mt-1">Active Tenders</div>
+            <div class="text-[12px] text-warning mt-0.5 font-medium">3 closing this week</div>
+          </div>
+          <div class="stat-card bg-white border border-line rounded-xl p-5">
+            <div class="flex items-center justify-between mb-2"><div class="w-9 h-9 rounded-lg bg-warning-light text-warning flex items-center justify-center"><i data-lucide="clock" class="w-4 h-4"></i></div><span class="text-[10.5px] uppercase tracking-wider text-warning font-semibold">Soon</span></div>
+            <div class="text-[26px] font-bold text-warning leading-none">3</div>
+            <div class="text-[12px] text-ink-500 mt-1">Approaching Deadline</div>
+            <div class="text-[12px] text-ink-500 mt-0.5">Next 7 days</div>
+          </div>
+          <div class="stat-card bg-white border border-line rounded-xl p-5">
+            <div class="flex items-center justify-between mb-2"><div class="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center"><i data-lucide="inbox" class="w-4 h-4"></i></div><span class="text-[10.5px] uppercase tracking-wider text-primary font-semibold">Today</span></div>
+            <div class="text-[26px] font-bold text-ink-900 leading-none">8</div>
+            <div class="text-[12px] text-ink-500 mt-1">Bids Received Today</div>
+            <div class="text-[12px] text-ink-500 mt-0.5">Across 3 tenders</div>
+          </div>
+          <div class="stat-card bg-white border border-line rounded-xl p-5">
+            <div class="flex items-center justify-between mb-2"><div class="w-9 h-9 rounded-lg bg-success-light text-success flex items-center justify-center"><i data-lucide="trophy" class="w-4 h-4"></i></div><span class="text-[10.5px] uppercase tracking-wider text-success font-semibold">May</span></div>
+            <div class="text-[26px] font-bold text-ink-900 leading-none">4</div>
+            <div class="text-[12px] text-ink-500 mt-1">Awarded This Month</div>
+            <div class="text-[12px] text-success mt-0.5 font-medium">₹2.8 Cr value</div>
+          </div>
+        </section>
+
+        <!-- ================================== -->
+        <!-- MY DESK SECTION                    -->
+        <!-- ================================== -->
+        <section class="space-y-7">
+          <!-- Header row -->
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <h2 class="text-[20px] font-bold text-ink-900">My Desk</h2>
+            <p class="text-[13px] text-ink-500">Here's where things stand for you today</p>
+          </div>
+
+          <!-- Zone 1 — PICK UP WHERE YOU LEFT OFF -->
+          <div>
+            <div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold mb-3">Pick up where you left off</div>
+            <div class="relative">
+              <div class="no-scrollbar flex gap-4 overflow-x-auto pr-12">
+                <article class="pickup-card shrink-0 w-[240px] bg-white border border-line rounded-xl p-4 shadow-soft" style="border-left: 3px solid #0F5EE8;">
+                  <div class="text-[14px] font-bold text-ink-900 truncate">Water Supply Pipeline Install…</div>
+                  <div class="text-[12px] text-ink-400 font-mono">TND-2026-003</div>
+                  <div class="mt-2.5 h-1 rounded-[2px] bg-line overflow-hidden"><div class="h-full bg-primary" style="width: 65%;"></div></div>
+                  <div class="text-[12px] text-ink-500 mt-1.5">65% complete</div>
+                  <div class="mt-3 flex items-center justify-between">
+                    <span class="text-[11px] text-ink-400">Last edited 2 days ago</span>
+                    <a href="evaluation.html" class="text-[13px] font-bold text-primary hover:underline">Resume →</a>
+                  </div>
+                </article>
+
+                <article class="pickup-card shrink-0 w-[240px] bg-white border border-line rounded-xl p-4 shadow-soft" style="border-left: 3px solid #F59E0B;">
+                  <div class="text-[14px] font-bold text-ink-900 truncate">Street Lighting LED Retrofit P…</div>
+                  <div class="text-[12px] text-ink-400 font-mono">TND-2026-004</div>
+                  <div class="mt-2.5 h-1 rounded-[2px] bg-line overflow-hidden"><div class="h-full bg-primary" style="width: 30%;"></div></div>
+                  <div class="text-[12px] text-ink-500 mt-1.5">30% complete</div>
+                  <div class="mt-3 flex items-center justify-between">
+                    <span class="text-[11px] text-ink-400">Last edited 5 days ago</span>
+                    <a href="tender-creation.html#step1" class="text-[13px] font-bold text-primary hover:underline">Resume →</a>
+                  </div>
+                </article>
+
+                <article class="pickup-card shrink-0 w-[240px] bg-white border border-line rounded-xl p-4 shadow-soft" style="border-left: 3px solid #0F5EE8;">
+                  <div class="text-[14px] font-bold text-ink-900 truncate">AMC Office Renovation Phas…</div>
+                  <div class="text-[12px] text-ink-400 font-mono">TND-2026-007</div>
+                  <div class="mt-2.5 h-1 rounded-[2px] bg-line overflow-hidden"><div class="h-full bg-primary" style="width: 80%;"></div></div>
+                  <div class="text-[12px] text-ink-500 mt-1.5">80% complete</div>
+                  <div class="mt-3 flex items-center justify-between">
+                    <span class="text-[11px] text-ink-400">Last edited today</span>
+                    <a href="tender-creation.html#step5" class="text-[13px] font-bold text-primary hover:underline">Resume →</a>
+                  </div>
+                </article>
+
+                <article class="pickup-card shrink-0 w-[240px] bg-white border border-line rounded-xl p-4 shadow-soft" style="border-left: 3px solid #F59E0B;">
+                  <div class="text-[14px] font-bold text-ink-900 truncate">Solid Waste Manager…</div>
+                  <div class="text-[12px] text-ink-400 font-mono">TND-2026-009</div>
+                  <div class="mt-2.5 h-1 rounded-[2px] bg-line overflow-hidden"><div class="h-full bg-primary" style="width: 15%;"></div></div>
+                  <div class="text-[12px] text-ink-500 mt-1.5">15% complete</div>
+                  <div class="mt-3 flex items-center justify-between">
+                    <span class="text-[11px] text-ink-400">Last edited 1 week ago</span>
+                    <a href="tender-creation.html#step1" class="text-[13px] font-bold text-primary hover:underline">Resume →</a>
+                  </div>
+                </article>
+              </div>
+              <div class="pickup-fade"></div>
+            </div>
+          </div>
+
+          <!-- Zone 2 — QUICK ACTIONS -->
+          <div>
+            <div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold mb-3">Quick actions</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <a href="tender-creation.html" class="quick-tile bg-white border border-line rounded-xl px-4 py-6 text-center block">
+                <i data-lucide="file-text" class="w-7 h-7 text-primary mx-auto"></i>
+                <div class="text-[14px] font-bold text-ink-900 mt-3">Create New Tender</div>
+                <div class="text-[12px] text-ink-500 mt-1">Start from scratch or template</div>
+              </a>
+              <a href="evaluation.html" class="quick-tile bg-white border border-line rounded-xl px-4 py-6 text-center block">
+                <i data-lucide="inbox" class="w-7 h-7 text-primary mx-auto"></i>
+                <div class="text-[14px] font-bold text-ink-900 mt-3">Review Pending Bids</div>
+                <div class="text-[12px] text-ink-500 mt-1">5 bids awaiting evaluation</div>
+              </a>
+              <a href="prebid-queries.html" class="quick-tile bg-white border border-line rounded-xl px-4 py-6 text-center block">
+                <i data-lucide="message-square" class="w-7 h-7 text-primary mx-auto"></i>
+                <div class="text-[14px] font-bold text-ink-900 mt-3">Respond to Queries</div>
+                <div class="text-[12px] text-ink-500 mt-1">2 queries past deadline</div>
+              </a>
+              <a href="evaluation.html#financial" class="quick-tile bg-white border border-line rounded-xl px-4 py-6 text-center block">
+                <i data-lucide="bar-chart-2" class="w-7 h-7 text-primary mx-auto"></i>
+                <div class="text-[14px] font-bold text-ink-900 mt-3">Comparative Statement</div>
+                <div class="text-[12px] text-ink-500 mt-1">Generate for active tenders</div>
+              </a>
+              <a href="#" onclick="showToast('Bid summaries report — generating ZIP'); return false;" class="quick-tile bg-white border border-line rounded-xl px-4 py-6 text-center block">
+                <i data-lucide="download" class="w-7 h-7 text-primary mx-auto"></i>
+                <div class="text-[14px] font-bold text-ink-900 mt-3">Download Reports</div>
+                <div class="text-[12px] text-ink-500 mt-1">Bid summaries, analytics</div>
+              </a>
+              <a href="evaluation.html#audit" class="quick-tile bg-white border border-line rounded-xl px-4 py-6 text-center block">
+                <i data-lucide="search" class="w-7 h-7 text-primary mx-auto"></i>
+                <div class="text-[14px] font-bold text-ink-900 mt-3">Audit Trail</div>
+                <div class="text-[12px] text-ink-500 mt-1">View all activity logs</div>
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================== -->
+        <!-- ALL TENDERS                        -->
+        <!-- ================================== -->
+        <section class="space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <h2 class="text-[20px] font-bold text-ink-900">All Tenders</h2>
+            <a href="tender-creation.html" class="px-4 py-2.5 rounded-lg bg-primary text-white text-[13.5px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5 shadow-soft">
+              <i data-lucide="plus" class="w-4 h-4"></i> Create Tender
+            </a>
+          </div>
+
+          <!-- Filter pills -->
+          <div class="flex flex-wrap gap-2">
+            <button class="t-filter active px-4 py-1.5 rounded-full text-[13px] bg-primary text-white border border-primary" data-filter="all">All <span class="opacity-80">24</span></button>
+            <button class="t-filter px-4 py-1.5 rounded-full text-[13px] bg-white border border-line text-ink-500 hover:text-ink-900" data-filter="draft">Draft <span class="opacity-70">2</span></button>
+            <button class="t-filter px-4 py-1.5 rounded-full text-[13px] bg-white border border-line text-ink-500 hover:text-ink-900" data-filter="published">Published <span class="opacity-70">4</span></button>
+            <button class="t-filter px-4 py-1.5 rounded-full text-[13px] bg-white border border-line text-ink-500 hover:text-ink-900" data-filter="closed">Submission Closed <span class="opacity-70">3</span></button>
+            <button class="t-filter px-4 py-1.5 rounded-full text-[13px] bg-white border border-line text-ink-500 hover:text-ink-900" data-filter="evaluation">Under Evaluation <span class="opacity-70">5</span></button>
+            <button class="t-filter px-4 py-1.5 rounded-full text-[13px] bg-white border border-line text-ink-500 hover:text-ink-900" data-filter="award">Award Pending <span class="opacity-70">2</span></button>
+            <button class="t-filter px-4 py-1.5 rounded-full text-[13px] bg-white border border-line text-ink-500 hover:text-ink-900" data-filter="awarded">Awarded <span class="opacity-70">8</span></button>
+          </div>
+
+          <!-- Search + filters -->
+          <div class="bg-white border border-line rounded-xl p-3 flex items-center gap-2 flex-wrap">
+            <div class="flex-1 min-w-[260px] relative">
+              <i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <input type="search" oninput="filterTenders(this.value)" placeholder="Search by tender name, ID, or department…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+            </div>
+            <button class="px-3 py-2 rounded-lg border border-line text-[13px] inline-flex items-center gap-1.5 text-ink-900 hover:bg-surface"><i data-lucide="filter" class="w-3.5 h-3.5"></i> Filters</button>
+          </div>
+
+          <!-- Table -->
+          <div class="bg-white border border-line rounded-xl overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-[13.5px]">
+                <thead class="bg-surface border-b border-line">
+                  <tr class="text-[10.5px] uppercase tracking-wider text-ink-500 font-semibold">
+                    <th class="text-left px-5 py-3 font-semibold">Tender</th>
+                    <th class="text-left px-5 py-3 font-semibold">Department</th>
+                    <th class="text-left px-5 py-3 font-semibold">Deadline</th>
+                    <th class="text-left px-5 py-3 font-semibold">Status</th>
+                    <th class="text-right px-5 py-3 font-semibold">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="tendersBody" class="divide-y divide-line"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <div class="h-6"></div>
+      </main>
+
+      <!-- ============ SCHEDULE PANEL ============ -->
+      <aside id="schedulePanel" class="w-[360px] shrink-0 border-l border-line bg-white overflow-y-auto" aria-label="Schedule">
+        <div class="px-5 pt-5 pb-4 border-b border-line flex items-center justify-between">
+          <h2 class="text-[16px] font-bold text-ink-900">Schedule</h2>
+          <button onclick="toggleSchedule()" aria-label="Close schedule" class="text-ink-400 hover:text-ink-900"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+
+        <div class="px-5 pt-4 pb-2">
+          <div role="tablist" class="grid grid-cols-2 gap-2">
+            <button id="weekTab" role="tab" aria-selected="true" onclick="setSchedView('week')" class="toggle-pill px-3 py-1.5 rounded-full text-[12.5px] font-medium bg-primary text-white border border-primary">This Week</button>
+            <button id="monthTab" role="tab" aria-selected="false" onclick="setSchedView('month')" class="toggle-pill px-3 py-1.5 rounded-full text-[12.5px] font-medium bg-white border border-line text-ink-500 hover:text-ink-900">This Month</button>
+          </div>
+        </div>
+
+        <!-- This Week view -->
+        <div id="weekView" class="view-fade px-5 py-4 relative">
+          <!-- Week strip -->
+          <div class="grid grid-cols-7 gap-1.5 mb-5">
+            <div class="text-center"><div class="text-[10.5px] uppercase text-ink-400 font-semibold">Mon</div><div class="text-[14px] font-medium text-ink-900 mt-1">4</div><div class="flex justify-center gap-0.5 mt-1 h-[6px]"></div></div>
+            <div class="text-center"><div class="text-[10.5px] uppercase text-ink-400 font-semibold">Tue</div><div class="text-[14px] font-medium text-ink-900 mt-1">5</div><div class="flex justify-center gap-0.5 mt-1 h-[6px]"></div></div>
+            <div class="text-center"><div class="text-[10.5px] uppercase text-ink-400 font-semibold">Wed</div><div class="text-[14px] font-medium text-ink-900 mt-1">6</div><div class="flex justify-center gap-0.5 mt-1 h-[6px]"><span class="w-[6px] h-[6px] rounded-full" style="background:#EF4444"></span><span class="w-[6px] h-[6px] rounded-full" style="background:#F97316"></span></div></div>
+            <div class="text-center"><div class="text-[10.5px] uppercase text-ink-400 font-semibold">Thu</div><div class="text-[14px] font-medium text-ink-900 mt-1">7</div><div class="flex justify-center gap-0.5 mt-1 h-[6px]"><span class="w-[6px] h-[6px] rounded-full" style="background:#F59E0B"></span></div></div>
+            <div class="text-center"><div class="text-[10.5px] uppercase text-ink-400 font-semibold">Fri</div><div class="cal-today mx-auto mt-0.5">8</div><div class="flex justify-center gap-0.5 mt-1 h-[6px]"><span class="w-[6px] h-[6px] rounded-full" style="background:#F59E0B"></span><span class="w-[6px] h-[6px] rounded-full" style="background:#10B981"></span></div></div>
+            <div class="text-center"><div class="text-[10.5px] uppercase text-ink-400 font-semibold">Sat</div><div class="text-[14px] font-medium text-ink-900 mt-1">9</div><div class="flex justify-center gap-0.5 mt-1 h-[6px]"><span class="w-[6px] h-[6px] rounded-full" style="background:#8B5CF6"></span></div></div>
+            <div class="text-center"><div class="text-[10.5px] uppercase text-ink-400 font-semibold">Sun</div><div class="text-[14px] font-medium text-ink-900 mt-1">10</div><div class="flex justify-center gap-0.5 mt-1 h-[6px]"></div></div>
+          </div>
+
+          <!-- Upcoming events list -->
+          <div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold mb-2">Upcoming</div>
+          <ul class="space-y-3.5">
+            <li>
+              <div class="text-[12.5px] font-bold text-ink-900">Today, Fri May 8</div>
+              <div class="mt-1 flex items-start gap-2 text-[12px]"><span class="w-1.5 h-1.5 rounded-full mt-1.5" style="background:#F59E0B"></span><div><div class="text-ink-900">Bid submission closes</div><div class="text-ink-500 font-mono text-[11px]">TND-2026-002</div></div></div>
+              <div class="mt-1.5 flex items-start gap-2 text-[12px]"><span class="w-1.5 h-1.5 rounded-full mt-1.5" style="background:#10B981"></span><div><div class="text-ink-900">Evaluation completion target</div><div class="text-ink-500 font-mono text-[11px]">TND-2026-003</div></div></div>
+            </li>
+            <li>
+              <div class="text-[12.5px] font-bold text-ink-900">Sat, May 9</div>
+              <div class="mt-1 flex items-start gap-2 text-[12px]"><span class="w-1.5 h-1.5 rounded-full mt-1.5" style="background:#8B5CF6"></span><div><div class="text-ink-900">Milestone payment due</div><div class="text-ink-500 font-mono text-[11px]">CTR-2025-089</div></div></div>
+            </li>
+            <li>
+              <div class="text-[12.5px] font-bold text-ink-900">Sun, May 11</div>
+              <div class="mt-1 flex items-start gap-2 text-[12px]"><span class="w-1.5 h-1.5 rounded-full mt-1.5" style="background:#374151"></span><div><div class="text-ink-900">Quarterly audit review</div><div class="text-ink-500 font-mono text-[11px]">AUD-2026-012</div></div></div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- This Month view -->
+        <div id="monthView" class="view-fade hidden-view px-5 py-4 relative">
+          <div class="text-[12.5px] font-bold text-ink-900 mb-3">May 2026</div>
+          <!-- Day-of-week header -->
+          <div class="grid grid-cols-7 gap-1 mb-1">
+            <div class="text-center text-[11px] text-ink-500 font-medium py-1">Mon</div>
+            <div class="text-center text-[11px] text-ink-500 font-medium py-1">Tue</div>
+            <div class="text-center text-[11px] text-ink-500 font-medium py-1">Wed</div>
+            <div class="text-center text-[11px] text-ink-500 font-medium py-1">Thu</div>
+            <div class="text-center text-[11px] text-ink-500 font-medium py-1">Fri</div>
+            <div class="text-center text-[11px] text-ink-500 font-medium py-1">Sat</div>
+            <div class="text-center text-[11px] text-ink-500 font-medium py-1">Sun</div>
+          </div>
+          <!-- Cells (populated by JS) -->
+          <div id="monthGrid" class="grid grid-cols-7 gap-1"></div>
+
+          <!-- Upcoming list (same data as week) -->
+          <div class="mt-5">
+            <div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold mb-2">Upcoming</div>
+            <ul class="space-y-3.5" id="monthUpcoming"></ul>
+          </div>
+
+          <!-- Day popover -->
+          <div id="dayPopover" class="hidden absolute z-30 bg-white border border-line rounded-lg p-3 w-[260px]" style="box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+            <div class="flex items-center justify-between mb-2">
+              <div id="popoverDate" class="text-[12.5px] font-bold text-ink-900">Date</div>
+              <button onclick="document.getElementById('dayPopover').classList.add('hidden')" aria-label="Close" class="text-ink-400 hover:text-ink-900"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+            </div>
+            <ul id="popoverEvents" class="space-y-2"></ul>
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="px-5 py-4 border-t border-line">
+          <div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold mb-2.5">Legend</div>
+          <div class="grid grid-cols-2 gap-y-1.5 gap-x-3 text-[12px]">
+            <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full" style="background:#0F5EE8"></span> Publication</div>
+            <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full" style="background:#EF4444"></span> Pre-Bid Query Deadline</div>
+            <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full" style="background:#F97316"></span> Pre-Bid Meeting</div>
+            <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full" style="background:#F59E0B"></span> Bid Submission</div>
+            <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full" style="background:#10B981"></span> Evaluation Target</div>
+            <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full" style="background:#8B5CF6"></span> Milestone Payment</div>
+            <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full" style="background:#374151"></span> Audit Review</div>
+          </div>
+        </div>
+
+        <!-- AI Assistant FAB -->
+        <button class="fixed bottom-6 right-6 z-30 w-12 h-12 rounded-full bg-primary text-white shadow-lift flex items-center justify-center hover:bg-primary/90" aria-label="AI Assistant"><i data-lucide="sparkles" class="w-5 h-5"></i></button>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-ink-900 text-white text-[13px] px-4 py-3 rounded-xl shadow-lift inline-flex items-center gap-2.5">
+  <i data-lucide="check-circle-2" class="w-4 h-4 text-success"></i>
+  <span id="toastMsg">Done</span>
+</div>
+
+<script>
+  function refreshIcons(){ if (window.lucide) lucide.createIcons(); }
+  let toastTimer;
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // ============ TENDERS DATA ============
+  const TENDERS = [
+    { name:'Supply of Desktop Computers for AMC Offices', id:'TND-2026-001', dept:'IT',             deadline:'15 May 2026', daysLeft:'10 days left', daysCls:'text-ink-500', status:'published',  action:'Manage',   actionHref:'prebid-queries.html' },
+    { name:'Road Maintenance and Repair Services Phase 2', id:'TND-2026-002', dept:'Infrastructure', deadline:'8 May 2026',  daysLeft:'Today',         daysCls:'text-warning font-medium', status:'closed',     action:'Manage',   actionHref:'prebid-queries.html' },
+    { name:'Water Supply Pipeline Installation',           id:'TND-2026-003', dept:'Water',          deadline:'28 Apr 2026', daysLeft:'10 days overdue', daysCls:'text-danger font-medium', status:'evaluation', action:'Evaluate', actionHref:'evaluation.html' },
+    { name:'Street Lighting LED Retrofit Project',         id:'TND-2026-004', dept:'Engineering',    deadline:'20 Jun 2026', daysLeft:'43 days left',   daysCls:'text-ink-500', status:'published',  action:'Manage',   actionHref:'prebid-queries.html' },
+    { name:'Solid Waste Collection Vehicles Procurement',  id:'TND-2026-005', dept:'Sanitation',     deadline:'12 Jul 2026', daysLeft:'Draft',          daysCls:'text-ink-400', status:'draft',      action:'Continue', actionHref:'tender-creation.html#step1' },
+    { name:'Public Park Renovation — Riverfront',          id:'TND-2026-006', dept:'Parks',          deadline:'30 Mar 2026', daysLeft:'Awarded',        daysCls:'text-success font-medium', status:'awarded',    action:'Track',    actionHref:'evaluation.html#award' },
+    { name:'AMC Office Renovation Phase 3',                id:'TND-2026-007', dept:'Urban Dev',      deadline:'5 Aug 2026',  daysLeft:'89 days left',   daysCls:'text-ink-500', status:'evaluation', action:'Evaluate', actionHref:'evaluation.html' },
+    { name:'Solid Waste Management Equipment',             id:'TND-2026-009', dept:'Sanitation',     deadline:'18 Jun 2026', daysLeft:'41 days left',   daysCls:'text-ink-500', status:'published',  action:'Manage',   actionHref:'prebid-queries.html' },
+  ];
+  const STATUS_PILL = {
+    draft:      { label:'Draft',             dot:'bg-ink-400',     bg:'bg-ink-400/15 text-ink-500' },
+    published:  { label:'Published',         dot:'bg-primary',     bg:'bg-primary-light text-primary' },
+    closed:     { label:'Submission Closed', dot:'bg-warning',     bg:'bg-warning-light text-warning' },
+    evaluation: { label:'Under Evaluation',  dot:'bg-purple-500',  bg:'bg-purple-50 text-purple-700' },
+    award:      { label:'Award Pending',     dot:'bg-warning',     bg:'bg-warning-light text-warning' },
+    awarded:    { label:'Awarded',           dot:'bg-success',     bg:'bg-success-light text-success' },
+  };
+  function actionStyle(a){
+    if (a === 'Manage')   return 'border border-line text-ink-900 hover:bg-surface';
+    if (a === 'Continue') return 'border border-primary text-primary hover:bg-primary-light';
+    if (a === 'Evaluate') return 'border border-warning text-warning hover:bg-warning/10';
+    if (a === 'Track')    return 'border border-success text-success hover:bg-success-light';
+    return 'border border-line text-ink-900 hover:bg-surface';
+  }
+  function renderTenders(filter='all'){
+    const tbody = document.getElementById('tendersBody');
+    const list = filter === 'all' ? TENDERS : TENDERS.filter(t => t.status === filter);
+    tbody.innerHTML = list.map(t => {
+      const pill = STATUS_PILL[t.status];
+      return `<tr class="hover:bg-surface transition">
+        <td class="px-5 py-3.5"><div class="font-medium text-ink-900">${t.name}</div><div class="text-[12px] text-ink-500 font-mono">${t.id}</div></td>
+        <td class="px-5 py-3.5 text-ink-900">${t.dept}</td>
+        <td class="px-5 py-3.5"><div class="text-ink-900">${t.deadline}</div><div class="text-[11.5px] ${t.daysCls}">${t.daysLeft}</div></td>
+        <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full ${pill.bg} text-[11.5px] font-semibold"><span class="w-1.5 h-1.5 rounded-full ${pill.dot}"></span> ${pill.label}</span></td>
+        <td class="px-5 py-3.5 text-right">
+          <div class="flex items-center justify-end gap-2">
+            <a href="${t.actionHref}" class="px-3 py-1.5 rounded-lg ${actionStyle(t.action)} text-[12.5px] font-medium">${t.action}</a>
+            <button aria-label="More actions" class="w-8 h-8 rounded-lg hover:bg-line flex items-center justify-center text-ink-400 hover:text-ink-900"><i data-lucide="more-vertical" class="w-4 h-4"></i></button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+    refreshIcons();
+  }
+  function filterTenders(q){
+    q = (q||'').trim().toLowerCase();
+    document.querySelectorAll('#tendersBody tr').forEach(row => {
+      row.style.display = !q || row.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  }
+  document.querySelectorAll('.t-filter').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.t-filter').forEach(x => { x.classList.remove('bg-primary','text-white','border-primary'); x.classList.add('bg-white','border-line','text-ink-500'); });
+    b.classList.add('bg-primary','text-white','border-primary'); b.classList.remove('bg-white','border-line','text-ink-500');
+    renderTenders(b.dataset.filter);
+  }));
+
+  // ============ NOTIFICATIONS DROPDOWN ============
+  const bellBtn = document.getElementById('bellBtn');
+  const bellMenu = document.getElementById('bellMenu');
+  bellBtn.addEventListener('click', e => { e.stopPropagation(); bellMenu.classList.toggle('hidden'); });
+  document.addEventListener('click', e => { if (!bellMenu.contains(e.target) && !bellBtn.contains(e.target)) bellMenu.classList.add('hidden'); });
+
+  // ============ SCHEDULE PANEL TOGGLE ============
+  const schedToggle = document.getElementById('schedToggle');
+  const schedulePanel = document.getElementById('schedulePanel');
+  schedToggle.addEventListener('click', () => toggleSchedule());
+  function toggleSchedule(){ schedulePanel.classList.toggle('collapsed'); }
+
+  // ============ SCHEDULE VIEWS (week / month) ============
+  const MONTH_EVENTS = {
+    6:  [{type:'danger',  label:'Pre-bid queries close', tnd:'TND-2026-004'}, {type:'orange', label:'Pre-bid meeting', tnd:'TND-2026-007'}],
+    7:  [{type:'amber',   label:'Bid submission closes', tnd:'TND-2026-001'}],
+    8:  [{type:'amber',   label:'Bid submission closes', tnd:'TND-2026-002'}, {type:'success', label:'Evaluation target', tnd:'TND-2026-003'}],
+    9:  [{type:'purple',  label:'Milestone payment due', tnd:'CTR-2025-089'}],
+    11: [{type:'black',   label:'Quarterly audit review',tnd:'AUD-2026-012'}],
+    15: [{type:'primary', label:'Publication',           tnd:'TND-2026-010'}],
+    20: [{type:'danger',  label:'Pre-bid query deadline',tnd:'TND-2026-011'}],
+    22: [{type:'orange',  label:'Pre-bid meeting',       tnd:'TND-2026-008'}],
+    28: [{type:'amber',   label:'Bid submission closes', tnd:'TND-2026-013'}, {type:'success', label:'Evaluation target', tnd:'TND-2026-009'}],
+    29: [{type:'primary', label:'Publication',           tnd:'TND-2026-014'}],
+    30: [{type:'black',   label:'Audit review',          tnd:'AUD-2026-013'}],
+  };
+  const TYPE_COLOR = { primary:'#0F5EE8', danger:'#EF4444', orange:'#F97316', amber:'#F59E0B', success:'#10B981', purple:'#8B5CF6', black:'#374151' };
+  const TODAY = 8; // May 8, 2026
+
+  function buildMonthGrid(){
+    // May 2026: starts Friday (offset 4 in Mon-first), 31 days
+    const startOffset = 4;
+    const daysInMonth = 31;
+    const grid = document.getElementById('monthGrid');
+    let html = '';
+    for (let i = 0; i < startOffset; i++) html += '<div class="aspect-square"></div>';
+    for (let d = 1; d <= daysInMonth; d++){
+      const events = MONTH_EVENTS[d] || [];
+      const isToday = d === TODAY;
+      const dots = events.slice(0, 3).map(ev => `<span class="w-[6px] h-[6px] rounded-full" style="background:${TYPE_COLOR[ev.type]}"></span>`).join('');
+      const num = isToday
+        ? `<span class="cal-today">${d}</span>`
+        : `<span class="text-[13px] text-ink-900">${d}</span>`;
+      html += `<button type="button" class="cal-cell aspect-square flex flex-col items-center justify-center pt-1 ${events.length?'cursor-pointer':'cursor-default'}" ${events.length?`onclick="showDayPopover(${d}, event)"`:''}>${num}<div class="flex justify-center gap-0.5 mt-0.5 h-[6px]">${dots}</div></button>`;
+    }
+    grid.innerHTML = html;
+  }
+  function showDayPopover(day, evt){
+    const events = MONTH_EVENTS[day] || [];
+    if (!events.length) return;
+    const pop = document.getElementById('dayPopover');
+    document.getElementById('popoverDate').textContent = `May ${day}, 2026`;
+    document.getElementById('popoverEvents').innerHTML = events.map(ev => `<li class="flex items-start gap-2 text-[12px]"><span class="w-1.5 h-1.5 rounded-full mt-1.5" style="background:${TYPE_COLOR[ev.type]}"></span><div><div class="text-ink-900">${ev.label}</div><div class="text-ink-500 font-mono text-[11px]">${ev.tnd}</div></div></li>`).join('');
+    // Position relative to clicked cell
+    const cell = evt.currentTarget.getBoundingClientRect();
+    const monthView = document.getElementById('monthView');
+    const monthRect = monthView.getBoundingClientRect();
+    const popWidth = 260;
+    let left = cell.left - monthRect.left - 60;
+    if (left + popWidth > monthRect.width - 10) left = monthRect.width - popWidth - 10;
+    if (left < 10) left = 10;
+    pop.style.left = left + 'px';
+    pop.style.top = (cell.bottom - monthRect.top + 4) + 'px';
+    pop.classList.remove('hidden');
+    refreshIcons();
+    evt.stopPropagation();
+  }
+  document.addEventListener('click', (e) => {
+    const pop = document.getElementById('dayPopover');
+    if (pop && !pop.classList.contains('hidden') && !pop.contains(e.target) && !e.target.closest('.cal-cell')){
+      pop.classList.add('hidden');
+    }
+  });
+  function buildMonthUpcoming(){
+    const ul = document.getElementById('monthUpcoming');
+    const upcoming = Object.keys(MONTH_EVENTS).map(d => parseInt(d,10)).filter(d => d >= TODAY).sort((a,b)=>a-b).slice(0,5);
+    ul.innerHTML = upcoming.map(d => {
+      const events = MONTH_EVENTS[d];
+      const dateLabel = d === TODAY ? `Today, May ${d}` : `May ${d}`;
+      return `<li><div class="text-[12.5px] font-bold text-ink-900">${dateLabel}</div>${events.map(ev => `<div class="mt-1 flex items-start gap-2 text-[12px]"><span class="w-1.5 h-1.5 rounded-full mt-1.5" style="background:${TYPE_COLOR[ev.type]}"></span><div><div class="text-ink-900">${ev.label}</div><div class="text-ink-500 font-mono text-[11px]">${ev.tnd}</div></div></div>`).join('')}</li>`;
+    }).join('');
+  }
+  function setSchedView(which){
+    const week = document.getElementById('weekView');
+    const month = document.getElementById('monthView');
+    const wt = document.getElementById('weekTab');
+    const mt = document.getElementById('monthTab');
+    if (which === 'week'){
+      week.classList.remove('hidden-view'); month.classList.add('hidden-view');
+      wt.setAttribute('aria-selected','true'); mt.setAttribute('aria-selected','false');
+      wt.classList.add('bg-primary','text-white','border-primary'); wt.classList.remove('bg-white','border-line','text-ink-500');
+      mt.classList.remove('bg-primary','text-white','border-primary'); mt.classList.add('bg-white','border-line','text-ink-500');
+    } else {
+      month.classList.remove('hidden-view'); week.classList.add('hidden-view');
+      mt.setAttribute('aria-selected','true'); wt.setAttribute('aria-selected','false');
+      mt.classList.add('bg-primary','text-white','border-primary'); mt.classList.remove('bg-white','border-line','text-ink-500');
+      wt.classList.remove('bg-primary','text-white','border-primary'); wt.classList.add('bg-white','border-line','text-ink-500');
+    }
+  }
+
+  // ============ INIT ============
+  renderTenders('all');
+  buildMonthGrid();
+  buildMonthUpcoming();
+  refreshIcons();
+</script>
+</body>
+</html>
