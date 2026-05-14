@@ -229,50 +229,27 @@
         </div>
 
         <!-- Timeline strip -->
-        <div class="bg-white border border-line rounded-xl p-5">
+        <div id="timelineStrip" class="bg-white border border-line rounded-xl p-5 relative group">
+          <!-- Edit hint -->
+          <div id="timelineEditHint" class="absolute text-[11px] italic" style="top: 12px; right: 16px; color:#9CA3AF; opacity: 0; transition: opacity 150ms ease;">Click any date to edit</div>
+
           <div class="relative">
             <!-- Track -->
             <div class="absolute top-2 left-3 right-3 h-0.5 bg-line"></div>
-            <div class="absolute top-2 left-3 h-0.5 bg-primary" style="width: 78%;"></div>
+            <div id="timelineFill" class="absolute top-2 left-3 h-0.5 bg-primary" style="width: 0%; transition: width 200ms ease;"></div>
             <!-- Today tick -->
-            <div class="absolute" style="top: -6px; left: 78%;">
+            <div id="timelineTodayTick" class="absolute" style="top: -6px; left: 0%; transition: left 200ms ease;">
               <div class="text-[9px] font-bold uppercase tracking-wider" style="color:#0F5EE8; margin-bottom: 2px; transform: translateX(-50%); white-space: nowrap;">TODAY</div>
               <div class="h-3 w-px mx-auto" style="background:#0F5EE8; transform: translateX(-50%);"></div>
             </div>
 
-            <div class="relative grid grid-cols-5">
-              <!-- 1 -->
-              <div class="flex flex-col items-start">
-                <span class="w-4 h-4 rounded-full bg-success ring-4 ring-white relative z-10 inline-flex items-center justify-center"><i data-lucide="check" class="w-2.5 h-2.5 text-white"></i></span>
-                <div class="mt-2 text-[11px] font-bold text-ink-900">Tender Released</div>
-                <div class="text-[11px] text-ink-500">Apr 30</div>
-              </div>
-              <!-- 2 -->
-              <div class="flex flex-col items-center">
-                <span class="w-4 h-4 rounded-full bg-success ring-4 ring-white relative z-10"></span>
-                <div class="mt-2 text-[11px] font-bold text-ink-900 text-center">Query Window</div>
-                <div class="text-[11px] text-ink-500">Apr 30–May 12</div>
-              </div>
-              <!-- 3 -->
-              <div class="flex flex-col items-center">
-                <span class="w-4 h-4 rounded-full bg-success ring-4 ring-white relative z-10"></span>
-                <div class="mt-2 text-[11px] font-bold text-ink-900 text-center">Pre-Bid Meeting</div>
-                <div class="text-[11px] text-ink-500">May 10</div>
-              </div>
-              <!-- 4 — Current -->
-              <div class="flex flex-col items-center">
-                <span class="w-4 h-4 rounded-full bg-primary pulse-blue ring-4 ring-white relative z-10"></span>
-                <div class="mt-2 text-[11px] font-bold text-ink-900 text-center">Window Closes</div>
-                <div class="text-[11px] text-ink-500">May 12</div>
-              </div>
-              <!-- 5 -->
-              <div class="flex flex-col items-end">
-                <span class="w-4 h-4 rounded-full bg-line ring-4 ring-white relative z-10"></span>
-                <div class="mt-2 text-[11px] font-bold text-ink-900">Responses Due</div>
-                <div class="text-[11px] text-ink-500">May 15</div>
-              </div>
+            <div id="timelineMilestones" class="relative grid grid-cols-4">
+              <!-- Milestones rendered dynamically by renderTimeline() -->
             </div>
           </div>
+
+          <!-- Local toast -->
+          <div id="timelineToast" role="status" aria-live="polite" class="absolute hidden" style="bottom: -34px; left: 50%; transform: translateX(-50%); background:#111827; color:white; border-radius:6px; padding:6px 12px; font-size:12px; z-index:20;">Date updated</div>
         </div>
 
         <!-- Tabs -->
@@ -742,6 +719,168 @@
   // ===================== DATA =====================
   const TODAY = new Date('2026-05-12'); // matches system date
 
+  // ============================================================
+  // TIMELINE STRIP — 4 milestones, editable dates
+  // ============================================================
+  const TIMELINE = [
+    { id:'released', label:'Tender Released', date:'2026-04-30' },
+    { id:'meeting',  label:'Pre-Bid Meeting', date:'2026-05-10' },
+    { id:'close',    label:'Window Closes',   date:'2026-05-12' },
+    { id:'due',      label:'Responses Due',   date:'2026-05-15' },
+  ];
+  let editingMilestoneIdx = null;
+  let toastHideT = null;
+
+  function fmtTimelineDate(iso){
+    const d = new Date(iso + 'T00:00:00');
+    return d.toLocaleString('en-US', { month:'short', day:'numeric' });
+  }
+  function timelineDot(i){
+    const m = TIMELINE[i];
+    const md = new Date(m.date + 'T00:00:00');
+    if (md < TODAY) return { cls:'bg-success', content:'<i data-lucide="check" class="w-2.5 h-2.5 text-white"></i>', state:'completed' };
+    if (md.toDateString() === TODAY.toDateString()) return { cls:'bg-primary pulse-blue', content:'', state:'active' };
+    return { cls:'bg-line', content:'', state:'upcoming' };
+  }
+  function getDateValidationError(idx, isoVal){
+    const d = new Date(isoVal + 'T00:00:00');
+    if (idx === 0 && d > TODAY) return 'Tender release date cannot be in the future';
+    if (idx > 0){
+      const prev = new Date(TIMELINE[idx-1].date + 'T00:00:00');
+      if (d <= prev){
+        const prevLabel = TIMELINE[idx-1].label.toLowerCase();
+        const prevFmt = fmtTimelineDate(TIMELINE[idx-1].date);
+        if (idx === 1) return `Meeting must be after tender release (${prevFmt})`;
+        if (idx === 2) return `Window close must be after the pre-bid meeting (${prevFmt})`;
+        if (idx === 3) return `Responses due must be after window closes (${prevFmt})`;
+        return `Date must be after ${prevLabel} (${prevFmt})`;
+      }
+    }
+    return null;
+  }
+  function showTimelineToast(msg){
+    const t = document.getElementById('timelineToast');
+    if (!t) return;
+    t.textContent = msg || 'Date updated';
+    t.classList.remove('hidden');
+    clearTimeout(toastHideT);
+    toastHideT = setTimeout(() => t.classList.add('hidden'), 2000);
+  }
+  function repositionTodayTick(){
+    const fill = document.getElementById('timelineFill');
+    const tick = document.getElementById('timelineTodayTick');
+    if (!fill || !tick) return;
+    const first = new Date(TIMELINE[0].date + 'T00:00:00');
+    const last  = new Date(TIMELINE[TIMELINE.length-1].date + 'T00:00:00');
+    const span = (last - first) || 1;
+    const elapsed = TODAY - first;
+    let pct = Math.max(0, Math.min(1, elapsed / span)) * 100;
+    fill.style.width = pct + '%';
+    tick.style.left = pct + '%';
+    if (TODAY < first){
+      tick.style.left = '0%';
+      fill.style.width = '0%';
+    } else if (TODAY > last){
+      tick.style.left = '100%';
+      fill.style.width = '100%';
+    }
+  }
+  function renderTimeline(){
+    const wrap = document.getElementById('timelineMilestones');
+    if (!wrap) return;
+    wrap.innerHTML = TIMELINE.map((m, i) => {
+      const dot = timelineDot(i);
+      const alignCls = i === 0 ? 'items-start' : (i === TIMELINE.length - 1 ? 'items-end' : 'items-center');
+      const txtAlign = i === 0 ? '' : (i === TIMELINE.length - 1 ? 'text-right' : 'text-center');
+      const isEditing = editingMilestoneIdx === i;
+      const dateContent = isEditing
+        ? `<input type="date" value="${m.date}" data-idx="${i}" aria-label="Edit ${m.label.toLowerCase()} date" style="border:1px solid #0F5EE8; border-radius:6px; padding:3px 8px; font-size:13px; color:#111827; background:white; box-shadow: 0 0 0 3px rgba(15,94,232,0.1); width:130px;" onkeydown="onTimelineDateKey(event, ${i})" onblur="saveTimelineDate(${i})" />
+           <div data-tl-err class="hidden text-[11px] mt-1" style="color:#EF4444;"></div>`
+        : `<button type="button" data-idx="${i}" aria-label="Edit ${m.label.toLowerCase()} date" onclick="startEditTimelineDate(${i})" onkeydown="if(event.key==='Enter'){event.preventDefault();startEditTimelineDate(${i})}" class="inline-flex items-center gap-1 hover:text-ink-900 cursor-pointer group/date" style="background:transparent; border:none; padding:0; color:#374151; font-size:13px;">
+            <span class="tl-date-text">${fmtTimelineDate(m.date)}</span>
+            <i data-lucide="pencil" class="w-3 h-3 opacity-0 group-hover/date:opacity-100 transition-opacity" style="color:#9CA3AF;"></i>
+          </button>`;
+      return `<div class="flex flex-col ${alignCls}">
+        <span class="w-4 h-4 rounded-full ${dot.cls} ring-4 ring-white relative z-10 inline-flex items-center justify-center">${dot.content}</span>
+        <div class="mt-2 text-[11px] font-bold text-ink-900 ${txtAlign}">${m.label}</div>
+        <div class="text-[11px] ${txtAlign}" style="color:#6B7280;">${dateContent}</div>
+      </div>`;
+    }).join('');
+    repositionTodayTick();
+    refreshIcons();
+    // Auto-focus the input if editing
+    if (editingMilestoneIdx !== null){
+      setTimeout(() => {
+        const inp = wrap.querySelector(`input[data-idx="${editingMilestoneIdx}"]`);
+        if (inp){ inp.focus(); inp.select && inp.select(); }
+      }, 10);
+    }
+  }
+  function startEditTimelineDate(i){
+    // Save any open edit first
+    if (editingMilestoneIdx !== null && editingMilestoneIdx !== i){
+      saveTimelineDate(editingMilestoneIdx, true);
+    }
+    editingMilestoneIdx = i;
+    renderTimeline();
+  }
+  function saveTimelineDate(i, silent){
+    const inp = document.querySelector(`#timelineMilestones input[data-idx="${i}"]`);
+    if (!inp || editingMilestoneIdx !== i) return;
+    const val = inp.value;
+    if (!val){ editingMilestoneIdx = null; renderTimeline(); return; }
+    const err = getDateValidationError(i, val);
+    if (err){
+      // shake + show error, keep open
+      inp.style.borderColor = '#EF4444';
+      inp.style.boxShadow = '0 0 0 3px rgba(239,68,68,0.12)';
+      const errEl = inp.parentElement.querySelector('[data-tl-err]');
+      if (errEl){ errEl.textContent = err; errEl.classList.remove('hidden'); }
+      inp.animate([
+        { transform: 'translateX(0)' },
+        { transform: 'translateX(-4px)' },
+        { transform: 'translateX(4px)' },
+        { transform: 'translateX(-3px)' },
+        { transform: 'translateX(3px)' },
+        { transform: 'translateX(0)' },
+      ], { duration: 280, easing: 'ease-out' });
+      // Re-focus so the next blur doesn't fire immediately
+      setTimeout(() => inp.focus(), 0);
+      return;
+    }
+    const oldVal = TIMELINE[i].date;
+    TIMELINE[i].date = val;
+    editingMilestoneIdx = null;
+    renderTimeline();
+    if (oldVal !== val){
+      if (!silent) showTimelineToast('Date updated');
+      // Green flash on the date text
+      const btn = document.querySelector(`#timelineMilestones button[data-idx="${i}"] .tl-date-text`);
+      if (btn){
+        btn.style.transition = 'color 600ms ease';
+        btn.style.color = '#10B981';
+        setTimeout(() => { btn.style.color = ''; }, 600);
+      }
+    }
+  }
+  function onTimelineDateKey(e, i){
+    if (e.key === 'Enter'){ e.preventDefault(); saveTimelineDate(i); }
+    else if (e.key === 'Escape'){
+      e.preventDefault();
+      editingMilestoneIdx = null;
+      renderTimeline();
+    }
+  }
+  // Hover hint
+  document.addEventListener('DOMContentLoaded', () => {
+    const strip = document.getElementById('timelineStrip');
+    const hint = document.getElementById('timelineEditHint');
+    if (strip && hint){
+      strip.addEventListener('mouseenter', () => { hint.style.opacity = '0.7'; });
+      strip.addEventListener('mouseleave', () => { hint.style.opacity = '0'; });
+    }
+  });
+
   const ACTIVE_TENDERS = [
     { id:'TND-2026-001', name:'Supply of Desktop Computers for AMC Offices',    dept:'IT',             cat:'Goods',    cost:'₹45,00,000', queries:24, unanswered:11, dueDate:'May 15', daysText:'5 days left',  daysCls:'text-success',  status:'open',    meetingDate:'May 10' },
     { id:'TND-2026-002', name:'Road Maintenance and Repair Services Phase 2',   dept:'Infrastructure', cat:'Works',    cost:'₹45,00,000', queries:18, unanswered:7,  dueDate:'May 15', daysText:'5 days left',  daysCls:'text-success',  status:'open',    meetingDate:'May 10' },
@@ -899,6 +1038,7 @@
     document.getElementById('screen-workspace').classList.remove('hidden');
     setTab('queries');
     selectQuery(null); // empty state
+    renderTimeline();
     renderTab1();
     renderDocsTable();
     renderCorrigendum();
