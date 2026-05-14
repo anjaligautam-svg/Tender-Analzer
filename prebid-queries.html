@@ -36,6 +36,7 @@
     .pulse-blue { animation: pulse-blue 1.6s ease-in-out infinite; }
     @keyframes pulse-amber { 0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,.5);} 50% { box-shadow: 0 0 0 6px rgba(245,158,11,0);} }
     .pulse-amber { animation: pulse-amber 1.6s ease-in-out infinite; }
+    @keyframes pulse-urgent { 0%,100% { opacity: 0.6; } 50% { opacity: 1.0; } }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     .field { border: 1px solid #D1D5DB; border-radius: 8px; padding: 10px 14px; font-size: 14px; width: 100%; background: white; transition: all .15s ease; }
@@ -333,6 +334,12 @@
             <label class="inline-flex items-center gap-1.5 text-[12px] text-ink-500">
               <input id="hideNonMatching" type="checkbox" onchange="renderTab1()" class="accent-primary"> Hide non-matching
             </label>
+
+            <!-- Deadline countdown (post-meeting only) -->
+            <div id="deadlineCountdown" class="hidden inline-flex items-center gap-1.5 ml-auto" role="status" aria-live="polite" style="background:#FFFBEB; border:1px solid #FCD34D; border-radius:6px; padding:5px 10px; font-size:12px; color:#92400E; white-space:nowrap;">
+              <span id="deadlineIcon">⏱</span>
+              <span id="deadlineText">Response window closes in —</span>
+            </div>
           </div>
 
           <!-- SECTION 3 — AI GROUPS -->
@@ -1023,6 +1030,10 @@
     { num:'Q-022', section:'Scope of Work',            vendor:'Maharashtra Roads Co.', source:'Portal', type:'Clarification',       form:'Information', received:'May 9, 9:45 AM',  text:'Does the scope include drainage works or only surface treatment? Please clarify the scope boundary.', status:'unanswered', response:'', assigned:null, group:null, published:'', imported:false, manual:false },
     { num:'Q-023', section:'BOQ & Quantities',         vendor:'NCC Infrastructure',    source:'Email',  type:'Clarification',       form:'Information', received:'May 9, 1:30 PM',  text:'Item 12 quantity (kerb stones) — 250 m vs 320 m in drawing. Please confirm which is correct.', status:'unanswered', response:'', assigned:null, group:null, published:'', imported:false, manual:false },
     { num:'Q-024', section:'BOQ & Quantities',         vendor:'Rajesh Constructions',  source:'Portal', type:'Spec Change Request', form:'Request',     received:'May 10, 10:00 AM', text:"Item 3 unit shown as 'm²' in BOQ but should be 'm' for linear measurements. Please correct.", status:'unanswered', response:'', assigned:null, group:null, published:'', imported:false, manual:false },
+    // ===== POST-MEETING QUERIES (arrived after May 10 pre-bid meeting) =====
+    { num:'Q-025', section:'Technical Specifications', vendor:'Maharashtra Roads Co.', source:'Portal', type:'Spec Change Request', form:'Request',     received:'May 11, 3:42 PM',  receivedISO:'2026-05-11T15:42:00', text:'Can the bitumen grade be changed to VG-40 for high traffic zones? Our experience shows VG-30 is insufficient for this application.', status:'unanswered', response:'', assigned:null, group:null, published:'', imported:false, manual:false, postMeeting:true, similarTo:'Q-002', similarTitle:'Bitumen Specification', similarPct:87, suggestedResponse:'The bitumen grade specification is VG-30 as per IS 73:2013. Substitutions are not permitted without formal amendment. The specification has been set after technical review and aligns with PWD standards for this category of work.', triageState:null },
+    { num:'Q-026', section:'Dates & Timeline',         vendor:'BuildTech Solutions',   source:'Portal', type:'Deadline Extension',  form:'Request',     received:'May 11, 6:15 PM',  receivedISO:'2026-05-11T18:15:00', text:'Given the complexity of the scope, can the bid submission deadline be extended by 15 days? Many vendors need more time to prepare accurate BOQ estimates.', status:'unanswered', response:'', assigned:null, group:null, published:'', imported:false, manual:false, postMeeting:true, similarTo:'Q-003', similarTitle:'Site Visit Duration', similarPct:74, suggestedResponse:'The bid submission deadline is as published in the NIT. The procurement authority will consider any extension based on the overall interest of the tender. Vendors are advised to submit bids well before the deadline.', triageState:null },
+    { num:'Q-027', section:'PQ / TQ & Eligibility',    vendor:'Patil & Associates',    source:'Email',  type:'Clarification',       form:'Information', received:'May 12, 9:05 AM',  receivedISO:'2026-05-12T09:05:00', text:'Our parent company has the required turnover but we are the executing entity. Can we use parent company financial statements?', status:'unanswered', response:'', assigned:null, group:null, published:'', imported:false, manual:false, postMeeting:true, similarTo:'Q-005', similarTitle:'Parent Company Guarantee', similarPct:91, suggestedResponse:'As per Clause 4.2 of the tender document, a parent company guarantee and financial statements are acceptable provided the parent company provides an undertaking of support. Supporting documents must be submitted with the bid.', triageState:null },
   ];
   const VENDORS = [
     'Rajesh Constructions',
@@ -1145,9 +1156,12 @@
     renderDocsTable();
     renderCorrigendum();
     mnInit();
+    initDeadlineCountdown();
     window.scrollTo({ top: 0 });
     refreshIcons();
   }
+
+  function showWorkspace(){ /* compat */ }
 
   // ============================================================
   // TABS
@@ -1467,7 +1481,9 @@
     const aiSection = document.getElementById('aiGroupsSection');
     const search = (document.getElementById('qsSearch')?.value || '').toLowerCase();
     const anyGroups = Object.values(GROUPS).some(g => g.members.length > 0);
-    if (!anyGroups){ if (aiSection) aiSection.style.display = 'none'; return; }
+    const postMeetingQs = QUERIES.filter(q => q.postMeeting && (!q.triageState || q.triageState === 'skipped'));
+    const showPostGroup = isPostMeetingPhase() && postMeetingQs.length > 0;
+    if (!anyGroups && !showPostGroup){ if (aiSection) aiSection.style.display = 'none'; return; }
     if (aiSection) aiSection.style.display = '';
 
     // Determine group section (most common section among members)
@@ -1482,7 +1498,47 @@
       return best;
     }
 
-    wrap.innerHTML = Object.entries(GROUPS).filter(([gid,g]) => g.members.length > 0).map(([gid, g]) => {
+    // Post-Meeting synthetic group (rendered first, amber-bordered)
+    let postGroupHTML = '';
+    if (showPostGroup){
+      const expanded = expandedGroups.has('POST_MEETING');
+      const subRows = postMeetingQs.map(q => {
+        const isMatch = !search || q.text.toLowerCase().includes(search) || q.num.toLowerCase().includes(search);
+        const dim = (search && !isMatch && !hideNonMatching) ? 'opacity: 0.25;' : '';
+        if (search && !isMatch && hideNonMatching) return '';
+        const textRendered = search ? matchesSearchHighlight(q.text, search) : q.text;
+        const matchBadge = q.similarTo
+          ? `<span class="text-[10px] shrink-0" style="background:#EFF6FF; color:#0F5EE8; border-radius:4px; padding:1px 6px;">↗ Similar to ${q.similarTo}</span>`
+          : `<span class="text-[10px] shrink-0" style="background:#F3F4F6; color:#9CA3AF; border-radius:4px; padding:1px 6px;">No match</span>`;
+        return `<div class="flex items-start gap-3" style="padding:10px 16px 10px 44px; border-top:1px solid #FEF3C7; ${dim}">
+          <span class="text-[11px] font-bold font-mono shrink-0" style="background:#EFF6FF; color:#0F5EE8; border-radius:4px; padding:1px 6px;">${q.num}</span>
+          <span class="text-[13px] text-ink-900 flex-1" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${textRendered}</span>
+          <span class="text-[10.5px] font-medium shrink-0" style="${formPillStyle(q.form)}; border-radius:14px; padding:1px 7px;">${q.form}</span>
+          ${matchBadge}
+        </div>`;
+      }).join('');
+
+      const headerHTML = `
+        <div class="flex items-center gap-3" style="padding:12px 16px; cursor:pointer;" onclick="toggleGroupExpand('POST_MEETING', event)" onmouseenter="this.style.background='#FFFBEB';" onmouseleave="this.style.background='';">
+          <span class="text-[14px] font-bold text-ink-900">⚡ Post-Meeting Queries</span>
+          <span class="text-[11px] font-medium" style="background:#FFFBEB; color:#92400E; border-radius:20px; padding:2px 8px;" aria-live="polite">${postMeetingQs.length} ${postMeetingQs.length===1?'query':'queries'}</span>
+          <button class="ml-auto text-ink-500 hover:text-ink-900" aria-expanded="${expanded}" aria-label="Toggle group" onclick="event.stopPropagation(); toggleGroupExpand('POST_MEETING')"><i data-lucide="${expanded?'chevron-up':'chevron-down'}" class="w-4 h-4"></i></button>
+        </div>`;
+
+      const batchHTML = expanded ? `
+        <div style="border-top:1px solid #FDE68A; padding:14px 16px; background:#FFFBEB;">
+          <button onclick="batchTriagePostMeeting()" class="w-full text-white inline-flex items-center justify-center gap-2" style="background:#0F5EE8; border-radius:8px; padding:10px 14px; font-size:13px; font-weight:500;"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> ✦ Apply matched answers to all ${postMeetingQs.length} post-meeting queries</button>
+          <div class="text-[12px] mt-2" style="color:#6B7280;">All ${postMeetingQs.length} queries have AI-detected similarity matches. Apply the suggested response to each at once.</div>
+        </div>` : '';
+
+      postGroupHTML = `<div data-group="POST_MEETING" style="background:white; border:1px solid #FDE68A; border-left:3px solid #F59E0B; border-radius:10px; margin-bottom:10px; overflow:hidden;">
+        ${headerHTML}
+        ${expanded ? subRows : ''}
+        ${batchHTML}
+      </div>`;
+    }
+
+    wrap.innerHTML = postGroupHTML + Object.entries(GROUPS).filter(([gid,g]) => g.members.length > 0).map(([gid, g]) => {
       const sec = groupSection(g);
       // Apply section filter at group level
       if (sectionFilter && sec !== sectionFilter) return '';
@@ -1567,7 +1623,8 @@
       list.innerHTML = '<div class="text-center text-[13px] text-ink-500 italic py-12">No individual queries match the current filters</div>';
       return;
     }
-    list.innerHTML = arr.map(q => {
+
+    const renderRegularCard = (q) => {
       const isMatch = !search || q.text.toLowerCase().includes(search) || q.num.toLowerCase().includes(search);
       if (search && !isMatch && hideNonMatching) return '';
       const dimStyle = (search && !isMatch && !hideNonMatching) ? 'opacity: 0.25;' : '';
@@ -1609,8 +1666,325 @@
         ${headerHtml}
         ${body}
       </div>`;
-    }).join('');
+    };
+
+    // Split into pre-meeting and post-meeting (only if we're in the post-meeting phase)
+    if (isPostMeetingPhase()){
+      const pre  = arr.filter(q => !q.postMeeting);
+      const post = arr.filter(q =>  q.postMeeting);
+      const preHTML  = pre.map(renderRegularCard).join('');
+      const postHTML = post.map(q => triageCardHTML(q, search)).join('');
+      const dividerHTML = post.length ? postMeetingDividerHTML(post) : '';
+      list.innerHTML = preHTML + dividerHTML + postHTML;
+    } else {
+      list.innerHTML = arr.map(renderRegularCard).join('');
+    }
     refreshIcons();
+  }
+
+  // ============= POST-MEETING TRIAGE =============
+  function isPostMeetingPhase(){
+    const m = TIMELINE.find(t => t.id === 'meeting');
+    if (!m) return false;
+    const md = new Date(m.date + 'T00:00:00');
+    return TODAY > md;
+  }
+
+  function postMeetingDividerHTML(postQueries){
+    const untriaged = postQueries.filter(q => !q.triageState || q.triageState === 'skipped').length;
+    const allHandled = untriaged === 0 && postQueries.length > 0;
+    const label = allHandled
+      ? `<span aria-live="polite" style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:20px; padding:4px 12px; font-size:11px; font-weight:600; color:#065F46; white-space:nowrap;">✓ All post-meeting queries handled</span>`
+      : `<span aria-live="polite" style="background:#FFFBEB; border:1px solid #FCD34D; border-radius:20px; padding:4px 12px; font-size:11px; font-weight:600; color:#92400E; white-space:nowrap;">NEW — Arrived after meeting · ${postQueries.length} ${postQueries.length===1?'query':'queries'}</span>`;
+    const lineColor = allHandled ? '#BBF7D0' : '#FCD34D';
+    return `<div style="display:flex; align-items:center; gap:10px; margin:16px 0 12px;">
+      <div style="flex:1; height:1px; background:${lineColor};"></div>
+      ${label}
+      <div style="flex:1; height:1px; background:${lineColor};"></div>
+    </div>`;
+  }
+
+  function urgencyForQuery(q){
+    const due = TIMELINE.find(t => t.id === 'due');
+    if (!due) return { color:'#10B981', label:'', pulse:false };
+    const dueAt = new Date(due.date + 'T23:59:00');
+    const nowRef = postMeetingNow();
+    const hours = Math.max(0, (dueAt - nowRef) / 36e5);
+    if (hours > 48) return { color:'#10B981', label:`Response deadline: ${Math.round(hours/24)} days left`, pulse:false, textColor:'#10B981' };
+    if (hours >= 12) return { color:'#F59E0B', label:`${Math.round(hours)} hours left`, pulse:false, textColor:'#F59E0B' };
+    return { color:'#EF4444', label:`⚡ ${Math.round(hours)} hours left`, pulse:true, textColor:'#EF4444' };
+  }
+
+  function postMeetingNow(){
+    // Deterministic demo "now" — anchored to TODAY at 1:45 AM so the close date countdown shows ~22h
+    const ref = new Date(TODAY.getTime());
+    ref.setHours(1, 45, 0, 0);
+    return new Date(ref.getTime() + (postMeetingTickMs || 0));
+  }
+  let postMeetingTickMs = 0;
+
+  function triageCardHTML(q, search){
+    const u = urgencyForQuery(q);
+    const isAccepted = q.triageState === 'accepted';
+    const isEditing  = q.triageState === 'editing';
+    const isSkipped  = q.triageState === 'skipped';
+    const isUntriaged = !q.triageState;
+
+    // Card border + badge styling reflects state
+    const borderLeft = isAccepted ? '3px solid #0F5EE8' : (isSkipped ? '3px solid #9CA3AF' : '3px solid #F59E0B');
+    const borderColor = isAccepted ? '#BFDBFE' : (isSkipped ? '#E5E7EB' : '#FDE68A');
+    const badgeHTML = isAccepted
+      ? `<span class="text-[11px] font-bold" style="background:#FFFBEB; color:#92400E; border-radius:4px; padding:2px 7px; transition:all 150ms ease;">Draft</span>`
+      : isSkipped
+        ? `<span class="text-[11px] font-bold" style="background:white; color:#6B7280; border:1px solid #D1D5DB; border-radius:4px; padding:2px 7px; transition:all 150ms ease;">NEW</span>`
+        : `<span class="text-[11px] font-bold" style="background:#DBEAFE; color:#1D4ED8; border-radius:4px; padding:2px 7px; transition:all 150ms ease;">🔵 NEW</span>`;
+
+    // For skipped: collapse to header (like regular cards); expand on click
+    const expanded = isSkipped ? expandedQueries.has(q.num) : true;
+
+    const isMatch = !search || q.text.toLowerCase().includes(search) || q.num.toLowerCase().includes(search);
+    if (search && !isMatch && hideNonMatching) return '';
+    const dimStyle = (search && !isMatch && !hideNonMatching) ? 'opacity: 0.25;' : '';
+
+    const headerOnClick = isSkipped ? `onclick="toggleQueryExpand('${q.num}')" style="padding:12px 16px; cursor:pointer;"` : 'style="padding:12px 16px;"';
+    const headerHTML = `
+      <div class="flex items-center gap-2.5 flex-wrap" ${headerOnClick} onmouseenter="if(${isSkipped})this.style.background='#F9FAFB';" onmouseleave="this.style.background='';">
+        ${badgeHTML}
+        <span class="text-[11.5px] font-bold font-mono shrink-0" style="background:#EFF6FF; color:#0F5EE8; border-radius:4px; padding:1px 6px;">${q.num}</span>
+        <span class="text-[10.5px] font-medium" style="${typePillStyle(q.type)}; border-radius:14px; padding:1px 7px;">${q.type}</span>
+        <span class="text-[10.5px] font-medium" style="${formPillStyle(q.form)}; border-radius:14px; padding:1px 7px;">${q.form}</span>
+        <span class="text-[10px] font-medium" style="${sectionPillStyle()}">${q.section}</span>
+        <span class="ml-auto text-[11px]" style="color:#9CA3AF;">${q.received}</span>
+      </div>
+      <div class="flex items-center justify-end" style="padding:0 16px 6px 16px;">
+        <span class="text-[11px] font-bold" style="color:${u.textColor}; ${u.pulse?'animation:pulse-urgent 1s infinite;':''}">${u.label}</span>
+      </div>`;
+
+    if (!expanded){
+      return `<div data-q="${q.num}" style="background:white; border:1px solid ${borderColor}; border-left:${borderLeft}; border-radius:10px; margin-bottom:10px; overflow:hidden; ${dimStyle}">
+        <div role="status" aria-label="Urgency" style="height:3px; background:${u.color}; ${u.pulse?'animation:pulse-urgent 1s infinite;':''}"></div>
+        ${headerHTML}
+      </div>`;
+    }
+
+    // Body — full query text + source/vendor
+    const textRendered = search ? matchesSearchHighlight(q.text, search) : q.text;
+    const vendorLabel = vendorShortLabel(q.vendor);
+    const bodyHTML = `
+      <div style="padding:0 16px 12px 16px;">
+        <p class="text-[13px]" style="color:#111827; line-height:1.7;">${textRendered}</p>
+        <div class="text-[11px] mt-1" style="color:#9CA3AF;">Source: ${q.source} submission · ${vendorLabel} — ${q.vendor || ''}</div>
+      </div>`;
+
+    // AI Similarity block
+    let similarityHTML = '';
+    if (isUntriaged || isEditing){
+      similarityHTML = renderSimilarityBlock(q);
+    } else if (isAccepted){
+      similarityHTML = `<div style="padding:0 16px 12px 16px;">
+        <div class="flex items-center gap-2" role="status" style="background:#F0FDF4; border-radius:6px; padding:8px 12px;">
+          <i data-lucide="check" class="w-3.5 h-3.5" style="color:#065F46;"></i>
+          <span class="text-[12px]" style="color:#065F46;">Response applied from ${q.similarTo || ''} — queued for approval</span>
+          <button onclick="triageEditAccepted('${q.num}')" class="ml-auto text-[12px] hover:underline" style="color:#0F5EE8;">Edit before approving ✎</button>
+          <button onclick="triageSendForApproval('${q.num}')" class="text-white text-[12px] font-medium" style="background:#10B981; border-radius:6px; padding:4px 10px;">Send for Approval →</button>
+        </div>
+      </div>`;
+    } else if (isSkipped){
+      similarityHTML = `<div style="padding:0 16px 12px 16px;">
+        <div class="text-[11px]" style="color:#9CA3AF;">Moved to inbox — draft a response manually below</div>
+      </div>`;
+    }
+
+    // Triage buttons (only when untriaged AND similarity match exists)
+    let actionsHTML = '';
+    if (isUntriaged && q.similarTo){
+      actionsHTML = `<div style="display:flex; gap:10px; padding:0 16px 14px 16px;">
+        <button onclick="triageUseAnswer('${q.num}')" class="inline-flex items-center gap-1.5" style="background:#0F5EE8; color:white; border-radius:8px; padding:8px 16px; font-size:13px; font-weight:500; transition:background 150ms ease;" onmouseover="this.style.background='#0B4BC4'" onmouseout="this.style.background='#0F5EE8'"><i data-lucide="check" class="w-3.5 h-3.5"></i> Use this answer</button>
+        <button onclick="triageEditFirst('${q.num}')" class="inline-flex items-center gap-1.5" style="border:1px solid #0F5EE8; color:#0F5EE8; background:white; border-radius:8px; padding:8px 16px; font-size:13px; transition:background 150ms ease;" onmouseover="this.style.background='#EFF6FF'" onmouseout="this.style.background='white'"><i data-lucide="pencil" class="w-3.5 h-3.5"></i> Edit first</button>
+        <button onclick="triageSkip('${q.num}')" style="color:#6B7280; font-size:13px; background:transparent; border:none; padding:8px 10px; cursor:pointer; transition:color 150ms ease;" onmouseover="this.style.color='#374151'" onmouseout="this.style.color='#6B7280'">Skip</button>
+      </div>`;
+    }
+
+    // Inline editor (when editing, skipped, or accepted+edit-mode)
+    let editorHTML = '';
+    if (isEditing){
+      const noteHTML = q.similarTo ? `<div style="background:#FFFBEB; border-radius:6px; padding:6px 10px; margin-bottom:8px; font-size:12px; color:#92400E;">Editing suggested response from ${q.similarTo} — modify before saving</div>` : '';
+      editorHTML = `<div style="border-top:1px solid #E5E7EB; padding:14px 16px; background:#FAFCFF;">
+        ${noteHTML}
+        ${triageEditorMarkup(q)}
+      </div>`;
+    } else if (isSkipped){
+      editorHTML = `<div style="border-top:1px solid #E5E7EB; padding:14px 16px; background:#FAFCFF;">
+        ${triageEditorMarkup(q)}
+      </div>`;
+    }
+
+    return `<div data-q="${q.num}" style="background:white; border:1px solid ${borderColor}; border-left:${borderLeft}; border-radius:10px; margin-bottom:10px; overflow:hidden; ${dimStyle}">
+      <div role="status" aria-label="Urgency" style="height:3px; background:${u.color}; ${u.pulse?'animation:pulse-urgent 1s infinite;':''}"></div>
+      ${headerHTML}
+      ${bodyHTML}
+      ${similarityHTML}
+      ${actionsHTML}
+      ${editorHTML}
+    </div>`;
+  }
+
+  function renderSimilarityBlock(q){
+    if (!q.similarTo){
+      return `<div style="background:#F9FAFB; border-radius:8px; padding:12px 14px; margin:0 16px 14px 16px;">
+        <div class="text-[12px]" style="color:#9CA3AF;">✦ No similar answered query found</div>
+        <div class="text-[11px] mt-1" style="color:#9CA3AF;">This query appears to be new. Draft a response below.</div>
+      </div>`;
+    }
+    const matched = QUERIES.find(x => x.num === q.similarTo);
+    const matchedText = matched ? matched.text.slice(0, 100) + (matched.text.length > 100 ? '…' : '') : '';
+    const fullResp = q.suggestedResponse || '';
+    const showFull = !!q.suggestedExpanded;
+    const respPreview = showFull ? fullResp : (fullResp.slice(0, 140) + (fullResp.length > 140 ? '' : ''));
+    const readMoreLink = (!showFull && fullResp.length > 140)
+      ? ` <a href="#" onclick="triageToggleReadMore('${q.num}'); return false;" style="color:#0F5EE8; font-size:11px; font-style:normal;">…read more</a>`
+      : '';
+
+    return `<div style="background:#EFF6FF; border-radius:8px; padding:12px 14px; margin:0 16px 14px 16px;">
+      <div class="flex items-center justify-between gap-2">
+        <span class="inline-flex items-center gap-1.5 text-[12px] font-bold" style="color:#1D4ED8;"><i data-lucide="sparkles" class="w-3 h-3"></i> Similar to an answered query</span>
+        <span class="text-[11px] font-bold" style="background:#DBEAFE; color:#1D4ED8; border-radius:20px; padding:2px 8px;">${q.similarPct}% match</span>
+      </div>
+      <div style="margin-top:8px;">
+        <div class="text-[12px] font-bold" style="color:#374151;">${q.similarTo} — ${q.similarTitle || ''}</div>
+        <div class="text-[12px] italic mt-1" style="color:#6B7280;">${matchedText}</div>
+      </div>
+      <div style="height:1px; background:#BFDBFE; margin:10px 0;"></div>
+      <div class="text-[11px] font-bold uppercase tracking-wider" style="color:#6B7280;">Suggested response:</div>
+      <div class="text-[12px] italic mt-1" style="color:#374151; line-height:1.6;">${respPreview}${(!showFull && fullResp.length > 140) ? '…' : ''}${readMoreLink}</div>
+    </div>`;
+  }
+
+  function triageEditorMarkup(q){
+    const initial = q.response || (q.triageState === 'editing' ? (q.suggestedResponse || '') : '');
+    const editorId = `triageEditor-${q.num}`;
+    return `
+      <label class="text-[13px] font-bold" style="color:#111827;">Your Response</label>
+      <div class="border rounded-lg overflow-hidden bg-white" style="border:1px solid #D1D5DB; margin-top:6px;">
+        <div class="flex items-center gap-1 px-2 py-1.5 border-b" style="border-color:#E5E7EB; background:#F9FAFB;">
+          <button onmousedown="event.preventDefault(); document.execCommand('bold')" aria-label="Bold" class="w-7 h-7 rounded hover:bg-white text-ink-500 flex items-center justify-center"><i data-lucide="bold" class="w-3.5 h-3.5"></i></button>
+          <button onmousedown="event.preventDefault(); document.execCommand('italic')" aria-label="Italic" class="w-7 h-7 rounded hover:bg-white text-ink-500 flex items-center justify-center"><i data-lucide="italic" class="w-3.5 h-3.5"></i></button>
+          <button onmousedown="event.preventDefault(); document.execCommand('insertUnorderedList')" aria-label="Bullet" class="w-7 h-7 rounded hover:bg-white text-ink-500 flex items-center justify-center"><i data-lucide="list" class="w-3.5 h-3.5"></i></button>
+          <button onmousedown="event.preventDefault(); document.execCommand('insertOrderedList')" aria-label="Numbered" class="w-7 h-7 rounded hover:bg-white text-ink-500 flex items-center justify-center"><i data-lucide="list-ordered" class="w-3.5 h-3.5"></i></button>
+        </div>
+        <div id="${editorId}" contenteditable="true" data-placeholder="Draft your formal response to this query…" style="min-height:100px; padding:10px 12px; font-size:13px; outline:none;" oninput="(QUERIES.find(x=>x.num==='${q.num}')||{}).response = this.innerHTML">${initial}</div>
+      </div>
+      <div class="mt-2 flex items-center gap-2 flex-wrap">
+        <button onclick="triageGenerateAI('${q.num}')" class="px-2.5 py-1.5 rounded-md text-[12px] font-medium hover:bg-primary-light inline-flex items-center gap-1.5" style="border:1px solid #BFDBFE; color:#0F5EE8;"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Generate AI Response</button>
+        <button onclick="triageStandardResp('${q.num}')" class="px-2.5 py-1.5 rounded-md text-[12px] hover:bg-surface inline-flex items-center gap-1.5" style="border:1px solid #E5E7EB; color:#374151; background:white;"><i data-lucide="library" class="w-3.5 h-3.5"></i> Standard response</button>
+        <button onclick="triageChip('${q.num}','refer')" class="text-[12px] hover:border-primary hover:text-primary" style="border:1px solid #E5E7EB; border-radius:20px; padding:4px 12px; background:white; color:#374151;">Refer to document</button>
+        <button onclick="triageChip('${q.num}','cannot')" class="text-[12px] hover:border-primary hover:text-primary" style="border:1px solid #E5E7EB; border-radius:20px; padding:4px 12px; background:white; color:#374151;">Cannot disclose</button>
+        <button onclick="triageChip('${q.num}','nochange')" class="text-[12px] hover:border-primary hover:text-primary" style="border:1px solid #E5E7EB; border-radius:20px; padding:4px 12px; background:white; color:#374151;">No change required</button>
+      </div>
+      <div class="mt-2 flex items-center gap-2 text-[12px]" style="color:#111827;">Requires corrigendum?
+        <label class="toggle"><input type="checkbox"><span class="slider"></span></label>
+      </div>
+      <div class="mt-3 flex items-center justify-end gap-2">
+        <button onclick="triageSaveDraft('${q.num}')" class="px-3 py-1.5 rounded-md text-[12px] hover:bg-white" style="border:1px solid #E5E7EB; color:#111827;">Save as Draft</button>
+        <button onclick="triageSendForApproval('${q.num}')" class="px-3 py-1.5 rounded-md text-white text-[12px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5" style="background:#0F5EE8;">Send for Approval <i data-lucide="arrow-right" class="w-3 h-3"></i></button>
+      </div>`;
+  }
+
+  function triageToggleReadMore(qNum){
+    const q = QUERIES.find(x => x.num === qNum);
+    if (!q) return;
+    q.suggestedExpanded = !q.suggestedExpanded;
+    renderQueryList();
+  }
+
+  function triageUseAnswer(qNum){
+    const q = QUERIES.find(x => x.num === qNum);
+    if (!q) return;
+    q.triageState = 'accepted';
+    q.response = q.suggestedResponse || '';
+    q.status = 'draft';
+    renderQueryList();
+    renderGroupsList();
+    showToast(`Response applied from ${q.similarTo || 'matched query'}`);
+  }
+  function triageEditFirst(qNum){
+    const q = QUERIES.find(x => x.num === qNum);
+    if (!q) return;
+    q.triageState = 'editing';
+    if (!q.response) q.response = q.suggestedResponse || '';
+    renderQueryList();
+    setTimeout(() => { const ed = document.getElementById('triageEditor-' + qNum); if (ed) ed.focus(); }, 50);
+  }
+  function triageSkip(qNum){
+    const q = QUERIES.find(x => x.num === qNum);
+    if (!q) return;
+    q.triageState = 'skipped';
+    q.response = '';
+    expandedQueries.delete(qNum);
+    renderQueryList();
+    showToast(`${qNum} moved to inbox`);
+  }
+  function triageEditAccepted(qNum){
+    const q = QUERIES.find(x => x.num === qNum);
+    if (!q) return;
+    q.triageState = 'editing';
+    renderQueryList();
+    setTimeout(() => { const ed = document.getElementById('triageEditor-' + qNum); if (ed) ed.focus(); }, 50);
+  }
+  function triageGenerateAI(qNum){
+    const q = QUERIES.find(x => x.num === qNum);
+    const ed = document.getElementById('triageEditor-' + qNum);
+    if (!q || !ed) return;
+    ed.innerHTML = q.suggestedResponse || 'Based on review of the tender document, please refer to the relevant clause. No further changes are required.';
+    q.response = ed.innerHTML;
+    showToast('AI response generated');
+  }
+  function triageStandardResp(qNum){
+    const ed = document.getElementById('triageEditor-' + qNum);
+    const q = QUERIES.find(x => x.num === qNum);
+    if (!ed || !q) return;
+    ed.innerHTML = 'Please refer to the tender document. No changes are required.';
+    q.response = ed.innerHTML;
+  }
+  function triageChip(qNum, kind){
+    const ed = document.getElementById('triageEditor-' + qNum);
+    const q = QUERIES.find(x => x.num === qNum);
+    if (!ed || !q) return;
+    const map = {
+      refer:    'The answer to this query is stated in the tender document. Please read carefully before raising further queries.',
+      cannot:   'The requested information is not available for public disclosure at this stage.',
+      nochange: 'After due consideration, no changes to the tender document are required.',
+    };
+    ed.innerHTML = map[kind] || '';
+    q.response = ed.innerHTML;
+  }
+  function triageSaveDraft(qNum){
+    const q = QUERIES.find(x => x.num === qNum);
+    const ed = document.getElementById('triageEditor-' + qNum);
+    if (!q || !ed) return;
+    const text = (ed.innerText || '').trim();
+    if (!text){ showToast('Write a response first'); return; }
+    q.response = ed.innerHTML;
+    q.status = 'draft';
+    q.triageState = 'accepted';
+    renderQueryList();
+    showToast(`${qNum} draft saved`);
+  }
+  function triageSendForApproval(qNum){
+    const q = QUERIES.find(x => x.num === qNum);
+    if (!q) return;
+    const ed = document.getElementById('triageEditor-' + qNum);
+    if (ed){
+      const text = (ed.innerText || '').trim();
+      if (!text){ showToast('Write a response first'); return; }
+      q.response = ed.innerHTML;
+    }
+    q.status = 'answered';
+    q.triageState = 'approved';
+    renderQueryList();
+    renderGroupsList();
+    if (typeof renderDocsTable === 'function') renderDocsTable();
+    showToast(`${qNum} sent for approval`);
   }
   function toggleQueryExpand(qid){
     if (expandedQueries.has(qid)) expandedQueries.delete(qid); else expandedQueries.add(qid);
@@ -2670,6 +3044,83 @@
       renderActiveList('');
     }
   })();
+
+  // ============================================================
+  // BATCH TRIAGE + DEADLINE COUNTDOWN
+  // ============================================================
+  function batchTriagePostMeeting(){
+    let n = 0;
+    QUERIES.forEach(q => {
+      if (q.postMeeting && (!q.triageState || q.triageState === 'skipped') && q.similarTo && q.suggestedResponse){
+        q.triageState = 'accepted';
+        q.response = q.suggestedResponse;
+        q.status = 'draft';
+        n++;
+      }
+    });
+    renderQueryList();
+    renderGroupsList();
+    showToast(`${n} responses applied — review before approving`);
+  }
+
+  let deadlineCountdownTimer = null;
+  function initDeadlineCountdown(){
+    const pill = document.getElementById('deadlineCountdown');
+    if (!pill) return;
+    if (!isPostMeetingPhase()){
+      pill.classList.add('hidden');
+      if (deadlineCountdownTimer){ clearInterval(deadlineCountdownTimer); deadlineCountdownTimer = null; }
+      return;
+    }
+    pill.classList.remove('hidden');
+    updateDeadlineCountdown();
+    if (deadlineCountdownTimer) clearInterval(deadlineCountdownTimer);
+    deadlineCountdownTimer = setInterval(() => {
+      postMeetingTickMs += 60_000;
+      updateDeadlineCountdown();
+    }, 60_000);
+  }
+  function updateDeadlineCountdown(){
+    const pill = document.getElementById('deadlineCountdown');
+    const icon = document.getElementById('deadlineIcon');
+    const txt  = document.getElementById('deadlineText');
+    if (!pill || !icon || !txt) return;
+    const close = TIMELINE.find(t => t.id === 'close');
+    const due   = TIMELINE.find(t => t.id === 'due');
+    if (!close || !due){ pill.classList.add('hidden'); return; }
+    const closeAt = new Date(close.date + 'T23:59:00');
+    const now = postMeetingNow();
+    const msLeft = closeAt - now;
+
+    if (msLeft <= 0){
+      // Window closed
+      pill.style.background = '#F3F4F6';
+      pill.style.borderColor = '#E5E7EB';
+      pill.style.color = '#6B7280';
+      icon.textContent = '🔒';
+      const dueLabel = new Date(due.date + 'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
+      txt.textContent = `Query window closed — responses due ${dueLabel}`;
+      if (deadlineCountdownTimer){ clearInterval(deadlineCountdownTimer); deadlineCountdownTimer = null; }
+      return;
+    }
+
+    const totalMin = Math.floor(msLeft / 60000);
+    const hours = Math.floor(totalMin / 60);
+    const mins = totalMin % 60;
+    const urgent = msLeft < 2 * 60 * 60 * 1000; // < 2 hours
+    if (urgent){
+      pill.style.background = '#FEF2F2';
+      pill.style.borderColor = '#FECACA';
+      pill.style.color = '#991B1B';
+      icon.textContent = '⚡';
+    } else {
+      pill.style.background = '#FFFBEB';
+      pill.style.borderColor = '#FCD34D';
+      pill.style.color = '#92400E';
+      icon.textContent = '⏱';
+    }
+    txt.textContent = `Response window closes in ${hours}h ${String(mins).padStart(2,'0')}m`;
+  }
 
   // ============================================================
   // UPLOAD TENDER MODAL
