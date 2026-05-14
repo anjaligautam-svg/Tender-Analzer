@@ -37,6 +37,12 @@
     @keyframes pulse-amber { 0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,.5);} 50% { box-shadow: 0 0 0 6px rgba(245,158,11,0);} }
     .pulse-amber { animation: pulse-amber 1.6s ease-in-out infinite; }
     @keyframes pulse-urgent { 0%,100% { opacity: 0.6; } 50% { opacity: 1.0; } }
+    @keyframes success-scale { from { transform: scale(0.8); } to { transform: scale(1); } }
+    @keyframes confetti {
+      0% { opacity: 0; transform: translateY(0) scale(0.6); }
+      30% { opacity: 1; transform: translateY(-20px) scale(1); }
+      100% { opacity: 0; transform: translateY(-80px) scale(0.4); }
+    }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     .field { border: 1px solid #D1D5DB; border-radius: 8px; padding: 10px 14px; font-size: 14px; width: 100%; background: white; transition: all .15s ease; }
@@ -262,7 +268,8 @@
         <div role="tablist" aria-label="Pre-bid workspace tabs" class="flex flex-wrap gap-2">
           <button role="tab" aria-selected="true" data-tab="queries" class="ev-tab px-4 py-1.5 rounded-full text-[13px] border border-primary bg-primary text-white"><i data-lucide="message-square" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1"></i> Queries &amp; Responses</button>
           <button role="tab" aria-selected="false" data-tab="mn" class="ev-tab px-4 py-1.5 rounded-full text-[13px] border border-line bg-white text-ink-500 hover:text-ink-900"><i data-lucide="calendar-check" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1"></i> Meeting &amp; Notes</button>
-          <button role="tab" aria-selected="false" data-tab="docs" class="ev-tab px-4 py-1.5 rounded-full text-[13px] border border-line bg-white text-ink-500 hover:text-ink-900"><i data-lucide="file-text" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1"></i> Documentation</button>
+          <button role="tab" aria-selected="false" data-tab="docs" class="ev-tab px-4 py-1.5 rounded-full text-[13px] border border-line bg-white text-ink-500 hover:text-ink-900"><i data-lucide="file-text" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1"></i> Responses &amp; Register</button>
+          <button role="tab" aria-selected="false" data-tab="corrigendum" class="ev-tab px-4 py-1.5 rounded-full text-[13px] border border-line bg-white text-ink-500 hover:text-ink-900"><i data-lucide="alert-triangle" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1"></i> <span id="corrigendumTabLabel">Corrigendum</span></button>
         </div>
 
         <!-- ===== TAB 1 — QUERIES & RESPONSES ===== -->
@@ -603,88 +610,140 @@
 
         <!-- ===== TAB 4 — DOCUMENTATION ===== -->
         <section id="tab-docs" role="tabpanel" class="hidden space-y-6">
-          <!-- Section 1: Register -->
-          <section>
-            <div class="flex items-start justify-between gap-3 flex-wrap mb-3">
-              <div>
-                <h3 class="text-[15px] font-bold text-ink-900">Complete Query Response Register</h3>
-                <p class="text-[12px] text-ink-500 mt-0.5">Official record of all queries received and responses given. This is published publicly.</p>
-              </div>
-              <div class="flex items-center gap-2">
-                <button class="px-3 py-2 rounded-lg border border-line text-[12.5px] text-ink-900 hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Download Register (PDF)</button>
-                <button onclick="publishAllApproved()" class="px-3 py-2 rounded-lg bg-primary text-white text-[12.5px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5 shadow-soft">Publish All Approved <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
-              </div>
-            </div>
-            <!-- Filter toolbar -->
-            <div class="bg-white border border-line rounded-xl p-3 mb-3 flex flex-wrap items-center gap-2">
-              <div class="flex flex-wrap gap-1.5" id="docStatusPills">
-                <button class="doc-filter pill-filter active inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] border border-primary bg-primary-light text-primary font-medium" data-df="all">All <span class="doc-pill-count text-[10.5px] font-semibold rounded-full bg-white/70 px-1.5" data-cnt="all">0</span></button>
-                <button class="doc-filter pill-filter inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] border border-line bg-white text-ink-500 hover:text-ink-900" data-df="unanswered">Unanswered <span class="doc-pill-count text-[10.5px] font-semibold rounded-full bg-ink-100 text-ink-500 px-1.5" style="background:#F3F4F6;" data-cnt="unanswered">0</span></button>
-                <button class="doc-filter pill-filter inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] border border-line bg-white text-ink-500 hover:text-ink-900" data-df="draft">Draft <span class="doc-pill-count text-[10.5px] font-semibold rounded-full px-1.5" style="background:#F3F4F6;" data-cnt="draft">0</span></button>
-                <button class="doc-filter pill-filter inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] border border-line bg-white text-ink-500 hover:text-ink-900" data-df="approved">Approved <span class="doc-pill-count text-[10.5px] font-semibold rounded-full px-1.5" style="background:#F3F4F6;" data-cnt="approved">0</span></button>
-                <button class="doc-filter pill-filter inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] border border-line bg-white text-ink-500 hover:text-ink-900" data-df="published">Published <span class="doc-pill-count text-[10.5px] font-semibold rounded-full px-1.5" style="background:#F3F4F6;" data-cnt="published">0</span></button>
-              </div>
-              <div class="ml-auto flex flex-wrap items-center gap-2">
-                <select id="docCategoryFilter" onchange="renderDocsTable()" class="bg-white border border-line rounded-lg px-2.5 py-1.5 text-[12px] focus:outline-none focus:border-primary"><option value="">All categories</option></select>
-                <select id="docVendorFilter" onchange="renderDocsTable()" class="bg-white border border-line rounded-lg px-2.5 py-1.5 text-[12px] focus:outline-none focus:border-primary"><option value="">All vendors</option></select>
-                <div class="relative">
-                  <i data-lucide="search" class="w-3.5 h-3.5 text-ink-400 absolute left-2.5 top-1/2 -translate-y-1/2"></i>
-                  <input id="docSearch" oninput="renderDocsTable()" placeholder="Search queries…" class="bg-white border border-line rounded-lg pl-7 pr-2.5 py-1.5 text-[12px] w-48 focus:outline-none focus:border-primary" />
+          <!-- SUCCESS SCREEN (replaces content when published) -->
+          <div id="docSuccessScreen" class="hidden"></div>
+
+          <!-- DEFAULT CONTENT -->
+          <div id="docMainContent">
+            <!-- Register -->
+            <section>
+              <div class="flex items-start justify-between gap-3 flex-wrap mb-3">
+                <div>
+                  <h3 class="text-[15px] font-bold text-ink-900">Query Response Register</h3>
+                  <p class="text-[12px] text-ink-500 mt-0.5">Official record of all queries received and responses drafted. Filter by clicking any column header.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button class="px-3 py-2 rounded-lg border border-line text-[12.5px] text-ink-900 hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Download Register (PDF)</button>
+                  <button onclick="publishAllApproved()" class="px-3 py-2 rounded-lg bg-primary text-white text-[12.5px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5 shadow-soft">Publish All Drafts <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
                 </div>
               </div>
-            </div>
-            <div class="bg-white border border-line rounded-xl overflow-hidden">
-              <div class="flex items-center gap-2 px-4 py-2 bg-surface border-b border-line">
-                <span class="text-[12px] text-ink-500" id="docCountLabel">0 queries</span>
-                <button onclick="publishAllApproved()" class="ml-auto px-2.5 py-1 rounded-md bg-primary text-white text-[11.5px] font-medium hover:bg-primary/90">Publish all approved</button>
-                <button class="px-2.5 py-1 rounded-md border border-line text-[11.5px] text-ink-900 hover:bg-white inline-flex items-center gap-1"><i data-lucide="download" class="w-3 h-3"></i> Export all</button>
-              </div>
-              <div class="overflow-x-auto">
-                <table class="w-full text-[12.5px]">
-                  <thead class="bg-surface text-[10.5px] uppercase tracking-wider text-ink-500 font-semibold">
-                    <tr>
-                      <th class="text-left px-3 py-2.5 w-16">Q.No</th>
-                      <th class="text-left px-3 py-2.5">Query</th>
-                      <th class="text-left px-3 py-2.5 w-20">Source</th>
-                      <th class="text-left px-3 py-2.5 w-24">Vendor</th>
-                      <th class="text-left px-3 py-2.5 w-32">Category</th>
-                      <th class="text-left px-3 py-2.5">Response</th>
-                      <th class="text-left px-3 py-2.5 w-24">Status</th>
-                      <th class="text-left px-3 py-2.5 w-24">Published</th>
-                    </tr>
-                  </thead>
-                  <tbody id="docTableBody" class="divide-y divide-line"></tbody>
-                </table>
-              </div>
-            </div>
-          </section>
 
-          <!-- Section 2: Corrigendum -->
-          <section>
-            <h3 class="text-[15px] font-bold text-ink-900 mb-3">Corrigendum</h3>
-            <div id="corrigendumWrap"></div>
-          </section>
+              <!-- Active filter chips -->
+              <div id="docActiveFilters" class="hidden mb-2.5" style="display:flex; gap:8px; flex-wrap:wrap;" aria-live="polite"></div>
 
-          <!-- Section 3: Process Summary -->
-          <section>
-            <h3 class="text-[15px] font-bold text-ink-900 mb-3">Pre-Bid Process Summary</h3>
-            <div class="bg-white border border-line rounded-xl p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-3 gap-x-6 text-[13px]">
-              <div class="flex items-center justify-between"><span class="text-ink-500">Total queries received</span><span class="text-ink-900 font-semibold">24</span></div>
-              <div class="flex items-center justify-between"><span class="text-ink-500">Queries responded</span><span class="text-ink-900 font-semibold">22</span></div>
-              <div class="flex items-center justify-between"><span class="text-ink-500">Generic responses applied</span><span class="text-ink-900 font-semibold">3</span></div>
-              <div class="flex items-center justify-between"><span class="text-ink-500">Queries discussed in meeting</span><span class="text-ink-900 font-semibold">8</span></div>
-              <div class="flex items-center justify-between"><span class="text-ink-500">Corrigendum issued</span><span id="summaryCorrigendum" class="text-ink-900 font-semibold">No</span></div>
-              <div class="flex items-center justify-between"><span class="text-ink-500">MoM uploaded</span><span id="summaryMom" class="text-ink-900 font-semibold">No</span></div>
-              <div class="sm:col-span-2 lg:col-span-3 flex items-center justify-between pt-3 border-t border-line"><span class="text-ink-500">Process completed on</span><span class="text-ink-900 font-semibold">May 15, 2026</span></div>
+              <!-- Search row -->
+              <div class="flex items-center gap-2 mb-3">
+                <div class="relative" style="max-width:280px; flex:1;">
+                  <i data-lucide="search" class="w-3.5 h-3.5 text-ink-400 absolute left-2.5 top-1/2 -translate-y-1/2"></i>
+                  <input id="docSearch" oninput="renderDocsTable()" placeholder="Search queries…" class="w-full bg-white border border-line rounded-lg pl-7 pr-2.5 py-1.5 text-[12px] focus:outline-none focus:border-primary" />
+                </div>
+                <span class="text-[12px] text-ink-500" id="docCountLabel" aria-live="polite">0 queries</span>
+              </div>
+
+              <!-- Excel-style table -->
+              <div class="relative" style="border:1px solid #E5E7EB; border-radius:12px; overflow:visible;">
+                <div style="overflow-x:auto; border-radius:12px;">
+                  <table id="docTable" class="w-full text-[13px]" style="border-collapse:separate; border-spacing:0;">
+                    <thead>
+                      <tr style="background:#F9FAFB; border-bottom:2px solid #E5E7EB;">
+                        <th data-col="num" style="text-align:left; padding:10px 14px; font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.05em; white-space:nowrap; user-select:none; width:70px; border-bottom:2px solid #E5E7EB;">Q.NO</th>
+                        <th data-col="text" style="text-align:left; padding:10px 14px; font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.05em; white-space:nowrap; user-select:none; border-bottom:2px solid #E5E7EB;">QUERY</th>
+                        <th data-col="source" data-filter="source" class="doc-th-filter" style="text-align:left; padding:10px 14px; font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.05em; white-space:nowrap; user-select:none; cursor:pointer; width:96px; border-bottom:2px solid #E5E7EB;"><span class="doc-th-content" style="display:flex; align-items:center; gap:6px;"><span class="doc-th-dot hidden" style="width:6px; height:6px; border-radius:50%; background:#0F5EE8;"></span><span class="doc-th-label">SOURCE</span><span class="doc-th-chev" style="font-size:10px; color:#9CA3AF;">▾</span></span></th>
+                        <th data-col="type" data-filter="type" class="doc-th-filter" style="text-align:left; padding:10px 14px; font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.05em; white-space:nowrap; user-select:none; cursor:pointer; width:150px; border-bottom:2px solid #E5E7EB;"><span class="doc-th-content" style="display:flex; align-items:center; gap:6px;"><span class="doc-th-dot hidden" style="width:6px; height:6px; border-radius:50%; background:#0F5EE8;"></span><span class="doc-th-label">CATEGORY</span><span class="doc-th-chev" style="font-size:10px; color:#9CA3AF;">▾</span></span></th>
+                        <th data-col="vendor" data-filter="vendor" class="doc-th-filter" style="text-align:left; padding:10px 14px; font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.05em; white-space:nowrap; user-select:none; cursor:pointer; width:170px; border-bottom:2px solid #E5E7EB;"><span class="doc-th-content" style="display:flex; align-items:center; gap:6px;"><span class="doc-th-dot hidden" style="width:6px; height:6px; border-radius:50%; background:#0F5EE8;"></span><span class="doc-th-label">VENDOR</span><span class="doc-th-chev" style="font-size:10px; color:#9CA3AF;">▾</span></span></th>
+                        <th data-col="response" style="text-align:left; padding:10px 14px; font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.05em; white-space:nowrap; user-select:none; border-bottom:2px solid #E5E7EB;">RESPONSE</th>
+                        <th data-col="status" data-filter="status" class="doc-th-filter" style="text-align:left; padding:10px 14px; font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.05em; white-space:nowrap; user-select:none; cursor:pointer; width:110px; border-bottom:2px solid #E5E7EB;"><span class="doc-th-content" style="display:flex; align-items:center; gap:6px;"><span class="doc-th-dot hidden" style="width:6px; height:6px; border-radius:50%; background:#0F5EE8;"></span><span class="doc-th-label">STATUS</span><span class="doc-th-chev" style="font-size:10px; color:#9CA3AF;">▾</span></span></th>
+                        <th data-col="drafted" style="text-align:left; padding:10px 14px; font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.05em; white-space:nowrap; user-select:none; width:100px; border-bottom:2px solid #E5E7EB;">DRAFTED</th>
+                      </tr>
+                    </thead>
+                    <tbody id="docTableBody"></tbody>
+                  </table>
+                </div>
+                <div id="docFilterDropdown" class="hidden" role="dialog" style="position:absolute; background:white; border:1px solid #E5E7EB; border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.1); min-width:220px; padding:8px; z-index:100;"></div>
+              </div>
+            </section>
+
+            <!-- Process Summary -->
+            <section style="margin-top:24px;">
+              <h3 class="text-[15px] font-bold text-ink-900 mb-3">Pre-Bid Process Summary</h3>
+              <div class="bg-white border border-line rounded-xl p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-3 gap-x-6 text-[13px]">
+                <div class="flex items-center justify-between"><span class="text-ink-500">Total queries received</span><span class="text-ink-900 font-semibold">24</span></div>
+                <div class="flex items-center justify-between"><span class="text-ink-500">Queries responded</span><span class="text-ink-900 font-semibold">22</span></div>
+                <div class="flex items-center justify-between"><span class="text-ink-500">Generic responses applied</span><span class="text-ink-900 font-semibold">3</span></div>
+                <div class="flex items-center justify-between"><span class="text-ink-500">Queries discussed in meeting</span><span class="text-ink-900 font-semibold">8</span></div>
+                <div class="flex items-center justify-between"><span class="text-ink-500">Corrigendum issued</span><span id="summaryCorrigendum" class="text-ink-900 font-semibold">No</span></div>
+                <div class="flex items-center justify-between"><span class="text-ink-500">MoM uploaded</span><span id="summaryMom" class="text-ink-900 font-semibold">No</span></div>
+                <div class="sm:col-span-2 lg:col-span-3 flex items-center justify-between pt-3 border-t border-line"><span class="text-ink-500">Process completed on</span><span class="text-ink-900 font-semibold">May 15, 2026</span></div>
+              </div>
+              <button class="mt-3 px-3.5 py-2 rounded-lg border border-primary text-primary text-[13px] font-medium hover:bg-primary-light inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Download Full Process Report</button>
+            </section>
+          </div>
+        </section>
+
+        <!-- ===== TAB 5 — CORRIGENDUM ===== -->
+        <section id="tab-corrigendum" role="tabpanel" class="hidden space-y-6">
+          <!-- Banner -->
+          <div style="background:linear-gradient(135deg, #0F2744 0%, #0F5EE8 100%); border-radius:14px; padding:24px 28px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:24px;">
+            <div>
+              <div style="font-size:20px; font-weight:700; color:white;">Corrigendum</div>
+              <div style="font-size:13px; color:rgba(255,255,255,0.7); margin-top:4px;">Formally amend this tender and notify all vendors who downloaded it.</div>
+              <div id="corrigendumStatsStrip" style="font-size:12px; color:rgba(255,255,255,0.6); margin-top:8px;">3 pending amendments · 1 already issued</div>
             </div>
-            <button class="mt-3 px-3.5 py-2 rounded-lg border border-primary text-primary text-[13px] font-medium hover:bg-primary-light inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Download Full Process Report</button>
-          </section>
+            <button id="issueCorrigendumBtn" onclick="openIssueCorrigendumForm()" style="background:white; color:#0F5EE8; border-radius:10px; padding:12px 24px; font-size:14px; font-weight:700; box-shadow:0 4px 12px rgba(0,0,0,0.15); cursor:pointer; transition:all 150ms ease;" onmouseover="this.style.background='#EFF6FF'; this.style.transform='translateY(-1px)';" onmouseout="this.style.background='white'; this.style.transform='translateY(0)';">+ Issue Corrigendum</button>
+          </div>
+          <div id="corrigendumWrap"></div>
         </section>
 
         <div class="h-6"></div>
       </section>
     </main>
   </div>
+</div>
+
+<!-- ============ ISSUE CORRIGENDUM FORM MODAL ============ -->
+<div id="issueCorrigendumModal" role="dialog" aria-modal="true" aria-label="Issue Corrigendum" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(15,39,68,0.4);">
+  <div class="bg-white shadow-lift w-full" style="max-width:680px; border-radius:16px; padding:28px; max-height:90vh; overflow-y:auto;">
+    <div class="flex items-start justify-between gap-3 mb-2">
+      <div>
+        <h3 class="text-[20px] font-bold text-ink-900">Issue Corrigendum</h3>
+        <p class="text-[13px] text-ink-500 mt-1">Review the pending amendments below. AI has drafted the official document — preview before issuing.</p>
+      </div>
+      <button onclick="closeIssueCorrigendumForm()" aria-label="Close" class="text-ink-400 hover:text-ink-900"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+    <div class="mt-4 space-y-2" id="issueCorrigendumPendingList"></div>
+    <div class="mt-5">
+      <label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Notes to vendors (optional)</label>
+      <textarea id="issueCorrigendumNote" rows="3" class="w-full bg-white border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" placeholder="e.g. Bid deadline will be extended to provide adequate time…"></textarea>
+    </div>
+    <div class="mt-6 flex items-center justify-end gap-2">
+      <button onclick="closeIssueCorrigendumForm()" class="px-3.5 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">Cancel</button>
+      <button onclick="openCorrigendumPreviewPanel()" class="px-3.5 py-2 rounded-lg border border-primary text-primary text-[13px] font-medium hover:bg-primary-light inline-flex items-center gap-1.5"><i data-lucide="eye" class="w-3.5 h-3.5"></i> Preview Corrigendum</button>
+      <button onclick="confirmIssueAndNotify()" class="px-3.5 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5">Issue &amp; Notify All Vendors <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CORRIGENDUM PREVIEW PANEL ============ -->
+<div id="corrigPanelBackdrop" class="hidden fixed inset-0" style="background:rgba(0,0,0,0.3); z-index:400;" onclick="closeCorrigendumPreviewPanel()"></div>
+<div id="corrigPanel" role="dialog" aria-modal="true" aria-label="Corrigendum Preview" class="hidden fixed top-0 right-0 h-full bg-white" style="width:720px; max-width:100vw; z-index:500; transform:translateX(100%); transition:transform 280ms cubic-bezier(0.4,0,0.2,1); display:flex; flex-direction:column; box-shadow:-8px 0 24px rgba(0,0,0,0.1);">
+  <div style="height:56px; background:#F9FAFB; border-bottom:1px solid #E5E7EB; padding:0 20px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <i data-lucide="file-text" class="w-5 h-5" style="color:#0F5EE8;"></i>
+      <div>
+        <div style="font-size:14px; font-weight:700; color:#111827;">Corrigendum Preview</div>
+        <div style="font-size:11px; color:#9CA3AF;">TND-2026-001 · AI drafted</div>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <button id="corrigEditToggleBtn" onclick="toggleCorrigEditMode()" style="background:#0F5EE8; color:white; border:none; border-radius:6px; padding:6px 14px; font-size:13px; cursor:pointer;">Edit Document</button>
+      <button onclick="closeCorrigendumPreviewPanel()" aria-label="Close" style="color:#6B7280; background:transparent; border:none; cursor:pointer; font-size:20px; line-height:1;">×</button>
+    </div>
+  </div>
+  <div id="corrigEditBanner" class="hidden" style="background:#FFFBEB; border-bottom:1px solid #FCD34D; padding:8px 20px; font-size:12px; color:#92400E;">✎ Edit mode — select any text to modify. Changes save automatically.</div>
+  <div style="height:4px; background:#10B981;"></div>
+  <div style="background:#F9FAFB; padding:4px 20px; font-size:11px; color:#10B981;">Document is ready to review</div>
+  <div id="corrigDocBody" style="flex:1; overflow-y:auto; padding:32px 40px; font-family:'Times New Roman', Georgia, serif; font-size:13.5px; line-height:1.9; color:#1a1a1a; background:white;"></div>
+  <div id="corrigSelectionDialog" class="hidden" style="position:absolute; width:320px; background:white; border:1px solid #E5E7EB; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.15); padding:14px; z-index:520;"></div>
 </div>
 
 <!-- ============ GENERIC RESPONSE MODAL ============ -->
@@ -1166,7 +1225,7 @@
   // ============================================================
   // TABS
   // ============================================================
-  const TABS = ['queries','mn','docs'];
+  const TABS = ['queries','mn','docs','corrigendum'];
   function setTab(name){
     // Legacy hash redirects
     if (name === 'notes' || name === 'meeting' || name === 'meeting-day') name = 'mn';
@@ -1183,7 +1242,25 @@
     });
     if (name === 'mn') { mnInit(); }
     if (name === 'docs') renderDocsTable();
+    if (name === 'corrigendum') renderCorrigendum();
     refreshIcons();
+  }
+  function refreshCorrigendumTabBadge(){
+    const lbl = document.getElementById('corrigendumTabLabel');
+    if (!lbl) return;
+    const pending = (typeof CORRIGENDUM_PENDING !== 'undefined' ? CORRIGENDUM_PENDING.length : 0);
+    const btn = lbl.closest('button');
+    if (pending > 0){
+      lbl.innerHTML = `⚠ Corrigendum (${pending})`;
+      if (btn && btn.getAttribute('aria-selected') !== 'true'){
+        btn.style.color = '#F59E0B';
+        btn.style.borderColor = '#FCD34D';
+        btn.style.background = '#FFFBEB';
+      }
+    } else {
+      lbl.textContent = 'Corrigendum';
+      if (btn){ btn.style.color = ''; btn.style.borderColor = ''; btn.style.background = ''; }
+    }
   }
   document.querySelectorAll('.ev-tab').forEach(b => b.addEventListener('click', () => setTab(b.dataset.tab)));
 
@@ -2706,12 +2783,12 @@
   }
 
   // ============================================================
-  // TAB 4 — DOCUMENTATION
+  // TAB 4 — RESPONSES & REGISTER (Excel-style table)
   // ============================================================
-  let docFilter = 'all';
   const docExpanded = new Set();   // Q-numbers whose Read more is expanded
-  const docEditorOpen = new Set(); // Q-numbers with inline editor open
-  const docDrafts = {};            // {qNum: 'html'} working drafts
+  let   docEditorOpen = null;       // single Q-num with inline editor open
+  const docDrafts = {};            // {qNum: 'html'}
+  const docColumnFilters = { source:new Set(), type:new Set(), vendor:new Set(), status:new Set() };
 
   function vendorShortLabel(name){
     if (!name) return '—';
@@ -2720,163 +2797,248 @@
   }
 
   function docRowStatus(q){
-    if (q.status === 'answered' && q.published) return 'published';
-    if (q.status === 'answered') return 'approved';
-    if (q.status === 'draft' || q.status === 'generic') return 'draft';
+    // Simplified — Unanswered or Draft only (no Published)
+    if (q.status === 'draft' || q.status === 'answered' || q.status === 'generic') return 'draft';
     return 'unanswered';
   }
 
-  function docComputeCounts(){
-    const all = QUERIES.length;
-    let unanswered=0, draft=0, approved=0, published=0;
-    QUERIES.forEach(q => {
-      const s = docRowStatus(q);
-      if (s === 'unanswered') unanswered++;
-      else if (s === 'draft') draft++;
-      else if (s === 'approved') approved++;
-      else if (s === 'published') published++;
-    });
-    return { all, unanswered, draft, approved, published };
+  function docCategoryOf(q){
+    // Map detailed q.type to filter buckets
+    if (!q.type) return 'General';
+    if (q.type.includes('Spec')) return 'Spec Change Request';
+    if (q.type.includes('Deadline')) return 'Deadline Extension';
+    if (q.type.includes('Eligibility')) return 'Eligibility Query';
+    if (q.type.includes('Clarification')) return 'Clarification';
+    return 'General';
   }
 
-  function docPopulateFilters(){
-    const catSel = document.getElementById('docCategoryFilter');
-    const venSel = document.getElementById('docVendorFilter');
-    if (catSel && catSel.options.length <= 1){
-      const cats = Array.from(new Set(QUERIES.map(q => q.section))).sort();
-      cats.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; catSel.appendChild(o); });
-    }
-    if (venSel && venSel.options.length <= 1){
-      VENDORS.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; venSel.appendChild(o); });
-    }
+  function docMatchesFilters(q){
+    const f = docColumnFilters;
+    if (f.source.size && !f.source.has(q.source)) return false;
+    if (f.type.size && !f.type.has(docCategoryOf(q))) return false;
+    if (f.vendor.size && !f.vendor.has(q.vendor)) return false;
+    if (f.status.size && !f.status.has(docRowStatus(q))) return false;
+    const s = (document.getElementById('docSearch')?.value || '').toLowerCase();
+    if (s && !(q.text.toLowerCase().includes(s) || q.num.toLowerCase().includes(s))) return false;
+    return true;
   }
 
   function renderDocsTable(){
-    docPopulateFilters();
     const body = document.getElementById('docTableBody');
-    const cat = (document.getElementById('docCategoryFilter')?.value || '').toLowerCase();
-    const ven = (document.getElementById('docVendorFilter')?.value || '').toLowerCase();
-    const q   = (document.getElementById('docSearch')?.value || '').toLowerCase();
+    if (!body) return;
+    const rows = QUERIES.filter(docMatchesFilters);
 
-    let rows = QUERIES.slice();
-    if (docFilter !== 'all') rows = rows.filter(r => docRowStatus(r) === docFilter);
-    if (cat) rows = rows.filter(r => r.section.toLowerCase() === cat);
-    if (ven) rows = rows.filter(r => (r.vendor||'').toLowerCase() === ven);
-    if (q)   rows = rows.filter(r => r.text.toLowerCase().includes(q) || r.num.toLowerCase().includes(q));
+    const lbl = document.getElementById('docCountLabel');
+    if (lbl) lbl.textContent = `${rows.length} of ${QUERIES.length} queries`;
 
-    const counts = docComputeCounts();
-    document.querySelectorAll('.doc-pill-count').forEach(el => { el.textContent = counts[el.dataset.cnt] || 0; });
-    const lbl = document.getElementById('docCountLabel'); if (lbl) lbl.textContent = `${rows.length} of ${QUERIES.length} queries`;
+    renderDocActiveFilterChips();
+    refreshDocHeaderFilterState();
 
-    body.innerHTML = rows.map(r => docRowHTML(r)).join('') || `<tr><td colspan="8" class="text-center text-[12.5px] text-ink-500 italic py-8">No queries match these filters</td></tr>`;
+    body.innerHTML = rows.map((q, i) => docRowHTML(q, i)).join('')
+      || `<tr><td colspan="8" style="padding:32px; text-align:center; font-size:13px; color:#9CA3AF; font-style:italic;">No queries match these filters</td></tr>`;
     refreshIcons();
   }
 
-  function docRowHTML(q){
+  function docRowHTML(q, i){
     const state = docRowStatus(q);
-    const stat = state === 'published' ? { label:'Published', style:'background:#F0FDF4; color:#10B981;' }
-              : state === 'approved'  ? { label:'Approved',  style:'background:#EFF6FF; color:#0F5EE8;' }
-              : state === 'draft'     ? { label:'Draft',     style:'background:#FFFBEB; color:#92400E;' }
-              :                          { label:'Unanswered', style:'background:#F3F4F6; color:#6B7280;' };
+    const stat = state === 'draft'
+      ? `<span style="background:#FEF3C7; color:#92400E; border-radius:20px; padding:3px 8px; font-size:11px; font-weight:700;">Draft</span>`
+      : `<span style="background:#F3F4F6; color:#6B7280; border-radius:20px; padding:3px 8px; font-size:11px;">Unanswered</span>`;
+
     const expanded = docExpanded.has(q.num);
     const queryCell = expanded
-      ? `<div class="text-ink-900 whitespace-pre-wrap">${q.text}</div><a href="#" onclick="docToggleExpand('${q.num}'); return false;" class="text-[11px] text-primary hover:underline">Show less</a>`
-      : `<div class="text-ink-900 truncate">${q.text}</div>${q.text.length > 90 ? `<a href="#" onclick="docToggleExpand('${q.num}'); return false;" class="text-[11px] text-primary hover:underline">Read more</a>` : ''}`;
+      ? `<div style="color:#374151; white-space:normal;">${q.text}</div><a href="#" onclick="docToggleExpand('${q.num}'); return false;" style="font-size:11px; color:#0F5EE8;">Read less</a>`
+      : `<div style="color:#374151; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${q.text}</div>${q.text.length > 100 ? `<a href="#" onclick="docToggleExpand('${q.num}'); return false;" style="font-size:11px; color:#0F5EE8;">Read more</a>` : ''}`;
+
     const vendorShort = vendorShortLabel(q.vendor);
     const respCell = docResponseCell(q, state);
-    const mainRow = `<tr class="hover:bg-surface align-top">
-      <td class="px-3 py-2.5 font-mono text-[11.5px] font-bold text-primary">${q.num}</td>
-      <td class="px-3 py-2.5" style="max-width:260px;">${queryCell}</td>
-      <td class="px-3 py-2.5 text-ink-500">${q.source}</td>
-      <td class="px-3 py-2.5 text-ink-900" title="${q.vendor || ''}">${vendorShort}</td>
-      <td class="px-3 py-2.5"><span class="text-[10.5px] font-medium" style="${typePillStyle(q.type)}; border-radius:14px; padding:1px 7px;">${q.type}</span></td>
-      <td class="px-3 py-2.5" style="max-width:240px;">${respCell}</td>
-      <td class="px-3 py-2.5"><span class="text-[10.5px] font-medium" style="${stat.style}; border-radius:14px; padding:1px 7px;">${stat.label}</span></td>
-      <td class="px-3 py-2.5 text-ink-500 text-[11.5px]">${q.published || '—'}</td>
+    const cat = docCategoryOf(q);
+    const catPill = `<span style="${typePillStyle(cat)}; border-radius:14px; padding:2px 8px; font-size:10.5px; font-weight:500;">${cat}</span>`;
+
+    const rowBg = (i % 2 === 0) ? 'white' : '#FAFAFA';
+    const cellBase = `padding:10px 14px; font-size:13px; color:#374151; vertical-align:top; border-bottom:1px solid #F3F4F6;`;
+    const draftedDate = q.draftedOn || (state === 'draft' ? 'May 8' : '');
+    const mainRow = `<tr class="doc-row" data-q="${q.num}" style="background:${rowBg}; transition:background 100ms ease;" onmouseover="this.style.background='#F0F7FF'" onmouseout="this.style.background='${rowBg}'">
+      <td style="${cellBase}"><span style="background:#EFF6FF; color:#0F5EE8; border-radius:4px; padding:2px 6px; font-size:11px; font-weight:700; font-family:monospace;">${q.num}</span></td>
+      <td style="${cellBase} max-width:280px;">${queryCell}</td>
+      <td style="${cellBase} color:#6B7280; font-size:12px;">${q.source}</td>
+      <td style="${cellBase}">${catPill}</td>
+      <td style="${cellBase} font-size:12px;" title="${q.vendor || ''}">${vendorShort}</td>
+      <td style="${cellBase} max-width:260px;">${respCell}</td>
+      <td style="${cellBase}">${stat}</td>
+      <td style="${cellBase} color:#6B7280; font-size:12px;">${draftedDate || '—'}</td>
     </tr>`;
-    const editorRow = docEditorOpen.has(q.num) ? docEditorRowHTML(q, state) : '';
+    const editorRow = (docEditorOpen === q.num) ? docEditorRowHTML(q, state) : '';
     return mainRow + editorRow;
   }
 
   function docResponseCell(q, state){
-    if (state === 'published'){
-      const text = q.response.replace(/<[^>]+>/g,'').slice(0,80) + (q.response.length > 80 ? '…' : '');
-      return `<div class="text-ink-900 truncate" title="Published responses cannot be edited. Issue a corrigendum to amend.">${text}</div><span class="text-[11px] text-ink-400" title="Published responses cannot be edited. Issue a corrigendum to amend."><i data-lucide="lock" class="w-3 h-3 inline -mt-0.5"></i> Read only</span>`;
-    }
     if (state === 'unanswered'){
-      return `<a href="#" onclick="docOpenEditor('${q.num}'); return false;" class="text-[12px] text-primary hover:underline inline-flex items-center gap-1"><i data-lucide="plus" class="w-3 h-3"></i> Draft Response</a>`;
+      return `<a href="#" onclick="docOpenEditor('${q.num}'); return false;" style="font-size:12px; color:#0F5EE8; display:inline-flex; align-items:center; gap:4px; cursor:pointer;"><i data-lucide="pencil" class="w-3 h-3"></i> + Draft Response</a>`;
     }
-    // draft or approved
-    const text = q.response ? (q.response.replace(/<[^>]+>/g,'').slice(0,80) + (q.response.length > 80 ? '…' : '')) : '<em class="text-ink-400">—</em>';
-    return `<div class="text-ink-900 truncate">${text}</div><a href="#" onclick="docOpenEditor('${q.num}'); return false;" class="text-[11px] text-primary hover:underline">Edit <i data-lucide="pencil" class="w-2.5 h-2.5 inline"></i></a>`;
+    const text = q.response ? (q.response.replace(/<[^>]+>/g,'').slice(0,80) + (q.response.length > 80 ? '…' : '')) : '<em style="color:#9CA3AF;">—</em>';
+    return `<div style="font-size:12px; color:#374151;">${text}</div><a href="#" onclick="docOpenEditor('${q.num}'); return false;" style="font-size:11px; color:#0F5EE8;">Edit ✎</a>`;
   }
 
   function docEditorRowHTML(q, state){
     const draft = docDrafts[q.num] != null ? docDrafts[q.num] : (q.response || '');
-    return `<tr class="doc-editor-row"><td colspan="8" class="p-0" style="background:#F8FBFF; border-top:1px solid #0F5EE8; border-bottom:1px solid #0F5EE8;">
-      <div class="px-5 py-4 space-y-3">
-        <div class="flex items-start justify-between gap-3">
-          <div class="flex-1">
-            <div class="text-[11px] uppercase tracking-wider text-ink-500 font-semibold">Drafting response to ${q.num}</div>
-            <div class="text-[13px] text-ink-900 mt-0.5">${q.text}</div>
-          </div>
-          <button onclick="docCloseEditor('${q.num}')" aria-label="Close" class="text-ink-400 hover:text-ink-900 shrink-0"><i data-lucide="x" class="w-4 h-4"></i></button>
+    return `<tr class="doc-editor-row"><td colspan="8" style="padding:0; background:#F8FBFF; border-top:2px solid #0F5EE8; border-bottom:2px solid #0F5EE8;">
+      <div style="padding:16px 20px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px;">
+          <div style="font-size:13px; font-weight:700; color:#0F5EE8;">Drafting response for ${q.num}</div>
+          <button onclick="docCloseEditor()" aria-label="Close" style="color:#9CA3AF; background:transparent; border:none; cursor:pointer; font-size:20px; line-height:1;">×</button>
         </div>
-        <div class="flex flex-wrap items-center gap-1.5">
-          <button onclick="docEditorCmd('${q.num}','bold')" class="p-1.5 rounded-md border border-line bg-white hover:bg-surface" title="Bold"><i data-lucide="bold" class="w-3.5 h-3.5"></i></button>
-          <button onclick="docEditorCmd('${q.num}','italic')" class="p-1.5 rounded-md border border-line bg-white hover:bg-surface" title="Italic"><i data-lucide="italic" class="w-3.5 h-3.5"></i></button>
-          <button onclick="docEditorCmd('${q.num}','insertUnorderedList')" class="p-1.5 rounded-md border border-line bg-white hover:bg-surface" title="Bullet list"><i data-lucide="list" class="w-3.5 h-3.5"></i></button>
-          <span class="w-px h-5 bg-line mx-1"></span>
-          <button onclick="docEditorAI('${q.num}')" class="px-2 py-1 rounded-md text-[11.5px] font-medium inline-flex items-center gap-1" style="background:#EFF6FF; color:#0F5EE8;"><i data-lucide="sparkles" class="w-3 h-3"></i> AI draft</button>
-          <button onclick="docEditorStandard('${q.num}')" class="px-2 py-1 rounded-md text-[11.5px] font-medium inline-flex items-center gap-1 border border-line bg-white text-ink-900 hover:bg-surface"><i data-lucide="file-text" class="w-3 h-3"></i> Standard</button>
-          <label class="ml-auto inline-flex items-center gap-1.5 text-[12px] text-ink-900"><input id="docCorr-${q.num}" type="checkbox" class="accent-primary"> Requires corrigendum</label>
+        <div style="background:#F9FAFB; border-radius:6px; padding:10px 12px; margin-bottom:12px; font-size:13px; color:#374151;">${q.text}</div>
+        <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
+          <button onmousedown="event.preventDefault(); document.execCommand('bold')" aria-label="Bold" style="padding:6px 8px; border:1px solid #E5E7EB; background:white; border-radius:6px; cursor:pointer;"><i data-lucide="bold" class="w-3.5 h-3.5"></i></button>
+          <button onmousedown="event.preventDefault(); document.execCommand('italic')" aria-label="Italic" style="padding:6px 8px; border:1px solid #E5E7EB; background:white; border-radius:6px; cursor:pointer;"><i data-lucide="italic" class="w-3.5 h-3.5"></i></button>
+          <button onmousedown="event.preventDefault(); document.execCommand('insertUnorderedList')" aria-label="Bullet" style="padding:6px 8px; border:1px solid #E5E7EB; background:white; border-radius:6px; cursor:pointer;"><i data-lucide="list" class="w-3.5 h-3.5"></i></button>
         </div>
-        <div id="docEditor-${q.num}" contenteditable="true" class="bg-white border border-line rounded-lg px-3 py-2 text-[13px] text-ink-900 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" style="min-height:90px;" oninput="docDrafts['${q.num}'] = this.innerHTML">${draft}</div>
-        <div class="flex items-center justify-end gap-2 pt-1">
-          <button onclick="docCloseEditor('${q.num}')" class="px-3 py-1.5 rounded-lg border border-line text-[12.5px] text-ink-900 hover:bg-white">Cancel</button>
-          <button onclick="docSaveDraft('${q.num}')" class="px-3 py-1.5 rounded-lg border border-line bg-white text-[12.5px] text-ink-900 hover:bg-surface">Save Draft</button>
-          <button onclick="docSendForApproval('${q.num}')" class="px-3 py-1.5 rounded-lg bg-primary text-white text-[12.5px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5">Send for Approval <i data-lucide="arrow-right" class="w-3 h-3"></i></button>
+        <div id="docEditor-${q.num}" contenteditable="true" placeholder="Draft your formal response..." style="background:white; border:1px solid #D1D5DB; border-radius:8px; padding:10px 12px; font-size:13px; color:#374151; min-height:100px; outline:none;" oninput="docDrafts['${q.num}'] = this.innerHTML">${draft}</div>
+        <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+          <button onclick="docEditorAI('${q.num}')" style="border:1px solid #BFDBFE; color:#0F5EE8; background:white; border-radius:6px; padding:6px 12px; font-size:12px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;"><i data-lucide="sparkles" class="w-3 h-3"></i> ✦ Generate AI Response</button>
+          <button onclick="docEditorStandard('${q.num}')" style="border:1px solid #E5E7EB; color:#374151; background:white; border-radius:6px; padding:6px 12px; font-size:12px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;"><i data-lucide="file-text" class="w-3 h-3"></i> 📋 Standard response</button>
+          <button onclick="docEditorChip('${q.num}','refer')" style="border:1px solid #E5E7EB; color:#374151; background:white; border-radius:20px; padding:4px 12px; font-size:12px; cursor:pointer;">Refer to document</button>
+          <button onclick="docEditorChip('${q.num}','cannot')" style="border:1px solid #E5E7EB; color:#374151; background:white; border-radius:20px; padding:4px 12px; font-size:12px; cursor:pointer;">Cannot disclose</button>
+          <button onclick="docEditorChip('${q.num}','nochange')" style="border:1px solid #E5E7EB; color:#374151; background:white; border-radius:20px; padding:4px 12px; font-size:12px; cursor:pointer;">No change required</button>
+          <label style="margin-left:auto; display:inline-flex; align-items:center; gap:8px; font-size:12px; color:#374151;">Requires corrigendum?
+            <label class="toggle"><input id="docCorr-${q.num}" type="checkbox"><span class="slider"></span></label>
+          </label>
+        </div>
+        <div style="margin-top:14px; display:flex; justify-content:flex-end; gap:8px;">
+          <button onclick="docCloseEditor()" style="padding:8px 14px; border:1px solid #E5E7EB; background:white; color:#6B7280; border-radius:8px; font-size:12.5px; cursor:pointer;">Cancel</button>
+          <button onclick="docSaveDraft('${q.num}')" style="padding:8px 14px; border:1px solid #E5E7EB; background:white; color:#374151; border-radius:8px; font-size:12.5px; cursor:pointer;">Save as Draft</button>
+          <button onclick="docSendForApproval('${q.num}')" style="padding:8px 14px; background:#0F5EE8; color:white; border-radius:8px; font-size:12.5px; font-weight:500; cursor:pointer; border:none; display:inline-flex; align-items:center; gap:6px;">Send for Approval <i data-lucide="arrow-right" class="w-3 h-3"></i></button>
         </div>
       </div>
     </td></tr>`;
   }
 
-  document.querySelectorAll('.doc-filter').forEach(p => p.addEventListener('click', () => {
-    document.querySelectorAll('.doc-filter').forEach(x => {
-      x.classList.remove('active');
-      x.classList.remove('border-primary','bg-primary-light','text-primary','font-medium');
-      x.classList.add('border-line','bg-white','text-ink-500');
-    });
-    p.classList.add('active');
-    p.classList.remove('border-line','bg-white','text-ink-500');
-    p.classList.add('border-primary','bg-primary-light','text-primary','font-medium');
-    docFilter = p.dataset.df;
+  // ============= COLUMN FILTER DROPDOWN =============
+  const DOC_FILTER_OPTIONS = {
+    source:  ['Portal','Email','Phone','Manual Entry'],
+    type:    ['Clarification','Spec Change Request','Deadline Extension','Eligibility Query','General'],
+    vendor:  VENDORS.map((v,i) => ({ value:v, label:`Vendor ${String.fromCharCode(65+i)} — ${v}` })),
+    status:  [{ value:'unanswered', label:'Unanswered' }, { value:'draft', label:'Draft' }],
+  };
+  const DOC_FILTER_TITLES = { source:'Source', type:'Category', vendor:'Vendor', status:'Status' };
+  let docActiveDropdown = null;
+
+  function openDocFilterDropdown(col, anchorEl){
+    const dd = document.getElementById('docFilterDropdown');
+    if (!dd) return;
+    if (docActiveDropdown === col){ closeDocFilterDropdown(); return; }
+    docActiveDropdown = col;
+    const opts = DOC_FILTER_OPTIONS[col] || [];
+    const active = docColumnFilters[col];
+    const rows = opts.map(o => {
+      const val = typeof o === 'string' ? o : o.value;
+      const label = typeof o === 'string' ? o : o.label;
+      const checked = active.has(val) ? 'checked' : '';
+      return `<label style="display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:6px; cursor:pointer; font-size:13px; color:#374151;" onmouseover="this.style.background='#F9FAFB'" onmouseout="this.style.background='transparent'">
+        <input type="checkbox" ${checked} onchange="toggleDocFilter('${col}', ${JSON.stringify(val).replace(/"/g,'&quot;')}, this.checked)" style="accent-color:#0F5EE8;">
+        <span>${label}</span>
+      </label>`;
+    }).join('');
+    dd.innerHTML = `
+      <div style="padding:6px 8px 10px; border-bottom:1px solid #F3F4F6; font-size:11px; font-weight:700; color:#6B7280; text-transform:uppercase;">Filter by ${DOC_FILTER_TITLES[col]}</div>
+      <div style="padding:4px 0;">${rows}</div>
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:8px; border-top:1px solid #F3F4F6;">
+        <button onclick="clearDocColumnFilter('${col}')" style="background:transparent; border:none; color:#9CA3AF; font-size:11px; cursor:pointer;">Clear filter</button>
+        <button onclick="closeDocFilterDropdown()" style="background:#0F5EE8; color:white; border:none; border-radius:6px; padding:5px 12px; font-size:12px; font-weight:500; cursor:pointer;">Apply</button>
+      </div>`;
+    // Position
+    const a = anchorEl.getBoundingClientRect();
+    const wrapEl = dd.parentElement.getBoundingClientRect();
+    dd.style.left = (a.left - wrapEl.left) + 'px';
+    dd.style.top  = (a.bottom - wrapEl.top + 4) + 'px';
+    dd.classList.remove('hidden');
+  }
+  function closeDocFilterDropdown(){
+    docActiveDropdown = null;
+    const dd = document.getElementById('docFilterDropdown');
+    if (dd) dd.classList.add('hidden');
+    refreshDocHeaderFilterState();
+  }
+  function toggleDocFilter(col, val, checked){
+    if (checked) docColumnFilters[col].add(val);
+    else docColumnFilters[col].delete(val);
     renderDocsTable();
-  }));
+  }
+  function clearDocColumnFilter(col){
+    docColumnFilters[col].clear();
+    renderDocsTable();
+    closeDocFilterDropdown();
+  }
+  function clearAllDocFilters(){
+    Object.values(docColumnFilters).forEach(s => s.clear());
+    renderDocsTable();
+  }
+
+  function refreshDocHeaderFilterState(){
+    document.querySelectorAll('.doc-th-filter').forEach(th => {
+      const col = th.dataset.filter;
+      const active = docColumnFilters[col] && docColumnFilters[col].size > 0;
+      const dot = th.querySelector('.doc-th-dot');
+      const label = th.querySelector('.doc-th-label');
+      const chev = th.querySelector('.doc-th-chev');
+      if (dot) dot.classList.toggle('hidden', !active);
+      if (label){ label.style.color = active ? '#0F5EE8' : ''; label.style.fontWeight = active ? '700' : '600'; }
+      if (chev){ chev.style.color = active ? '#0F5EE8' : '#9CA3AF'; chev.textContent = (docActiveDropdown === col) ? '▴' : '▾'; }
+    });
+  }
+
+  function renderDocActiveFilterChips(){
+    const wrap = document.getElementById('docActiveFilters');
+    if (!wrap) return;
+    const chips = [];
+    Object.entries(docColumnFilters).forEach(([col, set]) => {
+      set.forEach(v => {
+        const label = (col === 'vendor') ? vendorShortLabel(v) : (col === 'status' ? (v === 'draft' ? 'Draft' : 'Unanswered') : v);
+        chips.push(`<span style="background:#EFF6FF; color:#0F5EE8; border-radius:20px; padding:4px 10px; font-size:12px; display:inline-flex; align-items:center; gap:6px;">${DOC_FILTER_TITLES[col]}: ${label} <button onclick="toggleDocFilter('${col}', ${JSON.stringify(v).replace(/"/g,'&quot;')}, false)" style="background:transparent; border:none; color:#0F5EE8; cursor:pointer; font-size:14px; line-height:1;">×</button></span>`);
+      });
+    });
+    if (chips.length){
+      wrap.style.display = 'flex';
+      wrap.innerHTML = chips.join('') + `<button onclick="clearAllDocFilters()" style="background:transparent; border:none; color:#6B7280; font-size:12px; cursor:pointer; text-decoration:underline;">Clear all filters</button>`;
+    } else {
+      wrap.style.display = 'none';
+      wrap.innerHTML = '';
+    }
+  }
+
+  // Header click delegation
+  document.addEventListener('click', (e) => {
+    const th = e.target.closest('.doc-th-filter');
+    if (th){ openDocFilterDropdown(th.dataset.filter, th); return; }
+    const dd = document.getElementById('docFilterDropdown');
+    if (dd && !dd.contains(e.target) && !e.target.closest('.doc-th-filter')) closeDocFilterDropdown();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && docActiveDropdown) closeDocFilterDropdown();
+  });
 
   function docToggleExpand(qNum){
     if (docExpanded.has(qNum)) docExpanded.delete(qNum); else docExpanded.add(qNum);
     renderDocsTable();
   }
   function docOpenEditor(qNum){
-    docEditorOpen.add(qNum);
+    // Save current draft silently if open
+    if (docEditorOpen && docEditorOpen !== qNum){
+      const oldEd = document.getElementById('docEditor-' + docEditorOpen);
+      const oldQ = QUERIES.find(x => x.num === docEditorOpen);
+      if (oldEd && oldQ){
+        const text = (oldEd.innerText || '').trim();
+        if (text){ oldQ.response = oldEd.innerHTML; if (oldQ.status === 'unanswered' || oldQ.status === 'assigned') oldQ.status = 'draft'; oldQ.draftedOn = oldQ.draftedOn || 'May 8'; }
+      }
+    }
+    docEditorOpen = qNum;
     renderDocsTable();
-    setTimeout(() => {
-      const ed = document.getElementById('docEditor-' + qNum);
-      if (ed) ed.focus();
-    }, 50);
+    setTimeout(() => { const ed = document.getElementById('docEditor-' + qNum); if (ed) ed.focus(); }, 50);
   }
-  function docCloseEditor(qNum){
-    docEditorOpen.delete(qNum);
-    delete docDrafts[qNum];
+  function docCloseEditor(){
+    docEditorOpen = null;
     renderDocsTable();
-  }
-  function docEditorCmd(qNum, cmd){
-    const ed = document.getElementById('docEditor-' + qNum);
-    if (!ed) return;
-    ed.focus();
-    document.execCommand(cmd, false, null);
-    docDrafts[qNum] = ed.innerHTML;
   }
   function docEditorAI(qNum){
     const ed = document.getElementById('docEditor-' + qNum);
@@ -2892,6 +3054,17 @@
     ed.innerHTML = 'Please refer to the tender document. No changes are required.';
     docDrafts[qNum] = ed.innerHTML;
   }
+  function docEditorChip(qNum, kind){
+    const ed = document.getElementById('docEditor-' + qNum);
+    if (!ed) return;
+    const map = {
+      refer:    'Please refer to the tender document. The answer to this query is stated therein.',
+      cannot:   'The requested information is not available for public disclosure at this stage.',
+      nochange: 'After due consideration, no changes to the tender document are required.',
+    };
+    ed.innerHTML = map[kind] || '';
+    docDrafts[qNum] = ed.innerHTML;
+  }
   function docSaveDraft(qNum){
     const ed = document.getElementById('docEditor-' + qNum);
     const q = QUERIES.find(x => x.num === qNum);
@@ -2900,7 +3073,8 @@
     if (!text){ showToast('Write a response first'); return; }
     q.response = ed.innerHTML;
     if (q.status === 'unanswered' || q.status === 'assigned') q.status = 'draft';
-    docEditorOpen.delete(qNum);
+    q.draftedOn = q.draftedOn || 'May 8';
+    docEditorOpen = null;
     delete docDrafts[qNum];
     renderDocsTable();
     if (typeof renderQueryList === 'function') renderQueryList();
@@ -2914,18 +3088,15 @@
     if (!text){ showToast('Write a response first'); return; }
     q.response = ed.innerHTML;
     q.status = 'answered';
-    docEditorOpen.delete(qNum);
+    q.draftedOn = q.draftedOn || 'May 8';
+    docEditorOpen = null;
     delete docDrafts[qNum];
     renderDocsTable();
     if (typeof renderQueryList === 'function') renderQueryList();
     showToast(`${qNum} sent for approval`);
   }
   function publishAllApproved(){
-    let n = 0;
-    QUERIES.forEach(q => { if (q.status === 'answered' && !q.published){ q.published = 'May 15'; n++; } });
-    renderDocsTable();
-    if (typeof renderQueryList === 'function') renderQueryList();
-    showToast(n ? `Published ${n} approved responses` : 'No approved responses pending publication');
+    showPublishSuccessScreen();
   }
 
   const CORRIGENDUM_PENDING = [
@@ -2962,7 +3133,11 @@
   ];
 
   function renderCorrigendum(){
+    refreshCorrigendumTabBadge();
+    const statsStrip = document.getElementById('corrigendumStatsStrip');
+    if (statsStrip) statsStrip.textContent = `${CORRIGENDUM_PENDING.length} pending amendments · ${CORRIGENDUM_ISSUED.length} already issued`;
     const wrap = document.getElementById('corrigendumWrap');
+    if (!wrap) return;
     const pendingHTML = CORRIGENDUM_PENDING.map(c => `
       <div class="bg-white rounded-xl p-4" style="border:1px solid #FCD34D; border-left:4px solid #F59E0B;">
         <div class="flex items-start justify-between gap-3 flex-wrap">
@@ -3011,7 +3186,7 @@
       <div class="space-y-3">
         <div class="flex items-center justify-between gap-2 flex-wrap">
           <div class="text-[12px] text-ink-500">${CORRIGENDUM_PENDING.length} pending amendments · ${CORRIGENDUM_ISSUED.length} issued</div>
-          <a href="tender-creation.html#corrigendum?tnd=TND-2026-001" class="px-3 py-1.5 rounded-lg border border-primary text-primary text-[12.5px] font-medium hover:bg-primary-light inline-flex items-center gap-1.5"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Issue Corrigendum</a>
+          <button onclick="openIssueCorrigendumForm()" class="px-3 py-1.5 rounded-lg border border-primary text-primary text-[12.5px] font-medium hover:bg-primary-light inline-flex items-center gap-1.5"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Issue Corrigendum</button>
         </div>
         ${pendingHTML}
         ${issuedHTML}
@@ -3030,6 +3205,487 @@
   }
   function includeCorrigendum(qNum){
     showToast(`${qNum} queued for next corrigendum`);
+  }
+
+  // ============================================================
+  // ISSUE CORRIGENDUM FORM
+  // ============================================================
+  function openIssueCorrigendumForm(){
+    const modal = document.getElementById('issueCorrigendumModal');
+    if (!modal) return;
+    const list = document.getElementById('issueCorrigendumPendingList');
+    list.innerHTML = CORRIGENDUM_PENDING.map(c => `
+      <label style="display:flex; gap:10px; padding:12px; border:1px solid #E5E7EB; border-radius:8px; cursor:pointer; transition:background 150ms ease;" onmouseover="this.style.background='#F9FAFB'" onmouseout="this.style.background='white'">
+        <input type="checkbox" checked style="accent-color:#0F5EE8; margin-top:2px;">
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:13px; font-weight:600; color:#111827;">${c.qNum} — ${c.title}</div>
+          <div style="font-size:11.5px; color:#6B7280; margin-top:2px;">${c.clause}</div>
+        </div>
+      </label>
+    `).join('') || `<div style="font-size:13px; color:#9CA3AF; font-style:italic; text-align:center; padding:16px;">No pending amendments to issue.</div>`;
+    modal.classList.remove('hidden');
+    refreshIcons();
+  }
+  function closeIssueCorrigendumForm(){
+    const modal = document.getElementById('issueCorrigendumModal');
+    if (modal) modal.classList.add('hidden');
+  }
+
+  // ============================================================
+  // CORRIGENDUM PREVIEW PANEL
+  // ============================================================
+  let corrigEditMode = false;
+  let corrigDocEdited = false;
+
+  function buildCorrigDocHTML(){
+    const issueDateStr = '15th May 2026';
+    const subHeadStyle = 'font-size:13px; font-weight:700; margin:18px 0 8px;';
+    const sectionHeadStyle = 'font-size:13.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1px solid #D1D5DB; padding-bottom:6px; margin:24px 0 14px;';
+    const tableStyle = 'width:100%; border:1px solid #D1D5DB; border-collapse:collapse; margin:8px 0 12px; font-size:12.5px;';
+    const labelCellStyle = 'border:1px solid #D1D5DB; padding:8px 12px; background:#F9FAFB; font-weight:600; width:35%; vertical-align:top;';
+    const valueCellStyle = 'border:1px solid #D1D5DB; padding:8px 12px; vertical-align:top;';
+
+    const amendmentBlock = (sub, clauseTxt, origTxt, amendedTxt, reasonTxt) => `
+      <div class="corrig-section" data-section>
+        <div style="${subHeadStyle}">${sub}</div>
+        <table style="${tableStyle}">
+          <tr><td style="${labelCellStyle}">Clause / Section Reference</td><td style="${valueCellStyle}">${clauseTxt}</td></tr>
+          <tr><td style="${labelCellStyle}">Original Text</td><td style="${valueCellStyle}"><em>"${origTxt}"</em></td></tr>
+          <tr><td style="${labelCellStyle}">Amended Text</td><td style="${valueCellStyle}"><em>"${amendedTxt}"</em></td></tr>
+          <tr><td style="${labelCellStyle}">Reason for Amendment</td><td style="${valueCellStyle}">${reasonTxt}</td></tr>
+          <tr><td style="${labelCellStyle}">Effective From</td><td style="${valueCellStyle}">Date of issue of this Corrigendum</td></tr>
+        </table>
+      </div>`;
+
+    return `
+      <!-- Document header -->
+      <div class="corrig-section" data-section style="text-align:center;">
+        <div style="display:flex; justify-content:center; margin-bottom:10px;">
+          <div style="width:48px; height:48px; border-radius:50%; border:1.5px solid #9CA3AF; background:#F9FAFB; display:flex; align-items:center; justify-content:center; font-size:8px; color:#9CA3AF; letter-spacing:1px;">SEAL</div>
+        </div>
+        <div style="font-weight:700; font-size:14px;">GOVERNMENT OF MAHARASHTRA</div>
+        <div style="font-weight:700; font-size:14px;">AHMEDABAD MUNICIPAL CORPORATION</div>
+        <div style="border-top:2px solid #111827; border-bottom:1px solid #111827; padding:3px 0; margin:14px 0; font-weight:700; font-size:15px;">CORRIGENDUM NO. 1</div>
+        <div style="margin-top:8px;">To</div>
+        <div style="margin-top:4px;">Notice Inviting Tender No. TND-2026-001/AMC/2026-27</div>
+        <div style="margin-top:8px;">Name of Work: Supply of Desktop Computers for AMC Offices</div>
+        <div style="margin-top:4px;">Date of Issue: ${issueDateStr}</div>
+      </div>
+
+      <div class="corrig-section" data-section>
+        <div style="${sectionHeadStyle}">Section 1 — Reference</div>
+        <p>This office invites attention to the Notice Inviting Tender (NIT) No. TND-2026-001/AMC/2026-27 dated 30th April 2026 for the work of 'Supply of Desktop Computers for AMC Offices'. The following amendments/corrigendum are hereby issued and shall form part of the original tender document. All other terms and conditions of the NIT shall remain unchanged.</p>
+      </div>
+
+      <div class="corrig-section" data-section>
+        <div style="${sectionHeadStyle}">Section 2 — Amendments</div>
+      </div>
+      ${amendmentBlock(
+        '2.1 Amendment to Technical Specifications — Bitumen Grade',
+        'Section 3.2 — Technical Specifications',
+        'Bitumen grade VG-10 as per IS 73:2013 shall be used for all bituminous works.',
+        'Bitumen grade VG-30 as per IS 73:2013 (revised) shall be used for all bituminous works in high traffic zones. VG-10 is permissible only for low traffic areas as defined in IRC:SP:20.',
+        'Based on pre-bid query Q-002 and technical review by the Engineering Department.'
+      )}
+      ${amendmentBlock(
+        '2.2 Amendment to Site Visit Window — Clause 5.1',
+        'Section 5.1 — Site Visit',
+        'Prospective bidders may visit the site within 3 (three) days from the date of publication of the NIT.',
+        'Prospective bidders may visit the site within 7 (seven) days from the date of publication of the NIT. Site visit shall be arranged by contacting the site engineer at least 24 hours in advance.',
+        'Based on pre-bid query Q-003. Extended to facilitate better site assessment.'
+      )}
+      ${amendmentBlock(
+        '2.3 Clarification on Off-Hours Site Access — Clause 5.2',
+        'Section 5.2 — Site Access',
+        'Site visits shall be conducted between 10:00 and 17:00 on working days only.',
+        'Site visits may additionally be scheduled between 18:00 and 21:00 on weekdays, subject to prior coordination with the project office and not less than 24 hours advance notice.',
+        'Based on pre-bid query Q-009 from BuildTech Solutions seeking off-hours site access.'
+      )}
+
+      <div class="corrig-section" data-section>
+        <div style="${sectionHeadStyle}">Section 3 — Impact on Bid Submission Deadline</div>
+        <p>In view of the above amendments, the bid submission deadline is hereby extended as follows:</p>
+        <table style="${tableStyle}">
+          <tr><td style="${labelCellStyle}">Original Deadline</td><td style="${valueCellStyle}">7th June 2026, 3:00 PM</td></tr>
+          <tr><td style="${labelCellStyle}">Revised Deadline</td><td style="${valueCellStyle}">14th June 2026, 3:00 PM</td></tr>
+          <tr><td style="${labelCellStyle}">Reason</td><td style="${valueCellStyle}">To provide adequate time to vendors to incorporate the above amendments in their bids.</td></tr>
+        </table>
+        <div style="background:#FFFBEB; border:1px solid #FCD34D; border-radius:6px; padding:10px 14px; font-size:12px; margin-top:8px;">⚠ All other scheduled dates (bid opening, evaluation) stand extended by 7 days proportionally.</div>
+      </div>
+
+      <div class="corrig-section" data-section>
+        <div style="${sectionHeadStyle}">Section 4 — General Conditions</div>
+        <ol style="padding-left:22px; margin:0;">
+          <li style="margin-bottom:6px;">This Corrigendum shall be read in conjunction with the original NIT and all previously issued Corrigendums (if any).</li>
+          <li style="margin-bottom:6px;">The amendments contained herein shall supersede and replace the corresponding provisions of the original tender document.</li>
+          <li style="margin-bottom:6px;">All prospective bidders who have downloaded the original NIT are requested to take note of these amendments and incorporate the same in their bids.</li>
+          <li style="margin-bottom:6px;">This Corrigendum is being published on the Maharashtra Government e-Procurement Portal (mahatenders.gov.in) and shall be deemed to have been brought to the notice of all concerned.</li>
+          <li style="margin-bottom:6px;">The Procuring Authority reserves the right to issue further Corrigendums if deemed necessary.</li>
+        </ol>
+      </div>
+
+      <div class="corrig-section" data-section>
+        <div style="${sectionHeadStyle}">Section 5 — Notification</div>
+        <p style="font-weight:700;">This Corrigendum has been notified to:</p>
+        <ul style="padding-left:22px; margin:0;">
+          <li style="margin-bottom:4px;">All vendors who have downloaded the tender document (34 vendors)</li>
+          <li style="margin-bottom:4px;">Published on: mahatenders.gov.in</li>
+          <li style="margin-bottom:4px;">Publication date: ${issueDateStr}</li>
+        </ul>
+      </div>
+
+      <div class="corrig-section" data-section style="margin-top:40px; border-top:2px solid #111827; padding-top:16px; display:flex; justify-content:space-between; gap:24px;">
+        <div>
+          <div style="font-size:13px;">Signature of Authorized Officer</div>
+          <div style="font-size:12.5px; margin-top:18px; color:#6B7280;">[Name &amp; Designation]</div>
+          <div style="font-size:12.5px;">Ahmedabad Municipal Corporation</div>
+          <div style="font-size:12.5px;">Date: ${issueDateStr}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:13px;">Official Seal</div>
+          <div style="margin-top:6px; display:flex; justify-content:flex-end;">
+            <div style="width:40px; height:40px; border-radius:50%; border:1.5px solid #9CA3AF; background:#F9FAFB; display:flex; align-items:center; justify-content:center; font-size:7px; color:#9CA3AF;">SEAL</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px; text-align:center; font-size:11px; color:#9CA3AF; font-style:italic;">This corrigendum has been generated by TenderAI. Verify all details before issuing.</div>
+    `;
+  }
+
+  function openCorrigendumPreviewPanel(){
+    closeIssueCorrigendumForm();
+    const panel = document.getElementById('corrigPanel');
+    const backdrop = document.getElementById('corrigPanelBackdrop');
+    const body = document.getElementById('corrigDocBody');
+    if (!panel || !body) return;
+    body.innerHTML = buildCorrigDocHTML();
+    backdrop.classList.remove('hidden');
+    panel.classList.remove('hidden');
+    requestAnimationFrame(() => { panel.style.transform = 'translateX(0)'; });
+    refreshIcons();
+    corrigEditMode = false;
+    corrigDocEdited = false;
+    document.getElementById('corrigEditBanner').classList.add('hidden');
+    document.getElementById('corrigEditToggleBtn').textContent = 'Edit Document';
+    document.getElementById('corrigEditToggleBtn').style.background = '#0F5EE8';
+    body.classList.remove('corrig-edit-mode');
+    body.style.background = 'white';
+  }
+  function closeCorrigendumPreviewPanel(){
+    const panel = document.getElementById('corrigPanel');
+    const backdrop = document.getElementById('corrigPanelBackdrop');
+    if (!panel) return;
+    panel.style.transform = 'translateX(100%)';
+    setTimeout(() => {
+      panel.classList.add('hidden');
+      backdrop.classList.add('hidden');
+    }, 280);
+    document.getElementById('corrigSelectionDialog').classList.add('hidden');
+    if (corrigDocEdited) showToast('Corrigendum document updated');
+  }
+
+  function toggleCorrigEditMode(){
+    corrigEditMode = !corrigEditMode;
+    const banner = document.getElementById('corrigEditBanner');
+    const btn = document.getElementById('corrigEditToggleBtn');
+    const body = document.getElementById('corrigDocBody');
+    if (corrigEditMode){
+      banner.classList.remove('hidden');
+      btn.textContent = '✓ Save & Close';
+      btn.style.background = '#10B981';
+      body.style.background = '#FAFEF5';
+      body.classList.add('corrig-edit-mode');
+      enableCorrigSectionHover();
+      attachCorrigSelectionListener();
+    } else {
+      banner.classList.add('hidden');
+      btn.textContent = 'Edit Document';
+      btn.style.background = '#0F5EE8';
+      body.style.background = 'white';
+      body.classList.remove('corrig-edit-mode');
+      document.getElementById('corrigSelectionDialog').classList.add('hidden');
+      body.querySelectorAll('.corrig-section').forEach(s => { s.contentEditable = 'false'; s.style.boxShadow = ''; s.style.background = ''; });
+    }
+  }
+
+  function enableCorrigSectionHover(){
+    const body = document.getElementById('corrigDocBody');
+    body.querySelectorAll('.corrig-section').forEach(sec => {
+      sec.onmouseenter = () => {
+        if (sec.contentEditable === 'true') return;
+        sec.style.boxShadow = '0 0 0 2px #0F5EE8';
+        sec.style.background = 'rgba(15,94,232,0.02)';
+        if (!sec.querySelector('.corrig-section-actions')){
+          const bar = document.createElement('div');
+          bar.className = 'corrig-section-actions';
+          bar.style.cssText = 'position:absolute; top:-30px; left:0; display:flex; gap:6px; background:white; border:1px solid #E5E7EB; border-radius:6px; padding:4px 6px; font-size:11px; box-shadow:0 2px 6px rgba(0,0,0,0.08); z-index:5;';
+          bar.innerHTML = `
+            <button onclick="corrigEditSection(this)" style="background:transparent; border:none; cursor:pointer; color:#0F5EE8;">✎ Edit section</button>
+            <button onclick="corrigAIRewrite(this)" style="background:transparent; border:none; cursor:pointer; color:#0F5EE8;">✦ AI rewrite</button>
+            <button style="background:transparent; border:none; cursor:pointer; color:#6B7280;">↕ Move</button>`;
+          sec.style.position = 'relative';
+          sec.appendChild(bar);
+        }
+      };
+      sec.onmouseleave = () => {
+        if (sec.contentEditable === 'true') return;
+        sec.style.boxShadow = '';
+        sec.style.background = '';
+        const bar = sec.querySelector('.corrig-section-actions');
+        if (bar) bar.remove();
+      };
+    });
+  }
+
+  function corrigEditSection(btn){
+    const sec = btn.closest('.corrig-section');
+    if (!sec) return;
+    const bar = sec.querySelector('.corrig-section-actions');
+    if (bar) bar.remove();
+    sec.contentEditable = 'true';
+    sec.style.boxShadow = '0 0 0 2px #10B981';
+    sec.style.background = 'rgba(16,185,129,0.02)';
+    sec.style.outline = 'none';
+    sec.focus();
+    sec.oninput = () => { corrigDocEdited = true; };
+    sec.onblur = () => {
+      sec.contentEditable = 'false';
+      sec.style.boxShadow = '';
+      sec.style.background = '';
+      const body = document.getElementById('corrigDocBody');
+      body.style.transition = 'background 300ms ease';
+      sec.style.background = '#D1FAE5';
+      setTimeout(() => { sec.style.background = ''; }, 800);
+    };
+  }
+  function corrigAIRewrite(btn){
+    const sec = btn.closest('.corrig-section');
+    if (!sec) return;
+    showToast('AI rewriting section…');
+    setTimeout(() => {
+      sec.style.background = '#D1FAE5';
+      corrigDocEdited = true;
+      setTimeout(() => { sec.style.background = ''; }, 800);
+      showToast('Section rewritten');
+    }, 600);
+  }
+
+  function attachCorrigSelectionListener(){
+    const body = document.getElementById('corrigDocBody');
+    body.onmouseup = (e) => {
+      if (!corrigEditMode) return;
+      const sel = window.getSelection();
+      const text = (sel.toString() || '').trim();
+      const dialog = document.getElementById('corrigSelectionDialog');
+      if (!text){ dialog.classList.add('hidden'); return; }
+      const range = sel.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      const panelRect = document.getElementById('corrigPanel').getBoundingClientRect();
+      const top = rect.top - panelRect.top - 8;
+      const left = Math.max(8, rect.left - panelRect.left);
+      dialog.style.top = (top - 220) + 'px';
+      dialog.style.left = left + 'px';
+      dialog.innerHTML = `
+        <div style="font-size:11px; font-weight:700; color:#6B7280; text-transform:uppercase; margin-bottom:6px;">Editing selection</div>
+        <div style="background:#F9FAFB; border-radius:6px; padding:8px 10px; font-size:12px; color:#374151; max-height:60px; overflow:hidden; margin-bottom:10px;">${text}</div>
+        <div style="display:flex; gap:4px; margin-bottom:10px;">
+          <button id="corrigTabAI" onclick="corrigSelTab('ai')" style="flex:1; padding:6px; border:1px solid #0F5EE8; background:#EFF6FF; color:#0F5EE8; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;">✦ AI Suggest</button>
+          <button id="corrigTabManual" onclick="corrigSelTab('manual')" style="flex:1; padding:6px; border:1px solid #E5E7EB; background:white; color:#6B7280; border-radius:6px; font-size:12px; cursor:pointer;">✎ Edit Manually</button>
+        </div>
+        <div id="corrigSelTabContent">
+          <input id="corrigAIInput" placeholder="What do you want to change?" style="width:100%; border:1px solid #D1D5DB; border-radius:6px; padding:6px 10px; font-size:12px; margin-bottom:8px;">
+          <div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:8px;">
+            <button onclick="corrigAIQuick('formal')" style="background:#F3F4F6; color:#374151; border:none; border-radius:14px; padding:3px 9px; font-size:11px; cursor:pointer;">Make more formal</button>
+            <button onclick="corrigAIQuick('simplify')" style="background:#F3F4F6; color:#374151; border:none; border-radius:14px; padding:3px 9px; font-size:11px; cursor:pointer;">Simplify</button>
+            <button onclick="corrigAIQuick('expand')" style="background:#F3F4F6; color:#374151; border:none; border-radius:14px; padding:3px 9px; font-size:11px; cursor:pointer;">Expand</button>
+          </div>
+          <button onclick="corrigAcceptSelection()" style="width:100%; background:#0F5EE8; color:white; border:none; border-radius:6px; padding:6px; font-size:12px; font-weight:500; cursor:pointer;">Accept</button>
+        </div>
+        <div style="display:flex; justify-content:flex-end; margin-top:8px;">
+          <button onclick="document.getElementById('corrigSelectionDialog').classList.add('hidden')" style="background:transparent; border:none; color:#9CA3AF; font-size:11px; cursor:pointer;">Cancel</button>
+        </div>
+      `;
+      dialog.dataset.savedRange = '1';
+      window._corrigSavedRange = range.cloneRange();
+      dialog.classList.remove('hidden');
+    };
+  }
+  function corrigSelTab(tab){
+    const content = document.getElementById('corrigSelTabContent');
+    const tAI = document.getElementById('corrigTabAI');
+    const tM = document.getElementById('corrigTabManual');
+    if (tab === 'ai'){
+      tAI.style.background = '#EFF6FF'; tAI.style.color = '#0F5EE8'; tAI.style.borderColor = '#0F5EE8'; tAI.style.fontWeight = '600';
+      tM.style.background = 'white'; tM.style.color = '#6B7280'; tM.style.borderColor = '#E5E7EB'; tM.style.fontWeight = '400';
+      content.innerHTML = `
+        <input id="corrigAIInput" placeholder="What do you want to change?" style="width:100%; border:1px solid #D1D5DB; border-radius:6px; padding:6px 10px; font-size:12px; margin-bottom:8px;">
+        <div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:8px;">
+          <button onclick="corrigAIQuick('formal')" style="background:#F3F4F6; color:#374151; border:none; border-radius:14px; padding:3px 9px; font-size:11px; cursor:pointer;">Make more formal</button>
+          <button onclick="corrigAIQuick('simplify')" style="background:#F3F4F6; color:#374151; border:none; border-radius:14px; padding:3px 9px; font-size:11px; cursor:pointer;">Simplify</button>
+          <button onclick="corrigAIQuick('expand')" style="background:#F3F4F6; color:#374151; border:none; border-radius:14px; padding:3px 9px; font-size:11px; cursor:pointer;">Expand</button>
+        </div>
+        <button onclick="corrigAcceptSelection()" style="width:100%; background:#0F5EE8; color:white; border:none; border-radius:6px; padding:6px; font-size:12px; font-weight:500; cursor:pointer;">Accept</button>`;
+    } else {
+      tM.style.background = '#EFF6FF'; tM.style.color = '#0F5EE8'; tM.style.borderColor = '#0F5EE8'; tM.style.fontWeight = '600';
+      tAI.style.background = 'white'; tAI.style.color = '#6B7280'; tAI.style.borderColor = '#E5E7EB'; tAI.style.fontWeight = '400';
+      const sel = window._corrigSavedRange ? window._corrigSavedRange.toString() : '';
+      content.innerHTML = `
+        <textarea id="corrigManualText" style="width:100%; border:1px solid #D1D5DB; border-radius:6px; padding:6px 10px; font-size:12px; min-height:80px; margin-bottom:8px;">${sel}</textarea>
+        <button onclick="corrigApplyManual()" style="width:100%; background:#0F5EE8; color:white; border:none; border-radius:6px; padding:6px; font-size:12px; font-weight:500; cursor:pointer;">Apply Change</button>`;
+    }
+  }
+  function corrigAIQuick(){ /* visual only — pre-fills with AI'd text on accept */ }
+  function corrigAcceptSelection(){
+    const range = window._corrigSavedRange;
+    if (!range) return;
+    const promptInput = document.getElementById('corrigAIInput');
+    const userPrompt = promptInput ? promptInput.value.trim() : '';
+    const orig = range.toString();
+    const replacement = userPrompt
+      ? `${orig} [updated: ${userPrompt}]`
+      : `${orig}`;
+    range.deleteContents();
+    const span = document.createElement('span');
+    span.textContent = replacement;
+    span.style.background = '#D1FAE5';
+    span.style.transition = 'background 800ms ease';
+    range.insertNode(span);
+    setTimeout(() => { span.style.background = ''; }, 800);
+    document.getElementById('corrigSelectionDialog').classList.add('hidden');
+    corrigDocEdited = true;
+  }
+  function corrigApplyManual(){
+    const range = window._corrigSavedRange;
+    if (!range) return;
+    const ta = document.getElementById('corrigManualText');
+    if (!ta) return;
+    range.deleteContents();
+    const span = document.createElement('span');
+    span.textContent = ta.value;
+    span.style.background = '#D1FAE5';
+    range.insertNode(span);
+    setTimeout(() => { span.style.background = ''; }, 800);
+    document.getElementById('corrigSelectionDialog').classList.add('hidden');
+    corrigDocEdited = true;
+  }
+
+  function confirmIssueAndNotify(){
+    closeIssueCorrigendumForm();
+    // Move all pending to issued
+    const nextNo = (CORRIGENDUM_ISSUED[CORRIGENDUM_ISSUED.length-1]?.no || 0) + 1;
+    CORRIGENDUM_ISSUED.push({
+      no: nextNo,
+      issuedOn: 'May 15, 2026',
+      affects: CORRIGENDUM_PENDING.map(c => c.qNum),
+      summary: `Bundled ${CORRIGENDUM_PENDING.length} amendments triggered by post-meeting queries. Bid deadline extended to June 14.`,
+    });
+    CORRIGENDUM_PENDING.length = 0;
+    renderCorrigendum();
+    showPublishSuccessScreen();
+  }
+
+  // ============================================================
+  // SUCCESS SCREEN
+  // ============================================================
+  function showPublishSuccessScreen(){
+    setTab('docs');
+    const main = document.getElementById('docMainContent');
+    const screen = document.getElementById('docSuccessScreen');
+    if (!main || !screen) return;
+    main.classList.add('hidden');
+    screen.classList.remove('hidden');
+    const draftedCount = QUERIES.filter(q => q.status === 'answered' || q.status === 'draft').length;
+    const issuedCount = CORRIGENDUM_ISSUED.length;
+    screen.innerHTML = renderSuccessScreenHTML(draftedCount, issuedCount);
+    // Mark all draft + answered as published in display
+    QUERIES.forEach(q => { if (q.status === 'answered' || q.status === 'draft') q.published = 'May 15'; });
+    refreshIcons();
+    // Trigger animations
+    requestAnimationFrame(() => {
+      const card = screen.querySelector('.success-card');
+      if (card){ card.style.opacity = '1'; card.style.transform = 'translateY(0)'; }
+      setTimeout(() => {
+        const check = screen.querySelector('.success-check-path');
+        if (check){ check.style.strokeDashoffset = '0'; }
+      }, 400);
+    });
+  }
+  function backToPreBidQueries(){
+    const screen = document.getElementById('docSuccessScreen');
+    const main = document.getElementById('docMainContent');
+    if (screen) screen.classList.add('hidden');
+    if (main) main.classList.remove('hidden');
+    showLanding();
+  }
+  function goToBidManagement(){
+    showToast('Opening Bid Management…');
+  }
+  function backToDashboard(){
+    location.href = 'index.html';
+  }
+  function renderSuccessScreenHTML(draftedCount, issuedCount){
+    return `
+      <div class="success-card" role="alert" style="opacity:0; transform:translateY(16px); transition:opacity 400ms ease, transform 400ms ease; max-width:680px; margin:0 auto; padding:48px 32px; position:relative;">
+        <div style="position:absolute; inset:0; pointer-events:none; overflow:hidden;">
+          <span style="position:absolute; top:10px; left:20%; width:8px; height:8px; border-radius:50%; background:#0F5EE8; animation:confetti 1.5s ease 400ms forwards; opacity:0;"></span>
+          <span style="position:absolute; top:30px; left:35%; width:6px; height:6px; border-radius:50%; background:#10B981; animation:confetti 1.5s ease 500ms forwards; opacity:0;"></span>
+          <span style="position:absolute; top:18px; left:55%; width:10px; height:10px; border-radius:50%; background:#F59E0B; animation:confetti 1.5s ease 450ms forwards; opacity:0;"></span>
+          <span style="position:absolute; top:40px; left:70%; width:7px; height:7px; border-radius:50%; background:#0F5EE8; animation:confetti 1.5s ease 600ms forwards; opacity:0;"></span>
+          <span style="position:absolute; top:8px; left:80%; width:9px; height:9px; border-radius:50%; background:#10B981; animation:confetti 1.5s ease 550ms forwards; opacity:0;"></span>
+          <span style="position:absolute; top:50px; left:15%; width:6px; height:6px; border-radius:50%; background:#F59E0B; animation:confetti 1.5s ease 700ms forwards; opacity:0;"></span>
+          <span style="position:absolute; top:25px; left:45%; width:8px; height:8px; border-radius:50%; background:#0F5EE8; animation:confetti 1.5s ease 650ms forwards; opacity:0;"></span>
+          <span style="position:absolute; top:60px; left:62%; width:7px; height:7px; border-radius:50%; background:#10B981; animation:confetti 1.5s ease 480ms forwards; opacity:0;"></span>
+        </div>
+        <div style="display:flex; justify-content:center; margin-bottom:32px;">
+          <div style="width:80px; height:80px; border-radius:50%; background:#F0FDF4; border:3px solid #10B981; display:flex; align-items:center; justify-content:center; animation:success-scale 300ms ease forwards;">
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><path class="success-check-path" d="M8 20l8 8 16-18" stroke="#10B981" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" style="stroke-dasharray:50; stroke-dashoffset:50; transition:stroke-dashoffset 600ms ease;"/></svg>
+          </div>
+        </div>
+        <h2 style="font-size:26px; font-weight:700; color:#111827; text-align:center; margin-bottom:12px;">Responses &amp; Corrigendum Published</h2>
+        <p style="font-size:15px; color:#6B7280; text-align:center; max-width:500px; margin:0 auto 32px;">All pre-bid query responses and Corrigendum No. ${issuedCount || 1} have been published to the portal and all 34 vendors have been notified.</p>
+
+        <div style="border:1px solid #E5E7EB; border-radius:16px; padding:28px; margin-bottom:32px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+            <div>
+              <div style="margin-bottom:18px;"><div style="font-size:12px; color:#9CA3AF;">Responses published</div><div style="font-size:28px; font-weight:700; color:#111827;">${draftedCount}</div></div>
+              <div style="margin-bottom:18px;"><div style="font-size:12px; color:#9CA3AF;">Corrigendums issued</div><div style="font-size:28px; font-weight:700; color:#111827;">${issuedCount || 1}</div></div>
+              <div><div style="font-size:12px; color:#9CA3AF;">Vendors notified</div><div style="font-size:28px; font-weight:700; color:#111827;">34</div></div>
+            </div>
+            <div>
+              <div style="margin-bottom:18px;"><div style="font-size:12px; color:#9CA3AF;">Publication date</div><div style="font-size:15px; font-weight:700; color:#111827;">May 15, 2026</div></div>
+              <div style="margin-bottom:18px;"><div style="font-size:12px; color:#9CA3AF;">Tender</div><div style="font-size:15px; font-weight:700; color:#0F5EE8;">TND-2026-001</div></div>
+              <div><div style="font-size:12px; color:#9CA3AF;">Reference</div><div style="font-size:12px; color:#6B7280;">CORR-TND-2026-001-01</div></div>
+            </div>
+          </div>
+          <div style="border-top:1px solid #E5E7EB; margin:20px 0;"></div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:#374151;"><span style="color:#10B981; font-size:16px;">✓</span> ${draftedCount} query responses published</div>
+            <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:#374151;"><span style="color:#10B981; font-size:16px;">✓</span> Corrigendum No. ${issuedCount || 1} issued</div>
+            <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:#374151;"><span style="color:#10B981; font-size:16px;">✓</span> Bid deadline extended to June 14</div>
+            <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:#374151;"><span style="color:#10B981; font-size:16px;">✓</span> 34 vendors notified via portal</div>
+            <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:#374151;"><span style="color:#10B981; font-size:16px;">✓</span> Published on mahatenders.gov.in</div>
+            <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:#374151;"><span style="color:#10B981; font-size:16px;">✓</span> Audit trail updated</div>
+          </div>
+        </div>
+
+        <div style="background:#F9FAFB; border-radius:12px; padding:20px 24px; margin-bottom:32px;">
+          <div style="font-size:13px; font-weight:700; color:#111827; margin-bottom:10px;">Download official documents</div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button style="border:1px solid #E5E7EB; background:white; color:#374151; border-radius:8px; padding:10px 18px; font-size:13px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;"><i data-lucide="download" class="w-3.5 h-3.5"></i> Query Response Register (PDF)</button>
+            <button style="border:1px solid #E5E7EB; background:white; color:#374151; border-radius:8px; padding:10px 18px; font-size:13px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;"><i data-lucide="download" class="w-3.5 h-3.5"></i> Corrigendum No. ${issuedCount || 1} (PDF)</button>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+          <button onclick="backToPreBidQueries()" style="border:1px solid #D1D5DB; background:white; color:#6B7280; border-radius:8px; padding:11px 20px; font-size:14px; cursor:pointer;">← Back to Pre-Bid Queries</button>
+          <button onclick="goToBidManagement()" style="background:#0F5EE8; color:white; border:none; border-radius:8px; padding:11px 24px; font-size:14px; font-weight:700; cursor:pointer;">Go to Bid Management →</button>
+        </div>
+        <div style="display:flex; justify-content:center; margin-top:14px;">
+          <button onclick="backToDashboard()" style="background:transparent; border:none; color:#6B7280; font-size:13px; cursor:pointer; text-decoration:underline;">Back to Dashboard</button>
+        </div>
+        <div style="text-align:center; font-size:12px; color:#9CA3AF; margin-top:16px;">A full audit record of this pre-bid process has been saved.</div>
+      </div>`;
   }
 
   // ============================================================
@@ -3213,7 +3869,14 @@
     if (e.key === 'Escape'){
       if (!document.getElementById('genericModal').classList.contains('hidden')) closeGenericModal();
       if (!document.getElementById('uploadTenderModal').classList.contains('hidden')) closeUploadTenderModal();
+      const issueModal = document.getElementById('issueCorrigendumModal');
+      if (issueModal && !issueModal.classList.contains('hidden')) closeIssueCorrigendumForm();
+      const panel = document.getElementById('corrigPanel');
+      if (panel && !panel.classList.contains('hidden')) closeCorrigendumPreviewPanel();
     }
+  });
+  document.getElementById('issueCorrigendumModal')?.addEventListener('click', (e) => {
+    if (e.target.id === 'issueCorrigendumModal') closeIssueCorrigendumForm();
   });
 </script>
 </body>
