@@ -1248,7 +1248,7 @@
   function refreshCorrigendumTabBadge(){
     const lbl = document.getElementById('corrigendumTabLabel');
     if (!lbl) return;
-    const pending = (typeof CORRIGENDUM_PENDING !== 'undefined' ? CORRIGENDUM_PENDING.length : 0);
+    const pending = (typeof corrigPushedCount === 'function' ? corrigPushedCount() : (typeof CORRIGENDUM_PENDING !== 'undefined' ? CORRIGENDUM_PENDING.length : 0));
     const btn = lbl.closest('button');
     if (pending > 0){
       lbl.innerHTML = `⚠ Corrigendum (${pending})`;
@@ -3101,27 +3101,64 @@
 
   const CORRIGENDUM_PENDING = [
     {
-      qNum: 'Q-002',
-      title: 'Bitumen grade specification',
-      clause: 'Clause 5.2 — Technical Specifications',
-      original: 'Bitumen grade VG-10 shall be used for all surface course works as per BOQ Item 5.',
-      amended:  'Bitumen grade VG-30 shall be used for all surface course works in light of the climate zone, replacing VG-10 in BOQ Item 5.',
+      id: 'P1',
+      type: 'Spec Change',
+      sourceQs: ['Q-002','Q-007','Q-011'],
+      summary: 'Bitumen grade specification in Section 3.2 should be revised from VG-10 to VG-30 as per IS 73:2013 (revised). Multiple vendors have flagged that VG-10 is inadequate for the climate zone and traffic loads specified in this project. This is a material specification change that requires formal amendment.',
+      reasoningQs: [
+        { num:'Q-002', text:'Bitumen grade should be VG-30 instead of VG-10 for this climate zone.' },
+        { num:'Q-007', text:'Request to use VG-30 grade bitumen in lieu of VG-10 specified in BOQ Item 5.' },
+        { num:'Q-011', text:'Bitumen grade question — can we substitute with locally available higher-grade?' },
+      ],
     },
     {
-      qNum: 'Q-003',
-      title: 'Site visit window extension',
-      clause: 'Clause 3.1 — Pre-Bid Procedures',
-      original: 'Vendors may visit the site for survey during the 3-day window from the date of tender release.',
-      amended:  'Vendors may visit the site for survey during a 7-day window from the date of tender release.',
+      id: 'P2',
+      type: 'Date Extension',
+      sourceQs: ['Q-003','Q-009'],
+      summary: 'Site visit window in Clause 5.1 should be extended from 3 days to 7 days from tender publication date. Additionally, off-hours site access (6 PM – 9 PM on weekdays) should be permitted subject to prior coordination. Both changes affect vendor bid preparation and require formal amendment.',
+      reasoningQs: [
+        { num:'Q-003', text:'The site visit window of 3 days is insufficient. Please extend to 7 days.' },
+        { num:'Q-009', text:'Site visit duration should be increased to allow off-hours visits.' },
+      ],
     },
     {
-      qNum: 'Q-009',
-      title: 'Off-hours site access',
-      clause: 'Clause 3.1 — Pre-Bid Procedures',
-      original: 'Site visits shall be conducted between 10:00 and 17:00 on working days only.',
-      amended:  'Site visits may additionally be scheduled between 18:00 and 21:00 on weekdays, subject to prior coordination with the project office.',
+      id: 'P3',
+      type: 'Eligibility Change',
+      sourceQs: ['Q-004','Q-013'],
+      summary: 'JV eligibility clause in Section 4.1 requires clarification: whether combined turnover of JV partners meets the threshold collectively, and whether a parent company guarantee is acceptable for the executing entity. This is a substantive eligibility clarification that should be formally documented in an amendment to avoid disputes during evaluation.',
+      reasoningQs: [
+        { num:'Q-004', text:'Can a JV (Joint Venture) between two firms meet the turnover eligibility criteria collectively?' },
+        { num:'Q-013', text:'JV eligibility — combined turnover acceptable?' },
+      ],
+    },
+    {
+      id: 'P4',
+      type: 'Scope Clarification',
+      sourceQs: ['Q-001'],
+      summary: 'Scope of work description in Section 2.1 should explicitly clarify whether road markings are included or excluded. The current description is ambiguous and vendors are interpreting it differently. A scope clarification in the corrigendum will prevent evaluation disputes.',
+      reasoningQs: [
+        { num:'Q-001', text:'Please clarify whether the scope of work includes road markings or only surface repair.' },
+      ],
     },
   ];
+
+  // Decision state: undecided | pushed | dismissed
+  const CORRIG_LS_KEY = 'corrigendum_decisions_TND-2026-001';
+  let corrigDecisions = {};
+  let corrigReasoningOpen = new Set();
+  let corrigEditingPointId = null;
+  (function loadCorrigDecisions(){
+    try {
+      const raw = localStorage.getItem(CORRIG_LS_KEY);
+      if (raw) corrigDecisions = JSON.parse(raw) || {};
+    } catch(e){ corrigDecisions = {}; }
+    CORRIGENDUM_PENDING.forEach(p => { if (!corrigDecisions[p.id]) corrigDecisions[p.id] = 'undecided'; });
+  })();
+  function saveCorrigDecisions(){
+    try { localStorage.setItem(CORRIG_LS_KEY, JSON.stringify(corrigDecisions)); } catch(e){}
+  }
+  function corrigPushedCount(){ return CORRIGENDUM_PENDING.filter(p => corrigDecisions[p.id] === 'pushed').length; }
+  function corrigDecisionsMadeCount(){ return CORRIGENDUM_PENDING.filter(p => corrigDecisions[p.id] !== 'undecided').length; }
 
   const CORRIGENDUM_ISSUED = [
     {
@@ -3132,38 +3169,30 @@
     },
   ];
 
+  const CORRIG_TYPE_PILL = {
+    'Spec Change':         'background:#EDE9FE; color:#5B21B6;',
+    'Date Extension':      'background:#FEF3C7; color:#92400E;',
+    'Scope Clarification': 'background:#EFF6FF; color:#1D4ED8;',
+    'Eligibility Change':  'background:#F0FDF4; color:#065F46;',
+  };
+
   function renderCorrigendum(){
     refreshCorrigendumTabBadge();
+    const pushed = corrigPushedCount();
     const statsStrip = document.getElementById('corrigendumStatsStrip');
-    if (statsStrip) statsStrip.textContent = `${CORRIGENDUM_PENDING.length} pending amendments · ${CORRIGENDUM_ISSUED.length} already issued`;
+    if (statsStrip) statsStrip.textContent = `${pushed} pending amendments · ${CORRIGENDUM_ISSUED.length} already issued`;
+
     const wrap = document.getElementById('corrigendumWrap');
     if (!wrap) return;
-    const pendingHTML = CORRIGENDUM_PENDING.map(c => `
-      <div class="bg-white rounded-xl p-4" style="border:1px solid #FCD34D; border-left:4px solid #F59E0B;">
-        <div class="flex items-start justify-between gap-3 flex-wrap">
-          <div class="min-w-0">
-            <div class="inline-flex items-center gap-2 text-[10.5px] font-bold uppercase tracking-wide" style="color:#92400E;">
-              <i data-lucide="alert-triangle" class="w-3 h-3"></i> Pending — triggered by ${c.qNum}
-            </div>
-            <h4 class="text-[14px] font-bold text-ink-900 mt-1">${c.title}</h4>
-            <div class="text-[11.5px] text-ink-500 mt-0.5">${c.clause}</div>
-          </div>
-          <div class="flex items-center gap-2 shrink-0">
-            <button onclick="dismissCorrigendum('${c.qNum}')" class="px-2.5 py-1 rounded-md border border-line bg-white text-[11.5px] text-ink-900 hover:bg-surface">Dismiss</button>
-            <button onclick="includeCorrigendum('${c.qNum}')" class="px-2.5 py-1 rounded-md bg-primary text-white text-[11.5px] font-medium hover:bg-primary/90">Include in Corrigendum</button>
-          </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
-          <div class="rounded-lg p-3" style="background:#FEF2F2; border:1px solid #FECACA;">
-            <div class="text-[10.5px] font-semibold uppercase tracking-wider" style="color:#991B1B;">Original</div>
-            <div class="text-[12.5px] text-ink-900 mt-1 line-through decoration-red-400/70">${c.original}</div>
-          </div>
-          <div class="rounded-lg p-3" style="background:#F0FDF4; border:1px solid #BBF7D0;">
-            <div class="text-[10.5px] font-semibold uppercase tracking-wider" style="color:#065F46;">Amended</div>
-            <div class="text-[12.5px] text-ink-900 mt-1">${c.amended}</div>
-          </div>
-        </div>
-      </div>`).join('');
+
+    const total = CORRIGENDUM_PENDING.length;
+    const decisionsMade = corrigDecisionsMadeCount();
+    const progressPct = total ? Math.round((decisionsMade / total) * 100) : 0;
+
+    const requiresAmendment = CORRIGENDUM_PENDING.filter(p => p.type !== 'Scope Clarification').length;
+    const requiresClarification = total - requiresAmendment;
+
+    const pointsHTML = CORRIGENDUM_PENDING.map((p, i) => corrigPointRowHTML(p, i)).join('');
 
     const issuedHTML = CORRIGENDUM_ISSUED.map(c => `
       <div class="bg-white rounded-xl p-4" style="border:1px solid #BBF7D0; border-left:4px solid #10B981;">
@@ -3183,29 +3212,217 @@
       </div>`).join('');
 
     wrap.innerHTML = `
-      <div class="space-y-3">
-        <div class="flex items-center justify-between gap-2 flex-wrap">
-          <div class="text-[12px] text-ink-500">${CORRIGENDUM_PENDING.length} pending amendments · ${CORRIGENDUM_ISSUED.length} issued</div>
-          <button onclick="openIssueCorrigendumForm()" class="px-3 py-1.5 rounded-lg border border-primary text-primary text-[12.5px] font-medium hover:bg-primary-light inline-flex items-center gap-1.5"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Issue Corrigendum</button>
+      <!-- Section header -->
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:16px;">
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:16px; font-weight:700; color:#111827;">AI Amendment Summary</div>
+          <div style="font-size:13px; color:#6B7280; max-width:600px; line-height:1.6; margin-top:4px;">Based on your drafted query responses, AI has identified changes that need to be formally amended in the tender. Review each point and decide what goes into the corrigendum.</div>
         </div>
-        ${pendingHTML}
-        ${issuedHTML}
-      </div>`;
+        <button onclick="regenerateCorrigAI()" style="border:1px solid #0F5EE8; color:#0F5EE8; background:white; border-radius:8px; padding:7px 14px; font-size:12px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:background 150ms ease;" onmouseover="this.style.background='#EFF6FF'" onmouseout="this.style.background='white'"><i data-lucide="sparkles" class="w-3 h-3"></i> ✦ Regenerate</button>
+      </div>
+
+      <!-- AI generation strip (regenerate state) -->
+      <div id="corrigGenStrip" class="hidden" style="background:#EFF6FF; border-radius:8px; padding:14px 16px; margin-bottom:16px; font-size:13px; color:#1D4ED8;">✦ AI is analysing your drafted responses<span class="corrig-ellipsis">...</span></div>
+
+      <!-- AI Summary Card -->
+      <div style="background:white; border:1px solid #E5E7EB; border-radius:14px; overflow:hidden;">
+        <!-- Card header -->
+        <div style="background:#F9FAFB; border-bottom:1px solid #E5E7EB; padding:16px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+          <div style="min-width:0;">
+            <div style="font-size:14px; font-weight:700; color:#111827; display:inline-flex; align-items:center; gap:6px;"><span style="color:#0F5EE8;">✦</span> AI identified ${total} amendment points</div>
+            <div style="font-size:12px; color:#6B7280; margin-top:3px;">From ${QUERIES.length-2} drafted responses · ${requiresAmendment} queries require tender amendments · ${requiresClarification} requires only clarification</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+            <div style="display:flex; align-items:center; gap:10px;" aria-live="polite">
+              <span id="corrigProgressLabel" style="font-size:12px; color:#9CA3AF;">${decisionsMade} of ${total} decisions made</span>
+              <div style="width:120px; height:4px; border-radius:2px; background:#E5E7EB; overflow:hidden;"><div id="corrigProgressFill" style="height:100%; background:#0F5EE8; width:${progressPct}%; transition:width 150ms ease;"></div></div>
+            </div>
+            <button onclick="pushAllCorrigPoints()" style="background:transparent; border:none; color:#0F5EE8; font-size:12px; cursor:pointer; text-decoration:underline;">Push all to corrigendum</button>
+          </div>
+        </div>
+
+        <!-- Points -->
+        <div id="corrigPointsList">${pointsHTML}</div>
+
+        <!-- Card footer -->
+        <div style="border-top:1px solid #E5E7EB; padding:16px 20px; background:#F9FAFB; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+          <div id="corrigFooterCount" style="font-size:13px; color:#6B7280;" aria-live="polite">${pushed} of ${total} points pushed to corrigendum</div>
+          <div style="font-size:12px; color:#9CA3AF; font-style:italic; flex:1; text-align:center; min-width:200px;">After making your decisions, issue the formal corrigendum from above.</div>
+          <button onclick="openIssueCorrigendumForm()" style="background:#0F5EE8; color:white; border:none; border-radius:8px; padding:8px 18px; font-size:13px; font-weight:500; cursor:pointer;">Issue Corrigendum →</button>
+        </div>
+      </div>
+
+      <!-- Issued cards -->
+      ${issuedHTML ? `<div style="margin-top:24px; display:flex; flex-direction:column; gap:12px;">${issuedHTML}</div>` : ''}
+    `;
 
     const sm = document.getElementById('summaryCorrigendum');
     if (sm) sm.textContent = CORRIGENDUM_ISSUED.length ? `Yes (${CORRIGENDUM_ISSUED.length})` : 'No';
     refreshIcons();
   }
 
-  function dismissCorrigendum(qNum){
-    const idx = CORRIGENDUM_PENDING.findIndex(c => c.qNum === qNum);
-    if (idx >= 0) CORRIGENDUM_PENDING.splice(idx, 1);
+  function corrigPointRowHTML(p, i){
+    const state = corrigDecisions[p.id] || 'undecided';
+    const num = String(i + 1).padStart(2, '0');
+    const accentColor = state === 'pushed' ? '#0F5EE8' : '#E5E7EB';
+    const rowBg = state === 'pushed' ? '#F8FBFF' : (state === 'dismissed' ? 'white' : 'white');
+    const rowOpacity = state === 'dismissed' ? '0.45' : '1';
+    const isEditing = corrigEditingPointId === p.id;
+
+    const statusBadge = state === 'pushed'
+      ? `<span style="background:#EFF6FF; color:#0F5EE8; border-radius:14px; padding:2px 8px; font-size:10.5px; font-weight:600;">In Corrigendum</span>`
+      : state === 'dismissed'
+        ? `<span style="background:#F3F4F6; color:#9CA3AF; border-radius:14px; padding:2px 8px; font-size:10.5px;">Dismissed</span>`
+        : `<span style="background:#F3F4F6; color:#6B7280; border-radius:14px; padding:2px 8px; font-size:10.5px;">Undecided</span>`;
+
+    const reasoningOpen = corrigReasoningOpen.has(p.id);
+    const reasoningHTML = reasoningOpen ? `
+      <div style="background:#F9FAFB; border-radius:6px; padding:10px 12px; margin-top:8px;">
+        <div style="font-size:11px; font-weight:700; color:#6B7280; margin-bottom:6px;">AI detected this from:</div>
+        <ul style="margin:0; padding-left:18px;">
+          ${p.reasoningQs.map(r => `<li style="font-size:11px; color:#6B7280; margin-bottom:3px;"><span style="font-family:monospace; font-weight:700; color:#0F5EE8;">${r.num}</span> — ${r.text.slice(0, 60)}${r.text.length > 60 ? '…' : ''}</li>`).join('')}
+        </ul>
+      </div>` : '';
+
+    const summaryHTML = isEditing
+      ? `<div id="corrigEdit-${p.id}" contenteditable="true" data-original="${(p.summary || '').replace(/"/g,'&quot;')}" onkeydown="corrigEditKey(event, '${p.id}')" style="font-size:14px; color:#111827; line-height:1.7; font-weight:500; border:1.5px solid #0F5EE8; border-radius:6px; padding:6px 8px; background:#FAFEFF; outline:none;">${p.summary}</div>
+         <button onclick="saveCorrigPointEdit('${p.id}')" style="background:transparent; border:none; color:#10B981; font-size:12px; cursor:pointer; margin-top:4px;">↩ Save</button>`
+      : `<div onclick="${state === 'dismissed' ? '' : `beginEditCorrigPoint('${p.id}')`}" class="corrig-point-summary" style="font-size:14px; color:#111827; line-height:1.7; font-weight:500; cursor:${state==='dismissed'?'default':'text'}; position:relative;" onmouseover="const e=this.querySelector('.corrig-edit-ico'); if(e) e.style.opacity='1';" onmouseout="const e=this.querySelector('.corrig-edit-ico'); if(e) e.style.opacity='0';">${p.summary}${state==='dismissed'?'':'<span class="corrig-edit-ico" style="opacity:0; transition:opacity 150ms ease; color:#9CA3AF; font-size:12px; margin-left:6px;">✎</span>'}</div>`;
+
+    // Action row by state
+    let actionsHTML;
+    if (state === 'pushed'){
+      actionsHTML = `
+        <div style="display:flex; gap:10px; align-items:center; margin-top:12px; flex-wrap:wrap;">
+          <span style="background:#EFF6FF; color:#0F5EE8; border-radius:7px; padding:7px 14px; font-size:13px; font-weight:500;">✓ In Corrigendum</span>
+          <button onclick="undoCorrigPoint('${p.id}')" style="background:transparent; border:none; color:#9CA3AF; font-size:12px; cursor:pointer; text-decoration:underline;">Remove from Corrigendum</button>
+          <button onclick="beginEditCorrigPoint('${p.id}')" style="background:transparent; border:none; color:#9CA3AF; font-size:12px; cursor:pointer; text-decoration:underline;">Edit point ✎</button>
+        </div>`;
+    } else if (state === 'dismissed'){
+      actionsHTML = `
+        <div style="display:flex; gap:10px; align-items:center; margin-top:12px; flex-wrap:wrap;">
+          <span style="background:#F3F4F6; color:#9CA3AF; border-radius:7px; padding:7px 14px; font-size:13px;">Dismissed</span>
+          <button onclick="undoCorrigPoint('${p.id}')" style="background:transparent; border:none; color:#6B7280; font-size:12px; cursor:pointer; text-decoration:underline;">Undo</button>
+        </div>`;
+    } else {
+      actionsHTML = `
+        <div style="display:flex; gap:10px; align-items:center; margin-top:12px; flex-wrap:wrap;">
+          <button onclick="pushCorrigPoint('${p.id}')" style="background:#0F5EE8; color:white; border:none; border-radius:7px; padding:7px 16px; font-size:13px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">Push to Corrigendum <span style="font-size:13px;">→</span></button>
+          <button onclick="dismissCorrigPoint('${p.id}')" style="background:transparent; border:1px solid #E5E7EB; color:#6B7280; border-radius:7px; padding:7px 12px; font-size:13px; cursor:pointer;">Dismiss</button>
+          <button onclick="beginEditCorrigPoint('${p.id}')" style="background:transparent; border:none; color:#9CA3AF; font-size:12px; cursor:pointer; text-decoration:underline;">Edit point ✎</button>
+        </div>`;
+    }
+
+    return `<div class="corrig-point-row" data-point="${p.id}" style="padding:18px 20px; padding-left:24px; position:relative; border-bottom:1px solid #F3F4F6; background:${rowBg}; opacity:${rowOpacity}; transition:background 150ms ease, opacity 150ms ease;">
+      <div style="position:absolute; left:0; top:0; bottom:0; width:3px; background:${accentColor}; transition:background 150ms ease;"></div>
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;">
+        <span style="background:#F3F4F6; color:#6B7280; border-radius:4px; padding:2px 7px; font-size:11px; font-weight:700;">${num}</span>
+        <span style="${CORRIG_TYPE_PILL[p.type] || 'background:#F3F4F6; color:#6B7280;'}; border-radius:14px; padding:2px 8px; font-size:11px; font-weight:500;">${p.type}</span>
+        <span style="background:#F9FAFB; border:1px solid #E5E7EB; border-radius:4px; padding:2px 6px; font-size:11px; color:#6B7280;">From ${p.sourceQs.join(', ')}</span>
+        <span style="margin-left:auto;">${statusBadge}</span>
+      </div>
+      ${summaryHTML}
+      <button onclick="toggleCorrigReasoning('${p.id}')" aria-expanded="${reasoningOpen}" style="background:transparent; border:none; color:#9CA3AF; font-size:11px; cursor:pointer; margin-top:8px; padding:0;">Why AI flagged this ${reasoningOpen ? '▴' : '▾'}</button>
+      <div style="overflow:hidden; transition:max-height 200ms ease;">${reasoningHTML}</div>
+      ${actionsHTML}
+    </div>`;
+  }
+
+  function regenerateCorrigAI(){
+    const strip = document.getElementById('corrigGenStrip');
+    const wrap = document.getElementById('corrigendumWrap');
+    if (!strip || !wrap) return;
+    strip.classList.remove('hidden');
+    // Hide the card briefly
+    const card = wrap.querySelector('[style*="border-radius:14px"]');
+    if (card) card.style.opacity = '0.4';
+    setTimeout(() => {
+      strip.classList.add('hidden');
+      renderCorrigendum();
+      showToast('AI summary regenerated');
+    }, 1500);
+  }
+
+  function pushCorrigPoint(id){
+    corrigDecisions[id] = 'pushed';
+    saveCorrigDecisions();
     renderCorrigendum();
-    showToast(`${qNum} amendment dismissed`);
   }
-  function includeCorrigendum(qNum){
-    showToast(`${qNum} queued for next corrigendum`);
+  function dismissCorrigPoint(id){
+    corrigDecisions[id] = 'dismissed';
+    saveCorrigDecisions();
+    renderCorrigendum();
   }
+  function undoCorrigPoint(id){
+    corrigDecisions[id] = 'undecided';
+    saveCorrigDecisions();
+    renderCorrigendum();
+  }
+  function pushAllCorrigPoints(){
+    // Stagger: render once with all set, but animate by delaying state updates per row
+    const undecided = CORRIGENDUM_PENDING.filter(p => corrigDecisions[p.id] === 'undecided');
+    if (!undecided.length){ showToast('No undecided points'); return; }
+    undecided.forEach((p, i) => {
+      setTimeout(() => {
+        corrigDecisions[p.id] = 'pushed';
+        saveCorrigDecisions();
+        renderCorrigendum();
+      }, i * 50);
+    });
+  }
+  function toggleCorrigReasoning(id){
+    if (corrigReasoningOpen.has(id)) corrigReasoningOpen.delete(id); else corrigReasoningOpen.add(id);
+    renderCorrigendum();
+  }
+  function beginEditCorrigPoint(id){
+    // If editing another, save it silently
+    if (corrigEditingPointId && corrigEditingPointId !== id) saveCorrigPointEdit(corrigEditingPointId);
+    corrigEditingPointId = id;
+    renderCorrigendum();
+    setTimeout(() => {
+      const ed = document.getElementById('corrigEdit-' + id);
+      if (ed){
+        ed.focus();
+        const range = document.createRange();
+        range.selectNodeContents(ed);
+        range.collapse(false);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    }, 50);
+  }
+  function saveCorrigPointEdit(id){
+    const ed = document.getElementById('corrigEdit-' + id);
+    if (!ed){ corrigEditingPointId = null; renderCorrigendum(); return; }
+    const newText = (ed.innerText || '').trim();
+    const p = CORRIGENDUM_PENDING.find(x => x.id === id);
+    if (p && newText) p.summary = newText;
+    corrigEditingPointId = null;
+    renderCorrigendum();
+    showToast('Point updated');
+  }
+  function cancelCorrigPointEdit(id){
+    const ed = document.getElementById('corrigEdit-' + id);
+    if (ed){
+      const orig = ed.dataset.original || '';
+      ed.innerText = orig;
+    }
+    corrigEditingPointId = null;
+    renderCorrigendum();
+  }
+  function corrigEditKey(event, id){
+    if (event.key === 'Enter' && !event.shiftKey){ event.preventDefault(); saveCorrigPointEdit(id); }
+    else if (event.key === 'Escape'){ event.preventDefault(); cancelCorrigPointEdit(id); }
+  }
+  // Outside-click saves edit
+  document.addEventListener('mousedown', (e) => {
+    if (!corrigEditingPointId) return;
+    const ed = document.getElementById('corrigEdit-' + corrigEditingPointId);
+    if (ed && !ed.contains(e.target) && !e.target.closest(`[data-point="${corrigEditingPointId}"] button`)){
+      saveCorrigPointEdit(corrigEditingPointId);
+    }
+  });
 
   // ============================================================
   // ISSUE CORRIGENDUM FORM
@@ -3214,15 +3431,20 @@
     const modal = document.getElementById('issueCorrigendumModal');
     if (!modal) return;
     const list = document.getElementById('issueCorrigendumPendingList');
-    list.innerHTML = CORRIGENDUM_PENDING.map(c => `
+    const pushedPoints = CORRIGENDUM_PENDING.filter(p => corrigDecisions[p.id] === 'pushed');
+    list.innerHTML = pushedPoints.map((p, i) => `
       <label style="display:flex; gap:10px; padding:12px; border:1px solid #E5E7EB; border-radius:8px; cursor:pointer; transition:background 150ms ease;" onmouseover="this.style.background='#F9FAFB'" onmouseout="this.style.background='white'">
         <input type="checkbox" checked style="accent-color:#0F5EE8; margin-top:2px;">
         <div style="flex:1; min-width:0;">
-          <div style="font-size:13px; font-weight:600; color:#111827;">${c.qNum} — ${c.title}</div>
-          <div style="font-size:11.5px; color:#6B7280; margin-top:2px;">${c.clause}</div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="background:#F3F4F6; color:#6B7280; border-radius:4px; padding:2px 6px; font-size:10.5px; font-weight:700;">${String(CORRIGENDUM_PENDING.indexOf(p)+1).padStart(2,'0')}</span>
+            <span style="${CORRIG_TYPE_PILL[p.type] || ''}; border-radius:14px; padding:2px 8px; font-size:10.5px; font-weight:500;">${p.type}</span>
+            <span style="font-size:11px; color:#6B7280;">From ${p.sourceQs.join(', ')}</span>
+          </div>
+          <div style="font-size:12.5px; color:#374151; margin-top:6px; line-height:1.5;">${p.summary.slice(0, 140)}${p.summary.length > 140 ? '…' : ''}</div>
         </div>
       </label>
-    `).join('') || `<div style="font-size:13px; color:#9CA3AF; font-style:italic; text-align:center; padding:16px;">No pending amendments to issue.</div>`;
+    `).join('') || `<div style="font-size:13px; color:#9CA3AF; font-style:italic; text-align:center; padding:16px;">No amendments pushed to corrigendum yet. Push points from the AI summary first.</div>`;
     modal.classList.remove('hidden');
     refreshIcons();
   }
@@ -3574,13 +3796,22 @@
     closeIssueCorrigendumForm();
     // Move all pending to issued
     const nextNo = (CORRIGENDUM_ISSUED[CORRIGENDUM_ISSUED.length-1]?.no || 0) + 1;
+    const pushedPoints = CORRIGENDUM_PENDING.filter(p => corrigDecisions[p.id] === 'pushed');
+    const affectsList = Array.from(new Set(pushedPoints.flatMap(p => p.sourceQs)));
     CORRIGENDUM_ISSUED.push({
       no: nextNo,
       issuedOn: 'May 15, 2026',
-      affects: CORRIGENDUM_PENDING.map(c => c.qNum),
-      summary: `Bundled ${CORRIGENDUM_PENDING.length} amendments triggered by post-meeting queries. Bid deadline extended to June 14.`,
+      affects: affectsList,
+      summary: `Bundled ${pushedPoints.length} amendments covering ${pushedPoints.map(p => p.type).join(', ')}. Bid deadline extended to June 14.`,
     });
-    CORRIGENDUM_PENDING.length = 0;
+    // Remove only the pushed points; leave dismissed/undecided alone
+    for (let i = CORRIGENDUM_PENDING.length - 1; i >= 0; i--){
+      if (corrigDecisions[CORRIGENDUM_PENDING[i].id] === 'pushed'){
+        delete corrigDecisions[CORRIGENDUM_PENDING[i].id];
+        CORRIGENDUM_PENDING.splice(i, 1);
+      }
+    }
+    saveCorrigDecisions();
     renderCorrigendum();
     showPublishSuccessScreen();
   }
