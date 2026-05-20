@@ -143,38 +143,15 @@
       <!-- SCREEN 1 — BID MANAGEMENT LANDING                -->
       <!-- ============================================== -->
       <section id="screen-landing" class="space-y-6">
-        <div>
-          <div class="text-[13px] text-ink-500"><a href="index.html" class="hover:text-ink-900">Dashboard</a> <span class="mx-1 text-ink-400">/</span> Bid Management</div>
-          <h1 class="text-[24px] font-bold text-ink-900 leading-tight mt-1">Bid Management</h1>
-          <p class="text-[14px] text-ink-500 mt-1">Monitor bid submissions, run the formal opening ceremony, and process validity screening for published tenders.</p>
-        </div>
-
-        <!-- Stats row -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="stat-card bg-white border border-line rounded-xl p-5">
-            <div class="flex items-center justify-between mb-2"><div class="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center"><i data-lucide="inbox" class="w-4 h-4"></i></div><span class="text-[10.5px] uppercase tracking-wider text-ink-400 font-semibold">Active</span></div>
-            <div class="text-[26px] font-bold text-ink-900 leading-none">3</div>
-            <div class="text-[12px] text-ink-500 mt-1">Active Bid Windows</div>
-            <div class="text-[12px] text-warning mt-0.5 font-medium">1 closes in 48 hours</div>
+        <div class="flex items-start justify-between gap-3 flex-wrap">
+          <div>
+            <div class="text-[13px] text-ink-500"><a href="index.html" class="hover:text-ink-900">Dashboard</a> <span class="mx-1 text-ink-400">/</span> Bid Management</div>
+            <h1 class="text-[24px] font-bold text-ink-900 leading-tight mt-1">Bid Management</h1>
+            <p class="text-[14px] text-ink-500 mt-1">Monitor bid submissions, run the formal opening ceremony, and process validity screening for published tenders.</p>
           </div>
-          <div class="stat-card bg-white border border-line rounded-xl p-5">
-            <div class="flex items-center justify-between mb-2"><div class="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center"><i data-lucide="layers" class="w-4 h-4"></i></div><span class="text-[10.5px] uppercase tracking-wider text-ink-400 font-semibold">Received</span></div>
-            <div class="text-[26px] font-bold text-ink-900 leading-none">24</div>
-            <div class="text-[12px] text-ink-500 mt-1">Total Bids Received</div>
-            <div class="text-[12px] text-primary mt-0.5 font-medium">6 from new vendors</div>
-          </div>
-          <div class="stat-card bg-white border border-line rounded-xl p-5">
-            <div class="flex items-center justify-between mb-2"><div class="w-9 h-9 rounded-lg bg-warning-light text-warning flex items-center justify-center"><i data-lucide="lock" class="w-4 h-4"></i></div><span class="text-[10.5px] uppercase tracking-wider text-warning font-semibold">Pending</span></div>
-            <div class="text-[26px] font-bold text-warning leading-none">2</div>
-            <div class="text-[12px] text-ink-500 mt-1">Pending Opening</div>
-            <div class="text-[12px] text-danger mt-0.5 font-medium">Overdue by 1 day</div>
-          </div>
-          <div class="stat-card bg-white border border-line rounded-xl p-5">
-            <div class="flex items-center justify-between mb-2"><div class="w-9 h-9 rounded-lg bg-success-light text-success flex items-center justify-center"><i data-lucide="check-circle-2" class="w-4 h-4"></i></div><span class="text-[10.5px] uppercase tracking-wider text-success font-semibold">Done</span></div>
-            <div class="text-[26px] font-bold text-ink-900 leading-none">8</div>
-            <div class="text-[12px] text-ink-500 mt-1">Completed</div>
-            <div class="text-[12px] text-success mt-0.5 font-medium">This financial year</div>
-          </div>
+          <button onclick="openUploadTenderModal()" class="inline-flex items-center gap-1.5 text-[13px] font-medium shrink-0" style="border:1px solid #0F5EE8; border-radius:8px; padding:8px 16px; color:#0F5EE8; background:white;" onmouseover="this.style.background='#EFF6FF'" onmouseout="this.style.background='white'">
+            <i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload Existing Tender
+          </button>
         </div>
 
         <!-- Search -->
@@ -399,6 +376,88 @@
   </div>
 </div>
 
+<!-- ============ UPLOAD TENDER MODAL ============ -->
+<div id="uploadTenderModal" role="dialog" aria-modal="true" aria-label="Upload Existing Tender" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(15,39,68,0.4);">
+  <div class="bg-white shadow-lift w-full" style="max-width:560px; border-radius:16px; padding:32px; max-height:90vh; overflow-y:auto;">
+    <div class="flex items-start justify-between gap-3">
+      <div>
+        <h3 class="text-[20px] font-bold text-ink-900">Upload Existing Tender</h3>
+        <p class="text-[13px] text-ink-500 mt-1">Drop a published tender PDF and we'll extract the key fields so you can start managing its bids.</p>
+      </div>
+      <button onclick="closeUploadTenderModal()" aria-label="Close" class="text-ink-400 hover:text-ink-900"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+
+    <!-- Step 1: Drop zone -->
+    <div id="utStep1" class="mt-5">
+      <label id="utDropZone" for="utFileInput" class="block cursor-pointer text-center" style="border:2px dashed #D1D5DB; border-radius:12px; padding:32px 16px; background:#FAFBFC;" ondragover="utDragOver(event)" ondragleave="utDragLeave(event)" ondrop="utDrop(event)">
+        <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-ink-400"></i>
+        <div class="text-[14px] font-medium text-ink-900 mt-2">Drop your tender PDF here</div>
+        <div class="text-[12px] text-ink-500 mt-1">or <span class="text-primary font-medium">browse files</span></div>
+        <div class="text-[11px] text-ink-400 mt-2">PDF · max 20 MB</div>
+        <input id="utFileInput" type="file" accept=".pdf" class="hidden" onchange="utFileSelected(this)" />
+      </label>
+    </div>
+
+    <!-- Step 2: Extracting state -->
+    <div id="utStep2" class="hidden mt-5">
+      <div class="rounded-xl p-5 text-center" style="background:#EFF6FF; border:1px solid #BFDBFE;">
+        <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-soft mb-3">
+          <i data-lucide="sparkles" class="w-5 h-5 text-primary animate-pulse"></i>
+        </div>
+        <div class="text-[14px] font-medium text-ink-900">AI is reading your document and extracting key fields…</div>
+        <div class="text-[12px] text-ink-500 mt-1" id="utFileLabel">document.pdf</div>
+        <div class="mt-3 mx-auto h-1.5 rounded-full overflow-hidden" style="max-width:240px; background:#DBEAFE;">
+          <div id="utProgress" class="h-full bg-primary" style="width:0%; transition:width 200ms ease;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Extracted fields form -->
+    <div id="utStep3" class="hidden mt-5 space-y-3">
+      <div class="inline-flex items-center gap-1.5 text-[11.5px] font-medium rounded-full px-2.5 py-1" style="background:#F0FDF4; color:#10B981;">
+        <i data-lucide="check-circle-2" class="w-3 h-3"></i> Fields extracted — review &amp; edit
+      </div>
+      <div>
+        <label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Tender Title</label>
+        <input id="utFieldTitle" type="text" class="w-full bg-white border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">TND No.</label>
+          <input id="utFieldTnd" type="text" class="w-full bg-white border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+        </div>
+        <div>
+          <label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Department</label>
+          <input id="utFieldDept" type="text" class="w-full bg-white border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+        </div>
+        <div>
+          <label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Sector</label>
+          <select id="utFieldSector" class="w-full bg-white border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20">
+            <option>Goods</option><option>Works</option><option>Services</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Estimated Cost</label>
+          <input id="utFieldCost" type="text" class="w-full bg-white border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+        </div>
+        <div>
+          <label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Bid Opening Date</label>
+          <input id="utFieldOpen" type="date" class="w-full bg-white border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+        </div>
+        <div>
+          <label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Bid Submission Deadline</label>
+          <input id="utFieldDeadline" type="date" class="w-full bg-white border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6 flex items-center justify-end gap-2">
+      <button onclick="closeUploadTenderModal()" class="px-3.5 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">Cancel</button>
+      <button id="utSubmitBtn" onclick="utSubmit()" class="hidden px-3.5 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5">Add to Bid Management <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+    </div>
+  </div>
+</div>
+
 <!-- Confirmation modal -->
 <div id="confirmModal" role="dialog" aria-modal="true" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(15,39,68,0.4);">
   <div class="bg-white shadow-lift w-full" style="max-width:480px; border-radius:16px; padding:28px;">
@@ -481,7 +540,10 @@
       <span class="w-2 h-2 rounded-full shrink-0" style="background:${t.dot || '#9CA3AF'};"></span>
       <span class="font-mono text-[12px] font-semibold ${kind==='completed'?'':'text-primary'} shrink-0" style="background:${kind==='completed'?'#F3F4F6':'#EFF6FF'}; color:${kind==='completed'?'#6B7280':'#0F5EE8'}; border-radius:4px; padding:2px 6px; width:108px; text-align:center;">${t.id}</span>
       <div class="flex-1 min-w-0">
-        <div class="text-[14px] font-medium ${kind==='completed'?'':'text-ink-900'} truncate" style="${kind==='completed'?'color:#6B7280;':''}">${t.name}</div>
+        <div class="text-[14px] font-medium ${kind==='completed'?'':'text-ink-900'} truncate flex items-center gap-2" style="${kind==='completed'?'color:#6B7280;':''}">
+          <span class="truncate">${t.name}</span>
+          ${t.uploaded ? '<span class="shrink-0 inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider rounded-full px-2 py-0.5" style="background:#F0FDF4; color:#10B981;"><i data-lucide="upload" class="w-2.5 h-2.5"></i>Uploaded</span>' : ''}
+        </div>
         <div class="text-[12px] text-ink-400">${t.dept} · ${t.sector}</div>
       </div>
       ${right}
@@ -1015,6 +1077,83 @@
   function closeConfirm(){ document.getElementById('confirmModal').classList.add('hidden'); }
   document.getElementById('confirmModal').addEventListener('click', e => { if (e.target.id === 'confirmModal') closeConfirm(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeConfirm(); });
+
+  // ===================== UPLOAD TENDER MODAL =====================
+  function openUploadTenderModal(){
+    utReset();
+    document.getElementById('uploadTenderModal').classList.remove('hidden');
+    refreshIcons();
+  }
+  function closeUploadTenderModal(){
+    document.getElementById('uploadTenderModal').classList.add('hidden');
+  }
+  function utReset(){
+    document.getElementById('utStep1').classList.remove('hidden');
+    document.getElementById('utStep2').classList.add('hidden');
+    document.getElementById('utStep3').classList.add('hidden');
+    document.getElementById('utSubmitBtn').classList.add('hidden');
+    const inp = document.getElementById('utFileInput'); if (inp) inp.value = '';
+    const prog = document.getElementById('utProgress'); if (prog) prog.style.width = '0%';
+  }
+  function utDragOver(e){ e.preventDefault(); const z = document.getElementById('utDropZone'); z.style.background = '#EFF6FF'; z.style.borderColor = '#0F5EE8'; }
+  function utDragLeave(e){ e.preventDefault(); const z = document.getElementById('utDropZone'); z.style.background = '#FAFBFC'; z.style.borderColor = '#D1D5DB'; }
+  function utDrop(e){
+    e.preventDefault(); utDragLeave(e);
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (file) utStartExtraction(file.name);
+  }
+  function utFileSelected(input){
+    const file = input.files && input.files[0];
+    if (file) utStartExtraction(file.name);
+  }
+  function utStartExtraction(fileName){
+    document.getElementById('utStep1').classList.add('hidden');
+    document.getElementById('utStep2').classList.remove('hidden');
+    document.getElementById('utFileLabel').textContent = fileName;
+    refreshIcons();
+    let p = 0;
+    const prog = document.getElementById('utProgress');
+    const tick = setInterval(() => {
+      p += 12 + Math.random() * 8;
+      if (p >= 100) p = 100;
+      prog.style.width = p + '%';
+      if (p >= 100){ clearInterval(tick); setTimeout(utShowExtractedFields, 250); }
+    }, 180);
+  }
+  function utShowExtractedFields(){
+    document.getElementById('utStep2').classList.add('hidden');
+    document.getElementById('utStep3').classList.remove('hidden');
+    document.getElementById('utSubmitBtn').classList.remove('hidden');
+    document.getElementById('utFieldTitle').value  = 'Construction of Storm Water Drain — Zone 4';
+    document.getElementById('utFieldTnd').value    = 'TND-2026-009';
+    document.getElementById('utFieldDept').value   = 'Infrastructure';
+    document.getElementById('utFieldSector').value = 'Works';
+    document.getElementById('utFieldCost').value   = '₹1,20,00,000';
+    document.getElementById('utFieldOpen').value   = '2026-06-05';
+    document.getElementById('utFieldDeadline').value = '2026-06-04';
+    refreshIcons();
+  }
+  function utSubmit(){
+    const title  = document.getElementById('utFieldTitle').value.trim() || 'Untitled Tender';
+    const tnd    = document.getElementById('utFieldTnd').value.trim()   || 'TND-2026-NEW';
+    const dept   = document.getElementById('utFieldDept').value.trim()  || 'Department';
+    const sector = document.getElementById('utFieldSector').value;
+    const cost   = document.getElementById('utFieldCost').value.trim()  || '—';
+    const dl     = document.getElementById('utFieldDeadline').value;
+    const dlLabel = dl ? 'Closes ' + new Date(dl).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : 'Deadline TBD';
+    ACTIVE_TENDERS.unshift({
+      id: tnd, name: title, dept: dept, sector: sector, cost: cost,
+      status: 'open', dot: '#10B981', bids: '0 bids received',
+      deadline: dlLabel, dl: 'text-success', uploaded: true,
+    });
+    closeUploadTenderModal();
+    renderTenderLists(document.getElementById('bmSearch')?.value || '');
+    showToast(tnd + ' added to Bid Management');
+  }
+  document.getElementById('uploadTenderModal').addEventListener('click', e => { if (e.target.id === 'uploadTenderModal') closeUploadTenderModal(); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !document.getElementById('uploadTenderModal').classList.contains('hidden')) closeUploadTenderModal();
+  });
 
   // ===================== BOOT =====================
   (function boot(){
