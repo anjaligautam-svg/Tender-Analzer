@@ -44,8 +44,11 @@
     .pulse-amber { animation: pulse-amber 1.6s ease-in-out infinite; }
     @keyframes ellip { 0% { content:'.'; } 33% { content:'..'; } 66% { content:'...'; } }
     .ellip::after { content:'...'; animation: ellip 1.2s steps(1) infinite; }
-    @keyframes rowReveal { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform: translateY(0); } }
+    @keyframes rowReveal { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform: translateY(0); } }
     .row-reveal { animation: rowReveal .3s ease forwards; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes dialogIn { from { opacity:0; transform: scale(0.96); } to { opacity:1; transform: scale(1); } }
+    .dialog-in { animation: dialogIn 200ms ease both; }
     .radio-card { transition: all .15s ease; cursor: pointer; }
     .radio-card:hover { border-color: #93C5FD; }
     .radio-card.selected { border-color: #0F5EE8; background: #EFF6FF; }
@@ -462,7 +465,11 @@
     { label:'Bid Opening',         date:'2026-05-21' },
   ];
 
-  let openingDone = false;
+  let openingState = 'setup';   // 'setup' | 'confirming' | 'opened'
+  let openingForm = { dt: '2026-05-17T11:42', w1: '', w2: '', mode: 'physical', vcLink: '' };
+  const OPENING_LS_KEY = 'bidOpening_TND-2026-001';
+  const WITNESS_OPTIONS = ['Priya Shah — Technical Officer','Amit Patil — Finance Officer','Sunita Rao — Deputy Commissioner','Ravi Mehta — Accounts Officer'];
+  const OPENING_MODE_LABEL = { physical:'Physical presence', vc:'Video conference', auto:'System auto-open' };
 
   // ===================== LANDING =====================
   function tenderRowHTML(t, kind){
@@ -558,6 +565,8 @@
       b.classList.toggle('text-ink-500', !active);
       b.classList.toggle('border-line', !active);
     });
+    // Refresh the Bid Opening tab so the validity gate reflects current screening state
+    if (name === 'opening' && openingState === 'setup') renderOpening();
     refreshIcons();
   }
   document.querySelectorAll('.ev-tab').forEach(b => b.addEventListener('click', () => setTab(b.dataset.tab)));
@@ -681,106 +690,307 @@
   }
 
   // ===================== TAB 3 — OPENING =====================
+  // ===================== TAB 3 — BID OPENING (3-state ceremony) =====================
   function renderOpening(){
-    const wrap = document.getElementById('tab-opening');
-    const validBids = BIDS.filter(b => b.decision === 'valid');
-    const allScreened = BIDS.every(b => b.decision !== null);
-
-    if (openingDone){
-      wrap.innerHTML = openedRecordHTML(validBids, true);
-      refreshIcons();
+    const existing = localStorage.getItem(OPENING_LS_KEY);
+    if (existing){
+      openingState = 'opened';
+      renderOpeningState3(JSON.parse(existing), false);
       return;
     }
-    // Phase A — pre-opening setup
+    if (openingState === 'confirming'){ renderOpeningState2(); return; }
+    openingState = 'setup';
+    renderOpeningState1();
+  }
+
+  // ---------- STATE 1 — PRE-OPENING SETUP ----------
+  function renderOpeningState1(){
+    const wrap = document.getElementById('tab-opening');
+    const allScreened = BIDS.every(b => b.decision !== null);
+    const validCount = BIDS.filter(b => b.decision === 'valid').length;
+    const rejectedCount = BIDS.filter(b => b.decision === 'rejected').length;
+
     const gate = allScreened
-      ? `<div class="rounded-xl p-3.5 inline-flex items-center gap-2" style="background:#F0FDF4; border:1px solid #BBF7D0; color:#065F46;"><i data-lucide="check-circle-2" class="w-4 h-4"></i> <span class="text-[13px]">${validBids.length} valid bids ready to open</span></div>`
-      : `<div class="rounded-xl p-3.5 flex items-center gap-2" style="background:#FFFBEB; border:1px solid #FCD34D;" role="alert"><i data-lucide="alert-triangle" class="w-4 h-4" style="color:#92400E;"></i> <span class="text-[13px]" style="color:#92400E;">Validity screening must be complete before opening. <a href="#" onclick="setTab('screening');return false;" class="font-semibold underline">Go to Validity Screening →</a></span></div>`;
+      ? `<div style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:10px; padding:12px 16px; margin-bottom:20px;">
+           <span style="font-size:13px; color:#065F46;">✓ ${validCount} valid bids ready to open — validity screening complete · ${rejectedCount} bid${rejectedCount===1?'':'s'} rejected (insufficient EMD)</span>
+         </div>`
+      : `<div style="background:#FFFBEB; border:1px solid #FCD34D; border-radius:10px; padding:12px 16px; margin-bottom:20px;" role="alert">
+           <span style="font-size:13px; color:#92400E;">⚠ Validity screening must be complete before opening.</span>
+           <a href="#" onclick="setTab('screening');return false;" style="font-size:13px; color:#0F5EE8; margin-left:6px;">Go to Validity Screening →</a>
+         </div>`;
+
+    const witnessOpts = (sel) => `<option value="">Select witness…</option>` +
+      WITNESS_OPTIONS.map(w => `<option value="${w}" ${sel===w?'selected':''}>${w}</option>`).join('');
+    const fieldStyle = 'width:100%; background:white; border:1px solid #E5E7EB; border-radius:8px; padding:10px 14px; font-size:13px; color:#111827;';
+    const labelStyle = 'display:block; font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:6px;';
+
+    const modeCard = (id, label) => {
+      const on = openingForm.mode === id;
+      return `<label class="op-mode-card" data-mode="${id}" onclick="pickOpeningMode('${id}')" tabindex="0" onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();pickOpeningMode('${id}');}"
+        style="border:${on?'1.5px':'1px'} solid ${on?'#0F5EE8':'#E5E7EB'}; background:${on?'#EFF6FF':'white'}; border-radius:8px; padding:12px 14px; display:flex; align-items:center; gap:10px; cursor:pointer; font-size:13px; color:${on?'#0C447C':'#374151'};">
+        <span style="width:14px; height:14px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; border:1.5px solid ${on?'#0F5EE8':'#D1D5DB'}; background:${on?'#0F5EE8':'white'};">${on?'<span style=\"width:5px;height:5px;border-radius:50%;background:white;\"></span>':''}</span>
+        ${label}
+      </label>`;
+    };
 
     wrap.innerHTML = `
-      ${gate}
-      <div class="border border-line rounded-xl p-6" style="background:white; ${allScreened?'':'opacity:0.55; pointer-events:none;'}">
-        <div class="text-[16px] font-bold text-ink-900 mb-4">Opening Ceremony Details</div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Opening Officer</label><input value="Rajesh Kumar" readonly class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px]" /></div>
-          <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Opening Date &amp; Time</label><input type="datetime-local" value="2026-05-17T11:42" class="w-full bg-white border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-primary" /></div>
-          <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Witness 1 (required)</label><select class="w-full bg-white border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-primary"><option>Priya Shah</option><option>Amit Patil</option><option>Sunita Rao</option></select></div>
-          <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Witness 2 (required)</label><select class="w-full bg-white border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-primary"><option>Amit Patil</option><option>Priya Shah</option><option>Sunita Rao</option></select></div>
-        </div>
-        <div class="mt-4">
-          <label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-2">Opening Mode</label>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <label class="radio-card selected border border-line rounded-lg p-3 flex items-center gap-2" onclick="pickOpenMode(this,'physical')"><input type="radio" name="openMode" checked class="accent-primary"><span class="text-[13px]">Physical Presence</span></label>
-            <label class="radio-card border border-line rounded-lg p-3 flex items-center gap-2" onclick="pickOpenMode(this,'vc')"><input type="radio" name="openMode" class="accent-primary"><span class="text-[13px]">Video Conference</span></label>
-            <label class="radio-card border border-line rounded-lg p-3 flex items-center gap-2" onclick="pickOpenMode(this,'auto')"><input type="radio" name="openMode" class="accent-primary"><span class="text-[13px]">System Auto-Open</span></label>
+      <div id="openingSetupForm">
+        ${gate}
+        <div class="border border-line rounded-xl" style="background:white; padding:24px;">
+          <div style="font-size:16px; font-weight:700; color:#111827; margin-bottom:4px;">Opening Ceremony Details</div>
+          <div style="font-size:13px; color:#6B7280; margin-bottom:20px;">Fill in all required details before beginning the opening. This creates a permanent timestamped record.</div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div>
+              <label style="${labelStyle}">Opening Officer</label>
+              <div style="position:relative;">
+                <input value="Rajesh Kumar" readonly aria-readonly="true" style="${fieldStyle} background:#F9FAFB; padding-right:34px;" />
+                <i data-lucide="lock" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); width:12px; height:12px; color:#9CA3AF;"></i>
+              </div>
+            </div>
+            <div>
+              <label style="${labelStyle}">Opening Date &amp; Time</label>
+              <input id="opDateTime" type="datetime-local" value="${openingForm.dt}" onchange="openingForm.dt=this.value" style="${fieldStyle}" />
+            </div>
+            <div>
+              <label style="${labelStyle}">Witness 1 <span style="color:#EF4444;">*</span></label>
+              <select id="opW1" onchange="openingForm.w1=this.value; validateWitnesses();" style="${fieldStyle}">${witnessOpts(openingForm.w1)}</select>
+              <div id="opW1Err" style="display:none; font-size:11.5px; color:#EF4444; margin-top:4px;">Select Witness 1</div>
+            </div>
+            <div>
+              <label style="${labelStyle}">Witness 2 <span style="color:#EF4444;">*</span></label>
+              <select id="opW2" onchange="openingForm.w2=this.value; validateWitnesses();" style="${fieldStyle}">${witnessOpts(openingForm.w2)}</select>
+              <div id="opW2Err" style="display:none; font-size:11.5px; color:#EF4444; margin-top:4px;">Witness 2 must be a different officer</div>
+            </div>
           </div>
-          <div id="vcLinkRow" class="hidden mt-3"><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">VC Link</label><input placeholder="https://meet.example.gov.in/..." class="w-full bg-white border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-primary" /></div>
+
+          <div style="margin-top:18px;">
+            <label style="${labelStyle} margin-bottom:8px;">Opening Mode</label>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+              ${modeCard('physical','Physical Presence')}
+              ${modeCard('vc','Video Conference')}
+              ${modeCard('auto','System Auto-Open')}
+            </div>
+            <div id="opVcRow" class="expand-zone" style="${openingForm.mode==='vc'?'max-height:96px;':''}">
+              <div style="padding-top:10px;">
+                <label style="${labelStyle}">VC Link</label>
+                <input id="opVcLink" value="${openingForm.vcLink}" onchange="openingForm.vcLink=this.value" placeholder="Paste meeting link…" style="${fieldStyle}" />
+              </div>
+            </div>
+            <div id="opAutoNote" style="${openingForm.mode==='auto'?'':'display:none;'} margin-top:10px; background:#FFFBEB; border:1px solid #FCD34D; border-radius:8px; padding:10px 14px; font-size:12px; color:#92400E;">
+              System will automatically open at the scheduled bid opening time without manual intervention.
+            </div>
+          </div>
+
+          <div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:10px 14px; margin:16px 0; display:flex; gap:10px; align-items:flex-start; font-size:12px; color:#1E40AF;">
+            <i data-lucide="lock" style="width:14px; height:14px; flex-shrink:0; margin-top:1px;"></i>
+            <span>Financial bids are sealed and will not be opened at this stage. They open only after technical evaluation is complete for all bidders.</span>
+          </div>
+
+          <button id="opBeginBtn" onclick="beginBidOpening()" ${allScreened?'':'disabled aria-disabled="true"'}
+            style="width:100%; ${allScreened?'background:#0F5EE8;':'background:#9CA3AF; cursor:not-allowed;'} color:white; border:none; border-radius:8px; padding:13px; font-size:14px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:8px; transition:all 150ms;"
+            ${allScreened?'onmouseover="this.style.background=\'#0B4BC4\'; this.style.transform=\'translateY(-1px)\'; this.style.boxShadow=\'0 4px 12px rgba(15,94,232,0.25)\';" onmouseout="this.style.background=\'#0F5EE8\'; this.style.transform=\'none\'; this.style.boxShadow=\'none\';"':''}>
+            Begin Bid Opening <i data-lucide="arrow-right" style="width:16px; height:16px;"></i>
+          </button>
         </div>
-        <div class="mt-4 rounded-lg p-3 text-[12px]" style="background:#EFF6FF; border:1px solid #BFDBFE; color:#1D4ED8;">Financial bids are sealed and will not be opened at this stage.</div>
-        <button onclick="confirmBeginOpening(${validBids.length})" class="mt-4 w-full px-4 py-3 rounded-lg bg-primary text-white text-[14px] font-semibold hover:bg-primary/90 inline-flex items-center justify-center gap-2">Begin Bid Opening <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
       </div>`;
     refreshIcons();
   }
-  function pickOpenMode(el, mode){
-    document.querySelectorAll('[name=openMode]').forEach(r => r.closest('.radio-card').classList.remove('selected'));
-    el.classList.add('selected');
-    document.getElementById('vcLinkRow').classList.toggle('hidden', mode !== 'vc');
+
+  function pickOpeningMode(mode){
+    openingForm.mode = mode;
+    document.querySelectorAll('.op-mode-card').forEach(c => {
+      const on = c.dataset.mode === mode;
+      c.style.border = (on?'1.5px':'1px') + ' solid ' + (on?'#0F5EE8':'#E5E7EB');
+      c.style.background = on?'#EFF6FF':'white';
+      c.style.color = on?'#0C447C':'#374151';
+      const dot = c.querySelector('span');
+      dot.style.border = '1.5px solid ' + (on?'#0F5EE8':'#D1D5DB');
+      dot.style.background = on?'#0F5EE8':'white';
+      dot.innerHTML = on?'<span style="width:5px;height:5px;border-radius:50%;background:white;"></span>':'';
+    });
+    const vcRow = document.getElementById('opVcRow');
+    if (vcRow) vcRow.style.maxHeight = mode==='vc' ? '96px' : '0';
+    const autoNote = document.getElementById('opAutoNote');
+    if (autoNote) autoNote.style.display = mode==='auto' ? 'block' : 'none';
   }
-  function confirmBeginOpening(n){
-    openConfirm('Open Bids Now', `You are about to open ${n} bids for TND-2026-001. All bidder names will be revealed simultaneously. This action is permanent and timestamped.`, () => {
-      closeConfirm();
-      runOpeningCeremony();
-    }, 'Open Bids Now →');
+
+  function validateWitnesses(){
+    const w1 = openingForm.w1, w2 = openingForm.w2;
+    const e1 = document.getElementById('opW1Err'), e2 = document.getElementById('opW2Err');
+    let ok = true;
+    if (!w1){ if(e1){ e1.textContent='Select Witness 1'; e1.style.display='block'; } ok=false; }
+    else if (e1){ e1.style.display='none'; }
+    if (!w2){ if(e2){ e2.textContent='Select Witness 2'; e2.style.display='block'; } ok=false; }
+    else if (w2 === w1){ if(e2){ e2.textContent='Witness 2 must be a different officer'; e2.style.display='block'; } ok=false; }
+    else if (e2){ e2.style.display='none'; }
+    return ok;
   }
-  function runOpeningCeremony(){
+
+  function beginBidOpening(){
+    if (!BIDS.every(b => b.decision !== null)) return;
+    if (!validateWitnesses()) return;
+    openingState = 'confirming';
+    renderOpeningState2();
+  }
+
+  // ---------- STATE 2 — CONFIRMATION DIALOG (in-flow, not fixed) ----------
+  let openingEscHandler = null;
+  function renderOpeningState2(){
     const wrap = document.getElementById('tab-opening');
-    wrap.innerHTML = `<div class="bg-white border border-line rounded-xl p-12 text-center">
-      <div class="text-[16px] font-semibold text-ink-900"><span class="ellip">Opening bids</span></div>
-    </div>`;
-    setTimeout(() => {
-      openingDone = true;
-      const validBids = BIDS.filter(b => b.decision === 'valid');
-      wrap.innerHTML = openedRecordHTML(validBids, false);
-      refreshIcons();
-      // stagger reveal rows
-      wrap.querySelectorAll('.opened-row').forEach((r,i) => {
-        r.style.opacity = '0';
-        setTimeout(() => { r.classList.add('row-reveal'); }, i*50);
-      });
-      showToast('Bids opened — 5 bidders revealed');
-    }, 1500);
-  }
-  function openedRecordHTML(validBids, persistent){
-    const banner = persistent
-      ? `<div class="rounded-xl p-3.5 flex items-center gap-2" style="background:#F0FDF4; border:1px solid #BBF7D0; color:#065F46;"><i data-lucide="check-circle-2" class="w-4 h-4"></i><span class="text-[13px]">Bids opened on May 17, 2026 at 11:42 AM · ${validBids.length} bids · Opening log generated</span></div>`
-      : '';
-    const rows = validBids.map((b,i) => `<tr class="opened-row" style="border-top:1px solid #F3F4F6;">
-        <td class="px-3 py-2.5 text-[12.5px]">${i+1}</td>
-        <td class="px-3 py-2.5 text-[12.5px] font-medium text-ink-900">${b.vendorShort}</td>
-        <td class="px-3 py-2.5 text-[12.5px] text-ink-500">${b.company}</td>
-        <td class="px-3 py-2.5 text-[12px] font-mono text-primary">${b.ref}</td>
-        <td class="px-3 py-2.5 text-[12px] text-ink-500">11:42:03 AM</td>
-        <td class="px-3 py-2.5 text-[12px]"><span style="color:#10B981;">✅ Received</span></td>
-        <td class="px-3 py-2.5 text-[12px] text-ink-400"><i data-lucide="lock" class="w-3 h-3 inline -mt-0.5"></i> Sealed</td>
-      </tr>`).join('');
-    return `${banner}
-      <div class="bg-white border border-line rounded-xl overflow-hidden">
-        <div class="overflow-x-auto"><table class="w-full">
-          <thead class="bg-surface text-[10.5px] uppercase tracking-wider text-ink-500 font-semibold">
-            <tr>
-              <th class="text-left px-3 py-2.5">S.No</th><th class="text-left px-3 py-2.5">Bidder Name</th>
-              <th class="text-left px-3 py-2.5">Company</th><th class="text-left px-3 py-2.5">Bid Ref</th>
-              <th class="text-left px-3 py-2.5">Opened At</th><th class="text-left px-3 py-2.5">Technical Bid</th>
-              <th class="text-left px-3 py-2.5">Financial Bid</th>
-            </tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table></div>
+    const validCount = BIDS.filter(b => b.decision === 'valid').length;
+    let form = document.getElementById('openingSetupForm');
+    if (!form){ renderOpeningState1(); form = document.getElementById('openingSetupForm'); }
+    if (form){ form.style.opacity='0.25'; form.style.pointerEvents='none'; form.style.userSelect='none'; }
+
+    const wNames = [openingForm.w1, openingForm.w2].map(w => (w||'').split(' — ')[0]).filter(Boolean).join(', ');
+    const dialog = document.createElement('div');
+    dialog.id = 'openingDialog';
+    dialog.className = 'dialog-in';
+    dialog.setAttribute('role','dialog');
+    dialog.setAttribute('aria-modal','true');
+    dialog.setAttribute('aria-label','Confirm bid opening');
+    dialog.style.cssText = 'background:white; border:1px solid #E5E7EB; border-radius:16px; padding:28px 32px; max-width:440px; margin:24px auto; box-shadow:0 8px 24px rgba(0,0,0,0.1);';
+    dialog.innerHTML = `
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+        <i data-lucide="alert-triangle" style="width:20px; height:20px; color:#F59E0B;"></i>
+        <div style="font-size:17px; font-weight:700; color:#111827; flex:1;">Confirm bid opening</div>
+        <button onclick="cancelOpeningConfirm()" aria-label="Close dialog" style="background:none; border:none; cursor:pointer; font-size:20px; line-height:1; color:#9CA3AF;">×</button>
       </div>
-      <div class="text-[13px] text-ink-500">Opened by: Rajesh Kumar · Witnesses: Priya Shah, Amit Patil · May 17, 2026 · 11:42 AM</div>
-      <div class="flex items-center gap-2 flex-wrap">
-        <button onclick="showToast('Opening Register PDF generated')" class="px-3.5 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Download Opening Register (PDF)</button>
-        <button onclick="location.href='evaluation.html?tender=TND-2026-001'" class="px-3.5 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5">Proceed to Evaluation <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+      <div style="font-size:13px; color:#374151; line-height:1.7; margin-bottom:16px;">You are about to open <strong>${validCount} bids</strong> for <strong>TND-2026-001</strong>. All bidder names and companies will be revealed simultaneously. This action is <strong>permanent and timestamped</strong> — it cannot be undone.</div>
+      <div style="background:#F9FAFB; border-radius:8px; padding:12px 14px; margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:12px;"><span style="color:#6B7280;">Opening officer</span><span style="color:#111827;">Rajesh Kumar</span></div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:12px;"><span style="color:#6B7280;">Witnesses</span><span style="color:#111827;">${wNames}</span></div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:12px;"><span style="color:#6B7280;">Mode</span><span style="color:#111827;">${OPENING_MODE_LABEL[openingForm.mode]}</span></div>
+        <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:#6B7280;">Bids to open</span><span style="color:#0F5EE8; font-weight:700;">${validCount} valid bids</span></div>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button onclick="cancelOpeningConfirm()" style="flex:1; background:#F9FAFB; border:1px solid #E5E7EB; border-radius:8px; padding:10px; font-size:13px; color:#374151; cursor:pointer;">Cancel</button>
+        <button id="opConfirmBtn" onclick="confirmOpenBids()" style="flex:2; background:#0F5EE8; color:white; border:none; border-radius:8px; padding:10px; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">Open bids now <i data-lucide="lock-open" style="width:14px; height:14px;"></i></button>
       </div>`;
+    wrap.appendChild(dialog);
+    refreshIcons();
+    const cb = document.getElementById('opConfirmBtn'); if (cb) cb.focus();
+    openingEscHandler = (e) => { if (e.key === 'Escape') cancelOpeningConfirm(); };
+    document.addEventListener('keydown', openingEscHandler);
+  }
+  function cancelOpeningConfirm(){
+    if (openingEscHandler){ document.removeEventListener('keydown', openingEscHandler); openingEscHandler = null; }
+    openingState = 'setup';
+    renderOpeningState1();
+  }
+  function confirmOpenBids(){
+    if (openingEscHandler){ document.removeEventListener('keydown', openingEscHandler); openingEscHandler = null; }
+    const dialog = document.getElementById('openingDialog');
+    if (dialog){ dialog.style.transition='opacity 200ms ease'; dialog.style.opacity='0'; }
+    setTimeout(() => {
+      const wrap = document.getElementById('tab-opening');
+      wrap.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:80px 20px; gap:14px;">
+        <div role="img" aria-label="Opening bids, please wait" style="width:32px; height:32px; border:2px solid #E5E7EB; border-top:2px solid #0F5EE8; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
+        <div id="openingLoadText" aria-live="polite" style="font-size:15px; color:#6B7280;">Opening bids...</div>
+      </div>`;
+      let dots = 0;
+      const ellipT = setInterval(() => {
+        dots = (dots % 3) + 1;
+        const el = document.getElementById('openingLoadText');
+        if (el) el.textContent = 'Opening bids' + '.'.repeat(dots);
+      }, 400);
+      setTimeout(() => {
+        clearInterval(ellipT);
+        const data = {
+          openedAt: new Date().toISOString(),
+          officer: 'Rajesh Kumar',
+          witnesses: [openingForm.w1, openingForm.w2],
+          mode: openingForm.mode,
+          bidCount: BIDS.filter(b => b.decision === 'valid').length,
+        };
+        localStorage.setItem(OPENING_LS_KEY, JSON.stringify(data));
+        openingState = 'opened';
+        renderOpeningState3(data, true);
+      }, 1800);
+    }, 200);
+  }
+
+  // ---------- STATE 3 — POST-OPENING RECORD ----------
+  function renderOpeningState3(data, animate){
+    const wrap = document.getElementById('tab-opening');
+    const validBids = BIDS.filter(b => b.decision === 'valid');
+    const rejectedCount = BIDS.filter(b => b.decision === 'rejected').length;
+    const wNames = (data.witnesses || []).map(w => (w||'').split(' — ')[0]).filter(Boolean).join(', ') || 'Priya Shah, Amit Patil';
+    const modeLabel = OPENING_MODE_LABEL[data.mode] || 'Physical presence';
+    const thStyle = 'padding:10px 14px; font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; text-align:left;';
+    const tdStyle = 'padding:11px 14px; border-bottom:1px solid #F3F4F6;';
+
+    const rows = validBids.map((b,i) => `
+      <tr class="op-row" role="row" onmouseover="this.style.background='#F8FBFF'" onmouseout="this.style.background='white'" style="background:white;">
+        <td role="cell" style="${tdStyle} font-size:13px; color:#9CA3AF;">${i+1}</td>
+        <td role="cell" style="${tdStyle} font-size:13px; color:#111827; font-weight:700;">${b.vendorShort}</td>
+        <td role="cell" style="${tdStyle} font-size:13px; color:#374151;">${b.company}</td>
+        <td role="cell" style="${tdStyle}"><span style="background:#EFF6FF; color:#0C447C; border-radius:4px; padding:2px 6px; font-size:11px; font-weight:700;">${b.ref}</span></td>
+        <td role="cell" style="${tdStyle} font-size:11px; color:#9CA3AF;">11:42:03 AM</td>
+        <td role="cell" style="${tdStyle}"><span style="background:#F0FDF4; color:#065F46; border-radius:20px; padding:3px 10px; font-size:12px; display:inline-flex; align-items:center; gap:4px;"><i data-lucide="check" style="width:12px;height:12px;"></i> Received</span></td>
+        <td role="cell" style="${tdStyle}"><span title="Financial bids will be opened after technical evaluation is complete" style="background:#F3F4F6; color:#6B7280; border-radius:6px; padding:3px 8px; font-size:12px; display:inline-flex; align-items:center; gap:4px;"><i data-lucide="lock" style="width:12px;height:12px;"></i> Sealed</span></td>
+      </tr>`).join('');
+
+    wrap.innerHTML = `
+      <div role="alert" style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:10px; padding:12px 16px; margin-bottom:16px; display:flex; align-items:center; gap:10px;">
+        <i data-lucide="check-circle-2" style="width:16px; height:16px; color:#10B981; flex-shrink:0;"></i>
+        <span style="font-size:13px; color:#065F46;"><strong>Bids opened on May 17, 2026 at 11:42 AM</strong> · ${validBids.length} bids · Opening log generated · Record is immutable</span>
+      </div>
+      <div style="display:flex; gap:20px; flex-wrap:wrap; margin-bottom:16px;">
+        <div style="display:flex; align-items:center; gap:6px; font-size:12px; color:#6B7280;"><i data-lucide="user" style="width:13px;height:13px;color:#9CA3AF;"></i> ${data.officer || 'Rajesh Kumar'}</div>
+        <div style="display:flex; align-items:center; gap:6px; font-size:12px; color:#6B7280;"><i data-lucide="users" style="width:13px;height:13px;color:#9CA3AF;"></i> ${wNames}</div>
+        <div style="display:flex; align-items:center; gap:6px; font-size:12px; color:#6B7280;"><i data-lucide="building" style="width:13px;height:13px;color:#9CA3AF;"></i> ${modeLabel}</div>
+        <div style="display:flex; align-items:center; gap:6px; font-size:12px; color:#6B7280;"><i data-lucide="clock" style="width:13px;height:13px;color:#9CA3AF;"></i> 11:42:03 AM, May 17 2026</div>
+      </div>
+      <div style="background:#F9FAFB; border-radius:10px; padding:14px 20px; display:flex; gap:28px; margin-bottom:18px; flex-wrap:wrap;">
+        <div style="text-align:center;"><div style="font-size:22px; font-weight:700; color:#111827;">${validBids.length}</div><div style="font-size:11px; color:#6B7280;">Bids opened</div></div>
+        <div style="text-align:center;"><div style="font-size:22px; font-weight:700; color:#10B981;">${validBids.length}</div><div style="font-size:11px; color:#6B7280;">Technical received</div></div>
+        <div style="text-align:center;"><div style="font-size:22px; font-weight:700; color:#6B7280;">${validBids.length}</div><div style="font-size:11px; color:#6B7280;">Financial sealed</div></div>
+        <div style="text-align:center;"><div style="font-size:22px; font-weight:700; color:#EF4444;">${rejectedCount}</div><div style="font-size:11px; color:#6B7280;">Rejected (screening)</div></div>
+      </div>
+      <div role="table" aria-rowcount="${validBids.length+1}" aria-colcount="7" style="border:1px solid #E5E7EB; border-radius:12px; overflow:hidden;">
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse;">
+            <thead><tr role="row" style="background:#F9FAFB; border-bottom:2px solid #E5E7EB;">
+              <th style="${thStyle} width:50px;">S.No</th>
+              <th style="${thStyle} width:120px;">Bidder Name</th>
+              <th style="${thStyle} width:200px;">Company</th>
+              <th style="${thStyle} width:90px;">Bid Ref</th>
+              <th style="${thStyle} width:100px;">Opened At</th>
+              <th style="${thStyle} width:130px;">Technical Bid</th>
+              <th style="${thStyle} width:130px;">Financial Bid</th>
+            </tr></thead>
+            <tbody>${rows}
+              <tr><td colspan="7" style="background:#FEF2F2; border-top:1px solid #FECACA; border-bottom:1px solid #FECACA; padding:6px 14px; font-size:11px; color:#991B1B; font-style:italic; text-align:center;">— ${rejectedCount} bid${rejectedCount===1?'':'s'} rejected during validity screening (insufficient EMD) — not eligible for opening —</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="display:flex; gap:12px; margin-top:18px;">
+        <button onclick="downloadOpeningRegister()" style="flex:1; background:white; border:1px solid #E5E7EB; border-radius:8px; padding:10px 16px; font-size:12px; color:#374151; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 150ms;" onmouseover="this.style.background='#F9FAFB'; this.style.borderColor='#D1D5DB';" onmouseout="this.style.background='white'; this.style.borderColor='#E5E7EB';"><i data-lucide="download" style="width:14px;height:14px;"></i> Download Opening Register (PDF)</button>
+        <button onclick="location.href='evaluation.html?tender=TND-2026-001'" style="flex:2; background:#10B981; color:white; border:none; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 150ms;" onmouseover="this.style.background='#059669'; this.style.transform='translateY(-1px)';" onmouseout="this.style.background='#10B981'; this.style.transform='none';">Proceed to Evaluation <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></button>
+      </div>
+      <div id="openingToast" style="display:none; background:#111827; color:white; border-radius:8px; padding:10px 16px; font-size:12px; margin-top:16px; text-align:center; opacity:0; transition:opacity 300ms ease;"></div>`;
+    refreshIcons();
+    if (animate){
+      wrap.querySelectorAll('.op-row').forEach((r,i) => {
+        r.style.animation = 'rowReveal 300ms ease both';
+        r.style.animationDelay = (i*80) + 'ms';
+      });
+    }
+  }
+
+  function downloadOpeningRegister(){
+    const t = document.getElementById('openingToast');
+    if (!t) return;
+    t.textContent = 'Opening Register PDF generated';
+    t.style.display = 'block';
+    requestAnimationFrame(() => { t.style.opacity = '1'; });
+    setTimeout(() => {
+      t.style.opacity = '0';
+      setTimeout(() => { t.style.display = 'none'; }, 300);
+    }, 3000);
   }
 
   // ===================== TAB 4 — SINGLE BID HANDLER =====================
