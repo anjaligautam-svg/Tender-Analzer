@@ -106,14 +106,14 @@
           <li><a href="tender-creation.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="file-plus-2" class="w-4 h-4"></i> Tender Creation</a></li>
           <li><a href="prebid-queries.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="messages-square" class="w-4 h-4"></i> Pre-Bid Queries
             <span class="ml-auto bg-primary text-white text-[10px] font-semibold rounded-full px-1.5 py-0.5">11</span></a></li>
-          <li><a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="gavel" class="w-4 h-4"></i> Bid Management</a></li>
+          <li><a href="bid-management.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="gavel" class="w-4 h-4"></i> Bid Management</a></li>
         </ul>
       </div>
       <div>
         <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">EVALUATING</div>
         <ul class="space-y-0.5">
           <li><a href="evaluation.html" aria-current="page" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] bg-primary-light text-primary font-medium"><i data-lucide="clipboard-check" class="w-4 h-4"></i> Evaluation</a></li>
-          <li><a href="evaluation.html#financial" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="git-compare" class="w-4 h-4"></i> Comparative Stateme…</a></li>
+          <li><a href="comparative-statement.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="git-compare" class="w-4 h-4"></i> Bid Comparison</a></li>
           <li><a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="sparkles" class="w-4 h-4"></i> AI Assistant</a></li>
         </ul>
       </div>
@@ -865,6 +865,27 @@
     }
     VERDICTS[k] = cur;
     showToast('Verdict saved');
+    // ----- Equal Treatment Checker -----
+    if (sel.value === 'clarif'){
+      const sameIssue = BIDDERS.filter(b => !STATE.rejectedAtValidity.includes(b.id)
+        && b.id !== currentCell.bidderId
+        && (VERDICTS[`${b.id}-${currentCell.critId}`] || {}).v === 'clarif');
+      if (sameIssue.length){
+        const critName = (CRITERIA.find(c => c.id === currentCell.critId) || {}).name || 'this criterion';
+        const names = sameIssue.map(b => b.short).join(', ');
+        const verb = sameIssue.length > 1 ? 'have' : 'has';
+        renderTechnical();
+        closeCellPanel();
+        setTimeout(() => openConfirm({
+          title: 'Equal Treatment Check',
+          body: `<strong>${names}</strong> ${verb} the same open issue on <strong>${critName}</strong>. To ensure equal treatment of all bidders, raise the same clarification request for ${sameIssue.length > 1 ? 'them' : 'this bidder'} too.`,
+          icon: 'scale', iconBg: 'bg-primary-light text-primary',
+          actionLabel: 'Yes, raise for all',
+          action: () => showToast(`Clarification raised for ${sameIssue.length + 1} bidders — equal-treatment decision logged`)
+        }), 220);
+        return;
+      }
+    }
     if (next){
       const idx = CRITERIA.findIndex(c => c.id === currentCell.critId);
       if (idx < CRITERIA.length - 1){
@@ -1003,7 +1024,9 @@
             <div class="text-success inline-flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4"></i> ${l1Dev > 0 ? '+' : ''}${l1Dev.toFixed(1)}% ${l1Dev < 0 ? 'below' : 'above'} estimate (${fmtINR(ESTIMATE)})</div>
             <div class="text-success inline-flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4"></i> Within TS value of ${fmtINR(TS)}</div>
           </div>
-        </section>`;
+        </section>
+
+        ${rateSpreadSectionHTML(sortedQuotes)}`;
     }
 
     document.getElementById('tab-financial').innerHTML = `
@@ -1018,6 +1041,59 @@
     `;
     refreshIcons();
   }
+  // Per-item rate spread analysis (Tab 3)
+  const BOQ_RATE_ITEMS = [
+    { item:'1', desc:'Earthwork excavation in ordinary soil', unit:'cu.m', qty:1200, est:185,  rates:[178, 192, 188] },
+    { item:'2', desc:'Providing & laying granular sub-base', unit:'cu.m', qty:850,  est:1420, rates:[1390, 1455, 1410] },
+    { item:'3', desc:'Bituminous macadam, 50mm compacted', unit:'sq.m', qty:9500, est:340,  rates:[240, 290, 360] },
+    { item:'4', desc:'Reinforced cement concrete, grade M25', unit:'cu.m', qty:240,  est:6800, rates:[6600, 6950, 6720] },
+    { item:'5', desc:'Thermoplastic road marking paint', unit:'sq.m', qty:600,  est:520,  rates:[498, 540, 515] },
+  ];
+  function rateSpreadSectionHTML(sortedQuotes){
+    const top3 = sortedQuotes.slice(0, 3);
+    if (top3.length < 3) return '';
+    const labels = ['L1','L2','L3'];
+    const headRates = top3.map((b,i) => `<th class="text-right px-3 py-2.5">${labels[i]} Rate<div class="text-[10px] font-normal text-ink-400">${b.short}</div></th>`).join('');
+    const rows = BOQ_RATE_ITEMS.map(it => {
+      const rmin = Math.min(...it.rates), rmax = Math.max(...it.rates);
+      const spread = ((rmax - rmin) / rmin) * 100;
+      const high = spread > 30;
+      const rateCells = it.rates.map(r => `<td class="text-right px-3 py-2.5 ${r===rmin?'text-success font-semibold':'text-ink-900'}">${fmtINR(r)}</td>`).join('');
+      return `<tr class="${high?'bg-warning-light/60':''}">
+        <td class="px-3 py-2.5 text-ink-500">${it.item}</td>
+        <td class="px-3 py-2.5 text-ink-900">${it.desc}<div class="text-[11px] text-ink-400">${it.unit} · qty ${it.qty.toLocaleString('en-IN')}</div></td>
+        ${rateCells}
+        <td class="text-right px-3 py-2.5 text-ink-500">${fmtINR(it.est)}</td>
+        <td class="text-right px-3 py-2.5 font-semibold ${high?'text-warning':'text-ink-900'}">${spread.toFixed(1)}%</td>
+        <td class="px-3 py-2.5 text-[11.5px]">${high?'<span class="inline-flex items-center gap-1 text-warning"><i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> Unusual spread — possible cartel pricing signal</span>':'<span class="text-ink-400">—</span>'}</td>
+      </tr>`;
+    }).join('');
+    return `
+      <section>
+        <details class="bg-white border border-line rounded-xl overflow-hidden">
+          <summary class="px-5 py-3.5 text-[13.5px] font-semibold text-ink-900 cursor-pointer hover:bg-surface flex items-center gap-2"><i data-lucide="bar-chart-3" class="w-4 h-4 text-primary"></i> Rate Spread Analysis — per BOQ line item</summary>
+          <div class="border-t border-line">
+            <div class="px-5 py-3 text-[12px] text-ink-500">Compares the lowest three bidders' rates on each BOQ line item. A spread above 30% between bidders on a single item is flagged as a possible cartel pricing signal.</div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-[12.5px]">
+                <thead class="bg-surface text-[10.5px] uppercase tracking-wider text-ink-500 font-semibold">
+                  <tr>
+                    <th class="text-left px-3 py-2.5 w-12">Item</th>
+                    <th class="text-left px-3 py-2.5">Description</th>
+                    ${headRates}
+                    <th class="text-right px-3 py-2.5">Estimate</th>
+                    <th class="text-right px-3 py-2.5">Spread %</th>
+                    <th class="text-left px-3 py-2.5">Signal</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-line">${rows}</tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      </section>`;
+  }
+
   function openFinancialBids(){
     openConfirm({
       title: 'Open Financial Bids',
@@ -1061,6 +1137,35 @@
         <div class="bg-white border border-line rounded-xl p-5"><div class="text-[24px] font-bold text-success">4</div><div class="text-[12.5px] text-ink-500 mt-1 inline-flex items-center gap-1"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Clear</div></div>
         <div class="bg-white border border-line rounded-xl p-5"><div class="text-[24px] font-bold text-danger">${pending}</div><div class="text-[12.5px] text-ink-500 mt-1 inline-flex items-center gap-1"><i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> Pending Response</div></div>
       </div>
+
+      <!-- Submission timing analysis -->
+      <section class="bg-white border border-line rounded-xl p-5">
+        <div class="flex items-center gap-2 mb-1"><i data-lucide="clock" class="w-4 h-4 text-primary"></i><h3 class="text-[15px] font-bold text-ink-900">Submission Timing Analysis</h3></div>
+        <p class="text-[12.5px] text-ink-500 mb-4">When each bid was submitted across the final 24 hours before the deadline (8 May 2026, 11:59 PM). Three or more bids inside a 60-second window is flagged as coordinated submission.</p>
+        <div class="relative" style="height:46px; margin:0 6px;">
+          <div class="absolute left-0 right-0" style="top:21px; height:2px; background:#E5E7EB;"></div>
+          <div class="absolute" style="left:95.5%; right:-2px; top:6px; bottom:6px; background:rgba(239,68,68,0.10); border:1px dashed #EF4444; border-radius:6px;" role="img" aria-label="Coordinated submission cluster"></div>
+          ${[
+            { name:'Sharma Infra Works', time:'02:15 AM', pos:9, cluster:false },
+            { name:'NCC Infrastructure', time:'08:40 AM', pos:36, cluster:false },
+            { name:'Patil & Associates', time:'02:20 PM', pos:60, cluster:false },
+            { name:'Rajesh Constructions', time:'11:58:12 PM', pos:97.0, cluster:true },
+            { name:'Maharashtra Roads Co.', time:'11:58:34 PM', pos:98.3, cluster:true },
+            { name:'BuildTech Solutions', time:'11:58:59 PM', pos:99.6, cluster:true },
+          ].map(d => `<div class="absolute" style="left:${d.pos}%; top:15px; transform:translateX(-50%);" title="${d.name} — 8 May, ${d.time}">
+            <div class="w-3.5 h-3.5 rounded-full border-2 border-white" style="background:${d.cluster?'#EF4444':'#0F5EE8'}; box-shadow:0 0 0 1px ${d.cluster?'#EF4444':'#0F5EE8'};"></div>
+          </div>`).join('')}
+        </div>
+        <div class="flex justify-between text-[10.5px] text-ink-400 mt-1"><span>24 h before deadline</span><span>Deadline · 11:59 PM</span></div>
+        <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-1">
+          ${[
+            ['Sharma Infra Works','8 May, 02:15 AM',false],['NCC Infrastructure','8 May, 08:40 AM',false],
+            ['Patil & Associates','8 May, 02:20 PM',false],['Rajesh Constructions','8 May, 11:58:12 PM',true],
+            ['Maharashtra Roads Co.','8 May, 11:58:34 PM',true],['BuildTech Solutions','8 May, 11:58:59 PM',true],
+          ].map(([n,t,c]) => `<div class="flex items-center gap-2 text-[12px]"><span class="w-2 h-2 rounded-full shrink-0" style="background:${c?'#EF4444':'#0F5EE8'};"></span><span class="text-ink-900">${n}</span><span class="text-ink-400 ml-auto font-mono text-[11px]">${t}</span></div>`).join('')}
+        </div>
+        <div role="alert" class="mt-3 bg-danger-light border border-danger/30 rounded-lg px-3 py-2 text-[12.5px] text-ink-900 flex items-start gap-2"><i data-lucide="alert-octagon" class="w-4 h-4 text-danger shrink-0 mt-0.5"></i> <span><strong>3 bids submitted within 47 seconds</strong> of each other — coordinated submission detected. Officer response is required on the Submission Timing Anomaly flag below.</span></div>
+      </section>
 
       <!-- Within tender -->
       <section>
@@ -1131,13 +1236,13 @@
           <div class="mt-3 bg-white border border-line rounded-lg overflow-hidden">
             <table class="w-full text-[12.5px]">
               <thead class="bg-surface text-[10.5px] uppercase tracking-wider text-ink-500 font-semibold">
-                <tr><th class="text-left px-3 py-2">Tender</th><th class="text-left px-3 py-2">Winner</th><th class="text-left px-3 py-2">L2</th><th class="text-right px-3 py-2">L2 Margin</th></tr>
+                <tr><th class="text-left px-3 py-2">Tender</th><th class="text-left px-3 py-2">Winner (L1)</th><th class="text-left px-3 py-2">L2</th><th class="text-right px-3 py-2">L2 Margin</th><th class="text-left px-3 py-2">L3</th><th class="text-right px-3 py-2">L3 Margin</th></tr>
               </thead>
               <tbody class="divide-y divide-line">
-                <tr><td class="px-3 py-2 font-mono text-[11.5px]">TND-2025-034</td><td class="px-3 py-2">Rajesh Constructions</td><td class="px-3 py-2">Maharashtra Roads</td><td class="px-3 py-2 text-right text-warning font-medium">+2.1%</td></tr>
-                <tr><td class="px-3 py-2 font-mono text-[11.5px]">TND-2025-067</td><td class="px-3 py-2">Maharashtra Roads</td><td class="px-3 py-2">NCC Infrastructure</td><td class="px-3 py-2 text-right text-warning font-medium">+1.8%</td></tr>
-                <tr><td class="px-3 py-2 font-mono text-[11.5px]">TND-2025-089</td><td class="px-3 py-2">NCC Infrastructure</td><td class="px-3 py-2">Rajesh Constructions</td><td class="px-3 py-2 text-right text-warning font-medium">+2.4%</td></tr>
-                <tr class="bg-warning-light/40"><td class="px-3 py-2 font-mono text-[11.5px]">TND-2026-001</td><td class="px-3 py-2">Rajesh Constructions <span class="text-ink-400">(current)</span></td><td class="px-3 py-2 text-ink-400">?</td><td class="px-3 py-2 text-right text-ink-400">—</td></tr>
+                <tr><td class="px-3 py-2 font-mono text-[11.5px]">TND-2025-034</td><td class="px-3 py-2">Rajesh Constructions</td><td class="px-3 py-2">Maharashtra Roads</td><td class="px-3 py-2 text-right text-warning font-medium">+2.1%</td><td class="px-3 py-2">NCC Infrastructure</td><td class="px-3 py-2 text-right text-warning font-medium">+4.0%</td></tr>
+                <tr><td class="px-3 py-2 font-mono text-[11.5px]">TND-2025-067</td><td class="px-3 py-2">Maharashtra Roads</td><td class="px-3 py-2">NCC Infrastructure</td><td class="px-3 py-2 text-right text-warning font-medium">+1.8%</td><td class="px-3 py-2">Rajesh Constructions</td><td class="px-3 py-2 text-right text-warning font-medium">+3.9%</td></tr>
+                <tr><td class="px-3 py-2 font-mono text-[11.5px]">TND-2025-089</td><td class="px-3 py-2">NCC Infrastructure</td><td class="px-3 py-2">Rajesh Constructions</td><td class="px-3 py-2 text-right text-warning font-medium">+2.4%</td><td class="px-3 py-2">Maharashtra Roads</td><td class="px-3 py-2 text-right text-warning font-medium">+4.3%</td></tr>
+                <tr class="bg-warning-light/40"><td class="px-3 py-2 font-mono text-[11.5px]">TND-2026-001</td><td class="px-3 py-2">Rajesh Constructions <span class="text-ink-400">(current)</span></td><td class="px-3 py-2 text-ink-400">?</td><td class="px-3 py-2 text-right text-ink-400">—</td><td class="px-3 py-2 text-ink-400">?</td><td class="px-3 py-2 text-right text-ink-400">—</td></tr>
               </tbody>
             </table>
           </div>
@@ -1189,11 +1294,58 @@
   }
 
   // ===================== TAB 5 — COMMITTEE =====================
-  const COMMITTEE = [
-    { id:'ps', name:'Priya Shah', role:'Technical Officer', initials:'PS', signed:false, dissent:null, scores:{rc:82,mr:74,bt:68} },
-    { id:'ap', name:'Amit Patil', role:'Finance Officer',   initials:'AP', signed:false, dissent:null, scores:{rc:79,mr:76,bt:65} },
-    { id:'sr', name:'Sunita Rao', role:'Deputy Commissioner',initials:'SR', signed:false, dissent:null, scores:{rc:85,mr:71,bt:72} },
+  const SCORE_CRITERIA = [
+    { id:'meth',  name:'Methodology & Approach', max:20 },
+    { id:'team',  name:'Team Qualifications',    max:15 },
+    { id:'exp',   name:'Relevant Experience',    max:25 },
+    { id:'fin',   name:'Financial Capacity',     max:20 },
+    { id:'equip', name:'Equipment & Resources',  max:20 },
   ];
+  const COMMITTEE = [
+    { id:'ps', name:'Priya Shah', role:'Technical Officer', initials:'PS', signed:false, dissent:null,
+      cs:{ rc:{meth:17,team:12,exp:21,fin:16,equip:16}, mr:{meth:15,team:11,exp:18,fin:15,equip:15}, bt:{meth:14,team:10,exp:17,fin:14,equip:13} } },
+    { id:'ap', name:'Amit Patil', role:'Finance Officer',   initials:'AP', signed:false, dissent:null,
+      cs:{ rc:{meth:16,team:12,exp:20,fin:16,equip:15}, mr:{meth:16,team:11,exp:19,fin:15,equip:15}, bt:{meth:13,team:10,exp:16,fin:13,equip:13} } },
+    { id:'sr', name:'Sunita Rao', role:'Deputy Commissioner',initials:'SR', signed:false, dissent:null,
+      cs:{ rc:{meth:18,team:13,exp:22,fin:16,equip:16}, mr:{meth:14,team:11,exp:17,fin:15,equip:14}, bt:{meth:17,team:13,exp:21,fin:16,equip:16} } },
+  ];
+  function memberTotal(m, bid){ return SCORE_CRITERIA.reduce((s,c) => s + ((m.cs[bid] || {})[c.id] || 0), 0); }
+  function bidderScoreCardHTML(b){
+    const totals = COMMITTEE.map(m => memberTotal(m, b.id));
+    const avgTotal = totals.reduce((a,c)=>a+c,0) / totals.length;
+    const dev = Math.max(...totals) - Math.min(...totals);
+    const critRows = SCORE_CRITERIA.map(c => {
+      const scores = COMMITTEE.map(m => (m.cs[b.id] || {})[c.id] || 0);
+      const cavg = scores.reduce((a,s)=>a+s,0) / scores.length;
+      return `<tr>
+        <td class="px-4 py-2.5 text-ink-900">${c.name}</td>
+        <td class="px-3 py-2.5 text-center text-ink-400">/ ${c.max}</td>
+        ${scores.map(s => `<td class="px-3 py-2.5 text-center text-ink-900">${s}</td>`).join('')}
+        <td class="px-3 py-2.5 text-center font-semibold text-ink-900">${cavg.toFixed(1)}</td>
+      </tr>`;
+    }).join('');
+    return `<div class="bg-white border border-line rounded-xl overflow-hidden">
+      <div class="px-4 py-3 bg-surface border-b border-line flex items-center justify-between gap-3 flex-wrap">
+        <div class="text-[13.5px] font-semibold text-ink-900">${b.name}</div>
+        <div class="text-[12px] text-ink-500">Combined average: <strong class="text-ink-900">${avgTotal.toFixed(1)} / 100</strong> · spread <span class="${dev>15?'text-danger font-semibold':'text-success'}">${dev} pts ${dev>15?'⚠':'✓'}</span></div>
+      </div>
+      <div class="overflow-x-auto"><table class="w-full text-[12.5px]">
+        <thead class="bg-white text-[10.5px] uppercase tracking-wider text-ink-500 font-semibold border-b border-line">
+          <tr><th class="text-left px-4 py-2.5">Criterion</th><th class="text-center px-3 py-2.5">Max</th>
+            ${COMMITTEE.map(m => `<th class="text-center px-3 py-2.5">${m.name.split(' ')[0]}</th>`).join('')}
+            <th class="text-center px-3 py-2.5">Avg</th></tr>
+        </thead>
+        <tbody class="divide-y divide-line">${critRows}
+          <tr class="bg-surface font-semibold">
+            <td class="px-4 py-2.5 text-ink-900">Total</td><td class="px-3 py-2.5 text-center text-ink-500">/ 100</td>
+            ${totals.map(t => `<td class="px-3 py-2.5 text-center text-ink-900">${t}</td>`).join('')}
+            <td class="px-3 py-2.5 text-center text-primary">${avgTotal.toFixed(1)}</td>
+          </tr>
+        </tbody>
+      </table></div>
+      <div class="px-4 py-2 text-[11.5px] text-ink-500 border-t border-line inline-flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-success"></i> Per-criterion justifications recorded by all 3 members</div>
+    </div>`;
+  }
   function renderCommittee(){
     const constituted = STATE.committeeConstituted;
     const allScored = STATE.committeeScored;
@@ -1215,34 +1367,29 @@
         </div>
       </div>`).join('');
 
+    let deviationBidder = null;
+    tqBidders.forEach(b => {
+      const totals = COMMITTEE.map(m => memberTotal(m, b.id));
+      if (Math.max(...totals) - Math.min(...totals) > 15) deviationBidder = b;
+    });
     const scoringTable = allScored ? `
-      <div class="bg-white border border-line rounded-xl overflow-hidden">
-        <table class="w-full text-[13px]">
-          <thead class="bg-surface text-[10.5px] uppercase tracking-wider text-ink-500 font-semibold">
-            <tr>
-              <th class="text-left px-4 py-3">Bidder</th>
-              ${COMMITTEE.map(m => `<th class="text-right px-4 py-3">${m.name.split(' ')[0]}</th>`).join('')}
-              <th class="text-right px-4 py-3">Average</th>
-              <th class="text-right px-4 py-3">Deviation</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-line">
-            ${tqBidders.map(b => {
-              const scores = COMMITTEE.map(m => m.scores[b.id] || 0);
-              const avg = scores.reduce((a,c)=>a+c,0) / scores.length;
-              const dev = Math.max(...scores) - Math.min(...scores);
-              return `<tr><td class="px-4 py-3 font-medium text-ink-900">${b.name}</td>
-                ${scores.map(s => `<td class="px-4 py-3 text-right text-ink-900">${s}</td>`).join('')}
-                <td class="px-4 py-3 text-right font-semibold text-ink-900">${avg.toFixed(1)}</td>
-                <td class="px-4 py-3 text-right ${dev>15?'text-danger font-semibold':'text-success'}">${dev.toFixed(1)} ${dev>15?'⚠':'✓'}</td></tr>`;
-            }).join('')}
-          </tbody>
-        </table>
-      </div>` : `
+      ${deviationBidder ? `
+      <div role="alert" class="bg-warning-light border border-warning/40 rounded-xl px-4 py-3 mb-3">
+        <div class="flex items-start gap-2.5">
+          <i data-lucide="alert-triangle" class="w-4 h-4 text-warning shrink-0 mt-0.5"></i>
+          <div class="flex-1">
+            <p class="text-[13px] text-ink-900"><strong>Large scoring deviation detected for ${deviationBidder.name}.</strong> Committee member totals differ by more than 15 points. Discuss and reconcile before finalising the evaluation.</p>
+            <textarea id="devNote" rows="2" class="field mt-2" placeholder="Committee discussion note — record how the deviation was reconciled…"></textarea>
+            <button onclick="(document.getElementById('devNote').value.trim() ? showToast('Discussion note recorded in audit trail') : showToast('Add a discussion note first'))" class="mt-2 px-3 py-1.5 rounded-lg bg-warning text-white text-[12px] font-medium hover:bg-warning/90 inline-flex items-center gap-1.5"><i data-lucide="check" class="w-3.5 h-3.5"></i> Record discussion</button>
+          </div>
+        </div>
+      </div>` : ''}
+      <p class="text-[12px] text-ink-500 mb-3">Each technical criterion is scored independently by every committee member. Totals are auto-calculated. Justification is recorded per criterion, per member.</p>
+      <div class="space-y-3">${tqBidders.map(b => bidderScoreCardHTML(b)).join('')}</div>` : `
       <div class="bg-primary-light border border-primary-border rounded-xl px-4 py-3 flex items-start gap-2.5">
         <i data-lucide="clock" class="w-4 h-4 text-primary shrink-0 mt-0.5"></i>
         <div class="flex-1">
-          <p class="text-[13px] text-ink-900">Scoring in progress — waiting for all 3 committee members to submit scores. Results hidden until all submit.</p>
+          <p class="text-[13px] text-ink-900">Independent blind scoring in progress — each member sees only their own panel. Other members' scores stay locked until all 3 submit, then reveal simultaneously.</p>
           <div class="mt-2 flex items-center gap-3"><div class="flex-1 h-2 bg-line rounded-full overflow-hidden"><div class="h-full bg-primary rounded-full" style="width: 67%;"></div></div><div class="text-[12px] text-ink-500">2 of 3 scored</div></div>
         </div>
         <button onclick="STATE.committeeScored = true; renderCommittee(); showToast('All scores submitted — results revealed')" class="px-3 py-1.5 rounded-lg bg-primary text-white text-[12px] font-medium hover:bg-primary/90">Simulate all scored</button>
@@ -1258,7 +1405,7 @@
         </div>
         <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">${memberSlots}</div>
         <div class="mt-3 flex items-center gap-3">
-          <button class="text-[12.5px] text-primary hover:underline inline-flex items-center gap-1"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Member</button>
+          <button onclick="addCommitteeMember()" class="text-[12.5px] text-primary hover:underline inline-flex items-center gap-1"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Member</button>
           ${!constituted ? `<button onclick="STATE.committeeConstituted = true; renderCommittee(); showToast('Committee constituted — 3 members notified')" class="ml-auto px-4 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5 shadow-soft">Constitute Committee <i data-lucide="arrow-right" class="w-4 h-4"></i></button>` : `<span class="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-success-light text-success text-[12px] font-semibold"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Committee constituted</span>`}
         </div>
       </section>
@@ -1317,6 +1464,24 @@
       </section>` : ''}
     `;
     refreshIcons();
+  }
+  function addCommitteeMember(){
+    openConfirm({
+      title: 'Add Committee Member',
+      body: 'Select an officer to add to the evaluation committee. The tender-creating officer is excluded automatically.',
+      icon: 'user-plus', iconBg: 'bg-primary-light text-primary',
+      extraHtml: `<div class="mt-3 space-y-2">
+        <label class="radio-card"><input type="radio" name="newMember" value="Vikram Naik"><div><div class="text-[13.5px] font-medium text-ink-900">Vikram Naik</div><div class="text-[12px] text-ink-500">Senior Engineer</div></div></label>
+        <label class="radio-card"><input type="radio" name="newMember" value="Meena Joshi"><div><div class="text-[13.5px] font-medium text-ink-900">Meena Joshi</div><div class="text-[12px] text-ink-500">Accounts Officer</div></div></label>
+        <label class="radio-card opacity-50 cursor-not-allowed" title="Conflict of interest"><input type="radio" name="newMember" disabled><div><div class="text-[13.5px] font-medium text-ink-900">Rajesh Kumar</div><div class="text-[12px] text-danger">Conflict of interest — created this tender, cannot evaluate</div></div></label>
+      </div>`,
+      actionLabel: 'Add to Committee',
+      action: () => {
+        const sel = document.querySelector('input[name="newMember"]:checked');
+        if (!sel){ showToast('Select an officer first'); return; }
+        showToast(`${sel.value} added to the evaluation committee`);
+      }
+    });
   }
   function recordDissent(memberId){
     openConfirm({
