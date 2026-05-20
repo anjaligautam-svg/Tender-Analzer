@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bid Management — TenderAI Hub</title>
+  <meta name="description" content="Monitor bid submissions, run the formal opening ceremony, and process validity screening for published tenders." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>
+    tailwind.config = { theme: { extend: {
+      fontFamily: { sans: ['"DM Sans"', 'system-ui', 'sans-serif'] },
+      colors: {
+        primary: { DEFAULT: '#0F5EE8', light: '#EFF6FF', border: '#93C5FD' },
+        success: { DEFAULT: '#10B981', light: '#F0FDF4' },
+        warning: { DEFAULT: '#F59E0B', light: '#FFFBEB' },
+        danger:  { DEFAULT: '#EF4444', light: '#FEF2F2' },
+        ink: { 900: '#111827', 500: '#6B7280', 400: '#9CA3AF' },
+        line: '#E5E7EB', surface: '#F9FAFB',
+      },
+      boxShadow: { soft: '0 1px 3px rgba(0,0,0,0.08)', lift: '0 4px 12px rgba(0,0,0,0.12)' },
+    }}};
+  </script>
+  <style>
+    html, body { font-family: 'DM Sans', system-ui, sans-serif; color: #111827; background: #F9FAFB; }
+    *:focus-visible { outline: 2px solid #0F5EE8; outline-offset: 2px; border-radius: 4px; }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 8px; }
+    ::-webkit-scrollbar-thumb:hover { background: #D1D5DB; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    .stat-card { transition: all .15s ease; }
+    .stat-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); transform: translateY(-1px); }
+    .bm-row { transition: background .15s ease; cursor: pointer; }
+    .bm-row:hover { background: #F0F7FF; }
+    .ev-tab { transition: all .15s ease; }
+    .toast { transform: translateY(80px); opacity: 0; transition: transform .3s cubic-bezier(.2,.7,.2,1), opacity .25s ease; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    @keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+    .pulse-dot { animation: pulse-dot 1.5s ease-in-out infinite; }
+    @keyframes pulse-amber { 0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,.5);} 50% { box-shadow: 0 0 0 6px rgba(245,158,11,0);} }
+    .pulse-amber { animation: pulse-amber 1.6s ease-in-out infinite; }
+    @keyframes ellip { 0% { content:'.'; } 33% { content:'..'; } 66% { content:'...'; } }
+    .ellip::after { content:'...'; animation: ellip 1.2s steps(1) infinite; }
+    @keyframes rowReveal { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform: translateY(0); } }
+    .row-reveal { animation: rowReveal .3s ease forwards; }
+    .radio-card { transition: all .15s ease; cursor: pointer; }
+    .radio-card:hover { border-color: #93C5FD; }
+    .radio-card.selected { border-color: #0F5EE8; background: #EFF6FF; }
+    .expand-zone { max-height: 0; overflow: hidden; transition: max-height .2s ease; }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+  </style>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="w-[244px] shrink-0 bg-white border-r border-line flex flex-col" aria-label="Primary">
+    <div class="px-5 pt-5 pb-4 border-b border-line">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-[15px]">T</div>
+        <div>
+          <div class="text-[15px] font-semibold text-ink-900 leading-tight">TenderAI</div>
+          <div class="text-[11px] text-ink-500 leading-tight">Procurement Portal</div>
+        </div>
+      </div>
+      <button class="mt-4 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-line bg-surface hover:bg-white hover:shadow-soft transition" aria-label="Switch organisation">
+        <div class="w-7 h-7 rounded-md bg-primary-light text-primary flex items-center justify-center"><i data-lucide="building-2" class="w-4 h-4"></i></div>
+        <div class="text-left flex-1 min-w-0">
+          <div class="text-[12.5px] font-medium text-ink-900 truncate">Ahmedabad</div>
+          <div class="text-[10.5px] text-ink-500 truncate">Municipal Corporation</div>
+        </div>
+        <i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 text-ink-400"></i>
+      </button>
+    </div>
+    <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+      <div>
+        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">OVERVIEW</div>
+        <ul class="space-y-0.5">
+          <li><a href="index.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">TENDERING</div>
+        <ul class="space-y-0.5">
+          <li><a href="dpr-creation.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="clipboard-list" class="w-4 h-4"></i> DPR Creation</a></li>
+          <li><a href="tender-creation.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="file-plus-2" class="w-4 h-4"></i> Tender Creation</a></li>
+          <li><a href="prebid-queries.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="messages-square" class="w-4 h-4"></i> Pre-Bid Queries</a></li>
+          <li><a href="bid-management.html" aria-current="page" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] bg-primary-light text-primary font-medium"><i data-lucide="gavel" class="w-4 h-4"></i> Bid Management</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">EVALUATING</div>
+        <ul class="space-y-0.5">
+          <li><a href="evaluation.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="clipboard-check" class="w-4 h-4"></i> Evaluation</a></li>
+          <li><a href="comparative-statement.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="git-compare" class="w-4 h-4"></i> Bid Comparison</a></li>
+          <li><a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="sparkles" class="w-4 h-4"></i> AI Assistant</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">POST AWARD</div>
+        <ul class="space-y-0.5">
+          <li><a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Analytics</a></li>
+        </ul>
+      </div>
+    </nav>
+    <div class="border-t border-line px-4 py-3 flex items-center gap-3">
+      <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div>
+      <div class="flex-1 min-w-0">
+        <div class="text-[12.5px] font-medium text-ink-900 truncate">Rajesh Kumar</div>
+        <div class="text-[10.5px] text-ink-500 truncate">Super Admin</div>
+      </div>
+      <button onclick="sessionStorage.clear(); location.href='login.html'" aria-label="Sign out" class="text-ink-400 hover:text-ink-900"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN COLUMN ============ -->
+  <div class="flex-1 flex flex-col min-w-0">
+    <!-- Topnav -->
+    <header class="h-16 bg-white border-b border-line px-6 flex items-center gap-4 sticky top-0 z-30">
+      <button aria-label="Toggle sidebar" class="text-ink-500 hover:text-ink-900"><i data-lucide="panel-left" class="w-5 h-5"></i></button>
+      <div class="flex-1 max-w-xl relative">
+        <i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+        <input type="search" placeholder="Search tenders, bids, vendors…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] placeholder:text-ink-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+      </div>
+      <button class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">FY 2026-27 <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+      <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500"><i data-lucide="bell" class="w-4 h-4"></i></button>
+      <div class="flex items-center gap-2 pl-2 border-l border-line">
+        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div>
+        <div class="hidden md:block"><div class="text-[12.5px] font-medium text-ink-900 leading-tight">Rajesh Kumar</div></div>
+        <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto px-8 py-6">
+
+      <!-- ============================================== -->
+      <!-- SCREEN 1 — BID MANAGEMENT LANDING                -->
+      <!-- ============================================== -->
+      <section id="screen-landing" class="space-y-6">
+        <div>
+          <div class="text-[13px] text-ink-500"><a href="index.html" class="hover:text-ink-900">Dashboard</a> <span class="mx-1 text-ink-400">/</span> Bid Management</div>
+          <h1 class="text-[24px] font-bold text-ink-900 leading-tight mt-1">Bid Management</h1>
+          <p class="text-[14px] text-ink-500 mt-1">Monitor bid submissions, run the formal opening ceremony, and process validity screening for published tenders.</p>
+        </div>
+
+        <!-- Stats row -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="stat-card bg-white border border-line rounded-xl p-5">
+            <div class="flex items-center justify-between mb-2"><div class="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center"><i data-lucide="inbox" class="w-4 h-4"></i></div><span class="text-[10.5px] uppercase tracking-wider text-ink-400 font-semibold">Active</span></div>
+            <div class="text-[26px] font-bold text-ink-900 leading-none">3</div>
+            <div class="text-[12px] text-ink-500 mt-1">Active Bid Windows</div>
+            <div class="text-[12px] text-warning mt-0.5 font-medium">1 closes in 48 hours</div>
+          </div>
+          <div class="stat-card bg-white border border-line rounded-xl p-5">
+            <div class="flex items-center justify-between mb-2"><div class="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center"><i data-lucide="layers" class="w-4 h-4"></i></div><span class="text-[10.5px] uppercase tracking-wider text-ink-400 font-semibold">Received</span></div>
+            <div class="text-[26px] font-bold text-ink-900 leading-none">24</div>
+            <div class="text-[12px] text-ink-500 mt-1">Total Bids Received</div>
+            <div class="text-[12px] text-primary mt-0.5 font-medium">6 from new vendors</div>
+          </div>
+          <div class="stat-card bg-white border border-line rounded-xl p-5">
+            <div class="flex items-center justify-between mb-2"><div class="w-9 h-9 rounded-lg bg-warning-light text-warning flex items-center justify-center"><i data-lucide="lock" class="w-4 h-4"></i></div><span class="text-[10.5px] uppercase tracking-wider text-warning font-semibold">Pending</span></div>
+            <div class="text-[26px] font-bold text-warning leading-none">2</div>
+            <div class="text-[12px] text-ink-500 mt-1">Pending Opening</div>
+            <div class="text-[12px] text-danger mt-0.5 font-medium">Overdue by 1 day</div>
+          </div>
+          <div class="stat-card bg-white border border-line rounded-xl p-5">
+            <div class="flex items-center justify-between mb-2"><div class="w-9 h-9 rounded-lg bg-success-light text-success flex items-center justify-center"><i data-lucide="check-circle-2" class="w-4 h-4"></i></div><span class="text-[10.5px] uppercase tracking-wider text-success font-semibold">Done</span></div>
+            <div class="text-[26px] font-bold text-ink-900 leading-none">8</div>
+            <div class="text-[12px] text-ink-500 mt-1">Completed</div>
+            <div class="text-[12px] text-success mt-0.5 font-medium">This financial year</div>
+          </div>
+        </div>
+
+        <!-- Search -->
+        <div class="relative">
+          <i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+          <input id="bmSearch" oninput="renderTenderLists(this.value)" placeholder="Search tenders…" class="w-full bg-white border border-line rounded-lg pl-9 pr-3 py-2.5 text-[13px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+        </div>
+
+        <!-- Active bid windows -->
+        <section>
+          <div class="text-[11px] uppercase tracking-[0.08em] text-ink-500 font-semibold mb-2">Active Bid Windows</div>
+          <div id="activeList" class="bg-white border border-line rounded-xl overflow-hidden"></div>
+        </section>
+
+        <!-- Pending opening -->
+        <section>
+          <div class="text-[11px] uppercase tracking-[0.08em] text-ink-500 font-semibold mb-2">Pending Opening</div>
+          <div id="pendingList" class="bg-white border border-line rounded-xl overflow-hidden"></div>
+        </section>
+
+        <!-- Completed -->
+        <section>
+          <div class="text-[11px] uppercase tracking-[0.08em] text-ink-500 font-semibold mb-2">Completed</div>
+          <button id="completedToggle" onclick="toggleCompleted()" class="text-[13px] text-ink-500 hover:text-ink-900 inline-flex items-center gap-1">Show 8 completed <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i></button>
+          <div id="completedList" class="hidden mt-2 bg-white border border-line rounded-xl overflow-hidden"></div>
+        </section>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- SCREEN 2 — TENDER BID WORKSPACE                  -->
+      <!-- ============================================== -->
+      <section id="screen-workspace" class="hidden space-y-5">
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <div class="text-[13px] text-ink-500">
+            <a href="index.html" class="hover:text-ink-900">Dashboard</a>
+            <span class="mx-1.5 text-ink-400">/</span>
+            <a href="#" onclick="showLanding(); return false;" class="hover:text-ink-900">Bid Management</a>
+            <span class="mx-1.5 text-ink-400">/</span>
+            <span id="wsCrumb" class="text-ink-900 font-mono">TND-2026-001</span>
+          </div>
+          <a href="#" onclick="showLanding(); return false;" class="text-[13px] text-ink-500 hover:text-ink-900 inline-flex items-center gap-1.5"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back</a>
+        </div>
+
+        <!-- Tender header bar -->
+        <div class="bg-white border border-line rounded-xl flex flex-col lg:flex-row lg:items-center justify-between gap-4" style="padding:16px 20px;">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span id="wsBadge" class="text-[11.5px] font-bold text-primary font-mono" style="background:#EFF6FF; border-radius:6px; padding:2px 8px;">TND-2026-001</span>
+              <span id="wsName" class="text-[16px] font-bold text-ink-900">Supply of Desktop Computers for AMC Offices</span>
+            </div>
+            <div id="wsMeta" class="text-[12px] text-ink-500 mt-1">IT · Goods · Est. ₹45,00,000</div>
+          </div>
+          <div class="text-right">
+            <div id="wsPhasePill" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-semibold" style="background:#FFFBEB; color:#92400E;"><span class="w-1.5 h-1.5 rounded-full pulse-amber" style="background:#F59E0B;"></span> Bid Window Open</div>
+            <div id="wsCountdown" class="text-[12px] text-ink-500 mt-1">Closes May 20 · 3 days left</div>
+          </div>
+        </div>
+
+        <!-- Timeline strip -->
+        <div class="bg-white border border-line rounded-xl p-5 relative group">
+          <div class="text-[11px] italic absolute" style="top:12px; right:16px; color:#9CA3AF;">Click any date to edit</div>
+          <div class="relative">
+            <div class="absolute top-2 left-3 right-3 h-0.5 bg-line"></div>
+            <div id="tlFill" class="absolute top-2 left-3 h-0.5 bg-primary" style="width:50%; transition:width 200ms ease;"></div>
+            <div id="tlMilestones" class="relative grid grid-cols-4"></div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div role="tablist" aria-label="Bid workspace tabs" class="flex flex-wrap gap-2">
+          <button role="tab" data-tab="monitor" class="ev-tab px-4 py-1.5 rounded-full text-[13px] border border-primary bg-primary text-white"><i data-lucide="activity" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1"></i> Bid Monitor</button>
+          <button role="tab" data-tab="screening" class="ev-tab px-4 py-1.5 rounded-full text-[13px] border border-line bg-white text-ink-500 hover:text-ink-900"><i data-lucide="shield-check" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1"></i> Validity Screening</button>
+          <button role="tab" data-tab="opening" class="ev-tab px-4 py-1.5 rounded-full text-[13px] border border-line bg-white text-ink-500 hover:text-ink-900"><i data-lucide="unlock" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1"></i> Bid Opening</button>
+          <button role="tab" data-tab="single" class="ev-tab px-4 py-1.5 rounded-full text-[13px] border border-line bg-white text-ink-500 hover:text-ink-900"><i data-lucide="alert-triangle" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1"></i> Single Bid Handler</button>
+        </div>
+
+        <!-- TAB 1 — BID MONITOR -->
+        <section id="tab-monitor" role="tabpanel" class="space-y-5">
+          <div class="bg-white border border-line rounded-xl p-8 text-center">
+            <div class="text-[64px] font-bold text-primary leading-none" id="bmLiveCount" aria-live="polite">6</div>
+            <div class="text-[16px] text-ink-500 mt-1">bids received</div>
+            <div class="text-[11px] text-ink-400 mt-2 inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full pulse-dot" style="background:#10B981;"></span> Updated just now</div>
+          </div>
+
+          <div class="border border-line rounded-xl p-5" style="background:white;">
+            <div class="flex items-center justify-between gap-3 flex-wrap">
+              <div class="text-[14px] font-bold text-ink-900">Participation Health</div>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11.5px] font-semibold" style="background:#FFFBEB; color:#92400E;"><span class="w-1.5 h-1.5 rounded-full" style="background:#F59E0B;"></span> At Risk</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+              <div><div class="text-[20px] font-bold text-ink-900">6</div><div class="text-[12px] text-ink-500">Bids received</div></div>
+              <div><div class="text-[20px] font-bold text-ink-900">34</div><div class="text-[12px] text-ink-500">Downloads</div><div class="text-[11px] text-ink-400">17.6% converted to bids</div></div>
+              <div><div class="text-[20px] font-bold text-ink-900">8–12 bids</div><div class="text-[12px] text-ink-500">Benchmark</div><div class="text-[11px] text-ink-400">Typical for this sector/value</div></div>
+            </div>
+            <div class="mt-4 rounded-lg p-3.5" style="background:#FFFBEB; border:1px solid #FCD34D;" role="alert">
+              <div class="text-[13px]" style="color:#92400E;">✦ Only 2 bids received with 1 day remaining on similar tenders. This window has 6 bids — below the 8–12 benchmark. Consider extending the deadline by 7 days to improve competition.</div>
+              <div class="mt-2.5 flex items-center gap-2">
+                <button onclick="toggleExtendForm()" class="px-3 py-1.5 rounded-lg text-[12.5px] font-medium inline-flex items-center gap-1.5" style="border:1px solid #F59E0B; color:#92400E; background:white;">Extend Deadline <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+                <button onclick="dismissExtendRec(this)" class="text-[12.5px] text-ink-500 hover:text-ink-900">Dismiss</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Extension form -->
+          <div id="extendForm" class="expand-zone">
+            <div class="bg-white border border-line rounded-xl p-5">
+              <div class="text-[14px] font-bold text-ink-900 mb-3">Extend Bid Deadline</div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">New deadline</label>
+                  <input type="date" value="2026-05-27" class="w-full bg-white border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-primary" />
+                </div>
+                <div>
+                  <label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Reason for extension</label>
+                  <select id="extReason" onchange="updateExtReason()" class="w-full bg-white border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-primary">
+                    <option>Low bid participation</option>
+                    <option>Corrigendum issued</option>
+                    <option>Portal technical issue</option>
+                    <option>Public holiday conflict</option>
+                    <option>Other</option>
+                  </select>
+                  <div id="extRecommend" class="text-[11px] text-ink-400 mt-1">Minimum recommended extension: 7 days based on reason selected</div>
+                </div>
+              </div>
+              <div class="mt-3 rounded-lg p-3 text-[12px]" style="background:#FFFBEB; border:1px solid #FCD34D; color:#92400E;">⚠ This tender has already been extended 1 time. Multiple extensions attract CVC scrutiny.</div>
+              <label class="mt-3 flex items-center gap-2 text-[12.5px] text-ink-900"><input type="checkbox" checked class="accent-primary"> Notify all downloading vendors — 34 vendors will be notified</label>
+              <div class="text-[11px] text-ink-400 mt-2">Extension history: Extended once before — May 5 (reason: corrigendum)</div>
+              <div class="mt-4 flex items-center justify-end gap-2">
+                <button onclick="toggleExtendForm()" class="px-3.5 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">Cancel</button>
+                <button onclick="applyExtension()" class="px-3.5 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5">Apply Extension &amp; Notify <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Funnel -->
+          <div class="bg-white border border-line rounded-xl p-5">
+            <div class="text-[14px] font-bold text-ink-900 mb-3">Download → Bid Funnel</div>
+            <div class="space-y-2.5">
+              <div><div class="flex justify-between text-[12px] mb-1"><span class="text-ink-500">34 vendors downloaded</span><span class="font-semibold text-ink-900">34</span></div><div class="h-3 rounded-full" style="background:#0F5EE8; width:100%;"></div></div>
+              <div><div class="flex justify-between text-[12px] mb-1"><span class="text-ink-500">6 submitted bids</span><span class="font-semibold text-ink-900">6</span></div><div class="h-3 rounded-full" style="background:#10B981; width:17.6%;"></div></div>
+              <div><div class="flex justify-between text-[12px] mb-1"><span class="text-ink-500">Passed validity screening</span><span class="font-semibold text-ink-900" id="funnelValid">— pending</span></div><div id="funnelValidBar" class="h-3 rounded-full" style="background:#8B5CF6; width:0%; transition:width 300ms ease;"></div></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 2 — VALIDITY SCREENING -->
+        <section id="tab-screening" role="tabpanel" class="hidden space-y-4">
+          <div>
+            <h3 class="text-[18px] font-bold text-ink-900">Validity Screening</h3>
+            <p class="text-[13px] text-ink-500">Screen all submitted bids before opening. Bids failing validity are rejected here — not during evaluation.</p>
+          </div>
+          <div>
+            <div class="flex items-center justify-between text-[12px] mb-1"><span id="screenProgressLabel" class="text-ink-500" aria-live="polite">0 of 6 bids screened</span></div>
+            <div class="h-1.5 rounded-full bg-line overflow-hidden"><div id="screenProgressBar" class="h-full bg-primary" style="width:0%; transition:width 200ms ease;"></div></div>
+          </div>
+          <div id="screeningCards" class="space-y-3"></div>
+          <div class="sticky bottom-0 bg-white border border-line rounded-xl p-3.5 flex items-center justify-between gap-3 flex-wrap shadow-soft">
+            <div id="screenSummary" class="text-[13px] text-ink-900 flex items-center gap-3"></div>
+            <button id="proceedOpeningBtn" onclick="setTab('opening')" disabled class="px-3.5 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed">All bids screened — Proceed to Opening <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+          </div>
+        </section>
+
+        <!-- TAB 3 — BID OPENING -->
+        <section id="tab-opening" role="tabpanel" class="hidden space-y-5"></section>
+
+        <!-- TAB 4 — SINGLE BID HANDLER -->
+        <section id="tab-single" role="tabpanel" class="hidden space-y-5">
+          <div class="rounded-xl p-6" style="background:#FEF2F2; border:1px solid #FECACA;" role="alert">
+            <div class="text-[18px] font-bold" style="color:#991B1B;">⚠ Only 1 valid bid received</div>
+            <div class="text-[14px] mt-1" style="color:#7F1D1D;">Minimum 3 bids are recommended for competitive procurement. A single bid requires special handling and additional approvals.</div>
+          </div>
+          <div class="text-[14px] font-bold text-ink-900">Decision required</div>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <label class="radio-card bg-white border border-line rounded-xl p-5 block" data-single="accept" onclick="selectSingle('accept')">
+              <div class="flex items-start gap-3">
+                <input type="radio" name="singleDecision" class="accent-primary mt-1">
+                <div>
+                  <div class="text-[15px] font-bold text-ink-900">Accept Single Bid</div>
+                  <div class="text-[13px] text-ink-500 mt-1">Proceed with the single bid. Requires HOD approval and detailed justification. Enhanced scrutiny applies.</div>
+                  <div class="text-[11.5px] text-ink-400 mt-2">HOD approval · Written justification · Enhanced performance security may be required</div>
+                </div>
+              </div>
+            </label>
+            <label class="radio-card bg-white border border-line rounded-xl p-5 block" data-single="retender" onclick="selectSingle('retender')">
+              <div class="flex items-start gap-3">
+                <input type="radio" name="singleDecision" class="accent-primary mt-1">
+                <div>
+                  <div class="text-[15px] font-bold text-ink-900">Re-Tender</div>
+                  <div class="text-[13px] text-ink-500 mt-1">Cancel this tender and re-issue with revised specifications or extended timeline to attract more bidders.</div>
+                  <div class="text-[11.5px] text-ink-400 mt-2">Document reason for re-tender · Clone existing tender · Fast-track approval</div>
+                </div>
+              </div>
+            </label>
+          </div>
+          <div id="singleAcceptForm" class="hidden bg-white border border-line rounded-xl p-5 space-y-3">
+            <div>
+              <label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Justification (required, min 100 words)</label>
+              <textarea rows="4" class="w-full bg-white border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-primary" placeholder="Why is single bid acceptance justified?"></textarea>
+              <div class="text-[11px] text-ink-400 mt-1">Valid reasons: proprietary technology, emergency situation, single source, highly specialised work</div>
+            </div>
+            <div class="rounded-lg p-3 text-[12px]" style="background:#EFF6FF; border:1px solid #BFDBFE; color:#1D4ED8;">HOD approval required — routed via the same approval chain as CVC Review in tender creation.</div>
+            <div>
+              <label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Single Bid Acceptance Note (AI drafted, editable)</label>
+              <div contenteditable="true" class="w-full bg-white border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-primary" style="min-height:80px;">This office recommends acceptance of the single bid received for TND-2026-002 on the grounds that the work is of a specialised nature and the bid quoted is within the estimated cost. Enhanced performance security is recommended given the absence of competitive tension.</div>
+            </div>
+            <div class="flex justify-end"><button onclick="showToast('Sent for HOD approval')" class="px-3.5 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90">Send for HOD Approval →</button></div>
+          </div>
+          <div id="singleRetenderForm" class="hidden bg-white border border-line rounded-xl p-5 space-y-3">
+            <div>
+              <label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Reason for re-tender</label>
+              <select class="w-full bg-white border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-primary">
+                <option>Insufficient response</option><option>All bids NTQ</option><option>Bids above TS value</option><option>Changed scope</option><option>Other</option>
+              </select>
+            </div>
+            <label class="flex items-center gap-2 text-[12.5px] text-ink-900"><input type="checkbox" checked class="accent-primary"> Clone this tender</label>
+            <div class="rounded-lg p-3 text-[12px]" style="background:#EFF6FF; border:1px solid #BFDBFE; color:#1D4ED8;">✦ Suggested changes: Consider relaxing PQ turnover threshold by 20% to attract more bidders. <span class="italic">(editable)</span></div>
+            <div class="flex justify-end"><button onclick="location.href='tender-creation.html'" class="px-3.5 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90">Create Re-Tender →</button></div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- Confirmation modal -->
+<div id="confirmModal" role="dialog" aria-modal="true" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(15,39,68,0.4);">
+  <div class="bg-white shadow-lift w-full" style="max-width:480px; border-radius:16px; padding:28px;">
+    <h3 id="confirmTitle" class="text-[18px] font-bold text-ink-900">Confirm</h3>
+    <p id="confirmBody" class="text-[13px] text-ink-500 mt-2"></p>
+    <div class="mt-6 flex justify-end gap-2">
+      <button onclick="closeConfirm()" class="px-3.5 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">Cancel</button>
+      <button id="confirmOkBtn" class="px-3.5 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-ink-900 text-white text-[13px] px-4 py-3 rounded-xl shadow-lift inline-flex items-center gap-2.5">
+  <i data-lucide="check-circle-2" class="w-4 h-4 text-success"></i>
+  <span id="toastMsg">Done</span>
+</div>
+
+<script>
+  function refreshIcons(){ if (window.lucide) lucide.createIcons(); }
+  let toastT = null;
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastT);
+    toastT = setTimeout(() => t.classList.remove('show'), 2600);
+  }
+
+  // ===================== DATA =====================
+  const ACTIVE_TENDERS = [
+    { id:'TND-2026-001', name:'Supply of Desktop Computers', dept:'IT', sector:'Goods', cost:'₹45,00,000', status:'open', dot:'#F59E0B', bids:'6 bids received', deadline:'Closes May 20 · 3 days left', dl:'text-success' },
+    { id:'TND-2026-002', name:'Road Maintenance Phase 2', dept:'Infrastructure', sector:'Works', cost:'₹45,00,000', status:'risk', dot:'#EF4444', bids:'2 bids received', bidsWarn:'Below threshold', deadline:'Closes May 18 · 1 day left', dl:'text-danger' },
+    { id:'TND-2026-003', name:'Water Pipeline Kalyan', dept:'Water', sector:'Works', cost:'₹1,20,00,000', status:'healthy', dot:'#10B981', bids:'9 bids received', deadline:'Closes Jun 1 · 14 days left', dl:'text-success' },
+  ];
+  const PENDING_TENDERS = [
+    { id:'TND-2025-089', name:'Office Furniture', dept:'Admin', sector:'Goods', cost:'₹18,00,000', dot:'#EF4444', bids:'5 bids', deadline:'Closed May 8 · Open now', dl:'text-danger' },
+  ];
+  const COMPLETED_TENDERS = [
+    { id:'TND-2025-067', name:'Security Guard Services', dept:'Admin', sector:'Services', bids:'12 bids', deadline:'Opened Apr 28' },
+    { id:'TND-2025-054', name:'Vehicle Servicing AMC', dept:'Transport', sector:'Services', bids:'7 bids', deadline:'Opened Apr 15' },
+    { id:'TND-2025-041', name:'Stationery Annual Contract', dept:'Admin', sector:'Goods', bids:'4 bids', deadline:'Opened Mar 30' },
+    { id:'TND-2025-032', name:'Garden Maintenance', dept:'Parks', sector:'Services', bids:'9 bids', deadline:'Opened Mar 12' },
+    { id:'TND-2025-024', name:'IT Helpdesk AMC', dept:'IT', sector:'Services', bids:'6 bids', deadline:'Opened Feb 28' },
+    { id:'TND-2024-098', name:'Water Tankers Procurement', dept:'Water', sector:'Goods', bids:'8 bids', deadline:'Opened Feb 10' },
+    { id:'TND-2024-087', name:'Solar Panel Installation', dept:'Energy', sector:'Goods', bids:'11 bids', deadline:'Opened Jan 22' },
+    { id:'TND-2024-076', name:'Building Repairs Zone 3', dept:'Infrastructure', sector:'Works', bids:'5 bids', deadline:'Opened Jan 8' },
+  ];
+
+  // 6 bids for the TND-2026-001 demo workspace
+  const BIDS = [
+    { ref:'BID-001', vendorShort:'Vendor A', company:'Rajesh Constructions', submitted:'May 17, 11:43 AM', emdReq:90000, emdGot:90000, emdMode:'Online Payment', feeReq:1000, feeGot:1000, validReq:'Aug 20, 2026', validGot:'Aug 20, 2026', decision:null },
+    { ref:'BID-002', vendorShort:'Vendor B', company:'Maharashtra Roads Co.', submitted:'May 17, 10:18 AM', emdReq:90000, emdGot:90000, emdMode:'Online Payment', feeReq:1000, feeGot:1000, validReq:'Aug 20, 2026', validGot:'Aug 20, 2026', decision:null },
+    { ref:'BID-003', vendorShort:'Vendor C', company:'BuildTech Solutions', submitted:'May 16, 4:55 PM', emdReq:90000, emdGot:90000, emdMode:'Bank Guarantee', feeReq:1000, feeGot:1000, validReq:'Aug 20, 2026', validGot:'Aug 20, 2026', decision:null },
+    { ref:'BID-004', vendorShort:'Vendor D', company:'NCC Infrastructure', submitted:'May 17, 9:02 AM', emdReq:90000, emdGot:90000, emdMode:'Online Payment', feeReq:1000, feeGot:1000, validReq:'Aug 20, 2026', validGot:'Aug 20, 2026', decision:null },
+    { ref:'BID-005', vendorShort:'Vendor E', company:'Patil & Associates', submitted:'May 17, 11:10 AM', emdReq:90000, emdGot:90000, emdMode:'Online Payment', feeReq:1000, feeGot:1000, validReq:'Aug 20, 2026', validGot:'Aug 20, 2026', decision:null },
+    { ref:'BID-006', vendorShort:'Vendor F', company:'Shreeji Builders', submitted:'May 17, 11:58 AM', emdReq:90000, emdGot:85000, emdMode:'Online Payment', feeReq:1000, feeGot:1000, validReq:'Aug 20, 2026', validGot:'Aug 20, 2026', decision:null, fail:'emd' },
+  ];
+
+  const TIMELINE = [
+    { label:'Tender Published',    date:'2026-05-01' },
+    { label:'Bid Submission Opens',date:'2026-05-03' },
+    { label:'Bid Deadline',        date:'2026-05-20' },
+    { label:'Bid Opening',         date:'2026-05-21' },
+  ];
+
+  let openingDone = false;
+
+  // ===================== LANDING =====================
+  function tenderRowHTML(t, kind){
+    const right = kind === 'completed'
+      ? `<div class="shrink-0 text-right" style="width:150px;"><div class="text-[12px] text-ink-500">${t.bids}</div><div class="text-[11px] text-ink-400">${t.deadline}</div></div>`
+      : `<div class="shrink-0 text-center" style="width:150px;"><div class="text-[12px] text-ink-500">${t.bids}</div>${t.bidsWarn?`<div class="text-[11px] font-bold" style="color:#F59E0B;">${t.bidsWarn}</div>`:''}</div>
+         <div class="shrink-0 text-right" style="width:160px;"><div class="text-[12px] font-bold ${t.dl}">${t.deadline}</div></div>`;
+    return `<div class="bm-row" onclick="openWorkspace('${t.id}')" tabindex="0" role="button" onkeydown="if(event.key==='Enter')openWorkspace('${t.id}')" style="padding:14px 16px; border-bottom:1px solid #F3F4F6; display:flex; align-items:center; gap:16px;">
+      <span class="w-2 h-2 rounded-full shrink-0" style="background:${t.dot || '#9CA3AF'};"></span>
+      <span class="font-mono text-[12px] font-semibold ${kind==='completed'?'':'text-primary'} shrink-0" style="background:${kind==='completed'?'#F3F4F6':'#EFF6FF'}; color:${kind==='completed'?'#6B7280':'#0F5EE8'}; border-radius:4px; padding:2px 6px; width:108px; text-align:center;">${t.id}</span>
+      <div class="flex-1 min-w-0">
+        <div class="text-[14px] font-medium ${kind==='completed'?'':'text-ink-900'} truncate" style="${kind==='completed'?'color:#6B7280;':''}">${t.name}</div>
+        <div class="text-[12px] text-ink-400">${t.dept} · ${t.sector}</div>
+      </div>
+      ${right}
+      <i data-lucide="chevron-right" class="w-4 h-4 text-ink-400 shrink-0"></i>
+    </div>`;
+  }
+  function renderTenderLists(filter){
+    const q = (filter || '').toLowerCase();
+    const f = arr => arr.filter(t => !q || t.name.toLowerCase().includes(q) || t.id.toLowerCase().includes(q) || t.dept.toLowerCase().includes(q));
+    const empty = '<div class="text-center text-[13px] text-ink-500 italic py-8">No tenders match this search</div>';
+    document.getElementById('activeList').innerHTML = f(ACTIVE_TENDERS).map(t => tenderRowHTML(t,'active')).join('') || empty;
+    document.getElementById('pendingList').innerHTML = f(PENDING_TENDERS).map(t => tenderRowHTML(t,'pending')).join('') || empty;
+    document.getElementById('completedList').innerHTML = f(COMPLETED_TENDERS).map(t => tenderRowHTML(t,'completed')).join('') || empty;
+    refreshIcons();
+  }
+  function toggleCompleted(){
+    const list = document.getElementById('completedList');
+    const btn = document.getElementById('completedToggle');
+    const hidden = list.classList.toggle('hidden');
+    btn.innerHTML = hidden ? 'Show 8 completed <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>' : 'Hide completed <i data-lucide="chevron-up" class="w-3.5 h-3.5"></i>';
+    refreshIcons();
+  }
+
+  // ===================== ROUTING =====================
+  function showLanding(){
+    try { history.replaceState(null,'',location.pathname); } catch(e){}
+    document.getElementById('screen-workspace').classList.add('hidden');
+    document.getElementById('screen-landing').classList.remove('hidden');
+    renderTenderLists(document.getElementById('bmSearch')?.value || '');
+    window.scrollTo({ top:0 });
+  }
+  function openWorkspace(id){
+    try { history.replaceState(null,'','?tender='+encodeURIComponent(id)); } catch(e){}
+    const t = [...ACTIVE_TENDERS,...PENDING_TENDERS,...COMPLETED_TENDERS].find(x => x.id === id);
+    if (t){
+      document.getElementById('wsCrumb').textContent = t.id;
+      document.getElementById('wsBadge').textContent = t.id;
+      document.getElementById('wsName').textContent = t.name;
+      document.getElementById('wsMeta').textContent = `${t.dept} · ${t.sector}${t.cost?' · Est. '+t.cost:''}`;
+      if (t.deadline){ document.getElementById('wsCountdown').textContent = t.deadline; }
+    }
+    document.getElementById('screen-landing').classList.add('hidden');
+    document.getElementById('screen-workspace').classList.remove('hidden');
+    renderTimeline();
+    renderScreening();
+    renderOpening();
+    setTab('monitor');
+    window.scrollTo({ top:0 });
+    refreshIcons();
+  }
+
+  // ===================== TIMELINE =====================
+  function fmtDate(iso){ return new Date(iso+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}); }
+  function renderTimeline(){
+    const wrap = document.getElementById('tlMilestones');
+    const today = new Date('2026-05-17');
+    wrap.innerHTML = TIMELINE.map((m,i) => {
+      const md = new Date(m.date+'T00:00:00');
+      const done = md < today;
+      const active = md.toDateString() === today.toDateString();
+      const dotCls = done ? 'bg-success' : (active ? 'bg-primary pulse-amber' : 'bg-line');
+      return `<div class="text-center">
+        <div class="w-4 h-4 rounded-full ${dotCls} mx-auto flex items-center justify-center" style="margin-bottom:8px;">${done?'<i data-lucide="check" class="w-2.5 h-2.5 text-white"></i>':''}</div>
+        <div class="text-[11.5px] font-semibold text-ink-900">${m.label}</div>
+        <input type="date" value="${m.date}" onchange="TIMELINE[${i}].date=this.value; renderTimeline(); showToast('Date updated');" class="text-[11px] text-ink-500 bg-transparent border-none text-center cursor-pointer hover:text-primary" style="width:100px;" />
+      </div>`;
+    }).join('');
+    refreshIcons();
+  }
+
+  // ===================== TABS =====================
+  const TABS = ['monitor','screening','opening','single'];
+  function setTab(name){
+    TABS.forEach(t => document.getElementById('tab-'+t).classList.toggle('hidden', t !== name));
+    document.querySelectorAll('.ev-tab').forEach(b => {
+      const active = b.dataset.tab === name;
+      b.classList.toggle('bg-primary', active);
+      b.classList.toggle('text-white', active);
+      b.classList.toggle('border-primary', active);
+      b.classList.toggle('bg-white', !active);
+      b.classList.toggle('text-ink-500', !active);
+      b.classList.toggle('border-line', !active);
+    });
+    refreshIcons();
+  }
+  document.querySelectorAll('.ev-tab').forEach(b => b.addEventListener('click', () => setTab(b.dataset.tab)));
+
+  // ===================== TAB 1 — MONITOR =====================
+  function toggleExtendForm(){
+    const z = document.getElementById('extendForm');
+    const open = z.style.maxHeight && z.style.maxHeight !== '0px';
+    z.style.maxHeight = open ? '0px' : '600px';
+  }
+  function updateExtReason(){
+    const r = document.getElementById('extReason').value;
+    const map = { 'Low bid participation':'7 days', 'Corrigendum issued':'10 days', 'Portal technical issue':'3 days', 'Public holiday conflict':'2 days', 'Other':'7 days' };
+    document.getElementById('extRecommend').textContent = `Minimum recommended extension: ${map[r]} based on reason selected`;
+  }
+  function dismissExtendRec(btn){ btn.closest('[role=alert]').style.display='none'; }
+  function applyExtension(){ toggleExtendForm(); showToast('Deadline extended — 34 vendors notified'); }
+
+  // ===================== TAB 2 — SCREENING =====================
+  function renderScreening(){
+    const wrap = document.getElementById('screeningCards');
+    wrap.innerHTML = BIDS.map((b,i) => screeningCardHTML(b,i)).join('');
+    updateScreeningSummary();
+    refreshIcons();
+  }
+  function screeningCardHTML(b,i){
+    const emdPass = b.emdGot >= b.emdReq;
+    const decided = b.decision !== null;
+    const checkRow = (icon, name, detail, pass) => {
+      const ic = pass ? '<i data-lucide="check-circle-2" class="w-4 h-4" style="color:#10B981;"></i>'
+                       : '<i data-lucide="x-circle" class="w-4 h-4" style="color:#EF4444;"></i>';
+      const res = pass ? '<span class="text-[11.5px] font-semibold" style="color:#10B981;">Pass</span>'
+                       : '<span class="text-[11.5px] font-semibold" style="color:#EF4444;">Fail</span>';
+      return `<div class="flex items-start gap-2.5 py-2" style="border-top:1px solid #F3F4F6;">
+        ${ic}
+        <div class="flex-1 min-w-0"><div class="text-[12.5px] font-medium text-ink-900">${name}</div><div class="text-[11.5px] text-ink-500">${detail}</div></div>
+        ${res}
+      </div>`;
+    };
+    const emdDetail = emdPass
+      ? `Required: ₹${b.emdReq.toLocaleString('en-IN')} · Submitted: ₹${b.emdGot.toLocaleString('en-IN')} via ${b.emdMode}`
+      : `Required: ₹${b.emdReq.toLocaleString('en-IN')} · Submitted: ₹${b.emdGot.toLocaleString('en-IN')} — Short by ₹${(b.emdReq-b.emdGot).toLocaleString('en-IN')}`;
+    const allPass = emdPass; // fee + validity always pass in demo
+
+    let statusPill, footer;
+    if (b.decision === 'valid'){
+      statusPill = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold" style="background:#F0FDF4; color:#10B981;">Valid — confirmed</span>`;
+      footer = `<div class="mt-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-semibold" style="background:#F0FDF4; color:#10B981;"><i data-lucide="check" class="w-3.5 h-3.5"></i> Valid — eligible for opening</div>`;
+    } else if (b.decision === 'rejected'){
+      statusPill = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold" style="background:#FEF2F2; color:#EF4444;">REJECTED</span>`;
+      footer = `<div class="mt-3 text-[12px]" style="color:#991B1B;">✗ Rejected — ${b.rejectReason || 'Insufficient EMD'} · Rejection letter auto-generated and sent to vendor.</div>`;
+    } else if (allPass){
+      statusPill = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold" style="background:#F3F4F6; color:#6B7280;">Pending</span>`;
+      footer = `<div class="mt-3 flex items-center gap-2 flex-wrap">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-semibold" style="background:#F0FDF4; color:#10B981;">✓ Valid — eligible for opening</span>
+        <button onclick="confirmScreening(${i})" class="px-3 py-1.5 rounded-lg text-white text-[12.5px] font-medium" style="background:#10B981;">Confirm</button>
+      </div>`;
+    } else {
+      statusPill = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold" style="background:#FEF2F2; color:#EF4444;">Validity issue</span>`;
+      footer = `<div class="mt-3 flex items-center gap-2 flex-wrap">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-semibold" style="background:#FEF2F2; color:#EF4444;">✗ Invalid — rejection required</span>
+        <button onclick="toggleRejectForm(${i})" class="px-3 py-1.5 rounded-lg text-white text-[12.5px] font-medium" style="background:#EF4444;">Reject Bid</button>
+      </div>
+      <div id="rejectForm-${i}" class="expand-zone"><div class="mt-3 rounded-lg p-3.5" style="background:#FEF2F2; border:1px solid #FECACA;">
+        <label class="block text-[11.5px] font-semibold uppercase tracking-wide mb-1" style="color:#991B1B;">Reason for rejection (required)</label>
+        <select id="rejectReason-${i}" class="w-full bg-white border border-line rounded-lg px-3 py-2 text-[13px] mb-2">
+          <option>Insufficient EMD</option><option>EMD in wrong form</option><option>Bid validity too short</option><option>Tender fee not paid</option><option>Bid submitted after deadline</option><option>Other</option>
+        </select>
+        <div class="rounded-lg p-2.5 text-[12px] mb-2" style="background:#EFF6FF; border:1px solid #BFDBFE; color:#1D4ED8;">A rejection letter will be auto-generated and sent to the vendor.</div>
+        <div class="flex justify-end gap-2">
+          <button onclick="toggleRejectForm(${i})" class="px-3 py-1.5 rounded-lg border border-line text-[12.5px] text-ink-900 bg-white">Cancel</button>
+          <button onclick="confirmRejection(${i})" class="px-3 py-1.5 rounded-lg text-white text-[12.5px] font-medium" style="background:#EF4444;">Confirm Rejection →</button>
+        </div>
+      </div></div>`;
+    }
+
+    return `<div class="border border-line rounded-xl p-5" style="background:white; opacity:${b.decision==='rejected'?'0.55':'1'}; transition:opacity 150ms ease;">
+      <div class="flex items-start justify-between gap-3 flex-wrap">
+        <div><span class="text-[13px] font-bold text-ink-900">${b.ref}</span> <span class="text-[12px] text-ink-500">Submitted ${b.submitted}</span></div>
+        ${statusPill}
+      </div>
+      <div class="mt-2">
+        ${checkRow('','EMD', emdDetail, emdPass)}
+        ${checkRow('','Tender Fee', `Fee Required: ₹${b.feeReq.toLocaleString('en-IN')} · Paid: ₹${b.feeGot.toLocaleString('en-IN')} via portal`, true)}
+        ${checkRow('','Bid Validity', `Required: Valid until ${b.validReq} · Submitted validity: ${b.validGot}`, true)}
+      </div>
+      ${footer}
+    </div>`;
+  }
+  function toggleRejectForm(i){
+    const z = document.getElementById('rejectForm-'+i);
+    if (!z) return;
+    const open = z.style.maxHeight && z.style.maxHeight !== '0px';
+    z.style.maxHeight = open ? '0px' : '280px';
+  }
+  function confirmScreening(i){ BIDS[i].decision = 'valid'; renderScreening(); showToast(`${BIDS[i].ref} confirmed valid`); }
+  function confirmRejection(i){
+    BIDS[i].decision = 'rejected';
+    BIDS[i].rejectReason = document.getElementById('rejectReason-'+i)?.value || 'Insufficient EMD';
+    renderScreening();
+    showToast(`${BIDS[i].ref} rejected — letter sent`);
+  }
+  function updateScreeningSummary(){
+    const valid = BIDS.filter(b => b.decision === 'valid').length;
+    const rejected = BIDS.filter(b => b.decision === 'rejected').length;
+    const pending = BIDS.filter(b => b.decision === null).length;
+    const screened = valid + rejected;
+    document.getElementById('screenProgressLabel').textContent = `${screened} of ${BIDS.length} bids screened`;
+    document.getElementById('screenProgressBar').style.width = (screened/BIDS.length*100)+'%';
+    document.getElementById('screenSummary').innerHTML =
+      `<span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full" style="background:#10B981;"></span>${valid} valid</span>
+       <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full" style="background:#EF4444;"></span>${rejected} rejected</span>
+       <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full" style="background:#9CA3AF;"></span>${pending} pending</span>`;
+    const btn = document.getElementById('proceedOpeningBtn');
+    btn.disabled = pending > 0;
+    // funnel update
+    const fv = document.getElementById('funnelValid');
+    const fb = document.getElementById('funnelValidBar');
+    if (fv){ fv.textContent = screened === BIDS.length ? `${valid} passed validity` : '— pending'; }
+    if (fb){ fb.style.width = (valid/34*100)+'%'; }
+  }
+
+  // ===================== TAB 3 — OPENING =====================
+  function renderOpening(){
+    const wrap = document.getElementById('tab-opening');
+    const validBids = BIDS.filter(b => b.decision === 'valid');
+    const allScreened = BIDS.every(b => b.decision !== null);
+
+    if (openingDone){
+      wrap.innerHTML = openedRecordHTML(validBids, true);
+      refreshIcons();
+      return;
+    }
+    // Phase A — pre-opening setup
+    const gate = allScreened
+      ? `<div class="rounded-xl p-3.5 inline-flex items-center gap-2" style="background:#F0FDF4; border:1px solid #BBF7D0; color:#065F46;"><i data-lucide="check-circle-2" class="w-4 h-4"></i> <span class="text-[13px]">${validBids.length} valid bids ready to open</span></div>`
+      : `<div class="rounded-xl p-3.5 flex items-center gap-2" style="background:#FFFBEB; border:1px solid #FCD34D;" role="alert"><i data-lucide="alert-triangle" class="w-4 h-4" style="color:#92400E;"></i> <span class="text-[13px]" style="color:#92400E;">Validity screening must be complete before opening. <a href="#" onclick="setTab('screening');return false;" class="font-semibold underline">Go to Validity Screening →</a></span></div>`;
+
+    wrap.innerHTML = `
+      ${gate}
+      <div class="border border-line rounded-xl p-6" style="background:white; ${allScreened?'':'opacity:0.55; pointer-events:none;'}">
+        <div class="text-[16px] font-bold text-ink-900 mb-4">Opening Ceremony Details</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Opening Officer</label><input value="Rajesh Kumar" readonly class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px]" /></div>
+          <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Opening Date &amp; Time</label><input type="datetime-local" value="2026-05-17T11:42" class="w-full bg-white border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-primary" /></div>
+          <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Witness 1 (required)</label><select class="w-full bg-white border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-primary"><option>Priya Shah</option><option>Amit Patil</option><option>Sunita Rao</option></select></div>
+          <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Witness 2 (required)</label><select class="w-full bg-white border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-primary"><option>Amit Patil</option><option>Priya Shah</option><option>Sunita Rao</option></select></div>
+        </div>
+        <div class="mt-4">
+          <label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-2">Opening Mode</label>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <label class="radio-card selected border border-line rounded-lg p-3 flex items-center gap-2" onclick="pickOpenMode(this,'physical')"><input type="radio" name="openMode" checked class="accent-primary"><span class="text-[13px]">Physical Presence</span></label>
+            <label class="radio-card border border-line rounded-lg p-3 flex items-center gap-2" onclick="pickOpenMode(this,'vc')"><input type="radio" name="openMode" class="accent-primary"><span class="text-[13px]">Video Conference</span></label>
+            <label class="radio-card border border-line rounded-lg p-3 flex items-center gap-2" onclick="pickOpenMode(this,'auto')"><input type="radio" name="openMode" class="accent-primary"><span class="text-[13px]">System Auto-Open</span></label>
+          </div>
+          <div id="vcLinkRow" class="hidden mt-3"><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">VC Link</label><input placeholder="https://meet.example.gov.in/..." class="w-full bg-white border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-primary" /></div>
+        </div>
+        <div class="mt-4 rounded-lg p-3 text-[12px]" style="background:#EFF6FF; border:1px solid #BFDBFE; color:#1D4ED8;">Financial bids are sealed and will not be opened at this stage.</div>
+        <button onclick="confirmBeginOpening(${validBids.length})" class="mt-4 w-full px-4 py-3 rounded-lg bg-primary text-white text-[14px] font-semibold hover:bg-primary/90 inline-flex items-center justify-center gap-2">Begin Bid Opening <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+      </div>`;
+    refreshIcons();
+  }
+  function pickOpenMode(el, mode){
+    document.querySelectorAll('[name=openMode]').forEach(r => r.closest('.radio-card').classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('vcLinkRow').classList.toggle('hidden', mode !== 'vc');
+  }
+  function confirmBeginOpening(n){
+    openConfirm('Open Bids Now', `You are about to open ${n} bids for TND-2026-001. All bidder names will be revealed simultaneously. This action is permanent and timestamped.`, () => {
+      closeConfirm();
+      runOpeningCeremony();
+    }, 'Open Bids Now →');
+  }
+  function runOpeningCeremony(){
+    const wrap = document.getElementById('tab-opening');
+    wrap.innerHTML = `<div class="bg-white border border-line rounded-xl p-12 text-center">
+      <div class="text-[16px] font-semibold text-ink-900"><span class="ellip">Opening bids</span></div>
+    </div>`;
+    setTimeout(() => {
+      openingDone = true;
+      const validBids = BIDS.filter(b => b.decision === 'valid');
+      wrap.innerHTML = openedRecordHTML(validBids, false);
+      refreshIcons();
+      // stagger reveal rows
+      wrap.querySelectorAll('.opened-row').forEach((r,i) => {
+        r.style.opacity = '0';
+        setTimeout(() => { r.classList.add('row-reveal'); }, i*50);
+      });
+      showToast('Bids opened — 5 bidders revealed');
+    }, 1500);
+  }
+  function openedRecordHTML(validBids, persistent){
+    const banner = persistent
+      ? `<div class="rounded-xl p-3.5 flex items-center gap-2" style="background:#F0FDF4; border:1px solid #BBF7D0; color:#065F46;"><i data-lucide="check-circle-2" class="w-4 h-4"></i><span class="text-[13px]">Bids opened on May 17, 2026 at 11:42 AM · ${validBids.length} bids · Opening log generated</span></div>`
+      : '';
+    const rows = validBids.map((b,i) => `<tr class="opened-row" style="border-top:1px solid #F3F4F6;">
+        <td class="px-3 py-2.5 text-[12.5px]">${i+1}</td>
+        <td class="px-3 py-2.5 text-[12.5px] font-medium text-ink-900">${b.vendorShort}</td>
+        <td class="px-3 py-2.5 text-[12.5px] text-ink-500">${b.company}</td>
+        <td class="px-3 py-2.5 text-[12px] font-mono text-primary">${b.ref}</td>
+        <td class="px-3 py-2.5 text-[12px] text-ink-500">11:42:03 AM</td>
+        <td class="px-3 py-2.5 text-[12px]"><span style="color:#10B981;">✅ Received</span></td>
+        <td class="px-3 py-2.5 text-[12px] text-ink-400"><i data-lucide="lock" class="w-3 h-3 inline -mt-0.5"></i> Sealed</td>
+      </tr>`).join('');
+    return `${banner}
+      <div class="bg-white border border-line rounded-xl overflow-hidden">
+        <div class="overflow-x-auto"><table class="w-full">
+          <thead class="bg-surface text-[10.5px] uppercase tracking-wider text-ink-500 font-semibold">
+            <tr>
+              <th class="text-left px-3 py-2.5">S.No</th><th class="text-left px-3 py-2.5">Bidder Name</th>
+              <th class="text-left px-3 py-2.5">Company</th><th class="text-left px-3 py-2.5">Bid Ref</th>
+              <th class="text-left px-3 py-2.5">Opened At</th><th class="text-left px-3 py-2.5">Technical Bid</th>
+              <th class="text-left px-3 py-2.5">Financial Bid</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table></div>
+      </div>
+      <div class="text-[13px] text-ink-500">Opened by: Rajesh Kumar · Witnesses: Priya Shah, Amit Patil · May 17, 2026 · 11:42 AM</div>
+      <div class="flex items-center gap-2 flex-wrap">
+        <button onclick="showToast('Opening Register PDF generated')" class="px-3.5 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Download Opening Register (PDF)</button>
+        <button onclick="location.href='evaluation.html?tender=TND-2026-001'" class="px-3.5 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5">Proceed to Evaluation <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+      </div>`;
+  }
+
+  // ===================== TAB 4 — SINGLE BID HANDLER =====================
+  function selectSingle(kind){
+    document.querySelectorAll('[data-single]').forEach(c => {
+      c.classList.toggle('selected', c.dataset.single === kind);
+      c.querySelector('input').checked = c.dataset.single === kind;
+    });
+    document.getElementById('singleAcceptForm').classList.toggle('hidden', kind !== 'accept');
+    document.getElementById('singleRetenderForm').classList.toggle('hidden', kind !== 'retender');
+  }
+
+  // ===================== CONFIRM MODAL =====================
+  function openConfirm(title, body, onOk, okLabel){
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmBody').textContent = body;
+    const btn = document.getElementById('confirmOkBtn');
+    btn.textContent = okLabel || 'Confirm';
+    btn.onclick = onOk;
+    document.getElementById('confirmModal').classList.remove('hidden');
+  }
+  function closeConfirm(){ document.getElementById('confirmModal').classList.add('hidden'); }
+  document.getElementById('confirmModal').addEventListener('click', e => { if (e.target.id === 'confirmModal') closeConfirm(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeConfirm(); });
+
+  // ===================== BOOT =====================
+  (function boot(){
+    const params = new URLSearchParams(location.search);
+    const tnd = params.get('tender');
+    if (tnd){ openWorkspace(tnd); } else { renderTenderLists(''); }
+    refreshIcons();
+  })();
+</script>
+</body>
+</html>
