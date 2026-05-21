@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bid Management — TenderAI Hub</title>
-  <meta name="description" content="Bid management module — currently being rebuilt." />
+  <meta name="description" content="Reasonableness check, committee review, negotiation and award recommendation." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
@@ -18,6 +18,7 @@
         success: { DEFAULT: '#10B981', light: '#F0FDF4' },
         warning: { DEFAULT: '#F59E0B', light: '#FFFBEB' },
         danger:  { DEFAULT: '#EF4444', light: '#FEF2F2' },
+        purple:  { DEFAULT: '#8B5CF6', light: '#EEEDFE' },
         ink: { 900: '#111827', 500: '#6B7280', 400: '#9CA3AF' },
         line: '#E5E7EB', surface: '#F9FAFB',
       },
@@ -31,6 +32,16 @@
     ::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 8px; }
     ::-webkit-scrollbar-thumb:hover { background: #D1D5DB; }
     ::-webkit-scrollbar-track { background: transparent; }
+    .ev-row { transition: background .15s ease; cursor: pointer; }
+    .ev-row:hover { background: #F0F7FF; }
+    .ev-tab { transition: all .15s ease; }
+    .toast { transform: translateY(80px); opacity: 0; transition: transform .3s cubic-bezier(.2,.7,.2,1), opacity .25s ease; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .field { border:1px solid #D1D5DB; border-radius:8px; padding:8px 12px; font-size:13px; width:100%; background:white; }
+    .field:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 3px rgba(15,94,232,0.1); }
+    .radio-card { transition: all .15s ease; cursor: pointer; }
+    .radio-card:hover { border-color:#93C5FD; }
+    .radio-card.selected { border-color:#0F5EE8; background:#EFF6FF; }
     @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
   </style>
 </head>
@@ -97,9 +108,8 @@
     </div>
   </aside>
 
-  <!-- ============ MAIN COLUMN ============ -->
+  <!-- ============ MAIN ============ -->
   <div class="flex-1 flex flex-col min-w-0">
-    <!-- Topnav -->
     <header class="h-16 bg-white border-b border-line px-6 flex items-center gap-4 sticky top-0 z-30">
       <button aria-label="Toggle sidebar" class="text-ink-500 hover:text-ink-900"><i data-lucide="panel-left" class="w-5 h-5"></i></button>
       <div class="flex-1 max-w-xl relative">
@@ -107,7 +117,7 @@
         <input type="search" placeholder="Search tenders, bids, vendors…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] placeholder:text-ink-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
       </div>
       <button class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">FY 2026-27 <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
-      <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500"><i data-lucide="bell" class="w-4 h-4"></i></button>
+      <button aria-label="Notifications" class="w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500"><i data-lucide="bell" class="w-4 h-4"></i></button>
       <div class="flex items-center gap-2 pl-2 border-l border-line">
         <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div>
         <div class="hidden md:block"><div class="text-[12.5px] font-medium text-ink-900 leading-tight">Rajesh Kumar</div></div>
@@ -115,29 +125,466 @@
       </div>
     </header>
 
-    <main class="flex-1 overflow-y-auto">
-      <!-- Placeholder — section being rebuilt -->
-      <div style="padding:80px 40px; text-align:center;">
-        <i data-lucide="hammer" style="width:44px; height:44px; color:#D1D5DB;" class="mx-auto"></i>
-        <div style="font-size:20px; font-weight:500; color:#111827; margin-top:16px;">Coming soon</div>
-        <div style="font-size:14px; color:#6B7280; margin-top:6px;">This section is being rebuilt.</div>
-      </div>
+    <main class="flex-1 overflow-y-auto px-8 py-6">
+
+      <!-- ============ SCREEN 3A — LANDING ============ -->
+      <section id="screen-landing" class="space-y-5">
+        <div>
+          <h1 class="text-[24px] font-bold text-ink-900 leading-tight">Bid Management</h1>
+          <p class="text-[14px] text-ink-500 mt-1">Reasonableness check, committee review and award recommendation for compared tenders.</p>
+        </div>
+        <div id="bmList" class="bg-white border border-line rounded-xl overflow-hidden"></div>
+      </section>
+
+      <!-- ============ SCREEN 3B — WORKSPACE ============ -->
+      <section id="screen-workspace" class="hidden space-y-5">
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <div class="text-[13px] text-ink-500">
+            <a href="#" onclick="showLanding(); return false;" class="hover:text-ink-900">Bid Management</a>
+            <span class="mx-1.5 text-ink-400">/</span>
+            <span id="wsCrumb" class="text-ink-900 font-mono">TND-2026-001</span>
+          </div>
+          <a href="#" onclick="showLanding(); return false;" class="text-[13px] text-ink-500 hover:text-ink-900 inline-flex items-center gap-1.5"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back</a>
+        </div>
+
+        <div class="bg-white border border-line rounded-xl flex flex-col lg:flex-row lg:items-center justify-between gap-4" style="padding:16px 20px;">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span id="wsBadge" class="text-[11.5px] font-bold text-primary font-mono" style="background:#EFF6FF; border-radius:6px; padding:2px 8px;">TND-2026-001</span>
+              <span id="wsName" class="text-[16px] font-bold text-ink-900">Supply of Desktop Computers</span>
+            </div>
+            <div id="wsMeta" class="text-[12px] text-ink-500 mt-1">IT · Goods · Est. ₹27,85,350</div>
+          </div>
+          <span id="wsStagePill" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-semibold" style="background:#EFF6FF; color:#0C447C;"><span class="w-1.5 h-1.5 rounded-full" style="background:#0F5EE8;"></span> Reasonableness check pending</span>
+        </div>
+
+        <div role="tablist" aria-label="Bid management stages" id="bmTabs" class="flex flex-wrap gap-2"></div>
+        <div id="bmTabBody" class="space-y-4"></div>
+        <div class="h-4"></div>
+      </section>
     </main>
   </div>
 </div>
 
+<!-- Toast -->
+<div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-ink-900 text-white text-[13px] px-4 py-3 rounded-xl shadow-lift inline-flex items-center gap-2.5">
+  <i data-lucide="check-circle-2" class="w-4 h-4 text-success"></i>
+  <span id="toastMsg">Done</span>
+</div>
+
 <script>
-  // Clear any persisted state set by these pages on load
-  try {
-    const keysToRemove = [];
-    Object.keys(localStorage).forEach(k => {
-      if (k.startsWith('bidMgmt_') || k.startsWith('evalProgress_') || k.startsWith('bidOpening_')) {
-        keysToRemove.push(k);
-      }
-    });
-    keysToRemove.forEach(k => localStorage.removeItem(k));
-  } catch (e) {}
-  if (window.lucide) lucide.createIcons();
+  function refreshIcons(){ if (window.lucide) lucide.createIcons(); }
+  let toastT = null;
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // ===================== DATA =====================
+  const BM_TENDERS = [
+    { id:'TND-2026-001', name:'Supply of Desktop Computers', dept:'IT',    sector:'Goods', cost:'₹27,85,350', stage:'pending' },
+    { id:'TND-2026-003', name:'Water Pipeline Kalyan',       dept:'Water', sector:'Works', cost:'₹1,20,00,000', stage:'committee' },
+    { id:'TND-2026-007', name:'LED Street Light',            dept:'Engineering', sector:'Goods', cost:'₹28,50,000', stage:'complete' },
+  ];
+  const STAGE_META = {
+    pending:   { dot:'#0F5EE8', label:'Reasonableness check pending' },
+    committee: { dot:'#0F5EE8', label:'Committee review' },
+    award:     { dot:'#0F5EE8', label:'Award recommendation' },
+    sent:      { dot:'#F59E0B', label:'Sent for approval' },
+    complete:  { dot:'#10B981', label:'Complete' },
+  };
+  const L1_VENDOR = 'Rajesh Constructions Pvt Ltd';
+  const L1_AMOUNT = 2640000;
+  const TS_VALUE  = 2700000;
+  const COMMITTEE_SEED = [
+    { name:'Rajesh Kumar', role:'Super Admin',       me:true,  comment:'', verdict:null },
+    { name:'Priya Shah',   role:'Technical Officer', me:false, comment:'', verdict:null },
+    { name:'Amit Patil',   role:'Finance Officer',   me:false, comment:'', verdict:null },
+  ];
+
+  // ===================== STATE =====================
+  let BM = null;
+  function freshBM(tnd){
+    return {
+      tnd, activeTab:'rc',
+      bm1:{ done:false, decision:null, reason:'' },
+      committee: JSON.parse(JSON.stringify(COMMITTEE_SEED)),
+      bm2done:false,
+      negotiation:{ triggered:false, by:'', reason:'', invited:false, newQuote:null, decided:null },
+      bm3done:false,
+      checklist:[false,false,false,false,false,false],
+      bm4sent:false, bm4approved:false,
+    };
+  }
+  function saveBM(){ try { localStorage.setItem('bidmgmt_'+BM.tnd, JSON.stringify(BM)); } catch(e){} }
+  function loadBM(tnd){ try { const r = localStorage.getItem('bidmgmt_'+tnd); if (r) return JSON.parse(r); } catch(e){} return null; }
+
+  // ===================== LANDING =====================
+  function renderBMList(){
+    document.getElementById('bmList').innerHTML = BM_TENDERS.map(t => {
+      const m = STAGE_META[t.stage];
+      return `<div class="ev-row" onclick="openWorkspace('${t.id}')" tabindex="0" role="button" onkeydown="if(event.key==='Enter')openWorkspace('${t.id}')" style="padding:14px 16px; border-bottom:1px solid #F3F4F6; display:flex; align-items:center; gap:16px;">
+        <span class="w-2 h-2 rounded-full shrink-0" style="background:${m.dot};"></span>
+        <span class="font-mono text-[12px] font-semibold text-primary shrink-0" style="background:#EFF6FF; border-radius:4px; padding:2px 6px; width:108px; text-align:center;">${t.id}</span>
+        <div class="flex-1 min-w-0">
+          <div class="text-[14px] font-medium text-ink-900 truncate">${t.name}</div>
+          <div class="text-[12px] text-ink-400">${t.dept} · ${t.sector}</div>
+        </div>
+        <div class="shrink-0 text-[12.5px] text-ink-500" style="width:220px; text-align:right;">${m.label}</div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-ink-400 shrink-0"></i>
+      </div>`;
+    }).join('');
+    refreshIcons();
+  }
+  function showLanding(){
+    try { history.replaceState(null,'',location.pathname); } catch(e){}
+    document.getElementById('screen-workspace').classList.add('hidden');
+    document.getElementById('screen-landing').classList.remove('hidden');
+    renderBMList();
+    window.scrollTo({ top:0 });
+  }
+  function openWorkspace(tnd){
+    try { history.replaceState(null,'','?tender='+encodeURIComponent(tnd)); } catch(e){}
+    const t = BM_TENDERS.find(x => x.id === tnd) || BM_TENDERS[0];
+    BM = loadBM(tnd) || freshBM(tnd);
+    document.getElementById('wsCrumb').textContent = t.id;
+    document.getElementById('wsBadge').textContent = t.id;
+    document.getElementById('wsName').textContent = t.name;
+    document.getElementById('wsMeta').textContent = `${t.dept} · ${t.sector} · Est. ${t.cost}`;
+    document.getElementById('screen-landing').classList.add('hidden');
+    document.getElementById('screen-workspace').classList.remove('hidden');
+    renderTabs();
+    setTab(BM.activeTab);
+    window.scrollTo({ top:0 });
+  }
+
+  // ===================== TABS =====================
+  function tabList(){
+    const tabs = [
+      { id:'rc', label:'Reasonableness Check', icon:'scale' },
+      { id:'cr', label:'Committee Review',     icon:'users' },
+    ];
+    if (BM.negotiation.triggered) tabs.push({ id:'ng', label:'Negotiation', icon:'handshake' });
+    tabs.push({ id:'aw', label:'Award Recommendation', icon:'trophy' });
+    return tabs;
+  }
+  function tabUnlocked(id){
+    if (id==='rc') return true;
+    if (id==='cr') return BM.bm1.done;
+    if (id==='ng') return BM.negotiation.triggered;
+    if (id==='aw'){
+      if (BM.negotiation.triggered) return BM.bm3done;
+      return BM.bm2done;
+    }
+    return false;
+  }
+  function renderTabs(){
+    document.getElementById('bmTabs').innerHTML = tabList().map(t => {
+      const unlocked = tabUnlocked(t.id);
+      const active = BM.activeTab === t.id;
+      return `<button role="tab" onclick="setTab('${t.id}')" class="ev-tab px-4 py-1.5 rounded-full text-[13px] border ${active?'border-primary bg-primary text-white':(unlocked?'border-line bg-white text-ink-500':'border-line bg-white text-ink-400')}">
+        <i data-lucide="${unlocked?t.icon:'lock'}" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1"></i> ${t.label}</button>`;
+    }).join('');
+    refreshIcons();
+  }
+  function setTab(id){
+    if (!tabUnlocked(id)){ showToast('Complete previous stage to unlock'); return; }
+    BM.activeTab = id;
+    renderTabs(); saveBM();
+    const body = document.getElementById('bmTabBody');
+    if (id==='rc') body.innerHTML = rcBody();
+    else if (id==='cr') body.innerHTML = crBody();
+    else if (id==='ng') body.innerHTML = ngBody();
+    else body.innerHTML = awBody();
+    refreshIcons();
+  }
+  function thS(){ return 'padding:10px 12px; font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; text-align:left;'; }
+  function tdS(){ return 'padding:11px 12px; font-size:12.5px; color:#374151;'; }
+
+  // ===================== BM1 — REASONABLENESS CHECK =====================
+  function rcBody(){
+    const variance = ((L1_AMOUNT - TS_VALUE) / TS_VALUE) * 100;
+    const within = L1_AMOUNT <= TS_VALUE;
+    const fmt = n => '₹' + n.toLocaleString('en-IN');
+    let banner;
+    if (BM.bm1.done){
+      banner = `<div class="rounded-lg p-3.5 mt-4" style="background:#F0FDF4; border:1px solid #BBF7D0;"><span class="text-[13px]" style="color:#065F46;">✓ Reasonableness check complete${BM.bm1.decision?(' — '+BM.bm1.decision):''}. Committee Review unlocked.</span></div>`;
+    } else if (within){
+      banner = `<div class="rounded-lg p-3.5 mt-4 flex items-center justify-between gap-3 flex-wrap" style="background:#F0FDF4; border:1px solid #BBF7D0;">
+        <span class="text-[13px]" style="color:#065F46;">✓ L1 quote is within Technical Sanction value. Proceed to Committee Review.</span>
+        <button onclick="rcProceed()" class="px-3.5 py-2 rounded-lg bg-success text-white text-[12.5px] font-medium">Proceed →</button>
+      </div>`;
+    } else {
+      banner = `<div class="rounded-lg p-3.5 mt-4" style="background:#FEF2F2; border:1px solid #FECACA;">
+        <div class="text-[13px]" style="color:#991B1B;">✗ L1 quote exceeds Technical Sanction value by ${variance.toFixed(1)}%. A decision is required.</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-3">
+          <label class="radio-card bg-white border border-line rounded-lg p-3 flex items-start gap-2.5 ${BM._rcSel==='fresh'?'selected':''}" onclick="BM._rcSel='fresh'; setTab('rc')"><input type="radio" name="rc" class="accent-primary mt-0.5" ${BM._rcSel==='fresh'?'checked':''}><div><div class="text-[13px] font-medium text-ink-900">Seek fresh financial approval</div><div class="text-[11.5px] text-ink-500">Route to HOD for a revised Technical Sanction</div></div></label>
+          <label class="radio-card bg-white border border-line rounded-lg p-3 flex items-start gap-2.5 ${BM._rcSel==='retender'?'selected':''}" onclick="BM._rcSel='retender'; setTab('rc')"><input type="radio" name="rc" class="accent-primary mt-0.5" ${BM._rcSel==='retender'?'checked':''}><div><div class="text-[13px] font-medium text-ink-900">Re-tender</div><div class="text-[11.5px] text-ink-500">Reason required — returns to tender creation</div></div></label>
+        </div>
+        <textarea id="rcReason" rows="2" class="field mt-2" placeholder="Reason (required)"></textarea>
+        <div class="flex justify-end mt-2"><button onclick="rcConfirm()" class="px-3.5 py-2 rounded-lg bg-danger text-white text-[12.5px] font-medium">Confirm</button></div>
+      </div>`;
+    }
+    return `<div class="bg-white border border-line rounded-xl" style="padding:20px 24px;">
+      <div class="text-[14px] font-bold text-ink-900 mb-1">Reasonableness Check</div>
+      <div class="text-[12.5px] text-ink-500 mb-3">Confirm the L1 quote is reasonable against the Technical Sanction value before proceeding.</div>
+      <table style="width:100%; table-layout:fixed; border-collapse:collapse; border:1px solid #E5E7EB; border-radius:8px;">
+        <tbody>
+          <tr style="border-bottom:1px solid #F3F4F6;"><td style="${tdS()} color:#6B7280; width:55%;">L1 Quoted Amount</td><td style="${tdS()} font-weight:600;">${fmt(L1_AMOUNT)}</td></tr>
+          <tr style="border-bottom:1px solid #F3F4F6;"><td style="${tdS()} color:#6B7280;">Technical Sanction (TS) Value</td><td style="${tdS()} font-weight:600;">${fmt(TS_VALUE)}</td></tr>
+          <tr><td style="${tdS()} color:#6B7280;">Variance</td><td style="${tdS()} font-weight:600; color:${within?'#065F46':'#991B1B'};">${variance>0?'+':''}${variance.toFixed(1)}% ${within?'below TS ✓':'above TS'}</td></tr>
+        </tbody>
+      </table>
+      ${banner}
+    </div>`;
+  }
+  function rcProceed(){
+    BM.bm1.done = true;
+    BM.activeTab = 'cr';
+    saveBM(); renderTabs(); setTab('cr');
+    showToast('Committee Review unlocked');
+  }
+  function rcConfirm(){
+    if (!BM._rcSel){ showToast('Select a decision'); return; }
+    const reason = (document.getElementById('rcReason')||{}).value || '';
+    if (!reason.trim()){ showToast('Reason is required'); return; }
+    BM.bm1 = { done:true, decision:(BM._rcSel==='fresh'?'Fresh financial approval sought':'Re-tender initiated'), reason:reason.trim() };
+    BM.activeTab = 'cr';
+    saveBM(); renderTabs(); setTab('cr');
+    showToast('Decision confirmed');
+  }
+
+  // ===================== BM2 — COMMITTEE REVIEW =====================
+  function crBody(){
+    const rows = BM.committee.map((m,i) => {
+      const vPill = m.verdict==='approve' ? '<span style="color:#10B981; font-size:12px;">Approved</span>'
+        : m.verdict==='concern' ? '<span style="color:#92400E; font-size:12px;">Concern raised</span>'
+        : m.verdict==='negotiate' ? '<span style="color:#92400E; font-size:12px;">Negotiation requested</span>'
+        : '<span style="color:#F59E0B; font-size:12px;">Pending</span>';
+      let action = '';
+      if (m.verdict) action = '<span class="text-ink-400 text-[12px]">—</span>';
+      else if (m.me) action = `<button onclick="crShowForm(${i})" class="px-2.5 py-1 rounded-md bg-primary text-white text-[11.5px] font-medium">Add your comment</button>`;
+      else action = `<a href="#" onclick="crRemind(${i}); return false;" class="text-[12px] text-primary hover:underline">Send reminder</a>`;
+      return `<tr style="border-bottom:1px solid #F3F4F6;" data-crrow="${i}">
+        <td style="${tdS()} font-weight:600; color:#111827;">${m.name}${m.me?' <span class="text-[10.5px] text-primary">(you)</span>':''}</td>
+        <td style="${tdS()} color:#6B7280;">${m.role}</td>
+        <td style="${tdS()}">${m.comment ? m.comment : '<span class="text-ink-400 italic">No comment yet</span>'}</td>
+        <td style="${tdS()}">${vPill}</td>
+        <td style="${tdS()}">${action}</td>
+      </tr>`;
+    }).join('');
+    const submitted = BM.committee.filter(m => m.verdict).length;
+    const approved = BM.committee.filter(m => m.verdict==='approve').length;
+    const concerns = BM.committee.filter(m => m.verdict==='concern').length;
+    const negReq = BM.committee.some(m => m.verdict==='negotiate');
+    const allSubmitted = submitted === BM.committee.length;
+    const canComplete = allSubmitted && concerns===0 && BM.bm1.done && !negReq;
+    return `<div class="bg-white border border-line rounded-xl overflow-hidden">
+      <div style="padding:14px 18px; border-bottom:1px solid #E5E7EB;"><div class="text-[14px] font-bold text-ink-900">Committee Review</div>
+        <div class="text-[12px] text-ink-500">Evaluation committee members review and record their verdict before the final recommendation.</div></div>
+      <table style="width:100%; table-layout:fixed; border-collapse:collapse;">
+        <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;">
+          <th style="${thS()} width:18%;">Member</th><th style="${thS()} width:18%;">Designation</th><th style="${thS()} width:34%;">Comment</th><th style="${thS()} width:15%;">Status</th><th style="${thS()} width:15%;">Action</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div style="padding:14px 18px; border-top:1px solid #E5E7EB;">
+        <div class="flex items-center gap-3 mb-2"><div class="text-[12.5px] text-ink-500" aria-live="polite">${approved} of ${BM.committee.length} members approved · ${BM.committee.length-submitted} pending</div></div>
+        <div class="h-1.5 rounded-full bg-line overflow-hidden mb-3"><div class="h-full bg-primary" style="width:${(submitted/BM.committee.length*100)}%;"></div></div>
+        ${negReq ? '<div class="rounded-lg p-2.5 mb-2 text-[12px]" style="background:#FFFBEB; color:#92400E;">A member requested negotiation — the Negotiation stage has been added.</div>' : ''}
+        <div class="flex justify-end"><button onclick="crComplete()" class="px-4 py-2 rounded-lg ${canComplete?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-medium" ${canComplete?'':'disabled'}>Complete Committee Review →</button></div>
+      </div>
+    </div>`;
+  }
+  function crShowForm(i){
+    const row = document.querySelector(`#bmTabBody tr[data-crrow="${i}"]`);
+    if (!row || row.nextElementSibling?.dataset?.crform) return;
+    const tr = document.createElement('tr');
+    tr.dataset.crform = i;
+    tr.innerHTML = `<td colspan="5" style="padding:14px 18px; background:#F9FAFB;">
+      <label class="block text-[11.5px] font-semibold text-ink-500 uppercase mb-1">Add your comment</label>
+      <textarea id="crComment-${i}" rows="2" class="field" placeholder="Your review comment…"></textarea>
+      <div class="flex items-center gap-4 mt-2 flex-wrap">
+        <label class="flex items-center gap-1.5 text-[12.5px] text-ink-900"><input type="radio" name="crv-${i}" value="approve" class="accent-primary"> Approve</label>
+        <label class="flex items-center gap-1.5 text-[12.5px] text-ink-900"><input type="radio" name="crv-${i}" value="concern" class="accent-primary"> Raise concern</label>
+        <label class="flex items-center gap-1.5 text-[12.5px] text-ink-900"><input type="radio" name="crv-${i}" value="negotiate" class="accent-primary"> Request negotiation</label>
+        <button onclick="crSubmit(${i})" class="ml-auto px-3 py-1.5 rounded-lg bg-primary text-white text-[12.5px] font-medium">Submit comment</button>
+      </div></td>`;
+    row.after(tr);
+  }
+  function crSubmit(i){
+    const v = document.querySelector(`input[name="crv-${i}"]:checked`);
+    if (!v){ showToast('Select a verdict'); return; }
+    const c = document.getElementById('crComment-'+i).value.trim();
+    BM.committee[i].comment = c || (v.value==='approve'?'Recommendation reviewed and found in order.':v.value==='concern'?'A concern has been recorded for discussion.':'Negotiation requested before award.');
+    BM.committee[i].verdict = v.value;
+    if (v.value==='negotiate' && !BM.negotiation.triggered){
+      BM.negotiation.triggered = true;
+      BM.negotiation.by = BM.committee[i].name;
+      BM.negotiation.reason = 'Committee concern';
+    }
+    saveBM(); renderTabs(); setTab('cr');
+    showToast('Comment submitted');
+  }
+  function crRemind(i){
+    BM.committee[i].verdict = 'approve';
+    BM.committee[i].comment = 'Recommendation reviewed and approved.';
+    saveBM(); setTab('cr');
+    showToast(BM.committee[i].name + ' responded — approved');
+  }
+  function crComplete(){
+    const submitted = BM.committee.every(m => m.verdict);
+    const concerns = BM.committee.some(m => m.verdict==='concern');
+    if (!submitted || concerns){ showToast('All members must submit; resolve any concerns'); return; }
+    BM.bm2done = true;
+    BM.activeTab = BM.negotiation.triggered ? 'ng' : 'aw';
+    saveBM(); renderTabs(); setTab(BM.activeTab);
+    showToast(BM.negotiation.triggered ? 'Negotiation stage unlocked' : 'Award Recommendation unlocked');
+  }
+
+  // ===================== BM3 — NEGOTIATION =====================
+  function ngBody(){
+    const n = BM.negotiation;
+    const orig = L1_AMOUNT;
+    const reduction = n.newQuote ? ((orig - n.newQuote) / orig) * 100 : null;
+    const statusTxt = n.decided ? (n.decided==='accept'?'Accepted':'Original retained')
+      : n.newQuote ? 'Quote updated' : n.invited ? 'Invitation sent · May 20' : 'Not started';
+    return `<div class="bg-white border border-line rounded-xl overflow-hidden">
+      <div style="padding:14px 18px; border-bottom:1px solid #E5E7EB;">
+        <div class="text-[14px] font-bold text-ink-900">Negotiation</div>
+        <div class="rounded-lg p-2.5 mt-2 text-[12px]" style="background:#FFFBEB; color:#92400E;">Negotiation requested by ${n.by||'Committee'} — Reason: ${n.reason||'Committee concern'}</div>
+      </div>
+      <table style="width:100%; table-layout:fixed; border-collapse:collapse;">
+        <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;">
+          <th style="${thS()} width:26%;">Vendor</th><th style="${thS()} width:19%;">Original Quote</th><th style="${thS()} width:19%;">Negotiated Quote</th><th style="${thS()} width:16%;">% Reduction</th><th style="${thS()} width:20%;">Status</th>
+        </tr></thead>
+        <tbody><tr style="border-bottom:1px solid #F3F4F6;">
+          <td style="${tdS()} font-weight:600;">${L1_VENDOR}</td>
+          <td style="${tdS()}">₹${orig.toLocaleString('en-IN')}</td>
+          <td style="${tdS()}">${n.newQuote?'₹'+n.newQuote.toLocaleString('en-IN'):'—'}</td>
+          <td style="${tdS()} ${reduction!=null?'color:#065F46; font-weight:600;':''}">${reduction!=null?reduction.toFixed(1)+'%':'—'}</td>
+          <td style="${tdS()}">${statusTxt}</td>
+        </tr></tbody>
+      </table>
+      <div style="padding:14px 18px; border-top:1px solid #E5E7EB;">
+        ${!n.invited ? `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase mb-1">Reason for negotiation</label>
+              <select id="ngReason" class="field"><option>L1 above TS</option><option selected>Committee concern</option><option>Single bid</option><option>Market rates lower</option><option>Other</option></select></div>
+            <div class="flex items-end"><label class="flex items-center gap-2 text-[12.5px] text-ink-900"><input type="checkbox" checked class="accent-primary"> Notify L1 vendor of negotiation invitation</label></div>
+          </div>
+          <div class="flex justify-end mt-3"><button onclick="ngInvite()" class="px-3.5 py-2 rounded-lg text-white text-[12.5px] font-medium" style="background:#F59E0B;">Send negotiation invitation</button></div>
+        ` : !n.decided ? `
+          <div class="text-[12.5px] font-medium text-ink-900 mb-1">Updated quote from vendor</div>
+          <div class="flex items-center gap-2">
+            <input id="ngQuote" type="number" class="field" style="max-width:200px;" placeholder="2400000" value="${n.newQuote||''}"/>
+            <button onclick="ngRecord()" class="px-3.5 py-2 rounded-lg bg-primary text-white text-[12.5px] font-medium">Record updated quote</button>
+          </div>
+          ${n.newQuote ? `<div class="rounded-lg p-2.5 mt-3 text-[12px]" style="background:#FFFBEB; color:#92400E;">✦ AI note: Negotiated price of ₹${n.newQuote.toLocaleString('en-IN')} is ${(((2350000-n.newQuote)/2350000)*100).toFixed(1)}% ${n.newQuote<2350000?'below':'above'} the DSR-based estimate of ₹23,50,000. Ensure this is sustainable before proceeding.</div>
+          <div class="flex items-center gap-3 mt-3"><button onclick="ngDecide('accept')" class="px-3.5 py-2 rounded-lg bg-success text-white text-[12.5px] font-medium">Accept negotiated quote</button><button onclick="ngDecide('reject')" class="text-[12px] text-ink-500 hover:underline">Reject and proceed with original</button></div>` : ''}
+        ` : `<div class="rounded-lg p-2.5 text-[12.5px]" style="background:#F0FDF4; color:#065F46;">✓ Negotiation complete — ${n.decided==='accept'?'negotiated quote accepted':'original quote retained'}.</div>`}
+      </div>
+    </div>`;
+  }
+  function ngInvite(){
+    BM.negotiation.invited = true;
+    BM.negotiation.reason = document.getElementById('ngReason').value;
+    saveBM(); setTab('ng');
+    showToast('Negotiation invitation sent');
+  }
+  function ngRecord(){
+    const v = parseInt(document.getElementById('ngQuote').value);
+    if (isNaN(v) || v<=0){ showToast('Enter the updated quote'); return; }
+    BM.negotiation.newQuote = v;
+    saveBM(); setTab('ng');
+    showToast('Updated quote recorded');
+  }
+  function ngDecide(d){
+    BM.negotiation.decided = d;
+    BM.bm3done = true;
+    BM.activeTab = 'aw';
+    saveBM(); renderTabs(); setTab('aw');
+    showToast(d==='accept'?'Negotiated quote accepted':'Proceeding with original quote');
+  }
+
+  // ===================== BM4 — AWARD RECOMMENDATION =====================
+  function awBody(){
+    const finalAmount = (BM.negotiation.decided==='accept' && BM.negotiation.newQuote) ? BM.negotiation.newQuote : L1_AMOUNT;
+    const variance = ((finalAmount - TS_VALUE) / TS_VALUE) * 100;
+    const aiNote = `This office recommends the award of work for the captioned tender to M/s ${L1_VENDOR}, the L1 bidder. Five bids were received against this tender, of which four were found Technically Qualified after evaluation against the prescribed PQ and TQ criteria. Per the locked comparative statement, ${L1_VENDOR} emerged as L1 with a quoted amount of ₹${finalAmount.toLocaleString('en-IN')}, which is ${Math.abs(variance).toFixed(1)}% below the Technical Sanction value of ₹${TS_VALUE.toLocaleString('en-IN')}. The Evaluation Committee has reviewed and approved this recommendation. ${BM.negotiation.triggered?('A negotiation was conducted and concluded — '+(BM.negotiation.decided==='accept'?'the negotiated rate has been adopted.':'the original rate is retained.')):''} The recommendation is placed for approval as per the delegation of financial powers.`;
+    const checkItems = ['TS value check passed','All committee members have approved','Comparative statement locked','ALB decisions recorded (if applicable)','Recommendation note reviewed and complete','I certify this recommendation is accurate'];
+    const allChecked = BM.checklist.every(Boolean);
+    return `<div class="bg-white border border-line rounded-xl" style="padding:20px 24px; margin-bottom:16px;">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <div class="text-[11px] uppercase tracking-wider text-ink-500 font-semibold">Recommended Vendor</div>
+          <div class="text-[20px] font-bold text-ink-900 mt-1">${L1_VENDOR}</div>
+          <div class="text-[24px] font-bold text-primary mt-1.5">₹${finalAmount.toLocaleString('en-IN')}</div>
+          <div class="text-[13px] mt-1" style="color:#065F46;">${variance<0?Math.abs(variance).toFixed(1)+'% below TS value ✓':'+'+variance.toFixed(1)+'% above TS'}</div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          ${[['Bids received','5'],['TQ bids','4'],['Evaluation method','L1'],['Committee approvals',BM.committee.filter(m=>m.verdict==='approve').length+'/'+BM.committee.length]].map(([k,v]) => `<div style="background:#F9FAFB; border-radius:8px; padding:10px 12px;"><div class="text-[11px] text-ink-500">${k}</div><div class="text-[15px] font-bold text-ink-900 mt-0.5">${v}</div></div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="bg-white border border-line rounded-xl" style="padding:18px 22px; margin-bottom:16px;">
+      <div class="flex items-center justify-between gap-2 mb-2">
+        <div class="flex items-center gap-2"><span class="text-[14px] font-bold text-ink-900">Recommendation Note</span><span style="background:#EFF6FF; color:#0F5EE8; border-radius:20px; padding:2px 8px; font-size:10.5px; font-weight:600;">✦ AI Drafted</span></div>
+        <button onclick="awRegen()" class="text-[12px] text-primary hover:underline">✦ Regenerate</button>
+      </div>
+      <div id="awNote" contenteditable="true" class="field" style="min-height:130px; font-size:13px; line-height:1.6;">${aiNote}</div>
+      <div class="mt-3 flex flex-col gap-1">
+        <button onclick="awToggle('bids')" class="text-[12.5px] text-primary text-left hover:underline">View bids summary ▾</button>
+        <div id="awBids" class="hidden text-[12px] text-ink-500 pl-3">Comparative statement (locked) — 4 TQ vendors ranked; L1: ${L1_VENDOR} at ₹${L1_AMOUNT.toLocaleString('en-IN')}.</div>
+        <button onclick="awToggle('tqntq')" class="text-[12.5px] text-primary text-left hover:underline mt-1">View TQ/NTQ results ▾</button>
+        <div id="awTqntq" class="hidden text-[12px] text-ink-500 pl-3">4 vendors Technically Qualified · 1 vendor Not Technically Qualified (Patil &amp; Associates — ISO certification not found).</div>
+      </div>
+    </div>
+    <div class="bg-surface border border-line rounded-xl" style="padding:16px 18px; margin-bottom:16px;">
+      <div class="text-[13px] font-bold text-ink-900 mb-2">Pre-approval checklist</div>
+      ${checkItems.map((it,i) => `<label class="flex items-center gap-2 text-[12.5px] text-ink-900 py-1"><input type="checkbox" class="accent-primary" ${BM.checklist[i]?'checked':''} onchange="BM.checklist[${i}]=this.checked; saveBM(); awRefreshSend();"> ${it}</label>`).join('')}
+    </div>
+    ${BM.bm4approved ? `<div class="rounded-lg p-3.5 flex items-center justify-between gap-3 flex-wrap" style="background:#F0FDF4; border:1px solid #BBF7D0;">
+        <span class="text-[13px]" style="color:#065F46;">Award recommendation approved ✓</span>
+        <button onclick="showToast('Letter of Acceptance — post-award module')" class="px-3.5 py-2 rounded-lg bg-success text-white text-[12.5px] font-medium">Proceed to issue Letter of Acceptance →</button>
+      </div>`
+     : BM.bm4sent ? `<div class="rounded-lg p-3.5" style="background:#FFFBEB; border:1px solid #FCD34D;">
+        <div class="text-[13px]" style="color:#92400E;">Sent for approval · May 21 — awaiting response from Commissioner</div>
+        <div class="flex justify-end mt-2"><button onclick="awApprove()" class="px-3 py-1.5 rounded-lg bg-success text-white text-[12px] font-medium">Simulate approval</button></div>
+      </div>`
+     : `<button id="awSendBtn" onclick="awSend()" class="w-full px-4 py-3 rounded-lg ${allChecked?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[14px] font-semibold" ${allChecked?'':'disabled'}>Send for Approval →</button>`}`;
+  }
+  function awRegen(){
+    document.getElementById('awNote').textContent = `The Evaluation Committee, having completed evaluation of all bids received against this tender, recommends award to M/s ${L1_VENDOR} as the L1 bidder at ₹${L1_AMOUNT.toLocaleString('en-IN')}. The quote is within the Technical Sanction value and the recommendation carries the approval of all committee members. It is accordingly placed for sanction of the competent authority.`;
+    showToast('Recommendation note regenerated');
+  }
+  function awToggle(k){ const el = document.getElementById(k==='bids'?'awBids':'awTqntq'); if (el) el.classList.toggle('hidden'); }
+  function awRefreshSend(){
+    const btn = document.getElementById('awSendBtn');
+    if (!btn) return;
+    const ok = BM.checklist.every(Boolean);
+    btn.disabled = !ok;
+    btn.className = `w-full px-4 py-3 rounded-lg ${ok?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[14px] font-semibold`;
+  }
+  function awSend(){
+    if (!BM.checklist.every(Boolean)){ showToast('Complete all checklist items'); return; }
+    BM.bm4sent = true;
+    saveBM(); setTab('aw');
+    showToast('Recommendation sent for approval');
+  }
+  function awApprove(){
+    BM.bm4approved = true;
+    saveBM(); setTab('aw');
+    showToast('Award recommendation approved');
+  }
+
+  (function boot(){
+    const tnd = new URLSearchParams(location.search).get('tender');
+    if (tnd){ openWorkspace(tnd); } else { renderBMList(); }
+    refreshIcons();
+  })();
 </script>
 </body>
 </html>
