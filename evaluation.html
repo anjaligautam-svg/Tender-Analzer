@@ -4,27 +4,26 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bid Evaluation — TenderAI Hub</title>
-  <meta name="description" content="Bid evaluation module — currently being rebuilt." />
+  <meta name="description" content="Technical and financial evaluation of submitted bids." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script>
-    tailwind.config = {
-      theme: { extend: {
-        fontFamily: { sans: ['"DM Sans"', 'system-ui', 'sans-serif'] },
-        colors: {
-          primary: { DEFAULT: '#0F5EE8', light: '#EFF6FF', border: '#93C5FD' },
-          success: { DEFAULT: '#10B981', light: '#F0FDF4' },
-          warning: { DEFAULT: '#F59E0B', light: '#FFFBEB' },
-          danger:  { DEFAULT: '#EF4444', light: '#FEF2F2' },
-          ink: { 900: '#111827', 500: '#6B7280', 400: '#9CA3AF' },
-          line: '#E5E7EB', surface: '#F9FAFB',
-        },
-        boxShadow: { soft: '0 1px 3px rgba(0,0,0,0.08)', lift: '0 4px 12px rgba(0,0,0,0.12)' },
-      }},
-    };
+    tailwind.config = { theme: { extend: {
+      fontFamily: { sans: ['"DM Sans"', 'system-ui', 'sans-serif'] },
+      colors: {
+        primary: { DEFAULT: '#0F5EE8', light: '#EFF6FF', border: '#93C5FD' },
+        success: { DEFAULT: '#10B981', light: '#F0FDF4' },
+        warning: { DEFAULT: '#F59E0B', light: '#FFFBEB' },
+        danger:  { DEFAULT: '#EF4444', light: '#FEF2F2' },
+        purple:  { DEFAULT: '#8B5CF6', light: '#EEEDFE' },
+        ink: { 900: '#111827', 500: '#6B7280', 400: '#9CA3AF' },
+        line: '#E5E7EB', surface: '#F9FAFB',
+      },
+      boxShadow: { soft: '0 1px 3px rgba(0,0,0,0.08)', lift: '0 4px 12px rgba(0,0,0,0.12)' },
+    }}};
   </script>
   <style>
     html, body { font-family: 'DM Sans', system-ui, sans-serif; color: #111827; background: #F9FAFB; }
@@ -33,11 +32,28 @@
     ::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 8px; }
     ::-webkit-scrollbar-thumb:hover { background: #D1D5DB; }
     ::-webkit-scrollbar-track { background: transparent; }
+    .ev-row { transition: background .15s ease; cursor: pointer; }
+    .ev-row:hover { background: #F0F7FF; }
+    .ev-tab { transition: all .15s ease; }
+    .toast { transform: translateY(80px); opacity: 0; transition: transform .3s cubic-bezier(.2,.7,.2,1), opacity .25s ease; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes pulse-amber { 0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,.5);} 50% { box-shadow: 0 0 0 6px rgba(245,158,11,0);} }
+    .pulse-amber { animation: pulse-amber 1.6s ease-in-out infinite; }
+    @keyframes rowReveal { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform: translateY(0); } }
+    .matrix-cell { transition: all .15s ease; cursor: pointer; }
+    .matrix-cell:hover { box-shadow: inset 0 0 0 2px #93C5FD; }
+    .field { border:1px solid #D1D5DB; border-radius:8px; padding:8px 12px; font-size:13px; width:100%; background:white; }
+    .field:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 3px rgba(15,94,232,0.1); }
+    .drawer { transform: translateX(100%); transition: transform .25s cubic-bezier(.2,.7,.2,1); }
+    .drawer.open { transform: translateX(0); }
+    .expand-zone { overflow:hidden; transition: max-height .2s ease; }
     @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
   </style>
 </head>
 <body class="min-h-screen">
 <div class="flex min-h-screen">
+
   <!-- ============ SIDEBAR ============ -->
   <aside class="w-[244px] shrink-0 bg-white border-r border-line flex flex-col" aria-label="Primary">
     <div class="px-5 pt-5 pb-4 border-b border-line">
@@ -69,8 +85,7 @@
         <ul class="space-y-0.5">
           <li><a href="dpr-creation.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="clipboard-list" class="w-4 h-4"></i> DPR Creation</a></li>
           <li><a href="tender-creation.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="file-plus-2" class="w-4 h-4"></i> Tender Creation</a></li>
-          <li><a href="prebid-queries.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="messages-square" class="w-4 h-4"></i> Pre-Bid Queries
-            <span class="ml-auto bg-primary text-white text-[10px] font-semibold rounded-full px-1.5 py-0.5">11</span></a></li>
+          <li><a href="prebid-queries.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="messages-square" class="w-4 h-4"></i> Pre-Bid Queries</a></li>
           <li><a href="bid-management.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="gavel" class="w-4 h-4"></i> Bid Management</a></li>
         </ul>
       </div>
@@ -108,41 +123,937 @@
         <input type="search" placeholder="Search tenders, bids, vendors…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] placeholder:text-ink-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
       </div>
       <button class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">FY 2026-27 <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
-      <button aria-label="Calendar" class="hidden md:flex w-9 h-9 items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500"><i data-lucide="calendar" class="w-4 h-4"></i></button>
-      <button aria-label="Notifications" class="relative w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500">
-        <i data-lucide="bell" class="w-4 h-4"></i>
-        <span class="absolute -top-1 -right-1 bg-danger text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">6</span>
-      </button>
+      <button aria-label="Notifications" class="w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500"><i data-lucide="bell" class="w-4 h-4"></i></button>
       <div class="flex items-center gap-2 pl-2 border-l border-line">
-        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">U</div>
-        <div class="hidden md:block"><div class="text-[12.5px] font-medium text-ink-900 leading-tight">Admin User</div></div>
+        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div>
+        <div class="hidden md:block"><div class="text-[12.5px] font-medium text-ink-900 leading-tight">Rajesh Kumar</div></div>
         <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i>
       </div>
     </header>
 
-    <main class="flex-1 overflow-y-auto">
-      <!-- Placeholder — section being rebuilt -->
-      <div style="padding:80px 40px; text-align:center;">
-        <i data-lucide="hammer" style="width:44px; height:44px; color:#D1D5DB;" class="mx-auto"></i>
-        <div style="font-size:20px; font-weight:500; color:#111827; margin-top:16px;">Coming soon</div>
-        <div style="font-size:14px; color:#6B7280; margin-top:6px;">This section is being rebuilt.</div>
-      </div>
+    <main class="flex-1 overflow-y-auto px-8 py-6">
+
+      <!-- ============ SCREEN 1A — TENDER LIST ============ -->
+      <section id="screen-landing" class="space-y-5">
+        <div>
+          <h1 class="text-[24px] font-bold text-ink-900 leading-tight">Bid Evaluation</h1>
+          <p class="text-[14px] text-ink-500 mt-1">Select a tender to begin or continue technical and financial evaluation.</p>
+        </div>
+        <div id="evalList" class="bg-white border border-line rounded-xl overflow-hidden"></div>
+      </section>
+
+      <!-- ============ SCREEN 1B — WORKSPACE ============ -->
+      <section id="screen-workspace" class="hidden space-y-5">
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <div class="text-[13px] text-ink-500">
+            <a href="#" onclick="showLanding(); return false;" class="hover:text-ink-900">Bid Evaluation</a>
+            <span class="mx-1.5 text-ink-400">/</span>
+            <span id="wsCrumb" class="text-ink-900 font-mono">TND-2026-001</span>
+          </div>
+          <a href="#" onclick="showLanding(); return false;" class="text-[13px] text-ink-500 hover:text-ink-900 inline-flex items-center gap-1.5"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back</a>
+        </div>
+
+        <div class="bg-white border border-line rounded-xl flex flex-col lg:flex-row lg:items-center justify-between gap-4" style="padding:16px 20px;">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span id="wsBadge" class="text-[11.5px] font-bold text-primary font-mono" style="background:#EFF6FF; border-radius:6px; padding:2px 8px;">TND-2026-001</span>
+              <span id="wsName" class="text-[16px] font-bold text-ink-900">Supply of Desktop Computers</span>
+            </div>
+            <div id="wsMeta" class="text-[12px] text-ink-500 mt-1">IT · Goods · Est. ₹45,00,000</div>
+          </div>
+          <div id="wsStagePill" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-semibold" style="background:#FFFBEB; color:#92400E;"><span class="w-1.5 h-1.5 rounded-full pulse-amber" style="background:#F59E0B;"></span> Technical evaluation in progress</div>
+        </div>
+
+        <!-- Stage tabs -->
+        <div role="tablist" aria-label="Evaluation stages" class="flex flex-wrap gap-2">
+          <button role="tab" data-stab="technical" onclick="setStageTab('technical')" class="ev-tab px-4 py-1.5 rounded-full text-[13px] border border-primary bg-primary text-white"><i data-lucide="clipboard-check" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1"></i> Technical Evaluation</button>
+          <button role="tab" data-stab="financial" onclick="setStageTab('financial')" class="ev-tab px-4 py-1.5 rounded-full text-[13px] border border-line bg-white text-ink-400"><i data-lucide="lock" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1"></i> Financial Evaluation</button>
+        </div>
+
+        <section id="stage-technical" class="space-y-3"></section>
+        <section id="stage-financial" class="hidden space-y-4"></section>
+        <div class="h-4"></div>
+      </section>
     </main>
   </div>
 </div>
 
+<!-- Parsed data drawer -->
+<div id="drawerBackdrop" class="hidden fixed inset-0 bg-ink-900/30 z-40" onclick="closeDrawer()"></div>
+<aside id="drawer" role="dialog" aria-modal="true" aria-label="Parsed bid data" class="drawer fixed top-0 right-0 h-full w-full md:w-[480px] bg-white border-l border-line shadow-lift z-50 overflow-y-auto"></aside>
+
+<!-- Cell evaluation popover -->
+<div id="cellPopover" class="hidden" style="position:absolute; width:280px; background:white; border:1px solid #E5E7EB; border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.1); padding:14px 16px; z-index:50;"></div>
+
+<!-- Toast -->
+<div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-ink-900 text-white text-[13px] px-4 py-3 rounded-xl shadow-lift inline-flex items-center gap-2.5">
+  <i data-lucide="check-circle-2" class="w-4 h-4 text-success"></i>
+  <span id="toastMsg">Done</span>
+</div>
+
 <script>
-  // Clear any persisted state set by these pages on load
-  try {
-    const keysToRemove = [];
-    Object.keys(localStorage).forEach(k => {
-      if (k.startsWith('bidMgmt_') || k.startsWith('evalProgress_') || k.startsWith('bidOpening_')) {
-        keysToRemove.push(k);
-      }
+  function refreshIcons(){ if (window.lucide) lucide.createIcons(); }
+  let toastT = null;
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // ===================== DATA =====================
+  const EVAL_TENDERS = [
+    { id:'TND-2026-001', name:'Supply of Desktop Computers', dept:'IT',             sector:'Goods', cost:'₹45,00,000', stage:'tech-progress' },
+    { id:'TND-2026-002', name:'Road Maintenance Phase 2',    dept:'Infrastructure', sector:'Works', cost:'₹45,00,000', stage:'not-started' },
+    { id:'TND-2026-003', name:'Water Pipeline Kalyan',       dept:'Water',          sector:'Works', cost:'₹1,20,00,000', stage:'tech-complete' },
+    { id:'TND-2026-007', name:'LED Street Light',            dept:'Engineering',    sector:'Goods', cost:'₹28,50,000', stage:'complete' },
+  ];
+  const STAGE_META = {
+    'not-started':   { dot:'#9CA3AF', label:'Not started' },
+    'register':      { dot:'#F59E0B', label:'Bid register uploaded', pulse:true },
+    'tech-progress': { dot:'#F59E0B', label:'Technical evaluation in progress', pulse:true },
+    'tech-complete': { dot:'#0F5EE8', label:'Technical complete' },
+    'fin-progress':  { dot:'#0F5EE8', label:'Financial evaluation in progress' },
+    'complete':      { dot:'#10B981', label:'Evaluation complete' },
+  };
+
+  const VENDOR_OPTIONS = ['Rajesh Constructions','Maharashtra Roads Co.','BuildTech Solutions','NCC Infrastructure','Patil & Associates'];
+  const PARSED_TECH = {
+    'Rajesh Constructions': { 'Vendor Name':'Rajesh Constructions Pvt Ltd','Document Date':'May 15, 2026','Bid Reference':'BID/RC/2026/001','EMD Amount':'₹90,000','EMD Form':'Demand Draft','Bid Validity':'Aug 20, 2026','Company Type':'Private Limited','CIN':'U72900MH2019PTC123456','GST Number':'27AAACR1234Q1Z5','PAN':'AAACR1234Q','Turnover (Last 3 yr avg)':'₹1,42,00,000','ISO Certifications':'ISO 9001:2015','Similar Work Orders':'3 WOs detected' },
+    'Maharashtra Roads Co.': { 'Vendor Name':'Maharashtra Roads Co.','Document Date':'May 15, 2026','Bid Reference':'BID/MR/2026/002','EMD Amount':'₹90,000','EMD Form':'Online Payment','Bid Validity':'Aug 20, 2026','Company Type':'Private Limited','CIN':'U45200MH2017PTC298745','GST Number':'27AABCM5678R1Z2','PAN':'AABCM5678R','Turnover (Last 3 yr avg)':'₹1,08,00,000','ISO Certifications':'ISO 9001:2015, ISO 14001','Similar Work Orders':'2 WOs detected' },
+    'BuildTech Solutions':   { 'Vendor Name':'BuildTech Solutions Pvt Ltd','Document Date':'May 16, 2026','Bid Reference':'BID/BT/2026/003','EMD Amount':'₹90,000','EMD Form':'Bank Guarantee','Bid Validity':'Aug 20, 2026','Company Type':'Private Limited','CIN':'U72200MH2020PTC341122','GST Number':'27AADCB9012S1Z8','PAN':'AADCB9012S','Turnover (Last 3 yr avg)':'₹64,00,000','ISO Certifications':'ISO 9001:2015','Similar Work Orders':'1 WO detected' },
+    'NCC Infrastructure':    { 'Vendor Name':'NCC Infrastructure Ltd','Document Date':'May 15, 2026','Bid Reference':'BID/NCC/2026/004','EMD Amount':'₹90,000','EMD Form':'Online Payment','Bid Validity':'Aug 20, 2026','Company Type':'Public Limited','CIN':'L74210MH2009PLC112233','GST Number':'27AAECN3456T1Z1','PAN':'AAECN3456T','Turnover (Last 3 yr avg)':'₹2,85,00,000','ISO Certifications':'ISO 9001:2015, ISO 14001, ISO 45001','Similar Work Orders':'4 WOs detected' },
+    'Patil & Associates':    { 'Vendor Name':'Patil & Associates','Document Date':'May 16, 2026','Bid Reference':'BID/PA/2026/005','EMD Amount':'Not found','EMD Form':'Not found','Bid Validity':'Aug 20, 2026','Company Type':'Partnership','CIN':'—','GST Number':'27AAFFP7788U1Z4','PAN':'AAFFP7788U','Turnover (Last 3 yr avg)':'₹38,00,000','ISO Certifications':'Not found','Similar Work Orders':'1 WO detected' },
+  };
+  const PARSED_FIN = {
+    'Rajesh Constructions': { 'Vendor Name':'Rajesh Constructions Pvt Ltd','Total Quoted Amount (₹)':'₹26,40,000','GST Inclusive/Exclusive':'Exclusive','BOQ items count':'12 items','Any deviations noted':'None detected','Validity of quote':'90 days' },
+    'Maharashtra Roads Co.': { 'Vendor Name':'Maharashtra Roads Co.','Total Quoted Amount (₹)':'₹28,10,000','GST Inclusive/Exclusive':'Exclusive','BOQ items count':'12 items','Any deviations noted':'None detected','Validity of quote':'90 days' },
+    'BuildTech Solutions':   { 'Vendor Name':'BuildTech Solutions Pvt Ltd','Total Quoted Amount (₹)':'₹31,80,000','GST Inclusive/Exclusive':'Exclusive','BOQ items count':'12 items','Any deviations noted':'1 minor deviation — Item 7','Validity of quote':'90 days' },
+    'NCC Infrastructure':    { 'Vendor Name':'NCC Infrastructure Ltd','Total Quoted Amount (₹)':'₹22,10,000','GST Inclusive/Exclusive':'Exclusive','BOQ items count':'12 items','Any deviations noted':'None detected','Validity of quote':'90 days' },
+  };
+  const QUOTE_NUM = { 'Rajesh Constructions':2640000,'Maharashtra Roads Co.':2810000,'BuildTech Solutions':3180000,'NCC Infrastructure':2210000 };
+  const ESTIMATE = 2785350;
+
+  const PQ_CRITERIA = [
+    { id:'incorp',    short:'Incorporation', full:'Certificate of incorporation per company type' },
+    { id:'pangst',    short:'PAN / GST',     full:'Valid PAN and GST registration' },
+    { id:'moa',       short:'MOA / AOA',     full:'MOA and AOA (for companies)' },
+    { id:'turnover',  short:'Turnover',      full:'CA-certified average turnover ≥ EC, last 3 or 5 years' },
+    { id:'audit',     short:'Audit Docs',    full:'P&L and audited balance sheet for same period' },
+    { id:'iso',       short:'ISO Cert',      full:'At least one relevant ISO certification' },
+    { id:'blacklist', short:'Non-Blacklist', full:'Signed non-blacklisting declaration' },
+    { id:'wo',        short:'Work Orders',   full:'80-60-40 rule: 1×80% or 2×60% or 3×40% of EC' },
+  ];
+  const TQ_CRITERIA = [
+    { id:'woscore',   short:'WO Score',       full:'Work order marks (up to 10)', max:10 },
+    { id:'isoscore',  short:'ISO Score',      full:'ISO certificate count marks (2/5/10)', max:10 },
+    { id:'cmmi',      short:'CMMI',           full:'CMMI level marks (optional, 2/5/10)', max:10 },
+    { id:'turnscore', short:'Turnover Score', full:'Turnover-based marks', max:40 },
+    { id:'manpower',  short:'Manpower',       full:'Manpower-based marks (if applicable)', max:30 },
+  ];
+  const TQ_THRESHOLD = 50;
+
+  // AI suggestions per vendor (used by pre-screen + popover prefill)
+  function aiPQ(vendor, critId){
+    const p = PARSED_TECH[vendor] || {};
+    if (critId === 'incorp')    return p['CIN'] && p['CIN'] !== '—' ? 'pass' : (p['Company Type']==='Partnership' ? 'pass' : 'pass');
+    if (critId === 'pangst')    return (p['PAN'] && p['GST Number']) ? 'pass' : 'fail';
+    if (critId === 'moa')       return p['Company Type']==='Partnership' ? 'clarif' : 'pass';
+    if (critId === 'turnover')  return (parseTurnover(p['Turnover (Last 3 yr avg)']) >= 2250000) ? 'pass' : 'fail';
+    if (critId === 'audit')     return 'pass';
+    if (critId === 'iso')       return (p['ISO Certifications'] && p['ISO Certifications'] !== 'Not found') ? 'pass' : 'fail';
+    if (critId === 'blacklist') return 'pass';
+    if (critId === 'wo')        return (parseInt(p['Similar Work Orders']) >= 3) ? 'pass' : (parseInt(p['Similar Work Orders']) >= 1 ? 'clarif' : 'fail');
+    return 'pass';
+  }
+  function aiTQ(vendor, critId){
+    const p = PARSED_TECH[vendor] || {};
+    const wos = parseInt(p['Similar Work Orders']) || 0;
+    const isoCount = (p['ISO Certifications']||'').split(',').filter(x => x.trim() && x.trim()!=='Not found').length;
+    const turn = parseTurnover(p['Turnover (Last 3 yr avg)']);
+    if (critId === 'woscore')   return Math.min(10, wos * 3);
+    if (critId === 'isoscore')  return isoCount >= 3 ? 10 : isoCount === 2 ? 5 : isoCount === 1 ? 2 : 0;
+    if (critId === 'cmmi')      return 5;
+    if (critId === 'turnscore') return turn >= 20000000 ? 40 : turn >= 10000000 ? 30 : turn >= 5000000 ? 20 : 10;
+    if (critId === 'manpower')  return turn >= 10000000 ? 25 : 18;
+    return 0;
+  }
+  function parseTurnover(s){ return parseFloat(String(s||'').replace(/[₹,\s]/g,'')) || 0; }
+  function aiPQValue(vendor, critId){
+    const p = PARSED_TECH[vendor] || {};
+    const map = { incorp:p['CIN'], pangst:(p['PAN']+' · '+p['GST Number']), moa:p['Company Type'], turnover:p['Turnover (Last 3 yr avg)'], audit:'Audit docs present', iso:p['ISO Certifications'], blacklist:'Declaration signed', wo:p['Similar Work Orders'] };
+    return map[critId] || '—';
+  }
+
+  // ===================== STATE =====================
+  let EVAL = null;
+  function freshState(tnd){
+    return {
+      tnd,
+      stageTab:'technical',
+      t1:{ status:'pending', file:'', date:'', time:'', officer:'Rajesh Kumar', w1:'', w2:'', totalBids:'' },
+      bids:[],            // {vendor, file, status:'parsed', parsedEdits:{}}
+      expanded:'t1',
+      matrix:{},          // matrix[vendor][critId] = 'pass'|'fail'|'clarif'|number
+      prescreened:false,
+      t3confirmed:false,
+      clarifications:{},   // key `${vendor}|${critId}` -> {sent:bool, date, requestedDoc}
+      ntq:{},              // vendor -> {status:'draft'|'sent'|'signed', note}
+      techComplete:false,
+      finBids:[],          // {vendor, file, status:'parsed'}
+      finRun:false,
+      finComplete:false,
+      method:'L1',
+    };
+  }
+  function saveState(){ try { localStorage.setItem('eval_'+EVAL.tnd, JSON.stringify(EVAL)); } catch(e){} }
+  function loadState(tnd){
+    try { const raw = localStorage.getItem('eval_'+tnd); if (raw) return JSON.parse(raw); } catch(e){}
+    return null;
+  }
+  // Seed TND-2026-001 demo: T1 complete + 5 parsed technical bids, T3 active
+  function seedDemo(tnd){
+    const s = freshState(tnd);
+    s.t1 = { status:'complete', file:'bid_opening_register_TND-2026-001.pdf', date:'2026-05-15', time:'11:00', officer:'Rajesh Kumar', w1:'Priya Shah', w2:'Amit Patil', totalBids:'5' };
+    s.bids = VENDOR_OPTIONS.map((v,i) => ({ vendor:v, file:'technical_bid_'+v.toLowerCase().replace(/[^a-z]/g,'_')+'.pdf', status:'parsed', parsedEdits:{} }));
+    s.expanded = 't3';
+    return s;
+  }
+
+  // ===================== LANDING =====================
+  function renderEvalList(){
+    const wrap = document.getElementById('evalList');
+    wrap.innerHTML = EVAL_TENDERS.map(t => {
+      const m = STAGE_META[t.stage];
+      return `<div class="ev-row" onclick="openWorkspace('${t.id}')" tabindex="0" role="button" onkeydown="if(event.key==='Enter')openWorkspace('${t.id}')" style="padding:14px 16px; border-bottom:1px solid #F3F4F6; display:flex; align-items:center; gap:16px;">
+        <span class="w-2 h-2 rounded-full shrink-0 ${m.pulse?'pulse-amber':''}" style="background:${m.dot};"></span>
+        <span class="font-mono text-[12px] font-semibold text-primary shrink-0" style="background:#EFF6FF; border-radius:4px; padding:2px 6px; width:108px; text-align:center;">${t.id}</span>
+        <div class="flex-1 min-w-0">
+          <div class="text-[14px] font-medium text-ink-900 truncate">${t.name}</div>
+          <div class="text-[12px] text-ink-400">${t.dept} · ${t.sector}</div>
+        </div>
+        <div class="shrink-0 text-[12.5px] text-ink-500" style="width:240px; text-align:right;">${m.label}</div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-ink-400 shrink-0"></i>
+      </div>`;
+    }).join('');
+    refreshIcons();
+  }
+  function showLanding(){
+    try { history.replaceState(null,'',location.pathname); } catch(e){}
+    document.getElementById('screen-workspace').classList.add('hidden');
+    document.getElementById('screen-landing').classList.remove('hidden');
+    renderEvalList();
+    window.scrollTo({ top:0 });
+  }
+  function openWorkspace(tnd){
+    try { history.replaceState(null,'','?tender='+encodeURIComponent(tnd)); } catch(e){}
+    const t = EVAL_TENDERS.find(x => x.id === tnd) || EVAL_TENDERS[0];
+    EVAL = loadState(tnd) || (tnd === 'TND-2026-001' ? seedDemo(tnd) : freshState(tnd));
+    document.getElementById('wsCrumb').textContent = t.id;
+    document.getElementById('wsBadge').textContent = t.id;
+    document.getElementById('wsName').textContent = t.name;
+    document.getElementById('wsMeta').textContent = `${t.dept} · ${t.sector} · Est. ${t.cost}`;
+    refreshStagePill();
+    document.getElementById('screen-landing').classList.add('hidden');
+    document.getElementById('screen-workspace').classList.remove('hidden');
+    setStageTab(EVAL.stageTab || 'technical', true);
+    window.scrollTo({ top:0 });
+  }
+  function refreshStagePill(){
+    const pill = document.getElementById('wsStagePill');
+    if (EVAL.finComplete){ pill.style.background='#F0FDF4'; pill.style.color='#065F46'; pill.innerHTML='<span class="w-1.5 h-1.5 rounded-full" style="background:#10B981;"></span> Evaluation complete'; }
+    else if (EVAL.techComplete){ pill.style.background='#EFF6FF'; pill.style.color='#0C447C'; pill.innerHTML='<span class="w-1.5 h-1.5 rounded-full" style="background:#0F5EE8;"></span> Financial evaluation in progress'; }
+    else { pill.style.background='#FFFBEB'; pill.style.color='#92400E'; pill.innerHTML='<span class="w-1.5 h-1.5 rounded-full pulse-amber" style="background:#F59E0B;"></span> Technical evaluation in progress'; }
+  }
+
+  // ===================== STAGE TABS =====================
+  function setStageTab(name, silent){
+    if (name === 'financial' && !EVAL.techComplete){
+      if (!silent) showToast('Complete previous stage to unlock');
+      name = 'technical';
+    }
+    EVAL.stageTab = name;
+    document.getElementById('stage-technical').classList.toggle('hidden', name !== 'technical');
+    document.getElementById('stage-financial').classList.toggle('hidden', name !== 'financial');
+    document.querySelectorAll('[data-stab]').forEach(b => {
+      const on = b.dataset.stab === name;
+      const locked = b.dataset.stab === 'financial' && !EVAL.techComplete;
+      b.classList.toggle('bg-primary', on);
+      b.classList.toggle('text-white', on);
+      b.classList.toggle('border-primary', on);
+      b.classList.toggle('bg-white', !on);
+      b.classList.toggle('border-line', !on);
+      b.classList.toggle('text-ink-400', !on && locked);
+      b.classList.toggle('text-ink-500', !on && !locked);
+      const ic = b.querySelector('i');
+      if (b.dataset.stab === 'financial' && ic){ ic.setAttribute('data-lucide', locked ? 'lock' : 'indian-rupee'); }
     });
-    keysToRemove.forEach(k => localStorage.removeItem(k));
-  } catch (e) {}
-  if (window.lucide) lucide.createIcons();
+    if (name === 'technical') renderTechnical();
+    else renderFinancial();
+    saveState();
+    refreshIcons();
+  }
+
+  // ===================== TECHNICAL TAB =====================
+  function sectionStatus(){
+    const t1done = EVAL.t1.status === 'complete';
+    const t2done = t1done && EVAL.bids.length > 0;
+    const t3done = t2done && EVAL.t3confirmed;
+    const t4done = EVAL.techComplete;
+    return { t1done, t2done, t3done, t4done };
+  }
+  function sectionHeaderHTML(num, title, statusPill, key, expanded, locked){
+    return `<div class="flex items-center gap-3 ${locked?'opacity-50':'cursor-pointer'}" ${locked?'':`onclick="toggleSection('${key}')"`} style="padding:14px 18px;">
+      <span class="text-[11px] font-bold" style="background:#F3F4F6; color:#6B7280; border-radius:6px; padding:3px 8px;">${num}</span>
+      <span class="text-[14px] font-bold text-ink-900 flex-1">${title}</span>
+      ${statusPill}
+      ${locked ? '<i data-lucide="lock" class="w-4 h-4 text-ink-400"></i>' : `<i data-lucide="${expanded?'chevron-up':'chevron-down'}" class="w-4 h-4 text-ink-400"></i>`}
+    </div>`;
+  }
+  function pill(text, bg, color){ return `<span class="text-[11px] font-semibold" style="background:${bg}; color:${color}; border-radius:20px; padding:3px 10px;">${text}</span>`; }
+
+  function toggleSection(key){
+    EVAL.expanded = (EVAL.expanded === key) ? '' : key;
+    renderTechnical(); saveState();
+  }
+
+  function renderTechnical(){
+    const wrap = document.getElementById('stage-technical');
+    const st = sectionStatus();
+    wrap.innerHTML = [
+      sectionCard('t1','01','Bid Opening Register', st),
+      sectionCard('t2','02','Upload Technical Bids', st),
+      sectionCard('t3','03','PQ & TQ Evaluation', st),
+      sectionCard('t4','04','Results & Actions', st),
+    ].join('');
+    refreshIcons();
+  }
+  function sectionCard(key, num, title, st){
+    const locked = (key==='t2' && !st.t1done) || (key==='t3' && !st.t2done) || (key==='t4' && !st.t3done);
+    const done = st[key+'done'];
+    const expanded = EVAL.expanded === key && !locked;
+    let statusPill;
+    if (key==='t1') statusPill = EVAL.t1.status==='complete' ? pill('Uploaded','#F0FDF4','#065F46') : pill('Pending','#F3F4F6','#6B7280');
+    else if (key==='t2') statusPill = EVAL.bids.length ? pill(EVAL.bids.length+' uploaded','#F0FDF4','#065F46') : pill('Pending','#F3F4F6','#6B7280');
+    else if (key==='t3'){ const n = evaluatedCount(); statusPill = EVAL.t3confirmed ? pill('Complete','#F0FDF4','#065F46') : pill(n+' of '+EVAL.bids.length+' evaluated','#FFFBEB','#92400E'); }
+    else statusPill = EVAL.techComplete ? pill('Complete','#F0FDF4','#065F46') : pill('Pending','#F3F4F6','#6B7280');
+    const body = expanded ? `<div style="padding:0 18px 18px;">${sectionBody(key)}</div>` : '';
+    return `<div class="bg-white border border-line rounded-xl overflow-hidden">
+      ${sectionHeaderHTML(num,title,statusPill,key,expanded,locked)}
+      ${body}
+    </div>`;
+  }
+  function evaluatedCount(){
+    return EVAL.bids.filter(b => vendorVerdict(b.vendor) !== 'pending-empty').length;
+  }
+
+  function sectionBody(key){
+    if (key==='t1') return t1Body();
+    if (key==='t2') return t2Body();
+    if (key==='t3') return t3Body();
+    if (key==='t4') return t4Body();
+    return '';
+  }
+
+  // ----- T1 -----
+  function t1Body(){
+    if (EVAL.t1.status === 'complete'){
+      const t1 = EVAL.t1;
+      return `<div class="rounded-lg p-3 flex items-center gap-2 mb-3" style="background:#F0FDF4; border:1px solid #BBF7D0;">
+          <i data-lucide="check-circle-2" class="w-4 h-4" style="color:#10B981;"></i>
+          <span class="text-[12.5px]" style="color:#065F46;">Bid Opening Register uploaded · ${fmtDate(t1.date)} ${t1.time} · Immutable record</span>
+        </div>
+        <div class="flex items-center gap-2 mb-3" style="background:#F9FAFB; border:1px solid #E5E7EB; border-radius:8px; padding:8px 12px;">
+          <i data-lucide="file-text" class="w-4 h-4 text-primary"></i>
+          <span class="text-[12.5px] text-ink-900 flex-1 truncate">${t1.file}</span>
+          <a href="#" onclick="showToast('Opening document preview'); return false;" class="text-[12px] text-primary hover:underline">View</a>
+        </div>
+        <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-[12.5px]">
+          <div><span class="text-ink-500">Date of opening:</span> <span class="text-ink-900 font-medium">${fmtDate(t1.date)}</span></div>
+          <div><span class="text-ink-500">Time:</span> <span class="text-ink-900 font-medium">${t1.time}</span></div>
+          <div><span class="text-ink-500">Opening officer:</span> <span class="text-ink-900 font-medium">${t1.officer}</span></div>
+          <div><span class="text-ink-500">Total bids received:</span> <span class="text-ink-900 font-medium">${t1.totalBids}</span></div>
+          <div><span class="text-ink-500">Witness 1:</span> <span class="text-ink-900 font-medium">${t1.w1}</span></div>
+          <div><span class="text-ink-500">Witness 2:</span> <span class="text-ink-900 font-medium">${t1.w2||'—'}</span></div>
+        </div>`;
+    }
+    return `<div class="rounded-lg p-3 mb-3 text-[12px]" style="background:#EFF6FF; border:1px solid #BFDBFE; color:#1E40AF;">Upload the Bid Opening Register document that was prepared and signed during the in-person technical bid opening ceremony.</div>
+      <label class="block cursor-pointer" id="t1Drop" onclick="t1PickFile()" style="border:1.5px dashed #D1D5DB; border-radius:10px; padding:20px 24px; display:flex; gap:20px; align-items:center;">
+        <i data-lucide="upload-cloud" class="shrink-0" style="width:28px; height:28px; color:#0F5EE8;"></i>
+        <div class="flex-1">
+          <div class="text-[14px] font-bold text-ink-900" id="t1FileLabel">Upload Bid Opening Register</div>
+          <div class="text-[12px] text-ink-500">PDF or scanned image — max 20MB</div>
+        </div>
+        <span class="px-3.5 py-2 rounded-lg bg-primary text-white text-[12.5px] font-medium">Browse</span>
+      </label>
+      <div class="grid grid-cols-2 gap-3 mt-4">
+        <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Date of opening *</label><input id="t1Date" type="date" class="field" value="2026-05-15"/></div>
+        <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Time of opening *</label><input id="t1Time" type="time" class="field" value="11:00"/></div>
+        <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Opening officer</label><input id="t1Officer" type="text" class="field" value="Rajesh Kumar"/></div>
+        <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Total bids received *</label><input id="t1Total" type="number" class="field" placeholder="5"/></div>
+        <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Witness 1</label><input id="t1W1" type="text" class="field" placeholder="Priya Shah"/></div>
+        <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Witness 2 (optional)</label><input id="t1W2" type="text" class="field" placeholder="Amit Patil"/></div>
+      </div>
+      <div class="flex justify-end mt-4"><button onclick="submitT1()" class="px-4 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90">Submit &amp; Lock Register</button></div>`;
+  }
+  function t1PickFile(){ EVAL._t1file = 'bid_opening_register_'+EVAL.tnd+'.pdf'; const el = document.getElementById('t1FileLabel'); if (el){ el.textContent = EVAL._t1file; el.style.color='#0F5EE8'; } showToast('File selected'); }
+  function submitT1(){
+    const total = document.getElementById('t1Total').value.trim();
+    const date = document.getElementById('t1Date').value, time = document.getElementById('t1Time').value;
+    if (!EVAL._t1file){ showToast('Select the register file first'); return; }
+    if (!date || !time || !total){ showToast('Fill date, time and total bids'); return; }
+    EVAL.t1 = { status:'complete', file:EVAL._t1file, date, time, officer:document.getElementById('t1Officer').value||'Rajesh Kumar',
+      w1:document.getElementById('t1W1').value||'Priya Shah', w2:document.getElementById('t1W2').value||'', totalBids:total };
+    EVAL.expanded = 't2';
+    renderTechnical(); saveState();
+    showToast('Bid Opening Register locked');
+  }
+  function fmtDate(iso){ if(!iso) return '—'; try { return new Date(iso+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); } catch(e){ return iso; } }
+
+  // ----- T2 -----
+  function t2Body(){
+    const rows = EVAL.bids.map((b,i) => {
+      const stPill = b.status==='parsed' ? '<span style="color:#10B981; font-size:12px;">Parsed ✓</span>'
+                   : b.status==='processing' ? '<span style="color:#0F5EE8; font-size:12px;" class="inline-flex items-center gap-1.5"><span style="width:11px;height:11px;border:2px solid #BFDBFE;border-top-color:#0F5EE8;border-radius:50%;display:inline-block;animation:spin .7s linear infinite;"></span> AI is parsing the document...</span>'
+                   : '<span style="color:#EF4444; font-size:12px;">Parse failed</span>';
+      const action = b.status==='parsed' ? `<a href="#" onclick="openDrawer('${b.vendor}','tech'); return false;" class="text-[12px] text-primary hover:underline">View parsed data →</a>` : '<span class="text-ink-400 text-[12px]">—</span>';
+      return `<tr style="border-bottom:1px solid #F3F4F6;">
+        <td style="padding:10px 12px; font-size:13px; color:#111827; font-weight:600;">${b.vendor}</td>
+        <td style="padding:10px 12px; font-size:12px; color:#6B7280;" class="truncate">${b.file}</td>
+        <td style="padding:10px 12px; font-size:11.5px; color:#9CA3AF;">May 17, 2026</td>
+        <td style="padding:10px 12px;">${stPill}</td>
+        <td style="padding:10px 12px;">${action}</td>
+      </tr>`;
+    }).join('');
+    const table = EVAL.bids.length ? `<div style="border:1px solid #E5E7EB; border-radius:10px; overflow:hidden; margin-bottom:14px;">
+      <table style="width:100%; table-layout:fixed; border-collapse:collapse;">
+        <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;">
+          <th style="${thS()} width:24%;">Vendor</th><th style="${thS()} width:26%;">File</th><th style="${thS()} width:16%;">Uploaded At</th><th style="${thS()} width:18%;">Status</th><th style="${thS()} width:16%;">Action</th>
+        </tr></thead><tbody>${rows}</tbody></table></div>` : '';
+    const usedVendors = EVAL.bids.map(b => b.vendor);
+    const avail = VENDOR_OPTIONS.filter(v => !usedVendors.includes(v));
+    return `${table}
+      <div style="border:1px solid #E5E7EB; border-radius:10px; padding:16px 18px; background:#F9FAFB;">
+        <div class="text-[13px] font-bold text-ink-900 mb-3">Add a bid</div>
+        <div class="grid gap-3" style="grid-template-columns:1fr 1fr 1fr;">
+          <div>
+            <label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Vendor *</label>
+            <select id="t2Vendor" class="field" onchange="t2VendorChange()">
+              <option value="">Select vendor…</option>
+              ${avail.map(v => `<option value="${v}">${v}</option>`).join('')}
+              <option value="__new">+ Add new vendor</option>
+            </select>
+            <input id="t2VendorNew" type="text" class="field hidden mt-1" placeholder="New vendor name"/>
+          </div>
+          <div>
+            <label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Bid type</label>
+            <input type="text" class="field" value="Technical Bid" readonly style="background:#F3F4F6; color:#6B7280;"/>
+          </div>
+          <div>
+            <label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Document</label>
+            <button onclick="t2PickFile()" class="field text-left" id="t2FileBtn" style="cursor:pointer;">Choose file</button>
+          </div>
+        </div>
+        <div class="flex justify-end mt-3"><button onclick="uploadBid()" class="px-4 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90">Upload Bid</button></div>
+      </div>`;
+  }
+  function thS(){ return 'padding:9px 12px; font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; text-align:left;'; }
+  function t2VendorChange(){
+    const sel = document.getElementById('t2Vendor');
+    document.getElementById('t2VendorNew').classList.toggle('hidden', sel.value !== '__new');
+  }
+  function t2PickFile(){ EVAL._t2file = 'technical_bid_'+Date.now()+'.pdf'; document.getElementById('t2FileBtn').textContent = 'technical_bid.pdf'; }
+  function uploadBid(){
+    const sel = document.getElementById('t2Vendor');
+    let vendor = sel.value === '__new' ? document.getElementById('t2VendorNew').value.trim() : sel.value;
+    if (!vendor){ showToast('Select or enter a vendor'); return; }
+    if (!EVAL._t2file){ showToast('Choose a document'); return; }
+    const bid = { vendor, file:'technical_bid_'+vendor.toLowerCase().replace(/[^a-z]/g,'_')+'.pdf', status:'processing', parsedEdits:{} };
+    EVAL.bids.push(bid);
+    EVAL._t2file = null;
+    renderTechnical(); saveState();
+    setTimeout(() => { bid.status = 'parsed'; renderTechnical(); saveState(); showToast(vendor+' bid parsed'); }, 1600);
+  }
+
+  // ----- DRAWER (parsed data) -----
+  function openDrawer(vendor, kind){
+    const data = kind==='fin' ? (PARSED_FIN[vendor] || PARSED_FIN['Rajesh Constructions']) : (PARSED_TECH[vendor] || PARSED_TECH['Rajesh Constructions']);
+    const bid = (kind==='fin' ? EVAL.finBids : EVAL.bids).find(b => b.vendor === vendor) || { parsedEdits:{} };
+    const rows = Object.entries(data).map(([field,val]) => {
+      const edited = bid.parsedEdits && bid.parsedEdits[field];
+      const shown = edited != null ? edited : val;
+      const notFound = shown === 'Not found';
+      const cell = notFound
+        ? `<span style="color:#92400E;">Not found</span> <a href="#" onclick="drawerManual('${vendor}','${kind}','${field.replace(/'/g,'')}'); return false;" class="text-[11px] text-primary hover:underline">Enter manually</a>`
+        : `<span class="text-ink-900">${shown}</span>`;
+      return `<tr style="border-bottom:1px solid #F3F4F6;">
+        <td style="padding:9px 12px; font-size:12px; color:#6B7280; width:42%;">${field}</td>
+        <td style="padding:9px 12px; font-size:12.5px;" data-dfield="${field}">${cell}</td>
+      </tr>`;
+    }).join('');
+    document.getElementById('drawer').innerHTML = `
+      <div style="padding:16px 20px; border-bottom:1px solid #E5E7EB; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; background:white; z-index:2;">
+        <div class="text-[14px] font-bold text-ink-900">${vendor} — Parsed ${kind==='fin'?'Financial':'Technical'} Bid</div>
+        <button onclick="closeDrawer()" aria-label="Close" class="text-ink-400 hover:text-ink-900"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div style="padding:16px 20px;">
+        <div class="rounded-lg p-2.5 mb-3 text-[11.5px]" style="background:#EFF6FF; color:#0C447C;">✦ AI extracted the fields below from the uploaded document. Review before confirming.</div>
+        <div style="border:1px solid #E5E7EB; border-radius:10px; overflow:hidden;">
+          <table style="width:100%; border-collapse:collapse;">
+            <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()}">Field</th><th style="${thS()}">Extracted Value</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+        <div class="flex gap-2 mt-4">
+          <button onclick="closeDrawer(); showToast('Parsed data confirmed')" class="flex-1 px-3 py-2 rounded-lg bg-success text-white text-[13px] font-medium">Looks correct</button>
+          <button onclick="showToast('Edit mode — click any value to change')" class="px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">Edit details</button>
+        </div>
+      </div>`;
+    document.getElementById('drawerBackdrop').classList.remove('hidden');
+    document.getElementById('drawer').classList.add('open');
+    refreshIcons();
+  }
+  function closeDrawer(){ document.getElementById('drawer').classList.remove('open'); document.getElementById('drawerBackdrop').classList.add('hidden'); }
+  function drawerManual(vendor, kind, field){
+    const cell = document.querySelector(`#drawer td[data-dfield="${field}"]`);
+    if (!cell) return;
+    cell.innerHTML = `<input class="field" style="padding:5px 8px; font-size:12px;" placeholder="Enter ${field}" onblur="drawerSaveManual('${vendor}','${kind}','${field.replace(/'/g,'')}', this.value)"/>`;
+    cell.querySelector('input').focus();
+  }
+  function drawerSaveManual(vendor, kind, field, val){
+    const bid = (kind==='fin' ? EVAL.finBids : EVAL.bids).find(b => b.vendor === vendor);
+    if (bid && val.trim()){ bid.parsedEdits = bid.parsedEdits||{}; bid.parsedEdits[field] = val.trim(); saveState(); }
+    openDrawer(vendor, kind);
+  }
+
+  // ----- T3 — MATRIX -----
+  function t3Body(){
+    if (!EVAL.bids.length) return '<div class="text-[13px] text-ink-500 italic">Upload technical bids first.</div>';
+    const allCrit = PQ_CRITERIA.concat(TQ_CRITERIA);
+    const head = `<thead>
+      <tr>
+        <th rowspan="2" style="${matrixTh()} position:sticky; left:0; background:#F9FAFB; z-index:3; width:150px;">Vendor</th>
+        <th colspan="${PQ_CRITERIA.length}" style="${matrixTh()} background:#EFF6FF; color:#0C447C; border-bottom:2px solid #0F5EE8;">PQ CRITERIA</th>
+        <th colspan="${TQ_CRITERIA.length+1}" style="${matrixTh()} background:#EEEDFE; color:#3C3489; border-bottom:2px solid #8B5CF6;">TQ CRITERIA</th>
+        <th rowspan="2" style="${matrixTh()} position:sticky; right:0; background:#F9FAFB; z-index:3; width:88px;">Verdict</th>
+      </tr>
+      <tr>
+        ${PQ_CRITERIA.map(c => `<th style="${matrixTh()} width:84px;" title="${c.full}">${c.short} <span style="color:#9CA3AF;">ℹ</span></th>`).join('')}
+        ${TQ_CRITERIA.map(c => `<th style="${matrixTh()} width:84px;" title="${c.full}">${c.short} <span style="color:#9CA3AF;">ℹ</span></th>`).join('')}
+        <th style="${matrixTh()} width:78px;" title="Auto-calculated, out of 100">TQ Total</th>
+      </tr></thead>`;
+    const rows = EVAL.bids.map(b => {
+      const m = EVAL.matrix[b.vendor] || {};
+      const pqCells = PQ_CRITERIA.map(c => matrixCellHTML(b.vendor, c.id, m[c.id], 'pq')).join('');
+      const tqCells = TQ_CRITERIA.map(c => matrixCellHTML(b.vendor, c.id, m[c.id], 'tq')).join('');
+      const total = tqTotal(b.vendor);
+      const totalShown = total != null ? total : '—';
+      const v = vendorVerdict(b.vendor);
+      const vPill = v==='tq' ? pill('TQ','#F0FDF4','#065F46') : v==='ntq' ? pill('NTQ','#FEF2F2','#991B1B') : v==='pending' ? pill('Pending','#FFFBEB','#92400E') : '<span class="text-ink-400 text-[11px]">—</span>';
+      return `<tr>
+        <td style="${matrixTd()} position:sticky; left:0; background:white; z-index:2; font-weight:600; color:#111827;">${b.vendor}</td>
+        ${pqCells}${tqCells}
+        <td style="${matrixTd()} text-align:center; background:#EEEDFE; color:#3C3489; font-weight:700;">${totalShown}</td>
+        <td style="${matrixTd()} position:sticky; right:0; background:white; z-index:2; text-align:center;">${vPill}</td>
+      </tr>`;
+    }).join('');
+    return `<div class="flex items-center justify-between gap-3 flex-wrap mb-3">
+        <div class="text-[12px] text-ink-500">Click any cell to evaluate. Hover a column header for the full requirement.</div>
+        <button onclick="aiPrescreen()" class="px-3 py-1.5 rounded-lg border border-primary text-primary text-[12px] font-medium hover:bg-primary-light inline-flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> ✦ AI Pre-screen All</button>
+      </div>
+      <div style="overflow-x:auto; border:1px solid #E5E7EB; border-radius:10px;">
+        <table style="width:100%; border-collapse:collapse; min-width:1180px;">${head}<tbody>${rows}</tbody></table>
+      </div>
+      <div class="flex items-center justify-between mt-3 flex-wrap gap-2">
+        <div class="text-[12px] text-ink-500" aria-live="polite">${evaluatedCount()} of ${EVAL.bids.length} vendors fully evaluated</div>
+        <button onclick="confirmT3()" class="px-4 py-2 rounded-lg ${allEvaluated()?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-medium" ${allEvaluated()?'':'disabled'}>Confirm Evaluation</button>
+      </div>`;
+  }
+  function matrixTh(){ return 'padding:8px 6px; font-size:10px; font-weight:700; color:#6B7280; text-transform:uppercase; letter-spacing:0.03em; text-align:center; border-bottom:1px solid #E5E7EB; white-space:nowrap;'; }
+  function matrixTd(){ return 'padding:0; font-size:12px; border-bottom:1px solid #F3F4F6; border-right:1px solid #F3F4F6; height:42px;'; }
+  function matrixCellHTML(vendor, critId, val, kind){
+    let inner = '<span style="color:#9CA3AF;">—</span>', bg='white', color='#9CA3AF';
+    if (val != null){
+      if (kind==='pq'){
+        if (val==='pass'){ inner='✓'; bg='#F0FDF4'; color='#065F46'; }
+        else if (val==='fail'){ inner='✗'; bg='#FEF2F2'; color='#991B1B'; }
+        else if (val==='clarif'){ inner='⏳'; bg='#FFFBEB'; color='#92400E'; }
+      } else { inner=val; bg='#EEEDFE'; color='#3C3489'; }
+    }
+    return `<td class="matrix-cell" onclick="openCell(event,'${vendor}','${critId}','${kind}')" tabindex="0" style="${matrixTd()} text-align:center; background:${bg}; color:${color}; font-weight:600;">${inner}</td>`;
+  }
+  function tqTotal(vendor){
+    const m = EVAL.matrix[vendor] || {};
+    let sum = 0, any = false;
+    TQ_CRITERIA.forEach(c => { if (typeof m[c.id] === 'number'){ sum += m[c.id]; any = true; } });
+    return any ? sum : null;
+  }
+  function vendorVerdict(vendor){
+    const m = EVAL.matrix[vendor] || {};
+    const pqVals = PQ_CRITERIA.map(c => m[c.id]);
+    const tqVals = TQ_CRITERIA.map(c => m[c.id]);
+    if (pqVals.every(v => v==null) && tqVals.every(v => v==null)) return 'pending-empty';
+    if (pqVals.includes('fail')) return 'ntq';
+    if (pqVals.includes('clarif')) return 'pending';
+    if (pqVals.some(v => v==null) || tqVals.some(v => v==null)) return 'pending';
+    return (tqTotal(vendor) >= TQ_THRESHOLD) ? 'tq' : 'ntq';
+  }
+  function allEvaluated(){ return EVAL.bids.length > 0 && EVAL.bids.every(b => { const v = vendorVerdict(b.vendor); return v==='tq'||v==='ntq'||v==='pending'; }) && EVAL.bids.every(b => vendorVerdict(b.vendor)!=='pending-empty'); }
+
+  function openCell(e, vendor, critId, kind){
+    e.stopPropagation();
+    closeDrawer();
+    const pop = document.getElementById('cellPopover');
+    const crit = (kind==='pq'?PQ_CRITERIA:TQ_CRITERIA).find(c => c.id===critId);
+    const cur = (EVAL.matrix[vendor]||{})[critId];
+    let bodyHTML;
+    if (kind==='pq'){
+      const aiV = aiPQ(vendor, critId);
+      const aiLabel = aiV==='pass'?'Pass':aiV==='fail'?'Fail':'Clarification needed';
+      bodyHTML = `<div class="rounded-md p-2 mb-2.5 text-[11.5px]" style="background:#EFF6FF; color:#0C447C;">✦ AI extracted: ${aiPQValue(vendor,critId)} — suggests <strong>${aiLabel}</strong></div>
+        <div class="space-y-1.5">
+          ${pqRadio('pass','✓ Pass','#10B981','#F0FDF4',cur)}
+          ${pqRadio('fail','✗ Fail','#EF4444','#FEF2F2',cur)}
+          ${pqRadio('clarif','⏳ Clarification needed','#F59E0B','#FFFBEB',cur)}
+        </div>`;
+    } else {
+      const aiS = aiTQ(vendor, critId);
+      bodyHTML = `<div class="rounded-md p-2 mb-2.5 text-[11.5px]" style="background:#EFF6FF; color:#0C447C;">✦ AI suggests: ${aiS}</div>
+        <div class="flex items-center gap-2">
+          <input id="cellScore" type="number" class="field" style="width:60px; padding:6px 8px;" value="${typeof cur==='number'?cur:''}" min="0" max="${crit.max}"/>
+          <span class="text-[12px] text-ink-500">/ ${crit.max}</span>
+        </div>`;
+    }
+    pop.innerHTML = `<div class="flex items-center justify-between mb-2">
+        <div class="text-[12.5px] font-bold text-ink-900">${vendor} — ${crit.short}</div>
+        <button onclick="closeCell()" aria-label="Close" class="text-ink-400 hover:text-ink-900 text-[16px] leading-none">×</button>
+      </div>
+      ${bodyHTML}
+      <div class="flex items-center gap-2 mt-3">
+        <button onclick="saveCell('${vendor}','${critId}','${kind}')" class="px-3 py-1.5 rounded-lg bg-primary text-white text-[12px] font-medium">Save</button>
+        <button onclick="closeCell()" class="text-[12px] text-ink-500">Cancel</button>
+      </div>`;
+    pop.classList.remove('hidden');
+    const cell = e.currentTarget.getBoundingClientRect();
+    const sx = window.scrollX, sy = window.scrollY;
+    let left = cell.left + sx, top = cell.bottom + sy + 6;
+    if (left + 280 > sx + window.innerWidth - 16) left = sx + window.innerWidth - 296;
+    pop.style.left = left + 'px';
+    pop.style.top = top + 'px';
+    pop._cur = cur;
+  }
+  function pqRadio(val, label, color, bg, cur){
+    const on = cur===val;
+    return `<label class="flex items-center gap-2 cursor-pointer" style="border:1px solid ${on?color:'#E5E7EB'}; background:${on?bg:'white'}; border-radius:8px; padding:7px 10px;">
+      <input type="radio" name="pqv" value="${val}" ${on?'checked':''} style="accent-color:${color};">
+      <span class="text-[12.5px] text-ink-900">${label}</span></label>`;
+  }
+  function closeCell(){ document.getElementById('cellPopover').classList.add('hidden'); }
+  function saveCell(vendor, critId, kind){
+    EVAL.matrix[vendor] = EVAL.matrix[vendor] || {};
+    if (kind==='pq'){
+      const sel = document.querySelector('input[name="pqv"]:checked');
+      if (!sel){ showToast('Pick a verdict'); return; }
+      EVAL.matrix[vendor][critId] = sel.value;
+    } else {
+      const v = parseInt(document.getElementById('cellScore').value);
+      if (isNaN(v)){ showToast('Enter a score'); return; }
+      const crit = TQ_CRITERIA.find(c => c.id===critId);
+      EVAL.matrix[vendor][critId] = Math.max(0, Math.min(crit.max, v));
+    }
+    closeCell();
+    renderTechnical(); saveState();
+  }
+  function aiPrescreen(){
+    EVAL.bids.forEach(b => {
+      EVAL.matrix[b.vendor] = EVAL.matrix[b.vendor] || {};
+      PQ_CRITERIA.forEach(c => { EVAL.matrix[b.vendor][c.id] = aiPQ(b.vendor, c.id); });
+      TQ_CRITERIA.forEach(c => { EVAL.matrix[b.vendor][c.id] = aiTQ(b.vendor, c.id); });
+    });
+    EVAL.prescreened = true;
+    renderTechnical(); saveState();
+    showToast('AI pre-screened all cells — review and confirm');
+  }
+  function confirmT3(){
+    if (!allEvaluated()){ showToast('Evaluate all vendors first'); return; }
+    EVAL.t3confirmed = true;
+    EVAL.expanded = 't4';
+    renderTechnical(); saveState();
+    showToast('Technical evaluation confirmed');
+  }
+
+  // ----- T4 — RESULTS -----
+  function t4Body(){
+    const clarif = [];
+    EVAL.bids.forEach(b => {
+      PQ_CRITERIA.forEach(c => { if ((EVAL.matrix[b.vendor]||{})[c.id]==='clarif') clarif.push({ vendor:b.vendor, crit:c }); });
+    });
+    const ntqVendors = EVAL.bids.filter(b => vendorVerdict(b.vendor)==='ntq');
+    const tqVendors = EVAL.bids.filter(b => vendorVerdict(b.vendor)==='tq');
+
+    // Sub-table A — clarification
+    const clarRows = clarif.map(x => {
+      const key = x.vendor+'|'+x.crit.id;
+      const c = EVAL.clarifications[key];
+      const action = c && c.sent
+        ? `<span class="text-[12px]" style="color:#0C447C;">Request sent · ${c.date}</span> <a href="#" onclick="showToast('Reminder sent'); return false;" class="text-[11px] text-primary hover:underline ml-1">Follow up</a> <a href="#" onclick="markClarifReceived('${key}'); return false;" class="text-[11px] text-success hover:underline ml-1">Mark received</a>`
+        : `<button onclick="openClarifForm('${key}')" class="px-2.5 py-1 rounded-md text-white text-[11.5px] font-medium" style="background:#F59E0B;">Send clarification request</button>`;
+      return `<tr style="border-bottom:1px solid #F3F4F6;" data-clarrow="${key}">
+        <td style="${tdS()}">${x.vendor}</td><td style="${tdS()}">${x.crit.short}</td>
+        <td style="${tdS()} color:#92400E;">Document needs clarification</td>
+        <td style="${tdS()}">${action}</td>
+      </tr>`;
+    }).join('');
+    const subA = `<div class="mb-5">
+      <div class="text-[11px] uppercase tracking-wider font-semibold mb-2" style="color:#92400E;">Clarification Pending</div>
+      ${clarif.length ? `<div style="border:1px solid #E5E7EB; border-radius:10px; overflow:hidden;"><table style="width:100%; table-layout:fixed; border-collapse:collapse;">
+        <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:24%;">Vendor</th><th style="${thS()} width:20%;">Criterion</th><th style="${thS()} width:28%;">Issue</th><th style="${thS()} width:28%;">Action</th></tr></thead>
+        <tbody>${clarRows}</tbody></table></div>` : '<div class="text-[12.5px] text-ink-500 italic">No clarifications pending.</div>'}
+    </div>`;
+
+    // Sub-table B — NTQ
+    const ntqRows = ntqVendors.map(b => {
+      const failed = PQ_CRITERIA.filter(c => (EVAL.matrix[b.vendor]||{})[c.id]==='fail').map(c => c.short);
+      const tot = tqTotal(b.vendor);
+      const lowScore = (tot!=null && tot < TQ_THRESHOLD && !failed.length);
+      const reason = failed.length ? failed.join(', ') : ('TQ score '+tot+' below threshold');
+      const j = EVAL.ntq[b.vendor];
+      const jStatus = !j ? '<span class="text-ink-400 text-[12px]">Not started</span>'
+        : j.status==='draft' ? '<span style="color:#92400E; font-size:12px;">Draft</span>'
+        : j.status==='sent' ? '<span style="color:#0C447C; font-size:12px;">Sent for signing</span>'
+        : '<span style="color:#10B981; font-size:12px;">Signed</span>';
+      const action = (!j || j.status==='draft') ? `<button onclick="openNtqEditor('${b.vendor}')" class="px-2.5 py-1 rounded-md text-white text-[11.5px] font-medium" style="background:#EF4444;">${j?'Edit justification':'Draft justification'}</button>`
+        : j.status==='sent' ? `<a href="#" onclick="signNtq('${b.vendor}'); return false;" class="text-[11.5px] text-primary hover:underline">Mark signed</a>`
+        : '<span class="text-ink-400 text-[12px]">—</span>';
+      return `<tr style="border-bottom:1px solid #F3F4F6;" data-ntqrow="${b.vendor}">
+        <td style="${tdS()}">${b.vendor}</td><td style="${tdS()} color:#991B1B;">${reason}</td>
+        <td style="${tdS()}">${jStatus}</td><td style="${tdS()}">${action}</td></tr>`;
+    }).join('');
+    const subB = `<div class="mb-5">
+      <div class="text-[11px] uppercase tracking-wider font-semibold mb-2" style="color:#991B1B;">Not Technically Qualified</div>
+      ${ntqVendors.length ? `<div style="border:1px solid #E5E7EB; border-radius:10px; overflow:hidden;"><table style="width:100%; table-layout:fixed; border-collapse:collapse;">
+        <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:24%;">Vendor</th><th style="${thS()} width:34%;">Failed Criteria</th><th style="${thS()} width:20%;">Justification</th><th style="${thS()} width:22%;">Action</th></tr></thead>
+        <tbody>${ntqRows}</tbody></table></div>` : '<div class="text-[12.5px] text-ink-500 italic">No NTQ bids.</div>'}
+    </div>`;
+
+    // Sub-table C — TQ
+    const ranked = tqVendors.slice().sort((a,b) => tqTotal(b.vendor)-tqTotal(a.vendor));
+    const tqRows = ranked.map((b,i) => `<tr style="border-bottom:1px solid #F3F4F6;">
+      <td style="${tdS()}">${b.vendor}</td>
+      <td style="${tdS()}"><span style="color:#065F46;">All PQ passed</span></td>
+      <td style="${tdS()} font-weight:600;">${tqTotal(b.vendor)} / 100</td>
+      <td style="${tdS()}">#${i+1}</td>
+      <td style="${tdS()} color:#9CA3AF;">Pending upload</td></tr>`).join('');
+    const allNtqSigned = ntqVendors.every(b => EVAL.ntq[b.vendor] && EVAL.ntq[b.vendor].status==='signed');
+    const canProceed = tqVendors.length > 0 && allNtqSigned;
+    const subC = `<div>
+      <div class="text-[11px] uppercase tracking-wider font-semibold mb-2" style="color:#065F46;">Technically Qualified — Ready for Financial Bid Opening</div>
+      ${tqVendors.length ? `<div style="border:1px solid #E5E7EB; border-radius:10px; overflow:hidden;"><table style="width:100%; table-layout:fixed; border-collapse:collapse;">
+        <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:28%;">Vendor</th><th style="${thS()} width:22%;">PQ Status</th><th style="${thS()} width:18%;">TQ Score</th><th style="${thS()} width:12%;">Rank</th><th style="${thS()} width:20%;">Financial Bid</th></tr></thead>
+        <tbody>${tqRows}</tbody></table></div>` : '<div class="text-[12.5px] text-ink-500 italic">No TQ bids yet.</div>'}
+      <div class="flex justify-end mt-3"><button onclick="proceedToFinancial()" class="px-4 py-2 rounded-lg ${canProceed?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-medium" ${canProceed?'':'disabled'}>Proceed to Financial Evaluation →</button></div>
+      ${!allNtqSigned && ntqVendors.length ? '<div class="text-[11.5px] text-warning mt-1.5 text-right">All NTQ justifications must be signed before proceeding.</div>' : ''}
+    </div>`;
+    return subA + subB + subC;
+  }
+  function tdS(){ return 'padding:10px 12px; font-size:12.5px; color:#374151;'; }
+
+  function openClarifForm(key){
+    const row = document.querySelector(`#stage-technical tr[data-clarrow="${key}"]`);
+    if (!row || row.nextElementSibling?.dataset?.clarform) return;
+    const critShort = key.split('|')[1];
+    const tr = document.createElement('tr');
+    tr.dataset.clarform = key;
+    tr.innerHTML = `<td colspan="4" style="padding:14px; background:#FFFBEB;">
+      <div class="grid gap-2" style="grid-template-columns:1fr 1fr;">
+        <div><label class="block text-[11px] font-semibold text-ink-500 uppercase mb-1">Requested document</label><input id="clarDoc-${key}" class="field" value="${PQ_CRITERIA.find(c=>c.id===key.split('|')[1])?.full || critShort}"/></div>
+        <div><label class="block text-[11px] font-semibold text-ink-500 uppercase mb-1">Deadline to respond</label><input id="clarDate-${key}" type="date" class="field"/></div>
+        <div style="grid-column:span 2;"><label class="block text-[11px] font-semibold text-ink-500 uppercase mb-1">Additional note</label><textarea id="clarNote-${key}" rows="2" class="field" placeholder="Optional"></textarea></div>
+      </div>
+      <div class="flex justify-end gap-2 mt-2">
+        <button onclick="closeClarifForm('${key}')" class="px-3 py-1.5 rounded-lg border border-line text-[12.5px] text-ink-900 bg-white">Cancel</button>
+        <button onclick="sendClarif('${key}')" class="px-3 py-1.5 rounded-lg text-white text-[12.5px] font-medium" style="background:#F59E0B;">Send Request</button>
+      </div></td>`;
+    row.after(tr);
+  }
+  function closeClarifForm(key){ const f = document.querySelector(`#stage-technical tr[data-clarform="${key}"]`); if (f) f.remove(); }
+  function sendClarif(key){
+    EVAL.clarifications[key] = { sent:true, date:'May 18', requestedDoc:document.getElementById('clarDoc-'+key)?.value || '' };
+    saveState(); renderTechnical();
+    showToast('Clarification request sent');
+  }
+  function markClarifReceived(key){
+    const [vendor, critId] = key.split('|');
+    EVAL.matrix[vendor] = EVAL.matrix[vendor]||{};
+    EVAL.matrix[vendor][critId] = 'pass';
+    delete EVAL.clarifications[key];
+    saveState(); renderTechnical();
+    showToast('Clarification received — marked Pass');
+  }
+
+  function openNtqEditor(vendor){
+    const row = document.querySelector(`#stage-technical tr[data-ntqrow="${vendor}"]`);
+    if (!row || row.nextElementSibling?.dataset?.ntqedit) return;
+    const failed = PQ_CRITERIA.filter(c => (EVAL.matrix[vendor]||{})[c.id]==='fail').map(c => c.short);
+    const draft = (EVAL.ntq[vendor] && EVAL.ntq[vendor].note) || `Bid submitted by M/s ${vendor} has been evaluated against the prescribed Pre-Qualification criteria. The bid has been found Not Technically Qualified on the following grounds: ${failed.join(', ')||'TQ score below threshold'}. The Evaluation Committee has reviewed the submitted documents and found them insufficient to meet the minimum eligibility requirements as specified in the tender document.`;
+    const tr = document.createElement('tr');
+    tr.dataset.ntqedit = vendor;
+    tr.innerHTML = `<td colspan="4" style="padding:0;">
+      <div style="background:#FEF2F2; border-radius:8px; padding:16px; margin:6px 12px;">
+        <div class="flex items-center justify-between mb-2">
+          <div class="text-[14px] font-bold" style="color:#991B1B;">NTQ Justification — ${vendor}</div>
+          <a href="#" onclick="regenNtq('${vendor}'); return false;" class="text-[12px] text-primary hover:underline">Regenerate ✦</a>
+        </div>
+        <textarea id="ntqText-${vendor}" rows="5" class="field" style="font-size:12.5px;">${draft}</textarea>
+        <div class="flex items-center justify-end gap-2 mt-2">
+          <button onclick="closeNtqEditor('${vendor}')" class="px-3 py-1.5 rounded-lg border border-line text-[12.5px] text-ink-900 bg-white">Cancel</button>
+          <button onclick="saveNtqDraft('${vendor}')" class="px-3 py-1.5 rounded-lg border border-line text-[12.5px] text-ink-900 bg-white">Save Draft</button>
+          <button onclick="sendNtqSigning('${vendor}')" class="px-3 py-1.5 rounded-lg text-white text-[12.5px] font-medium" style="background:#EF4444;">Send for Signing →</button>
+        </div>
+      </div></td>`;
+    row.after(tr);
+  }
+  function closeNtqEditor(vendor){ const f = document.querySelector(`#stage-technical tr[data-ntqedit="${vendor}"]`); if (f) f.remove(); }
+  function regenNtq(vendor){
+    const ta = document.getElementById('ntqText-'+vendor);
+    if (ta){ const failed = PQ_CRITERIA.filter(c => (EVAL.matrix[vendor]||{})[c.id]==='fail').map(c => c.short);
+      ta.value = `The Evaluation Committee, having examined the bid of M/s ${vendor} in detail, hereby records that the bid does not meet the Pre-Qualification requirements of the tender. Specifically, the bid fell short on: ${failed.join(', ')||'the technical scoring threshold'}. Accordingly, the bid is declared Not Technically Qualified and shall not be considered for financial evaluation.`;
+      showToast('Justification regenerated'); }
+  }
+  function saveNtqDraft(vendor){
+    EVAL.ntq[vendor] = { status:'draft', note:document.getElementById('ntqText-'+vendor).value };
+    closeNtqEditor(vendor); saveState(); renderTechnical();
+    showToast('Justification draft saved');
+  }
+  function sendNtqSigning(vendor){
+    EVAL.ntq[vendor] = { status:'sent', note:document.getElementById('ntqText-'+vendor).value };
+    closeNtqEditor(vendor); saveState(); renderTechnical();
+    showToast(vendor+' justification sent for signing');
+  }
+  function signNtq(vendor){
+    if (EVAL.ntq[vendor]){ EVAL.ntq[vendor].status = 'signed'; saveState(); renderTechnical(); showToast('Justification signed — rejection letter generated'); }
+  }
+  function proceedToFinancial(){
+    EVAL.techComplete = true;
+    EVAL.stageTab = 'financial';
+    refreshStagePill();
+    saveState();
+    setStageTab('financial');
+    showToast('Financial Evaluation unlocked');
+  }
+
+  // ===================== FINANCIAL TAB =====================
+  function renderFinancial(){
+    const wrap = document.getElementById('stage-financial');
+    const tqVendors = EVAL.bids.filter(b => vendorVerdict(b.vendor)==='tq');
+    // F1
+    const finRows = EVAL.finBids.map(b => `<tr style="border-bottom:1px solid #F3F4F6;">
+      <td style="${tdS()} font-weight:600; color:#111827;">${b.vendor}</td>
+      <td style="${tdS()} color:#6B7280; font-size:12px;">${b.file}</td>
+      <td style="${tdS()} color:#9CA3AF; font-size:11.5px;">May 19, 2026</td>
+      <td style="${tdS()}">${b.status==='parsed'?'<span style="color:#10B981;">Parsed ✓</span>':'<span style="color:#0F5EE8;">Processing…</span>'}</td>
+      <td style="${tdS()}">${b.status==='parsed'?`<a href="#" onclick="openDrawer('${b.vendor}','fin'); return false;" class="text-[12px] text-primary hover:underline">View parsed data →</a>`:'—'}</td>
+    </tr>`).join('');
+    const usedFin = EVAL.finBids.map(b => b.vendor);
+    const availFin = tqVendors.map(b => b.vendor).filter(v => !usedFin.includes(v));
+    const f1 = `<div class="bg-white border border-line rounded-xl overflow-hidden">
+      <div style="padding:14px 18px;"><div class="text-[14px] font-bold text-ink-900 mb-0.5">Section F1 — Upload Financial Bids</div>
+        <div class="text-[12px] text-ink-500">Upload sealed financial bids for the ${tqVendors.length} technically qualified vendors.</div></div>
+      <div style="padding:0 18px 18px;">
+        ${EVAL.finBids.length ? `<div style="border:1px solid #E5E7EB; border-radius:10px; overflow:hidden; margin-bottom:14px;"><table style="width:100%; table-layout:fixed; border-collapse:collapse;">
+          <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:24%;">Vendor</th><th style="${thS()} width:26%;">File</th><th style="${thS()} width:16%;">Uploaded</th><th style="${thS()} width:18%;">Status</th><th style="${thS()} width:16%;">Action</th></tr></thead>
+          <tbody>${finRows}</tbody></table></div>` : ''}
+        <div style="border:1px solid #E5E7EB; border-radius:10px; padding:16px 18px; background:#F9FAFB;">
+          <div class="text-[13px] font-bold text-ink-900 mb-3">Add a financial bid</div>
+          <div class="grid gap-3" style="grid-template-columns:1fr 1fr 1fr;">
+            <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase mb-1">Vendor *</label>
+              <select id="fVendor" class="field"><option value="">Select vendor…</option>${availFin.map(v => `<option>${v}</option>`).join('')}</select></div>
+            <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase mb-1">Bid type</label><input class="field" value="Financial Bid" readonly style="background:#F3F4F6; color:#6B7280;"/></div>
+            <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase mb-1">Document</label><button onclick="fPickFile()" id="fFileBtn" class="field text-left" style="cursor:pointer;">Choose file</button></div>
+          </div>
+          <div class="flex justify-end mt-3"><button onclick="uploadFinBid()" class="px-4 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90">Upload Bid</button></div>
+        </div>
+        ${EVAL.finBids.length && EVAL.finBids.length>=tqVendors.length && !EVAL.finRun ? `<div class="flex justify-end mt-3"><button onclick="runFinancial()" class="px-4 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90">Run Financial Evaluation →</button></div>` : ''}
+      </div></div>`;
+
+    let f2 = '';
+    if (EVAL.finRun){
+      const rows = EVAL.finBids.map(b => ({ vendor:b.vendor, quote:QUOTE_NUM[b.vendor]||0 }))
+        .sort((a,b) => a.quote-b.quote);
+      const isQCBS = EVAL.method==='QCBS';
+      const banner = isQCBS
+        ? `<div class="rounded-lg p-3 text-[12.5px] mb-3" style="background:#EEEDFE; color:#3C3489;">Evaluation method for this tender: <strong>QCBS (70:30 — Technical:Financial)</strong></div>`
+        : `<div class="rounded-lg p-3 text-[12.5px] mb-3" style="background:#EFF6FF; color:#0C447C;">Evaluation method for this tender: <strong>L1 (Lowest Cost)</strong></div>`;
+      let tableHTML;
+      if (isQCBS){
+        const lowest = rows[0].quote;
+        const scored = rows.map(r => { const fin = (lowest/r.quote)*100; const tech = tqTotal(r.vendor)||0; return { ...r, fin, tech, combined:(tech*0.7)+(fin*0.3) }; })
+          .sort((a,b) => b.combined-a.combined);
+        tableHTML = `<table style="width:100%; table-layout:fixed; border-collapse:collapse;">
+          <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()}">Vendor</th><th style="${thS()}">Tech Score</th><th style="${thS()}">Financial Score</th><th style="${thS()}">Combined Score</th><th style="${thS()}">Rank</th></tr></thead>
+          <tbody>${scored.map((r,i) => `<tr style="border-bottom:1px solid #F3F4F6; ${i===0?'background:#F0FDF4;':''}">
+            <td style="${tdS()} font-weight:600;">${r.vendor}</td><td style="${tdS()}">${r.tech}</td><td style="${tdS()}">${r.fin.toFixed(1)}</td>
+            <td style="${tdS()} font-weight:700; color:#0F5EE8;">${r.combined.toFixed(1)}</td><td style="${tdS()}">#${i+1}</td></tr>`).join('')}</tbody></table>`;
+      } else {
+        tableHTML = `<table style="width:100%; table-layout:fixed; border-collapse:collapse;">
+          <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:10%;">Rank</th><th style="${thS()} width:34%;">Vendor</th><th style="${thS()} width:22%;">Quoted Amount</th><th style="${thS()} width:18%;">vs Estimate</th><th style="${thS()} width:16%;">L1 Status</th></tr></thead>
+          <tbody>${rows.map((r,i) => { const dev = ((r.quote-ESTIMATE)/ESTIMATE)*100; const devCls = dev<-15?'#991B1B':dev<0?'#065F46':dev>10?'#991B1B':'#92400E';
+            return `<tr style="border-bottom:1px solid #F3F4F6; ${i===0?'background:#F0FDF4;':''}">
+              <td style="${tdS()} ${i===0?'border-left:3px solid #10B981;':''}">#${i+1}</td>
+              <td style="${tdS()} font-weight:600;">${r.vendor}</td>
+              <td style="${tdS()}">₹${r.quote.toLocaleString('en-IN')}</td>
+              <td style="${tdS()} color:${devCls}; font-weight:600;">${dev>0?'+':''}${dev.toFixed(1)}%</td>
+              <td style="${tdS()}">${i===0?pill('L1 — Recommended','#F0FDF4','#065F46'):'<span class="text-ink-400">—</span>'}</td></tr>`; }).join('')}</tbody></table>`;
+      }
+      const alb = rows.find(r => ((r.quote-ESTIMATE)/ESTIMATE)*100 <= -15);
+      const albWarn = alb ? `<div class="rounded-lg p-3 mt-3 text-[12.5px]" style="background:#FFFBEB; border:1px solid #FCD34D; color:#92400E;">⚠ ${alb.vendor} quoted ₹${alb.quote.toLocaleString('en-IN')} which is ${Math.abs(((alb.quote-ESTIMATE)/ESTIMATE)*100).toFixed(1)}% below estimate — Abnormally Low Bid. <a href="comparative-statement.html?tender=${EVAL.tnd}" class="text-primary hover:underline font-medium">See Bid Comparison →</a></div>` : '';
+      f2 = `<div class="bg-white border border-line rounded-xl overflow-hidden">
+        <div style="padding:14px 18px;"><div class="text-[14px] font-bold text-ink-900">Section F2 — Financial Evaluation</div></div>
+        <div style="padding:0 18px 18px;">
+          ${banner}
+          <div style="border:1px solid #E5E7EB; border-radius:10px; overflow:hidden;">${tableHTML}</div>
+          ${albWarn}
+          <div class="flex justify-end mt-3"><button onclick="sendToComparison()" class="px-4 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90">Send to Bid Comparison →</button></div>
+        </div></div>`;
+    }
+    wrap.innerHTML = f1 + f2;
+    refreshIcons();
+  }
+  function fPickFile(){ EVAL._ffile = true; document.getElementById('fFileBtn').textContent = 'financial_bid.pdf'; }
+  function uploadFinBid(){
+    const v = document.getElementById('fVendor').value;
+    if (!v){ showToast('Select a vendor'); return; }
+    if (!EVAL._ffile){ showToast('Choose a document'); return; }
+    const b = { vendor:v, file:'financial_bid_'+v.toLowerCase().replace(/[^a-z]/g,'_')+'.pdf', status:'processing' };
+    EVAL.finBids.push(b); EVAL._ffile = false;
+    renderFinancial(); saveState();
+    setTimeout(() => { b.status='parsed'; renderFinancial(); saveState(); showToast(v+' financial bid parsed'); }, 1500);
+  }
+  function runFinancial(){
+    EVAL.finRun = true;
+    renderFinancial(); saveState();
+    showToast('Financial evaluation complete');
+  }
+  function sendToComparison(){
+    EVAL.finComplete = true;
+    refreshStagePill(); saveState();
+    location.href = 'comparative-statement.html?tender=' + EVAL.tnd;
+  }
+
+  // ===================== GLOBAL =====================
+  document.addEventListener('click', e => {
+    const pop = document.getElementById('cellPopover');
+    if (!pop.classList.contains('hidden') && !pop.contains(e.target) && !e.target.closest('.matrix-cell')) closeCell();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape'){ closeCell(); closeDrawer(); }
+  });
+
+  (function boot(){
+    const tnd = new URLSearchParams(location.search).get('tender');
+    if (tnd){ openWorkspace(tnd); } else { renderEvalList(); }
+    refreshIcons();
+  })();
 </script>
 </body>
 </html>
