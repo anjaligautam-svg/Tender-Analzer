@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bid Comparison — TenderAI Hub</title>
+  <meta name="description" content="Comparative statement of evaluated bids." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>
+    tailwind.config = { theme: { extend: {
+      fontFamily: { sans: ['"DM Sans"', 'system-ui', 'sans-serif'] },
+      colors: {
+        primary: { DEFAULT: '#0F5EE8', light: '#EFF6FF', border: '#93C5FD' },
+        success: { DEFAULT: '#10B981', light: '#F0FDF4' },
+        warning: { DEFAULT: '#F59E0B', light: '#FFFBEB' },
+        danger:  { DEFAULT: '#EF4444', light: '#FEF2F2' },
+        purple:  { DEFAULT: '#8B5CF6', light: '#EEEDFE' },
+        ink: { 900: '#111827', 500: '#6B7280', 400: '#9CA3AF' },
+        line: '#E5E7EB', surface: '#F9FAFB',
+      },
+      boxShadow: { soft: '0 1px 3px rgba(0,0,0,0.08)', lift: '0 4px 12px rgba(0,0,0,0.12)' },
+    }}};
+  </script>
+  <style>
+    html, body { font-family: 'DM Sans', system-ui, sans-serif; color: #111827; background: #F9FAFB; }
+    *:focus-visible { outline: 2px solid #0F5EE8; outline-offset: 2px; border-radius: 4px; }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 8px; }
+    ::-webkit-scrollbar-thumb:hover { background: #D1D5DB; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    .ev-row { transition: background .15s ease; cursor: pointer; }
+    .ev-row:hover { background: #F0F7FF; }
+    .toast { transform: translateY(80px); opacity: 0; transition: transform .3s cubic-bezier(.2,.7,.2,1), opacity .25s ease; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .field { border:1px solid #D1D5DB; border-radius:8px; padding:8px 12px; font-size:13px; width:100%; background:white; }
+    .field:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 3px rgba(15,94,232,0.1); }
+    .radio-card { transition: all .15s ease; cursor: pointer; }
+    .radio-card:hover { border-color:#93C5FD; }
+    .radio-card.selected { border-color:#0F5EE8; background:#EFF6FF; }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+  </style>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="w-[244px] shrink-0 bg-white border-r border-line flex flex-col" aria-label="Primary">
+    <div class="px-5 pt-5 pb-4 border-b border-line">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-[15px]">T</div>
+        <div>
+          <div class="text-[15px] font-semibold text-ink-900 leading-tight">TenderAI</div>
+          <div class="text-[11px] text-ink-500 leading-tight">Procurement Portal</div>
+        </div>
+      </div>
+      <button class="mt-4 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-line bg-surface hover:bg-white hover:shadow-soft transition" aria-label="Switch organisation">
+        <div class="w-7 h-7 rounded-md bg-primary-light text-primary flex items-center justify-center"><i data-lucide="building-2" class="w-4 h-4"></i></div>
+        <div class="text-left flex-1 min-w-0">
+          <div class="text-[12.5px] font-medium text-ink-900 truncate">Ahmedabad</div>
+          <div class="text-[10.5px] text-ink-500 truncate">Municipal Corporation</div>
+        </div>
+        <i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 text-ink-400"></i>
+      </button>
+    </div>
+    <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+      <div>
+        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">OVERVIEW</div>
+        <ul class="space-y-0.5">
+          <li><a href="index.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">TENDERING</div>
+        <ul class="space-y-0.5">
+          <li><a href="dpr-creation.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="clipboard-list" class="w-4 h-4"></i> DPR Creation</a></li>
+          <li><a href="tender-creation.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="file-plus-2" class="w-4 h-4"></i> Tender Creation</a></li>
+          <li><a href="prebid-queries.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="messages-square" class="w-4 h-4"></i> Pre-Bid Queries</a></li>
+          <li><a href="bid-management.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="gavel" class="w-4 h-4"></i> Bid Management</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">EVALUATING</div>
+        <ul class="space-y-0.5">
+          <li><a href="evaluation.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="clipboard-check" class="w-4 h-4"></i> Evaluation</a></li>
+          <li><a href="comparative-statement.html" aria-current="page" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] bg-primary-light text-primary font-medium"><i data-lucide="git-compare" class="w-4 h-4"></i> Bid Comparison</a></li>
+          <li><a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="sparkles" class="w-4 h-4"></i> AI Assistant</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">POST AWARD</div>
+        <ul class="space-y-0.5">
+          <li><a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Analytics</a></li>
+        </ul>
+      </div>
+    </nav>
+    <div class="border-t border-line px-4 py-3 flex items-center gap-3">
+      <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div>
+      <div class="flex-1 min-w-0">
+        <div class="text-[12.5px] font-medium text-ink-900 truncate">Rajesh Kumar</div>
+        <div class="text-[10.5px] text-ink-500 truncate">Super Admin</div>
+      </div>
+      <button onclick="sessionStorage.clear(); location.href='login.html'" aria-label="Sign out" class="text-ink-400 hover:text-ink-900"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="flex-1 flex flex-col min-w-0">
+    <header class="h-16 bg-white border-b border-line px-6 flex items-center gap-4 sticky top-0 z-30">
+      <button aria-label="Toggle sidebar" class="text-ink-500 hover:text-ink-900"><i data-lucide="panel-left" class="w-5 h-5"></i></button>
+      <div class="flex-1 max-w-xl relative">
+        <i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+        <input type="search" placeholder="Search tenders, bids, vendors…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] placeholder:text-ink-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+      </div>
+      <button class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">FY 2026-27 <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+      <button aria-label="Notifications" class="w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500"><i data-lucide="bell" class="w-4 h-4"></i></button>
+      <div class="flex items-center gap-2 pl-2 border-l border-line">
+        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div>
+        <div class="hidden md:block"><div class="text-[12.5px] font-medium text-ink-900 leading-tight">Rajesh Kumar</div></div>
+        <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto px-8 py-6">
+
+      <!-- ============ SCREEN 2A — LANDING ============ -->
+      <section id="screen-landing" class="space-y-5">
+        <div>
+          <h1 class="text-[24px] font-bold text-ink-900 leading-tight">Bid Comparison</h1>
+          <p class="text-[14px] text-ink-500 mt-1">Select a tender to build or review its comparative statement.</p>
+        </div>
+        <div id="compList" class="bg-white border border-line rounded-xl overflow-hidden"></div>
+      </section>
+
+      <!-- ============ SCREEN 2B — WORKSPACE ============ -->
+      <section id="screen-workspace" class="hidden space-y-5">
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <div class="text-[13px] text-ink-500">
+            <a href="#" onclick="showLanding(); return false;" class="hover:text-ink-900">Bid Comparison</a>
+            <span class="mx-1.5 text-ink-400">/</span>
+            <span id="wsCrumb" class="text-ink-900 font-mono">TND-2026-001</span>
+          </div>
+          <a href="#" onclick="showLanding(); return false;" class="text-[13px] text-ink-500 hover:text-ink-900 inline-flex items-center gap-1.5"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back</a>
+        </div>
+
+        <div class="bg-white border border-line rounded-xl flex flex-col lg:flex-row lg:items-center justify-between gap-4" style="padding:16px 20px;">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span id="wsBadge" class="text-[11.5px] font-bold text-primary font-mono" style="background:#EFF6FF; border-radius:6px; padding:2px 8px;">TND-2026-001</span>
+              <span id="wsName" class="text-[16px] font-bold text-ink-900">Supply of Desktop Computers</span>
+            </div>
+            <div id="wsMeta" class="text-[12px] text-ink-500 mt-1">IT · Goods · Est. ₹27,85,350</div>
+          </div>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-semibold" style="background:#EFF6FF; color:#0C447C;"><span class="w-1.5 h-1.5 rounded-full" style="background:#0F5EE8;"></span> Comparison in progress</span>
+        </div>
+
+        <div id="compWorkspace"></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-ink-900 text-white text-[13px] px-4 py-3 rounded-xl shadow-lift inline-flex items-center gap-2.5">
+  <i data-lucide="check-circle-2" class="w-4 h-4 text-success"></i>
+  <span id="toastMsg">Done</span>
+</div>
+
+<script>
+  function refreshIcons(){ if (window.lucide) lucide.createIcons(); }
+  let toastT = null;
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // ===================== DATA =====================
+  const COMP_TENDERS = [
+    { id:'TND-2026-001', name:'Supply of Desktop Computers', dept:'IT',    sector:'Goods', cost:'₹27,85,350', stage:'progress' },
+    { id:'TND-2026-003', name:'Water Pipeline Kalyan',       dept:'Water', sector:'Works', cost:'₹1,20,00,000', stage:'ready' },
+    { id:'TND-2026-007', name:'LED Street Light',            dept:'Engineering', sector:'Goods', cost:'₹28,50,000', stage:'complete' },
+  ];
+  const STAGE_META = {
+    ready:    { dot:'#9CA3AF', label:'Ready for comparison' },
+    progress: { dot:'#0F5EE8', label:'Comparison in progress' },
+    complete: { dot:'#10B981', label:'Complete' },
+  };
+  const ESTIMATE = 2785350;
+  const METHOD = 'QCBS';
+  const COMP_VENDORS = [
+    { vendor:'Rajesh Constructions',  tq:82, quote:2640000, fin:100  },
+    { vendor:'Maharashtra Roads Co.', tq:74, quote:2810000, fin:93.9 },
+    { vendor:'BuildTech Solutions',   tq:68, quote:3180000, fin:83.0 },
+    { vendor:'NCC Infrastructure',    tq:71, quote:2210000, fin:100  },
+  ];
+
+  // ===================== STATE =====================
+  let COMP = null;
+  function freshComp(tnd){ return { tnd, locked:false, lockedBy:'', notes:{}, albDecision:null, albNote:'' }; }
+  function saveComp(){ try { localStorage.setItem('comparison_'+COMP.tnd, JSON.stringify(COMP)); } catch(e){} }
+  function loadComp(tnd){ try { const r = localStorage.getItem('comparison_'+tnd); if (r) return JSON.parse(r); } catch(e){} return null; }
+
+  // ===================== LANDING =====================
+  function renderCompList(){
+    document.getElementById('compList').innerHTML = COMP_TENDERS.map(t => {
+      const m = STAGE_META[t.stage];
+      return `<div class="ev-row" onclick="openWorkspace('${t.id}')" tabindex="0" role="button" onkeydown="if(event.key==='Enter')openWorkspace('${t.id}')" style="padding:14px 16px; border-bottom:1px solid #F3F4F6; display:flex; align-items:center; gap:16px;">
+        <span class="w-2 h-2 rounded-full shrink-0" style="background:${m.dot};"></span>
+        <span class="font-mono text-[12px] font-semibold text-primary shrink-0" style="background:#EFF6FF; border-radius:4px; padding:2px 6px; width:108px; text-align:center;">${t.id}</span>
+        <div class="flex-1 min-w-0">
+          <div class="text-[14px] font-medium text-ink-900 truncate">${t.name}</div>
+          <div class="text-[12px] text-ink-400">${t.dept} · ${t.sector}</div>
+        </div>
+        <div class="shrink-0 text-[12.5px] text-ink-500" style="width:200px; text-align:right;">${m.label}</div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-ink-400 shrink-0"></i>
+      </div>`;
+    }).join('');
+    refreshIcons();
+  }
+  function showLanding(){
+    try { history.replaceState(null,'',location.pathname); } catch(e){}
+    document.getElementById('screen-workspace').classList.add('hidden');
+    document.getElementById('screen-landing').classList.remove('hidden');
+    renderCompList();
+    window.scrollTo({ top:0 });
+  }
+  function openWorkspace(tnd){
+    try { history.replaceState(null,'','?tender='+encodeURIComponent(tnd)); } catch(e){}
+    const t = COMP_TENDERS.find(x => x.id === tnd) || COMP_TENDERS[0];
+    COMP = loadComp(tnd) || freshComp(tnd);
+    document.getElementById('wsCrumb').textContent = t.id;
+    document.getElementById('wsBadge').textContent = t.id;
+    document.getElementById('wsName').textContent = t.name;
+    document.getElementById('wsMeta').textContent = `${t.dept} · ${t.sector} · Est. ${t.cost}`;
+    document.getElementById('screen-landing').classList.add('hidden');
+    document.getElementById('screen-workspace').classList.remove('hidden');
+    renderWorkspace();
+    window.scrollTo({ top:0 });
+  }
+
+  // ===================== WORKSPACE =====================
+  function computed(){
+    const lowest = Math.min(...COMP_VENDORS.map(v => v.quote));
+    return COMP_VENDORS.map(v => {
+      const finScore = (lowest / v.quote) * 100;
+      const combined = (v.tq * 0.7) + (finScore * 0.3);
+      const dev = ((v.quote - ESTIMATE) / ESTIMATE) * 100;
+      let flag = '';
+      if (dev <= -15) flag = 'ALB';
+      else if (dev >= 10) flag = 'High';
+      return { ...v, finScore, combined, dev, flag };
+    }).sort((a,b) => b.combined - a.combined).map((v,i) => ({ ...v, rank:i+1 }));
+  }
+  function thS(){ return 'padding:10px 12px; font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; text-align:left;'; }
+  function tdS(){ return 'padding:11px 12px; font-size:12.5px; color:#374151;'; }
+
+  function renderWorkspace(){
+    const rows = computed();
+    const alb = rows.find(r => r.flag === 'ALB');
+    const albDone = !alb || COMP.albDecision;
+    const proceedOk = COMP.locked && albDone;
+
+    const tableRows = rows.map(r => {
+      const isTop = r.rank === 1;
+      const devCol = r.dev <= -15 ? '#991B1B' : r.dev < 0 ? '#065F46' : r.dev > 10 ? '#991B1B' : '#92400E';
+      const flagPill = r.flag === 'ALB' ? `<span style="background:#FEF2F2; color:#991B1B; border-radius:20px; padding:2px 8px; font-size:11px; font-weight:600;">ALB</span>`
+        : r.flag === 'High' ? `<span style="background:#FFFBEB; color:#92400E; border-radius:20px; padding:2px 8px; font-size:11px; font-weight:600;">High</span>`
+        : '<span class="text-ink-400">—</span>';
+      const note = COMP.notes[r.vendor] || '';
+      return `<tr style="${isTop?'background:#F0FDF4;':''}">
+        <td style="${tdS()} ${isTop?'border-left:3px solid #10B981;':''} font-weight:700;">#${r.rank}</td>
+        <td style="${tdS()} font-weight:600; color:#111827;">${r.vendor}</td>
+        <td style="${tdS()}">${r.tq}</td>
+        <td style="${tdS()}">₹${r.quote.toLocaleString('en-IN')}</td>
+        <td style="${tdS()}">${r.finScore.toFixed(1)}</td>
+        <td style="${tdS()} font-weight:700; color:#0F5EE8;">${r.combined.toFixed(1)}</td>
+        <td style="${tdS()} color:${devCol}; font-weight:600;">${r.dev>0?'+':''}${r.dev.toFixed(1)}%</td>
+        <td style="${tdS()}">${flagPill}</td>
+        <td style="${tdS()} text-align:center;">
+          <button onclick="toggleNote('${r.vendor}', event)" aria-label="Officer note" title="${note?note.replace(/"/g,'&quot;'):'Add note'}" style="background:none; border:none; cursor:pointer; color:${note?'#0F5EE8':'#9CA3AF'};"><i data-lucide="${note?'message-square-text':'message-square'}" class="w-4 h-4"></i></button>
+        </td>
+      </tr>`;
+    }).join('');
+
+    const albSection = alb ? `
+      <div style="background:#FFFBEB; border-left:3px solid #F59E0B; border-radius:0 10px 10px 0; padding:16px 20px; margin-top:16px;">
+        <div class="text-[14px] font-bold" style="color:#92400E;">⚠ Abnormally Low Bid Detected</div>
+        <div class="text-[13px] mt-1" style="color:#374151;">${alb.vendor} quoted ₹${alb.quote.toLocaleString('en-IN')} — ${Math.abs(alb.dev).toFixed(1)}% below estimate of ₹${ESTIMATE.toLocaleString('en-IN')}.</div>
+        <div class="text-[12px] mt-1" style="color:#92400E;">✦ AI suggests: Accept with enhanced performance security (additional 10%) or reject with documented reason.</div>
+        ${COMP.albDecision ? `<div class="rounded-lg p-2.5 mt-3 text-[12.5px]" style="background:white; border:1px solid #E5E7EB;">✓ Decision recorded: <strong>${COMP.albDecision==='accept'?'Accept with enhanced security':'Reject'}</strong> — ${COMP.albNote}</div>` : `
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-3">
+          <label class="radio-card bg-white border border-line rounded-lg p-3 flex items-start gap-2.5 ${COMP._albSel==='accept'?'selected':''}" data-alb="accept" onclick="pickAlb('accept')">
+            <input type="radio" name="alb" class="accent-primary mt-0.5" ${COMP._albSel==='accept'?'checked':''}>
+            <div><div class="text-[13px] font-medium text-ink-900">Accept with enhanced security</div><div class="text-[11.5px] text-ink-500">Require additional 10% performance security</div></div>
+          </label>
+          <label class="radio-card bg-white border border-line rounded-lg p-3 flex items-start gap-2.5 ${COMP._albSel==='reject'?'selected':''}" data-alb="reject" onclick="pickAlb('reject')">
+            <input type="radio" name="alb" class="accent-primary mt-0.5" ${COMP._albSel==='reject'?'checked':''}>
+            <div><div class="text-[13px] font-medium text-ink-900">Reject</div><div class="text-[11.5px] text-ink-500">Reason required</div></div>
+          </label>
+        </div>
+        <textarea id="albNote" rows="2" class="field mt-2" placeholder="${COMP._albSel==='reject'?'Reason for rejection (required)':'Note (required)'}"></textarea>
+        <div class="flex justify-end mt-2"><button onclick="confirmAlb()" class="px-3.5 py-2 rounded-lg bg-primary text-white text-[12.5px] font-medium hover:bg-primary/90">Confirm decision</button></div>`}
+      </div>` : '';
+
+    document.getElementById('compWorkspace').innerHTML = `
+      <div class="bg-white border border-line rounded-xl overflow-hidden">
+        <div class="flex items-center justify-between gap-3 flex-wrap" style="padding:14px 18px; border-bottom:1px solid #E5E7EB;">
+          <div><span class="text-[15px] font-bold text-ink-900">Comparison — ${COMP.tnd}</span> <span class="text-[12.5px] text-ink-500 ml-1">${rows.length} vendors</span></div>
+          <div class="flex items-center gap-2">
+            <button onclick="showToast('Comparative statement PDF exported')" class="px-3 py-1.5 rounded-lg border border-line text-[12.5px] text-ink-900 hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Export PDF</button>
+            <button onclick="toggleLock()" class="px-3 py-1.5 rounded-lg border ${COMP.locked?'border-success text-success':'border-primary text-primary hover:bg-primary-light'} text-[12.5px] font-medium inline-flex items-center gap-1.5"><i data-lucide="${COMP.locked?'lock':'lock-open'}" class="w-3.5 h-3.5"></i> ${COMP.locked?'Locked':'Lock table'}</button>
+          </div>
+        </div>
+        <div style="padding:6px 18px; font-size:11.5px; ${COMP.locked?'color:#065F46;':'color:#9CA3AF;'} border-bottom:1px solid #F3F4F6;">${COMP.locked?'Locked by '+COMP.lockedBy+' · May 18 — table is immutable':'Unlocked — editable'}</div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%; table-layout:fixed; border-collapse:collapse; min-width:880px;">
+            <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;">
+              <th style="${thS()} width:64px;">Rank</th><th style="${thS()} width:20%;">Vendor</th><th style="${thS()} width:84px;">TQ Score</th>
+              <th style="${thS()} width:15%;">Quoted Amount</th><th style="${thS()} width:11%;">Fin. Score</th><th style="${thS()} width:12%;">Combined</th>
+              <th style="${thS()} width:11%;">vs Estimate</th><th style="${thS()} width:80px;">Flag</th><th style="${thS()} width:64px; text-align:center;">Note</th>
+            </tr></thead>
+            <tbody>${tableRows}</tbody>
+          </table>
+        </div>
+      </div>
+      ${albSection}
+      <div class="flex justify-end mt-4">
+        <button onclick="proceedToBidMgmt()" class="px-4 py-2.5 rounded-lg ${proceedOk?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13.5px] font-medium inline-flex items-center gap-1.5" ${proceedOk?'':'disabled'}>Proceed to Bid Management <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+      </div>
+      ${!proceedOk ? `<div class="text-[11.5px] text-ink-500 text-right mt-1">${!COMP.locked?'Lock the comparison table':'Record the ALB decision'} to proceed.</div>` : ''}`;
+    refreshIcons();
+  }
+  function toggleLock(){
+    if (COMP.locked){ showToast('Locked tables are immutable'); return; }
+    COMP.locked = true; COMP.lockedBy = 'Rajesh Kumar';
+    saveComp(); renderWorkspace();
+    showToast('Comparison table locked');
+  }
+  function pickAlb(v){ COMP._albSel = v; renderWorkspace(); }
+  function confirmAlb(){
+    const note = (document.getElementById('albNote')||{}).value || '';
+    if (!COMP._albSel){ showToast('Select a decision'); return; }
+    if (!note.trim()){ showToast(COMP._albSel==='reject'?'Rejection reason required':'Note required'); return; }
+    COMP.albDecision = COMP._albSel; COMP.albNote = note.trim();
+    saveComp(); renderWorkspace();
+    showToast('ALB decision recorded');
+  }
+  function toggleNote(vendor, e){
+    if (e) e.stopPropagation();
+    const cur = COMP.notes[vendor] || '';
+    const val = prompt('Officer note for '+vendor+' (officer-only, not in exported PDF):', cur);
+    if (val !== null){ if (val.trim()) COMP.notes[vendor] = val.trim(); else delete COMP.notes[vendor]; saveComp(); renderWorkspace(); }
+  }
+  function proceedToBidMgmt(){
+    if (!COMP.locked || (computed().find(r=>r.flag==='ALB') && !COMP.albDecision)){ showToast('Lock the table and record ALB decision first'); return; }
+    location.href = 'bid-management.html?tender=' + COMP.tnd;
+  }
+
+  (function boot(){
+    const tnd = new URLSearchParams(location.search).get('tender');
+    if (tnd){ openWorkspace(tnd); } else { renderCompList(); }
+    refreshIcons();
+  })();
+</script>
+</body>
+</html>
