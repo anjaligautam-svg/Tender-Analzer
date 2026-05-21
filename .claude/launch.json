@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "stratzi-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "/Users/Anjali/Desktop/stratzi-website"],
+      "port": 3000
+    },
+    {
+      "name": "swcs-dev",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "5500", "--directory", "/Users/Anjali/Documents/GitHub/SWSC-Website"],
+      "port": 5500
+    },
+    {
+      "name": "tender-analyzer",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "4180", "--directory", "/Users/Anjali/Documents/GitHub/Tender-Analzer"],
+      "port": 4180
+    }
+  ]
+}
