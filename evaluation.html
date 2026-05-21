@@ -304,6 +304,8 @@
       finRun:false,
       finComplete:false,
       method:'L1',
+      albDecision:null,    // 'accept' | 'reject'
+      albNote:'',
     };
   }
   function saveState(){ try { localStorage.setItem('eval_'+EVAL.tnd, JSON.stringify(EVAL)); } catch(e){} }
@@ -984,36 +986,50 @@
       const banner = isQCBS
         ? `<div class="rounded-lg p-3 text-[12.5px] mb-3" style="background:#EEEDFE; color:#3C3489;">Evaluation method for this tender: <strong>QCBS (70:30 — Technical:Financial)</strong></div>`
         : `<div class="rounded-lg p-3 text-[12.5px] mb-3" style="background:#EFF6FF; color:#0C447C;">Evaluation method for this tender: <strong>L1 (Lowest Cost)</strong></div>`;
-      let tableHTML;
+      let tableHTML, preTable = '';
       if (isQCBS){
+        // Formula box first — so the officer understands scoring before seeing numbers
+        preTable = `<div style="background:#F9FAFB; border-radius:10px; padding:14px 18px; margin-bottom:14px;">
+          <div class="text-[13px] font-bold text-ink-900 mb-1.5">QCBS Formula</div>
+          <div class="text-[12px] text-ink-500" style="font-family:monospace;">Financial Score = (Lowest Quote ÷ This Bidder's Quote) × 100</div>
+          <div class="text-[12px] text-ink-500" style="font-family:monospace;">Combined Score = (Technical Score × 70%) + (Financial Score × 30%)</div>
+        </div>`;
         const lowest = rows[0].quote;
         const scored = rows.map(r => { const fin = (lowest/r.quote)*100; const tech = tqTotal(r.vendor)||0; return { ...r, fin, tech, combined:(tech*0.7)+(fin*0.3) }; })
           .sort((a,b) => b.combined-a.combined);
         tableHTML = `<table style="width:100%; table-layout:fixed; border-collapse:collapse;">
-          <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()}">Vendor</th><th style="${thS()}">Tech Score</th><th style="${thS()}">Financial Score</th><th style="${thS()}">Combined Score</th><th style="${thS()}">Rank</th></tr></thead>
+          <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:22%;">Vendor</th><th style="${thS()} width:24%;">Tech Score</th><th style="${thS()} width:24%;">Financial Score</th><th style="${thS()} width:22%;">Combined Score</th><th style="${thS()} width:8%;">Rank</th></tr></thead>
           <tbody>${scored.map((r,i) => `<tr style="border-bottom:1px solid #F3F4F6; ${i===0?'background:#F0FDF4;':''}">
-            <td style="${tdS()} font-weight:600;">${r.vendor}</td><td style="${tdS()}">${r.tech}</td><td style="${tdS()}">${r.fin.toFixed(1)}</td>
-            <td style="${tdS()} font-weight:700; color:#0F5EE8;">${r.combined.toFixed(1)}</td><td style="${tdS()}">#${i+1}</td></tr>`).join('')}</tbody></table>`;
+            <td style="${tdS()} ${i===0?'border-left:3px solid #10B981;':''} font-weight:600;">${r.vendor}</td>
+            <td style="${tdS()}">${scoreBar(r.tech, 100, '#8B5CF6')}</td>
+            <td style="${tdS()}">${scoreBar(r.fin, 100, '#0F5EE8')}</td>
+            <td style="${tdS()}">${scoreBar(r.combined, 100, '#10B981', true)}${i===0?' <span style="background:#EEEDFE; color:#3C3489; border-radius:20px; padding:2px 8px; font-size:10px; font-weight:700; white-space:nowrap; margin-left:4px;">✦ AI recommends</span>':''}</td>
+            <td style="${tdS()} font-weight:700;">#${i+1}</td></tr>`).join('')}</tbody></table>`;
       } else {
         tableHTML = `<table style="width:100%; table-layout:fixed; border-collapse:collapse;">
           <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:10%;">Rank</th><th style="${thS()} width:34%;">Vendor</th><th style="${thS()} width:22%;">Quoted Amount</th><th style="${thS()} width:18%;">vs Estimate</th><th style="${thS()} width:16%;">L1 Status</th></tr></thead>
-          <tbody>${rows.map((r,i) => { const dev = ((r.quote-ESTIMATE)/ESTIMATE)*100; const devCls = dev<-15?'#991B1B':dev<0?'#065F46':dev>10?'#991B1B':'#92400E';
+          <tbody>${rows.map((r,i) => { const dev = ((r.quote-ESTIMATE)/ESTIMATE)*100; const devCls = dev<=-15?'#991B1B':dev<0?'#065F46':dev>10?'#991B1B':'#92400E';
             return `<tr style="border-bottom:1px solid #F3F4F6; ${i===0?'background:#F0FDF4;':''}">
-              <td style="${tdS()} ${i===0?'border-left:3px solid #10B981;':''}">#${i+1}</td>
+              <td style="${tdS()} ${i===0?'border-left:3px solid #10B981;':''} font-weight:700;">#${i+1}</td>
               <td style="${tdS()} font-weight:600;">${r.vendor}</td>
               <td style="${tdS()}">₹${r.quote.toLocaleString('en-IN')}</td>
               <td style="${tdS()} color:${devCls}; font-weight:600;">${dev>0?'+':''}${dev.toFixed(1)}%</td>
               <td style="${tdS()}">${i===0?pill('L1 — Recommended','#F0FDF4','#065F46'):'<span class="text-ink-400">—</span>'}</td></tr>`; }).join('')}</tbody></table>`;
       }
       const alb = rows.find(r => ((r.quote-ESTIMATE)/ESTIMATE)*100 <= -15);
-      const albWarn = alb ? `<div class="rounded-lg p-3 mt-3 text-[12.5px]" style="background:#FFFBEB; border:1px solid #FCD34D; color:#92400E;">⚠ ${alb.vendor} quoted ₹${alb.quote.toLocaleString('en-IN')} which is ${Math.abs(((alb.quote-ESTIMATE)/ESTIMATE)*100).toFixed(1)}% below estimate — Abnormally Low Bid. <a href="comparative-statement.html?tender=${EVAL.tnd}" class="text-primary hover:underline font-medium">See Bid Comparison →</a></div>` : '';
+      const albSection = alb ? albDecisionHTML(alb) : '';
+      const proceedOk = !alb || EVAL.albDecision;
       f2 = `<div class="bg-white border border-line rounded-xl overflow-hidden">
         <div style="padding:14px 18px;"><div class="text-[14px] font-bold text-ink-900">Section F2 — Financial Evaluation</div></div>
         <div style="padding:0 18px 18px;">
           ${banner}
+          ${preTable}
           <div style="border:1px solid #E5E7EB; border-radius:10px; overflow:hidden;">${tableHTML}</div>
-          ${albWarn}
-          <div class="flex justify-end mt-3"><button onclick="sendToComparison()" class="px-4 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90">Send to Bid Comparison →</button></div>
+          ${albSection}
+          <div class="flex justify-end mt-4">
+            <button onclick="sendToComparison()" class="px-4 py-2 rounded-lg ${proceedOk?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-medium" ${proceedOk?'':'disabled'}>Send to Bid Comparison →</button>
+          </div>
+          ${!proceedOk ? '<div class="text-[11.5px] text-warning mt-1.5 text-right">Record the Abnormally Low Bid decision before proceeding.</div>' : ''}
         </div></div>`;
     }
     wrap.innerHTML = f1 + f2;
@@ -1034,7 +1050,57 @@
     renderFinancial(); saveState();
     showToast('Financial evaluation complete');
   }
+  // Inline score progress bar — value out of max
+  function scoreBar(value, max, color){
+    const v = Math.round(value * 10) / 10;
+    const pct = Math.max(0, Math.min(100, (value / max) * 100));
+    return `<div style="display:flex; align-items:center; gap:8px;">
+      <span style="min-width:36px; font-weight:600; color:#111827;">${v}</span>
+      <div style="flex:1; min-width:36px; height:6px; background:#F3F4F6; border-radius:3px; overflow:hidden;"><div style="height:100%; width:${pct}%; background:${color}; border-radius:3px;"></div></div>
+    </div>`;
+  }
+  // Inline ALB decision section — sits below the F2 table, blocks Send to Bid Comparison
+  function albDecisionHTML(alb){
+    const dev = ((alb.quote - ESTIMATE) / ESTIMATE) * 100;
+    const enhanced = Math.round(alb.quote * 0.10);
+    if (EVAL.albDecision){
+      return `<div style="background:#FFFBEB; border-left:3px solid #F59E0B; border-radius:0 10px 10px 0; padding:14px 20px; margin-top:16px;">
+        <div class="text-[13.5px] font-bold" style="color:#92400E;">⚠ Abnormally Low Bid — decision recorded</div>
+        <div class="text-[12.5px] mt-1" style="color:#374151;">${alb.vendor} · ${EVAL.albDecision==='accept'?'Accepted with enhanced performance security':'Bid rejected'} — ${EVAL.albNote}</div>
+      </div>`;
+    }
+    const sel = EVAL._albSel || 'accept';   // Accept is pre-selected
+    const card = (val, title, desc) => {
+      const on = sel === val;
+      return `<label data-falb="${val}" onclick="pickFinAlb('${val}')" style="border:1.5px solid ${on?'#0F5EE8':'#E5E7EB'}; background:${on?'#EFF6FF':'white'}; border-radius:10px; padding:12px 14px; display:flex; gap:10px; align-items:flex-start; cursor:pointer; transition:all 150ms ease;">
+        <input type="radio" name="falb" ${on?'checked':''} style="accent-color:#0F5EE8; margin-top:2px;">
+        <div><div class="text-[13px] font-medium text-ink-900">${title}</div><div class="text-[11.5px] text-ink-500 mt-0.5">${desc}</div></div>
+      </label>`;
+    };
+    return `<div style="background:#FFFBEB; border-left:3px solid #F59E0B; border-radius:0 10px 10px 0; padding:16px 20px; margin-top:16px;">
+      <div class="text-[14px] font-bold" style="color:#92400E;">⚠ Abnormally Low Bid Detected</div>
+      <div class="text-[13px] mt-1" style="color:#374151;">${alb.vendor} quoted ₹${alb.quote.toLocaleString('en-IN')} — ${Math.abs(dev).toFixed(1)}% below the estimate of ₹${ESTIMATE.toLocaleString('en-IN')}.</div>
+      <div class="text-[12px] mt-1.5" style="color:#92400E;">✦ AI suggests: A bid this far below estimate carries delivery and abandonment risk. Accept only with enhanced performance security (an additional 10% ≈ ₹${enhanced.toLocaleString('en-IN')}), or reject with a documented reason.</div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-3">
+        ${card('accept','Accept with enhanced security','Require an additional 10% performance security to offset the risk')}
+        ${card('reject','Reject this bid','Document the reason — the bidder will be formally notified')}
+      </div>
+      <textarea id="falbNote" rows="2" class="field mt-2" style="font-size:12.5px;" placeholder="${sel==='reject'?'Reason for rejection (required)':'Note on enhanced security terms (required)'}"></textarea>
+      <div class="flex justify-end mt-2"><button onclick="confirmFinAlb()" class="px-3.5 py-2 rounded-lg bg-primary text-white text-[12.5px] font-medium hover:bg-primary/90">Confirm decision</button></div>
+    </div>`;
+  }
+  function pickFinAlb(v){ EVAL._albSel = v; renderFinancial(); }
+  function confirmFinAlb(){
+    const sel = EVAL._albSel || 'accept';
+    const note = (document.getElementById('falbNote') || {}).value || '';
+    if (!note.trim()){ showToast(sel==='reject' ? 'Rejection reason required' : 'Note required'); return; }
+    EVAL.albDecision = sel; EVAL.albNote = note.trim();
+    saveState(); renderFinancial();
+    showToast('ALB decision recorded');
+  }
   function sendToComparison(){
+    const alb = EVAL.finBids.map(b => QUOTE_NUM[b.vendor]||0).find(q => ((q-ESTIMATE)/ESTIMATE)*100 <= -15);
+    if (alb && !EVAL.albDecision){ showToast('Record the Abnormally Low Bid decision first'); return; }
     EVAL.finComplete = true;
     refreshStagePill(); saveState();
     location.href = 'comparative-statement.html?tender=' + EVAL.tnd;
