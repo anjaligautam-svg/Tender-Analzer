@@ -121,21 +121,26 @@
     </header>
 
     <main class="flex-1 overflow-y-auto">
-      <!-- Placeholder — evaluation module being rebuilt -->
+      <!-- Placeholder — section being rebuilt -->
       <div style="padding:80px 40px; text-align:center;">
-        <i data-lucide="clipboard-list" style="width:48px; height:48px; color:#D1D5DB;" class="mx-auto"></i>
-        <h1 style="font-size:22px; font-weight:700; color:#111827; margin-top:20px;">Bid Evaluation</h1>
-        <p style="font-size:14px; color:#6B7280; margin-top:8px;">This module is being rebuilt. Content coming soon.</p>
+        <i data-lucide="hammer" style="width:44px; height:44px; color:#D1D5DB;" class="mx-auto"></i>
+        <div style="font-size:20px; font-weight:500; color:#111827; margin-top:16px;">Coming soon</div>
+        <div style="font-size:14px; color:#6B7280; margin-top:6px;">This section is being rebuilt.</div>
       </div>
     </main>
   </div>
 </div>
 
 <script>
-  // Clear evaluation-specific persisted state on load
+  // Clear any persisted state set by these pages on load
   try {
-    localStorage.removeItem('evalProgress_TND-2026-001');
-    localStorage.removeItem('bidOpening_TND-2026-001');
+    const keysToRemove = [];
+    Object.keys(localStorage).forEach(k => {
+      if (k.startsWith('bidMgmt_') || k.startsWith('evalProgress_') || k.startsWith('bidOpening_')) {
+        keysToRemove.push(k);
+      }
+    });
+    keysToRemove.forEach(k => localStorage.removeItem(k));
   } catch (e) {}
   if (window.lucide) lucide.createIcons();
 </script>
