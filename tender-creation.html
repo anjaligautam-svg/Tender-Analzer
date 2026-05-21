@@ -1281,8 +1281,8 @@
                 <section class="mb-9">
                   <h2 class="text-[15px] font-bold text-ink-900 pb-2 border-b border-line mb-1">Pre-Qualification Criteria</h2>
                   <p class="text-[12px] text-ink-500 mb-4">Financial and organisational requirements. Vendors must meet ALL of these to be eligible.</p>
-                  <div class="space-y-2.5">
-                    <div class="bg-white border border-line rounded-[10px] p-4">
+                  <div id="pqCardsList" class="space-y-2.5">
+                    <div class="bg-white border border-line rounded-[10px] p-4" data-criterion-card data-standard="Annual Turnover">
                       <div class="flex items-start justify-between gap-3 flex-wrap">
                         <div class="flex-1 min-w-0">
                           <div class="text-[14px] font-bold text-ink-900">Minimum Annual Turnover</div>
@@ -1293,19 +1293,19 @@
                             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500 text-[13.5px]">₹</span>
                             <input id="pqTurnover" type="text" value="22,50,000" class="field pl-7 w-44" oninput="checkTurnover(this.value)" />
                           </div>
-                          <button aria-label="Remove criterion" class="text-ink-400 hover:text-danger w-8 h-8 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4"></i></button>
+                          <button aria-label="Remove criterion" onclick="removeCriterion(this,true,'Annual Turnover')" class="text-ink-400 hover:text-danger w-8 h-8 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4"></i></button>
                         </div>
                       </div>
                       <div class="mt-2.5 text-[11px] italic text-ink-500">AI suggestion: minimum 50% of estimated tender value for Works tenders</div>
                     </div>
 
-                    <div class="bg-white border border-line rounded-[10px] p-4">
+                    <div class="bg-white border border-line rounded-[10px] p-4" data-criterion-card data-standard="Similar Work Experience">
                       <div class="flex items-start justify-between gap-3 flex-wrap">
                         <div class="flex-1 min-w-0">
                           <div class="text-[14px] font-bold text-ink-900">Similar Work Experience</div>
                           <div class="text-[12px] text-ink-500 mt-0.5">Must have completed similar nature and magnitude works</div>
                         </div>
-                        <button aria-label="Remove criterion" class="text-ink-400 hover:text-danger w-8 h-8 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4"></i></button>
+                        <button aria-label="Remove criterion" onclick="removeCriterion(this,true,'Similar Work Experience')" class="text-ink-400 hover:text-danger w-8 h-8 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4"></i></button>
                       </div>
                       <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
@@ -1327,7 +1327,7 @@
                       <div class="mt-2.5 text-[11px] italic text-ink-500">AI suggestion: at least 1 similar work worth 40% of tender value in last 5 years</div>
                     </div>
 
-                    <div class="bg-white border border-line rounded-[10px] p-4">
+                    <div class="bg-white border border-line rounded-[10px] p-4" data-criterion-card>
                       <div class="flex items-start justify-between gap-3 flex-wrap">
                         <div class="flex-1 min-w-0">
                           <div class="text-[14px] font-bold text-ink-900">Years in Business</div>
@@ -1335,13 +1335,13 @@
                         <div class="flex items-center gap-2">
                           <input type="number" value="3" class="field !w-24" />
                           <span class="text-[12.5px] text-ink-500">years</span>
-                          <button aria-label="Remove criterion" class="text-ink-400 hover:text-danger w-8 h-8 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4"></i></button>
+                          <button aria-label="Remove criterion" onclick="removeCriterion(this,false)" class="text-ink-400 hover:text-danger w-8 h-8 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4"></i></button>
                         </div>
                       </div>
                       <div class="mt-2.5 text-[11px] italic text-ink-500">AI suggestion: minimum 3 years for tender value under ₹2 Crore</div>
                     </div>
 
-                    <div class="bg-white border border-line rounded-[10px] p-4">
+                    <div class="bg-white border border-line rounded-[10px] p-4" data-criterion-card>
                       <div class="flex items-start justify-between gap-3 flex-wrap">
                         <div class="flex-1 min-w-0">
                           <div class="text-[14px] font-bold text-ink-900">Positive Net Worth</div>
@@ -1349,50 +1349,40 @@
                         </div>
                         <div class="flex items-center gap-3">
                           <label class="toggle"><input type="checkbox" checked /><span class="slider"></span></label>
-                          <button aria-label="Remove criterion" class="text-ink-400 hover:text-danger w-8 h-8 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4"></i></button>
+                          <button aria-label="Remove criterion" onclick="removeCriterion(this,false)" class="text-ink-400 hover:text-danger w-8 h-8 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4"></i></button>
                         </div>
                       </div>
                       <div class="mt-2.5 text-[11px] italic text-ink-500">Standard CVC requirement for all government tenders</div>
                     </div>
                   </div>
-                  <button class="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary-border text-[12.5px] text-primary hover:bg-primary-light"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add PQ Criterion</button>
+                  <div id="pqRestoreZone" class="mt-2"></div>
+                  <div id="pqSelectorZone" style="max-height:0; overflow:hidden; transition:max-height 200ms ease;"></div>
+                  <button id="pqAddBtn" onclick="openCriterionSelector('pq')" aria-expanded="false" class="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary-border text-[12.5px] text-primary hover:bg-primary-light"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add PQ Criterion</button>
                 </section>
 
                 <!-- Section B: TQ -->
                 <section class="mb-9">
                   <h2 class="text-[15px] font-bold text-ink-900 pb-2 border-b border-line mb-1">Technical Qualification Criteria</h2>
                   <p class="text-[12px] text-ink-500 mb-4">Technical capability requirements. Vendors must demonstrate these to be technically qualified.</p>
-                  <div class="space-y-2.5">
-                    <div class="bg-white border border-line rounded-[10px] p-4">
+                  <div id="tqCardsList" class="space-y-2.5">
+                    <div class="bg-white border border-line rounded-[10px] p-4" data-criterion-card>
                       <div class="flex items-start justify-between gap-3 flex-wrap mb-3">
                         <div>
                           <div class="text-[14px] font-bold text-ink-900">Key Technical Personnel</div>
                           <div class="text-[12px] text-ink-500 mt-0.5">Qualified personnel who must be deployed on the project</div>
                         </div>
-                        <button aria-label="Remove criterion" class="text-ink-400 hover:text-danger w-8 h-8 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4"></i></button>
+                        <button aria-label="Remove criterion" onclick="removeCriterion(this,false)" class="text-ink-400 hover:text-danger w-8 h-8 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4"></i></button>
                       </div>
-                      <div class="overflow-x-auto">
-                        <table class="w-full text-[13px] border border-line rounded overflow-hidden">
-                          <thead class="bg-surface text-[10.5px] uppercase tracking-wider text-ink-500 font-semibold">
-                            <tr><th class="text-left px-3 py-2">Role</th><th class="text-left px-3 py-2">Qualification</th><th class="text-left px-3 py-2 w-32">Experience (yrs)</th></tr>
-                          </thead>
-                          <tbody class="divide-y divide-line">
-                            <tr><td class="px-3 py-2"><input class="w-full bg-transparent focus:outline-none" value="Project Manager" oninput="checkBrandLanguage(this.value, 'brandAlert-personnel')" /></td><td class="px-3 py-2"><input class="w-full bg-transparent focus:outline-none" value="Civil Engineering degree" /></td><td class="px-3 py-2"><input type="number" class="w-full bg-transparent focus:outline-none" value="5" /></td></tr>
-                            <tr><td class="px-3 py-2"><input class="w-full bg-transparent focus:outline-none" value="Site Engineer" /></td><td class="px-3 py-2"><input class="w-full bg-transparent focus:outline-none" value="Diploma/Degree Civil" /></td><td class="px-3 py-2"><input type="number" class="w-full bg-transparent focus:outline-none" value="3" /></td></tr>
-                          </tbody>
-                        </table>
-                      </div>
-                      <div id="brandAlert-personnel" role="alert" class="hidden mt-2 bg-danger-light border border-danger/40 rounded-lg px-3 py-2 text-[12px] text-danger inline-flex items-start gap-1.5"><i data-lucide="alert-octagon" class="w-3.5 h-3.5 shrink-0 mt-0.5"></i> <span class="text"></span></div>
-                      <button class="mt-2 text-[12.5px] text-primary hover:underline inline-flex items-center gap-1"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Personnel</button>
+                      <div data-personnel-table="p0"></div>
                     </div>
 
-                    <div class="bg-white border border-line rounded-[10px] p-4">
+                    <div class="bg-white border border-line rounded-[10px] p-4" data-criterion-card>
                       <div class="flex items-start justify-between gap-3 flex-wrap mb-3">
                         <div>
                           <div class="text-[14px] font-bold text-ink-900">Equipment Availability</div>
                           <div class="text-[12px] text-ink-500 mt-0.5">Key equipment that must be owned or available on hire</div>
                         </div>
-                        <button aria-label="Remove criterion" class="text-ink-400 hover:text-danger w-8 h-8 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4"></i></button>
+                        <button aria-label="Remove criterion" onclick="removeCriterion(this,false)" class="text-ink-400 hover:text-danger w-8 h-8 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4"></i></button>
                       </div>
                       <div id="equipChips" class="flex flex-wrap gap-2 mb-2">
                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface border border-line text-[12.5px]">Concrete Mixer <button onclick="this.parentElement.remove()" aria-label="Remove" class="text-ink-400 hover:text-danger">×</button></span>
@@ -1404,12 +1394,12 @@
                       <div id="brandAlert-equip" role="alert" class="hidden mt-2 bg-danger-light border border-danger/40 rounded-lg px-3 py-2 text-[12px] text-danger inline-flex items-start gap-1.5"><i data-lucide="alert-octagon" class="w-3.5 h-3.5 shrink-0 mt-0.5"></i> <span class="text"></span></div>
                     </div>
 
-                    <div class="bg-white border border-line rounded-[10px] p-4">
+                    <div class="bg-white border border-line rounded-[10px] p-4" data-criterion-card>
                       <div class="flex items-start justify-between gap-3 flex-wrap mb-3">
                         <div>
                           <div class="text-[14px] font-bold text-ink-900">Certifications &amp; Registrations</div>
                         </div>
-                        <button aria-label="Remove criterion" class="text-ink-400 hover:text-danger w-8 h-8 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4"></i></button>
+                        <button aria-label="Remove criterion" onclick="removeCriterion(this,false)" class="text-ink-400 hover:text-danger w-8 h-8 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4"></i></button>
                       </div>
                       <div class="space-y-2 text-[13px]">
                         <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked class="accent-primary"> Registered with Maharashtra PWD / CPWD</label>
@@ -1419,7 +1409,8 @@
                       </div>
                     </div>
                   </div>
-                  <button class="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary-border text-[12.5px] text-primary hover:bg-primary-light"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add TQ Criterion</button>
+                  <div id="tqSelectorZone" style="max-height:0; overflow:hidden; transition:max-height 200ms ease;"></div>
+                  <button id="tqAddBtn" onclick="openCriterionSelector('tq')" aria-expanded="false" class="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary-border text-[12.5px] text-primary hover:bg-primary-light"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add TQ Criterion</button>
                 </section>
               </fieldset>
 
@@ -1429,6 +1420,7 @@
                   <div class="flex items-center gap-2 mb-2.5">
                     <div class="w-7 h-7 rounded-lg bg-warning/20 text-warning flex items-center justify-center"><i data-lucide="shield-alert" class="w-4 h-4"></i></div>
                     <h3 class="text-[13px] font-bold text-[#92400E]">AI Eligibility Risk Check</h3>
+                    <span id="step2CritCount" aria-live="polite" class="ml-auto text-[11.5px] text-[#92400E]">4 PQ criteria · 3 TQ criteria defined</span>
                   </div>
                   <ul class="space-y-1.5 text-[13px] text-ink-900">
                     <li class="inline-flex items-center gap-2"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-success"></i> Turnover requirement (50% of tender value) — within CVC recommended range</li><br/>
@@ -1450,7 +1442,7 @@
             <div class="text-[12.5px] text-ink-500 hidden md:block">Step 2 of 7 — PQ &amp; TQ Criteria</div>
             <div class="flex items-center gap-2">
               <button onclick="saveAndExit()" class="px-3.5 py-2 rounded-lg border border-line text-[13px] text-ink-500 hover:text-ink-900 hover:bg-surface">Save as Draft</button>
-              <a href="#step3" class="px-4 py-2.5 rounded-lg bg-primary text-white text-[13.5px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5 shadow-soft">Continue to Project &amp; BOQ <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
+              <a id="step2ContinueLink" href="#step3" data-ok="1" onclick="return step2Guard(event)" class="px-4 py-2.5 rounded-lg bg-primary text-white text-[13.5px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5 shadow-soft">Continue to Project &amp; BOQ <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
             </div>
           </div>
         </section>
@@ -2685,8 +2677,16 @@
       const isStep = STEP_VIEWS.includes(name);
       document.getElementById('topnavMain').classList.toggle('hidden', isStep);
       document.getElementById('blueHeader').classList.toggle('hidden', !isStep);
+      if (name === 'step2' && typeof initStep2Personnel === 'function') initStep2Personnel();
       window.scrollTo({ top: 0 });
       refreshIcons();
+    }
+    let step2PersonnelInited = false;
+    function initStep2Personnel(){
+      if (step2PersonnelInited) return;
+      step2PersonnelInited = true;
+      if (typeof renderPersonnelGroup === 'function') renderPersonnelGroup('p0');
+      if (typeof updateStep2State === 'function') updateStep2State();
     }
     // DPR -> Tender prefill data
     const DPR_PREFILL = {
@@ -3354,6 +3354,641 @@
       if (!warn) return;
       warn.classList.toggle('hidden', !(num > PQ_TENDER_VALUE));
     }
+
+    // ================= STEP 2 — DYNAMIC CRITERIA =================
+    const CRITERION_TYPES = {
+      pq: [
+        { id:'turnover',   name:'Annual Turnover',        icon:'indian-rupee', desc:'Minimum financial turnover threshold' },
+        { id:'similar',    name:'Similar Work Experience',icon:'briefcase',    desc:'Completed works of similar nature' },
+        { id:'years',      name:'Years in Business',      icon:'calendar',     desc:'Minimum years since incorporation' },
+        { id:'networth',   name:'Net Worth',              icon:'trending-up',  desc:'Positive net worth requirement' },
+        { id:'capital',    name:'Paid-up Capital',        icon:'landmark',     desc:'Minimum registered capital' },
+        { id:'litigation', name:'Litigation History',     icon:'scale',        desc:'No pending litigation requirement' },
+        { id:'iso',        name:'ISO / Certification',    icon:'award',        desc:'Specific certification required' },
+        { id:'custom',     name:'Custom',                 icon:'edit-3',       desc:'Define your own criterion' },
+      ],
+      tq: [
+        { id:'personnel', name:'Key Technical Personnel',        icon:'users',           desc:'Qualified staff who must be deployed' },
+        { id:'equipment', name:'Equipment / Machinery',          icon:'truck',           desc:'Specific equipment the vendor must own or hire' },
+        { id:'certs',     name:'Certifications & Registrations', icon:'badge-check',     desc:'Required licences or registrations' },
+        { id:'qms',       name:'Quality Management System',      icon:'clipboard-check', desc:'ISO or equivalent quality certification' },
+        { id:'refs',      name:'Past Project References',        icon:'folder',          desc:'Specific project types in portfolio' },
+        { id:'customtq',  name:'Custom TQ',                      icon:'edit-3',          desc:'Define your own technical requirement' },
+      ],
+    };
+    const criterionSel = { pq:{ type:null }, tq:{ type:null } };
+    let personnelGroupSeq = 1;
+
+    function openCriterionSelector(scope){
+      const zone = document.getElementById(scope+'SelectorZone');
+      const btn  = document.getElementById(scope+'AddBtn');
+      const types = CRITERION_TYPES[scope];
+      criterionSel[scope].type = null;
+      zone.innerHTML = `
+        <div style="background:#F8FBFF; border:1px dashed #93C5FD; border-radius:10px; padding:18px 20px; margin-top:12px;">
+          <div class="flex items-center justify-between">
+            <div class="text-[13px] font-bold text-ink-900">Choose criterion type</div>
+            <button onclick="closeCriterionSelector('${scope}')" aria-label="Close" class="text-ink-400 hover:text-ink-900 text-[18px] leading-none">×</button>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px;">
+            ${types.map(t => `
+              <div onclick="pickCriterionType('${scope}','${t.id}')" tabindex="0" role="button"
+                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pickCriterionType('${scope}','${t.id}');}"
+                style="background:white; border:1px solid #E5E7EB; border-radius:8px; padding:12px 14px; cursor:pointer; transition:all 150ms;"
+                onmouseover="this.style.borderColor='#0F5EE8'; this.style.background='#F8FBFF';"
+                onmouseout="this.style.borderColor='#E5E7EB'; this.style.background='white';">
+                <div class="flex items-center gap-2"><i data-lucide="${t.icon}" class="w-5 h-5 text-primary"></i><span class="text-[13px] font-bold text-ink-900">${t.name}</span></div>
+                <div class="text-[11px] text-ink-500 mt-1">${t.desc}</div>
+              </div>`).join('')}
+          </div>
+        </div>`;
+      zone.style.maxHeight = '600px';
+      if (btn){ btn.style.display = 'none'; btn.setAttribute('aria-expanded','true'); }
+      refreshIcons();
+      updateStep2State();
+    }
+    function closeCriterionSelector(scope){
+      const zone = document.getElementById(scope+'SelectorZone');
+      const btn  = document.getElementById(scope+'AddBtn');
+      zone.style.maxHeight = '0';
+      setTimeout(() => { zone.innerHTML = ''; }, 210);
+      if (btn){ btn.style.display = ''; btn.setAttribute('aria-expanded','false'); }
+      criterionSel[scope].type = null;
+      updateStep2State();
+    }
+    function pickCriterionType(scope, typeId){
+      criterionSel[scope].type = typeId;
+      const zone = document.getElementById(scope+'SelectorZone');
+      const t = CRITERION_TYPES[scope].find(x => x.id === typeId);
+      const card = zone.firstElementChild;
+      if (card){ card.style.transition = 'opacity 150ms ease'; card.style.opacity = '0'; }
+      setTimeout(() => {
+        zone.innerHTML = `
+          <div style="background:white; border:1px solid #E5E7EB; border-radius:10px; padding:18px 20px; margin-top:12px; opacity:0; transition:opacity 150ms ease;" id="${scope}CritForm">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-[14px] font-bold text-ink-900">${t.name}</span>
+                <span style="background:#EFF6FF; color:#0F5EE8; border-radius:20px; padding:2px 8px; font-size:11px;">${t.name}</span>
+              </div>
+              <button onclick="closeCriterionSelector('${scope}')" aria-label="Remove" class="text-ink-400 hover:text-danger text-[18px] leading-none">×</button>
+            </div>
+            <div class="text-[12px] text-ink-500 mt-0.5">${t.desc}</div>
+            <div class="mt-3">${criterionFormFields(scope, typeId)}</div>
+            <div class="flex items-center justify-between mt-4 pt-3 border-t border-line">
+              <button onclick="openCriterionSelector('${scope}')" class="text-[12px] text-ink-500 hover:text-ink-900">← Change type</button>
+              <button onclick="addCriterion('${scope}')" class="px-[18px] py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90">Add Criterion</button>
+            </div>
+          </div>`;
+        const f = document.getElementById(scope+'CritForm');
+        requestAnimationFrame(() => { if (f) f.style.opacity = '1'; });
+        refreshIcons();
+      }, 150);
+    }
+
+    function fieldHTML(label, inner){ return `<div class="mb-2.5"><label class="block text-[12px] text-ink-500 mb-1">${label}</label>${inner}</div>`; }
+    function aiHint(txt){ return `<div class="mt-1 text-[11px] italic text-primary">AI suggestion: ${txt}</div>`; }
+
+    function criterionFormFields(scope, typeId){
+      if (scope === 'pq'){
+        switch(typeId){
+          case 'turnover': return `
+            ${fieldHTML('Minimum average annual turnover (₹)', `<div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500 text-[13.5px]">₹</span><input id="cf-amt" type="text" class="field pl-7" placeholder="22,50,000"/></div>`)}
+            <div class="flex items-center gap-2 mb-1"><span class="text-[12px] text-ink-500">Averaged over last</span><select id="cf-years" class="field !w-32"><option>3 years</option><option>5 years</option></select><span class="text-[12px] text-ink-500">financial years</span></div>
+            ${aiHint('minimum 50% of estimated tender value (₹22,50,000) for Works tenders')}`;
+          case 'similar': return `
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              ${fieldHTML('Minimum value per work (₹)', `<div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500 text-[13.5px]">₹</span><input id="cf-val" type="text" class="field pl-7" placeholder="18,00,000"/></div>`)}
+              ${fieldHTML('Number of such works', `<input id="cf-count" type="number" class="field" placeholder="1"/>`)}
+            </div>
+            <div class="flex items-center gap-2 mb-1"><span class="text-[12px] text-ink-500">In last</span><select id="cf-period" class="field !w-32"><option>3 years</option><option>5 years</option><option>7 years</option><option>10 years</option></select></div>
+            ${fieldHTML('Nature of work', `<input id="cf-nature" type="text" class="field" placeholder="e.g. civil road works, water pipeline, electrical installation"/>`)}
+            ${aiHint('1 similar work worth 40% of tender value in last 5 years')}`;
+          case 'years': return `
+            <div class="flex items-center gap-2 mb-1"><span class="text-[12px] text-ink-500">Minimum years since incorporation</span><input id="cf-years" type="number" class="field !w-24" placeholder="3"/><span class="text-[12.5px] text-ink-500">years</span></div>
+            ${aiHint('minimum 3 years for this tender value range')}`;
+          case 'networth': return `
+            <label class="flex items-center gap-3 text-[13px] text-ink-900"><label class="toggle"><input id="cf-toggle" type="checkbox" checked/><span class="slider"></span></label> Bidder must have positive net worth as per latest audited balance sheet</label>
+            ${aiHint('Standard CVC requirement for all government tenders')}`;
+          case 'capital': return fieldHTML('Minimum paid-up capital (₹)', `<div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500 text-[13.5px]">₹</span><input id="cf-amt" type="text" class="field pl-7" placeholder="10,00,000"/></div>`);
+          case 'litigation': return `<label class="flex items-center gap-3 text-[13px] text-ink-900"><label class="toggle"><input id="cf-toggle" type="checkbox" checked/><span class="slider"></span></label> Bidder should not have any pending litigation that adversely affects financial position</label>`;
+          case 'iso': return `
+            <div id="cf-isoRows">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 cf-iso-row">
+                ${fieldHTML('Certification name', `<input class="field cf-iso-name" type="text" placeholder="e.g. ISO 9001:2015, BIS certification, NSIC registration"/>`)}
+                ${fieldHTML('Issuing authority', `<input class="field cf-iso-auth" type="text" placeholder="e.g. Bureau of Indian Standards"/>`)}
+              </div>
+            </div>
+            <button onclick="addIsoRow()" class="text-[12px] text-primary hover:underline">+ Add another certification</button>`;
+          case 'custom': return `
+            ${fieldHTML('Criterion name', `<input id="cf-name" type="text" class="field" placeholder="e.g. Minimum fleet size"/>`)}
+            ${fieldHTML('Description', `<textarea id="cf-desc" rows="3" class="field" placeholder="Describe the requirement in detail..."></textarea>`)}
+            ${fieldHTML('Value / Threshold', `<input id="cf-thresh" type="text" class="field" placeholder="e.g. minimum 10 vehicles of 5-tonne capacity"/>`)}
+            ${fieldHTML('Measurement unit', `<input id="cf-unit" type="text" class="field" placeholder="e.g. vehicles, sq.ft., litres"/>`)}`;
+        }
+      } else {
+        switch(typeId){
+          case 'personnel': return `<div class="text-[12px] text-ink-500">A new Key Technical Personnel table will be added — define the roles this group must deploy.</div>`;
+          case 'equipment': return `
+            <label class="block text-[12px] text-ink-500 mb-1">Equipment or machinery the vendor must own or have access to:</label>
+            <div id="cf-equipChips" class="flex flex-wrap gap-2 mb-2"></div>
+            <input id="cf-equipInput" type="text" class="field" placeholder="Type equipment name and press Enter" onkeydown="if(event.key==='Enter'){event.preventDefault(); addFormEquip(this);}"/>
+            <div id="cf-equipBrand" class="hidden mt-1 text-[11px]" style="color:#991B1B;"></div>`;
+          case 'certs': return `
+            <div class="space-y-2 text-[13px]" id="cf-certs">
+              <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked class="accent-primary cf-cert" value="Registered with Maharashtra PWD / CPWD"> Registered with Maharashtra PWD / CPWD</label>
+              <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked class="accent-primary cf-cert" value="Valid GST Registration"> Valid GST Registration</label>
+              <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="accent-primary cf-cert" value="ISO 9001:2015 Certification"> ISO 9001:2015 Certification</label>
+              <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="accent-primary cf-cert" value="NSIC Registration"> NSIC Registration</label>
+              <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="accent-primary cf-cert" value="MSME Registration"> MSME Registration</label>
+              <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="accent-primary cf-cert" value="Labour License"> Labour License</label>
+            </div>
+            <button onclick="addCustomCertRow()" class="mt-2 text-[12px] text-primary hover:underline">+ Add custom certification</button>`;
+          case 'qms': return `
+            ${fieldHTML('Required quality management standard', `<select id="cf-qms" class="field"><option>ISO 9001:2015 (Quality)</option><option>ISO 14001 (Environmental)</option><option>ISO 45001 (Safety)</option><option>BIS Certification</option><option>Custom</option></select>`)}
+            <label class="flex items-center gap-2 text-[13px] text-ink-900"><input id="cf-qmsValid" type="checkbox" checked class="accent-primary"> Certificate must be valid at time of bid submission</label>`;
+          case 'refs': return `
+            ${fieldHTML('Project type', `<input id="cf-nature" type="text" class="field" placeholder="e.g. road construction, software development, hospital equipment supply"/>`)}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              ${fieldHTML('Minimum project value (₹)', `<div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500 text-[13.5px]">₹</span><input id="cf-val" type="text" class="field pl-7" placeholder="18,00,000"/></div>`)}
+              ${fieldHTML('Minimum number of such projects', `<input id="cf-count" type="number" class="field" placeholder="2"/>`)}
+            </div>
+            <div class="flex items-center gap-2"><span class="text-[12px] text-ink-500">In last</span><select id="cf-period" class="field !w-32"><option>3 years</option><option>5 years</option><option>7 years</option><option>10 years</option></select></div>`;
+          case 'customtq': return `
+            ${fieldHTML('Criterion name', `<input id="cf-name" type="text" class="field" placeholder="e.g. Minimum testing lab capacity"/>`)}
+            ${fieldHTML('Description', `<textarea id="cf-desc" rows="3" class="field" placeholder="Describe the requirement in detail..."></textarea>`)}
+            ${fieldHTML('Value / Threshold', `<input id="cf-thresh" type="text" class="field" placeholder="e.g. in-house NABL-accredited lab"/>`)}
+            ${fieldHTML('Measurement unit', `<input id="cf-unit" type="text" class="field" placeholder="e.g. tests/day, units"/>`)}`;
+        }
+      }
+      return '';
+    }
+    function addIsoRow(){
+      const wrap = document.getElementById('cf-isoRows');
+      if (!wrap) return;
+      const row = document.createElement('div');
+      row.className = 'grid grid-cols-1 sm:grid-cols-2 gap-3 cf-iso-row mt-1';
+      row.innerHTML = `${fieldHTML('Certification name', `<input class="field cf-iso-name" type="text" placeholder="e.g. ISO 14001"/>`)}${fieldHTML('Issuing authority', `<input class="field cf-iso-auth" type="text" placeholder="Issuing body"/>`)}`;
+      wrap.appendChild(row);
+    }
+    function addCustomCertRow(){
+      const wrap = document.getElementById('cf-certs');
+      if (!wrap) return;
+      const row = document.createElement('label');
+      row.className = 'flex items-center gap-2';
+      row.innerHTML = `<input type="checkbox" checked class="accent-primary cf-cert" value=""><input type="text" class="field" placeholder="Custom certification name" oninput="this.previousElementSibling.value=this.value;">`;
+      wrap.appendChild(row);
+    }
+    function addFormEquip(input){
+      const v = input.value.trim();
+      if (!v) return;
+      const wrap = document.getElementById('cf-equipChips');
+      const brand = detectBrand(v);
+      const chip = document.createElement('span');
+      chip.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px]';
+      chip.style.cssText = `background:#EFF6FF; color:#0C447C; ${brand?'border:1px solid #EF4444;':''} transform:scale(0.8); transition:transform 150ms ease;`;
+      chip.innerHTML = `${v} <button onclick="this.parentElement.remove()" aria-label="Remove" class="hover:text-danger">×</button>`;
+      wrap.appendChild(chip);
+      requestAnimationFrame(() => { chip.style.transform = 'scale(1)'; });
+      input.value = '';
+      const ba = document.getElementById('cf-equipBrand');
+      if (ba){
+        if (brand){ ba.textContent = `🚨 Brand name detected — use generic: 'hydraulic excavator (min 0.9m³ bucket capacity)'`; ba.classList.remove('hidden'); }
+        else ba.classList.add('hidden');
+      }
+    }
+    function detectBrand(text){
+      for (const b of BRAND_NAMES){
+        if (new RegExp('\\b'+b.replace(/[+]/g,'\\+')+'\\b','i').test(text)) return b;
+      }
+      return null;
+    }
+
+    function addCriterion(scope){
+      const typeId = criterionSel[scope].type;
+      if (!typeId) return;
+      const t = CRITERION_TYPES[scope].find(x => x.id === typeId);
+      const form = document.getElementById(scope+'CritForm');
+      const val = id => (document.getElementById(id) || {}).value || '';
+      const required = (ids) => {
+        let ok = true;
+        ids.forEach(id => { const el = document.getElementById(id); if (el && !el.value.trim()){ el.classList.add('invalid'); ok = false; } else if (el){ el.classList.remove('invalid'); } });
+        return ok;
+      };
+      let summary = '', name = t.name;
+      if (scope === 'pq'){
+        if (typeId === 'turnover'){ if(!required(['cf-amt'])) return; summary = `Minimum average annual turnover ₹${val('cf-amt')} over last ${val('cf-years')}.`; }
+        else if (typeId === 'similar'){ if(!required(['cf-val','cf-nature'])) return; summary = `${val('cf-count')||'1'} similar work(s) worth ₹${val('cf-val')} each — ${val('cf-nature')} — in last ${val('cf-period')}.`; }
+        else if (typeId === 'years'){ if(!required(['cf-years'])) return; summary = `Minimum ${val('cf-years')} years since incorporation.`; }
+        else if (typeId === 'networth'){ summary = (document.getElementById('cf-toggle')||{}).checked ? 'Bidder must have positive net worth as per latest audited balance sheet.' : 'Net worth requirement disabled.'; }
+        else if (typeId === 'capital'){ if(!required(['cf-amt'])) return; summary = `Minimum paid-up capital ₹${val('cf-amt')}.`; }
+        else if (typeId === 'litigation'){ summary = 'Bidder must have no pending litigation that adversely affects financial position.'; }
+        else if (typeId === 'iso'){
+          const certs = [...document.querySelectorAll('.cf-iso-row')].map(r => {
+            const n = r.querySelector('.cf-iso-name').value.trim(), a = r.querySelector('.cf-iso-auth').value.trim();
+            return n ? (n + (a?` (${a})`:'')) : '';
+          }).filter(Boolean);
+          if (!certs.length){ const fn = document.querySelector('.cf-iso-name'); if(fn) fn.classList.add('invalid'); return; }
+          summary = 'Required: ' + certs.join('; ') + '.';
+        }
+        else if (typeId === 'custom'){ if(!required(['cf-name'])) return; name = val('cf-name'); summary = `${val('cf-desc')||''} ${val('cf-thresh')?('Threshold: '+val('cf-thresh')):''} ${val('cf-unit')?('('+val('cf-unit')+')'):''}`.trim(); }
+        commitCriterionCard('pq', name, t.name, summary);
+      } else {
+        if (typeId === 'personnel'){
+          const gid = 'p' + (personnelGroupSeq++);
+          PERSONNEL_GROUPS[gid] = { rows: [], edit:'new', draft:{role:'',qual:'',exp:'',notes:''}, aiApplied:true };
+          commitCriterionCard('tq', 'Key Technical Personnel', 'Key Technical Personnel', '', gid);
+          renderPersonnelGroup(gid);
+        } else if (typeId === 'equipment'){
+          const chips = [...document.querySelectorAll('#cf-equipChips span')].map(s => s.childNodes[0].textContent.trim());
+          commitCriterionCard('tq', 'Equipment / Machinery', 'Equipment / Machinery', '', null, chips);
+        } else if (typeId === 'certs'){
+          const certs = [...document.querySelectorAll('.cf-cert:checked')].map(c => c.value).filter(Boolean);
+          if (!certs.length){ showToast('Select at least one certification'); return; }
+          summary = certs.join(' · ');
+          commitCriterionCard('tq', 'Certifications & Registrations', 'Certifications & Registrations', summary);
+        } else if (typeId === 'qms'){
+          summary = `${val('cf-qms')}${(document.getElementById('cf-qmsValid')||{}).checked ? ' — must be valid at time of bid submission' : ''}.`;
+          commitCriterionCard('tq', 'Quality Management System', 'Quality Management System', summary);
+        } else if (typeId === 'refs'){
+          if(!required(['cf-nature'])) return;
+          summary = `${val('cf-count')||'1'} ${val('cf-nature')} project(s) worth ₹${val('cf-val')||'—'}+ in last ${val('cf-period')}.`;
+          commitCriterionCard('tq', 'Past Project References', 'Past Project References', summary);
+        } else if (typeId === 'customtq'){
+          if(!required(['cf-name'])) return; name = val('cf-name');
+          summary = `${val('cf-desc')||''} ${val('cf-thresh')?('Threshold: '+val('cf-thresh')):''} ${val('cf-unit')?('('+val('cf-unit')+')'):''}`.trim();
+          commitCriterionCard('tq', name, 'Custom TQ', summary);
+        }
+      }
+      closeCriterionSelector(scope);
+    }
+
+    function commitCriterionCard(scope, name, typeName, summary, personnelGid, equipChips){
+      const list = document.getElementById(scope+'CardsList');
+      const card = document.createElement('div');
+      card.className = 'bg-white border border-line rounded-[10px] p-4';
+      card.setAttribute('data-criterion-card','');
+      card.style.cssText = 'opacity:0; transform:translateY(-8px); transition:opacity 250ms ease, transform 250ms ease;';
+      let body = '';
+      if (personnelGid){
+        body = `<div data-personnel-table="${personnelGid}"></div>`;
+      } else if (equipChips){
+        body = `<div class="equip-card-chips flex flex-wrap gap-2 mb-2 mt-1">
+            ${equipChips.map(c => `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface border border-line text-[12.5px]">${c} <button onclick="this.parentElement.remove()" aria-label="Remove" class="text-ink-400 hover:text-danger">×</button></span>`).join('')}
+          </div>
+          <input type="text" class="field" placeholder="Type equipment name and press Enter" onkeydown="if(event.key==='Enter'){event.preventDefault(); addCardEquip(this);}"/>`;
+      } else {
+        body = `<div class="text-[12.5px] text-ink-900 mt-2">${summary}</div>`;
+      }
+      card.innerHTML = `
+        <div class="flex items-start justify-between gap-3 flex-wrap">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-[14px] font-bold text-ink-900">${name}</span>
+            <span style="background:#EFF6FF; color:#0F5EE8; border-radius:20px; padding:2px 8px; font-size:11px;">${typeName}</span>
+          </div>
+          <button aria-label="Remove criterion" onclick="removeCriterion(this,false)" class="text-ink-400 hover:text-danger w-8 h-8 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+        ${body}`;
+      list.appendChild(card);
+      requestAnimationFrame(() => { card.style.opacity = '1'; card.style.transform = 'translateY(0)'; });
+      refreshIcons();
+      updateStep2State();
+    }
+    function addCardEquip(input){
+      const v = input.value.trim(); if (!v) return;
+      const wrap = input.previousElementSibling;
+      const chip = document.createElement('span');
+      chip.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface border border-line text-[12.5px]';
+      chip.style.cssText = 'transform:scale(0.8); transition:transform 150ms ease;';
+      const brand = detectBrand(v);
+      if (brand) chip.style.border = '1px solid #EF4444';
+      chip.innerHTML = `${v} <button onclick="this.parentElement.remove()" aria-label="Remove" class="text-ink-400 hover:text-danger">×</button>`;
+      wrap.appendChild(chip);
+      requestAnimationFrame(() => { chip.style.transform = 'scale(1)'; });
+      input.value = '';
+      if (brand) showToast(`Brand name '${brand}' detected — use a generic specification`);
+    }
+
+    // ---- Removal + mandatory warning ----
+    function removeCriterion(btn, isStandard, name){
+      const card = btn.closest('[data-criterion-card]');
+      if (!card) return;
+      if (isStandard){
+        if (card.querySelector('.mandatory-warn')) return;
+        const w = document.createElement('div');
+        w.className = 'mandatory-warn';
+        w.style.cssText = 'background:#FFFBEB; border-radius:6px; padding:8px 12px; font-size:12px; color:#92400E; margin-top:10px; overflow:hidden; max-height:0; transition:max-height 150ms ease;';
+        w.innerHTML = `⚠ This is a standard compliance requirement. CVC guidelines recommend including this criterion.
+          <button onclick="confirmRemoveCard(this)" style="color:#EF4444; margin-left:8px; text-decoration:underline;">Remove anyway</button>
+          <button onclick="dismissMandatoryWarn(this)" style="color:#0F5EE8; margin-left:6px; text-decoration:underline;">Keep</button>`;
+        card.appendChild(w);
+        requestAnimationFrame(() => { w.style.maxHeight = '70px'; });
+      } else {
+        fadeRemoveCard(card);
+      }
+    }
+    function confirmRemoveCard(btn){ fadeRemoveCard(btn.closest('[data-criterion-card]')); }
+    function dismissMandatoryWarn(btn){
+      const w = btn.closest('.mandatory-warn');
+      w.style.maxHeight = '0';
+      setTimeout(() => w.remove(), 160);
+    }
+    function fadeRemoveCard(card){
+      if (!card) return;
+      card.style.transition = 'opacity 150ms ease, max-height 200ms ease, margin 200ms ease, padding 200ms ease';
+      card.style.maxHeight = card.offsetHeight + 'px';
+      requestAnimationFrame(() => {
+        card.style.opacity = '0'; card.style.maxHeight = '0'; card.style.paddingTop = '0'; card.style.paddingBottom = '0'; card.style.marginTop = '0';
+      });
+      setTimeout(() => { card.remove(); checkRestoreLink(); updateStep2State(); }, 220);
+    }
+    function checkRestoreLink(){
+      const zone = document.getElementById('pqRestoreZone');
+      if (!zone) return;
+      const anyStandard = document.querySelectorAll('#pqCardsList [data-standard]').length > 0;
+      zone.innerHTML = anyStandard ? '' :
+        `<button onclick="restoreAISuggestions()" class="text-[12.5px] hover:underline" style="color:#F59E0B;">↺ Restore AI suggestions</button>`;
+    }
+    function restoreAISuggestions(){
+      const list = document.getElementById('pqCardsList');
+      ['Annual Turnover','Similar Work Experience'].forEach(std => {
+        if (document.querySelector(`#pqCardsList [data-standard="${std}"]`)) return;
+        const card = document.createElement('div');
+        card.className = 'bg-white border border-line rounded-[10px] p-4';
+        card.setAttribute('data-criterion-card','');
+        card.setAttribute('data-standard', std);
+        card.style.cssText = 'opacity:0; transform:translateY(-8px); transition:opacity 250ms ease, transform 250ms ease;';
+        const summary = std === 'Annual Turnover'
+          ? 'Minimum average annual turnover ₹22,50,000 over last 3 financial years.'
+          : '1 similar work worth ₹18,00,000 in last 5 years.';
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-3 flex-wrap">
+            <div class="flex items-center gap-2 flex-wrap"><span class="text-[14px] font-bold text-ink-900">${std}</span><span style="background:#EFF6FF; color:#0F5EE8; border-radius:20px; padding:2px 8px; font-size:11px;">${std}</span></div>
+            <button aria-label="Remove criterion" onclick="removeCriterion(this,true,'${std}')" class="text-ink-400 hover:text-danger w-8 h-8 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4"></i></button>
+          </div>
+          <div class="text-[12.5px] text-ink-900 mt-2">${summary}</div>`;
+        list.appendChild(card);
+        requestAnimationFrame(() => { card.style.opacity = '1'; card.style.transform = 'translateY(0)'; });
+      });
+      refreshIcons();
+      checkRestoreLink();
+      updateStep2State();
+      showToast('AI-suggested criteria restored');
+    }
+
+    // ---- Continue gating + count ----
+    function updateStep2State(){
+      const pq = document.querySelectorAll('#pqCardsList [data-criterion-card]').length;
+      const tq = document.querySelectorAll('#tqCardsList [data-criterion-card]').length;
+      const openForm = !!document.getElementById('pqCritForm') || !!document.getElementById('tqCritForm')
+        || !!document.getElementById('pqSelectorZone').firstElementChild || !!document.getElementById('tqSelectorZone').firstElementChild;
+      const cnt = document.getElementById('step2CritCount');
+      if (cnt) cnt.textContent = `${pq} PQ criteria · ${tq} TQ criteria defined`;
+      const link = document.getElementById('step2ContinueLink');
+      if (link){
+        const ok = pq >= 2 && tq >= 1 && !openForm;
+        link.dataset.ok = ok ? '1' : '0';
+        link.style.opacity = ok ? '1' : '0.5';
+        link.style.pointerEvents = ok ? '' : 'auto';
+      }
+    }
+    function step2Guard(e){
+      const link = document.getElementById('step2ContinueLink');
+      if (link && link.dataset.ok === '0'){
+        e.preventDefault();
+        showToast('Add at least 2 PQ and 1 TQ criterion, and finish any open form');
+        return false;
+      }
+      return true;
+    }
+
+    // ================= STEP 2 — KEY TECHNICAL PERSONNEL =================
+    const PERSONNEL_GROUPS = {
+      p0: {
+        rows: [
+          { role:'Project Manager', qual:'Civil Engineering degree (B.Tech/B.E.)', exp:'5', notes:'Must be deployed full-time on site', ai:true },
+          { role:'Site Engineer',   qual:'Diploma or Degree in Civil Engineering', exp:'3', notes:'', ai:true },
+        ],
+        edit:null, draft:null, aiApplied:false,
+      },
+    };
+    const ROLE_SUGGESTIONS = ['Project Manager','Site Engineer','Quality Control Engineer','Safety Officer','Electrical Engineer','Environmental Officer','Finance Manager','IT Project Manager','Technical Lead','Biomedical Engineer'];
+    const QUAL_SUGGESTIONS = ['B.Tech / B.E. Civil Engineering','M.Tech Civil Engineering','Diploma in Civil Engineering','B.Tech Computer Science','MBA','CA / CMA'];
+
+    function renderPersonnelGroup(gid){
+      const g = PERSONNEL_GROUPS[gid];
+      const host = document.querySelector(`[data-personnel-table="${gid}"]`);
+      if (!g || !host) return;
+      const banner = g.aiApplied ? '' : `
+        <div style="background:#EFF6FF; border:1px solid #93C5FD; border-radius:8px; padding:10px 14px; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+          <div style="display:flex; align-items:center; gap:8px;"><i data-lucide="sparkles" class="w-4 h-4 text-primary"></i><span style="font-size:12px; color:#0C447C;">AI has suggested standard personnel based on Works / Infrastructure / ₹45L</span></div>
+          <button onclick="applyPersonnelAI('${gid}')" style="border:1px solid #0F5EE8; color:#0F5EE8; background:white; border-radius:6px; padding:5px 12px; font-size:12px;">Apply AI suggestions</button>
+        </div>`;
+      const editStyle = 'border:1px solid #0F5EE8; border-radius:6px; padding:6px 8px; font-size:13px; width:100%; outline:none;';
+      const rowHTML = (r, i) => {
+        if (g.edit === i){
+          const d = g.draft || {};
+          return `<tr style="background:#F8FBFF;">
+            <td class="px-3 py-2" style="position:relative;">
+              <input value="${(d.role||'').replace(/"/g,'&quot;')}" oninput="personnelDraft('${gid}','role',this.value); personnelSug('${gid}','role',this.value)" onfocus="personnelSug('${gid}','role',this.value)" style="${editStyle}" placeholder="Role"/>
+              <div id="psug-${gid}-role" class="hidden" style="position:absolute; left:8px; right:8px; background:white; border:1px solid #E5E7EB; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:4px; z-index:50;"></div>
+            </td>
+            <td class="px-3 py-2" style="position:relative;">
+              <input value="${(d.qual||'').replace(/"/g,'&quot;')}" oninput="personnelDraft('${gid}','qual',this.value); personnelSug('${gid}','qual',this.value)" onfocus="personnelSug('${gid}','qual',this.value)" style="${editStyle}" placeholder="Minimum qualification"/>
+              <div id="psug-${gid}-qual" class="hidden" style="position:absolute; left:8px; right:8px; background:white; border:1px solid #E5E7EB; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:4px; z-index:50;"></div>
+            </td>
+            <td class="px-3 py-2"><div class="flex items-center gap-1.5"><input type="number" value="${d.exp||''}" oninput="personnelDraft('${gid}','exp',this.value)" style="${editStyle} width:60px;"/><span class="text-[12px] text-ink-500">years</span></div></td>
+            <td class="px-3 py-2"><input value="${(d.notes||'').replace(/"/g,'&quot;')}" oninput="personnelDraft('${gid}','notes',this.value)" style="${editStyle}" placeholder="Optional note..."/></td>
+            <td class="px-3 py-2"><div class="flex flex-col gap-1"><button onclick="personnelSave('${gid}',${i})" class="text-[12px] font-medium" style="color:#10B981;">✓ Save</button><button onclick="personnelCancel('${gid}')" class="text-[12px] text-ink-500">Cancel</button></div></td>
+          </tr>`;
+        }
+        return `<tr class="personnel-row" onmouseover="this.style.background='#F9FAFB'" onmouseout="this.style.background=''">
+          <td class="px-3 py-2.5 text-[13px] font-bold text-ink-900">${r.role}</td>
+          <td class="px-3 py-2.5 text-[13px] text-ink-700" style="color:#374151;">${r.qual}</td>
+          <td class="px-3 py-2.5 text-[13px]" style="color:#374151;">${r.exp} years</td>
+          <td class="px-3 py-2.5 text-[12px] italic" style="color:#9CA3AF;">${r.notes || '—'}</td>
+          <td class="px-3 py-2.5"><div class="flex items-center gap-2">
+            <button onclick="personnelEdit('${gid}',${i})" aria-label="Edit" class="text-ink-400 hover:text-primary"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+            <button onclick="personnelDelete('${gid}',${i})" aria-label="Delete" class="text-ink-400 hover:text-danger"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+          </div></td>
+        </tr>`;
+      };
+      const newRow = (g.edit === 'new') ? (() => {
+        const d = g.draft || {};
+        return `<tr style="background:#F8FBFF;">
+          <td class="px-3 py-2" style="position:relative;">
+            <input value="${(d.role||'').replace(/"/g,'&quot;')}" oninput="personnelDraft('${gid}','role',this.value); personnelSug('${gid}','role',this.value)" onfocus="personnelSug('${gid}','role',this.value)" style="${editStyle}" placeholder="e.g. Quality Inspector, Safety Officer, Team Leader"/>
+            <div id="psug-${gid}-role" class="hidden" style="position:absolute; left:8px; right:8px; background:white; border:1px solid #E5E7EB; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:4px; z-index:50;"></div>
+          </td>
+          <td class="px-3 py-2" style="position:relative;">
+            <input value="${(d.qual||'').replace(/"/g,'&quot;')}" oninput="personnelDraft('${gid}','qual',this.value); personnelSug('${gid}','qual',this.value)" onfocus="personnelSug('${gid}','qual',this.value)" style="${editStyle}" placeholder="e.g. B.Tech Civil, MBA, Diploma"/>
+            <div id="psug-${gid}-qual" class="hidden" style="position:absolute; left:8px; right:8px; background:white; border:1px solid #E5E7EB; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:4px; z-index:50;"></div>
+          </td>
+          <td class="px-3 py-2"><div class="flex items-center gap-1.5"><input type="number" value="${d.exp||''}" oninput="personnelDraft('${gid}','exp',this.value)" style="${editStyle} width:60px;"/><span class="text-[12px] text-ink-500">years</span></div></td>
+          <td class="px-3 py-2"><input value="${(d.notes||'').replace(/"/g,'&quot;')}" oninput="personnelDraft('${gid}','notes',this.value)" style="${editStyle}" placeholder="Optional — deployment terms, full-time requirement, etc."/></td>
+          <td class="px-3 py-2"><div class="flex flex-col gap-1"><button onclick="personnelSave('${gid}','new')" class="text-white text-[12px] font-medium" style="background:#0F5EE8; border-radius:6px; padding:5px 12px;">✓ Add</button><button onclick="personnelCancel('${gid}')" class="text-[12px] text-ink-500">Cancel</button></div></td>
+        </tr>`;
+      })() : '';
+      host.innerHTML = `
+        ${banner}
+        <div class="text-[12px] text-ink-500 mb-3.5">Required personnel — define the roles the winning vendor must deploy on this project</div>
+        <table style="width:100%; border-collapse:collapse; border:1px solid #E5E7EB; border-radius:8px; overflow:hidden;">
+          <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;">
+            <th style="padding:9px 12px; font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; text-align:left;">Role</th>
+            <th style="padding:9px 12px; font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; text-align:left;">Minimum Qualification</th>
+            <th style="padding:9px 12px; font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; text-align:left;">Min Experience</th>
+            <th style="padding:9px 12px; font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; text-align:left;">Notes</th>
+            <th style="padding:9px 12px; width:80px;"></th>
+          </tr></thead>
+          <tbody style="divide-y divide-line">${g.rows.map(rowHTML).join('')}${newRow}</tbody>
+        </table>
+        ${g.edit === 'new' ? '' : `<button onclick="personnelAdd('${gid}')" class="mt-2.5 text-[13px] text-primary hover:underline inline-flex items-center gap-1"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Personnel</button>`}`;
+      // borders for tbody rows
+      host.querySelectorAll('tbody tr').forEach(tr => tr.style.borderBottom = '1px solid #F3F4F6');
+      refreshIcons();
+    }
+    function personnelDraft(gid, field, v){ const g = PERSONNEL_GROUPS[gid]; if (g && g.draft) g.draft[field] = v; }
+    function personnelSug(gid, field, v){
+      const box = document.getElementById(`psug-${gid}-${field}`);
+      if (!box) return;
+      const pool = field === 'role' ? ROLE_SUGGESTIONS : QUAL_SUGGESTIONS;
+      const matches = pool.filter(x => x.toLowerCase().includes((v||'').toLowerCase())).slice(0,6);
+      if (!matches.length){ box.classList.add('hidden'); return; }
+      box.innerHTML = matches.map(m => `<div onmousedown="event.preventDefault(); personnelPickSug('${gid}','${field}',this.dataset.v)" data-v="${m.replace(/"/g,'&quot;')}" style="padding:6px 8px; font-size:12.5px; border-radius:6px; cursor:pointer;" onmouseover="this.style.background='#F8FBFF'" onmouseout="this.style.background=''">${m}</div>`).join('');
+      box.classList.remove('hidden');
+    }
+    function personnelPickSug(gid, field, value){
+      const g = PERSONNEL_GROUPS[gid];
+      if (g && g.draft) g.draft[field] = value;
+      const box = document.getElementById(`psug-${gid}-${field}`);
+      if (box){
+        box.classList.add('hidden');
+        const input = box.previousElementSibling;
+        if (input) input.value = value;
+      }
+    }
+    function personnelEdit(gid, i){
+      // save any other group's open edit first (one edit at a time)
+      Object.keys(PERSONNEL_GROUPS).forEach(k => {
+        const gg = PERSONNEL_GROUPS[k];
+        if (gg.edit !== null && !(k === gid && gg.edit === i)){ commitPersonnelEdit(k); }
+      });
+      const g = PERSONNEL_GROUPS[gid];
+      g.edit = i;
+      g.draft = Object.assign({}, g.rows[i]);
+      renderPersonnelGroup(gid);
+    }
+    function personnelAdd(gid){
+      Object.keys(PERSONNEL_GROUPS).forEach(k => { if (PERSONNEL_GROUPS[k].edit !== null) commitPersonnelEdit(k); });
+      const g = PERSONNEL_GROUPS[gid];
+      g.edit = 'new';
+      g.draft = { role:'', qual:'', exp:'', notes:'' };
+      renderPersonnelGroup(gid);
+    }
+    function commitPersonnelEdit(gid){
+      const g = PERSONNEL_GROUPS[gid];
+      if (g.edit === null) return;
+      const d = g.draft || {};
+      if (!(d.role||'').trim() || !(d.qual||'').trim()){ g.edit = null; g.draft = null; return; }
+      if (g.edit === 'new') g.rows.push({ role:d.role.trim(), qual:d.qual.trim(), exp:d.exp||'0', notes:d.notes||'', ai:false });
+      else g.rows[g.edit] = { role:d.role.trim(), qual:d.qual.trim(), exp:d.exp||'0', notes:d.notes||'', ai:g.rows[g.edit].ai };
+      g.edit = null; g.draft = null;
+    }
+    function personnelSave(gid, i){
+      const g = PERSONNEL_GROUPS[gid];
+      const d = g.draft || {};
+      if (!(d.role||'').trim() || !(d.qual||'').trim()){
+        const box = document.querySelector(`[data-personnel-table="${gid}"]`);
+        box.querySelectorAll('tbody tr:last-child input, tbody tr td input').forEach(()=>{});
+        // mark first two inputs red
+        const editRow = box.querySelector('tbody tr[style*="F8FBFF"]');
+        if (editRow){ const ins = editRow.querySelectorAll('input'); if(!(d.role||'').trim()&&ins[0]) ins[0].style.borderColor='#EF4444'; if(!(d.qual||'').trim()&&ins[1]) ins[1].style.borderColor='#EF4444'; }
+        showToast('Role and Qualification are required');
+        return;
+      }
+      if (i === 'new') g.rows.push({ role:d.role.trim(), qual:d.qual.trim(), exp:d.exp||'0', notes:d.notes||'', ai:false });
+      else g.rows[i] = { role:d.role.trim(), qual:d.qual.trim(), exp:d.exp||'0', notes:d.notes||'', ai:g.rows[i].ai };
+      g.edit = null; g.draft = null;
+      renderPersonnelGroup(gid);
+      // flash the saved row
+      const host = document.querySelector(`[data-personnel-table="${gid}"]`);
+      const rows = host.querySelectorAll('tbody tr.personnel-row');
+      const flashRow = (i === 'new') ? rows[g.rows.length-1] : rows[i];
+      if (flashRow){
+        flashRow.style.transition = 'background 600ms ease';
+        flashRow.style.background = '#F0FDF4';
+        setTimeout(() => { flashRow.style.background = ''; }, 650);
+      }
+      showToast('Personnel saved');
+    }
+    function personnelCancel(gid){
+      const g = PERSONNEL_GROUPS[gid];
+      g.edit = null; g.draft = null;
+      renderPersonnelGroup(gid);
+    }
+    function personnelDelete(gid, i){
+      const g = PERSONNEL_GROUPS[gid];
+      const row = g.rows[i];
+      const host = document.querySelector(`[data-personnel-table="${gid}"]`);
+      const tr = host.querySelectorAll('tbody tr.personnel-row')[i];
+      if (row.ai && !row._confirmDel){
+        if (tr && !tr.querySelector('.pers-warn')){
+          const td = tr.querySelector('td:last-child');
+          const warn = document.createElement('div');
+          warn.className = 'pers-warn';
+          warn.style.cssText = 'font-size:11px; color:#92400E; margin-top:4px;';
+          warn.innerHTML = `⚠ ${row.role} is a standard requirement.<br/>
+            <button onclick="personnelConfirmDelete('${gid}',${i})" style="color:#EF4444; text-decoration:underline;">Remove</button>
+            <button onclick="renderPersonnelGroup('${gid}')" style="color:#0F5EE8; text-decoration:underline; margin-left:6px;">Keep</button>`;
+          td.appendChild(warn);
+        }
+        return;
+      }
+      doPersonnelDelete(gid, i);
+    }
+    function personnelConfirmDelete(gid, i){ doPersonnelDelete(gid, i); }
+    function doPersonnelDelete(gid, i){
+      const host = document.querySelector(`[data-personnel-table="${gid}"]`);
+      const tr = host.querySelectorAll('tbody tr.personnel-row')[i];
+      if (tr){
+        tr.style.transition = 'opacity 300ms ease';
+        tr.style.opacity = '0.4'; tr.style.background = '#FEF2F2';
+        setTimeout(() => {
+          PERSONNEL_GROUPS[gid].rows.splice(i, 1);
+          renderPersonnelGroup(gid);
+        }, 300);
+      } else {
+        PERSONNEL_GROUPS[gid].rows.splice(i, 1);
+        renderPersonnelGroup(gid);
+      }
+    }
+    function applyPersonnelAI(gid){
+      const g = PERSONNEL_GROUPS[gid];
+      const extra = [
+        { role:'Quality Control Engineer', qual:'Diploma or Degree Civil / Materials', exp:'2', notes:'Must hold valid QC certification', ai:true },
+        { role:'Safety Officer', qual:'Diploma in Safety Management or equivalent', exp:'2', notes:'Mandatory for works above ₹25L', ai:true },
+      ];
+      extra.forEach(e => g.rows.push(e));
+      g.aiApplied = true;
+      renderPersonnelGroup(gid);
+      const host = document.querySelector(`[data-personnel-table="${gid}"]`);
+      const rows = host.querySelectorAll('tbody tr.personnel-row');
+      [rows[rows.length-2], rows[rows.length-1]].forEach((tr,idx) => {
+        if (!tr) return;
+        tr.style.opacity = '0'; tr.style.transform = 'translateY(-6px)';
+        tr.style.transition = 'opacity 250ms ease, transform 250ms ease';
+        setTimeout(() => { tr.style.opacity = '1'; tr.style.transform = 'translateY(0)'; }, idx*80);
+      });
+      showToast('AI personnel suggestions applied');
+    }
+    // close suggestion dropdowns on outside click / Escape
+    document.addEventListener('click', e => {
+      if (!e.target.closest('[id^="psug-"]') && e.target.tagName !== 'INPUT'){
+        document.querySelectorAll('[id^="psug-"]').forEach(b => b.classList.add('hidden'));
+      }
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') document.querySelectorAll('[id^="psug-"]').forEach(b => b.classList.add('hidden'));
+    });
 
     // ================= STEP 3 — Project & BOQ =================
     function aiDraftScope(){
