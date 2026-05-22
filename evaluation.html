@@ -135,10 +135,17 @@
 
       <!-- ============ SCREEN 1A — TENDER LIST ============ -->
       <section id="screen-landing" class="space-y-5">
-        <div>
-          <h1 class="text-[24px] font-bold text-ink-900 leading-tight">Bid Evaluation</h1>
-          <p class="text-[14px] text-ink-500 mt-1">Select a tender to begin or continue technical and financial evaluation.</p>
+        <div class="flex items-start justify-between gap-3 flex-wrap">
+          <div>
+            <h1 class="text-[24px] font-bold text-ink-900 leading-tight">Bid Evaluation</h1>
+            <p class="text-[14px] text-ink-500 mt-1">Select a tender to begin or continue technical and financial evaluation.</p>
+            <div id="evalEmptyHint" class="hidden text-[13px] text-ink-500 mt-1">No tenders yet? Upload a tender document to get started.</div>
+          </div>
+          <button onclick="toggleUploadPanel()" class="inline-flex items-center gap-1.5 text-[13px] font-medium shrink-0" style="border:1px solid #0F5EE8; border-radius:8px; padding:8px 16px; color:#0F5EE8; background:white;" onmouseover="this.style.background='#EFF6FF'" onmouseout="this.style.background='white'">
+            <i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload Tender
+          </button>
         </div>
+        <div id="uploadTenderPanel" style="max-height:0; overflow:hidden; transition:max-height 250ms ease;"></div>
         <div id="evalList" class="bg-white border border-line rounded-xl overflow-hidden"></div>
       </section>
 
@@ -303,9 +310,15 @@
       finBids:[],          // {vendor, file, status:'parsed'}
       finRun:false,
       finComplete:false,
+      finExpanded:'f1',
+      finOpeningRegister:'',
+      finQuoteEdits:{},
       method:'L1',
+      technicalWeightage:70,
+      financialWeightage:30,
       albDecision:null,    // 'accept' | 'reject'
       albNote:'',
+      _seedV:2,
     };
   }
   function saveState(){ try { localStorage.setItem('eval_'+EVAL.tnd, JSON.stringify(EVAL)); } catch(e){} }
@@ -313,25 +326,57 @@
     try { const raw = localStorage.getItem('eval_'+tnd); if (raw) return JSON.parse(raw); } catch(e){}
     return null;
   }
-  // Seed TND-2026-001 demo: T1 complete + 5 parsed technical bids, T3 active
+  // Seed TND-2026-001 demo: fully through technical, financial bids uploaded + evaluated
+  // so the Financial Evaluation design is immediately visible.
+  const DEMO_TQ_BREAKDOWN = {
+    'Rajesh Constructions':  { woscore:10, isoscore:10, cmmi:10, turnscore:32, manpower:20 }, // 82
+    'Maharashtra Roads Co.': { woscore:8,  isoscore:10, cmmi:10, turnscore:26, manpower:20 }, // 74
+    'BuildTech Solutions':   { woscore:6,  isoscore:5,  cmmi:8,  turnscore:29, manpower:20 }, // 68
+    'NCC Infrastructure':    { woscore:10, isoscore:10, cmmi:10, turnscore:21, manpower:20 }, // 71
+    'Patil & Associates':    { woscore:3,  isoscore:0,  cmmi:5,  turnscore:15, manpower:12 }, // 35
+  };
   function seedDemo(tnd){
     const s = freshState(tnd);
     s.t1 = { status:'complete', file:'bid_opening_register_TND-2026-001.pdf', date:'2026-05-15', time:'11:00', officer:'Rajesh Kumar', w1:'Priya Shah', w2:'Amit Patil', totalBids:'5' };
-    s.bids = VENDOR_OPTIONS.map((v,i) => ({ vendor:v, file:'technical_bid_'+v.toLowerCase().replace(/[^a-z]/g,'_')+'.pdf', status:'parsed', parsedEdits:{} }));
-    s.expanded = 't3';
+    s.bids = VENDOR_OPTIONS.map(v => ({ vendor:v, file:'technical_bid_'+v.toLowerCase().replace(/[^a-z]/g,'_')+'.pdf', status:'parsed', parsedEdits:{} }));
+    s.bids.forEach(b => {
+      s.matrix[b.vendor] = {};
+      PQ_CRITERIA.forEach(c => { s.matrix[b.vendor][c.id] = (b.vendor==='Patil & Associates' && c.id==='iso') ? 'fail' : 'pass'; });
+      const tq = DEMO_TQ_BREAKDOWN[b.vendor];
+      TQ_CRITERIA.forEach(c => { s.matrix[b.vendor][c.id] = tq[c.id]; });
+    });
+    s.prescreened = true;
+    s.t3confirmed = true;
+    s.ntq['Patil & Associates'] = { status:'signed', note:'Bid found Not Technically Qualified — the required ISO certification was not submitted with the bid.' };
+    s.techComplete = true;
+    s.finBids = ['Rajesh Constructions','Maharashtra Roads Co.','BuildTech Solutions','NCC Infrastructure']
+      .map(v => ({ vendor:v, file:'financial_bid_'+v.toLowerCase().replace(/[^a-z]/g,'_')+'.pdf', status:'parsed' }));
+    s.finOpeningRegister = 'financial_opening_register_TND-2026-001.pdf';
+    s.finRun = true;
+    s.finExpanded = 'f2';
+    s.expanded = 't4';
+    s.stageTab = 'financial';
+    s.method = 'L1';
     return s;
   }
 
   // ===================== LANDING =====================
   function renderEvalList(){
     const wrap = document.getElementById('evalList');
+    const hint = document.getElementById('evalEmptyHint');
+    if (hint) hint.classList.toggle('hidden', EVAL_TENDERS.length > 0);
+    if (!EVAL_TENDERS.length){
+      wrap.innerHTML = '<div class="text-center text-[13px] text-ink-500 italic py-12">No tenders in evaluation yet.</div>';
+      return;
+    }
     wrap.innerHTML = EVAL_TENDERS.map(t => {
       const m = STAGE_META[t.stage];
+      const newBadge = t.isNew ? '<span style="background:#EFF6FF; color:#0F5EE8; border-radius:4px; padding:1px 6px; font-size:10px; font-weight:700;">New</span>' : '';
       return `<div class="ev-row" onclick="openWorkspace('${t.id}')" tabindex="0" role="button" onkeydown="if(event.key==='Enter')openWorkspace('${t.id}')" style="padding:14px 16px; border-bottom:1px solid #F3F4F6; display:flex; align-items:center; gap:16px;">
         <span class="w-2 h-2 rounded-full shrink-0 ${m.pulse?'pulse-amber':''}" style="background:${m.dot};"></span>
         <span class="font-mono text-[12px] font-semibold text-primary shrink-0" style="background:#EFF6FF; border-radius:4px; padding:2px 6px; width:108px; text-align:center;">${t.id}</span>
         <div class="flex-1 min-w-0">
-          <div class="text-[14px] font-medium text-ink-900 truncate">${t.name}</div>
+          <div class="text-[14px] font-medium text-ink-900 truncate flex items-center gap-2"><span class="truncate">${t.name}</span>${newBadge}</div>
           <div class="text-[12px] text-ink-400">${t.dept} · ${t.sector}</div>
         </div>
         <div class="shrink-0 text-[12.5px] text-ink-500" style="width:240px; text-align:right;">${m.label}</div>
@@ -339,6 +384,107 @@
       </div>`;
     }).join('');
     refreshIcons();
+  }
+
+  // ===================== UPLOAD TENDER PANEL =====================
+  let uploadPanelOpen = false;
+  function toggleUploadPanel(){
+    uploadPanelOpen = !uploadPanelOpen;
+    const panel = document.getElementById('uploadTenderPanel');
+    if (uploadPanelOpen){
+      renderUploadPanel('upload');
+      panel.style.maxHeight = '900px';
+    } else {
+      panel.style.maxHeight = '0';
+      setTimeout(() => { if (!uploadPanelOpen) panel.innerHTML = ''; }, 260);
+    }
+  }
+  function renderUploadPanel(state){
+    const panel = document.getElementById('uploadTenderPanel');
+    let inner;
+    if (state === 'upload'){
+      inner = `<div onclick="utDoUpload()" id="utDropZone" style="border:2px dashed #D1D5DB; border-radius:10px; padding:32px; background:#F9FAFB; text-align:center; cursor:pointer;" onmouseover="this.style.borderColor='#0F5EE8'; this.style.background='#EFF6FF';" onmouseout="this.style.borderColor='#D1D5DB'; this.style.background='#F9FAFB';">
+        <i data-lucide="upload-cloud" style="width:32px; height:32px; color:#0F5EE8;" class="mx-auto"></i>
+        <div class="text-[14px] font-bold text-ink-900 mt-3">Drag and drop your tender document</div>
+        <div class="text-[12.5px] text-ink-500 mt-0.5">or <span class="text-primary font-medium">Browse files</span></div>
+        <div class="text-[11px] text-ink-400 mt-1.5">PDF, DOCX — max 20MB</div>
+      </div>`;
+    } else if (state === 'processing'){
+      inner = `<div style="padding:32px; text-align:center;">
+        <div style="width:30px; height:30px; border:2px solid #E5E7EB; border-top-color:#0F5EE8; border-radius:50%; animation:spin .8s linear infinite;" class="mx-auto"></div>
+        <div class="text-[13px] text-ink-500 mt-3"><span class="text">AI is reading your tender document</span><span class="ellip-dots">…</span></div>
+        <div class="text-[11px] text-ink-400 mt-1">Extracting tender details, evaluation method, estimated cost…</div>
+      </div>`;
+    } else {
+      inner = utFieldsHTML();
+    }
+    panel.innerHTML = `<div style="background:white; border:1px solid #E5E7EB; border-radius:12px; padding:24px;">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <div class="text-[15px] font-bold text-ink-900">Upload Tender Document</div>
+          <div class="text-[13px] text-ink-500 mt-0.5" style="max-width:520px;">Upload an existing tender document. AI will extract the key details so you can begin bid evaluation.</div>
+        </div>
+        <button onclick="toggleUploadPanel()" aria-label="Close" class="text-ink-400 hover:text-ink-900 text-[18px] leading-none">×</button>
+      </div>
+      <div style="margin-top:18px;">${inner}</div>
+    </div>`;
+    refreshIcons();
+  }
+  function utDoUpload(){
+    renderUploadPanel('processing');
+    setTimeout(() => { renderUploadPanel('fields'); }, 1800);
+  }
+  function utFieldsHTML(){
+    const aiChip = '<span style="position:absolute; top:6px; right:8px; background:#EFF6FF; color:#0C447C; border-radius:4px; padding:1px 5px; font-size:10px;">AI ✦</span>';
+    const fld = (label, inner, hasAI, helper) => `<div style="position:relative;">
+      <label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">${label}</label>
+      ${inner}${hasAI?aiChip:''}${helper?`<div class="text-[11px] text-ink-400 mt-1">${helper}</div>`:''}</div>`;
+    return `<div class="text-[12px] font-bold text-ink-500 mb-3.5">AI extracted the following — please verify and edit if needed:</div>
+      <div class="grid gap-3" style="grid-template-columns:1fr 1fr;">
+        ${fld('Tender Title *', `<input id="utTitle" class="field" value="Annual Maintenance of AMC Office IT Infrastructure" oninput="utClearChip(this)"/>`, true)}
+        ${fld('TND Reference No. *', `<input id="utTnd" class="field" value="TND-2026-015" oninput="utClearChip(this)"/>`, true)}
+        ${fld('Department', `<input id="utDept" class="field" value="IT" oninput="utClearChip(this)"/>`, true)}
+        ${fld('Sector', `<select id="utSector" class="field"><option>Goods</option><option>Works</option><option selected>Services</option></select>`, true)}
+        ${fld('Estimated Cost (₹)', `<input id="utCost" class="field" value="18,00,000" oninput="utClearChip(this)" style="padding-left:22px;"/><span style="position:absolute; left:10px; bottom:9px; color:#6B7280; font-size:13px;">₹</span>`, true)}
+        ${fld('Evaluation Method', `<select id="utMethod" class="field" onchange="utToggleQCBS()"><option value="L1">L1 (Lowest Cost)</option><option value="QCBS">QCBS</option><option value="QBS">QBS</option><option value="LCS">LCS</option><option value="FBS">FBS</option></select>`, true)}
+      </div>
+      <div id="utQcbsRow" class="hidden grid gap-3 mt-3" style="grid-template-columns:1fr 1fr;">
+        ${fld('Technical Weightage (%)', `<input id="utTechW" type="number" class="field" value="70" oninput="utSyncWeight('tech')"/>`, false)}
+        ${fld('Financial Weightage (%)', `<input id="utFinW" type="number" class="field" value="30" oninput="utSyncWeight('fin')"/>`, false)}
+      </div>
+      <div class="grid gap-3 mt-3" style="grid-template-columns:1fr 1fr;">
+        ${fld('Technical Sanction (TS) Value (₹)', `<input id="utTS" class="field" placeholder="Enter TS value"/>`, false, 'Used for reasonableness check in bid management')}
+        ${fld('Tender Date', `<input id="utDate" type="date" class="field" value="2026-05-12"/>`, true)}
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:18px; padding-top:16px; border-top:1px solid #F3F4F6;">
+        <button onclick="toggleUploadPanel()" class="text-[13px] text-ink-500 hover:text-ink-900 px-2">Cancel</button>
+        <button id="utSubmitBtn" onclick="utSubmitTender()" class="px-5 py-2 rounded-lg bg-primary text-white text-[13px] font-bold hover:bg-primary/90">Add to Evaluation List →</button>
+      </div>`;
+  }
+  function utClearChip(input){ const chip = input.parentElement.querySelector('span[style*="AI ✦"]'); if (chip) chip.remove(); }
+  function utToggleQCBS(){
+    document.getElementById('utQcbsRow').classList.toggle('hidden', document.getElementById('utMethod').value !== 'QCBS');
+  }
+  function utSyncWeight(which){
+    const t = document.getElementById('utTechW'), f = document.getElementById('utFinW');
+    if (which === 'tech'){ const v = parseInt(t.value)||0; f.value = Math.max(0, 100-v); }
+    else { const v = parseInt(f.value)||0; t.value = Math.max(0, 100-v); }
+  }
+  function utSubmitTender(){
+    const title = document.getElementById('utTitle').value.trim();
+    const tnd = document.getElementById('utTnd').value.trim();
+    if (!title || !tnd){ showToast('Tender Title and TND Reference are required'); return; }
+    const t = { id:tnd, name:title, dept:document.getElementById('utDept').value.trim()||'—',
+      sector:document.getElementById('utSector').value, cost:'₹'+(document.getElementById('utCost').value.trim()||'0'),
+      stage:'not-started', isNew:true,
+      method:document.getElementById('utMethod').value };
+    EVAL_TENDERS.unshift(t);
+    uploadPanelOpen = false;
+    document.getElementById('uploadTenderPanel').style.maxHeight = '0';
+    setTimeout(() => { document.getElementById('uploadTenderPanel').innerHTML = ''; }, 260);
+    renderEvalList();
+    showToast('Tender added to evaluation list');
+    setTimeout(() => { t.isNew = false; if (!document.getElementById('screen-landing').classList.contains('hidden')) renderEvalList(); }, 5000);
   }
   function showLanding(){
     try { history.replaceState(null,'',location.pathname); } catch(e){}
@@ -350,7 +496,9 @@
   function openWorkspace(tnd){
     try { history.replaceState(null,'','?tender='+encodeURIComponent(tnd)); } catch(e){}
     const t = EVAL_TENDERS.find(x => x.id === tnd) || EVAL_TENDERS[0];
-    EVAL = loadState(tnd) || (tnd === 'TND-2026-001' ? seedDemo(tnd) : freshState(tnd));
+    const loaded = loadState(tnd);
+    EVAL = (loaded && loaded._seedV === 2) ? loaded
+         : (tnd === 'TND-2026-001' ? seedDemo(tnd) : (loaded || freshState(tnd)));
     document.getElementById('wsCrumb').textContent = t.id;
     document.getElementById('wsBadge').textContent = t.id;
     document.getElementById('wsName').textContent = t.name;
@@ -945,96 +1093,198 @@
   }
 
   // ===================== FINANCIAL TAB =====================
+  function finQuote(vendor){ return (EVAL.finQuoteEdits && EVAL.finQuoteEdits[vendor]) || QUOTE_NUM[vendor] || 0; }
+  function isALB(quote){ return quote > 0 && quote < ESTIMATE * 0.85; }
+  function finComputed(){
+    const bids = EVAL.finBids.map(b => {
+      const q = finQuote(b.vendor);
+      return { vendor:b.vendor, quote:q, alb:isALB(q), tq:tqTotal(b.vendor)||0 };
+    });
+    if (EVAL.method === 'QCBS'){
+      const nonAlb = bids.filter(b => !b.alb).map(b => b.quote);
+      const lowest = nonAlb.length ? Math.min(...nonAlb) : Math.min(...bids.map(b => b.quote || Infinity));
+      bids.forEach(b => {
+        b.fin = b.quote ? Math.min(100, (lowest / b.quote) * 100) : 0;
+        b.combined = b.tq * (EVAL.technicalWeightage/100) + b.fin * (EVAL.financialWeightage/100);
+      });
+      bids.sort((a,b) => b.combined - a.combined);
+    } else {
+      const valid = bids.filter(b => !b.alb).sort((a,b) => a.quote - b.quote);
+      const albs  = bids.filter(b => b.alb).sort((a,b) => a.quote - b.quote);
+      bids.length = 0; bids.push(...valid, ...albs);
+    }
+    bids.forEach((b,i) => b.rank = i+1);
+    return bids;
+  }
   function renderFinancial(){
     const wrap = document.getElementById('stage-financial');
-    const tqVendors = EVAL.bids.filter(b => vendorVerdict(b.vendor)==='tq');
-    // F1
-    const finRows = EVAL.finBids.map(b => `<tr style="border-bottom:1px solid #F3F4F6;">
-      <td style="${tdS()} font-weight:600; color:#111827;">${b.vendor}</td>
-      <td style="${tdS()} color:#6B7280; font-size:12px;">${b.file}</td>
-      <td style="${tdS()} color:#9CA3AF; font-size:11.5px;">May 19, 2026</td>
-      <td style="${tdS()}">${b.status==='parsed'?'<span style="color:#10B981;">Parsed ✓</span>':'<span style="color:#0F5EE8;">Processing…</span>'}</td>
-      <td style="${tdS()}">${b.status==='parsed'?`<a href="#" onclick="openDrawer('${b.vendor}','fin'); return false;" class="text-[12px] text-primary hover:underline">View parsed data →</a>`:'—'}</td>
-    </tr>`).join('');
-    const usedFin = EVAL.finBids.map(b => b.vendor);
-    const availFin = tqVendors.map(b => b.vendor).filter(v => !usedFin.includes(v));
-    const f1 = `<div class="bg-white border border-line rounded-xl overflow-hidden">
-      <div style="padding:14px 18px;"><div class="text-[14px] font-bold text-ink-900 mb-0.5">Section F1 — Upload Financial Bids</div>
-        <div class="text-[12px] text-ink-500">Upload sealed financial bids for the ${tqVendors.length} technically qualified vendors.</div></div>
-      <div style="padding:0 18px 18px;">
-        ${EVAL.finBids.length ? `<div style="border:1px solid #E5E7EB; border-radius:10px; overflow:hidden; margin-bottom:14px;"><table style="width:100%; table-layout:fixed; border-collapse:collapse;">
-          <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:24%;">Vendor</th><th style="${thS()} width:26%;">File</th><th style="${thS()} width:16%;">Uploaded</th><th style="${thS()} width:18%;">Status</th><th style="${thS()} width:16%;">Action</th></tr></thead>
-          <tbody>${finRows}</tbody></table></div>` : ''}
-        <div style="border:1px solid #E5E7EB; border-radius:10px; padding:16px 18px; background:#F9FAFB;">
-          <div class="text-[13px] font-bold text-ink-900 mb-3">Add a financial bid</div>
-          <div class="grid gap-3" style="grid-template-columns:1fr 1fr 1fr;">
-            <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase mb-1">Vendor *</label>
-              <select id="fVendor" class="field"><option value="">Select vendor…</option>${availFin.map(v => `<option>${v}</option>`).join('')}</select></div>
-            <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase mb-1">Bid type</label><input class="field" value="Financial Bid" readonly style="background:#F3F4F6; color:#6B7280;"/></div>
-            <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase mb-1">Document</label><button onclick="fPickFile()" id="fFileBtn" class="field text-left" style="cursor:pointer;">Choose file</button></div>
-          </div>
-          <div class="flex justify-end mt-3"><button onclick="uploadFinBid()" class="px-4 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90">Upload Bid</button></div>
-        </div>
-        ${EVAL.finBids.length && EVAL.finBids.length>=tqVendors.length && !EVAL.finRun ? `<div class="flex justify-end mt-3"><button onclick="runFinancial()" class="px-4 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90">Run Financial Evaluation →</button></div>` : ''}
-      </div></div>`;
-
-    let f2 = '';
-    if (EVAL.finRun){
-      const rows = EVAL.finBids.map(b => ({ vendor:b.vendor, quote:QUOTE_NUM[b.vendor]||0 }))
-        .sort((a,b) => a.quote-b.quote);
-      const isQCBS = EVAL.method==='QCBS';
-      const banner = isQCBS
-        ? `<div class="rounded-lg p-3 text-[12.5px] mb-3" style="background:#EEEDFE; color:#3C3489;">Evaluation method for this tender: <strong>QCBS (70:30 — Technical:Financial)</strong></div>`
-        : `<div class="rounded-lg p-3 text-[12.5px] mb-3" style="background:#EFF6FF; color:#0C447C;">Evaluation method for this tender: <strong>L1 (Lowest Cost)</strong></div>`;
-      let tableHTML, preTable = '';
-      if (isQCBS){
-        // Formula box first — so the officer understands scoring before seeing numbers
-        preTable = `<div style="background:#F9FAFB; border-radius:10px; padding:14px 18px; margin-bottom:14px;">
-          <div class="text-[13px] font-bold text-ink-900 mb-1.5">QCBS Formula</div>
-          <div class="text-[12px] text-ink-500" style="font-family:monospace;">Financial Score = (Lowest Quote ÷ This Bidder's Quote) × 100</div>
-          <div class="text-[12px] text-ink-500" style="font-family:monospace;">Combined Score = (Technical Score × 70%) + (Financial Score × 30%)</div>
-        </div>`;
-        const lowest = rows[0].quote;
-        const scored = rows.map(r => { const fin = (lowest/r.quote)*100; const tech = tqTotal(r.vendor)||0; return { ...r, fin, tech, combined:(tech*0.7)+(fin*0.3) }; })
-          .sort((a,b) => b.combined-a.combined);
-        tableHTML = `<table style="width:100%; table-layout:fixed; border-collapse:collapse;">
-          <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:22%;">Vendor</th><th style="${thS()} width:24%;">Tech Score</th><th style="${thS()} width:24%;">Financial Score</th><th style="${thS()} width:22%;">Combined Score</th><th style="${thS()} width:8%;">Rank</th></tr></thead>
-          <tbody>${scored.map((r,i) => `<tr style="border-bottom:1px solid #F3F4F6; ${i===0?'background:#F0FDF4;':''}">
-            <td style="${tdS()} ${i===0?'border-left:3px solid #10B981;':''} font-weight:600;">${r.vendor}</td>
-            <td style="${tdS()}">${scoreBar(r.tech, 100, '#8B5CF6')}</td>
-            <td style="${tdS()}">${scoreBar(r.fin, 100, '#0F5EE8')}</td>
-            <td style="${tdS()}">${scoreBar(r.combined, 100, '#10B981', true)}${i===0?' <span style="background:#EEEDFE; color:#3C3489; border-radius:20px; padding:2px 8px; font-size:10px; font-weight:700; white-space:nowrap; margin-left:4px;">✦ AI recommends</span>':''}</td>
-            <td style="${tdS()} font-weight:700;">#${i+1}</td></tr>`).join('')}</tbody></table>`;
-      } else {
-        tableHTML = `<table style="width:100%; table-layout:fixed; border-collapse:collapse;">
-          <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:10%;">Rank</th><th style="${thS()} width:34%;">Vendor</th><th style="${thS()} width:22%;">Quoted Amount</th><th style="${thS()} width:18%;">vs Estimate</th><th style="${thS()} width:16%;">L1 Status</th></tr></thead>
-          <tbody>${rows.map((r,i) => { const dev = ((r.quote-ESTIMATE)/ESTIMATE)*100; const devCls = dev<=-15?'#991B1B':dev<0?'#065F46':dev>10?'#991B1B':'#92400E';
-            return `<tr style="border-bottom:1px solid #F3F4F6; ${i===0?'background:#F0FDF4;':''}">
-              <td style="${tdS()} ${i===0?'border-left:3px solid #10B981;':''} font-weight:700;">#${i+1}</td>
-              <td style="${tdS()} font-weight:600;">${r.vendor}</td>
-              <td style="${tdS()}">₹${r.quote.toLocaleString('en-IN')}</td>
-              <td style="${tdS()} color:${devCls}; font-weight:600;">${dev>0?'+':''}${dev.toFixed(1)}%</td>
-              <td style="${tdS()}">${i===0?pill('L1 — Recommended','#F0FDF4','#065F46'):'<span class="text-ink-400">—</span>'}</td></tr>`; }).join('')}</tbody></table>`;
-      }
-      const alb = rows.find(r => ((r.quote-ESTIMATE)/ESTIMATE)*100 <= -15);
-      const albSection = alb ? albDecisionHTML(alb) : '';
-      const proceedOk = !alb || EVAL.albDecision;
-      f2 = `<div class="bg-white border border-line rounded-xl overflow-hidden">
-        <div style="padding:14px 18px;"><div class="text-[14px] font-bold text-ink-900">Section F2 — Financial Evaluation</div></div>
-        <div style="padding:0 18px 18px;">
-          ${banner}
-          ${preTable}
-          <div style="border:1px solid #E5E7EB; border-radius:10px; overflow:hidden;">${tableHTML}</div>
-          ${albSection}
-          <div class="flex justify-end mt-4">
-            <button onclick="sendToComparison()" class="px-4 py-2 rounded-lg ${proceedOk?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-medium" ${proceedOk?'':'disabled'}>Send to Bid Comparison →</button>
-          </div>
-          ${!proceedOk ? '<div class="text-[11.5px] text-warning mt-1.5 text-right">Record the Abnormally Low Bid decision before proceeding.</div>' : ''}
-        </div></div>`;
-    }
-    wrap.innerHTML = f1 + f2;
+    const f1exp = (EVAL.finExpanded||'f1') === 'f1';
+    const f2locked = !EVAL.finRun;
+    const f2exp = EVAL.finExpanded === 'f2' && !f2locked;
+    wrap.innerHTML = finCard('f1','01','Upload Financial Bids', f1StatusPill(), f1exp, false, f1Body())
+                   + finCard('f2','02','Financial Evaluation', f2StatusPill(), f2exp, f2locked, f2locked ? '' : f2Body());
     refreshIcons();
   }
+  function finCard(key, num, title, statusPill, expanded, locked, body){
+    return `<div class="bg-white border border-line rounded-xl overflow-hidden">
+      <div class="flex items-center gap-3 ${locked?'opacity-50':'cursor-pointer'}" ${locked?'':`onclick="toggleFinSection('${key}')"`} style="padding:14px 18px;">
+        <span class="text-[11px] font-bold" style="background:#F3F4F6; color:#6B7280; border-radius:6px; padding:3px 8px;">${num}</span>
+        <span class="text-[14px] font-bold text-ink-900 flex-1">${title}</span>
+        <span aria-live="polite">${statusPill}</span>
+        ${locked?'<i data-lucide="lock" class="w-4 h-4 text-ink-400"></i>':`<i data-lucide="${expanded?'chevron-up':'chevron-down'}" class="w-4 h-4 text-ink-400"></i>`}
+      </div>
+      ${expanded?`<div style="padding:0 18px 18px;">${body}</div>`:''}
+    </div>`;
+  }
+  function toggleFinSection(key){ EVAL.finExpanded = (EVAL.finExpanded===key)?'':key; renderFinancial(); saveState(); }
+  function f1StatusPill(){
+    if (EVAL.finRun) return pill('Complete','#F0FDF4','#065F46');
+    if (EVAL.finBids.length) return pill(EVAL.finBids.length+' bids uploaded','#EFF6FF','#0C447C');
+    return pill('Pending','#F3F4F6','#6B7280');
+  }
+  function f2StatusPill(){
+    if (EVAL.finComplete) return pill('Complete','#F0FDF4','#065F46');
+    if (EVAL.finRun) return pill('In review','#EFF6FF','#0C447C');
+    return pill('Pending','#F3F4F6','#6B7280');
+  }
+
+  function f1Body(){
+    const tqVendors = EVAL.bids.filter(b => vendorVerdict(b.vendor)==='tq').map(b => b.vendor);
+    const ntqVendors = EVAL.bids.filter(b => vendorVerdict(b.vendor)==='ntq').map(b => b.vendor);
+    const uploaded = EVAL.finBids.map(b => b.vendor);
+    const chips = tqVendors.map(v => {
+      const has = uploaded.includes(v);
+      return `<span style="background:${has?'#EFF6FF':'#FFFBEB'}; color:${has?'#0F5EE8':'#92400E'}; border-radius:20px; padding:3px 10px; font-size:12px;">${v}${has?'':' · awaiting'}</span>`;
+    }).join('');
+    const finRows = EVAL.finBids.map(b => {
+      const q = finQuote(b.vendor);
+      return `<tr style="border-bottom:1px solid #F3F4F6;">
+        <td style="${tdS()} font-weight:600; color:#111827;">${b.vendor}</td>
+        <td style="${tdS()} color:#6B7280; font-size:12px;" class="truncate">${b.file}</td>
+        <td style="${tdS()} color:#9CA3AF; font-size:11.5px;">May 19, 2026</td>
+        <td style="${tdS()}" data-fq="${b.vendor}">${b.status==='parsed'?`<span onclick="editFinQuote(this,'${b.vendor}')" style="cursor:pointer; border-bottom:1px dashed #9CA3AF;" title="Click to edit">₹${q.toLocaleString('en-IN')}</span>`:'<span class="text-ink-400">—</span>'}</td>
+        <td style="${tdS()}">${b.status==='parsed'?'<span style="color:#10B981;">Parsed ✓</span> <a href="#" onclick="openDrawer(\''+b.vendor+'\',\'fin\'); return false;" class="text-[11px] text-primary hover:underline">View</a>':'<span style="color:#0F5EE8;" class="inline-flex items-center gap-1.5"><span style="width:11px;height:11px;border:2px solid #BFDBFE;border-top-color:#0F5EE8;border-radius:50%;display:inline-block;animation:spin .7s linear infinite;"></span> Processing…</span>'}</td>
+      </tr>`;
+    }).join('');
+    const availFin = tqVendors.filter(v => !uploaded.includes(v));
+    const allUploaded = tqVendors.length > 0 && availFin.length === 0;
+    const reg = EVAL.finOpeningRegister;
+    return `<div class="rounded-lg p-3 mb-3 text-[12px]" style="background:#EFF6FF; border:1px solid #BFDBFE; color:#1E40AF;">The financial bid opening ceremony has now been held separately. Upload the financial bid documents received from each Technically Qualified vendor.</div>
+      <div style="background:#F9FAFB; border:1px solid #E5E7EB; border-radius:8px; padding:12px 14px; margin-bottom:14px;">
+        <div class="text-[11px] font-bold text-ink-500 uppercase tracking-wide mb-2">Technically Qualified vendors expecting financial bids</div>
+        <div class="flex flex-wrap gap-2">${chips || '<span class="text-[12px] text-ink-400 italic">No TQ vendors yet</span>'}</div>
+      </div>
+      <div class="mb-3">
+        <div class="text-[13px] font-bold text-ink-900 mb-1.5">Financial Bid Opening Register <span class="text-ink-400 font-normal">(optional but recommended)</span></div>
+        ${reg
+          ? `<div class="flex items-center gap-2" style="background:#F9FAFB; border:1px solid #E5E7EB; border-radius:8px; padding:8px 12px;"><i data-lucide="file-text" class="w-4 h-4 text-primary"></i><span class="text-[12.5px] text-ink-900 flex-1 truncate">${reg}</span><a href="#" onclick="showToast('Register preview'); return false;" class="text-[12px] text-primary hover:underline">View</a><span style="background:#F0FDF4; color:#065F46; border-radius:20px; padding:2px 8px; font-size:11px; font-weight:600;">✓ Uploaded</span></div>`
+          : `<div style="border:1.5px dashed #D1D5DB; border-radius:8px; padding:14px 18px; display:flex; align-items:center; gap:16px;">
+              <i data-lucide="upload-cloud" style="width:24px; height:24px; color:#0F5EE8;"></i>
+              <div class="flex-1"><div class="text-[13px] text-ink-900">Upload the signed opening register</div><div class="text-[11px] text-ink-400">PDF or scan</div></div>
+              <button onclick="uploadFinRegister()" class="px-3 py-1.5 rounded-lg bg-primary text-white text-[12px] font-medium">Browse</button>
+            </div>`}
+      </div>
+      ${EVAL.finBids.length ? `<div style="border:1px solid #E5E7EB; border-radius:10px; overflow:hidden; margin-bottom:14px;"><table style="width:100%; table-layout:fixed; border-collapse:collapse;">
+        <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:24%;">Vendor</th><th style="${thS()} width:26%;">File</th><th style="${thS()} width:16%;">Uploaded At</th><th style="${thS()} width:17%;">Quoted Amount</th><th style="${thS()} width:17%;">Status</th></tr></thead>
+        <tbody>${finRows}</tbody></table></div>` : ''}
+      <div style="border:1px solid #E5E7EB; border-radius:10px; padding:16px 18px; background:#F9FAFB;">
+        <div class="text-[13px] font-bold text-ink-900 mb-3">Add a financial bid</div>
+        <div class="grid gap-3" style="grid-template-columns:1fr 1fr 1fr;">
+          <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase mb-1">Vendor *</label>
+            <select id="fVendor" class="field"><option value="">Select vendor…</option>
+              ${availFin.map(v => `<option value="${v}">${v}</option>`).join('')}
+              ${ntqVendors.map(v => `<option disabled>${v} — NTQ — not eligible</option>`).join('')}
+            </select></div>
+          <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase mb-1">Bid type</label><input class="field" value="Financial Bid" readonly style="background:#F3F4F6; color:#6B7280;"/></div>
+          <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase mb-1">Document</label><button onclick="fPickFile()" id="fFileBtn" class="field text-left" style="cursor:pointer;">Choose file</button></div>
+        </div>
+        <div class="flex justify-end mt-3"><button onclick="uploadFinBid()" class="px-4 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90">Upload Bid</button></div>
+      </div>
+      <div class="flex items-center justify-between mt-3 flex-wrap gap-2">
+        <span class="text-[12px] font-medium" style="color:${allUploaded?'#065F46':'#92400E'};" aria-live="polite">${uploaded.filter(v=>tqVendors.includes(v)).length} of ${tqVendors.length} TQ vendors uploaded</span>
+        <button onclick="runFinancial()" class="px-4 py-2 rounded-lg ${EVAL.finBids.length?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-medium" ${EVAL.finBids.length?'':'disabled'}>Run financial evaluation →</button>
+      </div>`;
+  }
+  function f2Body(){
+    const isQCBS = EVAL.method === 'QCBS';
+    const rows = finComputed();
+    const alb = rows.find(r => r.alb);
+    const proceedOk = !alb || EVAL.albDecision;
+    const methodBanner = isQCBS
+      ? `<div style="background:#EEEDFE; border:1px solid #D6D2F7; border-radius:8px; padding:12px 16px; margin-bottom:14px; display:flex; gap:10px; align-items:flex-start;">
+          <i data-lucide="calculator" style="width:18px; height:18px; color:#534AB7;"></i>
+          <div><div class="text-[13px] font-bold" style="color:#3C3489;">Evaluation method: QCBS &nbsp;·&nbsp; ${EVAL.technicalWeightage}:${EVAL.financialWeightage} — Technical : Financial</div>
+          <div class="text-[12px]" style="color:#534AB7;">Award is decided on the combined technical and financial score</div></div></div>`
+      : `<div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:12px 16px; margin-bottom:14px; display:flex; gap:10px; align-items:flex-start;">
+          <i data-lucide="trophy" style="width:18px; height:18px; color:#185FA5;"></i>
+          <div><div class="text-[13px] font-bold" style="color:#0C447C;">Evaluation method: L1 — Lowest Cost</div>
+          <div class="text-[12px]" style="color:#185FA5;">Award goes to the TQ vendor with the lowest quoted amount</div></div></div>`;
+    const rankBadge = (rank, win) => `<span style="display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:50%; font-size:11px; font-weight:700; background:${win?'#10B981':'#E5E7EB'}; color:${win?'white':'#6B7280'};">${rank}</span>`;
+    let formula = '', tableHTML;
+    if (isQCBS){
+      formula = `<div style="background:#F9FAFB; border-radius:10px; padding:14px 18px; margin-bottom:16px;">
+        <div class="text-[13px] font-bold text-ink-900 mb-2">QCBS score calculation</div>
+        <div class="grid gap-1" style="grid-template-columns:130px 1fr;">
+          <div class="text-[12px] text-ink-500">Financial score</div><div class="text-[12px] text-ink-900" style="font-family:monospace;">= (Lowest quote ÷ This bidder's quote) × 100</div>
+          <div class="text-[12px] text-ink-500">Combined score</div><div class="text-[12px] text-ink-900" style="font-family:monospace;">= (Tech score × ${EVAL.technicalWeightage}%) + (Fin score × ${EVAL.financialWeightage}%)</div>
+          <div class="text-[12px] text-ink-500">Weightage</div><div class="text-[12px] text-ink-900" style="font-family:monospace;">As specified in tender document — ${EVAL.technicalWeightage}:${EVAL.financialWeightage}</div>
+        </div></div>`;
+      tableHTML = `<table style="width:100%; table-layout:fixed; border-collapse:collapse;">
+        <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:52px;">Rank</th><th style="${thS()} width:19%;">Vendor</th><th style="${thS()} width:18%;">Tech Score</th><th style="${thS()} width:18%;">Fin Score</th><th style="${thS()} width:16%;">Combined</th><th style="${thS()} width:15%;">Quoted (₹)</th><th style="${thS()} width:13%;">Status</th></tr></thead>
+        <tbody>${rows.map((r,i) => {
+          const win = i===0;
+          const stat = win ? pill('Recommended','#F0FDF4','#065F46') : r.alb ? pill('ALB','#FFFBEB','#92400E') : pill(ordinal(r.rank),'#F3F4F6','#6B7280');
+          return `<tr style="border-bottom:1px solid #F3F4F6; ${win?'background:#F0FDF4;':''}">
+            <td style="${tdS()} ${win?'border-left:3px solid #10B981;':''}">${rankBadge(r.rank,win)}</td>
+            <td style="${tdS()} font-weight:600; color:#111827;">${r.vendor}</td>
+            <td style="${tdS()}">${scoreBar(r.tq, 100, '#0F5EE8')}</td>
+            <td style="${tdS()}">${scoreBar(r.fin, 100, '#10B981')}</td>
+            <td style="${tdS()} font-weight:700; color:#111827;">${r.combined.toFixed(1)}${win?' <span style="background:#EFF6FF; color:#0C447C; border-radius:4px; padding:1px 6px; font-size:11px; white-space:nowrap;">✦ Recommended</span>':''}</td>
+            <td style="${tdS()}">₹${r.quote.toLocaleString('en-IN')}</td>
+            <td style="${tdS()}">${stat}</td></tr>`;
+        }).join('')}</tbody></table>`;
+    } else {
+      tableHTML = `<table style="width:100%; table-layout:fixed; border-collapse:collapse;">
+        <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:52px;">Rank</th><th style="${thS()} width:30%;">Vendor</th><th style="${thS()} width:20%;">Quoted Amount (₹)</th><th style="${thS()} width:16%;">vs Estimate</th><th style="${thS()} width:15%;">Status</th></tr></thead>
+        <tbody>${rows.map((r,i) => {
+          const win = i===0 && !r.alb;
+          const dev = ((r.quote-ESTIMATE)/ESTIMATE)*100;
+          const devCls = r.alb?'#991B1B':dev<0?'#065F46':dev>10?'#991B1B':'#92400E';
+          const stat = r.alb ? pill('ALB','#FEF2F2','#991B1B') : win ? pill('L1','#F0FDF4','#065F46') : dev>10 ? pill('High','#FFFBEB','#92400E') : pill('L'+r.rank,'#F3F4F6','#6B7280');
+          return `<tr style="border-bottom:1px solid #F3F4F6; ${win?'background:#F0FDF4;':''}">
+            <td style="${tdS()} ${win?'border-left:3px solid #10B981;':''}">${rankBadge(r.rank,win)}</td>
+            <td style="${tdS()}"><div class="font-medium text-ink-900">${r.vendor}</div><div class="text-[11px] text-ink-400">TQ Score: ${r.tq}/100</div></td>
+            <td style="${tdS()} ${win?'font-weight:700;':''}">₹${r.quote.toLocaleString('en-IN')}</td>
+            <td style="${tdS()} color:${devCls}; font-weight:600;">${dev>0?'+':''}${dev.toFixed(1)}%</td>
+            <td style="${tdS()}">${stat}</td></tr>`;
+        }).join('')}</tbody></table>`;
+    }
+    const tName = (EVAL_TENDERS.find(t => t.id===EVAL.tnd)||{}).name || EVAL.tnd;
+    return `${methodBanner}${formula}
+      <div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
+        <div><span class="text-[14px] font-bold text-ink-900">Financial bids — ${tName}</span> <span class="text-[12px] text-ink-500">${rows.length} vendors</span></div>
+        <button onclick="showToast('Financial evaluation PDF exported')" class="px-3 py-1.5 rounded-lg border border-line text-[12px] text-ink-900 hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Export PDF</button>
+      </div>
+      <div style="border:1px solid #E5E7EB; border-radius:12px; overflow:hidden;">${tableHTML}</div>
+      ${alb ? albDecisionHTML(alb) : ''}
+      <div class="flex justify-end mt-4">
+        <button onclick="sendToComparison()" class="px-5 py-2.5 rounded-lg ${proceedOk?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-bold" ${proceedOk?'':'disabled'}>Send to Bid Comparison →</button>
+      </div>
+      ${!proceedOk ? '<div class="text-[12px] text-ink-400 mt-1.5 text-right">Resolve all flagged bids before proceeding</div>' : ''}`;
+  }
+  function ordinal(n){ return n===1?'1st':n===2?'2nd':n===3?'3rd':n+'th'; }
+  function editFinQuote(span, vendor){
+    const td = span.closest('td');
+    const cur = finQuote(vendor);
+    td.innerHTML = `<input type="number" value="${cur}" class="field" style="padding:4px 6px; font-size:12px;" onblur="saveFinQuote('${vendor}', this.value)" onkeydown="if(event.key==='Enter')this.blur();"/>`;
+    td.querySelector('input').focus();
+  }
+  function saveFinQuote(vendor, val){
+    const n = parseInt(val);
+    if (!isNaN(n) && n > 0){ EVAL.finQuoteEdits[vendor] = n; saveState(); }
+    renderFinancial();
+  }
+  function uploadFinRegister(){ EVAL.finOpeningRegister = 'financial_opening_register_'+EVAL.tnd+'.pdf'; saveState(); renderFinancial(); showToast('Opening register uploaded'); }
   function fPickFile(){ EVAL._ffile = true; document.getElementById('fFileBtn').textContent = 'financial_bid.pdf'; }
   function uploadFinBid(){
     const v = document.getElementById('fVendor').value;
@@ -1046,7 +1296,9 @@
     setTimeout(() => { b.status='parsed'; renderFinancial(); saveState(); showToast(v+' financial bid parsed'); }, 1500);
   }
   function runFinancial(){
+    if (!EVAL.finBids.length){ showToast('Upload at least one financial bid'); return; }
     EVAL.finRun = true;
+    EVAL.finExpanded = 'f2';
     renderFinancial(); saveState();
     showToast('Financial evaluation complete');
   }
