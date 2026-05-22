@@ -294,6 +294,7 @@
 
   // ===================== STATE =====================
   let EVAL = null;
+  let activeView = null;   // 'L1' | 'QCBS' — F2 view toggle (UI preference, not persisted)
   function freshState(tnd){
     return {
       tnd,
@@ -499,6 +500,8 @@
     const loaded = loadState(tnd);
     EVAL = (loaded && loaded._seedV === 2) ? loaded
          : (tnd === 'TND-2026-001' ? seedDemo(tnd) : (loaded || freshState(tnd)));
+    if (t.method && !(loaded && loaded._seedV === 2)) EVAL.method = t.method;
+    activeView = null;   // reset F2 view toggle for each tender
     document.getElementById('wsCrumb').textContent = t.id;
     document.getElementById('wsBadge').textContent = t.id;
     document.getElementById('wsName').textContent = t.name;
@@ -1205,72 +1208,236 @@
         <button onclick="runFinancial()" class="px-4 py-2 rounded-lg ${EVAL.finBids.length?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-medium" ${EVAL.finBids.length?'':'disabled'}>Run financial evaluation →</button>
       </div>`;
   }
+  // ---- Financial row computations (per view) ----
+  function finBidsBase(){
+    return EVAL.finBids.map(b => {
+      const q = finQuote(b.vendor);
+      return { vendor:b.vendor, quote:q, alb:isALB(q), tq:tqTotal(b.vendor)||0 };
+    });
+  }
+  function l1Rows(){
+    const bids = finBidsBase();
+    const valid = bids.filter(b => !b.alb).sort((a,b) => a.quote-b.quote);
+    const albs  = bids.filter(b => b.alb).sort((a,b) => a.quote-b.quote);
+    const ordered = valid.concat(albs);
+    ordered.forEach((b,i) => b.rank=i+1);
+    return ordered;
+  }
+  function qcbsRows(T, F){
+    const bids = finBidsBase();
+    const nonAlb = bids.filter(b => !b.alb).map(b => b.quote);
+    const lowest = nonAlb.length ? Math.min(...nonAlb) : Math.min(...bids.map(b => b.quote||Infinity));
+    bids.forEach(b => {
+      let fin = b.quote ? Math.round((lowest/b.quote)*100*10)/10 : 0;
+      if (fin > 100) fin = 100;
+      b.fin = fin;
+      b.combined = Math.round(((b.tq*T/100)+(b.fin*F/100))*10)/10;
+    });
+    bids.sort((a,b) => b.combined-a.combined);
+    bids.forEach((b,i) => b.rank=i+1);
+    return bids;
+  }
+  function rankBadgeHTML(rank, win){
+    return `<span style="display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:50%; font-size:11px; font-weight:700; background:${win?'#10B981':'#E5E7EB'}; color:${win?'white':'#6B7280'};">${rank}</span>`;
+  }
+
   function f2Body(){
-    const isQCBS = EVAL.method === 'QCBS';
-    const rows = finComputed();
-    const alb = rows.find(r => r.alb);
+    const native = EVAL.method === 'QCBS' ? 'QCBS' : 'L1';
+    if (!activeView) activeView = native;
+    const T = EVAL.technicalWeightage, F = EVAL.financialWeightage;
+    const albBid = finBidsBase().find(b => b.alb);
+    const alb = albBid ? { vendor:albBid.vendor, quote:albBid.quote } : null;
     const proceedOk = !alb || EVAL.albDecision;
-    const methodBanner = isQCBS
+    const tName = (EVAL_TENDERS.find(t => t.id===EVAL.tnd)||{}).name || EVAL.tnd;
+
+    const methodBanner = native==='QCBS'
       ? `<div style="background:#EEEDFE; border:1px solid #D6D2F7; border-radius:8px; padding:12px 16px; margin-bottom:14px; display:flex; gap:10px; align-items:flex-start;">
           <i data-lucide="calculator" style="width:18px; height:18px; color:#534AB7;"></i>
-          <div><div class="text-[13px] font-bold" style="color:#3C3489;">Evaluation method: QCBS &nbsp;·&nbsp; ${EVAL.technicalWeightage}:${EVAL.financialWeightage} — Technical : Financial</div>
+          <div><div class="text-[13px] font-bold" style="color:#3C3489;">Evaluation method: QCBS &nbsp;·&nbsp; ${T}:${F} — Technical : Financial</div>
           <div class="text-[12px]" style="color:#534AB7;">Award is decided on the combined technical and financial score</div></div></div>`
       : `<div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:12px 16px; margin-bottom:14px; display:flex; gap:10px; align-items:flex-start;">
           <i data-lucide="trophy" style="width:18px; height:18px; color:#185FA5;"></i>
           <div><div class="text-[13px] font-bold" style="color:#0C447C;">Evaluation method: L1 — Lowest Cost</div>
           <div class="text-[12px]" style="color:#185FA5;">Award goes to the TQ vendor with the lowest quoted amount</div></div></div>`;
-    const rankBadge = (rank, win) => `<span style="display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:50%; font-size:11px; font-weight:700; background:${win?'#10B981':'#E5E7EB'}; color:${win?'white':'#6B7280'};">${rank}</span>`;
-    let formula = '', tableHTML;
-    if (isQCBS){
-      formula = `<div style="background:#F9FAFB; border-radius:10px; padding:14px 18px; margin-bottom:16px;">
-        <div class="text-[13px] font-bold text-ink-900 mb-2">QCBS score calculation</div>
-        <div class="grid gap-1" style="grid-template-columns:130px 1fr;">
-          <div class="text-[12px] text-ink-500">Financial score</div><div class="text-[12px] text-ink-900" style="font-family:monospace;">= (Lowest quote ÷ This bidder's quote) × 100</div>
-          <div class="text-[12px] text-ink-500">Combined score</div><div class="text-[12px] text-ink-900" style="font-family:monospace;">= (Tech score × ${EVAL.technicalWeightage}%) + (Fin score × ${EVAL.financialWeightage}%)</div>
-          <div class="text-[12px] text-ink-500">Weightage</div><div class="text-[12px] text-ink-900" style="font-family:monospace;">As specified in tender document — ${EVAL.technicalWeightage}:${EVAL.financialWeightage}</div>
-        </div></div>`;
-      tableHTML = `<table style="width:100%; table-layout:fixed; border-collapse:collapse;">
-        <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:52px;">Rank</th><th style="${thS()} width:19%;">Vendor</th><th style="${thS()} width:18%;">Tech Score</th><th style="${thS()} width:18%;">Fin Score</th><th style="${thS()} width:16%;">Combined</th><th style="${thS()} width:15%;">Quoted (₹)</th><th style="${thS()} width:13%;">Status</th></tr></thead>
-        <tbody>${rows.map((r,i) => {
-          const win = i===0;
-          const stat = win ? pill('Recommended','#F0FDF4','#065F46') : r.alb ? pill('ALB','#FFFBEB','#92400E') : pill(ordinal(r.rank),'#F3F4F6','#6B7280');
-          return `<tr style="border-bottom:1px solid #F3F4F6; ${win?'background:#F0FDF4;':''}">
-            <td style="${tdS()} ${win?'border-left:3px solid #10B981;':''}">${rankBadge(r.rank,win)}</td>
-            <td style="${tdS()} font-weight:600; color:#111827;">${r.vendor}</td>
-            <td style="${tdS()}">${scoreBar(r.tq, 100, '#0F5EE8')}</td>
-            <td style="${tdS()}">${scoreBar(r.fin, 100, '#10B981')}</td>
-            <td style="${tdS()} font-weight:700; color:#111827;">${r.combined.toFixed(1)}${win?' <span style="background:#EFF6FF; color:#0C447C; border-radius:4px; padding:1px 6px; font-size:11px; white-space:nowrap;">✦ Recommended</span>':''}</td>
-            <td style="${tdS()}">₹${r.quote.toLocaleString('en-IN')}</td>
-            <td style="${tdS()}">${stat}</td></tr>`;
-        }).join('')}</tbody></table>`;
-    } else {
-      tableHTML = `<table style="width:100%; table-layout:fixed; border-collapse:collapse;">
-        <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:52px;">Rank</th><th style="${thS()} width:30%;">Vendor</th><th style="${thS()} width:20%;">Quoted Amount (₹)</th><th style="${thS()} width:16%;">vs Estimate</th><th style="${thS()} width:15%;">Status</th></tr></thead>
-        <tbody>${rows.map((r,i) => {
-          const win = i===0 && !r.alb;
-          const dev = ((r.quote-ESTIMATE)/ESTIMATE)*100;
-          const devCls = r.alb?'#991B1B':dev<0?'#065F46':dev>10?'#991B1B':'#92400E';
-          const stat = r.alb ? pill('ALB','#FEF2F2','#991B1B') : win ? pill('L1','#F0FDF4','#065F46') : dev>10 ? pill('High','#FFFBEB','#92400E') : pill('L'+r.rank,'#F3F4F6','#6B7280');
-          return `<tr style="border-bottom:1px solid #F3F4F6; ${win?'background:#F0FDF4;':''}">
-            <td style="${tdS()} ${win?'border-left:3px solid #10B981;':''}">${rankBadge(r.rank,win)}</td>
-            <td style="${tdS()}"><div class="font-medium text-ink-900">${r.vendor}</div><div class="text-[11px] text-ink-400">TQ Score: ${r.tq}/100</div></td>
-            <td style="${tdS()} ${win?'font-weight:700;':''}">₹${r.quote.toLocaleString('en-IN')}</td>
-            <td style="${tdS()} color:${devCls}; font-weight:600;">${dev>0?'+':''}${dev.toFixed(1)}%</td>
-            <td style="${tdS()}">${stat}</td></tr>`;
-        }).join('')}</tbody></table>`;
-    }
-    const tName = (EVAL_TENDERS.find(t => t.id===EVAL.tnd)||{}).name || EVAL.tnd;
-    return `${methodBanner}${formula}
-      <div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
+
+    const tglBtn = (v, label) => {
+      const on = activeView===v;
+      return `<button id="finTgl${v}" onclick="switchFinView('${v}')" aria-pressed="${on}" style="padding:8px 20px; font-size:13px; cursor:pointer; border:none; ${v==='QCBS'?'border-left:1px solid #E5E7EB;':''} transition:all 150ms ease; ${on?'background:#0F5EE8; color:white; font-weight:500;':'background:white; color:#6B7280;'}">${label}</button>`;
+    };
+    const toggle = `<div style="display:flex; align-items:center; flex-wrap:wrap; margin-bottom:16px;">
+      <div role="group" aria-label="Evaluation view" style="display:inline-flex; border:1px solid #E5E7EB; border-radius:8px; overflow:hidden;">
+        ${tglBtn('L1','L1 — Lowest Cost')}${tglBtn('QCBS','QCBS — Quality &amp; Cost')}
+      </div>
+      <span id="finTglNote" style="margin-left:12px; font-size:11px; color:${activeView===native?'#9CA3AF':'#F59E0B'};">${activeView===native?'Default evaluation method for this tender':'Preview only — not the specified evaluation method for this tender'}</span>
+    </div>`;
+
+    const l1show = activeView==='L1';
+    return `${methodBanner}${toggle}
+      <div id="finViewL1" style="${l1show?'':'display:none;'} transition:opacity 200ms ease, transform 200ms ease; opacity:1;">${l1ViewBody(tName)}</div>
+      <div id="finViewQCBS" style="${l1show?'display:none;':''} transition:opacity 200ms ease, transform 200ms ease; opacity:1;">${qcbsViewBody(tName, T, F)}</div>
+      <div id="finAlbZone">${alb ? albDecisionHTML(alb) : ''}</div>
+      <div class="flex flex-col items-end mt-4">
+        <div id="finSendNote" class="text-[11px] text-ink-400 mb-1" style="${activeView===native?'display:none;':''}" aria-live="polite">This tender uses ${native} as its evaluation method. Bid comparison will use ${native} ranking.</div>
+        <button onclick="sendToComparison()" class="px-5 py-2.5 rounded-lg ${proceedOk?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-bold" ${proceedOk?'':'disabled'}>Send to Bid Comparison →</button>
+        ${!proceedOk ? '<div class="text-[12px] text-ink-400 mt-1.5">Resolve all flagged bids before proceeding</div>' : ''}
+      </div>`;
+  }
+  function l1ViewBody(tName){
+    const rows = l1Rows();
+    const tableRows = rows.map((r,i) => {
+      const win = i===0 && !r.alb;
+      const dev = ((r.quote-ESTIMATE)/ESTIMATE)*100;
+      const devCls = r.alb?'#991B1B':dev<0?'#065F46':dev>10?'#991B1B':'#92400E';
+      const stat = r.alb ? pill('ALB','#FEF2F2','#991B1B') : win ? pill('L1','#F0FDF4','#065F46') : dev>10 ? pill('High','#FFFBEB','#92400E') : pill('L'+r.rank,'#F3F4F6','#6B7280');
+      return `<tr style="border-bottom:1px solid #F3F4F6; ${win?'background:#F0FDF4;':''}">
+        <td style="${tdS()} ${win?'border-left:3px solid #10B981;':''}">${rankBadgeHTML(r.rank,win)}</td>
+        <td style="${tdS()}"><div class="font-medium text-ink-900">${r.vendor}</div><div class="text-[11px] text-ink-400">TQ Score: ${r.tq}/100</div></td>
+        <td style="${tdS()} ${win?'font-weight:700;':''}">₹${r.quote.toLocaleString('en-IN')}</td>
+        <td style="${tdS()} color:${devCls}; font-weight:600;">${dev>0?'+':''}${dev.toFixed(1)}%</td>
+        <td style="${tdS()}">${stat}</td></tr>`;
+    }).join('');
+    return `<div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
         <div><span class="text-[14px] font-bold text-ink-900">Financial bids — ${tName}</span> <span class="text-[12px] text-ink-500">${rows.length} vendors</span></div>
         <button onclick="showToast('Financial evaluation PDF exported')" class="px-3 py-1.5 rounded-lg border border-line text-[12px] text-ink-900 hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Export PDF</button>
       </div>
-      <div style="border:1px solid #E5E7EB; border-radius:12px; overflow:hidden;">${tableHTML}</div>
-      ${alb ? albDecisionHTML(alb) : ''}
-      <div class="flex justify-end mt-4">
-        <button onclick="sendToComparison()" class="px-5 py-2.5 rounded-lg ${proceedOk?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-bold" ${proceedOk?'':'disabled'}>Send to Bid Comparison →</button>
+      <div style="border:1px solid #E5E7EB; border-radius:12px; overflow:hidden;">
+        <table style="width:100%; table-layout:fixed; border-collapse:collapse;">
+          <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:52px;">Rank</th><th style="${thS()} width:30%;">Vendor</th><th style="${thS()} width:20%;">Quoted Amount (₹)</th><th style="${thS()} width:16%;">vs Estimate</th><th style="${thS()} width:15%;">Status</th></tr></thead>
+          <tbody>${tableRows}</tbody>
+        </table>
+      </div>`;
+  }
+  function qcbsViewBody(tName, T, F){
+    const rows = qcbsRows(T, F);
+    const tableRows = rows.map((r,i) => {
+      const win = i===0;
+      const stat = win ? pill('1st','#F0FDF4','#065F46') : pill(ordinal(r.rank),'#F3F4F6','#6B7280');
+      const quotedCell = `₹${r.quote.toLocaleString('en-IN')}${r.alb?' <span style="background:#FFFBEB; color:#92400E; border-radius:20px; padding:1px 7px; font-size:10px; font-weight:600;">ALB</span>':''}`;
+      return `<tr data-vendor="${r.vendor}" style="border-bottom:1px solid #F3F4F6; ${win?'background:#F0FDF4;':''} transition:background 300ms ease;">
+        <td style="${tdS()} ${win?'border-left:3px solid #10B981;':''}">${rankBadgeHTML(r.rank,win)}</td>
+        <td style="${tdS()} font-weight:600; color:#111827;">${r.vendor}</td>
+        <td style="${tdS()}">${scoreBar(r.tq, 100, '#0F5EE8')}</td>
+        <td style="${tdS()}">${scoreBar(r.fin, 100, '#10B981')}</td>
+        <td style="${tdS()} font-weight:700; color:#111827;">${r.combined.toFixed(1)}${win?' <span style="background:#EFF6FF; color:#0C447C; border-radius:4px; padding:1px 6px; font-size:10px; white-space:nowrap;">✦ Recommended</span>':''}</td>
+        <td style="${tdS()}">${quotedCell}</td>
+        <td style="${tdS()}">${stat}</td></tr>`;
+    }).join('');
+    const sumOk = (T+F)===100;
+    return `<div style="background:#F9FAFB; border:1px solid #E5E7EB; border-radius:10px; padding:14px 18px; margin-bottom:14px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+        <div class="text-[13px] font-bold text-ink-900">Weightage</div>
+        <div><div class="text-[10.5px] font-semibold text-ink-500 uppercase mb-0.5">Technical %</div><input id="wTech" type="number" min="0" max="100" step="1" value="${T}" oninput="onWeightInput('tech')" class="field" style="width:70px; padding:6px 8px;"/></div>
+        <div class="text-ink-400 text-[15px]" style="margin-top:14px;">+</div>
+        <div><div class="text-[10.5px] font-semibold text-ink-500 uppercase mb-0.5">Financial %</div><input id="wFin" type="number" min="0" max="100" step="1" value="${F}" oninput="onWeightInput('fin')" class="field" style="width:70px; padding:6px 8px;"/></div>
+        <div style="margin-top:14px;"><button id="wRecalc" onclick="recalcQCBS()" class="rounded-md text-white text-[12px] font-medium" style="background:#0F5EE8; padding:6px 14px; ${sumOk?'':'opacity:0.5; cursor:not-allowed;'}" ${sumOk?'':'disabled'}>Recalculate →</button></div>
+        <div id="wErr" class="text-[11px]" style="color:#EF4444; ${sumOk?'display:none;':''} margin-top:14px;">Must sum to 100</div>
       </div>
-      ${!proceedOk ? '<div class="text-[12px] text-ink-400 mt-1.5 text-right">Resolve all flagged bids before proceeding</div>' : ''}`;
+      <div style="background:#F9FAFB; border-radius:10px; padding:14px 18px; margin-bottom:16px;">
+        <div class="text-[12px] font-bold text-ink-900 mb-1.5">QCBS score formula</div>
+        <div style="display:flex; gap:8px; margin-bottom:4px;"><div class="text-[12px] text-ink-500" style="min-width:160px;">Financial score</div><div class="text-[12px]" style="font-family:monospace; color:#0C447C;">= (Lowest quote ÷ This bidder's quote) × 100</div></div>
+        <div style="display:flex; gap:8px; margin-bottom:4px;"><div class="text-[12px] text-ink-500" style="min-width:160px;">Combined score</div><div class="text-[12px]" style="font-family:monospace; color:#0C447C;">= (Tech score × <span class="fmlT">${T}</span>%) + (Fin score × <span class="fmlF">${F}</span>%)</div></div>
+        <div style="display:flex; gap:8px;"><div class="text-[12px] text-ink-500" style="min-width:160px;">Current weightage</div><div class="text-[12px]" style="font-family:monospace; color:#0C447C;"><span class="fmlT">${T}</span>:<span class="fmlF">${F}</span> — Technical : Financial</div></div>
+      </div>
+      <div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
+        <div><span class="text-[14px] font-bold text-ink-900">Financial bids — ${tName}</span> <span class="text-[12px] text-ink-500">${rows.length} vendors</span></div>
+        <button onclick="showToast('QCBS evaluation PDF exported')" class="px-3 py-1.5 rounded-lg border border-line text-[12px] text-ink-900 hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Export PDF</button>
+      </div>
+      <div style="border:1px solid #E5E7EB; border-radius:12px; overflow:hidden;">
+        <table style="width:100%; table-layout:fixed; border-collapse:collapse;">
+          <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:52px;">Rank</th><th style="${thS()} width:19%;">Vendor</th><th style="${thS()} width:18%;">Tech Score /100</th><th style="${thS()} width:18%;">Fin Score /100</th><th style="${thS()} width:15%;">Combined</th><th style="${thS()} width:15%;">Quoted (₹)</th><th style="${thS()} width:12%;">Status</th></tr></thead>
+          <tbody id="qcbsTbody">${tableRows}</tbody>
+        </table>
+      </div>
+      <div id="qcbsRankWarn" aria-live="polite" style="display:none; background:#FFFBEB; border-radius:8px; padding:10px 14px; margin-top:10px; font-size:12px; color:#92400E;"></div>`;
+  }
+  function switchFinView(v){
+    if (v === activeView) return;
+    const out = document.getElementById(activeView==='L1'?'finViewL1':'finViewQCBS');
+    const inn = document.getElementById(v==='L1'?'finViewL1':'finViewQCBS');
+    activeView = v;
+    updateFinToggleUI();
+    if (out) out.style.opacity = '0';
+    setTimeout(() => {
+      if (out) out.style.display = 'none';
+      if (inn){
+        inn.style.display = 'block';
+        inn.style.opacity = '0'; inn.style.transform = 'translateY(4px)';
+        requestAnimationFrame(() => { inn.style.opacity = '1'; inn.style.transform = 'translateY(0)'; });
+      }
+      refreshIcons();
+    }, 150);
+  }
+  function updateFinToggleUI(){
+    const native = EVAL.method === 'QCBS' ? 'QCBS' : 'L1';
+    ['L1','QCBS'].forEach(v => {
+      const btn = document.getElementById('finTgl'+v);
+      if (!btn) return;
+      const on = activeView===v;
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      btn.style.background = on ? '#0F5EE8' : 'white';
+      btn.style.color = on ? 'white' : '#6B7280';
+      btn.style.fontWeight = on ? '500' : '400';
+    });
+    const note = document.getElementById('finTglNote');
+    if (note){
+      const nat = activeView===native;
+      note.textContent = nat ? 'Default evaluation method for this tender' : 'Preview only — not the specified evaluation method for this tender';
+      note.style.color = nat ? '#9CA3AF' : '#F59E0B';
+    }
+    const sendNote = document.getElementById('finSendNote');
+    if (sendNote) sendNote.style.display = (activeView===native) ? 'none' : 'block';
+  }
+  function onWeightInput(which){
+    const tEl = document.getElementById('wTech'), fEl = document.getElementById('wFin');
+    if (!tEl || !fEl) return;
+    let t = parseInt(tEl.value), f = parseInt(fEl.value);
+    if (which==='tech' && !isNaN(t)){ f = Math.max(0, Math.min(100, 100-t)); fEl.value = f; }
+    else if (which==='fin' && !isNaN(f)){ t = Math.max(0, Math.min(100, 100-f)); tEl.value = t; }
+    const sum = (parseInt(tEl.value)||0) + (parseInt(fEl.value)||0);
+    const ok = sum===100;
+    tEl.style.borderColor = ok ? '' : '#EF4444';
+    fEl.style.borderColor = ok ? '' : '#EF4444';
+    const err = document.getElementById('wErr'); if (err) err.style.display = ok ? 'none' : 'block';
+    const rc = document.getElementById('wRecalc');
+    if (rc){ rc.disabled = !ok; rc.style.opacity = ok ? '1' : '0.5'; rc.style.cursor = ok ? 'pointer' : 'not-allowed'; }
+    document.querySelectorAll('#finViewQCBS .fmlT').forEach(s => s.textContent = parseInt(tEl.value)||0);
+    document.querySelectorAll('#finViewQCBS .fmlF').forEach(s => s.textContent = parseInt(fEl.value)||0);
+  }
+  function recalcQCBS(){
+    const t = parseInt(document.getElementById('wTech').value)||0;
+    const f = parseInt(document.getElementById('wFin').value)||0;
+    if (t+f !== 100){ showToast('Weightage must sum to 100'); return; }
+    const oldWinner = qcbsRows(EVAL.technicalWeightage, EVAL.financialWeightage)[0]?.vendor;
+    EVAL.technicalWeightage = t; EVAL.financialWeightage = f;
+    saveState();
+    const rows = qcbsRows(t, f);
+    const newWinner = rows[0]?.vendor;
+    const tbody = document.getElementById('qcbsTbody');
+    if (tbody){
+      const byVendor = {};
+      [...tbody.children].forEach(tr => byVendor[tr.dataset.vendor] = tr);
+      rows.forEach((r,i) => {
+        const tr = byVendor[r.vendor]; if (!tr) return;
+        const win = i===0;
+        tr.style.background = win ? '#F0FDF4' : '';
+        tr.children[0].style.borderLeft = win ? '3px solid #10B981' : '';
+        tr.children[0].innerHTML = rankBadgeHTML(r.rank, win);
+        tr.children[4].innerHTML = r.combined.toFixed(1) + (win ? ' <span style="background:#EFF6FF; color:#0C447C; border-radius:4px; padding:1px 6px; font-size:10px; white-space:nowrap;">✦ Recommended</span>' : '');
+        tr.children[6].innerHTML = win ? pill('1st','#F0FDF4','#065F46') : pill(ordinal(r.rank),'#F3F4F6','#6B7280');
+        tbody.appendChild(tr); // reorder to new rank position
+      });
+      const winRow = byVendor[newWinner];
+      if (winRow){ winRow.style.background = '#DCFCE7'; setTimeout(() => { winRow.style.background = '#F0FDF4'; }, 400); }
+    }
+    const warn = document.getElementById('qcbsRankWarn');
+    if (warn){
+      if (newWinner && oldWinner && newWinner !== oldWinner){
+        warn.innerHTML = `⚠ Changing weightage to ${t}:${f} changes the recommended vendor from <strong>${oldWinner}</strong> to <strong>${newWinner}</strong>.`;
+        warn.style.display = 'block';
+      } else { warn.style.display = 'none'; }
+    }
+    document.querySelectorAll('#finViewQCBS .fmlT').forEach(s => s.textContent = t);
+    document.querySelectorAll('#finViewQCBS .fmlF').forEach(s => s.textContent = f);
+    showToast('Scores recalculated');
   }
   function ordinal(n){ return n===1?'1st':n===2?'2nd':n===3?'3rd':n+'th'; }
   function editFinQuote(span, vendor){
