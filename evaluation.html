@@ -48,6 +48,84 @@
     .drawer { transform: translateX(100%); transition: transform .25s cubic-bezier(.2,.7,.2,1); }
     .drawer.open { transform: translateX(0); }
     .expand-zone { overflow:hidden; transition: max-height .2s ease; }
+
+    /* === Change 1 — landing search === */
+    .search-wrap { position:relative; }
+    .search-input { width:100%; border:1px solid #E5E7EB; border-radius:8px; padding:10px 14px 10px 38px; font-size:14px; background:white; color:#111827; transition: border-color .15s ease, box-shadow .15s ease; }
+    .search-input::placeholder { color:#9CA3AF; }
+    .search-input:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 3px rgba(15,94,232,0.1); }
+    .search-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); width:16px; height:16px; color:#9CA3AF; pointer-events:none; }
+    .ev-row { transition: background .15s ease, opacity .2s ease; }
+    .ev-row.dimmed { opacity:0.3; pointer-events:none; }
+
+    /* === Change 2 — awarded list === */
+    .awarded-toggle { display:inline-flex; align-items:center; gap:6px; font-size:13px; color:#6B7280; background:transparent; border:none; padding:4px 0; cursor:pointer; }
+    .awarded-toggle:hover { color:#111827; }
+    .awarded-zone { overflow:hidden; max-height:0; transition: max-height .2s ease; }
+    .awarded-zone.open { max-height:1200px; }
+
+    /* === Change 6 — bid doc panel (in-flow within main column, NOT position:fixed) === */
+    .main-col { position:relative; }
+    .bid-doc-backdrop { position:absolute; top:64px; left:0; right:0; bottom:0; background:rgba(0,0,0,0.25); opacity:0; pointer-events:none; transition: opacity .28s ease; z-index:40; }
+    .bid-doc-backdrop.open { opacity:1; pointer-events:auto; }
+    .bid-doc-panel { position:absolute; top:64px; right:0; bottom:0; width:720px; max-width:100%; background:white; border-left:1px solid #E5E7EB; box-shadow:-4px 0 16px rgba(0,0,0,0.08); transform:translateX(100%); transition: transform .28s cubic-bezier(.2,.7,.2,1); z-index:45; display:flex; flex-direction:column; }
+    .bid-doc-panel.open { transform:translateX(0); }
+    .bid-doc-header { height:56px; background:#F9FAFB; border-bottom:1px solid #E5E7EB; padding:0 20px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+    .bid-doc-body { flex:1; overflow-y:auto; padding:32px 40px; font-family:'Times New Roman', Georgia, serif; font-size:13px; line-height:1.8; color:#1a1a1a; background:white; }
+    .bid-doc-body h2.bd-sec { font-family:'Times New Roman', Georgia, serif; font-size:13px; font-weight:700; text-transform:uppercase; border-bottom:1px solid #D1D5DB; padding-bottom:6px; margin:24px 0 14px; letter-spacing:0.04em; }
+    .bid-doc-body table.bd-table { width:100%; border:1px solid #D1D5DB; border-collapse:collapse; font-family:'Times New Roman', Georgia, serif; font-size:13px; margin-bottom:6px; }
+    .bid-doc-body table.bd-table th, .bid-doc-body table.bd-table td { border:1px solid #D1D5DB; padding:8px 12px; vertical-align:top; }
+    .bid-doc-body table.bd-table th { background:#F9FAFB; font-weight:700; text-align:left; }
+    .bid-doc-body .bd-label-cell { background:#F9FAFB; font-weight:700; width:40%; }
+    .bid-doc-body .bd-rules-double { border-top:2px solid #111827; border-bottom:1px solid #111827; margin:14px 0; height:5px; }
+    .bid-doc-body .bd-cover { text-align:center; }
+    .bid-doc-body ol.bd-num { margin:8px 0 0 22px; padding:0; }
+    .bid-doc-body ol.bd-num li { margin-bottom:10px; }
+
+    /* === Change 5 — Add a bid card === */
+    .ab-card { background:white; border:1px solid #E5E7EB; border-radius:12px; padding:24px; margin-bottom:20px; }
+    .ab-field-label { display:block; font-size:13px; font-weight:500; color:#374151; margin-bottom:6px; }
+    .ab-input { width:100%; border:1px solid #D1D5DB; border-radius:8px; padding:11px 14px; font-size:14px; background:white; color:#111827; transition: border-color .15s ease, box-shadow .15s ease; }
+    .ab-input:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 3px rgba(15,94,232,0.1); }
+    .ab-drop { border:2px dashed #D1D5DB; border-radius:10px; padding:28px 24px; background:#F9FAFB; text-align:center; cursor:pointer; transition: border-color .15s ease, background .15s ease; }
+    .ab-drop:hover { border-color:#0F5EE8; background:#EFF6FF; }
+    .ab-file-card { background:#F9FAFB; border:1px solid #E5E7EB; border-radius:8px; padding:14px 16px; display:flex; align-items:center; gap:12px; }
+    .ab-progress-track { width:100%; height:4px; background:#E5E7EB; border-radius:2px; overflow:hidden; margin-top:8px; }
+    .ab-progress-fill { height:100%; background:#0F5EE8; border-radius:2px; width:0%; transition: width .1s linear; }
+    .ab-remove { background:transparent; border:none; cursor:pointer; color:#9CA3AF; font-size:18px; line-height:1; padding:4px; transition: color .15s ease; }
+    .ab-remove:hover { color:#EF4444; }
+    .ab-submit { width:100%; padding:11px 24px; border-radius:8px; font-size:14px; font-weight:700; background:#0F5EE8; color:white; border:none; cursor:pointer; margin-top:20px; transition: background .15s ease, opacity .15s ease; }
+    .ab-submit:disabled { background:#E5E7EB; color:#9CA3AF; cursor:not-allowed; }
+    .ab-submit:not(:disabled):hover { background:#0B4FCB; }
+    .ab-bid-pill { display:inline-flex; align-items:center; gap:6px; background:#EFF6FF; color:#0C447C; border-radius:6px; padding:8px 14px; font-size:13px; }
+
+    /* === Change 7 — vendor pill tabs + criterion table === */
+    .vendor-tabs { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+    .vendor-tab { padding:7px 16px; border-radius:999px; border:1px solid #E5E7EB; background:white; color:#6B7280; font-size:13px; font-weight:500; cursor:pointer; transition: all 150ms ease; }
+    .vendor-tab:hover { color:#111827; border-color:#D1D5DB; }
+    .vendor-tab.active { background:#0F5EE8; border-color:#0F5EE8; color:white; }
+    .crit-table { width:100%; border-collapse:collapse; font-size:15px; color:#111827; }
+    .crit-table th { font-size:12px; font-weight:700; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; text-align:left; padding:10px 16px; background:#F9FAFB; border-bottom:1px solid #E5E7EB; }
+    .crit-table td { padding:14px 16px; border-bottom:1px solid #F3F4F6; vertical-align:top; }
+    .crit-table tr:last-child td { border-bottom:none; }
+    .crit-table tbody tr { transition: background .15s ease; }
+    .crit-table tbody tr:hover { background:#F9FAFB; }
+    .crit-name { font-size:15px; font-weight:600; color:#111827; }
+    .crit-desc { font-size:13px; color:#6B7280; margin-top:2px; }
+    .crit-sub { font-size:13px; color:#374151; }
+    .verdict-pill { display:inline-flex; align-items:center; gap:4px; padding:6px 12px; border-radius:999px; font-size:13px; font-weight:500; cursor:pointer; border:none; transition: filter .15s ease; }
+    .verdict-pill:hover { filter:brightness(0.95); }
+    .verdict-pass { background:#F0FDF4; color:#065F46; }
+    .verdict-fail { background:#FEF2F2; color:#991B1B; }
+    .verdict-pending { background:#FFFBEB; color:#92400E; }
+    .tq-score-input { width:60px; padding:6px 8px; border:1px solid #D1D5DB; border-radius:6px; font-size:14px; text-align:center; }
+    .tq-score-input:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 2px rgba(15,94,232,0.15); }
+    .note-icon-btn { background:transparent; border:none; cursor:pointer; color:#9CA3AF; padding:6px; border-radius:6px; transition: color .15s ease, background .15s ease; }
+    .note-icon-btn:hover { color:#0F5EE8; background:#EFF6FF; }
+
+    /* === Change 8 — read-only banner === */
+    .ro-banner { background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px; padding:12px 16px; color:#0C447C; font-size:13px; font-weight:600; display:flex; align-items:center; gap:8px; }
+
     @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
   </style>
 </head>
@@ -115,7 +193,7 @@
   </aside>
 
   <!-- ============ MAIN ============ -->
-  <div class="flex-1 flex flex-col min-w-0">
+  <div class="flex-1 flex flex-col min-w-0 main-col">
     <header class="h-16 bg-white border-b border-line px-6 flex items-center gap-4 sticky top-0 z-30">
       <button aria-label="Toggle sidebar" class="text-ink-500 hover:text-ink-900"><i data-lucide="panel-left" class="w-5 h-5"></i></button>
       <div class="flex-1 max-w-xl relative">
@@ -146,7 +224,27 @@
           </button>
         </div>
         <div id="uploadTenderPanel" style="max-height:0; overflow:hidden; transition:max-height 250ms ease;"></div>
+
+        <!-- Change 1: search bar -->
+        <div class="search-wrap">
+          <i data-lucide="search" class="search-icon"></i>
+          <input id="evalSearch" type="search" class="search-input" placeholder="Search tenders by name, ID, department or sector..." oninput="filterEvalList(this.value)" aria-label="Search tenders" />
+        </div>
+        <div id="evalSearchEmpty" class="hidden text-[14px] text-ink-500 text-center" style="padding:8px 0;"></div>
+
         <div id="evalList" class="bg-white border border-line rounded-xl overflow-hidden"></div>
+
+        <!-- Change 2: awarded tenders section -->
+        <div id="awardedSection">
+          <div class="text-[11px] uppercase tracking-[0.08em] font-semibold text-ink-500" style="margin-top:28px; margin-bottom:8px;">AWARDED — CLOSED</div>
+          <button id="awardedToggle" class="awarded-toggle" onclick="toggleAwarded()" aria-expanded="false">
+            <span id="awardedToggleText">Show 3 awarded tenders</span>
+            <i id="awardedToggleIcon" data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+          </button>
+          <div id="awardedZone" class="awarded-zone">
+            <div id="awardedList" class="bg-white border border-line rounded-xl overflow-hidden" style="margin-top:8px;"></div>
+          </div>
+        </div>
       </section>
 
       <!-- ============ SCREEN 1B — WORKSPACE ============ -->
@@ -158,6 +256,12 @@
             <span id="wsCrumb" class="text-ink-900 font-mono">TND-2026-001</span>
           </div>
           <a href="#" onclick="showLanding(); return false;" class="text-[13px] text-ink-500 hover:text-ink-900 inline-flex items-center gap-1.5"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back</a>
+        </div>
+
+        <!-- Read-only banner (Change 2) -->
+        <div id="wsReadOnly" class="ro-banner hidden">
+          <i data-lucide="lock" class="w-4 h-4"></i>
+          <span>Read only — evaluation complete</span>
         </div>
 
         <div class="bg-white border border-line rounded-xl flex flex-col lg:flex-row lg:items-center justify-between gap-4" style="padding:16px 20px;">
@@ -182,6 +286,10 @@
         <div class="h-4"></div>
       </section>
     </main>
+
+    <!-- Change 6: Technical Bid viewer panel (in-flow within main column, NOT position:fixed) -->
+    <div id="bidDocBackdrop" class="bid-doc-backdrop" onclick="closeBidDoc()"></div>
+    <aside id="bidDocPanel" class="bid-doc-panel" role="dialog" aria-modal="true" aria-label="Technical Bid Viewer"></aside>
   </div>
 </div>
 
@@ -215,9 +323,14 @@
     { id:'TND-2026-003', name:'Water Pipeline Kalyan',       dept:'Water',          sector:'Works', cost:'₹1,20,00,000', stage:'tech-complete' },
     { id:'TND-2026-007', name:'LED Street Light',            dept:'Engineering',    sector:'Goods', cost:'₹28,50,000', stage:'complete' },
   ];
+  // Change 2: closed/awarded tenders shown in a separate collapsed section
+  const AWARDED_TENDERS = [
+    { id:'TND-2025-089', name:'Office Furniture Procurement', dept:'Admin', sector:'Goods',    cost:'₹18,00,000' },
+    { id:'TND-2025-067', name:'Security Guard Services',      dept:'Admin', sector:'Services', cost:'₹35,00,000' },
+    { id:'TND-2025-034', name:'Supply of Computers Phase 1',  dept:'IT',    sector:'Goods',    cost:'₹52,00,000' },
+  ];
   const STAGE_META = {
     'not-started':   { dot:'#9CA3AF', label:'Not started' },
-    'register':      { dot:'#F59E0B', label:'Bid register uploaded', pulse:true },
     'tech-progress': { dot:'#F59E0B', label:'Technical evaluation in progress', pulse:true },
     'tech-complete': { dot:'#0F5EE8', label:'Technical complete' },
     'fin-progress':  { dot:'#0F5EE8', label:'Financial evaluation in progress' },
@@ -299,15 +412,19 @@
     return {
       tnd,
       stageTab:'technical',
-      t1:{ status:'pending', file:'', date:'', time:'', officer:'Rajesh Kumar', w1:'', w2:'', totalBids:'' },
       bids:[],            // {vendor, file, status:'parsed', parsedEdits:{}}
-      expanded:'t1',
+      expanded:'s1',      // s1=Upload, s2=PQ, s3=TQ, s4=Results
+      activeVendor:'',    // shared vendor selection across PQ + TQ tabs
       matrix:{},          // matrix[vendor][critId] = 'pass'|'fail'|'clarif'|number
+      notes:{},           // notes[`${vendor}|${critId}`] = string
       prescreened:false,
-      t3confirmed:false,
+      pqConfirmed:false,
+      tqConfirmed:false,
+      t3confirmed:false,   // kept for backward compat with t4Body code paths
       clarifications:{},   // key `${vendor}|${critId}` -> {sent:bool, date, requestedDoc}
       ntq:{},              // vendor -> {status:'draft'|'sent'|'signed', note}
       techComplete:false,
+      readonly:false,      // Change 2: view-record read-only mode
       finBids:[],          // {vendor, file, status:'parsed'}
       finRun:false,
       finComplete:false,
@@ -319,7 +436,7 @@
       financialWeightage:30,
       albDecision:null,    // 'accept' | 'reject'
       albNote:'',
-      _seedV:2,
+      _seedV:3,
     };
   }
   function saveState(){ try { localStorage.setItem('eval_'+EVAL.tnd, JSON.stringify(EVAL)); } catch(e){} }
@@ -338,7 +455,6 @@
   };
   function seedDemo(tnd){
     const s = freshState(tnd);
-    s.t1 = { status:'complete', file:'bid_opening_register_TND-2026-001.pdf', date:'2026-05-15', time:'11:00', officer:'Rajesh Kumar', w1:'Priya Shah', w2:'Amit Patil', totalBids:'5' };
     s.bids = VENDOR_OPTIONS.map(v => ({ vendor:v, file:'technical_bid_'+v.toLowerCase().replace(/[^a-z]/g,'_')+'.pdf', status:'parsed', parsedEdits:{} }));
     s.bids.forEach(b => {
       s.matrix[b.vendor] = {};
@@ -346,7 +462,10 @@
       const tq = DEMO_TQ_BREAKDOWN[b.vendor];
       TQ_CRITERIA.forEach(c => { s.matrix[b.vendor][c.id] = tq[c.id]; });
     });
+    s.activeVendor = s.bids[0].vendor;
     s.prescreened = true;
+    s.pqConfirmed = true;
+    s.tqConfirmed = true;
     s.t3confirmed = true;
     s.ntq['Patil & Associates'] = { status:'signed', note:'Bid found Not Technically Qualified — the required ISO certification was not submitted with the bid.' };
     s.techComplete = true;
@@ -355,7 +474,7 @@
     s.finOpeningRegister = 'financial_opening_register_TND-2026-001.pdf';
     s.finRun = true;
     s.finExpanded = 'f2';
-    s.expanded = 't4';
+    s.expanded = 's4';
     s.stageTab = 'financial';
     s.method = 'L1';
     return s;
@@ -368,23 +487,106 @@
     if (hint) hint.classList.toggle('hidden', EVAL_TENDERS.length > 0);
     if (!EVAL_TENDERS.length){
       wrap.innerHTML = '<div class="text-center text-[13px] text-ink-500 italic py-12">No tenders in evaluation yet.</div>';
-      return;
+    } else {
+      wrap.innerHTML = EVAL_TENDERS.map(t => {
+        const m = STAGE_META[t.stage];
+        const newBadge = t.isNew ? '<span style="background:#EFF6FF; color:#0F5EE8; border-radius:4px; padding:1px 6px; font-size:10px; font-weight:700;">New</span>' : '';
+        return `<div class="ev-row" data-tender-name="${(t.name||'').toLowerCase()}" data-tender-id="${(t.id||'').toLowerCase()}" data-tender-dept="${(t.dept||'').toLowerCase()}" data-tender-sector="${(t.sector||'').toLowerCase()}" onclick="openWorkspace('${t.id}')" tabindex="0" role="button" onkeydown="if(event.key==='Enter')openWorkspace('${t.id}')" style="padding:14px 16px; border-bottom:1px solid #F3F4F6; display:flex; align-items:center; gap:16px; cursor:pointer;">
+          <span class="w-2 h-2 rounded-full shrink-0 ${m.pulse?'pulse-amber':''}" style="background:${m.dot};"></span>
+          <span class="font-mono text-[12px] font-semibold text-primary shrink-0" style="background:#EFF6FF; border-radius:4px; padding:2px 6px; width:108px; text-align:center;">${t.id}</span>
+          <div class="flex-1 min-w-0">
+            <div class="text-[14px] font-medium text-ink-900 truncate flex items-center gap-2"><span class="truncate">${t.name}</span>${newBadge}</div>
+            <div class="text-[12px] text-ink-400">${t.dept} · ${t.sector}</div>
+          </div>
+          <div class="shrink-0 text-[12.5px] text-ink-500" style="width:240px; text-align:right;">${m.label}</div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-ink-400 shrink-0"></i>
+        </div>`;
+      }).join('');
     }
-    wrap.innerHTML = EVAL_TENDERS.map(t => {
-      const m = STAGE_META[t.stage];
-      const newBadge = t.isNew ? '<span style="background:#EFF6FF; color:#0F5EE8; border-radius:4px; padding:1px 6px; font-size:10px; font-weight:700;">New</span>' : '';
-      return `<div class="ev-row" onclick="openWorkspace('${t.id}')" tabindex="0" role="button" onkeydown="if(event.key==='Enter')openWorkspace('${t.id}')" style="padding:14px 16px; border-bottom:1px solid #F3F4F6; display:flex; align-items:center; gap:16px;">
-        <span class="w-2 h-2 rounded-full shrink-0 ${m.pulse?'pulse-amber':''}" style="background:${m.dot};"></span>
-        <span class="font-mono text-[12px] font-semibold text-primary shrink-0" style="background:#EFF6FF; border-radius:4px; padding:2px 6px; width:108px; text-align:center;">${t.id}</span>
+    renderAwardedList();
+    refreshIcons();
+  }
+
+  // ===================== AWARDED (Change 2) =====================
+  function renderAwardedList(){
+    const wrap = document.getElementById('awardedList');
+    if (!wrap) return;
+    const tt = document.getElementById('awardedToggleText');
+    if (tt) tt.textContent = (AWARDED_TENDERS.length === 1 ? 'Show 1 awarded tender' : 'Show '+AWARDED_TENDERS.length+' awarded tenders');
+    wrap.innerHTML = AWARDED_TENDERS.map(t => `
+      <div class="ev-row" data-tender-name="${(t.name||'').toLowerCase()}" data-tender-id="${(t.id||'').toLowerCase()}" data-tender-dept="${(t.dept||'').toLowerCase()}" data-tender-sector="${(t.sector||'').toLowerCase()}" style="padding:14px 16px; border-bottom:1px solid #F3F4F6; display:flex; align-items:center; gap:16px;">
+        <span class="w-2 h-2 rounded-full shrink-0" style="background:#10B981;" aria-label="Awarded"></span>
+        <span class="font-mono text-[12px] font-semibold shrink-0" style="background:#F0FDF4; color:#065F46; border-radius:4px; padding:2px 6px; width:108px; text-align:center;">${t.id}</span>
         <div class="flex-1 min-w-0">
-          <div class="text-[14px] font-medium text-ink-900 truncate flex items-center gap-2"><span class="truncate">${t.name}</span>${newBadge}</div>
+          <div class="text-[14px] font-medium truncate" style="color:#374151;">${t.name}</div>
           <div class="text-[12px] text-ink-400">${t.dept} · ${t.sector}</div>
         </div>
-        <div class="shrink-0 text-[12.5px] text-ink-500" style="width:240px; text-align:right;">${m.label}</div>
-        <i data-lucide="chevron-right" class="w-4 h-4 text-ink-400 shrink-0"></i>
-      </div>`;
-    }).join('');
+        <div class="shrink-0 text-[12px]" style="color:#10B981; width:240px; text-align:right;">Evaluation complete · Awarded</div>
+        <a href="#" onclick="openAwardedRecord('${t.id}'); return false;" class="text-[12px] font-medium shrink-0" style="color:#0F5EE8;">View record</a>
+      </div>`).join('');
+  }
+  let awardedOpen = false;
+  function toggleAwarded(){
+    awardedOpen = !awardedOpen;
+    const zone = document.getElementById('awardedZone');
+    const btn  = document.getElementById('awardedToggle');
+    const icon = document.getElementById('awardedToggleIcon');
+    const txt  = document.getElementById('awardedToggleText');
+    if (awardedOpen){
+      zone.classList.add('open');
+      btn.setAttribute('aria-expanded','true');
+      if (icon) icon.setAttribute('data-lucide','chevron-up');
+      if (txt) txt.textContent = 'Hide awarded tenders';
+    } else {
+      zone.classList.remove('open');
+      btn.setAttribute('aria-expanded','false');
+      if (icon) icon.setAttribute('data-lucide','chevron-down');
+      renderAwardedList(); // resets label text
+    }
     refreshIcons();
+  }
+  function openAwardedRecord(tnd){
+    const t = AWARDED_TENDERS.find(x => x.id === tnd);
+    if (!t) return;
+    // Build a read-only EVAL state — fully complete, all sections collapsed
+    EVAL = seedDemo(tnd);
+    EVAL.tnd = t.id;
+    EVAL.readonly = true;
+    EVAL.expanded = '';
+    EVAL.finExpanded = '';
+    try { history.replaceState(null,'','?tender='+encodeURIComponent(t.id)); } catch(e){}
+    document.getElementById('wsCrumb').textContent = t.id;
+    document.getElementById('wsBadge').textContent = t.id;
+    document.getElementById('wsName').textContent  = t.name;
+    document.getElementById('wsMeta').textContent  = `${t.dept} · ${t.sector} · Est. ${t.cost}`;
+    refreshStagePill();
+    document.getElementById('wsReadOnly').classList.remove('hidden');
+    document.getElementById('screen-landing').classList.add('hidden');
+    document.getElementById('screen-workspace').classList.remove('hidden');
+    setStageTab('technical', true);
+    window.scrollTo({ top:0 });
+  }
+
+  // ===================== SEARCH (Change 1) =====================
+  function filterEvalList(query){
+    const q = (query||'').trim().toLowerCase();
+    const allRows = document.querySelectorAll('#evalList .ev-row, #awardedList .ev-row');
+    let matches = 0;
+    allRows.forEach(row => {
+      const hay = (row.dataset.tenderName||'') + ' ' + (row.dataset.tenderId||'') + ' ' + (row.dataset.tenderDept||'') + ' ' + (row.dataset.tenderSector||'');
+      const ok = !q || hay.includes(q);
+      row.classList.toggle('dimmed', !ok);
+      if (ok) matches++;
+    });
+    const empty = document.getElementById('evalSearchEmpty');
+    if (empty){
+      if (q && matches === 0){
+        empty.textContent = `No tenders found for "${query}"`;
+        empty.classList.remove('hidden');
+      } else {
+        empty.classList.add('hidden');
+      }
+    }
   }
 
   // ===================== UPLOAD TENDER PANEL =====================
@@ -489,24 +691,32 @@
   }
   function showLanding(){
     try { history.replaceState(null,'',location.pathname); } catch(e){}
+    closeBidDoc();
     document.getElementById('screen-workspace').classList.add('hidden');
+    document.getElementById('wsReadOnly').classList.add('hidden');
     document.getElementById('screen-landing').classList.remove('hidden');
     renderEvalList();
+    // Reset search
+    const sb = document.getElementById('evalSearch');
+    if (sb){ sb.value = ''; filterEvalList(''); }
     window.scrollTo({ top:0 });
   }
   function openWorkspace(tnd){
     try { history.replaceState(null,'','?tender='+encodeURIComponent(tnd)); } catch(e){}
     const t = EVAL_TENDERS.find(x => x.id === tnd) || EVAL_TENDERS[0];
     const loaded = loadState(tnd);
-    EVAL = (loaded && loaded._seedV === 2) ? loaded
+    EVAL = (loaded && loaded._seedV === 3) ? loaded
          : (tnd === 'TND-2026-001' ? seedDemo(tnd) : (loaded || freshState(tnd)));
-    if (t.method && !(loaded && loaded._seedV === 2)) EVAL.method = t.method;
+    if (t.method && !(loaded && loaded._seedV === 3)) EVAL.method = t.method;
+    EVAL.readonly = false;
+    if (!EVAL.activeVendor && EVAL.bids.length) EVAL.activeVendor = EVAL.bids[0].vendor;
     activeView = null;   // reset F2 view toggle for each tender
     document.getElementById('wsCrumb').textContent = t.id;
     document.getElementById('wsBadge').textContent = t.id;
     document.getElementById('wsName').textContent = t.name;
     document.getElementById('wsMeta').textContent = `${t.dept} · ${t.sector} · Est. ${t.cost}`;
     refreshStagePill();
+    document.getElementById('wsReadOnly').classList.add('hidden');
     document.getElementById('screen-landing').classList.add('hidden');
     document.getElementById('screen-workspace').classList.remove('hidden');
     setStageTab(EVAL.stageTab || 'technical', true);
@@ -548,15 +758,19 @@
   }
 
   // ===================== TECHNICAL TAB =====================
+  // Section keys: s1 = Upload Technical Bids, s2 = PQ Evaluation, s3 = TQ Evaluation, s4 = Results & Actions
   function sectionStatus(){
-    const t1done = EVAL.t1.status === 'complete';
-    const t2done = t1done && EVAL.bids.length > 0;
-    const t3done = t2done && EVAL.t3confirmed;
-    const t4done = EVAL.techComplete;
-    return { t1done, t2done, t3done, t4done };
+    const s1done = EVAL.bids.length > 0;
+    const allPQDecided = s1done && EVAL.bids.every(b => PQ_CRITERIA.every(c => (EVAL.matrix[b.vendor]||{})[c.id] != null && (EVAL.matrix[b.vendor]||{})[c.id] !== 'clarif'));
+    const s2done = allPQDecided && EVAL.pqConfirmed;
+    const allTQScored = s2done && EVAL.bids.every(b => TQ_CRITERIA.every(c => typeof (EVAL.matrix[b.vendor]||{})[c.id] === 'number'));
+    const s3done = allTQScored && EVAL.tqConfirmed;
+    const s4done = EVAL.techComplete;
+    return { s1done, s2done, s3done, s4done, allPQDecided, allTQScored };
   }
   function sectionHeaderHTML(num, title, statusPill, key, expanded, locked){
-    return `<div class="flex items-center gap-3 ${locked?'opacity-50':'cursor-pointer'}" ${locked?'':`onclick="toggleSection('${key}')"`} style="padding:14px 18px;">
+    const ro = EVAL && EVAL.readonly;
+    return `<div class="flex items-center gap-3 ${(locked||ro)?'opacity-60':'cursor-pointer'}" ${(locked||ro)?'':`onclick="toggleSection('${key}')"`} style="padding:14px 18px;">
       <span class="text-[11px] font-bold" style="background:#F3F4F6; color:#6B7280; border-radius:6px; padding:3px 8px;">${num}</span>
       <span class="text-[14px] font-bold text-ink-900 flex-1">${title}</span>
       ${statusPill}
@@ -566,6 +780,10 @@
   function pill(text, bg, color){ return `<span class="text-[11px] font-semibold" style="background:${bg}; color:${color}; border-radius:20px; padding:3px 10px;">${text}</span>`; }
 
   function toggleSection(key){
+    if (EVAL.readonly) return;
+    const st = sectionStatus();
+    const locked = (key==='s2' && !st.s1done) || (key==='s3' && !st.s2done) || (key==='s4' && !st.s3done);
+    if (locked){ showToast('Complete previous section first'); return; }
     EVAL.expanded = (EVAL.expanded === key) ? '' : key;
     renderTechnical(); saveState();
   }
@@ -574,21 +792,28 @@
     const wrap = document.getElementById('stage-technical');
     const st = sectionStatus();
     wrap.innerHTML = [
-      sectionCard('t1','01','Bid Opening Register', st),
-      sectionCard('t2','02','Upload Technical Bids', st),
-      sectionCard('t3','03','PQ & TQ Evaluation', st),
-      sectionCard('t4','04','Results & Actions', st),
+      sectionCard('s1','01','Upload Technical Bids', st),
+      sectionCard('s2','02','PQ Evaluation', st),
+      sectionCard('s3','03','TQ Evaluation', st),
+      sectionCard('s4','04','Results & Actions', st),
     ].join('');
     refreshIcons();
   }
   function sectionCard(key, num, title, st){
-    const locked = (key==='t2' && !st.t1done) || (key==='t3' && !st.t2done) || (key==='t4' && !st.t3done);
-    const done = st[key+'done'];
+    const locked = (key==='s2' && !st.s1done) || (key==='s3' && !st.s2done) || (key==='s4' && !st.s3done);
     const expanded = EVAL.expanded === key && !locked;
     let statusPill;
-    if (key==='t1') statusPill = EVAL.t1.status==='complete' ? pill('Uploaded','#F0FDF4','#065F46') : pill('Pending','#F3F4F6','#6B7280');
-    else if (key==='t2') statusPill = EVAL.bids.length ? pill(EVAL.bids.length+' uploaded','#F0FDF4','#065F46') : pill('Pending','#F3F4F6','#6B7280');
-    else if (key==='t3'){ const n = evaluatedCount(); statusPill = EVAL.t3confirmed ? pill('Complete','#F0FDF4','#065F46') : pill(n+' of '+EVAL.bids.length+' evaluated','#FFFBEB','#92400E'); }
+    if (key==='s1') statusPill = EVAL.bids.length ? pill(EVAL.bids.length+' uploaded','#F0FDF4','#065F46') : pill('Pending','#F3F4F6','#6B7280');
+    else if (key==='s2'){
+      const pqDone = EVAL.bids.length && EVAL.bids.every(b => PQ_CRITERIA.every(c => { const v = (EVAL.matrix[b.vendor]||{})[c.id]; return v != null && v !== 'clarif'; }));
+      const n = EVAL.bids.filter(b => PQ_CRITERIA.every(c => { const v = (EVAL.matrix[b.vendor]||{})[c.id]; return v != null && v !== 'clarif'; })).length;
+      statusPill = EVAL.pqConfirmed ? pill('Complete','#F0FDF4','#065F46') : (pqDone ? pill('Ready to confirm','#EFF6FF','#0C447C') : pill(n+' of '+EVAL.bids.length+' evaluated','#FFFBEB','#92400E'));
+    }
+    else if (key==='s3'){
+      const tqDone = EVAL.bids.length && EVAL.bids.every(b => TQ_CRITERIA.every(c => typeof (EVAL.matrix[b.vendor]||{})[c.id] === 'number'));
+      const n = EVAL.bids.filter(b => TQ_CRITERIA.every(c => typeof (EVAL.matrix[b.vendor]||{})[c.id] === 'number')).length;
+      statusPill = EVAL.tqConfirmed ? pill('Complete','#F0FDF4','#065F46') : (tqDone ? pill('Ready to confirm','#EFF6FF','#0C447C') : pill(n+' of '+EVAL.bids.length+' scored','#FFFBEB','#92400E'));
+    }
     else statusPill = EVAL.techComplete ? pill('Complete','#F0FDF4','#065F46') : pill('Pending','#F3F4F6','#6B7280');
     const body = expanded ? `<div style="padding:0 18px 18px;">${sectionBody(key)}</div>` : '';
     return `<div class="bg-white border border-line rounded-xl overflow-hidden">
@@ -601,131 +826,151 @@
   }
 
   function sectionBody(key){
-    if (key==='t1') return t1Body();
-    if (key==='t2') return t2Body();
-    if (key==='t3') return t3Body();
-    if (key==='t4') return t4Body();
+    if (key==='s1') return s1Body();
+    if (key==='s2') return s2PqBody();
+    if (key==='s3') return s3TqBody();
+    if (key==='s4') return s4Body();
     return '';
   }
 
-  // ----- T1 -----
-  function t1Body(){
-    if (EVAL.t1.status === 'complete'){
-      const t1 = EVAL.t1;
-      return `<div class="rounded-lg p-3 flex items-center gap-2 mb-3" style="background:#F0FDF4; border:1px solid #BBF7D0;">
-          <i data-lucide="check-circle-2" class="w-4 h-4" style="color:#10B981;"></i>
-          <span class="text-[12.5px]" style="color:#065F46;">Bid Opening Register uploaded · ${fmtDate(t1.date)} ${t1.time} · Immutable record</span>
-        </div>
-        <div class="flex items-center gap-2 mb-3" style="background:#F9FAFB; border:1px solid #E5E7EB; border-radius:8px; padding:8px 12px;">
-          <i data-lucide="file-text" class="w-4 h-4 text-primary"></i>
-          <span class="text-[12.5px] text-ink-900 flex-1 truncate">${t1.file}</span>
-          <a href="#" onclick="showToast('Opening document preview'); return false;" class="text-[12px] text-primary hover:underline">View</a>
-        </div>
-        <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-[12.5px]">
-          <div><span class="text-ink-500">Date of opening:</span> <span class="text-ink-900 font-medium">${fmtDate(t1.date)}</span></div>
-          <div><span class="text-ink-500">Time:</span> <span class="text-ink-900 font-medium">${t1.time}</span></div>
-          <div><span class="text-ink-500">Opening officer:</span> <span class="text-ink-900 font-medium">${t1.officer}</span></div>
-          <div><span class="text-ink-500">Total bids received:</span> <span class="text-ink-900 font-medium">${t1.totalBids}</span></div>
-          <div><span class="text-ink-500">Witness 1:</span> <span class="text-ink-900 font-medium">${t1.w1}</span></div>
-          <div><span class="text-ink-500">Witness 2:</span> <span class="text-ink-900 font-medium">${t1.w2||'—'}</span></div>
-        </div>`;
-    }
-    return `<div class="rounded-lg p-3 mb-3 text-[12px]" style="background:#EFF6FF; border:1px solid #BFDBFE; color:#1E40AF;">Upload the Bid Opening Register document that was prepared and signed during the in-person technical bid opening ceremony.</div>
-      <label class="block cursor-pointer" id="t1Drop" onclick="t1PickFile()" style="border:1.5px dashed #D1D5DB; border-radius:10px; padding:20px 24px; display:flex; gap:20px; align-items:center;">
-        <i data-lucide="upload-cloud" class="shrink-0" style="width:28px; height:28px; color:#0F5EE8;"></i>
-        <div class="flex-1">
-          <div class="text-[14px] font-bold text-ink-900" id="t1FileLabel">Upload Bid Opening Register</div>
-          <div class="text-[12px] text-ink-500">PDF or scanned image — max 20MB</div>
-        </div>
-        <span class="px-3.5 py-2 rounded-lg bg-primary text-white text-[12.5px] font-medium">Browse</span>
-      </label>
-      <div class="grid grid-cols-2 gap-3 mt-4">
-        <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Date of opening *</label><input id="t1Date" type="date" class="field" value="2026-05-15"/></div>
-        <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Time of opening *</label><input id="t1Time" type="time" class="field" value="11:00"/></div>
-        <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Opening officer</label><input id="t1Officer" type="text" class="field" value="Rajesh Kumar"/></div>
-        <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Total bids received *</label><input id="t1Total" type="number" class="field" placeholder="5"/></div>
-        <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Witness 1</label><input id="t1W1" type="text" class="field" placeholder="Priya Shah"/></div>
-        <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Witness 2 (optional)</label><input id="t1W2" type="text" class="field" placeholder="Amit Patil"/></div>
-      </div>
-      <div class="flex justify-end mt-4"><button onclick="submitT1()" class="px-4 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90">Submit &amp; Lock Register</button></div>`;
-  }
-  function t1PickFile(){ EVAL._t1file = 'bid_opening_register_'+EVAL.tnd+'.pdf'; const el = document.getElementById('t1FileLabel'); if (el){ el.textContent = EVAL._t1file; el.style.color='#0F5EE8'; } showToast('File selected'); }
-  function submitT1(){
-    const total = document.getElementById('t1Total').value.trim();
-    const date = document.getElementById('t1Date').value, time = document.getElementById('t1Time').value;
-    if (!EVAL._t1file){ showToast('Select the register file first'); return; }
-    if (!date || !time || !total){ showToast('Fill date, time and total bids'); return; }
-    EVAL.t1 = { status:'complete', file:EVAL._t1file, date, time, officer:document.getElementById('t1Officer').value||'Rajesh Kumar',
-      w1:document.getElementById('t1W1').value||'Priya Shah', w2:document.getElementById('t1W2').value||'', totalBids:total };
-    EVAL.expanded = 't2';
-    renderTechnical(); saveState();
-    showToast('Bid Opening Register locked');
-  }
   function fmtDate(iso){ if(!iso) return '—'; try { return new Date(iso+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); } catch(e){ return iso; } }
 
-  // ----- T2 -----
-  function t2Body(){
-    const rows = EVAL.bids.map((b,i) => {
+  // ----- Section 01 — Upload Technical Bids (Changes 4 + 5 + 6 rename) -----
+  // Per Change 4: "Add a bid" form FIRST at top, "Opened bids" table BELOW.
+  // Per Change 5: redesigned form (white card, stacked fields, taller drop-zone, simulated upload).
+  // Per Change 6: rename "View parsed data →" to "View Technical Bid".
+  function s1Body(){
+    const usedVendors = EVAL.bids.map(b => b.vendor);
+    const avail = VENDOR_OPTIONS.filter(v => !usedVendors.includes(v));
+    // pending UI state for the form (held on EVAL so re-renders preserve it)
+    const f = EVAL._addBid = EVAL._addBid || { vendorMode:'select', vendor:'', vendorNew:'', file:'', fileSize:'', uploaded:false, progressing:false };
+    const vendorField = f.vendorMode === 'new'
+      ? `<input id="abVendorNew" type="text" class="ab-input" placeholder="Enter vendor / company name" value="${esc(f.vendorNew)}" oninput="abSetVendorNew(this.value)" autofocus />
+         <a href="#" onclick="abBackToList(); return false;" class="text-[12px] mt-2 inline-block" style="color:#6B7280;">← Back to list</a>`
+      : `<select id="abVendor" class="ab-input" onchange="abVendorChange(this.value)">
+           <option value="">Select vendor…</option>
+           ${avail.map(v => `<option value="${esc(v)}" ${f.vendor===v?'selected':''}>${esc(v)}</option>`).join('')}
+           <option value="__new">+ Add new vendor</option>
+         </select>`;
+
+    let fileField;
+    if (!f.file){
+      fileField = `<div class="ab-drop" id="abDrop" onclick="abPickFile()" role="button" tabindex="0" onkeydown="if(event.key==='Enter')abPickFile()">
+          <i data-lucide="upload" style="width:28px; height:28px; color:#0F5EE8;"></i>
+          <div class="text-[14px] font-bold text-ink-900" style="margin-top:10px;">Click to upload or drag and drop</div>
+          <div class="text-[12px]" style="color:#9CA3AF; margin-top:4px;">PDF, DOCX, XLSX — max 20MB</div>
+        </div>`;
+    } else {
+      const progressBar = f.progressing
+        ? `<div class="ab-progress-track"><div id="abProgFill" class="ab-progress-fill"></div></div>`
+        : `<div class="text-[12px]" style="color:#10B981; margin-top:6px;">✓ Uploaded successfully</div>`;
+      fileField = `<div class="ab-file-card">
+          <i data-lucide="file-text" style="width:24px; height:24px; color:#0F5EE8; flex-shrink:0;"></i>
+          <div style="flex:1; min-width:0;">
+            <div class="text-[14px] font-bold text-ink-900 truncate">${esc(f.file)}</div>
+            <div class="text-[12px]" style="color:#9CA3AF;">${esc(f.fileSize)}</div>
+            ${progressBar}
+          </div>
+          <button class="ab-remove" onclick="abRemoveFile()" aria-label="Remove file">×</button>
+        </div>`;
+    }
+
+    const chosenVendor = f.vendorMode === 'new' ? f.vendorNew.trim() : f.vendor;
+    const canSubmit = !!chosenVendor && !!f.file && f.uploaded;
+    const helper = canSubmit ? '' : '<div class="text-[12px]" style="color:#9CA3AF; margin-top:8px; text-align:center;">Select a vendor and upload a document to continue</div>';
+
+    const addForm = `<div class="ab-card">
+        <div class="text-[15px] font-bold" style="color:#111827; margin-bottom:4px;">Add a bid</div>
+        <div class="text-[13px]" style="color:#6B7280; margin-bottom:20px;">Upload a technical bid document and assign it to a vendor.</div>
+        <div style="margin-bottom:20px;">
+          <label class="ab-field-label">Vendor</label>
+          ${vendorField}
+        </div>
+        <div style="margin-bottom:20px;">
+          <label class="ab-field-label">Bid document</label>
+          ${fileField}
+        </div>
+        <div style="margin-bottom:8px;">
+          <label class="ab-field-label">Bid type</label>
+          <span class="ab-bid-pill"><i data-lucide="lock" style="width:13px; height:13px;"></i> Technical Bid</span>
+          <div class="text-[11px]" style="color:#9CA3AF; margin-top:6px;">Financial bids are uploaded separately after technical evaluation</div>
+        </div>
+        <button class="ab-submit" ${canSubmit?'':'disabled'} onclick="abSubmit()">Upload Bid</button>
+        ${helper}
+      </div>`;
+
+    // Opened bids table — BELOW the form
+    const rows = EVAL.bids.map(b => {
       const stPill = b.status==='parsed' ? '<span style="color:#10B981; font-size:12px;">Parsed ✓</span>'
                    : b.status==='processing' ? '<span style="color:#0F5EE8; font-size:12px;" class="inline-flex items-center gap-1.5"><span style="width:11px;height:11px;border:2px solid #BFDBFE;border-top-color:#0F5EE8;border-radius:50%;display:inline-block;animation:spin .7s linear infinite;"></span> AI is parsing the document...</span>'
                    : '<span style="color:#EF4444; font-size:12px;">Parse failed</span>';
-      const action = b.status==='parsed' ? `<a href="#" onclick="openDrawer('${b.vendor}','tech'); return false;" class="text-[12px] text-primary hover:underline">View parsed data →</a>` : '<span class="text-ink-400 text-[12px]">—</span>';
+      const action = b.status==='parsed' ? `<a href="#" onclick="openBidDoc('${esc(b.vendor)}'); return false;" class="text-[12px] hover:underline" style="color:#0F5EE8;">View Technical Bid</a>` : '<span class="text-ink-400 text-[12px]">—</span>';
       return `<tr style="border-bottom:1px solid #F3F4F6;">
-        <td style="padding:10px 12px; font-size:13px; color:#111827; font-weight:600;">${b.vendor}</td>
-        <td style="padding:10px 12px; font-size:12px; color:#6B7280;" class="truncate">${b.file}</td>
+        <td style="padding:10px 12px; font-size:13px; color:#111827; font-weight:600;">${esc(b.vendor)}</td>
+        <td style="padding:10px 12px; font-size:12px; color:#6B7280;" class="truncate">${esc(b.file)}</td>
         <td style="padding:10px 12px; font-size:11.5px; color:#9CA3AF;">May 17, 2026</td>
         <td style="padding:10px 12px;">${stPill}</td>
         <td style="padding:10px 12px;">${action}</td>
       </tr>`;
     }).join('');
-    const table = EVAL.bids.length ? `<div style="border:1px solid #E5E7EB; border-radius:10px; overflow:hidden; margin-bottom:14px;">
-      <table style="width:100%; table-layout:fixed; border-collapse:collapse;">
-        <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;">
-          <th style="${thS()} width:24%;">Vendor</th><th style="${thS()} width:26%;">File</th><th style="${thS()} width:16%;">Uploaded At</th><th style="${thS()} width:18%;">Status</th><th style="${thS()} width:16%;">Action</th>
-        </tr></thead><tbody>${rows}</tbody></table></div>` : '';
-    const usedVendors = EVAL.bids.map(b => b.vendor);
-    const avail = VENDOR_OPTIONS.filter(v => !usedVendors.includes(v));
-    return `${table}
-      <div style="border:1px solid #E5E7EB; border-radius:10px; padding:16px 18px; background:#F9FAFB;">
-        <div class="text-[13px] font-bold text-ink-900 mb-3">Add a bid</div>
-        <div class="grid gap-3" style="grid-template-columns:1fr 1fr 1fr;">
-          <div>
-            <label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Vendor *</label>
-            <select id="t2Vendor" class="field" onchange="t2VendorChange()">
-              <option value="">Select vendor…</option>
-              ${avail.map(v => `<option value="${v}">${v}</option>`).join('')}
-              <option value="__new">+ Add new vendor</option>
-            </select>
-            <input id="t2VendorNew" type="text" class="field hidden mt-1" placeholder="New vendor name"/>
-          </div>
-          <div>
-            <label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Bid type</label>
-            <input type="text" class="field" value="Technical Bid" readonly style="background:#F3F4F6; color:#6B7280;"/>
-          </div>
-          <div>
-            <label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Document</label>
-            <button onclick="t2PickFile()" class="field text-left" id="t2FileBtn" style="cursor:pointer;">Choose file</button>
-          </div>
-        </div>
-        <div class="flex justify-end mt-3"><button onclick="uploadBid()" class="px-4 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90">Upload Bid</button></div>
-      </div>`;
+    const opened = EVAL.bids.length
+      ? `<div class="text-[13px] font-bold text-ink-900 mb-2">Opened bids</div>
+         <div style="border:1px solid #E5E7EB; border-radius:10px; overflow:hidden;">
+           <table style="width:100%; table-layout:fixed; border-collapse:collapse;">
+             <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;">
+               <th style="${thS()} width:24%;">Vendor</th><th style="${thS()} width:26%;">File</th><th style="${thS()} width:16%;">Uploaded At</th><th style="${thS()} width:18%;">Status</th><th style="${thS()} width:16%;">Action</th>
+             </tr></thead><tbody>${rows}</tbody></table>
+         </div>`
+      : '<div class="text-[12.5px] text-ink-500 italic" style="padding:6px 0;">No bids uploaded yet.</div>';
+
+    return addForm + opened;
   }
   function thS(){ return 'padding:9px 12px; font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; text-align:left;'; }
-  function t2VendorChange(){
-    const sel = document.getElementById('t2Vendor');
-    document.getElementById('t2VendorNew').classList.toggle('hidden', sel.value !== '__new');
+  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+  // ----- Add-bid form interactions (Change 5) -----
+  function abVendorChange(val){
+    const f = EVAL._addBid;
+    if (val === '__new'){ f.vendorMode = 'new'; f.vendor=''; }
+    else { f.vendorMode = 'select'; f.vendor = val; }
+    renderTechnical();
   }
-  function t2PickFile(){ EVAL._t2file = 'technical_bid_'+Date.now()+'.pdf'; document.getElementById('t2FileBtn').textContent = 'technical_bid.pdf'; }
-  function uploadBid(){
-    const sel = document.getElementById('t2Vendor');
-    let vendor = sel.value === '__new' ? document.getElementById('t2VendorNew').value.trim() : sel.value;
+  function abSetVendorNew(val){ EVAL._addBid.vendorNew = val; renderTechnical(); }
+  function abBackToList(){ const f = EVAL._addBid; f.vendorMode='select'; f.vendorNew=''; renderTechnical(); }
+  function abPickFile(){
+    const f = EVAL._addBid;
+    const v = f.vendorMode==='new' ? (f.vendorNew.trim()||'vendor') : (f.vendor || 'vendor');
+    const slug = v.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
+    f.file = slug + '_technical_bid.pdf';
+    f.fileSize = '2.4 MB';
+    f.uploaded = false;
+    f.progressing = true;
+    renderTechnical();
+    // Animate the progress bar from 0 → 100 over 1.5s
+    requestAnimationFrame(() => {
+      const bar = document.getElementById('abProgFill');
+      if (!bar) return;
+      bar.style.transition = 'width 1.5s linear';
+      bar.style.width = '100%';
+    });
+    setTimeout(() => {
+      f.uploaded = true;
+      f.progressing = false;
+      renderTechnical();
+    }, 1550);
+  }
+  function abRemoveFile(){ const f = EVAL._addBid; f.file=''; f.fileSize=''; f.uploaded=false; f.progressing=false; renderTechnical(); }
+  function abSubmit(){
+    const f = EVAL._addBid;
+    const vendor = f.vendorMode==='new' ? f.vendorNew.trim() : f.vendor;
     if (!vendor){ showToast('Select or enter a vendor'); return; }
-    if (!EVAL._t2file){ showToast('Choose a document'); return; }
-    const bid = { vendor, file:'technical_bid_'+vendor.toLowerCase().replace(/[^a-z]/g,'_')+'.pdf', status:'processing', parsedEdits:{} };
+    if (!f.file || !f.uploaded){ showToast('Upload a document first'); return; }
+    const bid = { vendor, file:f.file, status:'processing', parsedEdits:{} };
     EVAL.bids.push(bid);
-    EVAL._t2file = null;
+    if (!EVAL.activeVendor) EVAL.activeVendor = vendor;
+    EVAL._addBid = { vendorMode:'select', vendor:'', vendorNew:'', file:'', fileSize:'', uploaded:false, progressing:false };
     renderTechnical(); saveState();
-    setTimeout(() => { bid.status = 'parsed'; renderTechnical(); saveState(); showToast(vendor+' bid parsed'); }, 1600);
+    setTimeout(() => { bid.status='parsed'; renderTechnical(); saveState(); showToast(vendor+' bid parsed'); }, 1400);
   }
 
   // ----- DRAWER (parsed data) -----
@@ -779,62 +1024,400 @@
     openDrawer(vendor, kind);
   }
 
-  // ----- T3 — MATRIX -----
-  function t3Body(){
-    if (!EVAL.bids.length) return '<div class="text-[13px] text-ink-500 italic">Upload technical bids first.</div>';
-    const allCrit = PQ_CRITERIA.concat(TQ_CRITERIA);
-    const head = `<thead>
-      <tr>
-        <th rowspan="2" style="${matrixTh()} position:sticky; left:0; background:#F9FAFB; z-index:3; width:150px;">Vendor</th>
-        <th colspan="${PQ_CRITERIA.length}" style="${matrixTh()} background:#EFF6FF; color:#0C447C; border-bottom:2px solid #0F5EE8;">PQ CRITERIA</th>
-        <th colspan="${TQ_CRITERIA.length+1}" style="${matrixTh()} background:#EEEDFE; color:#3C3489; border-bottom:2px solid #8B5CF6;">TQ CRITERIA</th>
-        <th rowspan="2" style="${matrixTh()} position:sticky; right:0; background:#F9FAFB; z-index:3; width:88px;">Verdict</th>
-      </tr>
-      <tr>
-        ${PQ_CRITERIA.map(c => `<th style="${matrixTh()} width:84px;" title="${c.full}">${c.short} <span style="color:#9CA3AF;">ℹ</span></th>`).join('')}
-        ${TQ_CRITERIA.map(c => `<th style="${matrixTh()} width:84px;" title="${c.full}">${c.short} <span style="color:#9CA3AF;">ℹ</span></th>`).join('')}
-        <th style="${matrixTh()} width:78px;" title="Auto-calculated, out of 100">TQ Total</th>
-      </tr></thead>`;
-    const rows = EVAL.bids.map(b => {
-      const m = EVAL.matrix[b.vendor] || {};
-      const pqCells = PQ_CRITERIA.map(c => matrixCellHTML(b.vendor, c.id, m[c.id], 'pq')).join('');
-      const tqCells = TQ_CRITERIA.map(c => matrixCellHTML(b.vendor, c.id, m[c.id], 'tq')).join('');
-      const total = tqTotal(b.vendor);
-      const totalShown = total != null ? total : '—';
-      const v = vendorVerdict(b.vendor);
-      const vPill = v==='tq' ? pill('TQ','#F0FDF4','#065F46') : v==='ntq' ? pill('NTQ','#FEF2F2','#991B1B') : v==='pending' ? pill('Pending','#FFFBEB','#92400E') : '<span class="text-ink-400 text-[11px]">—</span>';
-      return `<tr>
-        <td style="${matrixTd()} position:sticky; left:0; background:white; z-index:2; font-weight:600; color:#111827;">${b.vendor}</td>
-        ${pqCells}${tqCells}
-        <td style="${matrixTd()} text-align:center; background:#EEEDFE; color:#3C3489; font-weight:700;">${totalShown}</td>
-        <td style="${matrixTd()} position:sticky; right:0; background:white; z-index:2; text-align:center;">${vPill}</td>
-      </tr>`;
-    }).join('');
-    return `<div class="flex items-center justify-between gap-3 flex-wrap mb-3">
-        <div class="text-[12px] text-ink-500">Click any cell to evaluate. Hover a column header for the full requirement.</div>
-        <button onclick="aiPrescreen()" class="px-3 py-1.5 rounded-lg border border-primary text-primary text-[12px] font-medium hover:bg-primary-light inline-flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> ✦ AI Pre-screen All</button>
+  // ===================== TECHNICAL BID VIEWER PANEL (Change 6) =====================
+  // In-flow overlay anchored inside .main-col (no position:fixed) so it works in the preview iframe.
+  function openBidDoc(vendor){
+    closeDrawer();
+    const panel = document.getElementById('bidDocPanel');
+    const back  = document.getElementById('bidDocBackdrop');
+    panel.innerHTML = bidDocHTML(vendor);
+    back.classList.add('open');
+    panel.classList.add('open');
+    refreshIcons();
+  }
+  function closeBidDoc(){
+    const panel = document.getElementById('bidDocPanel');
+    const back  = document.getElementById('bidDocBackdrop');
+    if (panel) panel.classList.remove('open');
+    if (back)  back.classList.remove('open');
+  }
+  function bidDocHTML(vendor){
+    const tName = (EVAL_TENDERS.find(t => t.id === EVAL.tnd) || AWARDED_TENDERS.find(t => t.id === EVAL.tnd) || {}).name || EVAL.tnd;
+    const tRef = (EVAL.tnd || 'TND-XXXX') + '/AMC/2026-27';
+    // Per-vendor profile (kept small but realistic — derives from PARSED_TECH where possible)
+    const p = PARSED_TECH[vendor] || {};
+    const profile = {
+      legal:   (vendor === 'Rajesh Constructions' ? 'M/s Rajesh Constructions Pvt Ltd' : (p['Vendor Name'] || 'M/s ' + vendor)),
+      address: '123, Business Park, Andheri East, Mumbai – 400069',
+      cin:     p['CIN']    || 'U72900MH2019PTC123456',
+      gst:     p['GST Number'] || '27AAACR1234Q1Z5',
+      pan:     p['PAN']    || 'AAACR1234Q',
+      type:    p['Company Type'] || 'Private Limited Company',
+      year:    '2019',
+      contact: 'Mr. Rajesh Kumar, MD',
+      mobile:  '+91 98765 43210',
+      email:   'rajesh@rajeshconstructions.com',
+      website: 'www.rajeshconstructions.com',
+      signer:  'Mr. Rajesh Kumar',
+      sigRole: 'Managing Director',
+    };
+    const pqChecklist = [
+      ['Certificate of Incorporation','Annexure A-1'],
+      ['PAN Card','Annexure A-2'],
+      ['GST Registration Certificate','Annexure A-3'],
+      ['MOA & AOA','Annexure A-4'],
+      ['Audited Balance Sheet (FY 2022-23, 23-24, 24-25)','Annexure A-5'],
+      ['CA Certified Turnover Certificate','Annexure A-6'],
+      ['Non-Blacklisting Declaration','Annexure A-7'],
+      ['ISO 9001:2015 Certificate','Annexure A-8'],
+    ];
+
+    return `<div class="bid-doc-header">
+        <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+          <i data-lucide="file-text" style="width:18px; height:18px; color:#0F5EE8; flex-shrink:0;"></i>
+          <div style="min-width:0;">
+            <div class="text-[14px] font-bold text-ink-900 truncate" style="font-family:'DM Sans', sans-serif;">Technical Bid — ${esc(profile.legal)}</div>
+            <div class="text-[11px]" style="color:#9CA3AF; font-family:'DM Sans', sans-serif;">${esc(EVAL.tnd)} · Uploaded May 15, 2026</div>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+          <button onclick="showToast('Downloading PDF…')" class="inline-flex items-center gap-1.5" style="border:1px solid #E5E7EB; background:white; color:#374151; border-radius:8px; padding:6px 12px; font-size:12px; font-family:'DM Sans', sans-serif; cursor:pointer;" onmouseover="this.style.background='#F9FAFB'" onmouseout="this.style.background='white'">
+            <i data-lucide="download" style="width:13px; height:13px;"></i> Download PDF
+          </button>
+          <button onclick="closeBidDoc()" aria-label="Close" style="background:transparent; border:none; cursor:pointer; color:#6B7280; font-size:20px; line-height:1; padding:4px 8px;">×</button>
+        </div>
       </div>
-      <div style="overflow-x:auto; border:1px solid #E5E7EB; border-radius:10px;">
-        <table style="width:100%; border-collapse:collapse; min-width:1180px;">${head}<tbody>${rows}</tbody></table>
-      </div>
-      <div class="flex items-center justify-between mt-3 flex-wrap gap-2">
-        <div class="text-[12px] text-ink-500" aria-live="polite">${evaluatedCount()} of ${EVAL.bids.length} vendors fully evaluated</div>
-        <button onclick="confirmT3()" class="px-4 py-2 rounded-lg ${allEvaluated()?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-medium" ${allEvaluated()?'':'disabled'}>Confirm Evaluation</button>
+
+      <div class="bid-doc-body">
+        <!-- Cover page -->
+        <div class="bd-cover">
+          <div>TO</div>
+          <div style="margin-top:14px;">THE TENDER INVITING AUTHORITY</div>
+          <div>Ahmedabad Municipal Corporation</div>
+          <div>Ahmedabad, Gujarat</div>
+          <div class="bd-rules-double"></div>
+          <div style="font-weight:bold;">TECHNICAL BID</div>
+          <div>for</div>
+          <div style="font-size:14px; font-weight:bold; margin-top:6px;">${esc(String(tName).toUpperCase())}</div>
+          <div>Tender Reference No.: ${esc(tRef)}</div>
+          <div class="bd-rules-double"></div>
+          <div>Submitted by:</div>
+          <div style="font-weight:bold;">${esc(profile.legal)}</div>
+          <div>[Registered Office Address]</div>
+          <div>CIN: ${esc(profile.cin)}</div>
+          <div>GST No.: ${esc(profile.gst)}</div>
+        </div>
+
+        <!-- Section 1 — Covering Letter -->
+        <h2 class="bd-sec">Section 1 — Covering Letter</h2>
+        <div>To,<br>The Commissioner / Tender Inviting Authority,<br>Ahmedabad Municipal Corporation,<br>Ahmedabad – 380001.</div>
+        <div style="margin-top:12px;"><strong>Subject:</strong> Submission of Technical Bid for "${esc(tName)}" – Tender No. ${esc(tRef)}.</div>
+        <div style="margin-top:12px;">Sir/Madam,</div>
+        <div style="margin-top:8px;">With reference to the above-cited Notice Inviting Tender (NIT), we, ${esc(profile.legal)}, hereby submit our Technical Bid for the subject tender.</div>
+        <div style="margin-top:8px;">We have read and understood all the terms, conditions, and specifications contained in the Tender Document and confirm our acceptance of the same without any reservation.</div>
+        <div style="margin-top:10px;">We confirm that:</div>
+        <ol class="bd-num">
+          <li>The information furnished in this bid is true and correct to the best of our knowledge and belief.</li>
+          <li>We meet all the Pre-Qualification (PQ) and Technical Qualification (TQ) criteria as specified in the tender document.</li>
+          <li>We are not blacklisted by any government department or PSU.</li>
+          <li>Our firm is not under liquidation or insolvency proceedings.</li>
+        </ol>
+        <div style="margin-top:18px;">Yours faithfully,</div>
+        <div style="margin-top:18px;">[Authorised Signatory]<br>Name: ${esc(profile.signer)}<br>Designation: ${esc(profile.sigRole)}<br>Date: May 15, 2026<br>Company Seal</div>
+
+        <!-- Section 2 — Company Profile -->
+        <h2 class="bd-sec">Section 2 — Company Profile</h2>
+        <table class="bd-table">
+          <tbody>
+            <tr><td class="bd-label-cell">Name of Company</td><td>${esc(profile.legal)}</td></tr>
+            <tr><td class="bd-label-cell">Type of Entity</td><td>${esc(profile.type)}</td></tr>
+            <tr><td class="bd-label-cell">Year of Incorporation</td><td>${esc(profile.year)}</td></tr>
+            <tr><td class="bd-label-cell">CIN</td><td>${esc(profile.cin)}</td></tr>
+            <tr><td class="bd-label-cell">PAN</td><td>${esc(profile.pan)}</td></tr>
+            <tr><td class="bd-label-cell">GST Registration No.</td><td>${esc(profile.gst)}</td></tr>
+            <tr><td class="bd-label-cell">Registered Address</td><td>${esc(profile.address)}</td></tr>
+            <tr><td class="bd-label-cell">Contact Person</td><td>${esc(profile.contact)}</td></tr>
+            <tr><td class="bd-label-cell">Mobile</td><td>${esc(profile.mobile)}</td></tr>
+            <tr><td class="bd-label-cell">Email</td><td>${esc(profile.email)}</td></tr>
+            <tr><td class="bd-label-cell">Website</td><td>${esc(profile.website)}</td></tr>
+          </tbody>
+        </table>
+
+        <!-- Section 3 — PQ Documents Checklist -->
+        <h2 class="bd-sec">Section 3 — Pre-Qualification Documents Checklist</h2>
+        <table class="bd-table">
+          <thead><tr><th style="width:8%;">S.NO</th><th style="width:52%;">DOCUMENT</th><th style="width:14%;">SUBMITTED</th><th style="width:26%;">REFERENCE / REMARKS</th></tr></thead>
+          <tbody>${pqChecklist.map((r,i) => `<tr><td>${i+1}</td><td>${esc(r[0])}</td><td style="color:#065F46; font-weight:700;">✓ Yes</td><td>${esc(r[1])}</td></tr>`).join('')}</tbody>
+        </table>
+
+        <!-- Section 4 — Turnover and Financial Details -->
+        <h2 class="bd-sec">Section 4 — Turnover and Financial Details</h2>
+        <div style="font-size:13px; font-weight:700; margin-bottom:8px;">4.1 Annual Turnover (Last 3 Financial Years)</div>
+        <table class="bd-table">
+          <thead><tr><th>FINANCIAL YEAR</th><th>TOTAL TURNOVER (₹)</th><th>TURNOVER FROM SIMILAR WORK (₹)</th><th>CA CERTIFIED</th></tr></thead>
+          <tbody>
+            <tr><td>FY 2022-23</td><td>₹1,28,00,000</td><td>₹85,00,000</td><td>✓ Yes (UAN: 123456)</td></tr>
+            <tr><td>FY 2023-24</td><td>₹1,45,00,000</td><td>₹98,00,000</td><td>✓ Yes (UAN: 123456)</td></tr>
+            <tr><td>FY 2024-25</td><td>₹1,53,00,000</td><td>₹1,12,00,000</td><td>✓ Yes (UAN: 123456)</td></tr>
+            <tr style="background:#F9FAFB; font-weight:bold;"><td>Average</td><td>₹1,42,00,000</td><td>₹98,33,333</td><td>—</td></tr>
+          </tbody>
+        </table>
+        <div style="font-size:11px; color:#6B7280; font-style:italic; margin-top:4px;">CA Name: CA Priya Mehta, FRN: 123456W, UAN: MH-123456 · As per Section 44AB of the Income Tax Act</div>
+
+        <!-- Section 5 — Work Order / Experience Details -->
+        <h2 class="bd-sec">Section 5 — Work Order / Experience Details</h2>
+        <div style="font-size:13px; font-weight:700; margin-bottom:8px;">5.1 Similar Work Orders (Last 5 Years)</div>
+        <table class="bd-table">
+          <thead><tr><th>S.NO</th><th>CLIENT</th><th>WORK DESCRIPTION</th><th>ORDER VALUE (₹)</th><th>ORDER DATE</th><th>COMPLETION DATE</th><th>STATUS</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Maharashtra IT Dept.</td><td>Supply &amp; installation of 300 desktop computers</td><td>₹1,20,00,000</td><td>Jan 2023</td><td>Jun 2023</td><td>Completed</td></tr>
+            <tr><td>2</td><td>Pune Municipal Corp.</td><td>Supply of laptops and peripherals</td><td>₹85,00,000</td><td>Mar 2024</td><td>Jul 2024</td><td>Completed</td></tr>
+            <tr><td>3</td><td>State Bank of India (Pune)</td><td>IT equipment procurement</td><td>₹62,00,000</td><td>Sep 2024</td><td>Dec 2024</td><td>Completed</td></tr>
+          </tbody>
+        </table>
+        <div style="font-size:11px; color:#6B7280; font-style:italic; margin-top:4px;">Completion certificates from all three clients are enclosed as Annexure B-1, B-2, B-3</div>
+
+        <!-- Section 6 — Key Technical Personnel -->
+        <h2 class="bd-sec">Section 6 — Key Technical Personnel</h2>
+        <table class="bd-table">
+          <thead><tr><th>ROLE</th><th>NAME</th><th>QUALIFICATION</th><th>EXPERIENCE</th><th>DEPLOYMENT</th></tr></thead>
+          <tbody>
+            <tr><td>Project Manager</td><td>Mr. Amit Singh</td><td>B.Tech (Computer Science)</td><td>8 years</td><td>Full-time</td></tr>
+            <tr><td>Site Coordinator</td><td>Ms. Priya Desai</td><td>Diploma (IT)</td><td>4 years</td><td>Full-time</td></tr>
+            <tr><td>Technical Support</td><td>Mr. Suresh Patil</td><td>B.Sc (IT)</td><td>3 years</td><td>As required</td></tr>
+          </tbody>
+        </table>
+
+        <!-- Section 7 — Certifications -->
+        <h2 class="bd-sec">Section 7 — ISO and Other Certifications</h2>
+        <ul style="margin:8px 0 0 22px; padding:0;">
+          <li style="margin-bottom:8px;">ISO 9001:2015 — Quality Management System — Valid till March 2027 — Cert No. QMS-2024-12345</li>
+          <li>ISO/IEC 27001 — Information Security Management — Valid till June 2027 — Cert No. ISMS-2024-67890</li>
+        </ul>
+
+        <!-- Section 8 — Declarations -->
+        <h2 class="bd-sec">Section 8 — Declarations</h2>
+        <ol class="bd-num">
+          <li>We hereby declare that all information furnished in this Technical Bid is true and correct to the best of our knowledge and belief.</li>
+          <li>We declare that our firm has not been blacklisted or debarred by any government authority, public sector undertaking, or autonomous body in India.</li>
+          <li>We declare that there is no conflict of interest in participating in this tender.</li>
+          <li>We undertake to deploy the Key Technical Personnel as proposed and will seek prior written approval for any changes.</li>
+          <li>We accept all terms and conditions of the tender document without any deviation or reservation.</li>
+        </ol>
+
+        <!-- Footer -->
+        <div style="margin-top:40px; border-top:2px solid #111827; padding-top:16px; display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+          <div>Signature of Authorised Signatory<br>Name: ${esc(profile.signer)}<br>Designation: ${esc(profile.sigRole)}<br>Date: May 15, 2026<br>Place: Mumbai</div>
+          <div style="text-align:right;">Company Seal<br><div style="display:inline-block; width:64px; height:64px; border-radius:50%; background:#E5E7EB; margin:6px 0;" aria-hidden="true"></div><br>${esc(profile.legal)}</div>
+        </div>
+        <div style="font-size:11px; color:#9CA3AF; font-style:italic; text-align:center; margin-top:16px;">This is a system-rendered preview of the uploaded technical bid document.</div>
       </div>`;
   }
-  function matrixTh(){ return 'padding:8px 6px; font-size:10px; font-weight:700; color:#6B7280; text-transform:uppercase; letter-spacing:0.03em; text-align:center; border-bottom:1px solid #E5E7EB; white-space:nowrap;'; }
-  function matrixTd(){ return 'padding:0; font-size:12px; border-bottom:1px solid #F3F4F6; border-right:1px solid #F3F4F6; height:42px;'; }
-  function matrixCellHTML(vendor, critId, val, kind){
-    let inner = '<span style="color:#9CA3AF;">—</span>', bg='white', color='#9CA3AF';
-    if (val != null){
-      if (kind==='pq'){
-        if (val==='pass'){ inner='✓'; bg='#F0FDF4'; color='#065F46'; }
-        else if (val==='fail'){ inner='✗'; bg='#FEF2F2'; color='#991B1B'; }
-        else if (val==='clarif'){ inner='⏳'; bg='#FFFBEB'; color='#92400E'; }
-      } else { inner=val; bg='#EEEDFE'; color='#3C3489'; }
-    }
-    return `<td class="matrix-cell" onclick="openCell(event,'${vendor}','${critId}','${kind}')" tabindex="0" style="${matrixTd()} text-align:center; background:${bg}; color:${color}; font-weight:600;">${inner}</td>`;
+
+  // ----- Sections 02 + 03 — PQ / TQ Evaluation with shared vendor tabs (Change 7 + 8) -----
+  function pqVendorComplete(v){ return PQ_CRITERIA.every(c => { const x = (EVAL.matrix[v]||{})[c.id]; return x != null && x !== 'clarif'; }); }
+  function tqVendorComplete(v){ return TQ_CRITERIA.every(c => typeof (EVAL.matrix[v]||{})[c.id] === 'number'); }
+  function vendorTabsHTML(progressKind){
+    if (!EVAL.bids.length) return '';
+    if (!EVAL.activeVendor || !EVAL.bids.find(b => b.vendor === EVAL.activeVendor)) EVAL.activeVendor = EVAL.bids[0].vendor;
+    const tabs = EVAL.bids.map(b => {
+      const done = progressKind === 'pq' ? pqVendorComplete(b.vendor) : tqVendorComplete(b.vendor);
+      const on = b.vendor === EVAL.activeVendor;
+      return `<button class="vendor-tab ${on?'active':''}" onclick="setActiveVendor('${esc(b.vendor)}')">${done?'✓ ':''}${esc(b.vendor)}</button>`;
+    }).join('');
+    const doneCount = EVAL.bids.filter(b => progressKind==='pq' ? pqVendorComplete(b.vendor) : tqVendorComplete(b.vendor)).length;
+    const pct = EVAL.bids.length ? Math.round(doneCount * 100 / EVAL.bids.length) : 0;
+    const progress = `<div class="flex items-center gap-3 flex-wrap" style="margin-bottom:10px;">
+        <div class="text-[13px]" style="color:#6B7280;" aria-live="polite">${doneCount} of ${EVAL.bids.length} vendors evaluated</div>
+        <div style="flex:1; min-width:120px; max-width:240px; height:5px; background:#F3F4F6; border-radius:3px; overflow:hidden;"><div style="height:100%; width:${pct}%; background:#0F5EE8; border-radius:3px; transition:width 200ms ease;"></div></div>
+      </div>`;
+    return progress + `<div class="vendor-tabs" role="tablist" aria-label="Select vendor">${tabs}</div>`;
   }
+  function setActiveVendor(v){ EVAL.activeVendor = v; renderTechnical(); saveState(); }
+
+  // ----- Section 02 — PQ Evaluation -----
+  function s2PqBody(){
+    if (!EVAL.bids.length) return '<div class="text-[13px] text-ink-500 italic">Upload technical bids first.</div>';
+    const vendor = EVAL.activeVendor;
+    const m = EVAL.matrix[vendor] || {};
+    const rows = PQ_CRITERIA.map(c => {
+      const val = m[c.id];
+      const aiVal = aiPQValue(vendor, c.id);
+      const notFound = aiVal === 'Not found' || aiVal === '—' || aiVal == null;
+      const submittedCell = notFound
+        ? `<div><span style="font-size:13px; color:#F59E0B; font-style:italic;">Not found</span> <a href="#" onclick="pqInlineEdit('${esc(vendor)}','${c.id}'); return false;" class="text-[12px] hover:underline" style="color:#0F5EE8;">Enter manually</a></div>`
+        : `<div class="crit-sub">${esc(aiVal)}</div>`;
+      const verdictPills = `
+        <button class="verdict-pill ${val==='pass'?'verdict-pass':''}" style="${val==='pass'?'':'background:#F9FAFB; color:#6B7280;'}" onclick="setPqVerdict('${esc(vendor)}','${c.id}','pass')">✓ Pass</button>
+        <button class="verdict-pill ${val==='fail'?'verdict-fail':''}" style="${val==='fail'?'':'background:#F9FAFB; color:#6B7280;'} margin-left:4px;" onclick="setPqVerdict('${esc(vendor)}','${c.id}','fail')">✗ Fail</button>
+        <button class="verdict-pill ${val==='clarif'?'verdict-pending':''}" style="${val==='clarif'?'':'background:#F9FAFB; color:#6B7280;'} margin-left:4px;" onclick="setPqVerdict('${esc(vendor)}','${c.id}','clarif')">⏳ Pending</button>`;
+      const note = (EVAL.notes||{})[vendor+'|'+c.id] || '';
+      const noteBtn = `<button class="note-icon-btn" title="${note ? 'Note: '+esc(note) : 'Add note'}" onclick="editNote('${esc(vendor)}','${c.id}')"><i data-lucide="${note?'sticky-note':'pencil'}" class="w-4 h-4"></i></button>`;
+      return `<tr>
+        <td><div class="crit-name">${esc(c.short)}</div><div class="crit-desc">${esc(c.full)}</div></td>
+        <td><div class="crit-sub">${esc(pqRequirement(c.id))}</div></td>
+        <td>${submittedCell}</td>
+        <td>${verdictPills}</td>
+        <td style="text-align:center;">${noteBtn}</td>
+      </tr>`;
+    }).join('');
+
+    // Overall PQ verdict for this vendor
+    const passCount = PQ_CRITERIA.filter(c => m[c.id] === 'pass').length;
+    const failCount = PQ_CRITERIA.filter(c => m[c.id] === 'fail').length;
+    const clarCount = PQ_CRITERIA.filter(c => m[c.id] === 'clarif').length;
+    const overall = failCount ? `<span style="background:#FEF2F2; color:#991B1B; padding:6px 12px; border-radius:999px; font-size:13px; font-weight:600;">PQ Disqualified</span>`
+                  : passCount === PQ_CRITERIA.length ? `<span style="background:#F0FDF4; color:#065F46; padding:6px 12px; border-radius:999px; font-size:13px; font-weight:600;">PQ Qualified</span>`
+                  : `<span style="background:#FFFBEB; color:#92400E; padding:6px 12px; border-radius:999px; font-size:13px; font-weight:600;">In progress</span>`;
+    const allDone = EVAL.bids.every(b => PQ_CRITERIA.every(c => { const x = (EVAL.matrix[b.vendor]||{})[c.id]; return x != null && x !== 'clarif'; }));
+    const confirmBtn = `<button onclick="confirmPQ()" class="px-4 py-2 rounded-lg ${allDone?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-medium" ${allDone?'':'disabled'}>Confirm PQ Evaluation</button>`;
+
+    return `<div class="flex items-center justify-between gap-3 flex-wrap mb-2">
+        <div class="text-[12.5px] text-ink-500">Apply Pass / Fail to each criterion. ⏳ Pending is for clarifications still in flight.</div>
+        <button onclick="aiPrescreenPQ()" class="px-3 py-1.5 rounded-lg border border-primary text-primary text-[12px] font-medium hover:bg-primary-light inline-flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> ✦ AI Pre-screen PQ</button>
+      </div>
+      ${vendorTabsHTML('pq')}
+      <div class="flex items-center justify-between mb-2">
+        <div class="text-[13.5px] font-bold text-ink-900">${esc(vendor)}</div>
+        <div>${overall}</div>
+      </div>
+      <div style="border:1px solid #E5E7EB; border-radius:12px; overflow:hidden;">
+        <table class="crit-table" style="table-layout:fixed;">
+          <colgroup><col style="width:25%"><col style="width:25%"><col style="width:25%"><col style="width:15%"><col style="width:10%"></colgroup>
+          <thead><tr><th>Criterion</th><th>Requirement</th><th>Submitted Value</th><th>Verdict</th><th style="text-align:center;">Notes</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <div class="flex justify-end mt-3">${confirmBtn}</div>`;
+  }
+  function pqRequirement(id){
+    return { incorp:'Certificate of incorporation', pangst:'Valid PAN + GST', moa:'MOA / AOA on file', turnover:'Avg ≥ ₹22.5L over 3 yrs', audit:'Audited P&L + balance sheet', iso:'≥ 1 ISO cert', blacklist:'Non-blacklisting declaration', wo:'80-60-40 work-order rule' }[id] || '—';
+  }
+  function setPqVerdict(vendor, critId, val){
+    EVAL.matrix[vendor] = EVAL.matrix[vendor] || {};
+    EVAL.matrix[vendor][critId] = val;
+    renderTechnical(); saveState();
+  }
+  function pqInlineEdit(vendor, critId){
+    const v = prompt('Enter the value extracted from the bid for "'+(PQ_CRITERIA.find(c=>c.id===critId)?.short||critId)+'":');
+    if (v && v.trim()){
+      const bid = EVAL.bids.find(b => b.vendor===vendor);
+      if (bid){
+        bid.parsedEdits = bid.parsedEdits || {};
+        // Mirror PARSED_TECH field naming
+        const map = { incorp:'CIN', pangst:'PAN', moa:'Company Type', turnover:'Turnover (Last 3 yr avg)', iso:'ISO Certifications', wo:'Similar Work Orders' };
+        const field = map[critId] || critId;
+        bid.parsedEdits[field] = v.trim();
+        saveState(); renderTechnical();
+      }
+    }
+  }
+  function editNote(vendor, critId){
+    EVAL.notes = EVAL.notes || {};
+    const cur = EVAL.notes[vendor+'|'+critId] || '';
+    const v = prompt('Note for '+vendor+' / '+critId+':', cur);
+    if (v != null){
+      if (v.trim()) EVAL.notes[vendor+'|'+critId] = v.trim();
+      else delete EVAL.notes[vendor+'|'+critId];
+      saveState(); renderTechnical();
+    }
+  }
+  function aiPrescreenPQ(){
+    EVAL.bids.forEach(b => {
+      EVAL.matrix[b.vendor] = EVAL.matrix[b.vendor] || {};
+      PQ_CRITERIA.forEach(c => { EVAL.matrix[b.vendor][c.id] = aiPQ(b.vendor, c.id); });
+    });
+    EVAL.prescreened = true;
+    renderTechnical(); saveState();
+    showToast('AI pre-screened PQ — review and confirm');
+  }
+  function confirmPQ(){
+    const allDone = EVAL.bids.every(b => PQ_CRITERIA.every(c => { const x = (EVAL.matrix[b.vendor]||{})[c.id]; return x != null && x !== 'clarif'; }));
+    if (!allDone){ showToast('Resolve all pending PQ verdicts first'); return; }
+    EVAL.pqConfirmed = true;
+    EVAL.expanded = 's3';
+    renderTechnical(); saveState();
+    showToast('PQ Evaluation confirmed — TQ unlocked');
+  }
+
+  // ----- Section 03 — TQ Evaluation -----
+  function s3TqBody(){
+    if (!EVAL.bids.length) return '<div class="text-[13px] text-ink-500 italic">Upload technical bids first.</div>';
+    if (!EVAL.pqConfirmed){
+      return `<div style="background:#FFFBEB; border:1px solid #FDE68A; color:#92400E; border-radius:10px; padding:14px 16px; font-size:13px;"><i data-lucide="alert-triangle" class="w-4 h-4 inline-block -mt-0.5 mr-1"></i> Complete PQ Evaluation for all vendors first</div>`;
+    }
+    const vendor = EVAL.activeVendor;
+    const m = EVAL.matrix[vendor] || {};
+    const rows = TQ_CRITERIA.map(c => {
+      const val = typeof m[c.id] === 'number' ? m[c.id] : '';
+      const aiScore = aiTQ(vendor, c.id);
+      const note = (EVAL.notes||{})[vendor+'|'+c.id] || '';
+      const noteBtn = `<button class="note-icon-btn" title="${note ? 'Note: '+esc(note) : 'Add note'}" onclick="editNote('${esc(vendor)}','${c.id}')"><i data-lucide="${note?'sticky-note':'pencil'}" class="w-4 h-4"></i></button>`;
+      return `<tr>
+        <td><div class="crit-name">${esc(c.short)}</div><div class="crit-desc">${esc(c.full)}</div></td>
+        <td><div class="crit-sub">Max ${c.max} marks</div></td>
+        <td><div class="crit-sub">Auto-detected from bid</div></td>
+        <td>
+          <input type="number" class="tq-score-input" min="0" max="${c.max}" value="${val}" oninput="setTqScore('${esc(vendor)}','${c.id}', this.value)" /> <span style="color:#6B7280; font-size:13px;">/ ${c.max}</span>
+          <div style="font-size:12px; color:#9CA3AF; margin-top:4px;">AI suggests: ${aiScore}</div>
+        </td>
+        <td style="text-align:center;">${noteBtn}</td>
+      </tr>`;
+    }).join('');
+    const total = TQ_CRITERIA.reduce((sum, c) => sum + (typeof m[c.id] === 'number' ? m[c.id] : 0), 0);
+    const maxTotal = TQ_CRITERIA.reduce((s,c) => s + c.max, 0);
+    const totalRow = `<tr style="background:#F9FAFB;"><td colspan="3" style="font-weight:700; color:#111827;">TQ Score</td><td style="font-weight:700; color:#111827;">${total} / ${maxTotal}</td><td></td></tr>`;
+    const allScored = EVAL.bids.every(b => TQ_CRITERIA.every(c => typeof (EVAL.matrix[b.vendor]||{})[c.id] === 'number'));
+    const confirmBtn = `<button onclick="confirmTQ()" class="px-4 py-2 rounded-lg ${allScored?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-medium" ${allScored?'':'disabled'}>Confirm TQ Evaluation</button>`;
+    return `<div class="flex items-center justify-between gap-3 flex-wrap mb-2">
+        <div class="text-[12.5px] text-ink-500">Score each criterion out of its maximum. Running total updates live.</div>
+        <button onclick="aiPrescreenTQ()" class="px-3 py-1.5 rounded-lg border border-primary text-primary text-[12px] font-medium hover:bg-primary-light inline-flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> ✦ AI Pre-score TQ</button>
+      </div>
+      ${vendorTabsHTML('tq')}
+      <div class="text-[13.5px] font-bold text-ink-900 mb-2">${esc(vendor)}</div>
+      <div style="border:1px solid #E5E7EB; border-radius:12px; overflow:hidden;">
+        <table class="crit-table" style="table-layout:fixed;">
+          <colgroup><col style="width:25%"><col style="width:25%"><col style="width:25%"><col style="width:15%"><col style="width:10%"></colgroup>
+          <thead><tr><th>Criterion</th><th>Requirement</th><th>Submitted Value</th><th>Score</th><th style="text-align:center;">Notes</th></tr></thead>
+          <tbody>${rows}${totalRow}</tbody>
+        </table>
+      </div>
+      <div class="flex justify-end mt-3">${confirmBtn}</div>`;
+  }
+  function setTqScore(vendor, critId, val){
+    const n = parseInt(val);
+    const crit = TQ_CRITERIA.find(c => c.id === critId);
+    EVAL.matrix[vendor] = EVAL.matrix[vendor] || {};
+    if (isNaN(n)){ delete EVAL.matrix[vendor][critId]; }
+    else { EVAL.matrix[vendor][critId] = Math.max(0, Math.min(crit.max, n)); }
+    saveState();
+    // Live-update only the total row without full re-render (preserves input focus)
+    const m = EVAL.matrix[vendor];
+    const total = TQ_CRITERIA.reduce((sum, c) => sum + (typeof m[c.id] === 'number' ? m[c.id] : 0), 0);
+    const maxTotal = TQ_CRITERIA.reduce((s,c) => s + c.max, 0);
+    // Find the last row's score cell — too brittle. Just update header instead.
+    const totalCell = document.querySelector('#stage-technical tr[style*="background:#F9FAFB"] td:nth-child(4)');
+    if (totalCell) totalCell.textContent = total + ' / ' + maxTotal;
+  }
+  function aiPrescreenTQ(){
+    EVAL.bids.forEach(b => {
+      EVAL.matrix[b.vendor] = EVAL.matrix[b.vendor] || {};
+      TQ_CRITERIA.forEach(c => { EVAL.matrix[b.vendor][c.id] = aiTQ(b.vendor, c.id); });
+    });
+    renderTechnical(); saveState();
+    showToast('AI pre-scored TQ — review and confirm');
+  }
+  function confirmTQ(){
+    const allScored = EVAL.bids.every(b => TQ_CRITERIA.every(c => typeof (EVAL.matrix[b.vendor]||{})[c.id] === 'number'));
+    if (!allScored){ showToast('Score all vendors first'); return; }
+    EVAL.tqConfirmed = true;
+    EVAL.t3confirmed = true; // back-compat with Results section
+    EVAL.expanded = 's4';
+    renderTechnical(); saveState();
+    showToast('TQ Evaluation confirmed — Results unlocked');
+  }
+  // Legacy AI prescreen — runs both PQ and TQ (kept for any external callers)
+  function aiPrescreen(){ aiPrescreenPQ(); aiPrescreenTQ(); }
   function tqTotal(vendor){
     const m = EVAL.matrix[vendor] || {};
     let sum = 0, any = false;
@@ -935,8 +1518,8 @@
     showToast('Technical evaluation confirmed');
   }
 
-  // ----- T4 — RESULTS -----
-  function t4Body(){
+  // ----- Section 04 — Results & Actions (renumbered, content unchanged) -----
+  function s4Body(){
     const clarif = [];
     EVAL.bids.forEach(b => {
       PQ_CRITERIA.forEach(c => { if ((EVAL.matrix[b.vendor]||{})[c.id]==='clarif') clarif.push({ vendor:b.vendor, crit:c }); });
@@ -1531,7 +2114,7 @@
     if (!pop.classList.contains('hidden') && !pop.contains(e.target) && !e.target.closest('.matrix-cell')) closeCell();
   });
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape'){ closeCell(); closeDrawer(); }
+    if (e.key === 'Escape'){ closeCell(); closeDrawer(); closeBidDoc(); }
   });
 
   (function boot(){
