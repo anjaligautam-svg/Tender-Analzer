@@ -174,6 +174,76 @@
     .success-banner .sb-text { font-size:14px; font-weight:700; color:#065F46; }
     .success-banner .sb-meta { font-size:12px; color:#6B7280; margin-left:auto; }
 
+    /* === Method-aware additions === */
+    .method-pill { display:inline-flex; align-items:center; gap:6px; background:#EFF6FF; color:#0C447C; border-radius:20px; padding:5px 12px; font-size:12px; font-weight:700; border:none; cursor:pointer; position:relative; }
+    .method-pill:hover { background:#DBEAFE; }
+    .method-pill .pill-icon { width:13px; height:13px; }
+    .method-pill-menu { position:absolute; left:0; top:calc(100% + 6px); min-width:240px; background:white; border:1px solid #E5E7EB; border-radius:10px; box-shadow:0 12px 32px rgba(0,0,0,0.12); padding:6px; z-index:35; max-height:0; overflow:hidden; opacity:0; transition: max-height .2s ease, opacity .15s ease; }
+    .method-pill-menu.open { max-height:320px; opacity:1; }
+    .method-pill-menu .menu-item { display:flex; align-items:center; justify-content:space-between; padding:8px 10px; font-size:13px; color:#374151; border-radius:6px; cursor:pointer; }
+    .method-pill-menu .menu-item:hover { background:#F9FAFB; }
+    .method-pill-menu .menu-item.on { background:#EFF6FF; color:#0C447C; font-weight:600; }
+    .method-pill-menu .menu-item .native-tag { font-size:10px; color:#9CA3AF; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; }
+    .preview-note { font-size:11px; color:#92400E; margin-left:4px; }
+    .method-input-group { display:inline-flex; align-items:center; gap:6px; font-size:12px; color:#6B7280; flex-wrap:wrap; }
+    .method-input-group input[type="number"] { border:1px solid #D1D5DB; border-radius:6px; padding:5px 8px; font-size:13px; }
+    .method-input-group input[type="number"]:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 2px rgba(15,94,232,0.15); }
+    .method-input-group input.invalid { border-color:#EF4444; box-shadow:0 0 0 2px rgba(239,68,68,0.15); }
+    .method-input-group .apply-btn { background:white; color:#0F5EE8; border:1px solid #0F5EE8; border-radius:6px; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer; transition: background .15s ease; }
+    .method-input-group .apply-btn:hover:not(:disabled) { background:#EFF6FF; }
+    .method-input-group .apply-btn.amber { color:#F59E0B; border-color:#F59E0B; }
+    .method-input-group .apply-btn.amber:hover:not(:disabled) { background:#FFFBEB; }
+    .method-input-group .apply-btn.purple { color:#8B5CF6; border-color:#8B5CF6; }
+    .method-input-group .apply-btn.purple:hover:not(:disabled) { background:#F5F2FF; }
+    .method-input-group .apply-btn:disabled { opacity:0.5; cursor:not-allowed; }
+    .rupee-prefix { position:relative; }
+    .rupee-prefix span { position:absolute; left:8px; top:50%; transform:translateY(-50%); color:#6B7280; font-size:13px; pointer-events:none; }
+    .rupee-prefix input { padding-left:22px !important; }
+
+    /* Ranking label row */
+    .ranking-row { background:#F0F7FF; }
+    .ranking-row td { padding:6px 14px !important; font-size:11px !important; color:#0C447C; border-bottom:1px solid #E5E7EB !important; }
+
+    /* LCS / FBS divider rows */
+    .divider-row td { background:#FFFBEB !important; border-top:2px solid #FCD34D !important; border-bottom:2px solid #FCD34D !important; padding:8px !important; text-align:center; font-size:12px !important; color:#92400E !important; font-weight:600; }
+
+    /* Method-aware row borders */
+    .comp-table tbody tr.below-cutoff td:first-child,
+    .comp-table tbody tr.above-budget td:first-child { border-left:3px solid #F59E0B; }
+    .comp-table tbody tr.below-cutoff,
+    .comp-table tbody tr.above-budget { opacity:0.45; }
+
+    /* N/A cells */
+    .cell-na { color:#C4C9D4; font-style:italic; cursor:help; }
+
+    /* Sealed financial bid (QBS) */
+    .sealed-pill { display:inline-flex; align-items:center; gap:4px; background:#F3F4F6; color:#6B7280; border-radius:6px; padding:4px 10px; font-size:12px; }
+    .sealed-pill .lock-icon { width:11px; height:11px; }
+    .neg-pill { display:inline-flex; align-items:center; gap:4px; background:#E1F5EE; color:#0F6E56; border-radius:6px; padding:4px 10px; font-size:12px; }
+
+    /* Cutoff/budget status pills */
+    .pill-above { background:#F0FDF4; color:#065F46; border-radius:20px; padding:3px 10px; font-size:12px; font-weight:600; display:inline-block; }
+    .pill-below { background:#FEF2F2; color:#991B1B; border-radius:20px; padding:3px 10px; font-size:12px; font-weight:600; display:inline-block; }
+    .pill-disq  { background:#FEF2F2; color:#991B1B; border-radius:6px; padding:4px 10px; font-size:12px; font-weight:600; display:inline-block; }
+    .strike { text-decoration:line-through; }
+
+    /* FBS quote indicator */
+    .budget-indicator { font-size:11px; font-style:italic; margin-top:2px; display:block; }
+    .budget-indicator.below { color:#065F46; }
+    .budget-indicator.above { color:#991B1B; }
+
+    /* Rank badge variants */
+    .rank-badge.rank-na { background:#F3F4F6 !important; color:#6B7280 !important; }
+    .rank-badge.rank-ntq { background:#FEF2F2 !important; color:#991B1B !important; }
+
+    /* Method-switch fade */
+    .comp-table-wrap.switching { opacity:0.4; transition: opacity 150ms ease; }
+    .comp-table-wrap { transition: opacity 150ms ease; }
+
+    /* Winner-change toast */
+    .winner-toast { position:absolute; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:#FFFBEB; border:1px solid #FCD34D; color:#92400E; border-radius:10px; padding:12px 18px; font-size:13px; box-shadow:0 8px 24px rgba(0,0,0,0.12); z-index:50; opacity:0; pointer-events:none; transition: opacity .25s ease, transform .3s cubic-bezier(.2,.7,.2,1); max-width:520px; }
+    .winner-toast.show { opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto; }
+
     @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
   </style>
 </head>
@@ -355,6 +425,9 @@
     <!-- In-flow confirmation modal (NOT position:fixed — anchored within .main-col) -->
     <div id="modalBackdrop" class="modal-backdrop" onclick="closeConfirmModal()"></div>
     <div id="modalDialog" class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle"></div>
+
+    <!-- QCBS winner-change toast (in-flow within .main-col) -->
+    <div id="winnerToast" class="winner-toast" role="status" aria-live="polite"></div>
   </div>
 </div>
 
@@ -431,19 +504,22 @@
 
   // Column model — drives both the header and the body
   const COLUMNS = [
-    { id:'rank',        label:'Rank',           group:'vendor',     width:'52px',  sortable:true,  align:'center' },
-    { id:'vendor',      label:'Vendor',         group:'vendor',     width:'180px', sortable:true },
-    { id:'companyType', label:'Company Type',   group:'vendor',     width:'100px' },
-    { id:'pqStatus',    label:'PQ Status',      group:'technical',  width:'100px' },
-    { id:'tqScore',     label:'TQ Score /100',  group:'technical',  width:'110px', sortable:true },
-    { id:'tqRank',      label:'TQ Rank',        group:'technical',  width:'80px' },
-    { id:'quoted',      label:'Quoted (₹)',     group:'financial',  width:'130px', sortable:true },
-    { id:'vsEstimate',  label:'vs Estimate',    group:'financial',  width:'110px', sortable:true },
-    { id:'vsTs',        label:'vs TS Value',    group:'financial',  width:'110px', sortable:true },
-    { id:'combined',    label:'Combined Score', group:'comparison', width:'120px', sortable:true, methodGated:['QCBS','LCS'] },
-    { id:'flags',       label:'Flags',          group:'comparison', width:'110px' },
-    { id:'notes',       label:'Notes',          group:'decision',   width:'80px',  align:'center' },
-    { id:'select',      label:'Select',         group:'decision',   width:'90px',  align:'center' },
+    { id:'rank',              label:'Rank',           group:'vendor',     width:'52px',  sortable:true,  align:'center' },
+    { id:'vendor',            label:'Vendor',         group:'vendor',     width:'180px', sortable:true },
+    { id:'companyType',       label:'Company Type',   group:'vendor',     width:'100px' },
+    { id:'pqStatus',          label:'PQ Status',      group:'technical',  width:'100px' },
+    { id:'tqScore',           label:'TQ Score /100',  group:'technical',  width:'110px', sortable:true },
+    { id:'cutoffStatus',      label:'Cutoff Status',  group:'technical',  width:'130px' },
+    { id:'financialScore',    label:'Fin. Score',     group:'financial',  width:'100px', sortable:true },
+    { id:'combinedScore',     label:'Combined Score', group:'comparison', width:'130px', sortable:true },
+    { id:'quotedAmount',      label:'Quoted (₹)',     group:'financial',  width:'140px', sortable:true },
+    { id:'budgetStatus',      label:'Budget Status',  group:'financial',  width:'130px' },
+    { id:'vsEstimate',        label:'vs Estimate',    group:'financial',  width:'110px', sortable:true },
+    { id:'vsTS',              label:'vs TS Value',    group:'financial',  width:'110px', sortable:true },
+    { id:'financialBidStatus',label:'Financial Bid',  group:'financial',  width:'130px' },
+    { id:'flags',             label:'Flags',          group:'comparison', width:'110px' },
+    { id:'notes',             label:'Notes',          group:'decision',   width:'80px',  align:'center' },
+    { id:'select',            label:'Select',         group:'decision',   width:'90px',  align:'center' },
   ];
   const GROUPS = [
     { id:'vendor',     label:'Vendor Info', tint:'grp-vendor' },
@@ -453,14 +529,65 @@
     { id:'decision',   label:'Decision',    tint:'grp-decision' },
   ];
 
+  // === Method-aware table configuration — single source of truth for column visibility per method ===
+  const methodColumns = {
+    L1: {
+      visible: ['rank','vendor','companyType','pqStatus','tqScore','quotedAmount','vsEstimate','vsTS','flags','notes','select'],
+      hidden:  ['financialScore','combinedScore','budgetStatus','cutoffStatus','financialBidStatus'],
+      naColumns: [],
+      primarySort: 'quotedAmount', primarySortDir: 'asc',
+      rankingLabel: 'Ranked by: Lowest quoted amount',
+    },
+    QCBS: {
+      visible: ['rank','vendor','companyType','pqStatus','tqScore','financialScore','combinedScore','quotedAmount','vsEstimate','vsTS','flags','notes','select'],
+      hidden:  ['budgetStatus','cutoffStatus','financialBidStatus'],
+      naColumns: [],
+      primarySort: 'combinedScore', primarySortDir: 'desc',
+      rankingLabel: 'Ranked by: Highest combined score (T×70% + F×30%)',
+    },
+    LCS: {
+      visible: ['rank','vendor','companyType','pqStatus','tqScore','cutoffStatus','quotedAmount','vsEstimate','vsTS','flags','notes','select'],
+      hidden:  ['financialScore','combinedScore','budgetStatus','financialBidStatus'],
+      naColumns: [],
+      primarySort: 'quotedAmount', primarySortDir: 'asc',
+      rankingLabel: 'Ranked by: Lowest quote (among vendors above TQ cutoff)',
+    },
+    QBS: {
+      visible: ['rank','vendor','companyType','pqStatus','tqScore','financialBidStatus','flags','notes','select'],
+      hidden:  ['financialScore','combinedScore','budgetStatus','cutoffStatus','vsEstimate','vsTS','quotedAmount'],
+      naColumns: ['quotedAmount'], // when shown via user toggle, render N/A
+      primarySort: 'tqScore', primarySortDir: 'desc',
+      rankingLabel: 'Ranked by: Highest TQ score — price negotiated after selection',
+    },
+    FBS: {
+      visible: ['rank','vendor','companyType','pqStatus','tqScore','quotedAmount','budgetStatus','vsEstimate','flags','notes','select'],
+      hidden:  ['financialScore','combinedScore','cutoffStatus','vsTS','financialBidStatus'],
+      naColumns: [],
+      primarySort: 'tqScore', primarySortDir: 'desc',
+      rankingLabel: 'Ranked by: Highest TQ score (within-budget vendors only)',
+    },
+  };
+  const METHOD_LABELS = { L1:'L1', QCBS:'QCBS', LCS:'LCS', QBS:'QBS', FBS:'FBS' };
+  const METHOD_LONG   = { L1:'L1 — Lowest Cost', QCBS:'QCBS — Quality & Cost', LCS:'LCS — Least Cost Selection', QBS:'QBS — Quality Based Selection', FBS:'FBS — Fixed Budget Selection' };
+
   const SELECTION_REASONS = [
     'L1 — Lowest quote among TQ bids',
     'QCBS — Highest combined score',
+    'LCS — Lowest quote among above-cutoff TQ bids',
+    'QBS — Highest technical score',
+    'FBS — Highest technical score within fixed budget',
     'Best value for money',
     'Only qualified bidder',
     'Committee recommendation',
     'Custom reason',
   ];
+  const SELECTION_REASON_DEFAULT_BY_METHOD = {
+    L1:   'L1 — Lowest quote among TQ bids',
+    QCBS: 'QCBS — Highest combined score',
+    LCS:  'LCS — Lowest quote among above-cutoff TQ bids',
+    QBS:  'QBS — Highest technical score',
+    FBS:  'FBS — Highest technical score within fixed budget',
+  };
 
   function defaultColumnVisibility(){
     const v = {};
@@ -475,7 +602,14 @@
   // ===================== STATE per workspace =====================
   let COMP = null;
   // UI-only state, not persisted
-  let _ui = { filterPanelOpen:false, notesPanelOpen:false, columnsMenuOpen:false, pendingVendor:null };
+  let _ui = { filterPanelOpen:false, notesPanelOpen:false, columnsMenuOpen:false, methodMenuOpen:false, pendingVendor:null };
+  // Pending input values awaiting Apply (debounced from keypress)
+  let _pendingInputs = { lcsCutoff:null, fbsBudget:null, qcbsT:null, qcbsF:null };
+  let _inputDebounce = null;
+  // Cache the native (declared) method per tender — read from eval_TND once on workspace open
+  let _nativeMethod = 'L1';
+  // Winner-change toast timer
+  let _winnerToastT = null;
 
   function freshComp(tnd){
     return {
@@ -490,6 +624,11 @@
       columnVisibility: defaultColumnVisibility(),
       activeSort: defaultSort(),
       activeFilters: defaultFilters(),
+      // Method-aware state
+      activeMethod: null,            // overrides the tender's declared method when set
+      lcsCutoff: 75,                 // TQ cutoff for LCS view
+      fbsBudget: null,               // ₹ fixed budget for FBS view (defaults to ds.estimate)
+      qcbsWeightage: { T:70, F:30 }, // QCBS technical / financial weightage
     };
   }
   function saveComp(){
@@ -618,6 +757,30 @@
     if (!COMP.columnVisibility) COMP.columnVisibility = defaultColumnVisibility();
     if (!COMP.activeSort) COMP.activeSort = defaultSort();
     if (!COMP.activeFilters) COMP.activeFilters = defaultFilters();
+    // Method-aware state defaults (back-compat for older stored COMP records)
+    if (typeof COMP.lcsCutoff !== 'number') COMP.lcsCutoff = 75;
+    if (COMP.fbsBudget == null) COMP.fbsBudget = ds.estimate || 0;
+    if (!COMP.qcbsWeightage) COMP.qcbsWeightage = { T:70, F:30 };
+    // Migrate older column IDs (quoted → quotedAmount, combined → combinedScore, vsTs → vsTS)
+    const renameMap = { quoted:'quotedAmount', combined:'combinedScore', vsTs:'vsTS' };
+    Object.keys(renameMap).forEach(oldK => {
+      if (oldK in COMP.columnVisibility){
+        const newK = renameMap[oldK];
+        if (!(newK in COMP.columnVisibility)) COMP.columnVisibility[newK] = COMP.columnVisibility[oldK];
+        delete COMP.columnVisibility[oldK];
+      }
+    });
+    // Ensure newly added columns default to visible
+    ['financialScore','cutoffStatus','budgetStatus','financialBidStatus'].forEach(k => {
+      if (!(k in COMP.columnVisibility)) COMP.columnVisibility[k] = true;
+    });
+    // Migrate old sort keys
+    if (COMP.activeSort && COMP.activeSort.column in renameMap) COMP.activeSort.column = renameMap[COMP.activeSort.column];
+
+    // Native (declared) method — read from eval_TND-XXX evaluationMethod if present
+    _nativeMethod = readNativeMethodFromEval(tnd, t.method);
+    if (!COMP.activeMethod) COMP.activeMethod = _nativeMethod;
+
     // Seed notes if empty for this tender
     const seed = SEED_NOTES[tnd];
     if (seed){
@@ -625,7 +788,8 @@
         if (!COMP.notes[v]) COMP.notes[v] = seed[v].slice();
       });
     }
-    _ui = { filterPanelOpen:false, notesPanelOpen:false, columnsMenuOpen:false, pendingVendor: COMP.selectedVendor || null };
+    _ui = { filterPanelOpen:false, notesPanelOpen:false, columnsMenuOpen:false, methodMenuOpen:false, pendingVendor: COMP.selectedVendor || null };
+    _pendingInputs = { lcsCutoff: COMP.lcsCutoff, fbsBudget: COMP.fbsBudget, qcbsT: COMP.qcbsWeightage.T, qcbsF: COMP.qcbsWeightage.F };
 
     // Populate context bar
     document.getElementById('wsCrumb').textContent = t.id;
@@ -639,57 +803,105 @@
     renderWorkspace();
     window.scrollTo({ top:0 });
   }
+  function readNativeMethodFromEval(tnd, fallbackTenderMethod){
+    try {
+      const raw = localStorage.getItem('eval_' + tnd);
+      if (raw){
+        const obj = JSON.parse(raw);
+        const m = obj && (obj.evaluationMethod || obj.method);
+        if (m && methodColumns[m]) return m;
+      }
+    } catch(e){}
+    // Fall back to the tender's declared method (e.g. "QCBS 70:30" → "QCBS")
+    if (fallbackTenderMethod){
+      const m = fallbackTenderMethod.split(' ')[0];
+      if (methodColumns[m]) return m;
+    }
+    return 'L1';
+  }
 
   function tenderDataset(){
     return TENDER_BIDS[COMP.tnd] || TENDER_BIDS['TND-2026-001'];
   }
-  function methodForTender(){
-    const t = COMP_TENDERS.find(x => x.id === COMP.tnd);
-    if (!t) return 'L1';
-    return t.method.split(' ')[0]; // "QCBS 70:30" → "QCBS"
-  }
-  function combinedColumnVisible(){
-    const m = methodForTender();
-    const col = COLUMNS.find(c => c.id === 'combined');
-    return COMP.columnVisibility[col.id] && (!col.methodGated || col.methodGated.indexOf(m) !== -1);
-  }
+  // === Method helpers ===
+  function activeMethod(){ return (COMP && COMP.activeMethod) || _nativeMethod || 'L1'; }
+  function nativeMethod(){ return _nativeMethod || 'L1'; }
+  function methodCfg(){ return methodColumns[activeMethod()] || methodColumns.L1; }
+  function isNaColumn(colId){ return (methodCfg().naColumns || []).indexOf(colId) !== -1; }
   function visibleColumns(){
-    return COLUMNS.filter(c => {
-      if (!COMP.columnVisibility[c.id]) return false;
-      if (c.id === 'combined' && !combinedColumnVisible()) return false;
-      return true;
-    });
+    const cfg = methodCfg();
+    const allowed = new Set(cfg.visible.concat(cfg.naColumns || []));
+    return COLUMNS.filter(c => allowed.has(c.id) && (COMP.columnVisibility[c.id] !== false));
   }
-  function computedRows(){
+  // === Per-row computed fields (financial score etc.) ===
+  function decoratedBids(){
     const ds = tenderDataset();
-    const m = methodForTender();
-    // Rank: for QCBS use combined score desc; for L1/LCS/FBS use quote asc (ALB pushed to end); for QBS use TQ desc
-    const tq  = ds.bids.filter(b => b.pqStatus === 'q');
+    const tq = ds.bids.filter(b => b.pqStatus === 'q');
     const ntq = ds.bids.filter(b => b.pqStatus !== 'q');
-    let ordered;
-    if (m === 'QCBS' || m === 'LCS'){
-      ordered = tq.slice().sort((a,b) => (b.combined||0) - (a.combined||0));
+    const nonAlbQuotes = tq.filter(b => !b.flags.includes('alb') && b.quote).map(b => b.quote);
+    const lowestNonAlb = nonAlbQuotes.length ? Math.min.apply(null, nonAlbQuotes) : null;
+    const T = (COMP.qcbsWeightage && COMP.qcbsWeightage.T) || 70;
+    const F = (COMP.qcbsWeightage && COMP.qcbsWeightage.F) || 30;
+    tq.forEach(b => {
+      b.finScore = b.quote && lowestNonAlb ? Math.round((lowestNonAlb / b.quote) * 100 * 10) / 10 : null;
+      if (b.finScore != null) b.finScore = Math.min(100, b.finScore);
+      // Live combined — overrides the seeded one so weightage edits and method switches stay in sync
+      if (b.tq != null && b.finScore != null){
+        b.combinedLive = Math.round(((b.tq * T / 100) + (b.finScore * F / 100)) * 10) / 10;
+      } else b.combinedLive = b.combined;
+    });
+    ntq.forEach(b => { b.finScore = null; b.combinedLive = null; });
+    return { tq, ntq, lowestNonAlb, T, F };
+  }
+  // === computedRows — primary ordering + zone assignment per method ===
+  function computedRows(){
+    const m = activeMethod();
+    const { tq, ntq } = decoratedBids();
+    const tqCopy = tq.slice();
+    let primary = [], secondary = [];
+    // Reset zones
+    tqCopy.forEach(b => { b.zone = null; });
+    ntq.forEach(b => { b.zone = 'ntq'; });
+    if (m === 'L1'){
+      const nonAlb = tqCopy.filter(b => !b.flags.includes('alb')).sort((a,b) => (a.quote||0) - (b.quote||0));
+      const albs   = tqCopy.filter(b =>  b.flags.includes('alb')).sort((a,b) => (a.quote||0) - (b.quote||0));
+      primary = nonAlb.concat(albs);
+      primary.forEach(b => b.zone = 'primary');
+    } else if (m === 'QCBS'){
+      primary = tqCopy.slice().sort((a,b) => (b.combinedLive||0) - (a.combinedLive||0));
+      primary.forEach(b => b.zone = 'primary');
+    } else if (m === 'LCS'){
+      const cutoff = COMP.lcsCutoff != null ? COMP.lcsCutoff : 75;
+      const above = tqCopy.filter(b => (b.tq||0) >= cutoff).sort((a,b) => (a.quote||0) - (b.quote||0));
+      const below = tqCopy.filter(b => (b.tq||0) <  cutoff).sort((a,b) => (b.tq||0) - (a.tq||0));
+      primary = above; secondary = below;
+      above.forEach(b => b.zone = 'aboveCutoff');
+      below.forEach(b => b.zone = 'belowCutoff');
     } else if (m === 'QBS'){
-      ordered = tq.slice().sort((a,b) => (b.tq||0) - (a.tq||0));
-    } else { // L1 / FBS
-      const nonAlb = tq.filter(b => !b.flags.includes('alb')).sort((a,b) => (a.quote||0) - (b.quote||0));
-      const albs   = tq.filter(b =>  b.flags.includes('alb')).sort((a,b) => (a.quote||0) - (b.quote||0));
-      ordered = nonAlb.concat(albs);
+      primary = tqCopy.slice().sort((a,b) => (b.tq||0) - (a.tq||0));
+      primary.forEach(b => b.zone = 'primary');
+    } else if (m === 'FBS'){
+      const budget = COMP.fbsBudget != null ? COMP.fbsBudget : (tenderDataset().estimate || 0);
+      const within = tqCopy.filter(b => (b.quote||0) <= budget).sort((a,b) => (b.tq||0) - (a.tq||0));
+      const above  = tqCopy.filter(b => (b.quote||0) >  budget).sort((a,b) => (b.tq||0) - (a.tq||0));
+      primary = within; secondary = above;
+      within.forEach(b => b.zone = 'withinBudget');
+      above.forEach(b  => b.zone = 'aboveBudget');
     }
-    ordered.forEach((b,i) => b.rank = i+1);
+    // Ranking — primary zone gets 1, 2, 3 …; secondary zone gets '—' (disqualified for the active method)
+    primary.forEach((b,i) => b.rank = i+1);
+    secondary.forEach(b => b.rank = '—');
     ntq.forEach(b => b.rank = '—');
-    // TQ rank — strict by TQ score desc among qualifiers
+    // Keep tqRank around for completeness
     const byTq = tq.slice().sort((a,b) => (b.tq||0) - (a.tq||0));
     byTq.forEach((b,i) => b.tqRank = i+1);
     ntq.forEach(b => b.tqRank = '—');
-    return { all: ordered.concat(ntq), tq: ordered, ntq };
+    return { all: primary.concat(secondary, ntq), primary, secondary, ntq };
   }
   function applySortAndFilters(rows){
     const f = COMP.activeFilters;
     const filtered = rows.filter(b => {
-      if (b.pqStatus !== 'q'){
-        return f.showNTQ; // NTQ rows shown only if filter allows
-      }
+      if (b.pqStatus !== 'q') return f.showNTQ;
       if (b.tq != null && (b.tq < (f.tqMin||0) || b.tq > (f.tqMax||100))) return false;
       if (f.quoteMin != null && (b.quote||0) < f.quoteMin) return false;
       if (f.quoteMax != null && (b.quote||0) > f.quoteMax) return false;
@@ -698,28 +910,35 @@
       if (!isAlb && !f.showTQ) return false;
       return true;
     });
-    // Sort — NTQ always at the bottom regardless
-    const tqRows  = filtered.filter(b => b.pqStatus === 'q');
-    const ntqRows = filtered.filter(b => b.pqStatus !== 'q');
     const s = COMP.activeSort;
     const dir = s.direction === 'desc' ? -1 : 1;
     const cmp = (a,b) => {
       let va, vb;
       switch (s.column){
-        case 'rank':       va = a.rank;       vb = b.rank; break;
-        case 'vendor':     va = (a.vendor||'').toLowerCase(); vb = (b.vendor||'').toLowerCase(); break;
-        case 'tqScore':    va = a.tq||0;      vb = b.tq||0;  break;
-        case 'quoted':     va = a.quote||0;   vb = b.quote||0; break;
-        case 'vsEstimate': va = a.vsEstimate==null?0:a.vsEstimate; vb = b.vsEstimate==null?0:b.vsEstimate; break;
-        case 'vsTs':       va = a.vsTs==null?0:a.vsTs; vb = b.vsTs==null?0:b.vsTs; break;
-        case 'combined':   va = a.combined||0;vb = b.combined||0; break;
-        default:           va = a.rank;       vb = b.rank;
+        case 'rank':           va = a.rank;          vb = b.rank; break;
+        case 'vendor':         va = (a.vendor||'').toLowerCase(); vb = (b.vendor||'').toLowerCase(); break;
+        case 'tqScore':        va = a.tq||0;         vb = b.tq||0;  break;
+        case 'quotedAmount':   va = a.quote||0;      vb = b.quote||0; break;
+        case 'vsEstimate':     va = a.vsEstimate==null?0:a.vsEstimate; vb = b.vsEstimate==null?0:b.vsEstimate; break;
+        case 'vsTS':           va = a.vsTS!=null?a.vsTS:(a.vsTs==null?0:a.vsTs); vb = b.vsTS!=null?b.vsTS:(b.vsTs==null?0:b.vsTs); break;
+        case 'combinedScore':  va = a.combinedLive!=null?a.combinedLive:(a.combined||0); vb = b.combinedLive!=null?b.combinedLive:(b.combined||0); break;
+        case 'financialScore': va = a.finScore==null?0:a.finScore; vb = b.finScore==null?0:b.finScore; break;
+        default:               va = a.rank;          vb = b.rank;
       }
-      if (typeof va === 'string') return va.localeCompare(vb) * dir;
+      if (typeof va === 'string' || typeof vb === 'string') return String(va).localeCompare(String(vb)) * dir;
+      if (typeof va !== 'number') va = 0;
+      if (typeof vb !== 'number') vb = 0;
       return (va - vb) * dir;
     };
-    tqRows.sort(cmp);
-    return tqRows.concat(ntqRows);
+    // Zone-preserving stable sort: primary zone → secondary zone → NTQ.
+    // Within each zone, user-chosen sort applies. If user picks the method's
+    // primarySort, the zone-based default order is preserved naturally.
+    const primary   = filtered.filter(b => b.zone && b.zone !== 'ntq' && b.zone !== 'belowCutoff' && b.zone !== 'aboveBudget');
+    const secondary = filtered.filter(b => b.zone === 'belowCutoff' || b.zone === 'aboveBudget');
+    const ntqRows   = filtered.filter(b => b.pqStatus !== 'q');
+    primary.sort(cmp);
+    secondary.sort(cmp);
+    return primary.concat(secondary, ntqRows);
   }
 
   // ============ RENDER ============
@@ -777,7 +996,58 @@
   function renderToolbar(){
     const f = COMP.activeFilters;
     const visible = applySortAndFilters(computedRows().all).length;
-    const total   = computedRows().all.length;
+    const m = activeMethod();
+    const isPreview = m !== nativeMethod();
+
+    // === Method pill + dropdown (replaces no element before sort) ===
+    const methodMenuItems = Object.keys(methodColumns).map(k => {
+      const on = k === m;
+      const isNative = k === nativeMethod();
+      return `<div class="menu-item ${on?'on':''}" onclick="switchMethod('${k}')" role="option" aria-selected="${on?'true':'false'}">
+        <span>${esc(METHOD_LONG[k] || k)}</span>${isNative ? '<span class="native-tag">Native</span>' : ''}
+      </div>`;
+    }).join('');
+    const methodPill = `<div style="position:relative;">
+        <button class="method-pill" onclick="toggleMethodMenu(event)" aria-haspopup="listbox" aria-expanded="${_ui.methodMenuOpen?'true':'false'}">
+          Method: ${esc(METHOD_LABELS[m]||m)} <i data-lucide="chevron-down" class="pill-icon"></i>
+        </button>
+        <div id="methodPillMenu" class="method-pill-menu ${_ui.methodMenuOpen?'open':''}" role="listbox">${methodMenuItems}</div>
+        ${isPreview ? `<div class="preview-note" aria-live="polite">Viewing as ${esc(METHOD_LABELS[m])} preview — tender uses ${esc(METHOD_LABELS[nativeMethod()])}</div>` : ''}
+      </div>`;
+
+    // === Method-specific inline input(s) ===
+    let methodInput = '';
+    if (m === 'LCS'){
+      const v = _pendingInputs.lcsCutoff != null ? _pendingInputs.lcsCutoff : COMP.lcsCutoff;
+      methodInput = `<div class="method-input-group">
+        <span>TQ cutoff:</span>
+        <input id="lcsCutoffInput" type="number" min="0" max="100" step="1" value="${v}" oninput="onMethodInputChange('lcsCutoff', this.value)" style="width:60px;" />
+        <span style="color:#9CA3AF;">/ 100</span>
+        <button class="apply-btn" onclick="applyLcsCutoff()">Apply</button>
+      </div>`;
+    } else if (m === 'FBS'){
+      const v = _pendingInputs.fbsBudget != null ? _pendingInputs.fbsBudget : COMP.fbsBudget;
+      methodInput = `<div class="method-input-group">
+        <span>Fixed budget:</span>
+        <span class="rupee-prefix"><span>₹</span><input id="fbsBudgetInput" type="number" min="0" step="1000" value="${v||0}" oninput="onMethodInputChange('fbsBudget', this.value)" style="width:130px;" /></span>
+        <button class="apply-btn amber" onclick="applyFbsBudget()">Apply</button>
+      </div>`;
+    } else if (m === 'QCBS'){
+      const T = _pendingInputs.qcbsT != null ? _pendingInputs.qcbsT : COMP.qcbsWeightage.T;
+      const F = _pendingInputs.qcbsF != null ? _pendingInputs.qcbsF : COMP.qcbsWeightage.F;
+      const sumOk = (parseInt(T)||0) + (parseInt(F)||0) === 100;
+      methodInput = `<div class="method-input-group">
+        <span>Weightage:</span>
+        <span style="color:#374151;">T</span>
+        <input id="qcbsT" type="number" min="0" max="100" step="1" value="${T}" class="${sumOk?'':'invalid'}" oninput="onMethodInputChange('qcbsT', this.value)" style="width:50px;" />
+        <span style="color:#374151;">:</span>
+        <span style="color:#374151;">F</span>
+        <input id="qcbsF" type="number" min="0" max="100" step="1" value="${F}" class="${sumOk?'':'invalid'}" oninput="onMethodInputChange('qcbsF', this.value)" style="width:50px;" />
+        <button class="apply-btn purple" onclick="recalcQCBS()" ${sumOk?'':'disabled'} title="${sumOk?'':'T + F must sum to 100'}">Recalculate</button>
+      </div>`;
+    }
+
+    // === Filter chips ===
     const chips = [`<span class="filter-chip active" aria-live="polite">All (${visible})</span>`];
     if (f.tqMin > 0 || f.tqMax < 100) chips.push(`<span class="filter-chip tag" onclick="clearFilter('tq')">Score: ${f.tqMin}–${f.tqMax} <span class="x">×</span></span>`);
     if (f.quoteMin != null) chips.push(`<span class="filter-chip tag" onclick="clearFilter('quoteMin')">Min ₹${f.quoteMin.toLocaleString('en-IN')} <span class="x">×</span></span>`);
@@ -785,19 +1055,123 @@
     if (!f.showNTQ) chips.push(`<span class="filter-chip tag" onclick="setFilter('showNTQ',true)">Hide NTQ <span class="x">×</span></span>`);
     if (!f.showALB) chips.push(`<span class="filter-chip tag" onclick="setFilter('showALB',true)">Hide ALB <span class="x">×</span></span>`);
 
-    const sortOptions = [
-      ['rank|asc','Rank (default)'],['tqScore|desc','TQ Score: High to Low'],
-      ['quoted|asc','Quote: Low to High'],['quoted|desc','Quote: High to Low'],
-      ['combined|desc','Combined Score'],['vendor|asc','Vendor Name A–Z'],
+    // === Sort dropdown — drop options that aren't visible columns for the active method ===
+    const allSortOptions = [
+      { key:'rank|asc',           label:'Rank (default)',         needs:'rank' },
+      { key:'tqScore|desc',       label:'TQ Score: High to Low',  needs:'tqScore' },
+      { key:'quotedAmount|asc',   label:'Quote: Low to High',     needs:'quotedAmount' },
+      { key:'quotedAmount|desc',  label:'Quote: High to Low',     needs:'quotedAmount' },
+      { key:'combinedScore|desc', label:'Combined Score',         needs:'combinedScore' },
+      { key:'vendor|asc',         label:'Vendor Name A–Z',        needs:'vendor' },
     ];
+    const visibleColIds = new Set(visibleColumns().map(c => c.id));
+    const sortOptions = allSortOptions.filter(o => visibleColIds.has(o.needs)).map(o => [o.key, o.label]);
     const currentKey = COMP.activeSort.column + '|' + COMP.activeSort.direction;
     const sortSelect = `<select class="toolbar-btn" style="padding:6px 10px; border:1px solid #E5E7EB;" onchange="onSortSelectChange(this.value)">
       ${sortOptions.map(o => `<option value="${o[0]}" ${currentKey===o[0]?'selected':''}>Sort by: ${o[1]}</option>`).join('')}
     </select>`;
     document.getElementById('toolbarLeft').innerHTML = `
+      ${methodPill}
+      ${methodInput}
       <div class="flex items-center gap-2 flex-wrap">${chips.join('')}</div>
       ${sortSelect}
       <button class="toolbar-btn" onclick="toggleFilterPanel()"><i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i> Filters ${_ui.filterPanelOpen?'▴':'▾'}</button>`;
+  }
+  // === Method-aware toolbar handlers ===
+  function toggleMethodMenu(e){
+    if (e) e.stopPropagation();
+    _ui.methodMenuOpen = !_ui.methodMenuOpen;
+    renderToolbar();
+    refreshIcons();
+  }
+  function onMethodInputChange(key, value){
+    const n = value === '' ? null : parseFloat(value);
+    if (key === 'qcbsT' && isFinite(n)){
+      _pendingInputs.qcbsT = Math.max(0, Math.min(100, n));
+      _pendingInputs.qcbsF = Math.max(0, 100 - _pendingInputs.qcbsT);
+      const fEl = document.getElementById('qcbsF'); if (fEl) fEl.value = _pendingInputs.qcbsF;
+    } else if (key === 'qcbsF' && isFinite(n)){
+      _pendingInputs.qcbsF = Math.max(0, Math.min(100, n));
+      _pendingInputs.qcbsT = Math.max(0, 100 - _pendingInputs.qcbsF);
+      const tEl = document.getElementById('qcbsT'); if (tEl) tEl.value = _pendingInputs.qcbsT;
+    } else {
+      _pendingInputs[key] = isFinite(n) ? n : null;
+    }
+    // Debounce — re-render toolbar after 300ms so the live invalid border appears for QCBS sum != 100
+    clearTimeout(_inputDebounce);
+    _inputDebounce = setTimeout(() => {
+      if (key === 'qcbsT' || key === 'qcbsF'){
+        // Toggle the invalid class without losing focus — write directly
+        const sumOk = (parseInt(_pendingInputs.qcbsT)||0) + (parseInt(_pendingInputs.qcbsF)||0) === 100;
+        ['qcbsT','qcbsF'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.toggle('invalid', !sumOk); });
+        const btn = document.querySelector('.method-input-group .apply-btn.purple'); if (btn){ btn.disabled = !sumOk; btn.title = sumOk?'':'T + F must sum to 100'; }
+      }
+    }, 300);
+  }
+  function applyLcsCutoff(){
+    const v = _pendingInputs.lcsCutoff != null ? _pendingInputs.lcsCutoff : COMP.lcsCutoff;
+    const n = parseInt(v); if (isNaN(n)) return;
+    COMP.lcsCutoff = Math.max(0, Math.min(100, n));
+    saveComp();
+    fadeAndRerender();
+    showToast('Cutoff applied — '+COMP.lcsCutoff+' / 100');
+  }
+  function applyFbsBudget(){
+    const v = _pendingInputs.fbsBudget != null ? _pendingInputs.fbsBudget : COMP.fbsBudget;
+    const n = parseFloat(v); if (isNaN(n) || n < 0) return;
+    COMP.fbsBudget = n;
+    saveComp();
+    fadeAndRerender();
+    showToast('Budget applied — ₹'+COMP.fbsBudget.toLocaleString('en-IN'));
+  }
+  function recalcQCBS(){
+    const T = parseInt(_pendingInputs.qcbsT != null ? _pendingInputs.qcbsT : COMP.qcbsWeightage.T) || 0;
+    const F = parseInt(_pendingInputs.qcbsF != null ? _pendingInputs.qcbsF : COMP.qcbsWeightage.F) || 0;
+    if (T + F !== 100){ showToast('T + F must sum to 100'); return; }
+    // Identify current rank-1 vendor
+    const before = computedRows();
+    const oldWinner = before.primary[0] ? before.primary[0].vendor : null;
+    COMP.qcbsWeightage = { T, F };
+    saveComp();
+    const after = computedRows();
+    const newWinner = after.primary[0] ? after.primary[0].vendor : null;
+    fadeAndRerender();
+    if (oldWinner && newWinner && oldWinner !== newWinner){
+      showWinnerToast(`⚠ Changing weightage to ${T}:${F} changes the recommended vendor from ${oldWinner} to ${newWinner}`);
+    } else {
+      showToast('Scores recalculated');
+    }
+  }
+  // Smooth opacity fade → re-render → fade back; used for method-switch and any param re-apply
+  function fadeAndRerender(){
+    const host = document.getElementById('compTableHost');
+    if (host) host.classList.add('switching');
+    setTimeout(() => {
+      renderWorkspace();
+      requestAnimationFrame(() => {
+        if (host) host.classList.remove('switching');
+      });
+    }, 160);
+  }
+  function showWinnerToast(msg){
+    const el = document.getElementById('winnerToast');
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(_winnerToastT);
+    _winnerToastT = setTimeout(() => el.classList.remove('show'), 5000);
+  }
+  // === Method switch — the headline transition ===
+  function switchMethod(newMethod){
+    if (!methodColumns[newMethod]) return;
+    if (newMethod === activeMethod()){ _ui.methodMenuOpen = false; renderToolbar(); refreshIcons(); return; }
+    COMP.activeMethod = newMethod;
+    // Reset sort to the new method's primary sort (user can re-sort after)
+    const cfg = methodColumns[newMethod];
+    COMP.activeSort = { column: cfg.primarySort, direction: cfg.primarySortDir };
+    _ui.methodMenuOpen = false;
+    saveComp();
+    fadeAndRerender();
   }
   function renderFilterPanel(){
     const panel = document.getElementById('filterPanel');
@@ -846,8 +1220,12 @@
     menu.classList.toggle('open', _ui.columnsMenuOpen);
   }
   function renderTable(){
-    const rows = applySortAndFilters(computedRows().all);
+    const cr = computedRows();
+    const rows = applySortAndFilters(cr.all);
     const vc = visibleColumns();
+    const m = activeMethod();
+    const cfg = methodCfg();
+
     // Group header spans = visible cols per group
     const groupHeaders = GROUPS.map(g => {
       const cols = vc.filter(c => c.group === g.id);
@@ -856,42 +1234,81 @@
     }).join('');
     // Column headers (level 2)
     const colHeaders = vc.map(c => {
-      if (!c.sortable) return `<th class="col-th" style="width:${c.width}; text-align:${c.align||'left'};">${esc(c.label)}</th>`;
+      const align = c.align || 'left';
+      const sortable = c.sortable && !isNaColumn(c.id);
+      if (!sortable) return `<th class="col-th" style="width:${c.width}; text-align:${align};">${esc(c.label)}</th>`;
       const isActive = COMP.activeSort.column === c.id;
       const ariaSort = isActive ? COMP.activeSort.direction === 'asc' ? 'ascending' : 'descending' : 'none';
       const arrow = isActive
         ? `<i data-lucide="${COMP.activeSort.direction==='asc'?'arrow-up':'arrow-down'}" class="sort-icon" style="width:12px; height:12px;"></i>`
         : `<i data-lucide="chevrons-up-down" class="sort-icon" style="width:12px; height:12px;"></i>`;
-      return `<th class="col-th sortable" aria-sort="${ariaSort}" style="width:${c.width}; text-align:${c.align||'left'};" onclick="setSort('${c.id}')">${esc(c.label)}${arrow}</th>`;
+      return `<th class="col-th sortable" aria-sort="${ariaSort}" style="width:${c.width}; text-align:${align};" onclick="setSort('${c.id}')">${esc(c.label)}${arrow}</th>`;
     }).join('');
 
-    // Body rows
-    const body = rows.map(r => renderTableRow(r, vc)).join('');
+    // Ranking label row
+    const rankingLabelRow = `<tr class="ranking-row" aria-live="polite"><td colspan="${vc.length}">✦ ${esc(cfg.rankingLabel)}</td></tr>`;
 
-    // Summary footer
+    // Body rows — with optional LCS/FBS divider injected at zone boundary
+    let body = rankingLabelRow;
+    let prevZone = null;
+    rows.forEach(r => {
+      const z = r.zone;
+      // Insert divider when crossing from primary to secondary zone
+      if (prevZone && z !== prevZone){
+        if (m === 'LCS' && prevZone === 'aboveCutoff' && z === 'belowCutoff'){
+          body += `<tr class="divider-row"><td colspan="${vc.length}">─── Below TQ cutoff (score &lt; ${COMP.lcsCutoff}) — disqualified from price comparison ───</td></tr>`;
+        } else if (m === 'FBS' && prevZone === 'withinBudget' && z === 'aboveBudget'){
+          const b = COMP.fbsBudget || 0;
+          body += `<tr class="divider-row"><td colspan="${vc.length}">─── Above fixed budget limit (₹${b.toLocaleString('en-IN')}) — disqualified ───</td></tr>`;
+        }
+      }
+      body += renderTableRow(r, vc);
+      prevZone = z;
+    });
+
+    // Summary footer — per method
     const tqRows = rows.filter(r => r.pqStatus === 'q' && r.tq != null);
     const avgTq = tqRows.length ? (tqRows.reduce((s,r) => s + (r.tq||0), 0) / tqRows.length).toFixed(1) : '—';
+    const finScores = tqRows.map(r => r.finScore).filter(v => v != null);
+    const avgFin = finScores.length ? (finScores.reduce((s,v) => s + v, 0) / finScores.length).toFixed(1) : '—';
+    const combined = tqRows.map(r => r.combinedLive != null ? r.combinedLive : r.combined).filter(v => v != null);
+    const topCombined = combined.length ? Math.max.apply(null, combined).toFixed(1) : '—';
+    const topTq = tqRows.length ? Math.max.apply(null, tqRows.map(r => r.tq||0)) : '—';
     const quotes = tqRows.map(r => r.quote).filter(q => q!=null).sort((a,b)=>a-b);
     const lowQ  = quotes.length ? quotes[0] : null;
     const highQ = quotes.length ? quotes[quotes.length-1] : null;
     const variances = tqRows.map(r => r.vsEstimate).filter(v => v!=null).sort((a,b)=>a-b);
     const varRange = variances.length ? `Range: ${variances[0]>=0?'+':''}${variances[0].toFixed(1)}% to ${variances[variances.length-1]>=0?'+':''}${variances[variances.length-1].toFixed(1)}%` : '—';
     const flaggedCount = rows.filter(r => r.flags && (r.flags.includes('alb')||r.flags.includes('high')||r.flags.includes('above-ts')||r.flags.includes('ntq'))).length;
-    const footerCells = vc.map((c, idx) => {
-      if (idx === 0) return `<td colspan="3" style="font-weight:700; color:#374151; text-transform:uppercase; font-size:11px; letter-spacing:0.04em;">Summary</td>`;
-      if (idx <= 2) return ''; // already covered by colspan
+    function footerCellFor(c){
       switch (c.id){
-        case 'tqScore':    return `<td><span style="color:#6B7280; font-size:12px;">Avg: ${avgTq}</span></td>`;
-        case 'quoted':     return `<td><span style="color:#10B981; font-size:12px; font-weight:700;">L1: ₹${lowQ?lowQ.toLocaleString('en-IN'):'—'}</span><br><span style="color:#9CA3AF; font-size:12px;">L${quotes.length}: ₹${highQ?highQ.toLocaleString('en-IN'):'—'}</span></td>`;
+        case 'tqScore':
+          if (m === 'QCBS') return `<td><span style="color:#6B7280; font-size:12px;">Avg TQ: ${avgTq}</span></td>`;
+          if (m === 'QBS')  return `<td><span style="color:#10B981; font-size:12px; font-weight:700;">Top TQ: ${topTq}</span><br><span style="color:#9CA3AF; font-size:12px;">Avg TQ: ${avgTq}</span></td>`;
+          return `<td><span style="color:#6B7280; font-size:12px;">Avg: ${avgTq}</span></td>`;
+        case 'financialScore':
+          return `<td><span style="color:#6B7280; font-size:12px;">Avg fin: ${avgFin}</span></td>`;
+        case 'combinedScore':
+          return `<td><span style="color:#10B981; font-size:12px; font-weight:700;">Top combined: ${topCombined}</span></td>`;
+        case 'quotedAmount':
+          if (m === 'QBS') return `<td><span style="color:#9CA3AF; font-size:12px; font-style:italic;">Financial: Sealed</span></td>`;
+          return `<td><span style="color:#10B981; font-size:12px; font-weight:700;">L1: ₹${lowQ?lowQ.toLocaleString('en-IN'):'—'}</span><br><span style="color:#9CA3AF; font-size:12px;">L${quotes.length}: ₹${highQ?highQ.toLocaleString('en-IN'):'—'}</span>${quotes.length>1?`<br><span style="color:#6B7280; font-size:12px;">Spread: ₹${(highQ-lowQ).toLocaleString('en-IN')}</span>`:''}</td>`;
+        case 'financialBidStatus':
+          return `<td><span style="color:#9CA3AF; font-size:12px; font-style:italic;">Sealed</span></td>`;
         case 'vsEstimate': return `<td><span style="color:#6B7280; font-size:12px;">${esc(varRange)}</span></td>`;
         case 'flags':      return `<td><span style="color:#6B7280; font-size:12px;">${flaggedCount} flagged</span></td>`;
         default:           return '<td></td>';
       }
+    }
+    const footerCells = vc.map((c, idx) => {
+      if (idx === 0) return `<td colspan="3" style="font-weight:700; color:#374151; text-transform:uppercase; font-size:11px; letter-spacing:0.04em;">Summary</td>`;
+      if (idx <= 2) return '';
+      return footerCellFor(c);
     }).filter(Boolean).join('');
 
     document.getElementById('compTableHost').innerHTML = `
       <div style="overflow-x:auto;">
-        <table class="comp-table" role="table" aria-label="Bid comparison">
+        <table class="comp-table" role="table" aria-label="Bid comparison (${esc(METHOD_LABELS[m])})">
           <thead>
             <tr>${groupHeaders}</tr>
             <tr>${colHeaders}</tr>
@@ -902,16 +1319,34 @@
       </div>`;
   }
   function renderTableRow(r, vc){
-    const isWinner = r.rank === 1 && r.pqStatus === 'q';
+    const m = activeMethod();
     const isNtq    = r.pqStatus !== 'q';
+    const isWinner = r.rank === 1 && !isNtq && (r.zone === 'primary' || r.zone === 'aboveCutoff' || r.zone === 'withinBudget');
+    const isBelowCutoff = r.zone === 'belowCutoff';
+    const isAboveBudget = r.zone === 'aboveBudget';
     const isSelected = COMP.selectedVendor && COMP.selectedVendor === r.vendor;
-    const rowClass = [isWinner?'winner-row':'', isNtq?'ntq-row':'', isSelected?'selected-row':''].filter(Boolean).join(' ');
+    const rowClass = [
+      isWinner?'winner-row':'',
+      isNtq?'ntq-row':'',
+      isBelowCutoff?'below-cutoff':'',
+      isAboveBudget?'above-budget':'',
+      isSelected?'selected-row':'',
+    ].filter(Boolean).join(' ');
 
     const cells = vc.map(c => {
       const align = c.align || 'left';
+      // N/A column → render across the board
+      if (isNaColumn(c.id)){
+        return `<td style="text-align:${align};"><span class="cell-na" title="Not applicable — ${esc(METHOD_LABELS[m])} does not compare financial bids competitively.">N/A</span></td>`;
+      }
       switch (c.id){
         case 'rank': {
-          if (isNtq) return `<td style="text-align:${align};"><span style="color:#9CA3AF;">—</span></td>`;
+          if (isNtq){
+            return `<td style="text-align:${align};"><span class="rank-badge rank-ntq">✗</span></td>`;
+          }
+          if (isBelowCutoff || isAboveBudget){
+            return `<td style="text-align:${align};"><span class="rank-badge rank-na">—</span></td>`;
+          }
           const bg = r.rank === 1 ? '#10B981' : r.rank === 2 ? '#6B7280' : '#D1D5DB';
           return `<td style="text-align:${align};"><span class="rank-badge" style="background:${bg};">${r.rank}</span></td>`;
         }
@@ -932,32 +1367,73 @@
             <div class="tq-bar-track"><div class="tq-bar-fill" style="width:${r.tq}%;"></div></div>
           </td>`;
         }
-        case 'tqRank':
-          return `<td>${r.tqRank && r.tqRank !== '—' ? '<span class="tq-rank-pill">'+ordinal(r.tqRank)+'</span>' : '<span style="color:#9CA3AF;">—</span>'}</td>`;
-        case 'quoted': {
+        case 'cutoffStatus': {
+          if (isNtq) return `<td><span style="color:#9CA3AF;">—</span></td>`;
+          return r.zone === 'aboveCutoff'
+            ? `<td><span class="pill-above">✓ Above cutoff</span></td>`
+            : `<td><span class="pill-below">✗ Below cutoff</span></td>`;
+        }
+        case 'budgetStatus': {
+          if (isNtq) return `<td><span style="color:#9CA3AF;">—</span></td>`;
+          return r.zone === 'withinBudget'
+            ? `<td><span class="pill-above">✓ Within budget</span></td>`
+            : `<td><span class="pill-below">✗ Above budget</span></td>`;
+        }
+        case 'financialScore': {
+          if (r.finScore == null) return `<td><span style="color:#9CA3AF;">—</span></td>`;
+          return `<td><span style="font-size:14px; font-weight:700; color:#0F6E56;">${r.finScore.toFixed(1)}</span></td>`;
+        }
+        case 'quotedAmount': {
           if (r.quote == null) return `<td><span style="color:#9CA3AF;">—</span></td>`;
+          // FBS: label header is rewritten elsewhere, but the cell shows the indicator beneath
+          if (m === 'FBS'){
+            const budget = COMP.fbsBudget || 0;
+            const diff = r.quote - budget;
+            const ind = diff <= 0
+              ? `<span class="budget-indicator below">₹${Math.abs(diff).toLocaleString('en-IN')} below</span>`
+              : `<span class="budget-indicator above">₹${diff.toLocaleString('en-IN')} above</span>`;
+            return `<td>
+              <div style="font-size:14px; font-weight:700; color:#111827;${isAboveBudget?'text-decoration:line-through;':''}">₹${r.quote.toLocaleString('en-IN')}</div>
+              ${ind}
+            </td>`;
+          }
+          // LCS below-cutoff cells get a "Disqualified" pill instead of the quote (per spec)
+          if (m === 'LCS' && isBelowCutoff){
+            return `<td><span class="pill-disq">Disqualified</span><div style="font-size:11px; color:#9CA3AF; margin-top:4px;" class="strike">₹${r.quote.toLocaleString('en-IN')}</div></td>`;
+          }
           return `<td>
             <div style="font-size:14px; font-weight:700; color:#111827;">₹${r.quote.toLocaleString('en-IN')}</div>
             <div style="font-size:11px; color:#9CA3AF;">Financial bid</div>
           </td>`;
+        }
+        case 'financialBidStatus': {
+          if (isNtq) return `<td><span style="color:#9CA3AF;">—</span></td>`;
+          const isPicked = COMP.selectedVendor === r.vendor && COMP.locked;
+          if (isPicked){
+            return `<td><span class="neg-pill"><i data-lucide="arrow-right" style="width:11px; height:11px;"></i> Open for negotiation</span></td>`;
+          }
+          return `<td><span class="sealed-pill" title="Financial bids of non-selected vendors are not opened under QBS. Price is negotiated with the selected vendor only."><i data-lucide="lock" class="lock-icon"></i> Sealed</span></td>`;
         }
         case 'vsEstimate': {
           if (r.vsEstimate == null) return `<td><span style="color:#9CA3AF;">—</span></td>`;
           const color = pctColor(r.vsEstimate);
           return `<td><span style="font-size:13px; font-weight:700; color:${color};">${r.vsEstimate>=0?'+':''}${r.vsEstimate.toFixed(1)}%</span></td>`;
         }
-        case 'vsTs': {
-          if (r.vsTs == null) return `<td><span style="color:#9CA3AF;">—</span></td>`;
-          const color = pctColor(r.vsTs);
-          return `<td><span style="font-size:13px; font-weight:700; color:${color};">${r.vsTs>=0?'+':''}${r.vsTs.toFixed(1)}%</span></td>`;
+        case 'vsTS': {
+          const v = r.vsTS != null ? r.vsTS : r.vsTs;
+          if (v == null) return `<td><span style="color:#9CA3AF;">—</span></td>`;
+          const color = pctColor(v);
+          return `<td><span style="font-size:13px; font-weight:700; color:${color};">${v>=0?'+':''}${v.toFixed(1)}%</span></td>`;
         }
-        case 'combined': {
-          if (r.combined == null) return `<td><span style="color:#9CA3AF;">—</span></td>`;
-          const ds = tenderDataset();
-          const t  = r.tq, T = ds.weightT, F = ds.weightF;
-          const finScore = r.quote ? Math.min(100, (Math.min(...tenderDataset().bids.filter(b => !b.flags.includes('alb') && b.quote).map(b => b.quote)) / r.quote) * 100) : 0;
-          const title = `Tech: ${t} × ${T}% = ${(t*T/100).toFixed(1)} + Fin: ${finScore.toFixed(1)} × ${F}% = ${(finScore*F/100).toFixed(1)} = ${r.combined.toFixed(1)}`;
-          return `<td><span title="${esc(title)}" style="font-size:14px; font-weight:700; color:#3C3489; cursor:help;">${r.combined.toFixed(1)}</span></td>`;
+        case 'combinedScore': {
+          const val = r.combinedLive != null ? r.combinedLive : r.combined;
+          if (val == null) return `<td><span style="color:#9CA3AF;">—</span></td>`;
+          const T = (COMP.qcbsWeightage && COMP.qcbsWeightage.T) || 70;
+          const F = (COMP.qcbsWeightage && COMP.qcbsWeightage.F) || 30;
+          const fin = r.finScore != null ? r.finScore : 0;
+          const t  = r.tq != null ? r.tq : 0;
+          const title = `${t} × ${T}% = ${(t*T/100).toFixed(1)} + ${fin.toFixed(1)} × ${F}% = ${(fin*F/100).toFixed(1)} = ${val.toFixed(1)}`;
+          return `<td><span title="${esc(title)}" style="font-size:14px; font-weight:700; color:#3C3489; cursor:help;">${val.toFixed(1)}</span></td>`;
         }
         case 'flags': {
           if (!r.flags || !r.flags.length) return `<td><span class="flag-pill flag-clean">✓ Clean</span></td>`;
@@ -977,7 +1453,10 @@
           return `<td style="text-align:center;"><button class="notes-btn ${cnt?'has-notes':''}" onclick="openNotesPopover('${esc(r.vendor)}', event)" aria-label="Notes for ${esc(r.vendor)}"><i data-lucide="notebook-pen" class="w-4 h-4"></i>${cnt?'<span class="note-count">'+cnt+'</span>':''}</button></td>`;
         }
         case 'select': {
+          // Disable selection on NTQ rows and on disqualified zone rows (below cutoff / above budget)
+          const disq = isBelowCutoff || isAboveBudget;
           if (isNtq) return `<td style="text-align:center;"><input type="radio" name="selvendor" disabled aria-label="NTQ vendor cannot be selected" /></td>`;
+          if (disq)  return `<td style="text-align:center;"><input type="radio" name="selvendor" disabled aria-label="Disqualified — cannot be selected" title="Disqualified — cannot be selected" /></td>`;
           if (COMP.selectedVendor === r.vendor && COMP.locked){
             return `<td style="text-align:center;"><span class="flag-selected">✓ Selected</span></td>`;
           }
@@ -1214,6 +1693,11 @@
   function selectVendor(vendor){
     if (COMP.locked) return;
     _ui.pendingVendor = vendor;
+    // Method-aware default reason (if officer hasn't picked one yet for this session)
+    if (!COMP.selectionReason){
+      const def = SELECTION_REASON_DEFAULT_BY_METHOD[activeMethod()];
+      if (def) COMP.selectionReason = def;
+    }
     renderTable();
     renderSelectionBar();
     refreshIcons();
@@ -1235,13 +1719,22 @@
     const ds = tenderDataset();
     const b = ds.bids.find(x => x.vendor === _ui.pendingVendor);
     if (!b) return;
+    const m = activeMethod();
     const rank = b.rank || '—';
     const reasonValue = COMP.selectionReason || '';
     const isCustom = reasonValue === 'Custom reason';
+    // Method-aware vendor sub-line — QBS hides the price (sealed), others show ₹ + TQ
+    const subLine = m === 'QBS'
+      ? `Rank ${rank} · TQ Score: ${b.tq!=null?b.tq:'—'} · Financial bid sealed`
+      : `Rank ${rank} · ₹${(b.quote||0).toLocaleString('en-IN')} · TQ Score: ${b.tq!=null?b.tq:'—'}`;
+    const qbsNote = m === 'QBS'
+      ? `<div style="background:#FFFBEB; border:1px solid #FDE68A; color:#92400E; border-radius:6px; padding:6px 10px; font-size:11.5px; margin-top:6px;">Financial bid will be opened for negotiation after selection is confirmed</div>`
+      : '';
     bar.innerHTML = `<div>
         <div style="font-size:12px; color:#6B7280;">Selected for recommendation:</div>
         <div style="font-size:15px; font-weight:700; color:#0C447C;">${esc(b.vendor)}</div>
-        <div style="font-size:12px; color:#1D4ED8;">Rank ${rank} · ₹${(b.quote||0).toLocaleString('en-IN')} · TQ Score: ${b.tq!=null?b.tq:'—'}</div>
+        <div style="font-size:12px; color:#1D4ED8;">${esc(subLine)}</div>
+        ${qbsNote}
       </div>
       <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
         <label style="font-size:12px; color:#374151;">Selection reason <span style="color:#EF4444;">*</span></label>
@@ -1273,12 +1766,17 @@
     if (!reasonShown){ showToast('Pick a selection reason first'); return; }
     const dlg = document.getElementById('modalDialog');
     const bk  = document.getElementById('modalBackdrop');
+    const m = activeMethod();
+    const quoteRow = m === 'QBS'
+      ? `<div class="row"><span class="lbl">Financial bid</span><span class="val">To be opened for negotiation</span></div>`
+      : `<div class="row"><span class="lbl">Quoted amount</span><span class="val">₹${(b.quote||0).toLocaleString('en-IN')}</span></div>`;
     dlg.innerHTML = `<div id="modalTitle" style="font-size:17px; font-weight:700; color:#111827; margin-bottom:8px;">Confirm final selection?</div>
-      <div style="font-size:13px; color:#374151;">You are recommending <strong>${esc(b.vendor)}</strong> for award of <strong>${esc(COMP.tnd)}</strong>. This selection will be carried forward to Bid Management.</div>
+      <div style="font-size:13px; color:#374151;">You are recommending <strong>${esc(b.vendor)}</strong> for award of <strong>${esc(COMP.tnd)}</strong> under <strong>${esc(METHOD_LABELS[m])}</strong>. This selection will be carried forward to Bid Management.</div>
       <div class="modal-summary">
         <div class="row"><span class="lbl">Selected vendor</span><span class="val">${esc(b.vendor)}</span></div>
-        <div class="row"><span class="lbl">Quoted amount</span><span class="val">₹${(b.quote||0).toLocaleString('en-IN')}</span></div>
+        ${quoteRow}
         <div class="row"><span class="lbl">TQ Score</span><span class="val">${b.tq!=null?b.tq+'/100':'—'}</span></div>
+        <div class="row"><span class="lbl">Method</span><span class="val">${esc(METHOD_LONG[m]||m)}</span></div>
         <div class="row"><span class="lbl">Selection reason</span><span class="val">${esc(reasonShown)}</span></div>
         <div class="row"><span class="lbl">Officer</span><span class="val">Rajesh Kumar</span></div>
         <div class="row"><span class="lbl">Date</span><span class="val">${esc(todayShort())}</span></div>
@@ -1362,6 +1860,15 @@
         renderColumnsMenu();
       }
     }
+    // Close method pill menu on outside click
+    if (_ui.methodMenuOpen){
+      const menu = document.getElementById('methodPillMenu');
+      if (menu && !menu.contains(e.target) && !(e.target.closest && e.target.closest('.method-pill'))){
+        _ui.methodMenuOpen = false;
+        renderToolbar();
+        refreshIcons();
+      }
+    }
     // Close notes popover on outside click
     const pop = document.getElementById('notesPopover');
     if (pop && !pop.classList.contains('hidden') && !pop.contains(e.target) && !(e.target.closest && e.target.closest('.notes-btn'))){
@@ -1373,7 +1880,10 @@
       closeConfirmModal();
       closeNotesPopover();
       _ui.columnsMenuOpen = false;
+      _ui.methodMenuOpen = false;
       renderColumnsMenu();
+      renderToolbar();
+      refreshIcons();
     }
   });
 
