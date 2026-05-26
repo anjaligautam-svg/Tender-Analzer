@@ -218,6 +218,85 @@
     .clar-inline-confirm .yes-btn { background:#10B981; color:white; border:none; border-radius:6px; padding:5px 10px; font-size:12px; font-weight:600; cursor:pointer; }
     .clar-inline-confirm .yes-btn:hover { background:#059669; }
 
+    /* === Change 2 — dynamic evaluation method banner === */
+    .method-banner { border-radius:8px; padding:12px 16px; margin-bottom:14px; display:flex; gap:10px; align-items:flex-start; border:1px solid transparent; transition: background 200ms ease, border-color 200ms ease, color 200ms ease; }
+    .method-badge-common { display:inline-flex; background:#E6F1FB; color:#0C447C; border-radius:20px; padding:2px 8px; font-size:11px; font-weight:700; margin-left:8px; vertical-align:middle; }
+
+    /* === Change 3 — 5-method pill selector === */
+    .method-segments { display:inline-flex; border:1px solid #E5E7EB; border-radius:8px; overflow:hidden; margin-bottom:16px; flex-wrap:wrap; }
+    .method-segments button { padding:8px 16px; font-size:13px; cursor:pointer; border:none; background:white; color:#6B7280; transition: all 150ms ease; display:inline-flex; align-items:center; gap:6px; }
+    .method-segments button:not(:first-child) { border-left:1px solid #E5E7EB; }
+    .method-segments button:hover:not(.on) { background:#F9FAFB; }
+    .method-segments button.on { background:#0F5EE8; color:white; font-weight:500; }
+    .method-segments button.on .method-badge-common { background:rgba(255,255,255,0.25); color:white; }
+    .fin-view { transition: opacity 200ms ease; }
+    .fin-view.hidden-view { display:none; }
+
+    /* LCS / QBS / FBS info boxes */
+    .info-box-blue  { background:#E6F1FB; border:1px solid #BFDBFE; color:#0C447C; border-radius:8px; padding:12px 16px; font-size:13px; line-height:1.6; margin-bottom:14px; }
+    .info-box-teal  { background:#E1F5EE; border:1px solid #9FE1CB; color:#0F5D4B; border-radius:8px; padding:12px 16px; font-size:13px; line-height:1.6; margin-bottom:14px; }
+    .info-box-amber { background:#FAEEDA; border:1px solid #FAC775; color:#92400E; border-radius:8px; padding:12px 16px; font-size:13px; line-height:1.6; margin-bottom:14px; }
+
+    /* === Change 4 — Reasonableness Check === */
+    .reason-summary-card { border:1px solid #E5E7EB; border-radius:12px; padding:20px 24px; margin-bottom:20px; background:white; }
+    .reason-summary-card table { width:100%; border-collapse:collapse; }
+    .reason-summary-card td { padding:10px 14px; font-size:13px; border-bottom:1px solid #F3F4F6; }
+    .reason-summary-card tr:last-child td { border-bottom:none; }
+    .reason-summary-card .label-cell { background:#F9FAFB; font-weight:500; color:#374151; width:44%; }
+    .reason-summary-card .val-cell { color:#374151; }
+    .reason-banner { border-radius:10px; padding:16px 20px; margin-bottom:16px; }
+    .reason-banner.case-a { background:#F0FDF4; border:1px solid #BBF7D0; color:#065F46; }
+    .reason-banner.case-b { background:#FEF2F2; border:1px solid #FECACA; color:#991B1B; }
+    .reason-banner.case-c { background:#FFFBEB; border:1px solid #FCD34D; color:#92400E; }
+    .reason-banner .rb-head { display:flex; align-items:center; gap:8px; font-size:15px; font-weight:700; }
+    .reason-banner .rb-body { font-size:13px; margin-top:6px; line-height:1.6; }
+    .reason-card { border:1px solid #E5E7EB; border-radius:8px; padding:12px 14px; cursor:pointer; transition: border-color .15s ease, background .15s ease; }
+    .reason-card:hover { border-color:#D1D5DB; }
+    .reason-card.on { border:1.5px solid #0F5EE8; background:#EFF6FF; }
+    .reason-card .rc-title { font-size:13px; font-weight:600; color:#111827; }
+    .reason-card .rc-desc { font-size:12px; color:#6B7280; margin-top:2px; line-height:1.4; }
+    .reason-cards-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+    .reason-cards-row.three { grid-template-columns:1fr 1fr 1fr; }
+    .reason-decision-field { margin-top:12px; }
+    .reason-decision-field label { display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px; }
+    .reason-decision-field textarea, .reason-decision-field select { width:100%; border:1px solid #D1D5DB; border-radius:6px; padding:8px 10px; font-size:13px; background:white; }
+    .reason-decision-field textarea:focus, .reason-decision-field select:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 3px rgba(15,94,232,0.1); }
+    .alb-risk-strip { background:#FEF2F2; border-radius:6px; padding:10px 14px; margin-top:10px; font-size:12px; color:#991B1B; line-height:1.6; }
+    .proceed-btn-green { background:#10B981; color:white; border:none; border-radius:8px; padding:10px 20px; font-size:14px; font-weight:700; cursor:pointer; transition: background .15s ease; }
+    .proceed-btn-green:hover { background:#059669; }
+    .proceed-btn-blue { background:#0F5EE8; color:white; border:none; border-radius:8px; padding:10px 20px; font-size:14px; font-weight:700; cursor:pointer; transition: background .15s ease; }
+    .proceed-btn-blue:hover { background:#0B4FCB; }
+    .proceed-btn-blue:disabled, .proceed-btn-green:disabled { background:#E5E7EB; color:#9CA3AF; cursor:not-allowed; }
+
+    /* === Change 5 — Final results table === */
+    .final-results-card { border:1px solid #E5E7EB; border-radius:12px; overflow:hidden; margin-bottom:24px; background:white; }
+    .final-results-toolbar { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid #E5E7EB; }
+    .final-results-table { width:100%; border-collapse:collapse; }
+    .final-results-table th { background:#F9FAFB; font-size:11px; font-weight:700; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; text-align:left; padding:10px 12px; border-bottom:1px solid #E5E7EB; }
+    .final-results-table td { padding:14px 12px; font-size:13px; color:#374151; border-bottom:1px solid #F3F4F6; vertical-align:middle; }
+    .final-results-table tr:last-child td { border-bottom:none; }
+    .final-results-table tr.row-tq td:first-child  { border-left:3px solid #10B981; }
+    .final-results-table tr.row-ntq td:first-child { border-left:3px solid #EF4444; }
+    .final-results-table tr.row-ntq { opacity:0.85; }
+    .pq-pill-q  { background:#F0FDF4; color:#065F46; border:1px solid #BBF7D0; border-radius:20px; padding:3px 10px; font-size:12px; font-weight:600; }
+    .pq-pill-dq { background:#FEF2F2; color:#991B1B; border:1px solid #FECACA; border-radius:20px; padding:3px 10px; font-size:12px; font-weight:600; }
+    .pq-pill-pend { background:#FFFBEB; color:#92400E; border:1px solid #FDE68A; border-radius:20px; padding:3px 10px; font-size:12px; font-weight:600; }
+    .verdict-pill-tq  { background:#F0FDF4; color:#065F46; border:1px solid #BBF7D0; border-radius:20px; padding:4px 12px; font-size:13px; font-weight:700; }
+    .verdict-pill-ntq { background:#FEF2F2; color:#991B1B; border:1px solid #FECACA; border-radius:20px; padding:4px 12px; font-size:13px; font-weight:700; }
+    .verdict-pill-pend { background:#F9FAFB; color:#6B7280; border-radius:20px; padding:4px 12px; font-size:13px; }
+    .stat-strip { background:#F9FAFB; border-radius:10px; padding:14px 20px; display:flex; gap:32px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
+    .stat-strip .stat-label { font-size:11px; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; font-weight:600; }
+    .stat-strip .stat-value { font-size:22px; font-weight:700; margin-top:2px; }
+    .definition-callout { background:#EFF6FF; border-radius:8px; padding:14px 16px; margin-top:10px; max-height:0; overflow:hidden; transition: max-height 200ms ease, padding 200ms ease; }
+    .definition-callout.open { max-height:400px; padding:14px 16px; }
+
+    /* LCS / QBS / FBS table extras */
+    .below-cutoff { opacity:0.5; }
+    .below-cutoff .strike-quote { text-decoration:line-through; }
+    .pill-above   { background:#F0FDF4; color:#065F46; border-radius:20px; padding:3px 10px; font-size:12px; font-weight:600; }
+    .pill-below   { background:#FEF2F2; color:#991B1B; border-radius:20px; padding:3px 10px; font-size:12px; font-weight:600; }
+    .pill-disq    { background:#FEF2F2; color:#991B1B; border-radius:20px; padding:3px 10px; font-size:12px; font-weight:700; }
+
     @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
   </style>
 </head>
@@ -452,6 +531,14 @@
   };
   const QUOTE_NUM = { 'Rajesh Constructions':2640000,'Maharashtra Roads Co.':2810000,'BuildTech Solutions':3180000,'NCC Infrastructure':2210000 };
   const ESTIMATE = 2785350;
+  // Change 2/3 — evaluation methods metadata
+  const METHOD_META = {
+    L1:   { name:'L1 — Lowest Cost',                       short:'L1',   icon:'trophy',     bg:'#E6F1FB', border:'#BFDBFE', text:'#0C447C', sub:'#185FA5', desc:'Award goes to the TQ vendor with the lowest quoted amount', mostCommon:true },
+    QCBS: { name:'QCBS — Quality & Cost Based Selection',  short:'QCBS', icon:'calculator', bg:'#EEEDFE', border:'#AFA9EC', text:'#3C3489', sub:'#534AB7', desc:'Combined score = (Technical × T%) + (Financial × F%)' },
+    LCS:  { name:'LCS — Least Cost Selection',             short:'LCS',  icon:'coins',      bg:'#EFF6FF', border:'#BFDBFE', text:'#0C447C', sub:'#185FA5', desc:'Lowest cost among vendors who meet the minimum technical cutoff score' },
+    QBS:  { name:'QBS — Quality Based Selection',          short:'QBS',  icon:'star',       bg:'#E1F5EE', border:'#9FE1CB', text:'#0F5D4B', sub:'#0F5D4B', desc:'Only technical score matters. Highest technical score wins. Price is negotiated after selection.' },
+    FBS:  { name:'FBS — Fixed Budget Selection',           short:'FBS',  icon:'lock',       bg:'#FAEEDA', border:'#FAC775', text:'#92400E', sub:'#92400E', desc:'Best technical proposal within a fixed budget wins' },
+  };
 
   const PQ_CRITERIA = [
     { id:'incorp',    short:'Incorporation', full:'Certificate of incorporation per company type' },
@@ -531,12 +618,17 @@
       finExpanded:'f1',
       finOpeningRegister:'',
       finQuoteEdits:{},
-      method:'L1',
+      method:'L1',                // tender's DECLARED method (from upload form) — fallback only
+      evaluationMethod:null,      // ACTIVE method for this evaluation (null = derive from .method)
       technicalWeightage:70,
       financialWeightage:30,
+      lcsCutoff:75,               // LCS cutoff TQ score (out of 100)
+      fbsBudget:null,             // FBS budget limit (₹) — defaults to ESTIMATE on first render
+      ts:null,                    // Technical Sanction value (₹) — from tender upload form
       albDecision:null,    // 'accept' | 'reject'
       albNote:'',
-      _seedV:4,
+      reasonableness:{ decision:null, note:'', retenderReason:'', confirmed:false },
+      _seedV:5,
     };
   }
   // Helpers for the new array-based clarifications store
@@ -608,6 +700,9 @@
     s.expanded = 's4';
     s.stageTab = 'financial';
     s.method = 'L1';
+    s.evaluationMethod = 'L1';
+    s.ts = 2700000;          // ₹27,00,000 Technical Sanction
+    s.fbsBudget = ESTIMATE;  // default fixed-budget value used by FBS view
     return s;
   }
 
@@ -808,10 +903,13 @@
     const title = document.getElementById('utTitle').value.trim();
     const tnd = document.getElementById('utTnd').value.trim();
     if (!title || !tnd){ showToast('Tender Title and TND Reference are required'); return; }
+    const tsRaw = (document.getElementById('utTS').value || '').replace(/[₹,\s]/g, '');
+    const tsNum = parseFloat(tsRaw);
     const t = { id:tnd, name:title, dept:document.getElementById('utDept').value.trim()||'—',
       sector:document.getElementById('utSector').value, cost:'₹'+(document.getElementById('utCost').value.trim()||'0'),
       stage:'not-started', isNew:true,
-      method:document.getElementById('utMethod').value };
+      method:document.getElementById('utMethod').value,
+      ts: isFinite(tsNum) ? tsNum : null };
     EVAL_TENDERS.unshift(t);
     uploadPanelOpen = false;
     document.getElementById('uploadTenderPanel').style.maxHeight = '0';
@@ -836,12 +934,15 @@
     try { history.replaceState(null,'','?tender='+encodeURIComponent(tnd)); } catch(e){}
     const t = EVAL_TENDERS.find(x => x.id === tnd) || EVAL_TENDERS[0];
     const loaded = loadState(tnd);
-    EVAL = (loaded && loaded._seedV === 4) ? loaded
+    EVAL = (loaded && loaded._seedV === 5) ? loaded
          : (tnd === 'TND-2026-001' ? seedDemo(tnd) : (loaded || freshState(tnd)));
-    if (t.method && !(loaded && loaded._seedV === 4)) EVAL.method = t.method;
+    if (t.method && !(loaded && loaded._seedV === 5)) EVAL.method = t.method;
+    if (!EVAL.evaluationMethod) EVAL.evaluationMethod = EVAL.method || 'L1';
+    if (t.ts != null && EVAL.ts == null) EVAL.ts = t.ts;
     EVAL.readonly = false;
     // Migrate old clarifications shape ({}) → array
     if (!Array.isArray(EVAL.clarifications)) EVAL.clarifications = [];
+    if (!EVAL.reasonableness) EVAL.reasonableness = { decision:null, note:'', retenderReason:'', confirmed:false };
     if (!EVAL.activeVendor && EVAL.bids.length) EVAL.activeVendor = EVAL.bids[0].vendor;
     activeView = null;   // reset F2 view toggle for each tender
     document.getElementById('wsCrumb').textContent = t.id;
@@ -1167,13 +1268,13 @@
 
   // ===================== TECHNICAL BID VIEWER PANEL (Change 6) =====================
   // In-flow overlay anchored inside .main-col (no position:fixed) so it works in the preview iframe.
-  function openBidDoc(vendor){
+  function openBidDoc(vendor, kind){
     closeDrawer();
     closeClarPanel();
     closePqPopover();
     const panel = document.getElementById('bidDocPanel');
     const back  = document.getElementById('bidDocBackdrop');
-    panel.innerHTML = bidDocHTML(vendor);
+    panel.innerHTML = bidDocHTML(vendor, kind || 'tech');
     back.classList.add('open');
     panel.classList.add('open');
     refreshIcons();
@@ -1184,7 +1285,11 @@
     if (panel) panel.classList.remove('open');
     if (back)  back.classList.remove('open');
   }
-  function bidDocHTML(vendor){
+  function bidDocHTML(vendor, kind){
+    if (kind === 'fin') return finBidDocHTML(vendor);
+    return techBidDocHTML(vendor);
+  }
+  function techBidDocHTML(vendor){
     const tName = (EVAL_TENDERS.find(t => t.id === EVAL.tnd) || AWARDED_TENDERS.find(t => t.id === EVAL.tnd) || {}).name || EVAL.tnd;
     const tRef = (EVAL.tnd || 'TND-XXXX') + '/AMC/2026-27';
     // Per-vendor profile (kept small but realistic — derives from PARSED_TECH where possible)
@@ -1354,6 +1459,129 @@
           <div style="text-align:right;">Company Seal<br><div style="display:inline-block; width:64px; height:64px; border-radius:50%; background:#E5E7EB; margin:6px 0;" aria-hidden="true"></div><br>${esc(profile.legal)}</div>
         </div>
         <div style="font-size:11px; color:#9CA3AF; font-style:italic; text-align:center; margin-top:16px;">This is a system-rendered preview of the uploaded technical bid document.</div>
+      </div>`;
+  }
+
+  // === Financial Bid document template (Change 1b) — reuses the same panel container ===
+  function finBidDocHTML(vendor){
+    const tName = (EVAL_TENDERS.find(t => t.id === EVAL.tnd) || AWARDED_TENDERS.find(t => t.id === EVAL.tnd) || {}).name || EVAL.tnd;
+    const tRef = (EVAL.tnd || 'TND-XXXX') + '/AMC/2026-27';
+    const p = PARSED_TECH[vendor] || {};
+    const profile = {
+      legal:  (vendor === 'Rajesh Constructions' ? 'M/s Rajesh Constructions Pvt Ltd' : (p['Vendor Name'] || 'M/s ' + vendor)),
+      gst:    p['GST Number'] || '27AAACR1234Q1Z5',
+      signer: 'Mr. Rajesh Kumar',
+      sigRole:'Managing Director',
+    };
+    // BOQ items — 12 rows totalling exactly ₹26,40,000 ex-GST
+    const items = [
+      ['Desktop Computer (Core i5, 8GB RAM, 512GB SSD)', 'Unit', 50, 42000],
+      ['Monitor 21.5" FHD',                              'Unit', 50,  8500],
+      ['Keyboard & Mouse',                               'Set',  50,   800],
+      ['UPS 600VA',                                      'Unit', 50,  3200],
+      ['Microsoft Windows 11 Pro (OEM license)',         'Unit', 50,  9800],
+      ['Microsoft Office Standard 2024 (subscription)',  'Unit', 50,  6200],
+      ['Antivirus / Endpoint Security (3-year)',         'Unit', 50,  1800],
+      ['Desk Mount Bracket',                             'Unit', 50,   650],
+      ['Power Strip 4-socket (surge protected)',         'Unit', 50,   420],
+      ['Installation, on-site setup and commissioning',  'Lot',   1, 80000],
+      ['On-site warranty support — 3 years',             'Lot',   1, 60000],
+      ['User training (2 sessions of 25 attendees)',     'Lot',   1, 40000],
+    ];
+    let subtotal = 0;
+    const rowsHTML = items.map((it,i) => {
+      const amt = it[2] * it[3];
+      subtotal += amt;
+      return `<tr>
+        <td style="text-align:center;">${i+1}</td>
+        <td>${esc(it[0])}</td>
+        <td style="text-align:center;">${esc(it[1])}</td>
+        <td style="text-align:right;">${it[2]}</td>
+        <td style="text-align:right;">₹${it[3].toLocaleString('en-IN')}</td>
+        <td style="text-align:right;">₹${amt.toLocaleString('en-IN')}</td>
+      </tr>`;
+    }).join('');
+    const gst = Math.round(subtotal * 0.18);
+    const grand = subtotal + gst;
+
+    return `<div class="bid-doc-header">
+        <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+          <i data-lucide="receipt-indian-rupee" style="width:18px; height:18px; color:#0F5EE8; flex-shrink:0;"></i>
+          <div style="min-width:0;">
+            <div class="text-[14px] font-bold text-ink-900 truncate" style="font-family:'DM Sans', sans-serif;">Financial Bid — ${esc(profile.legal)}</div>
+            <div class="text-[11px]" style="color:#9CA3AF; font-family:'DM Sans', sans-serif;">${esc(EVAL.tnd)} · Uploaded May 19, 2026</div>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+          <button onclick="showToast('Downloading PDF…')" class="inline-flex items-center gap-1.5" style="border:1px solid #E5E7EB; background:white; color:#374151; border-radius:8px; padding:6px 12px; font-size:12px; font-family:'DM Sans', sans-serif; cursor:pointer;" onmouseover="this.style.background='#F9FAFB'" onmouseout="this.style.background='white'">
+            <i data-lucide="download" style="width:13px; height:13px;"></i> Download PDF
+          </button>
+          <button onclick="closeBidDoc()" aria-label="Close" style="background:transparent; border:none; cursor:pointer; color:#6B7280; font-size:20px; line-height:1; padding:4px 8px;">×</button>
+        </div>
+      </div>
+
+      <div class="bid-doc-body">
+        <!-- Cover -->
+        <div class="bd-cover">
+          <div>TO</div>
+          <div style="margin-top:14px;">THE TENDER INVITING AUTHORITY</div>
+          <div>Ahmedabad Municipal Corporation</div>
+          <div class="bd-rules-double"></div>
+          <div style="font-weight:bold;">FINANCIAL BID</div>
+          <div>(BOQ — Bill of Quantities)</div>
+          <div style="font-size:14px; font-weight:bold; margin-top:6px;">${esc(String(tName).toUpperCase())}</div>
+          <div>Tender Reference No.: ${esc(tRef)}</div>
+          <div class="bd-rules-double"></div>
+          <div>Submitted by:</div>
+          <div style="font-weight:bold;">${esc(profile.legal)}</div>
+          <div>GST No.: ${esc(profile.gst)}</div>
+        </div>
+
+        <!-- Section 1 -->
+        <h2 class="bd-sec">Section 1 — Financial Bid Covering Letter</h2>
+        <div style="margin-top:8px;">We hereby submit our Financial Bid for the above-mentioned tender.</div>
+        <div style="margin-top:8px;">We confirm that our quoted rates are firm and fixed for the entire duration of the contract and shall not be subject to any escalation.</div>
+        <div style="margin-top:8px;">All rates are exclusive of GST unless otherwise stated.</div>
+
+        <!-- Section 2 — BOQ -->
+        <h2 class="bd-sec">Section 2 — Bill of Quantities (BOQ)</h2>
+        <table class="bd-table">
+          <thead><tr>
+            <th style="width:7%; text-align:center;">S.NO</th>
+            <th style="width:42%;">DESCRIPTION OF ITEM</th>
+            <th style="width:9%; text-align:center;">UNIT</th>
+            <th style="width:9%; text-align:right;">QUANTITY</th>
+            <th style="width:16%; text-align:right;">UNIT RATE (₹)</th>
+            <th style="width:17%; text-align:right;">AMOUNT (₹)</th>
+          </tr></thead>
+          <tbody>${rowsHTML}
+            <tr style="background:#F9FAFB; font-weight:bold;">
+              <td colspan="5" style="text-align:right;">Subtotal (excl. GST)</td>
+              <td style="text-align:right;">₹${subtotal.toLocaleString('en-IN')}</td>
+            </tr>
+            <tr style="background:#F9FAFB;">
+              <td colspan="5" style="text-align:right;">GST @ 18%</td>
+              <td style="text-align:right;">₹${gst.toLocaleString('en-IN')}</td>
+            </tr>
+            <tr style="background:#EFF6FF; font-weight:bold; font-size:14px;">
+              <td colspan="5" style="text-align:right;">Grand Total (incl. GST)</td>
+              <td style="text-align:right;">₹${grand.toLocaleString('en-IN')}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="font-size:11px; color:#6B7280; font-style:italic; margin-top:4px;">All rates are firm and fixed. Validity of quote: 90 days from date of submission.</div>
+
+        <!-- Section 3 -->
+        <h2 class="bd-sec">Section 3 — Declaration</h2>
+        <div style="margin-top:8px;">We declare that the rates quoted above are our best and final rates.</div>
+        <div style="margin-top:8px;">We have not quoted any rate in excess of the approved schedule of rates and the rates are reasonable and workable.</div>
+
+        <!-- Footer -->
+        <div style="margin-top:40px; border-top:2px solid #111827; padding-top:16px; display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+          <div>Signature of Authorised Signatory<br>Name: ${esc(profile.signer)}<br>Designation: ${esc(profile.sigRole)}<br>Date: May 19, 2026<br>Place: Mumbai</div>
+          <div style="text-align:right;">Company Seal<br><div style="display:inline-block; width:64px; height:64px; border-radius:50%; background:#E5E7EB; margin:6px 0;" aria-hidden="true"></div><br>${esc(profile.legal)}</div>
+        </div>
+        <div style="font-size:11px; color:#9CA3AF; font-style:italic; text-align:center; margin-top:16px;">This is a system-rendered preview of the uploaded financial bid document.</div>
       </div>`;
   }
 
@@ -2024,6 +2252,9 @@ Date: ${esc(fmtDateShort(today))}`;
 
   // ----- Section 04 — Results & Actions (renumbered, content unchanged) -----
   function s4Body(){
+    // Change 5: final TQ/NTQ table at the very top of the section
+    const finalResults = finalResultsBlockHTML();
+
     const clarif = [];
     EVAL.bids.forEach(b => {
       PQ_CRITERIA.forEach(c => { if ((EVAL.matrix[b.vendor]||{})[c.id]==='clarif') clarif.push({ vendor:b.vendor, crit:c }); });
@@ -2095,9 +2326,97 @@ Date: ${esc(fmtDateShort(today))}`;
       <div class="flex justify-end mt-3"><button onclick="proceedToFinancial()" class="px-4 py-2 rounded-lg ${canProceed?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-medium" ${canProceed?'':'disabled'}>Proceed to Financial Evaluation →</button></div>
       ${!allNtqSigned && ntqVendors.length ? '<div class="text-[11.5px] text-warning mt-1.5 text-right">All NTQ justifications must be signed before proceeding.</div>' : ''}
     </div>`;
-    return subA + subB + subC;
+    return finalResults + subA + subB + subC;
   }
   function tdS(){ return 'padding:10px 12px; font-size:12.5px; color:#374151;'; }
+
+  // === Change 5: final results block ===
+  function finalResultsBlockHTML(){
+    const rows = EVAL.bids.map((b, i) => {
+      const m = EVAL.matrix[b.vendor] || {};
+      const pqVals = PQ_CRITERIA.map(c => m[c.id]);
+      const pqResult = pqVals.includes('fail') ? 'dq'
+                     : pqVals.every(v => v === 'pass') ? 'q'
+                     : 'pend';
+      const verdict = vendorVerdict(b.vendor);
+      const tqScore = pqResult === 'dq' ? '—' : (tqTotal(b.vendor) != null ? tqTotal(b.vendor) + ' / 100' : '—');
+      const companyType = (PARSED_TECH[b.vendor] && PARSED_TECH[b.vendor]['Company Type']) || '—';
+      const pqPill = pqResult === 'q' ? '<span class="pq-pill-q">Qualified</span>' : pqResult === 'dq' ? '<span class="pq-pill-dq">Disqualified</span>' : '<span class="pq-pill-pend">Pending</span>';
+      let verdictPill, nextStep, rowCls;
+      if (verdict === 'tq'){
+        verdictPill = '<span class="verdict-pill-tq">✓ TQ</span>';
+        nextStep = '<span style="display:inline-flex; align-items:center; gap:4px; color:#065F46; font-size:12px;"><i data-lucide="folder-open" style="width:14px; height:14px;"></i> Eligible for financial opening</span>';
+        rowCls = 'row-tq';
+      } else if (verdict === 'ntq'){
+        verdictPill = '<span class="verdict-pill-ntq">✗ NTQ</span>';
+        nextStep = '<span style="display:inline-flex; align-items:center; gap:4px; color:#991B1B; font-size:12px;"><i data-lucide="x-circle" style="width:14px; height:14px;"></i> Rejection letter to be issued</span>';
+        rowCls = 'row-ntq';
+      } else {
+        verdictPill = '<span class="verdict-pill-pend">Pending</span>';
+        nextStep = '<span style="color:#9CA3AF; font-size:12px;">Awaiting evaluation</span>';
+        rowCls = '';
+      }
+      return `<tr class="${rowCls}">
+        <td style="text-align:center; color:#9CA3AF; font-weight:600;">${i+1}</td>
+        <td><div style="font-weight:700; color:#111827; font-size:14px;">${esc(b.vendor)}</div><div style="font-size:11px; color:#9CA3AF; margin-top:2px;">${esc(b.file || '—')}</div></td>
+        <td>${esc(companyType)}</td>
+        <td>${pqPill}</td>
+        <td style="font-weight:600;">${tqScore}</td>
+        <td>${verdictPill}</td>
+        <td>${nextStep}</td>
+      </tr>`;
+    }).join('');
+
+    const totalCount = EVAL.bids.length;
+    const tqCount  = EVAL.bids.filter(b => vendorVerdict(b.vendor) === 'tq').length;
+    const ntqCount = EVAL.bids.filter(b => vendorVerdict(b.vendor) === 'ntq').length;
+
+    return `<div>
+        <div class="text-[17px] font-bold" style="color:#111827; margin-bottom:6px;">Final Evaluation Results</div>
+        <div class="text-[13px]" style="color:#6B7280; margin-bottom:20px;">Summary of all bids evaluated. Technically Qualified (TQ) bids proceed to financial bid opening. Not Technically Qualified (NTQ) bids are formally rejected.</div>
+
+        <div class="final-results-card">
+          <div class="final-results-toolbar">
+            <div class="text-[14px] font-bold" style="color:#111827;">All Bids — Technical Evaluation Result</div>
+            <button onclick="showToast('Results exported')" class="px-3 py-1.5 rounded-lg border border-line text-[12px] text-ink-900 hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Export</button>
+          </div>
+          <table class="final-results-table">
+            <thead><tr>
+              <th style="width:44px; text-align:center;">S.NO</th>
+              <th>Vendor</th>
+              <th style="width:120px;">Company Type</th>
+              <th style="width:110px;">PQ Result</th>
+              <th style="width:90px;">TQ Score</th>
+              <th style="width:110px;">Final Verdict</th>
+              <th style="width:200px;">Next Step</th>
+            </tr></thead>
+            <tbody>${rows || '<tr><td colspan="7" style="text-align:center; color:#9CA3AF; font-style:italic;">No bids evaluated yet.</td></tr>'}</tbody>
+          </table>
+        </div>
+
+        <div class="stat-strip">
+          <div><div class="stat-label">Total bids</div><div class="stat-value" style="color:#111827;">${totalCount}</div></div>
+          <div><div class="stat-label">Technically Qualified (TQ)</div><div class="stat-value" style="color:#10B981;">${tqCount}</div></div>
+          <div><div class="stat-label">Not Technically Qualified (NTQ)</div><div class="stat-value" style="color:#EF4444;">${ntqCount}</div></div>
+        </div>
+
+        <button id="tqNtqDefToggle" class="text-[13px] hover:underline" style="color:#0F5EE8; background:transparent; border:none; padding:0; cursor:pointer;" onclick="toggleTqNtqDefinition()" aria-expanded="false">What do TQ and NTQ mean? <span id="tqNtqDefIcon">▾</span></button>
+        <div id="tqNtqDefBox" class="definition-callout">
+          <div class="text-[13px]" style="color:#374151; margin-bottom:8px;"><span style="font-weight:700;">Technically Qualified (TQ):</span> The vendor has met all Pre-Qualification (PQ) criteria and has achieved the required Technical Qualification (TQ) score. Their financial bid will now be opened and evaluated.</div>
+          <div class="text-[13px]" style="color:#374151;"><span style="font-weight:700;">Not Technically Qualified (NTQ):</span> The vendor has failed to meet one or more mandatory eligibility or technical criteria. Their financial bid remains sealed and is returned unopened. A formal rejection letter is issued with documented reasons.</div>
+        </div>
+      </div>`;
+  }
+  let tqNtqDefOpen = false;
+  function toggleTqNtqDefinition(){
+    tqNtqDefOpen = !tqNtqDefOpen;
+    const box  = document.getElementById('tqNtqDefBox');
+    const btn  = document.getElementById('tqNtqDefToggle');
+    const icon = document.getElementById('tqNtqDefIcon');
+    if (box) box.classList.toggle('open', tqNtqDefOpen);
+    if (btn) btn.setAttribute('aria-expanded', tqNtqDefOpen ? 'true' : 'false');
+    if (icon) icon.textContent = tqNtqDefOpen ? '▴' : '▾';
+  }
 
   function openClarifForm(key){
     const row = document.querySelector(`#stage-technical tr[data-clarrow="${key}"]`);
@@ -2218,9 +2537,16 @@ Date: ${esc(fmtDateShort(today))}`;
     const f1exp = (EVAL.finExpanded||'f1') === 'f1';
     const f2locked = !EVAL.finRun;
     const f2exp = EVAL.finExpanded === 'f2' && !f2locked;
+    const f3exp = EVAL.finExpanded === 'f3' && EVAL.finRun;
     wrap.innerHTML = finCard('f1','01','Upload Financial Bids', f1StatusPill(), f1exp, false, f1Body())
-                   + finCard('f2','02','Financial Evaluation', f2StatusPill(), f2exp, f2locked, f2locked ? '' : f2Body());
+                   + finCard('f2','02','Financial Evaluation',   f2StatusPill(), f2exp, f2locked, f2locked ? '' : f2Body())
+                   + (EVAL.finRun ? finCard('f3','03','Reasonableness Check', f3StatusPill(), f3exp, false, f3Body()) : '');
     refreshIcons();
+  }
+  function f3StatusPill(){
+    return (EVAL.reasonableness && EVAL.reasonableness.confirmed)
+      ? pill('Check complete','#F0FDF4','#065F46')
+      : pill('Pending','#F3F4F6','#6B7280');
   }
   function finCard(key, num, title, statusPill, expanded, locked, body){
     return `<div class="bg-white border border-line rounded-xl overflow-hidden">
@@ -2251,21 +2577,94 @@ Date: ${esc(fmtDateShort(today))}`;
     const uploaded = EVAL.finBids.map(b => b.vendor);
     const chips = tqVendors.map(v => {
       const has = uploaded.includes(v);
-      return `<span style="background:${has?'#EFF6FF':'#FFFBEB'}; color:${has?'#0F5EE8':'#92400E'}; border-radius:20px; padding:3px 10px; font-size:12px;">${v}${has?'':' · awaiting'}</span>`;
-    }).join('');
-    const finRows = EVAL.finBids.map(b => {
-      const q = finQuote(b.vendor);
-      return `<tr style="border-bottom:1px solid #F3F4F6;">
-        <td style="${tdS()} font-weight:600; color:#111827;">${b.vendor}</td>
-        <td style="${tdS()} color:#6B7280; font-size:12px;" class="truncate">${b.file}</td>
-        <td style="${tdS()} color:#9CA3AF; font-size:11.5px;">May 19, 2026</td>
-        <td style="${tdS()}" data-fq="${b.vendor}">${b.status==='parsed'?`<span onclick="editFinQuote(this,'${b.vendor}')" style="cursor:pointer; border-bottom:1px dashed #9CA3AF;" title="Click to edit">₹${q.toLocaleString('en-IN')}</span>`:'<span class="text-ink-400">—</span>'}</td>
-        <td style="${tdS()}">${b.status==='parsed'?'<span style="color:#10B981;">Parsed ✓</span> <a href="#" onclick="openDrawer(\''+b.vendor+'\',\'fin\'); return false;" class="text-[11px] text-primary hover:underline">View</a>':'<span style="color:#0F5EE8;" class="inline-flex items-center gap-1.5"><span style="width:11px;height:11px;border:2px solid #BFDBFE;border-top-color:#0F5EE8;border-radius:50%;display:inline-block;animation:spin .7s linear infinite;"></span> Processing…</span>'}</td>
-      </tr>`;
+      return `<span style="background:${has?'#EFF6FF':'#FFFBEB'}; color:${has?'#0F5EE8':'#92400E'}; border-radius:20px; padding:3px 10px; font-size:12px;">${esc(v)}${has?'':' · awaiting'}</span>`;
     }).join('');
     const availFin = tqVendors.filter(v => !uploaded.includes(v));
     const allUploaded = tqVendors.length > 0 && availFin.length === 0;
     const reg = EVAL.finOpeningRegister;
+
+    // === Add a financial bid form — same card pattern as s1Body ===
+    const f = EVAL._addFinBid = EVAL._addFinBid || { vendor:'', file:'', fileSize:'', uploaded:false, progressing:false };
+    const vendorField = `<select id="fbVendor" class="ab-input" onchange="fbVendorChange(this.value)">
+        <option value="">Select vendor…</option>
+        ${availFin.map(v => `<option value="${esc(v)}" ${f.vendor===v?'selected':''}>${esc(v)}</option>`).join('')}
+        ${ntqVendors.map(v => `<option disabled style="color:#9CA3AF;">${esc(v)} — NTQ — not eligible</option>`).join('')}
+      </select>`;
+    let fileField;
+    if (!f.file){
+      fileField = `<div class="ab-drop" id="fbDrop" onclick="fbPickFile()" role="button" tabindex="0" onkeydown="if(event.key==='Enter')fbPickFile()">
+          <i data-lucide="upload" style="width:28px; height:28px; color:#0F5EE8;"></i>
+          <div class="text-[14px] font-bold text-ink-900" style="margin-top:10px;">Click to upload or drag and drop</div>
+          <div class="text-[12px]" style="color:#9CA3AF; margin-top:4px;">PDF, DOCX, XLSX — max 20MB</div>
+        </div>`;
+    } else {
+      const progressBar = f.progressing
+        ? `<div class="ab-progress-track"><div id="fbProgFill" class="ab-progress-fill"></div></div>`
+        : `<div class="text-[12px]" style="color:#10B981; margin-top:6px;">✓ Uploaded successfully</div>`;
+      fileField = `<div class="ab-file-card">
+          <i data-lucide="file-text" style="width:24px; height:24px; color:#0F5EE8; flex-shrink:0;"></i>
+          <div style="flex:1; min-width:0;">
+            <div class="text-[14px] font-bold text-ink-900 truncate">${esc(f.file)}</div>
+            <div class="text-[12px]" style="color:#9CA3AF;">${esc(f.fileSize)}</div>
+            ${progressBar}
+          </div>
+          <button class="ab-remove" onclick="fbRemoveFile()" aria-label="Remove file">×</button>
+        </div>`;
+    }
+    const canSubmit = !!f.vendor && !!f.file && f.uploaded;
+    const helper = canSubmit ? '' : '<div class="text-[12px]" style="color:#9CA3AF; margin-top:8px; text-align:center;">Select a vendor and upload a document to continue</div>';
+    const noTQ = tqVendors.length === 0;
+    const addForm = `<div class="ab-card">
+        <div class="text-[15px] font-bold" style="color:#111827; margin-bottom:4px;">Add a financial bid</div>
+        <div class="text-[13px]" style="color:#6B7280; margin-bottom:20px;">Upload a financial bid document and assign it to a vendor. Only Technically Qualified vendors are eligible.</div>
+        ${noTQ ? '<div class="text-[12.5px]" style="color:#92400E; background:#FFFBEB; border:1px solid #FDE68A; padding:10px 12px; border-radius:8px; margin-bottom:14px;">No Technically Qualified vendors yet — complete Technical Evaluation first.</div>' : ''}
+        <div style="margin-bottom:20px;">
+          <label class="ab-field-label">Vendor</label>
+          ${vendorField}
+        </div>
+        <div style="margin-bottom:20px;">
+          <label class="ab-field-label">Bid document</label>
+          ${fileField}
+        </div>
+        <div style="margin-bottom:8px;">
+          <label class="ab-field-label">Bid type</label>
+          <span class="ab-bid-pill"><i data-lucide="lock" style="width:13px; height:13px;"></i> Financial Bid</span>
+          <div class="text-[11px]" style="color:#9CA3AF; margin-top:6px;">Technical bids were uploaded in the previous section</div>
+        </div>
+        <button class="ab-submit" ${canSubmit?'':'disabled'} onclick="fbSubmit()">Upload Bid</button>
+        ${helper}
+      </div>`;
+
+    // === Opened financial bids table — same layout as opened technical bids ===
+    const finRows = EVAL.finBids.map(b => {
+      const q = finQuote(b.vendor);
+      const stPill = b.status==='parsed' ? '<span style="color:#10B981; font-size:12px;">Parsed ✓</span>'
+                   : '<span style="color:#0F5EE8; font-size:12px;" class="inline-flex items-center gap-1.5"><span style="width:11px;height:11px;border:2px solid #BFDBFE;border-top-color:#0F5EE8;border-radius:50%;display:inline-block;animation:spin .7s linear infinite;"></span> AI is parsing the document...</span>';
+      const action = b.status==='parsed'
+        ? `<a href="#" onclick="openBidDoc('${esc(b.vendor)}','fin'); return false;" class="text-[12px] hover:underline" style="color:#0F5EE8;">View Financial Bid</a>`
+        : '<span class="text-ink-400 text-[12px]">—</span>';
+      const quoteCell = b.status==='parsed'
+        ? `<span onclick="editFinQuote(this,'${esc(b.vendor)}')" style="cursor:pointer; border-bottom:1px dashed #9CA3AF;" title="Click to edit">₹${q.toLocaleString('en-IN')}</span>`
+        : '<span class="text-ink-400">—</span>';
+      return `<tr style="border-bottom:1px solid #F3F4F6;">
+        <td style="padding:10px 12px; font-size:13px; color:#111827; font-weight:600;">${esc(b.vendor)}</td>
+        <td style="padding:10px 12px; font-size:12px; color:#6B7280;" class="truncate">${esc(b.file)}</td>
+        <td style="padding:10px 12px; font-size:11.5px; color:#9CA3AF;">May 19, 2026</td>
+        <td style="padding:10px 12px; font-size:13px; color:#111827;" data-fq="${esc(b.vendor)}">${quoteCell}</td>
+        <td style="padding:10px 12px;">${stPill}</td>
+        <td style="padding:10px 12px;">${action}</td>
+      </tr>`;
+    }).join('');
+    const opened = EVAL.finBids.length
+      ? `<div class="text-[13px] font-bold text-ink-900 mb-2">Opened financial bids</div>
+         <div style="border:1px solid #E5E7EB; border-radius:10px; overflow:hidden; margin-bottom:14px;">
+           <table style="width:100%; table-layout:fixed; border-collapse:collapse;">
+             <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;">
+               <th style="${thS()} width:20%;">Vendor</th><th style="${thS()} width:22%;">File</th><th style="${thS()} width:14%;">Uploaded At</th><th style="${thS()} width:16%;">Quoted Amount (₹)</th><th style="${thS()} width:13%;">Status</th><th style="${thS()} width:15%;">Action</th>
+             </tr></thead><tbody>${finRows}</tbody></table>
+         </div>`
+      : '<div class="text-[12.5px] text-ink-500 italic mb-3" style="padding:6px 0;">No financial bids uploaded yet.</div>';
+
     return `<div class="rounded-lg p-3 mb-3 text-[12px]" style="background:#EFF6FF; border:1px solid #BFDBFE; color:#1E40AF;">The financial bid opening ceremony has now been held separately. Upload the financial bid documents received from each Technically Qualified vendor.</div>
       <div style="background:#F9FAFB; border:1px solid #E5E7EB; border-radius:8px; padding:12px 14px; margin-bottom:14px;">
         <div class="text-[11px] font-bold text-ink-500 uppercase tracking-wide mb-2">Technically Qualified vendors expecting financial bids</div>
@@ -2274,33 +2673,52 @@ Date: ${esc(fmtDateShort(today))}`;
       <div class="mb-3">
         <div class="text-[13px] font-bold text-ink-900 mb-1.5">Financial Bid Opening Register <span class="text-ink-400 font-normal">(optional but recommended)</span></div>
         ${reg
-          ? `<div class="flex items-center gap-2" style="background:#F9FAFB; border:1px solid #E5E7EB; border-radius:8px; padding:8px 12px;"><i data-lucide="file-text" class="w-4 h-4 text-primary"></i><span class="text-[12.5px] text-ink-900 flex-1 truncate">${reg}</span><a href="#" onclick="showToast('Register preview'); return false;" class="text-[12px] text-primary hover:underline">View</a><span style="background:#F0FDF4; color:#065F46; border-radius:20px; padding:2px 8px; font-size:11px; font-weight:600;">✓ Uploaded</span></div>`
+          ? `<div class="flex items-center gap-2" style="background:#F9FAFB; border:1px solid #E5E7EB; border-radius:8px; padding:8px 12px;"><i data-lucide="file-text" class="w-4 h-4 text-primary"></i><span class="text-[12.5px] text-ink-900 flex-1 truncate">${esc(reg)}</span><a href="#" onclick="showToast('Register preview'); return false;" class="text-[12px] text-primary hover:underline">View</a><span style="background:#F0FDF4; color:#065F46; border-radius:20px; padding:2px 8px; font-size:11px; font-weight:600;">✓ Uploaded</span></div>`
           : `<div style="border:1.5px dashed #D1D5DB; border-radius:8px; padding:14px 18px; display:flex; align-items:center; gap:16px;">
               <i data-lucide="upload-cloud" style="width:24px; height:24px; color:#0F5EE8;"></i>
               <div class="flex-1"><div class="text-[13px] text-ink-900">Upload the signed opening register</div><div class="text-[11px] text-ink-400">PDF or scan</div></div>
               <button onclick="uploadFinRegister()" class="px-3 py-1.5 rounded-lg bg-primary text-white text-[12px] font-medium">Browse</button>
             </div>`}
       </div>
-      ${EVAL.finBids.length ? `<div style="border:1px solid #E5E7EB; border-radius:10px; overflow:hidden; margin-bottom:14px;"><table style="width:100%; table-layout:fixed; border-collapse:collapse;">
-        <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:24%;">Vendor</th><th style="${thS()} width:26%;">File</th><th style="${thS()} width:16%;">Uploaded At</th><th style="${thS()} width:17%;">Quoted Amount</th><th style="${thS()} width:17%;">Status</th></tr></thead>
-        <tbody>${finRows}</tbody></table></div>` : ''}
-      <div style="border:1px solid #E5E7EB; border-radius:10px; padding:16px 18px; background:#F9FAFB;">
-        <div class="text-[13px] font-bold text-ink-900 mb-3">Add a financial bid</div>
-        <div class="grid gap-3" style="grid-template-columns:1fr 1fr 1fr;">
-          <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase mb-1">Vendor *</label>
-            <select id="fVendor" class="field"><option value="">Select vendor…</option>
-              ${availFin.map(v => `<option value="${v}">${v}</option>`).join('')}
-              ${ntqVendors.map(v => `<option disabled>${v} — NTQ — not eligible</option>`).join('')}
-            </select></div>
-          <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase mb-1">Bid type</label><input class="field" value="Financial Bid" readonly style="background:#F3F4F6; color:#6B7280;"/></div>
-          <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase mb-1">Document</label><button onclick="fPickFile()" id="fFileBtn" class="field text-left" style="cursor:pointer;">Choose file</button></div>
-        </div>
-        <div class="flex justify-end mt-3"><button onclick="uploadFinBid()" class="px-4 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90">Upload Bid</button></div>
-      </div>
+      ${addForm}
+      ${opened}
       <div class="flex items-center justify-between mt-3 flex-wrap gap-2">
         <span class="text-[12px] font-medium" style="color:${allUploaded?'#065F46':'#92400E'};" aria-live="polite">${uploaded.filter(v=>tqVendors.includes(v)).length} of ${tqVendors.length} TQ vendors uploaded</span>
         <button onclick="runFinancial()" class="px-4 py-2 rounded-lg ${EVAL.finBids.length?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-medium" ${EVAL.finBids.length?'':'disabled'}>Run financial evaluation →</button>
       </div>`;
+  }
+  // === F1 form interactions — mirror of abXxx handlers (Change 1a) ===
+  function fbVendorChange(val){ EVAL._addFinBid.vendor = val; renderFinancial(); }
+  function fbPickFile(){
+    const f = EVAL._addFinBid;
+    const v = (f.vendor || 'vendor').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
+    f.file = v + '_financial_bid.pdf';
+    f.fileSize = '1.6 MB';
+    f.uploaded = false;
+    f.progressing = true;
+    renderFinancial();
+    requestAnimationFrame(() => {
+      const bar = document.getElementById('fbProgFill');
+      if (!bar) return;
+      bar.style.transition = 'width 1.5s linear';
+      bar.style.width = '100%';
+    });
+    setTimeout(() => {
+      f.uploaded = true;
+      f.progressing = false;
+      renderFinancial();
+    }, 1550);
+  }
+  function fbRemoveFile(){ const f = EVAL._addFinBid; f.file=''; f.fileSize=''; f.uploaded=false; f.progressing=false; renderFinancial(); }
+  function fbSubmit(){
+    const f = EVAL._addFinBid;
+    if (!f.vendor){ showToast('Select a TQ vendor'); return; }
+    if (!f.file || !f.uploaded){ showToast('Upload a document first'); return; }
+    const bid = { vendor:f.vendor, file:f.file, status:'processing' };
+    EVAL.finBids.push(bid);
+    EVAL._addFinBid = { vendor:'', file:'', fileSize:'', uploaded:false, progressing:false };
+    renderFinancial(); saveState();
+    setTimeout(() => { bid.status='parsed'; renderFinancial(); saveState(); showToast(f.vendor+' financial bid parsed'); }, 1400);
   }
   // ---- Financial row computations (per view) ----
   function finBidsBase(){
@@ -2336,46 +2754,102 @@ Date: ${esc(fmtDateShort(today))}`;
   }
 
   function f2Body(){
-    const native = EVAL.method === 'QCBS' ? 'QCBS' : 'L1';
-    if (!activeView) activeView = native;
+    if (!EVAL.evaluationMethod) EVAL.evaluationMethod = EVAL.method || 'L1';
+    const m = EVAL.evaluationMethod;
+    activeView = m; // keep legacy var in sync for any old call sites
     const T = EVAL.technicalWeightage, F = EVAL.financialWeightage;
     const albBid = finBidsBase().find(b => b.alb);
     const alb = albBid ? { vendor:albBid.vendor, quote:albBid.quote } : null;
-    const proceedOk = !alb || EVAL.albDecision;
-    const tName = (EVAL_TENDERS.find(t => t.id===EVAL.tnd)||{}).name || EVAL.tnd;
+    const tName = (EVAL_TENDERS.find(t => t.id===EVAL.tnd)||AWARDED_TENDERS.find(t => t.id===EVAL.tnd)||{}).name || EVAL.tnd;
 
-    const methodBanner = native==='QCBS'
-      ? `<div style="background:#EEEDFE; border:1px solid #D6D2F7; border-radius:8px; padding:12px 16px; margin-bottom:14px; display:flex; gap:10px; align-items:flex-start;">
-          <i data-lucide="calculator" style="width:18px; height:18px; color:#534AB7;"></i>
-          <div><div class="text-[13px] font-bold" style="color:#3C3489;">Evaluation method: QCBS &nbsp;·&nbsp; ${T}:${F} — Technical : Financial</div>
-          <div class="text-[12px]" style="color:#534AB7;">Award is decided on the combined technical and financial score</div></div></div>`
-      : `<div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:12px 16px; margin-bottom:14px; display:flex; gap:10px; align-items:flex-start;">
-          <i data-lucide="trophy" style="width:18px; height:18px; color:#185FA5;"></i>
-          <div><div class="text-[13px] font-bold" style="color:#0C447C;">Evaluation method: L1 — Lowest Cost</div>
-          <div class="text-[12px]" style="color:#185FA5;">Award goes to the TQ vendor with the lowest quoted amount</div></div></div>`;
-
-    const tglBtn = (v, label) => {
-      const on = activeView===v;
-      return `<button id="finTgl${v}" onclick="switchFinView('${v}')" aria-pressed="${on}" style="padding:8px 20px; font-size:13px; cursor:pointer; border:none; ${v==='QCBS'?'border-left:1px solid #E5E7EB;':''} transition:all 150ms ease; ${on?'background:#0F5EE8; color:white; font-weight:500;':'background:white; color:#6B7280;'}">${label}</button>`;
-    };
-    const toggle = `<div style="display:flex; align-items:center; flex-wrap:wrap; margin-bottom:16px;">
-      <div role="group" aria-label="Evaluation view" style="display:inline-flex; border:1px solid #E5E7EB; border-radius:8px; overflow:hidden;">
-        ${tglBtn('L1','L1 — Lowest Cost')}${tglBtn('QCBS','QCBS — Quality &amp; Cost')}
+    // === Dynamic method banner (Change 2) ===
+    const meta = METHOD_META[m] || METHOD_META.L1;
+    const commonBadge = meta.mostCommon ? '<span class="method-badge-common">Most common</span>' : '';
+    const banner = `<div class="method-banner" id="methodBanner" style="background:${meta.bg}; border-color:${meta.border}; color:${meta.text};">
+      <i id="mbIcon" data-lucide="${meta.icon}" style="width:18px; height:18px; color:${meta.sub}; flex-shrink:0; margin-top:1px;"></i>
+      <div style="flex:1; min-width:0;">
+        <div class="text-[13px] font-bold" style="color:${meta.text};"><span id="mbName">${esc(meta.name)}</span>${commonBadge}</div>
+        <div class="text-[12px]" id="mbDesc" style="color:${meta.sub};">${esc(meta.desc)}</div>
       </div>
-      <span id="finTglNote" style="margin-left:12px; font-size:11px; color:${activeView===native?'#9CA3AF':'#F59E0B'};">${activeView===native?'Default evaluation method for this tender':'Preview only — not the specified evaluation method for this tender'}</span>
     </div>`;
 
-    const l1show = activeView==='L1';
-    return `${methodBanner}${toggle}
-      <div id="finViewL1" style="${l1show?'':'display:none;'} transition:opacity 200ms ease, transform 200ms ease; opacity:1;">${l1ViewBody(tName)}</div>
-      <div id="finViewQCBS" style="${l1show?'display:none;':''} transition:opacity 200ms ease, transform 200ms ease; opacity:1;">${qcbsViewBody(tName, T, F)}</div>
-      <div id="finAlbZone">${alb ? albDecisionHTML(alb) : ''}</div>
-      <div class="flex flex-col items-end mt-4">
-        <div id="finSendNote" class="text-[11px] text-ink-400 mb-1" style="${activeView===native?'display:none;':''}" aria-live="polite">This tender uses ${native} as its evaluation method. Bid comparison will use ${native} ranking.</div>
-        <button onclick="sendToComparison()" class="px-5 py-2.5 rounded-lg ${proceedOk?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-bold" ${proceedOk?'':'disabled'}>Send to Bid Comparison →</button>
-        ${!proceedOk ? '<div class="text-[12px] text-ink-400 mt-1.5">Resolve all flagged bids before proceeding</div>' : ''}
-      </div>`;
+    // === 5-method pill selector (Change 3) ===
+    const segBtn = (key) => {
+      const on = m === key;
+      const mm = METHOD_META[key];
+      const badge = mm.mostCommon ? '<span class="method-badge-common">Most common</span>' : '';
+      return `<button data-method="${key}" class="${on?'on':''}" aria-pressed="${on?'true':'false'}" aria-label="Evaluation method ${esc(mm.name)}" onclick="switchMethod('${key}')">${esc(mm.short)}${badge}</button>`;
+    };
+    const segments = `<div class="method-segments" role="tablist" id="methodSegments" aria-label="Evaluation method">
+      ${segBtn('L1')}${segBtn('QCBS')}${segBtn('LCS')}${segBtn('QBS')}${segBtn('FBS')}
+    </div>`;
+
+    // === Render all 5 view bodies; only active visible. Switching animates opacity. ===
+    const view = (k, body) => `<div id="finView${k}" class="fin-view ${m===k?'':'hidden-view'}" style="opacity:1;">${body}</div>`;
+
+    return `${banner}${segments}
+      ${view('L1',   l1ViewBody(tName))}
+      ${view('QCBS', qcbsViewBody(tName, T, F))}
+      ${view('LCS',  lcsViewBody(tName))}
+      ${view('QBS',  qbsViewBody(tName))}
+      ${view('FBS',  fbsViewBody(tName))}
+      <div id="finAlbZone">${alb ? albDecisionHTML(alb) : ''}</div>`;
   }
+  // === Method switch — animates inner view + updates banner without full re-render ===
+  function switchMethod(newM){
+    if (!METHOD_META[newM]) return;
+    if (newM === EVAL.evaluationMethod) return;
+    EVAL.evaluationMethod = newM;
+    activeView = newM;
+    saveState();
+    // 1. Fade out current visible view, show new one with opacity 0 → 1
+    document.querySelectorAll('#stage-financial .fin-view').forEach(v => v.classList.add('hidden-view'));
+    const target = document.getElementById('finView' + newM);
+    if (target){
+      target.classList.remove('hidden-view');
+      target.style.opacity = '0';
+      requestAnimationFrame(() => { target.style.opacity = '1'; });
+    }
+    // 2. Update banner DOM directly (transition: all 200ms ease)
+    updateMethodBanner(newM);
+    // 3. Update segments highlight
+    document.querySelectorAll('#methodSegments button').forEach(btn => {
+      const on = btn.dataset.method === newM;
+      btn.classList.toggle('on', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    // 4. Re-render F3 body since reasonableness depends on method
+    if (EVAL.finRun) renderFinancial();
+  }
+  function updateMethodBanner(m){
+    const meta = METHOD_META[m] || METHOD_META.L1;
+    const banner = document.getElementById('methodBanner');
+    if (!banner) return;
+    banner.style.background   = meta.bg;
+    banner.style.borderColor  = meta.border;
+    banner.style.color        = meta.text;
+    const name = document.getElementById('mbName');
+    const desc = document.getElementById('mbDesc');
+    const icon = document.getElementById('mbIcon');
+    if (name) name.textContent = meta.name;
+    if (desc){ desc.textContent = meta.desc; desc.style.color = meta.sub; }
+    if (icon){
+      icon.setAttribute('data-lucide', meta.icon);
+      icon.style.color = meta.sub;
+    }
+    // Most-common badge management — only L1 shows it (next to mbName)
+    const headerDiv = name ? name.parentElement : null;
+    if (headerDiv){
+      const existingBadge = headerDiv.querySelector('.method-badge-common');
+      if (meta.mostCommon){
+        if (!existingBadge) name.insertAdjacentHTML('afterend', '<span class="method-badge-common">Most common</span>');
+      } else if (existingBadge) existingBadge.remove();
+      headerDiv.style.color = meta.text;
+    }
+    refreshIcons();
+  }
+  // Legacy alias — old code paths may still call switchFinView
+  function switchFinView(v){ switchMethod(v); }
   function l1ViewBody(tName){
     const rows = l1Rows();
     const tableRows = rows.map((r,i) => {
@@ -2534,6 +3008,181 @@ Date: ${esc(fmtDateShort(today))}`;
     showToast('Scores recalculated');
   }
   function ordinal(n){ return n===1?'1st':n===2?'2nd':n===3?'3rd':n+'th'; }
+
+  // ===================== LCS — Least Cost Selection (Change 3) =====================
+  function lcsViewBody(tName){
+    const cutoff = EVAL.lcsCutoff != null ? EVAL.lcsCutoff : 75;
+    const all = finBidsBase();
+    const above = all.filter(b => b.tq >= cutoff).sort((a,b) => a.quote - b.quote);
+    const below = all.filter(b => b.tq <  cutoff).sort((a,b) => a.quote - b.quote);
+    above.forEach((b,i) => b.rank = i+1);
+    below.forEach(b => b.rank = '—');
+    const winner = above[0];
+    const ordered = above.concat(below);
+    const rows = ordered.map((r) => {
+      const isWin = r === winner;
+      const dev = ((r.quote - ESTIMATE) / ESTIMATE) * 100;
+      const devCls = dev < 0 ? '#065F46' : dev > 10 ? '#991B1B' : '#92400E';
+      const dimCls = r.tq < cutoff ? 'below-cutoff' : '';
+      const cutoffPill = r.tq >= cutoff ? '<span class="pill-above">✓ Above cutoff</span>' : '<span class="pill-below">Below cutoff</span>';
+      const stat = r.tq < cutoff ? '<span class="pill-disq">Disqualified</span>' : isWin ? pill('L1','#F0FDF4','#065F46') : pill('Eligible','#F3F4F6','#6B7280');
+      const quoteText = r.tq < cutoff
+        ? `<span class="strike-quote">₹${r.quote.toLocaleString('en-IN')}</span>`
+        : `<span ${isWin?'style="font-weight:700;"':''}>₹${r.quote.toLocaleString('en-IN')}</span>`;
+      return `<tr class="${dimCls}" style="border-bottom:1px solid #F3F4F6; ${isWin?'background:#F0FDF4;':''}">
+        <td style="${tdS()} ${isWin?'border-left:3px solid #10B981;':''}">${typeof r.rank==='number'?rankBadgeHTML(r.rank,isWin):'<span style="color:#9CA3AF;">—</span>'}</td>
+        <td style="${tdS()}"><div class="font-medium text-ink-900">${esc(r.vendor)}</div></td>
+        <td style="${tdS()} font-weight:600;">${r.tq} / 100</td>
+        <td style="${tdS()}">${cutoffPill}</td>
+        <td style="${tdS()}">${quoteText}</td>
+        <td style="${tdS()} color:${devCls}; font-weight:600;">${dev>0?'+':''}${dev.toFixed(1)}%</td>
+        <td style="${tdS()}">${stat}</td>
+      </tr>`;
+    }).join('');
+    return `<div class="info-box-blue">LCS awards to the lowest-cost vendor who meets or exceeds the minimum technical cutoff score. Vendors below the cutoff are disqualified regardless of price.</div>
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:16px;">
+        <span class="text-[13px] font-bold text-ink-900">Minimum technical cutoff score:</span>
+        <input id="lcsCutoffInput" type="number" min="0" max="100" step="1" value="${cutoff}" class="field" style="width:80px; padding:6px 8px;" oninput="onLcsCutoffInput(this.value)" />
+        <span class="text-[13px] text-ink-500">/ 100</span>
+        <button onclick="applyLcsCutoff()" class="px-3 py-1.5 rounded-lg border border-primary text-primary text-[12px] font-medium hover:bg-primary-light">Apply cutoff</button>
+      </div>
+      <div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
+        <div><span class="text-[14px] font-bold text-ink-900">Financial bids — ${esc(tName)}</span> <span class="text-[12px] text-ink-500">${ordered.length} vendors · ${above.length} above cutoff</span></div>
+        <button onclick="showToast('LCS evaluation PDF exported')" class="px-3 py-1.5 rounded-lg border border-line text-[12px] text-ink-900 hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Export PDF</button>
+      </div>
+      <div style="border:1px solid #E5E7EB; border-radius:12px; overflow:hidden;">
+        <table style="width:100%; table-layout:fixed; border-collapse:collapse;">
+          <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:52px;">Rank</th><th style="${thS()} width:22%;">Vendor</th><th style="${thS()} width:14%;">TQ Score</th><th style="${thS()} width:17%;">Cutoff Status</th><th style="${thS()} width:18%;">Quoted Amount</th><th style="${thS()} width:14%;">vs Estimate</th><th style="${thS()} width:13%;">Status</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  }
+  function onLcsCutoffInput(v){ const n = parseInt(v); if (!isNaN(n)) EVAL.lcsCutoff = Math.max(0, Math.min(100, n)); }
+  function applyLcsCutoff(){
+    const el = document.getElementById('lcsCutoffInput');
+    const n = parseInt(el?.value || EVAL.lcsCutoff);
+    EVAL.lcsCutoff = isNaN(n) ? 75 : Math.max(0, Math.min(100, n));
+    saveState();
+    // Re-render the LCS view only (and F3 since reasonableness depends on it)
+    const view = document.getElementById('finViewLCS');
+    if (view){
+      const tName = (EVAL_TENDERS.find(t => t.id===EVAL.tnd)||AWARDED_TENDERS.find(t => t.id===EVAL.tnd)||{}).name || EVAL.tnd;
+      view.innerHTML = lcsViewBody(tName);
+    }
+    if (EVAL.finRun) renderFinancial();
+    showToast('Cutoff applied');
+  }
+
+  // ===================== QBS — Quality Based Selection (Change 3) =====================
+  function qbsViewBody(tName){
+    const bids = finBidsBase().slice().sort((a,b) => b.tq - a.tq);
+    bids.forEach((b,i) => b.rank = i+1);
+    const winner = bids[0];
+    const rows = bids.map((r) => {
+      const isWin = r === winner;
+      const stat = isWin ? `<span style="background:#E1F5EE; color:#0F5D4B; border-radius:20px; padding:4px 12px; font-size:13px; font-weight:600;">Selected</span>` : '<span class="text-ink-400">—</span>';
+      const finCell = isWin
+        ? `<a href="#" onclick="showToast('Negotiation initiated in Bid Management'); return false;" class="text-[12px] hover:underline" style="color:#0F5D4B;">Open for negotiation</a>`
+        : '<span class="text-ink-400 text-[12px]">🔒 Not opened</span>';
+      const breakdownId = 'qbsBd-' + esc(r.vendor).replace(/[^a-zA-Z0-9]/g,'_');
+      const breakdown = TQ_CRITERIA.map(c => {
+        const s = (EVAL.matrix[r.vendor]||{})[c.id];
+        return `<div style="font-size:12px; color:#374151;">${esc(c.short)} <span style="color:#9CA3AF;">— ${typeof s==='number'?s:'—'} / ${c.max}</span></div>`;
+      }).join('');
+      return `<tr style="border-bottom:1px solid #F3F4F6; ${isWin?'background:#E1F5EE;':''}">
+        <td style="${tdS()} ${isWin?'border-left:3px solid #0F5D4B;':''}">${rankBadgeHTML(r.rank,isWin)}</td>
+        <td style="${tdS()} font-weight:600; color:#111827;">${esc(r.vendor)}</td>
+        <td style="${tdS()} font-weight:700;">${r.tq} / 100</td>
+        <td style="${tdS()}">
+          <a href="#" onclick="toggleQbsBreakdown('${breakdownId}'); return false;" class="text-[12px] hover:underline" style="color:#0F5EE8;" id="${breakdownId}-link">View breakdown ▾</a>
+          <div id="${breakdownId}" style="display:none; margin-top:6px; padding:8px 10px; background:#F9FAFB; border-radius:6px;">${breakdown}</div>
+        </td>
+        <td style="${tdS()}">${finCell}</td>
+        <td style="${tdS()}">${stat}</td>
+      </tr>`;
+    }).join('');
+    return `<div class="info-box-teal">QBS selects the highest technically scoring vendor. Price is not a factor in selection. The selected vendor's financial bid is opened and price is negotiated after selection.</div>
+      <div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
+        <div><span class="text-[14px] font-bold text-ink-900">Technical ranking — ${esc(tName)}</span> <span class="text-[12px] text-ink-500">${bids.length} vendors · sorted by TQ score</span></div>
+        <button onclick="showToast('QBS report exported')" class="px-3 py-1.5 rounded-lg border border-line text-[12px] text-ink-900 hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Export PDF</button>
+      </div>
+      <div style="border:1px solid #E5E7EB; border-radius:12px; overflow:hidden; margin-bottom:14px;">
+        <table style="width:100%; table-layout:fixed; border-collapse:collapse;">
+          <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:52px;">Rank</th><th style="${thS()} width:24%;">Vendor</th><th style="${thS()} width:15%;">TQ Score</th><th style="${thS()} width:32%;">Score Breakdown</th><th style="${thS()} width:17%;">Financial Bid</th><th style="${thS()} width:12%;">Status</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      ${winner ? `<div style="display:flex; justify-content:flex-end;"><button onclick="showToast('Negotiation initiated in Bid Management')" style="background:#0F5D4B; color:white; border:none; border-radius:8px; padding:9px 18px; font-size:13px; font-weight:600; cursor:pointer;">Proceed to negotiation with ${esc(winner.vendor)} →</button></div>` : ''}`;
+  }
+  function toggleQbsBreakdown(id){
+    const el = document.getElementById(id);
+    const link = document.getElementById(id + '-link');
+    if (!el) return;
+    const isOpen = el.style.display !== 'none';
+    el.style.display = isOpen ? 'none' : 'block';
+    if (link) link.textContent = (isOpen ? 'View breakdown ▾' : 'Hide breakdown ▴');
+  }
+
+  // ===================== FBS — Fixed Budget Selection (Change 3) =====================
+  function fbsViewBody(tName){
+    const budget = EVAL.fbsBudget != null ? EVAL.fbsBudget : ESTIMATE;
+    const all = finBidsBase();
+    const within = all.filter(b => b.quote <= budget).sort((a,b) => b.tq - a.tq);
+    const above  = all.filter(b => b.quote >  budget).sort((a,b) => b.tq - a.tq);
+    within.forEach((b,i) => b.rank = i+1);
+    above.forEach(b => b.rank = '—');
+    const winner = within[0];
+    const ordered = within.concat(above);
+    const rows = ordered.map((r) => {
+      const isWin = r === winner;
+      const overBudget = r.quote > budget;
+      const dimCls = overBudget ? 'below-cutoff' : '';
+      const budgetPill = overBudget ? '<span class="pill-below">Above budget</span>' : '<span class="pill-above">✓ Within budget</span>';
+      const stat = overBudget ? '<span class="pill-disq">Disqualified</span>' : isWin ? '<span style="background:#FAEEDA; color:#92400E; border-radius:20px; padding:4px 12px; font-size:13px; font-weight:700;">Selected</span>' : '<span class="text-ink-400">—</span>';
+      return `<tr class="${dimCls}" style="border-bottom:1px solid #F3F4F6; ${isWin?'background:#FFFBEB;':''}">
+        <td style="${tdS()} ${isWin?'border-left:3px solid #F59E0B;':''}">${typeof r.rank==='number'?rankBadgeHTML(r.rank,isWin):'<span style="color:#9CA3AF;">—</span>'}</td>
+        <td style="${tdS()} font-weight:600;">${esc(r.vendor)}</td>
+        <td style="${tdS()}"><span ${overBudget?'class="strike-quote"':''}>₹${r.quote.toLocaleString('en-IN')}</span></td>
+        <td style="${tdS()}">${budgetPill}</td>
+        <td style="${tdS()} font-weight:700;">${r.tq} / 100</td>
+        <td style="${tdS()}">${stat}</td>
+      </tr>`;
+    }).join('');
+    return `<div class="info-box-amber">FBS selects the highest technical score among vendors whose quoted price is within the fixed budget. Vendors quoting above the budget are disqualified.</div>
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:16px;">
+        <span class="text-[13px] font-bold text-ink-900">Fixed budget limit (₹):</span>
+        <div style="position:relative;">
+          <span style="position:absolute; left:10px; top:7px; color:#6B7280; font-size:13px;">₹</span>
+          <input id="fbsBudgetInput" type="number" min="0" step="10000" value="${budget}" class="field" style="width:160px; padding:6px 8px 6px 22px;" oninput="onFbsBudgetInput(this.value)" />
+        </div>
+        <button onclick="applyFbsBudget()" class="px-3 py-1.5 rounded-lg" style="border:1px solid #F59E0B; color:#F59E0B; background:white; font-size:12px; font-weight:500;">Apply budget</button>
+      </div>
+      <div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
+        <div><span class="text-[14px] font-bold text-ink-900">Financial bids — ${esc(tName)}</span> <span class="text-[12px] text-ink-500">${ordered.length} vendors · ${within.length} within budget</span></div>
+        <button onclick="showToast('FBS report exported')" class="px-3 py-1.5 rounded-lg border border-line text-[12px] text-ink-900 hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Export PDF</button>
+      </div>
+      <div style="border:1px solid #E5E7EB; border-radius:12px; overflow:hidden;">
+        <table style="width:100%; table-layout:fixed; border-collapse:collapse;">
+          <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:52px;">Rank</th><th style="${thS()} width:24%;">Vendor</th><th style="${thS()} width:20%;">Quoted Amount</th><th style="${thS()} width:18%;">Budget Status</th><th style="${thS()} width:14%;">TQ Score</th><th style="${thS()} width:18%;">Status</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  }
+  function onFbsBudgetInput(v){ const n = parseFloat(v); if (!isNaN(n)) EVAL.fbsBudget = Math.max(0, n); }
+  function applyFbsBudget(){
+    const el = document.getElementById('fbsBudgetInput');
+    const n = parseFloat(el?.value || EVAL.fbsBudget);
+    EVAL.fbsBudget = isNaN(n) ? ESTIMATE : Math.max(0, n);
+    saveState();
+    const view = document.getElementById('finViewFBS');
+    if (view){
+      const tName = (EVAL_TENDERS.find(t => t.id===EVAL.tnd)||AWARDED_TENDERS.find(t => t.id===EVAL.tnd)||{}).name || EVAL.tnd;
+      view.innerHTML = fbsViewBody(tName);
+    }
+    if (EVAL.finRun) renderFinancial();
+    showToast('Budget applied');
+  }
+
   function editFinQuote(span, vendor){
     const td = span.closest('td');
     const cur = finQuote(vendor);
@@ -2600,6 +3249,11 @@ Date: ${esc(fmtDateShort(today))}`;
       </div>
       <textarea id="falbNote" rows="2" class="field mt-2" style="font-size:12.5px;" placeholder="${sel==='reject'?'Reason for rejection (required)':'Note on enhanced security terms (required)'}"></textarea>
       <div class="flex justify-end mt-2"><button onclick="confirmFinAlb()" class="px-3.5 py-2 rounded-lg bg-primary text-white text-[12.5px] font-medium hover:bg-primary/90">Confirm decision</button></div>
+      <div class="alb-risk-strip">
+        <div style="font-weight:700;">⚠ Non-favourable outcome risk:</div>
+        <div style="margin-top:4px;">Accepting an abnormally low bid without enhanced performance security creates serious risk. Vendors who underquote may abandon the work midway due to financial pressure, leaving the project incomplete.</div>
+        <div style="margin-top:6px; font-weight:700;">If accepted: enhanced performance security of minimum 10% additional is mandatory.</div>
+      </div>
     </div>`;
   }
   function pickFinAlb(v){ EVAL._albSel = v; renderFinancial(); }
@@ -2611,9 +3265,201 @@ Date: ${esc(fmtDateShort(today))}`;
     saveState(); renderFinancial();
     showToast('ALB decision recorded');
   }
+  // ===================== F3 — REASONABLENESS CHECK (Change 4) =====================
+  function getRecommendedVendor(){
+    // Returns the vendor whose bid is recommended for award under the active method
+    const m = EVAL.evaluationMethod || EVAL.method || 'L1';
+    const bids = finBidsBase();
+    if (!bids.length) return null;
+    if (m === 'QCBS'){
+      const T = EVAL.technicalWeightage, F = EVAL.financialWeightage;
+      const rows = qcbsRows(T, F);
+      return rows[0] || null;
+    }
+    if (m === 'QBS'){
+      const sorted = bids.slice().sort((a,b) => b.tq - a.tq);
+      return sorted[0] || null;
+    }
+    if (m === 'LCS'){
+      const cutoff = EVAL.lcsCutoff != null ? EVAL.lcsCutoff : 75;
+      const above = bids.filter(b => b.tq >= cutoff).sort((a,b) => a.quote - b.quote);
+      return above[0] || null;
+    }
+    if (m === 'FBS'){
+      const budget = EVAL.fbsBudget != null ? EVAL.fbsBudget : ESTIMATE;
+      const within = bids.filter(b => b.quote <= budget).sort((a,b) => b.tq - a.tq);
+      return within[0] || null;
+    }
+    // L1
+    const valid = bids.filter(b => !b.alb).sort((a,b) => a.quote - b.quote);
+    return valid[0] || bids.slice().sort((a,b) => a.quote - b.quote)[0];
+  }
+  function reasonablenessCase(){
+    // Returns 'A' (reasonable) | 'B' (above TS) | 'C' (above EC by >10%) | 'D' (ALB) | 'qbs' (skip)
+    const m = EVAL.evaluationMethod || EVAL.method || 'L1';
+    if (m === 'QBS') return 'qbs';
+    const winner = getRecommendedVendor();
+    if (!winner) return null;
+    const quote = m === 'FBS' ? (EVAL.fbsBudget || ESTIMATE) : winner.quote;
+    const ec = ESTIMATE;
+    const ts = EVAL.ts;
+    if (quote < ec * 0.85) return 'D';
+    if (ts != null && quote > ts) return 'B';
+    if (quote > ec * 1.10) return 'C';
+    return 'A';
+  }
+  function f3Body(){
+    const m = EVAL.evaluationMethod || EVAL.method || 'L1';
+    const winner = getRecommendedVendor();
+    const ec = ESTIMATE;
+    const ts = EVAL.ts;
+    const quote = winner ? (m === 'FBS' ? (EVAL.fbsBudget || ESTIMATE) : winner.quote) : null;
+    const tName = (EVAL_TENDERS.find(t => t.id===EVAL.tnd)||AWARDED_TENDERS.find(t => t.id===EVAL.tnd)||{}).name || EVAL.tnd;
+
+    // === Intro / subtitle ===
+    const intro = `<div class="text-[13px]" style="color:#6B7280; margin-bottom:18px;">Verify whether the L1 bid is reasonable before recommending award. This is a mandatory step before proceeding to Bid Comparison.</div>`;
+
+    // === QBS — skip reasonableness ===
+    if (m === 'QBS'){
+      return intro + `<div class="info-box-amber">QBS evaluation is based on technical score only. Price is negotiated after selection — reasonableness check applies post-negotiation.</div>
+        <div style="display:flex; justify-content:flex-end;"><button class="proceed-btn-blue" onclick="sendToComparison()">Proceed to Bid Comparison →</button></div>`;
+    }
+
+    if (!winner){
+      return intro + `<div class="text-[12.5px] text-ink-500 italic">No recommended vendor yet.</div>`;
+    }
+
+    // === Comparison table (EC / TS / L1 / variances) ===
+    const evsec = ec ? ((quote - ec) / ec) * 100 : 0;
+    const tsvsec = ts != null ? ((quote - ts) / ts) * 100 : null;
+    const colorFor = (pct) => pct < 0 ? '#065F46' : pct > 10 ? '#991B1B' : '#92400E';
+    const ecPct = `<span style="color:${colorFor(evsec)}; font-weight:600;">${evsec>=0?'+':''}${evsec.toFixed(1)}% (${evsec<0?'below':'above'} estimate)</span>`;
+    const tsPct = ts != null
+      ? `<span style="color:${colorFor(tsvsec)}; font-weight:600;">${tsvsec>=0?'+':''}${tsvsec.toFixed(1)}% (${tsvsec<0?'below':'above'} TS value)</span>`
+      : '<span style="color:#9CA3AF;">TS not recorded</span>';
+    const summaryTable = `<div class="reason-summary-card" aria-live="polite">
+      <table>
+        <tr><td class="label-cell">Estimated Cost (EC)</td><td class="val-cell">₹${ec.toLocaleString('en-IN')}</td></tr>
+        <tr><td class="label-cell">Technical Sanction (TS) Value</td><td class="val-cell">${ts != null ? '₹'+ts.toLocaleString('en-IN') : '<span style="color:#9CA3AF;">Not recorded at tender upload</span>'}</td></tr>
+        <tr><td class="label-cell">${m === 'L1' ? 'L1' : m === 'QCBS' ? 'Recommended (combined)' : m === 'LCS' ? 'Lowest above-cutoff' : 'Within-budget quote'} — ${esc(winner.vendor)}</td><td class="val-cell">₹${(quote||0).toLocaleString('en-IN')}</td></tr>
+        <tr><td class="label-cell">${m === 'L1' ? 'L1' : 'Recommended'} vs EC</td><td class="val-cell">${ecPct}</td></tr>
+        <tr><td class="label-cell">${m === 'L1' ? 'L1' : 'Recommended'} vs TS</td><td class="val-cell">${tsPct}</td></tr>
+      </table>
+    </div>`;
+
+    // === Case selection ===
+    const caseKey = reasonablenessCase();
+    const rs = EVAL.reasonableness || (EVAL.reasonableness = { decision:null, note:'', retenderReason:'', confirmed:false });
+
+    let banner, decisionUI = '', proceedBtnDisabled = false;
+    if (caseKey === 'D'){
+      // ALB — handled in F2's ALB block; F3 just notes it
+      banner = `<div class="reason-banner case-b" aria-live="polite">
+        <div class="rb-head"><i data-lucide="alert-triangle" style="width:18px; height:18px;"></i> Abnormally low bid detected</div>
+        <div class="rb-body">${esc(winner.vendor)} quoted ₹${winner.quote.toLocaleString('en-IN')} — more than 15% below the estimate of ₹${ec.toLocaleString('en-IN')}. Record the ALB decision in Section 02 before proceeding with reasonableness.</div>
+      </div>`;
+      proceedBtnDisabled = !EVAL.albDecision;
+    } else if (caseKey === 'A'){
+      banner = `<div class="reason-banner case-a" aria-live="polite">
+        <div class="rb-head"><i data-lucide="check-circle-2" style="width:18px; height:18px;"></i> ${m === 'L1' ? 'L1 bid' : 'Recommended bid'} is reasonable</div>
+        <div class="rb-body">${m === 'L1' ? 'L1' : 'Recommended'} quote of ₹${quote.toLocaleString('en-IN')} is ${Math.abs(evsec).toFixed(1)}% ${evsec<0?'below':'above'} the estimated cost${ts != null ? ' and within the Technical Sanction value':''}. No further approval is required for reasonableness.</div>
+      </div>`;
+    } else if (caseKey === 'B'){
+      banner = `<div class="reason-banner case-b" aria-live="polite">
+        <div class="rb-head"><i data-lucide="alert-circle" style="width:18px; height:18px;"></i> ${m === 'L1' ? 'L1 bid' : 'Recommended bid'} exceeds Technical Sanction value</div>
+        <div class="rb-body">${m === 'L1' ? 'L1' : 'Recommended'} quote of ₹${quote.toLocaleString('en-IN')} is ${tsvsec.toFixed(1)}% above the Technical Sanction value of ₹${(ts||0).toLocaleString('en-IN')}. Fresh financial approval is required before award can proceed.</div>
+      </div>`;
+      decisionUI = renderReasonDecisionCards(['fresh_approval','retender'], rs);
+      proceedBtnDisabled = !rs.confirmed;
+    } else { // 'C'
+      banner = `<div class="reason-banner case-c" aria-live="polite">
+        <div class="rb-head"><i data-lucide="alert-triangle" style="width:18px; height:18px;"></i> ${m === 'L1' ? 'L1 bid' : 'Recommended bid'} is significantly above estimate</div>
+        <div class="rb-body">${m === 'L1' ? 'L1' : 'Recommended'} quote is ${evsec.toFixed(1)}% above the estimated cost. This may indicate uncompetitive bidding or scope underestimation. Review before proceeding.</div>
+        <div style="background:rgba(250,199,117,0.25); border-radius:6px; padding:8px 12px; margin:10px 0; font-size:12px; color:#92400E;">✦ AI suggests: Verify if market rates have changed since estimation. Consider negotiation with L1 vendor or re-estimating before re-tender.</div>
+      </div>`;
+      decisionUI = renderReasonDecisionCards(['proceed','negotiate','retender'], rs);
+      proceedBtnDisabled = !rs.confirmed;
+    }
+
+    // FBS-specific note: also compare fixed budget vs EC
+    let fbsNote = '';
+    if (m === 'FBS'){
+      const budget = EVAL.fbsBudget || ESTIMATE;
+      const budgetVsEc = ((budget - ec) / ec) * 100;
+      if (budgetVsEc > 10){
+        fbsNote = `<div class="info-box-amber" style="margin-bottom:14px;">Fixed budget (₹${budget.toLocaleString('en-IN')}) is ${budgetVsEc.toFixed(1)}% above the estimated cost. Consider whether the budget reflects scope changes since estimation.</div>`;
+      }
+    }
+
+    const proceedBtn = `<button class="${caseKey==='A' ? 'proceed-btn-green' : 'proceed-btn-blue'}" ${proceedBtnDisabled?'disabled':''} onclick="sendToComparison()">Proceed to Bid Comparison →</button>`;
+    return intro + fbsNote + summaryTable + banner + decisionUI + `<div style="display:flex; justify-content:flex-end; margin-top:16px;">${proceedBtn}</div>`;
+  }
+  function renderReasonDecisionCards(options, rs){
+    const labels = {
+      fresh_approval: ['Seek fresh financial approval', 'Escalate to competent authority for revised TS approval'],
+      retender:       ['Re-tender',                     'Cancel and re-issue with revised specifications or estimates'],
+      proceed:        ['Proceed anyway',                'Officer accepts the higher price with documented justification'],
+      negotiate:      ['Negotiate with L1',             'Initiate negotiation process in Bid Management'],
+    };
+    const cards = options.map(opt => {
+      const [t, d] = labels[opt];
+      return `<label class="reason-card ${rs.decision===opt?'on':''}" onclick="setReasonDecision('${opt}')"><input type="radio" name="rdec" ${rs.decision===opt?'checked':''} style="display:none;"><div><div class="rc-title">${esc(t)}</div><div class="rc-desc">${esc(d)}</div></div></label>`;
+    }).join('');
+    const cardsCls = options.length === 3 ? 'reason-cards-row three' : 'reason-cards-row';
+
+    let fieldHTML = '';
+    if (rs.decision === 'fresh_approval' || rs.decision === 'proceed' || rs.decision === 'negotiate'){
+      fieldHTML = `<div class="reason-decision-field"><label>Reason / notes</label><textarea id="rdNote" placeholder="Add context for the approving authority..." style="min-height:60px;">${esc(rs.note||'')}</textarea></div>`;
+    } else if (rs.decision === 'retender'){
+      fieldHTML = `<div class="reason-decision-field"><label>Reason for re-tender</label><select id="rdSelect">
+        <option value="" ${!rs.retenderReason?'selected':''}>Select a reason…</option>
+        <option value="L1 above TS" ${rs.retenderReason==='L1 above TS'?'selected':''}>L1 above TS</option>
+        <option value="Uncompetitive bids" ${rs.retenderReason==='Uncompetitive bids'?'selected':''}>Uncompetitive bids</option>
+        <option value="Scope changed" ${rs.retenderReason==='Scope changed'?'selected':''}>Scope changed</option>
+        <option value="Other" ${rs.retenderReason==='Other'?'selected':''}>Other</option>
+      </select></div>`;
+    }
+
+    const canConfirm = rs.decision && (
+      (rs.decision === 'retender' && rs.retenderReason) ||
+      (rs.decision !== 'retender' && (rs.note || '').trim())
+    );
+    const confirmBtn = `<button class="proceed-btn-blue" style="margin-top:14px; padding:9px 16px; font-size:13px;" ${canConfirm?'':'disabled'} onclick="confirmReasonDecision()">${rs.confirmed?'Decision recorded':'Confirm decision'}</button>`;
+
+    return `<div class="${cardsCls}">${cards}</div>${fieldHTML}<div>${confirmBtn}</div>`;
+  }
+  function setReasonDecision(opt){
+    const rs = EVAL.reasonableness || (EVAL.reasonableness = { decision:null, note:'', retenderReason:'', confirmed:false });
+    // Persist any in-progress field input before re-render
+    const noteEl = document.getElementById('rdNote'); if (noteEl) rs.note = noteEl.value;
+    const selEl  = document.getElementById('rdSelect'); if (selEl) rs.retenderReason = selEl.value;
+    rs.decision = opt;
+    rs.confirmed = false; // changing the decision invalidates prior confirmation
+    saveState();
+    renderFinancial();
+  }
+  function confirmReasonDecision(){
+    const rs = EVAL.reasonableness;
+    if (!rs.decision){ showToast('Pick a decision first'); return; }
+    const noteEl = document.getElementById('rdNote'); if (noteEl) rs.note = noteEl.value;
+    const selEl  = document.getElementById('rdSelect'); if (selEl) rs.retenderReason = selEl.value;
+    if (rs.decision === 'retender' && !rs.retenderReason){ showToast('Pick a re-tender reason'); return; }
+    if (rs.decision !== 'retender' && !(rs.note || '').trim()){ showToast('Add a note / reason'); return; }
+    rs.confirmed = true;
+    saveState(); renderFinancial();
+    showToast('Reasonableness decision recorded');
+  }
+
   function sendToComparison(){
     const alb = EVAL.finBids.map(b => QUOTE_NUM[b.vendor]||0).find(q => ((q-ESTIMATE)/ESTIMATE)*100 <= -15);
     if (alb && !EVAL.albDecision){ showToast('Record the Abnormally Low Bid decision first'); return; }
+    const caseKey = reasonablenessCase();
+    if (caseKey === 'B' || caseKey === 'C'){
+      if (!EVAL.reasonableness || !EVAL.reasonableness.confirmed){
+        showToast('Record the reasonableness decision first');
+        return;
+      }
+    }
     EVAL.finComplete = true;
     refreshStagePill(); saveState();
     location.href = 'comparative-statement.html?tender=' + EVAL.tnd;
