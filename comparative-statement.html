@@ -32,15 +32,148 @@
     ::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 8px; }
     ::-webkit-scrollbar-thumb:hover { background: #D1D5DB; }
     ::-webkit-scrollbar-track { background: transparent; }
-    .ev-row { transition: background .15s ease; cursor: pointer; }
-    .ev-row:hover { background: #F0F7FF; }
     .toast { transform: translateY(80px); opacity: 0; transition: transform .3s cubic-bezier(.2,.7,.2,1), opacity .25s ease; }
     .toast.show { transform: translateY(0); opacity: 1; }
     .field { border:1px solid #D1D5DB; border-radius:8px; padding:8px 12px; font-size:13px; width:100%; background:white; }
     .field:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 3px rgba(15,94,232,0.1); }
-    .radio-card { transition: all .15s ease; cursor: pointer; }
-    .radio-card:hover { border-color:#93C5FD; }
-    .radio-card.selected { border-color:#0F5EE8; background:#EFF6FF; }
+
+    /* === Landing list rows + search === */
+    .search-wrap { position:relative; }
+    .search-input { width:100%; border:1px solid #E5E7EB; border-radius:8px; padding:10px 14px 10px 38px; font-size:14px; background:white; color:#111827; transition: border-color .15s ease, box-shadow .15s ease; }
+    .search-input::placeholder { color:#9CA3AF; }
+    .search-input:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 3px rgba(15,94,232,0.1); }
+    .search-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); width:16px; height:16px; color:#9CA3AF; pointer-events:none; }
+    .ev-row { transition: background .15s ease, opacity .2s ease; cursor:pointer; }
+    .ev-row:hover { background:#F9FAFB; }
+    .ev-row.dimmed { opacity:0.3; pointer-events:none; }
+    @keyframes pulse-amber { 0%,100% { box-shadow:0 0 0 0 rgba(245,158,11,.5);} 50% { box-shadow:0 0 0 6px rgba(245,158,11,0);} }
+    .pulse-amber { animation: pulse-amber 1.6s ease-in-out infinite; }
+    .completed-toggle { display:inline-flex; align-items:center; gap:6px; font-size:13px; color:#6B7280; background:transparent; border:none; padding:4px 0; cursor:pointer; }
+    .completed-toggle:hover { color:#111827; }
+    .completed-zone { overflow:hidden; max-height:0; transition: max-height .2s ease; }
+    .completed-zone.open { max-height:800px; }
+
+    /* === Workspace toolbar === */
+    .filter-chip { display:inline-flex; align-items:center; gap:6px; padding:5px 12px; border-radius:999px; font-size:12px; cursor:pointer; transition: all .15s ease; }
+    .filter-chip.active { background:#EFF6FF; color:#0F5EE8; font-weight:600; }
+    .filter-chip.tag { background:#F3F4F6; color:#374151; }
+    .filter-chip .x { font-size:14px; line-height:1; opacity:0.65; }
+    .filter-chip.tag:hover .x { opacity:1; color:#EF4444; }
+    .toolbar-btn { display:inline-flex; align-items:center; gap:6px; padding:7px 12px; border:1px solid #E5E7EB; border-radius:8px; background:white; color:#374151; font-size:13px; cursor:pointer; transition: background .15s ease; position:relative; }
+    .toolbar-btn:hover { background:#F9FAFB; }
+    .toolbar-btn.purple { border-color:#C7BAFC; color:#6D44E6; }
+    .toolbar-btn.purple:hover { background:#F5F2FF; }
+    .toolbar-btn .count-badge { display:inline-flex; align-items:center; justify-content:center; min-width:16px; height:16px; padding:0 4px; border-radius:999px; background:#8B5CF6; color:white; font-size:10px; font-weight:700; margin-left:2px; }
+    .menu-dropdown { position:absolute; right:0; top:calc(100% + 6px); min-width:240px; background:white; border:1px solid #E5E7EB; border-radius:10px; box-shadow:0 12px 32px rgba(0,0,0,0.12); padding:6px; z-index:30; max-height:0; overflow:hidden; opacity:0; transition: max-height .2s ease, opacity .15s ease; }
+    .menu-dropdown.open { max-height:520px; opacity:1; }
+    .menu-dropdown .menu-item { display:flex; align-items:center; gap:8px; padding:8px 10px; font-size:13px; color:#374151; border-radius:6px; cursor:pointer; }
+    .menu-dropdown .menu-item:hover { background:#F9FAFB; }
+    .menu-dropdown .menu-item input[type="checkbox"] { accent-color:#0F5EE8; }
+    .menu-dropdown .menu-item.danger { color:#0F5EE8; }
+    .menu-dropdown .menu-section { padding:6px 10px; font-size:11px; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.04em; font-weight:600; }
+    .menu-dropdown .menu-divider { height:1px; background:#F3F4F6; margin:4px 0; }
+
+    /* Filter panel === */
+    .filter-panel { background:#F9FAFB; border:1px solid #E5E7EB; border-radius:10px; padding:16px 20px; margin-bottom:14px; max-height:0; overflow:hidden; transition: max-height 200ms ease, padding 200ms ease, margin 200ms ease; padding-top:0; padding-bottom:0; margin-bottom:0; }
+    .filter-panel.open { max-height:420px; padding:16px 20px; margin-bottom:14px; }
+    .filter-panel .grp-label { font-size:12px; font-weight:700; color:#374151; margin-bottom:6px; }
+    .filter-panel input[type="number"] { width:120px; border:1px solid #D1D5DB; border-radius:6px; padding:6px 10px; font-size:13px; }
+    .filter-panel input[type="number"]:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 2px rgba(15,94,232,0.15); }
+    .range-dual { display:flex; align-items:center; gap:10px; }
+    .range-dual input[type="range"] { flex:1; accent-color:#0F5EE8; }
+    .checkbox-row { display:flex; gap:14px; flex-wrap:wrap; font-size:13px; color:#374151; }
+    .checkbox-row label { display:inline-flex; align-items:center; gap:6px; cursor:pointer; }
+
+    /* === Notes global panel === */
+    .notes-panel { background:white; border:1px solid #E5E7EB; border-radius:12px; padding:20px 24px; margin-bottom:16px; max-height:0; overflow:hidden; transition: max-height 200ms ease, padding 200ms ease; padding-top:0; padding-bottom:0; }
+    .notes-panel.open { max-height:1200px; padding:20px 24px; }
+    .note-card { background:#F9FAFB; border-radius:6px; padding:10px 12px; margin-bottom:8px; }
+    .note-card .nc-text { font-size:13px; color:#374151; line-height:1.5; }
+    .note-card .nc-meta { font-size:11px; color:#9CA3AF; margin-top:4px; }
+
+    /* === Comparison table === */
+    .comp-table-wrap { background:white; border:1px solid #E5E7EB; border-radius:12px; overflow:hidden; }
+    .comp-table { width:100%; table-layout:fixed; border-collapse:collapse; }
+    .comp-table th, .comp-table td { padding:10px 12px; font-size:11px; vertical-align:middle; }
+    .comp-table thead .grp-header { background:#F3F4F6; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.05em; font-weight:600; text-align:center; font-size:11px; padding:6px 12px; border-bottom:1px solid #E5E7EB; }
+    .comp-table thead .grp-vendor    { background:#F9FAFB !important; }
+    .comp-table thead .grp-technical { background:#F0F7FF !important; }
+    .comp-table thead .grp-financial { background:#F0FDF4 !important; }
+    .comp-table thead .grp-comparison { background:#EEEDFE !important; }
+    .comp-table thead .grp-decision  { background:#F9FAFB !important; }
+    .comp-table thead .col-th { background:#F9FAFB; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; font-weight:600; font-size:11px; padding:10px 12px; white-space:nowrap; text-align:left; cursor:default; user-select:none; border-bottom:1px solid #E5E7EB; }
+    .comp-table thead .col-th.sortable { cursor:pointer; }
+    .comp-table thead .col-th.sortable:hover { background:#F0F7FF; }
+    .comp-table thead .col-th.sortable:hover .sort-icon { color:#0F5EE8; }
+    .comp-table thead .col-th .sort-icon { color:#C4C9D4; margin-left:4px; vertical-align:-2px; transition: color .15s ease; }
+    .comp-table thead .col-th[aria-sort="ascending"] .sort-icon,
+    .comp-table thead .col-th[aria-sort="descending"] .sort-icon { color:#0F5EE8; }
+    .comp-table tbody td { padding:14px 12px; font-size:13px; color:#374151; border-bottom:1px solid #F3F4F6; }
+    .comp-table tbody tr { transition: background .15s ease, opacity .15s ease; }
+    .comp-table tbody tr:hover { background:#F8FBFF; }
+    .comp-table tbody tr.winner-row td:first-child { border-left:3px solid #10B981; }
+    .comp-table tbody tr.winner-row { background:#FAFFFE; }
+    .comp-table tbody tr.ntq-row { opacity:0.55; }
+    .comp-table tbody tr.ntq-row td:first-child { border-left:3px solid #EF4444; }
+    .comp-table tbody tr.selected-row { background:#F0F7FF !important; }
+    .comp-table tfoot td { background:#F9FAFB; border-top:2px solid #E5E7EB; padding:10px 12px; font-size:12px; color:#6B7280; }
+    .col-hidden { display:none !important; }
+
+    .rank-badge { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:50%; color:white; font-size:13px; font-weight:700; }
+    .pq-pill-q { background:#F0FDF4; color:#065F46; border-radius:20px; padding:3px 10px; font-size:11px; font-weight:600; }
+    .pq-pill-dq { background:#FEF2F2; color:#991B1B; border-radius:20px; padding:3px 10px; font-size:11px; font-weight:600; }
+    .tq-bar-track { width:100%; height:4px; background:#E5E7EB; border-radius:2px; overflow:hidden; margin-top:6px; }
+    .tq-bar-fill { height:100%; background:#0F5EE8; border-radius:2px; transition: width 150ms ease; }
+    .tq-rank-pill { background:#F3F4F6; border-radius:4px; padding:2px 8px; font-size:12px; color:#374151; display:inline-block; }
+    .flag-pill { display:inline-block; border-radius:4px; padding:2px 7px; font-size:11px; font-weight:600; margin-right:4px; margin-bottom:2px; }
+    .flag-alb        { background:#FEF2F2; color:#991B1B; }
+    .flag-high       { background:#FFFBEB; color:#92400E; }
+    .flag-above-ts   { background:#FEF2F2; color:#991B1B; }
+    .flag-clean      { background:#F0FDF4; color:#065F46; }
+    .flag-ntq        { background:#FEF2F2; color:#991B1B; }
+    .flag-selected   { background:#F0FDF4; color:#065F46; border:1px solid #BBF7D0; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:700; }
+
+    .notes-btn { background:transparent; border:none; cursor:pointer; color:#9CA3AF; position:relative; padding:4px; border-radius:6px; transition: color .15s ease, background .15s ease; }
+    .notes-btn:hover { color:#0F5EE8; background:#F0F7FF; }
+    .notes-btn.has-notes { color:#8B5CF6; }
+    .notes-btn .note-count { position:absolute; top:-2px; right:-2px; min-width:14px; height:14px; padding:0 3px; background:#8B5CF6; color:white; border-radius:999px; font-size:9px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; }
+    .select-radio { width:18px; height:18px; accent-color:#0F5EE8; cursor:pointer; }
+    .select-radio:disabled { cursor:not-allowed; opacity:0.5; }
+
+    /* === Notes popover === */
+    .notes-popover { position:absolute; width:280px; background:white; border:1px solid #E5E7EB; border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.1); padding:14px 16px; z-index:50; }
+    .notes-popover textarea { width:100%; min-height:64px; border:1px solid #D1D5DB; border-radius:6px; padding:8px 10px; font-size:13px; resize:vertical; transition: border-color .15s ease, box-shadow .15s ease; }
+    .notes-popover textarea:focus { outline:none; border-color:#8B5CF6; box-shadow:0 0 0 3px rgba(139,92,246,0.15); }
+    .notes-popover .add-note-btn { background:#8B5CF6; color:white; border:none; border-radius:6px; padding:6px 14px; font-size:12px; cursor:pointer; transition: background .15s ease; }
+    .notes-popover .add-note-btn:hover { background:#7C3AED; }
+    @keyframes fade-in-note { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+    .note-card.new { animation: fade-in-note 200ms ease; }
+
+    /* === Selection bar (below table) === */
+    .select-bar { background:#EFF6FF; border:1px solid #BFDBFE; border-radius:0 0 12px 12px; padding:16px 20px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; max-height:0; overflow:hidden; transition: max-height 250ms ease, padding 250ms ease; padding-top:0; padding-bottom:0; }
+    .select-bar.open { max-height:240px; padding:16px 20px; }
+    .select-bar .sel-reason { border:1px solid #D1D5DB; border-radius:6px; padding:6px 10px; font-size:13px; background:white; min-width:240px; }
+    .select-bar .sel-reason:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 2px rgba(15,94,232,0.15); }
+    .select-bar .btn-confirm { background:#0F5EE8; color:white; border:none; border-radius:8px; padding:9px 20px; font-size:13px; font-weight:700; cursor:pointer; transition: background .15s ease; }
+    .select-bar .btn-confirm:hover { background:#0B4FCB; }
+    .select-bar .btn-confirm:disabled { background:#E5E7EB; color:#9CA3AF; cursor:not-allowed; }
+
+    /* === Confirmation dialog (in-flow, NOT position:fixed) === */
+    .main-col { position:relative; }
+    .modal-backdrop { position:absolute; top:64px; left:0; right:0; bottom:0; background:rgba(17,24,39,0.4); opacity:0; pointer-events:none; transition: opacity .2s ease; z-index:55; }
+    .modal-backdrop.open { opacity:1; pointer-events:auto; }
+    .modal-dialog { position:absolute; top:50%; left:50%; transform:translate(-50%, -50%) scale(0.96); opacity:0; pointer-events:none; width:520px; max-width:calc(100% - 32px); background:white; border:1px solid #E5E7EB; border-radius:12px; box-shadow:0 20px 48px rgba(0,0,0,0.18); padding:24px; z-index:60; transition: opacity .2s ease, transform .2s ease; }
+    .modal-dialog.open { opacity:1; pointer-events:auto; transform:translate(-50%, -50%) scale(1); }
+    .modal-summary { background:#F9FAFB; border:1px solid #E5E7EB; border-radius:8px; padding:14px 16px; margin-top:14px; }
+    .modal-summary .row { display:flex; justify-content:space-between; font-size:13px; padding:4px 0; }
+    .modal-summary .row .lbl { color:#6B7280; }
+    .modal-summary .row .val { color:#111827; font-weight:600; }
+
+    /* === Success banner === */
+    .success-banner { background:#F0FDF4; border:1px solid #BBF7D0; border-radius:10px; padding:14px 18px; display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+    .success-banner .sb-text { font-size:14px; font-weight:700; color:#065F46; }
+    .success-banner .sb-meta { font-size:12px; color:#6B7280; margin-left:auto; }
+
     @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
   </style>
 </head>
@@ -108,7 +241,7 @@
   </aside>
 
   <!-- ============ MAIN ============ -->
-  <div class="flex-1 flex flex-col min-w-0">
+  <div class="flex-1 flex flex-col min-w-0 main-col">
     <header class="h-16 bg-white border-b border-line px-6 flex items-center gap-4 sticky top-0 z-30">
       <button aria-label="Toggle sidebar" class="text-ink-500 hover:text-ink-900"><i data-lucide="panel-left" class="w-5 h-5"></i></button>
       <div class="flex-1 max-w-xl relative">
@@ -126,16 +259,36 @@
 
     <main class="flex-1 overflow-y-auto px-8 py-6">
 
-      <!-- ============ SCREEN 2A — LANDING ============ -->
+      <!-- ============ SCREEN 1 — LANDING ============ -->
       <section id="screen-landing" class="space-y-5">
         <div>
           <h1 class="text-[24px] font-bold text-ink-900 leading-tight">Bid Comparison</h1>
-          <p class="text-[14px] text-ink-500 mt-1">Select a tender to build or review its comparative statement.</p>
+          <p class="text-[14px] text-ink-500 mt-1">Select a tender to compare all bids and make a final selection.</p>
         </div>
-        <div id="compList" class="bg-white border border-line rounded-xl overflow-hidden"></div>
+        <div class="search-wrap">
+          <i data-lucide="search" class="search-icon"></i>
+          <input id="landingSearch" type="search" class="search-input" placeholder="Search tenders by name, ID, department or sector..." oninput="filterCompList(this.value)" aria-label="Search tenders" />
+        </div>
+        <div id="landingSearchEmpty" class="hidden text-[14px] text-ink-500 text-center" style="padding:8px 0;"></div>
+
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.08em] font-semibold text-ink-500" style="margin-bottom:8px;">READY FOR COMPARISON</div>
+          <div id="readyList" class="bg-white border border-line rounded-xl overflow-hidden"></div>
+        </div>
+
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.08em] font-semibold text-ink-500" style="margin-top:20px; margin-bottom:8px;">COMPLETED</div>
+          <button id="completedToggle" class="completed-toggle" onclick="toggleCompleted()" aria-expanded="false">
+            <span id="completedToggleText">Show 1 completed</span>
+            <i id="completedToggleIcon" data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+          </button>
+          <div id="completedZone" class="completed-zone">
+            <div id="completedList" class="bg-white border border-line rounded-xl overflow-hidden" style="margin-top:8px;"></div>
+          </div>
+        </div>
       </section>
 
-      <!-- ============ SCREEN 2B — WORKSPACE ============ -->
+      <!-- ============ SCREEN 2 — WORKSPACE ============ -->
       <section id="screen-workspace" class="hidden space-y-5">
         <div class="flex items-center justify-between gap-3 flex-wrap">
           <div class="text-[13px] text-ink-500">
@@ -143,23 +296,65 @@
             <span class="mx-1.5 text-ink-400">/</span>
             <span id="wsCrumb" class="text-ink-900 font-mono">TND-2026-001</span>
           </div>
-          <a href="#" onclick="showLanding(); return false;" class="text-[13px] text-ink-500 hover:text-ink-900 inline-flex items-center gap-1.5"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back</a>
+          <a href="#" onclick="showLanding(); return false;" class="text-[13px] text-ink-500 hover:text-ink-900 inline-flex items-center gap-1.5"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back to all tenders</a>
         </div>
 
+        <!-- Tender context bar -->
         <div class="bg-white border border-line rounded-xl flex flex-col lg:flex-row lg:items-center justify-between gap-4" style="padding:16px 20px;">
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
               <span id="wsBadge" class="text-[11.5px] font-bold text-primary font-mono" style="background:#EFF6FF; border-radius:6px; padding:2px 8px;">TND-2026-001</span>
-              <span id="wsName" class="text-[16px] font-bold text-ink-900">Supply of Desktop Computers</span>
+              <span id="wsName" class="text-[16px] font-bold text-ink-900">Supply of Desktop Computers for AMC Offices</span>
             </div>
-            <div id="wsMeta" class="text-[12px] text-ink-500 mt-1">IT · Goods · Est. ₹27,85,350</div>
+            <div id="wsMeta" class="text-[12px] text-ink-500 mt-1">IT · Goods · Est. ₹27,85,350 · TS: ₹27,00,000 · Method: L1</div>
           </div>
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-semibold" style="background:#EFF6FF; color:#0C447C;"><span class="w-1.5 h-1.5 rounded-full" style="background:#0F5EE8;"></span> Comparison in progress</span>
+          <div class="flex items-center gap-3 flex-wrap">
+            <span id="wsSelectionPill" aria-live="polite" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-semibold" style="background:#F3F4F6; color:#6B7280;"><span class="w-1.5 h-1.5 rounded-full" style="background:#9CA3AF;"></span> No selection made</span>
+            <button id="wsLockBtn" onclick="toggleLock()" class="inline-flex items-center gap-1.5" style="border:1px solid #0F5EE8; border-radius:8px; padding:7px 14px; font-size:13px; color:#0F5EE8; background:white; cursor:pointer;" onmouseover="this.style.background='#EFF6FF'" onmouseout="this.style.background='white'"><i data-lucide="lock-open" class="w-3.5 h-3.5"></i> <span id="wsLockBtnText">Lock Comparison</span></button>
+          </div>
         </div>
 
-        <div id="compWorkspace"></div>
+        <!-- Success banner (after confirm) -->
+        <div id="wsSuccessBanner" class="success-banner hidden"></div>
+
+        <!-- Toolbar -->
+        <div class="flex items-center justify-between gap-3 flex-wrap" style="margin-bottom:14px;">
+          <div class="flex items-center gap-2 flex-wrap" id="toolbarLeft"></div>
+          <div class="flex items-center gap-2 flex-wrap" style="position:relative;">
+            <button class="toolbar-btn" onclick="toggleColumnsMenu(event)"><i data-lucide="columns-3" class="w-3.5 h-3.5"></i> Columns ▾</button>
+            <div id="columnsMenu" class="menu-dropdown" style="right:auto; left:0;"></div>
+            <button class="toolbar-btn" onclick="showToast('Comparative Statement PDF generated')"><i data-lucide="download" class="w-3.5 h-3.5"></i> Export PDF</button>
+            <button class="toolbar-btn" onclick="showToast('Comparison exported as Excel')"><i data-lucide="table" class="w-3.5 h-3.5"></i> Export Excel</button>
+            <button class="toolbar-btn purple" onclick="toggleNotesPanel()"><i data-lucide="notebook-pen" class="w-3.5 h-3.5"></i> Notes<span id="notesCountBadge" class="count-badge hidden">0</span></button>
+          </div>
+        </div>
+
+        <!-- Filter panel (slides down) -->
+        <div id="filterPanel" class="filter-panel" aria-hidden="true"></div>
+
+        <!-- Notes global panel (slides down) -->
+        <div id="notesPanel" class="notes-panel" aria-hidden="true"></div>
+
+        <!-- Comparison table + Selection bar -->
+        <div id="compTableHost" class="comp-table-wrap"></div>
+        <div id="selectionBar" class="select-bar" aria-live="polite"></div>
+
+        <!-- Post-confirm actions -->
+        <div id="postConfirmActions" class="hidden flex items-center justify-end gap-2" style="margin-top:14px;">
+          <button class="toolbar-btn" onclick="showToast('Comparative Statement PDF generated')"><i data-lucide="download" class="w-3.5 h-3.5"></i> Download Comparative Statement (PDF)</button>
+          <button onclick="proceedToBidMgmt()" style="background:#10B981; color:white; border:none; border-radius:8px; padding:10px 18px; font-size:14px; font-weight:700; cursor:pointer;">Proceed to Bid Management →</button>
+        </div>
+
+        <div class="h-4"></div>
       </section>
     </main>
+
+    <!-- In-flow notes popover (positioned absolutely on click) -->
+    <div id="notesPopover" class="notes-popover hidden" role="dialog" aria-modal="false"></div>
+
+    <!-- In-flow confirmation modal (NOT position:fixed — anchored within .main-col) -->
+    <div id="modalBackdrop" class="modal-backdrop" onclick="closeConfirmModal()"></div>
+    <div id="modalDialog" class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle"></div>
   </div>
 </div>
 
@@ -171,6 +366,7 @@
 
 <script>
   function refreshIcons(){ if (window.lucide) lucide.createIcons(); }
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
   let toastT = null;
   function showToast(msg){
     const t = document.getElementById('toast');
@@ -180,190 +376,1010 @@
   }
 
   // ===================== DATA =====================
+  // Top-level tender list (shown on landing)
   const COMP_TENDERS = [
-    { id:'TND-2026-001', name:'Supply of Desktop Computers', dept:'IT',    sector:'Goods', cost:'₹27,85,350', stage:'progress' },
-    { id:'TND-2026-003', name:'Water Pipeline Kalyan',       dept:'Water', sector:'Works', cost:'₹1,20,00,000', stage:'ready' },
-    { id:'TND-2026-007', name:'LED Street Light',            dept:'Engineering', sector:'Goods', cost:'₹28,50,000', stage:'complete' },
-  ];
-  const STAGE_META = {
-    ready:    { dot:'#9CA3AF', label:'Ready for comparison' },
-    progress: { dot:'#0F5EE8', label:'Comparison in progress' },
-    complete: { dot:'#10B981', label:'Complete' },
-  };
-  const ESTIMATE = 2785350;
-  const METHOD = 'QCBS';
-  const COMP_VENDORS = [
-    { vendor:'Rajesh Constructions',  tq:82, quote:2640000, fin:100  },
-    { vendor:'Maharashtra Roads Co.', tq:74, quote:2810000, fin:93.9 },
-    { vendor:'BuildTech Solutions',   tq:68, quote:3180000, fin:83.0 },
-    { vendor:'NCC Infrastructure',    tq:71, quote:2210000, fin:100  },
+    { id:'TND-2026-001', name:'Supply of Desktop Computers', dept:'IT',         sector:'Goods', method:'L1',         status:'pending'  },
+    { id:'TND-2026-003', name:'Water Pipeline Kalyan',       dept:'Water',      sector:'Works', method:'QCBS 70:30', status:'pending'  },
+    { id:'TND-2026-007', name:'LED Street Light Retrofit',   dept:'Engineering',sector:'Goods', method:'L1',         status:'complete' },
   ];
 
-  // ===================== STATE =====================
+  // Per-tender bid datasets (precomputed variances per spec)
+  const TENDER_BIDS = {
+    'TND-2026-001': {
+      title:'Supply of Desktop Computers for AMC Offices',
+      estimate:2785350, ts:2700000, method:'L1', weightT:70, weightF:30,
+      bids:[
+        { vendor:'Rajesh Constructions Pvt Ltd', ref:'BID-001', companyType:'Pvt Ltd',     pqStatus:'q',  tq:82,   quote:2640000, vsEstimate:-5.2,  vsTs:-2.2,  combined:87.4, flags:['clean'] },
+        { vendor:'Maharashtra Roads Co.',        ref:'BID-002', companyType:'Pvt Ltd',     pqStatus:'q',  tq:74,   quote:2810000, vsEstimate:0.9,   vsTs:4.1,   combined:79.9, flags:['clean'] },
+        { vendor:'BuildTech Solutions',          ref:'BID-003', companyType:'LLP',         pqStatus:'q',  tq:68,   quote:3180000, vsEstimate:14.3,  vsTs:17.8,  combined:72.5, flags:['high','above-ts'] },
+        { vendor:'NCC Infrastructure Ltd',       ref:'BID-004', companyType:'Pvt Ltd',     pqStatus:'q',  tq:71,   quote:2210000, vsEstimate:-20.5, vsTs:-18.1, combined:79.7, flags:['alb'] },
+        { vendor:'Patil & Associates',           ref:'BID-005', companyType:'Partnership', pqStatus:'dq', tq:null, quote:null,    vsEstimate:null,  vsTs:null,  combined:null, flags:['ntq'] },
+      ],
+    },
+    'TND-2026-003': {
+      title:'Water Pipeline Kalyan',
+      estimate:12000000, ts:11800000, method:'QCBS', weightT:70, weightF:30,
+      bids:[
+        { vendor:'Rajesh Constructions Pvt Ltd', ref:'BID-101', companyType:'Pvt Ltd',     pqStatus:'q', tq:78, quote:11700000, vsEstimate:-2.5, vsTs:-0.8, combined:85.2, flags:['clean'] },
+        { vendor:'NCC Infrastructure Ltd',       ref:'BID-102', companyType:'Pvt Ltd',     pqStatus:'q', tq:84, quote:12200000, vsEstimate:1.7,  vsTs:3.4,  combined:84.6, flags:['clean'] },
+        { vendor:'Maharashtra Roads Co.',        ref:'BID-103', companyType:'Pvt Ltd',     pqStatus:'q', tq:75, quote:11900000, vsEstimate:-0.8, vsTs:0.8,  combined:82.5, flags:['clean'] },
+        { vendor:'BuildTech Solutions',          ref:'BID-104', companyType:'LLP',         pqStatus:'q', tq:69, quote:13400000, vsEstimate:11.7, vsTs:13.6, combined:75.8, flags:['high','above-ts'] },
+        { vendor:'Patil & Associates',           ref:'BID-105', companyType:'Partnership', pqStatus:'q', tq:62, quote:11500000, vsEstimate:-4.2, vsTs:-2.5, combined:75.7, flags:['clean'] },
+      ],
+    },
+    'TND-2026-007': {
+      title:'LED Street Light Retrofit',
+      estimate:2850000, ts:2800000, method:'L1', weightT:70, weightF:30,
+      bids:[
+        { vendor:'LED Solutions Ltd', ref:'BID-201', companyType:'Pvt Ltd', pqStatus:'q', tq:80, quote:2720000, vsEstimate:-4.6, vsTs:-2.9, combined:null, flags:['clean'] },
+        { vendor:'GreenLight Inc.',   ref:'BID-202', companyType:'Pvt Ltd', pqStatus:'q', tq:74, quote:2810000, vsEstimate:-1.4, vsTs:0.4,  combined:null, flags:['clean'] },
+        { vendor:'BrightCorp',        ref:'BID-203', companyType:'LLP',     pqStatus:'q', tq:68, quote:2890000, vsEstimate:1.4,  vsTs:3.2,  combined:null, flags:['clean'] },
+      ],
+    },
+  };
+  // Seeded officer notes per the spec
+  const SEED_NOTES = {
+    'TND-2026-001': {
+      'Rajesh Constructions Pvt Ltd': [
+        { text:"Strong technical team. Good track record with similar AMC tenders. Recommend verification of ISO certificate validity.", author:'Rajesh Kumar', timestamp:'May 18, 10:42 AM' },
+      ],
+      'NCC Infrastructure Ltd': [
+        { text:"ALB accepted with enhanced security decision made. Monitor closely during execution.", author:'Rajesh Kumar', timestamp:'May 18, 11:20 AM' },
+      ],
+    },
+  };
+
+  // Column model — drives both the header and the body
+  const COLUMNS = [
+    { id:'rank',        label:'Rank',           group:'vendor',     width:'52px',  sortable:true,  align:'center' },
+    { id:'vendor',      label:'Vendor',         group:'vendor',     width:'180px', sortable:true },
+    { id:'companyType', label:'Company Type',   group:'vendor',     width:'100px' },
+    { id:'pqStatus',    label:'PQ Status',      group:'technical',  width:'100px' },
+    { id:'tqScore',     label:'TQ Score /100',  group:'technical',  width:'110px', sortable:true },
+    { id:'tqRank',      label:'TQ Rank',        group:'technical',  width:'80px' },
+    { id:'quoted',      label:'Quoted (₹)',     group:'financial',  width:'130px', sortable:true },
+    { id:'vsEstimate',  label:'vs Estimate',    group:'financial',  width:'110px', sortable:true },
+    { id:'vsTs',        label:'vs TS Value',    group:'financial',  width:'110px', sortable:true },
+    { id:'combined',    label:'Combined Score', group:'comparison', width:'120px', sortable:true, methodGated:['QCBS','LCS'] },
+    { id:'flags',       label:'Flags',          group:'comparison', width:'110px' },
+    { id:'notes',       label:'Notes',          group:'decision',   width:'80px',  align:'center' },
+    { id:'select',      label:'Select',         group:'decision',   width:'90px',  align:'center' },
+  ];
+  const GROUPS = [
+    { id:'vendor',     label:'Vendor Info', tint:'grp-vendor' },
+    { id:'technical',  label:'Technical',   tint:'grp-technical' },
+    { id:'financial',  label:'Financial',   tint:'grp-financial' },
+    { id:'comparison', label:'Comparison',  tint:'grp-comparison' },
+    { id:'decision',   label:'Decision',    tint:'grp-decision' },
+  ];
+
+  const SELECTION_REASONS = [
+    'L1 — Lowest quote among TQ bids',
+    'QCBS — Highest combined score',
+    'Best value for money',
+    'Only qualified bidder',
+    'Committee recommendation',
+    'Custom reason',
+  ];
+
+  function defaultColumnVisibility(){
+    const v = {};
+    COLUMNS.forEach(c => { v[c.id] = true; });
+    return v;
+  }
+  function defaultFilters(){
+    return { tqMin:0, tqMax:100, quoteMin:null, quoteMax:null, showTQ:true, showNTQ:true, showALB:true };
+  }
+  function defaultSort(){ return { column:'rank', direction:'asc' }; }
+
+  // ===================== STATE per workspace =====================
   let COMP = null;
-  function freshComp(tnd){ return { tnd, locked:false, lockedBy:'', notes:{}, albDecision:null, albNote:'' }; }
-  function saveComp(){ try { localStorage.setItem('comparison_'+COMP.tnd, JSON.stringify(COMP)); } catch(e){} }
-  function loadComp(tnd){ try { const r = localStorage.getItem('comparison_'+tnd); if (r) return JSON.parse(r); } catch(e){} return null; }
+  // UI-only state, not persisted
+  let _ui = { filterPanelOpen:false, notesPanelOpen:false, columnsMenuOpen:false, pendingVendor:null };
+
+  function freshComp(tnd){
+    return {
+      tnd,
+      locked: false,
+      selectedVendor: null,
+      selectionReason: null,
+      selectionCustomReason: '',
+      selectionDate: null,
+      selectionOfficer: null,
+      notes: { general: [] },
+      columnVisibility: defaultColumnVisibility(),
+      activeSort: defaultSort(),
+      activeFilters: defaultFilters(),
+    };
+  }
+  function saveComp(){
+    if (!COMP) return;
+    try { localStorage.setItem('comparison_'+COMP.tnd, JSON.stringify(COMP)); } catch(e){}
+  }
+  function loadComp(tnd){
+    try { const r = localStorage.getItem('comparison_'+tnd); if (r) return JSON.parse(r); } catch(e){}
+    return null;
+  }
+  function seedNotesForTender(tnd){
+    const out = { general: [] };
+    const src = SEED_NOTES[tnd] || {};
+    for (const k of Object.keys(src)) out[k] = src[k].slice();
+    return out;
+  }
+  function seedCompletedDemo(tnd){
+    const c = freshComp(tnd);
+    const ds = TENDER_BIDS[tnd];
+    if (!ds || !ds.bids.length) return c;
+    c.locked = true;
+    c.selectedVendor = ds.bids[0].vendor;
+    c.selectionReason = 'L1 — Lowest quote among TQ bids';
+    c.selectionDate = '2026-05-12';
+    c.selectionOfficer = 'Rajesh Kumar';
+    return c;
+  }
 
   // ===================== LANDING =====================
-  function renderCompList(){
-    document.getElementById('compList').innerHTML = COMP_TENDERS.map(t => {
-      const m = STAGE_META[t.stage];
-      return `<div class="ev-row" onclick="openWorkspace('${t.id}')" tabindex="0" role="button" onkeydown="if(event.key==='Enter')openWorkspace('${t.id}')" style="padding:14px 16px; border-bottom:1px solid #F3F4F6; display:flex; align-items:center; gap:16px;">
-        <span class="w-2 h-2 rounded-full shrink-0" style="background:${m.dot};"></span>
-        <span class="font-mono text-[12px] font-semibold text-primary shrink-0" style="background:#EFF6FF; border-radius:4px; padding:2px 6px; width:108px; text-align:center;">${t.id}</span>
-        <div class="flex-1 min-w-0">
-          <div class="text-[14px] font-medium text-ink-900 truncate">${t.name}</div>
-          <div class="text-[12px] text-ink-400">${t.dept} · ${t.sector}</div>
-        </div>
-        <div class="shrink-0 text-[12.5px] text-ink-500" style="width:200px; text-align:right;">${m.label}</div>
-        <i data-lucide="chevron-right" class="w-4 h-4 text-ink-400 shrink-0"></i>
-      </div>`;
-    }).join('');
-    refreshIcons();
-  }
   function showLanding(){
     try { history.replaceState(null,'',location.pathname); } catch(e){}
+    closeConfirmModal();
+    closeNotesPopover();
     document.getElementById('screen-workspace').classList.add('hidden');
     document.getElementById('screen-landing').classList.remove('hidden');
-    renderCompList();
+    renderLanding();
+    const sb = document.getElementById('landingSearch');
+    if (sb){ sb.value=''; filterCompList(''); }
     window.scrollTo({ top:0 });
   }
+
+  function renderLanding(){
+    const ready    = COMP_TENDERS.filter(t => t.status === 'pending');
+    const completed = COMP_TENDERS.filter(t => t.status === 'complete');
+    document.getElementById('readyList').innerHTML = ready.map(t => renderLandingRow(t)).join('');
+    document.getElementById('completedList').innerHTML = completed.map(t => renderLandingRow(t)).join('');
+    const tt = document.getElementById('completedToggleText');
+    if (tt) tt.textContent = (completed.length === 1 ? 'Show 1 completed' : 'Show '+completed.length+' completed');
+    refreshIcons();
+  }
+  function renderLandingRow(t){
+    const ds = TENDER_BIDS[t.id] || { bids:[] };
+    const tqCount = ds.bids.filter(b => b.pqStatus === 'q').length;
+    const isPending = t.status === 'pending';
+    const dot = isPending
+      ? '<span class="w-2 h-2 rounded-full shrink-0 pulse-amber" style="background:#F59E0B;" title="Pending comparison"></span>'
+      : '<span class="w-2 h-2 rounded-full shrink-0" style="background:#10B981;" title="Selection made"></span>';
+    const statusText = isPending
+      ? '<span style="color:#92400E;">Comparison pending</span>'
+      : '<span style="color:#065F46;">Selection made</span>';
+    return `<div class="ev-row" data-name="${esc((t.name||'').toLowerCase())}" data-id="${esc((t.id||'').toLowerCase())}" data-dept="${esc((t.dept||'').toLowerCase())}" data-sector="${esc((t.sector||'').toLowerCase())}" onclick="openWorkspace('${esc(t.id)}')" tabindex="0" role="button" onkeydown="if(event.key==='Enter')openWorkspace('${esc(t.id)}')" style="padding:14px 16px; border-bottom:1px solid #F3F4F6; display:flex; align-items:center; gap:16px;">
+      ${dot}
+      <span class="font-mono text-[11px] font-bold text-primary shrink-0" style="background:#EFF6FF; border-radius:4px; padding:2px 6px; width:108px; text-align:center;">${esc(t.id)}</span>
+      <div class="flex-1 min-w-0">
+        <div class="text-[14px] font-medium text-ink-900 truncate">${esc(t.name)}</div>
+        <div class="text-[12px] text-ink-400">${esc(t.dept)} · ${esc(t.sector)}</div>
+      </div>
+      <span style="background:#F3F4F6; border-radius:20px; padding:2px 8px; font-size:11px; color:#374151;" class="shrink-0">${esc(t.method)}</span>
+      <span class="shrink-0 text-[12px] text-ink-500" style="width:80px; text-align:right;">${tqCount} TQ bid${tqCount===1?'':'s'}</span>
+      <span class="shrink-0 text-[12px]" style="width:170px; text-align:right;">${statusText}</span>
+      <i data-lucide="chevron-right" class="w-4 h-4 text-ink-400 shrink-0"></i>
+    </div>`;
+  }
+  function filterCompList(query){
+    const q = (query||'').trim().toLowerCase();
+    const rows = document.querySelectorAll('#readyList .ev-row, #completedList .ev-row');
+    let matches = 0;
+    rows.forEach(r => {
+      const hay = (r.dataset.name||'')+' '+(r.dataset.id||'')+' '+(r.dataset.dept||'')+' '+(r.dataset.sector||'');
+      const ok = !q || hay.includes(q);
+      r.classList.toggle('dimmed', !ok);
+      if (ok) matches++;
+    });
+    const empty = document.getElementById('landingSearchEmpty');
+    if (empty){
+      if (q && matches === 0){
+        empty.textContent = 'No tenders found for "'+query+'"';
+        empty.classList.remove('hidden');
+      } else empty.classList.add('hidden');
+    }
+  }
+  let _completedOpen = false;
+  function toggleCompleted(){
+    _completedOpen = !_completedOpen;
+    const zone = document.getElementById('completedZone');
+    const btn  = document.getElementById('completedToggle');
+    const txt  = document.getElementById('completedToggleText');
+    const icon = document.getElementById('completedToggleIcon');
+    const completedCount = COMP_TENDERS.filter(t => t.status==='complete').length;
+    if (_completedOpen){
+      zone.classList.add('open');
+      btn.setAttribute('aria-expanded','true');
+      if (txt) txt.textContent = 'Hide completed';
+      if (icon) icon.setAttribute('data-lucide','chevron-up');
+    } else {
+      zone.classList.remove('open');
+      btn.setAttribute('aria-expanded','false');
+      if (txt) txt.textContent = (completedCount === 1 ? 'Show 1 completed' : 'Show '+completedCount+' completed');
+      if (icon) icon.setAttribute('data-lucide','chevron-down');
+    }
+    refreshIcons();
+  }
+
+  // ===================== WORKSPACE =====================
   function openWorkspace(tnd){
     try { history.replaceState(null,'','?tender='+encodeURIComponent(tnd)); } catch(e){}
+    closeConfirmModal();
+    closeNotesPopover();
     const t = COMP_TENDERS.find(x => x.id === tnd) || COMP_TENDERS[0];
-    COMP = loadComp(tnd) || freshComp(tnd);
+    const ds = TENDER_BIDS[t.id] || TENDER_BIDS['TND-2026-001'];
+    const loaded = loadComp(tnd);
+    COMP = loaded || (t.status === 'complete' ? seedCompletedDemo(tnd) : freshComp(tnd));
+    // Migrate any older partial states
+    if (!COMP.notes) COMP.notes = { general: [] };
+    if (!COMP.notes.general) COMP.notes.general = [];
+    if (!COMP.columnVisibility) COMP.columnVisibility = defaultColumnVisibility();
+    if (!COMP.activeSort) COMP.activeSort = defaultSort();
+    if (!COMP.activeFilters) COMP.activeFilters = defaultFilters();
+    // Seed notes if empty for this tender
+    const seed = SEED_NOTES[tnd];
+    if (seed){
+      Object.keys(seed).forEach(v => {
+        if (!COMP.notes[v]) COMP.notes[v] = seed[v].slice();
+      });
+    }
+    _ui = { filterPanelOpen:false, notesPanelOpen:false, columnsMenuOpen:false, pendingVendor: COMP.selectedVendor || null };
+
+    // Populate context bar
     document.getElementById('wsCrumb').textContent = t.id;
     document.getElementById('wsBadge').textContent = t.id;
-    document.getElementById('wsName').textContent = t.name;
-    document.getElementById('wsMeta').textContent = `${t.dept} · ${t.sector} · Est. ${t.cost}`;
+    document.getElementById('wsName').textContent  = ds.title || t.name;
+    const tsTxt = ds.ts ? '₹'+ds.ts.toLocaleString('en-IN') : '—';
+    document.getElementById('wsMeta').textContent  = `${t.dept} · ${t.sector} · Est. ₹${(ds.estimate||0).toLocaleString('en-IN')} · TS: ${tsTxt} · Method: ${t.method}`;
+
     document.getElementById('screen-landing').classList.add('hidden');
     document.getElementById('screen-workspace').classList.remove('hidden');
     renderWorkspace();
     window.scrollTo({ top:0 });
   }
 
-  // ===================== WORKSPACE =====================
-  function computed(){
-    const lowest = Math.min(...COMP_VENDORS.map(v => v.quote));
-    return COMP_VENDORS.map(v => {
-      const finScore = (lowest / v.quote) * 100;
-      const combined = (v.tq * 0.7) + (finScore * 0.3);
-      const dev = ((v.quote - ESTIMATE) / ESTIMATE) * 100;
-      let flag = '';
-      if (dev <= -15) flag = 'ALB';
-      else if (dev >= 10) flag = 'High';
-      return { ...v, finScore, combined, dev, flag };
-    }).sort((a,b) => b.combined - a.combined).map((v,i) => ({ ...v, rank:i+1 }));
+  function tenderDataset(){
+    return TENDER_BIDS[COMP.tnd] || TENDER_BIDS['TND-2026-001'];
   }
-  function thS(){ return 'padding:10px 12px; font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; text-align:left;'; }
-  function tdS(){ return 'padding:11px 12px; font-size:12.5px; color:#374151;'; }
+  function methodForTender(){
+    const t = COMP_TENDERS.find(x => x.id === COMP.tnd);
+    if (!t) return 'L1';
+    return t.method.split(' ')[0]; // "QCBS 70:30" → "QCBS"
+  }
+  function combinedColumnVisible(){
+    const m = methodForTender();
+    const col = COLUMNS.find(c => c.id === 'combined');
+    return COMP.columnVisibility[col.id] && (!col.methodGated || col.methodGated.indexOf(m) !== -1);
+  }
+  function visibleColumns(){
+    return COLUMNS.filter(c => {
+      if (!COMP.columnVisibility[c.id]) return false;
+      if (c.id === 'combined' && !combinedColumnVisible()) return false;
+      return true;
+    });
+  }
+  function computedRows(){
+    const ds = tenderDataset();
+    const m = methodForTender();
+    // Rank: for QCBS use combined score desc; for L1/LCS/FBS use quote asc (ALB pushed to end); for QBS use TQ desc
+    const tq  = ds.bids.filter(b => b.pqStatus === 'q');
+    const ntq = ds.bids.filter(b => b.pqStatus !== 'q');
+    let ordered;
+    if (m === 'QCBS' || m === 'LCS'){
+      ordered = tq.slice().sort((a,b) => (b.combined||0) - (a.combined||0));
+    } else if (m === 'QBS'){
+      ordered = tq.slice().sort((a,b) => (b.tq||0) - (a.tq||0));
+    } else { // L1 / FBS
+      const nonAlb = tq.filter(b => !b.flags.includes('alb')).sort((a,b) => (a.quote||0) - (b.quote||0));
+      const albs   = tq.filter(b =>  b.flags.includes('alb')).sort((a,b) => (a.quote||0) - (b.quote||0));
+      ordered = nonAlb.concat(albs);
+    }
+    ordered.forEach((b,i) => b.rank = i+1);
+    ntq.forEach(b => b.rank = '—');
+    // TQ rank — strict by TQ score desc among qualifiers
+    const byTq = tq.slice().sort((a,b) => (b.tq||0) - (a.tq||0));
+    byTq.forEach((b,i) => b.tqRank = i+1);
+    ntq.forEach(b => b.tqRank = '—');
+    return { all: ordered.concat(ntq), tq: ordered, ntq };
+  }
+  function applySortAndFilters(rows){
+    const f = COMP.activeFilters;
+    const filtered = rows.filter(b => {
+      if (b.pqStatus !== 'q'){
+        return f.showNTQ; // NTQ rows shown only if filter allows
+      }
+      if (b.tq != null && (b.tq < (f.tqMin||0) || b.tq > (f.tqMax||100))) return false;
+      if (f.quoteMin != null && (b.quote||0) < f.quoteMin) return false;
+      if (f.quoteMax != null && (b.quote||0) > f.quoteMax) return false;
+      const isAlb = b.flags && b.flags.includes('alb');
+      if (isAlb && !f.showALB) return false;
+      if (!isAlb && !f.showTQ) return false;
+      return true;
+    });
+    // Sort — NTQ always at the bottom regardless
+    const tqRows  = filtered.filter(b => b.pqStatus === 'q');
+    const ntqRows = filtered.filter(b => b.pqStatus !== 'q');
+    const s = COMP.activeSort;
+    const dir = s.direction === 'desc' ? -1 : 1;
+    const cmp = (a,b) => {
+      let va, vb;
+      switch (s.column){
+        case 'rank':       va = a.rank;       vb = b.rank; break;
+        case 'vendor':     va = (a.vendor||'').toLowerCase(); vb = (b.vendor||'').toLowerCase(); break;
+        case 'tqScore':    va = a.tq||0;      vb = b.tq||0;  break;
+        case 'quoted':     va = a.quote||0;   vb = b.quote||0; break;
+        case 'vsEstimate': va = a.vsEstimate==null?0:a.vsEstimate; vb = b.vsEstimate==null?0:b.vsEstimate; break;
+        case 'vsTs':       va = a.vsTs==null?0:a.vsTs; vb = b.vsTs==null?0:b.vsTs; break;
+        case 'combined':   va = a.combined||0;vb = b.combined||0; break;
+        default:           va = a.rank;       vb = b.rank;
+      }
+      if (typeof va === 'string') return va.localeCompare(vb) * dir;
+      return (va - vb) * dir;
+    };
+    tqRows.sort(cmp);
+    return tqRows.concat(ntqRows);
+  }
 
+  // ============ RENDER ============
   function renderWorkspace(){
-    const rows = computed();
-    const alb = rows.find(r => r.flag === 'ALB');
-    const albDone = !alb || COMP.albDecision;
-    const proceedOk = COMP.locked && albDone;
-
-    const tableRows = rows.map(r => {
-      const isTop = r.rank === 1;
-      const devCol = r.dev <= -15 ? '#991B1B' : r.dev < 0 ? '#065F46' : r.dev > 10 ? '#991B1B' : '#92400E';
-      const flagPill = r.flag === 'ALB' ? `<span style="background:#FEF2F2; color:#991B1B; border-radius:20px; padding:2px 8px; font-size:11px; font-weight:600;">ALB</span>`
-        : r.flag === 'High' ? `<span style="background:#FFFBEB; color:#92400E; border-radius:20px; padding:2px 8px; font-size:11px; font-weight:600;">High</span>`
-        : '<span class="text-ink-400">—</span>';
-      const note = COMP.notes[r.vendor] || '';
-      return `<tr style="${isTop?'background:#F0FDF4;':''}">
-        <td style="${tdS()} ${isTop?'border-left:3px solid #10B981;':''} font-weight:700;">#${r.rank}</td>
-        <td style="${tdS()} font-weight:600; color:#111827;">${r.vendor}</td>
-        <td style="${tdS()}">${r.tq}</td>
-        <td style="${tdS()}">₹${r.quote.toLocaleString('en-IN')}</td>
-        <td style="${tdS()}">${r.finScore.toFixed(1)}</td>
-        <td style="${tdS()} font-weight:700; color:#0F5EE8;">${r.combined.toFixed(1)}</td>
-        <td style="${tdS()} color:${devCol}; font-weight:600;">${r.dev>0?'+':''}${r.dev.toFixed(1)}%</td>
-        <td style="${tdS()}">${flagPill}</td>
-        <td style="${tdS()} text-align:center;">
-          <button onclick="toggleNote('${r.vendor}', event)" aria-label="Officer note" title="${note?note.replace(/"/g,'&quot;'):'Add note'}" style="background:none; border:none; cursor:pointer; color:${note?'#0F5EE8':'#9CA3AF'};"><i data-lucide="${note?'message-square-text':'message-square'}" class="w-4 h-4"></i></button>
-        </td>
-      </tr>`;
-    }).join('');
-
-    const albSection = alb ? `
-      <div style="background:#FFFBEB; border-left:3px solid #F59E0B; border-radius:0 10px 10px 0; padding:16px 20px; margin-top:16px;">
-        <div class="text-[14px] font-bold" style="color:#92400E;">⚠ Abnormally Low Bid Detected</div>
-        <div class="text-[13px] mt-1" style="color:#374151;">${alb.vendor} quoted ₹${alb.quote.toLocaleString('en-IN')} — ${Math.abs(alb.dev).toFixed(1)}% below estimate of ₹${ESTIMATE.toLocaleString('en-IN')}.</div>
-        <div class="text-[12px] mt-1" style="color:#92400E;">✦ AI suggests: Accept with enhanced performance security (additional 10%) or reject with documented reason.</div>
-        ${COMP.albDecision ? `<div class="rounded-lg p-2.5 mt-3 text-[12.5px]" style="background:white; border:1px solid #E5E7EB;">✓ Decision recorded: <strong>${COMP.albDecision==='accept'?'Accept with enhanced security':'Reject'}</strong> — ${COMP.albNote}</div>` : `
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-3">
-          <label class="radio-card bg-white border border-line rounded-lg p-3 flex items-start gap-2.5 ${COMP._albSel==='accept'?'selected':''}" data-alb="accept" onclick="pickAlb('accept')">
-            <input type="radio" name="alb" class="accent-primary mt-0.5" ${COMP._albSel==='accept'?'checked':''}>
-            <div><div class="text-[13px] font-medium text-ink-900">Accept with enhanced security</div><div class="text-[11.5px] text-ink-500">Require additional 10% performance security</div></div>
-          </label>
-          <label class="radio-card bg-white border border-line rounded-lg p-3 flex items-start gap-2.5 ${COMP._albSel==='reject'?'selected':''}" data-alb="reject" onclick="pickAlb('reject')">
-            <input type="radio" name="alb" class="accent-primary mt-0.5" ${COMP._albSel==='reject'?'checked':''}>
-            <div><div class="text-[13px] font-medium text-ink-900">Reject</div><div class="text-[11.5px] text-ink-500">Reason required</div></div>
-          </label>
-        </div>
-        <textarea id="albNote" rows="2" class="field mt-2" placeholder="${COMP._albSel==='reject'?'Reason for rejection (required)':'Note (required)'}"></textarea>
-        <div class="flex justify-end mt-2"><button onclick="confirmAlb()" class="px-3.5 py-2 rounded-lg bg-primary text-white text-[12.5px] font-medium hover:bg-primary/90">Confirm decision</button></div>`}
-      </div>` : '';
-
-    document.getElementById('compWorkspace').innerHTML = `
-      <div class="bg-white border border-line rounded-xl overflow-hidden">
-        <div class="flex items-center justify-between gap-3 flex-wrap" style="padding:14px 18px; border-bottom:1px solid #E5E7EB;">
-          <div><span class="text-[15px] font-bold text-ink-900">Comparison — ${COMP.tnd}</span> <span class="text-[12.5px] text-ink-500 ml-1">${rows.length} vendors</span></div>
-          <div class="flex items-center gap-2">
-            <button onclick="showToast('Comparative statement PDF exported')" class="px-3 py-1.5 rounded-lg border border-line text-[12.5px] text-ink-900 hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Export PDF</button>
-            <button onclick="toggleLock()" class="px-3 py-1.5 rounded-lg border ${COMP.locked?'border-success text-success':'border-primary text-primary hover:bg-primary-light'} text-[12.5px] font-medium inline-flex items-center gap-1.5"><i data-lucide="${COMP.locked?'lock':'lock-open'}" class="w-3.5 h-3.5"></i> ${COMP.locked?'Locked':'Lock table'}</button>
-          </div>
-        </div>
-        <div style="padding:6px 18px; font-size:11.5px; ${COMP.locked?'color:#065F46;':'color:#9CA3AF;'} border-bottom:1px solid #F3F4F6;">${COMP.locked?'Locked by '+COMP.lockedBy+' · May 18 — table is immutable':'Unlocked — editable'}</div>
-        <div style="overflow-x:auto;">
-          <table style="width:100%; table-layout:fixed; border-collapse:collapse; min-width:880px;">
-            <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;">
-              <th style="${thS()} width:64px;">Rank</th><th style="${thS()} width:20%;">Vendor</th><th style="${thS()} width:84px;">TQ Score</th>
-              <th style="${thS()} width:15%;">Quoted Amount</th><th style="${thS()} width:11%;">Fin. Score</th><th style="${thS()} width:12%;">Combined</th>
-              <th style="${thS()} width:11%;">vs Estimate</th><th style="${thS()} width:80px;">Flag</th><th style="${thS()} width:64px; text-align:center;">Note</th>
-            </tr></thead>
-            <tbody>${tableRows}</tbody>
-          </table>
-        </div>
-      </div>
-      ${albSection}
-      <div class="flex justify-end mt-4">
-        <button onclick="proceedToBidMgmt()" class="px-4 py-2.5 rounded-lg ${proceedOk?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13.5px] font-medium inline-flex items-center gap-1.5" ${proceedOk?'':'disabled'}>Proceed to Bid Management <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
-      </div>
-      ${!proceedOk ? `<div class="text-[11.5px] text-ink-500 text-right mt-1">${!COMP.locked?'Lock the comparison table':'Record the ALB decision'} to proceed.</div>` : ''}`;
+    renderContextBar();
+    renderSelectionPill();
+    renderLockButton();
+    renderToolbar();
+    renderFilterPanel();
+    renderColumnsMenu();
+    renderTable();
+    renderSelectionBar();
+    renderNotesPanelIfOpen();
+    renderPostConfirmUI();
     refreshIcons();
   }
+  function renderContextBar(){
+    // Already populated in openWorkspace; nothing to do here unless we want to update on lock change
+  }
+  function renderSelectionPill(){
+    const pill = document.getElementById('wsSelectionPill');
+    if (!pill) return;
+    if (COMP.selectedVendor && COMP.locked){
+      pill.style.background = '#F0FDF4';
+      pill.style.color = '#065F46';
+      pill.innerHTML = '<span class="w-1.5 h-1.5 rounded-full" style="background:#10B981;"></span> Selection made ✓';
+    } else if (COMP.selectedVendor){
+      pill.style.background = '#EFF6FF';
+      pill.style.color = '#0C447C';
+      pill.innerHTML = '<span class="w-1.5 h-1.5 rounded-full" style="background:#0F5EE8;"></span> Selection pending confirmation';
+    } else {
+      pill.style.background = '#F3F4F6';
+      pill.style.color = '#6B7280';
+      pill.innerHTML = '<span class="w-1.5 h-1.5 rounded-full" style="background:#9CA3AF;"></span> No selection made';
+    }
+  }
+  function renderLockButton(){
+    const btn = document.getElementById('wsLockBtn');
+    const lbl = document.getElementById('wsLockBtnText');
+    if (!btn || !lbl) return;
+    if (COMP.locked){
+      btn.style.borderColor = '#10B981';
+      btn.style.color = '#10B981';
+      btn.onmouseover = function(){ this.style.background = '#F0FDF4'; };
+      btn.onmouseout  = function(){ this.style.background = 'white'; };
+      btn.innerHTML = '<i data-lucide="lock" class="w-3.5 h-3.5"></i> <span id="wsLockBtnText">Locked ✓</span>';
+    } else {
+      btn.style.borderColor = '#0F5EE8';
+      btn.style.color = '#0F5EE8';
+      btn.onmouseover = function(){ this.style.background = '#EFF6FF'; };
+      btn.onmouseout  = function(){ this.style.background = 'white'; };
+      btn.innerHTML = '<i data-lucide="lock-open" class="w-3.5 h-3.5"></i> <span id="wsLockBtnText">Lock Comparison</span>';
+    }
+  }
+  function renderToolbar(){
+    const f = COMP.activeFilters;
+    const visible = applySortAndFilters(computedRows().all).length;
+    const total   = computedRows().all.length;
+    const chips = [`<span class="filter-chip active" aria-live="polite">All (${visible})</span>`];
+    if (f.tqMin > 0 || f.tqMax < 100) chips.push(`<span class="filter-chip tag" onclick="clearFilter('tq')">Score: ${f.tqMin}–${f.tqMax} <span class="x">×</span></span>`);
+    if (f.quoteMin != null) chips.push(`<span class="filter-chip tag" onclick="clearFilter('quoteMin')">Min ₹${f.quoteMin.toLocaleString('en-IN')} <span class="x">×</span></span>`);
+    if (f.quoteMax != null) chips.push(`<span class="filter-chip tag" onclick="clearFilter('quoteMax')">Max ₹${f.quoteMax.toLocaleString('en-IN')} <span class="x">×</span></span>`);
+    if (!f.showNTQ) chips.push(`<span class="filter-chip tag" onclick="setFilter('showNTQ',true)">Hide NTQ <span class="x">×</span></span>`);
+    if (!f.showALB) chips.push(`<span class="filter-chip tag" onclick="setFilter('showALB',true)">Hide ALB <span class="x">×</span></span>`);
+
+    const sortOptions = [
+      ['rank|asc','Rank (default)'],['tqScore|desc','TQ Score: High to Low'],
+      ['quoted|asc','Quote: Low to High'],['quoted|desc','Quote: High to Low'],
+      ['combined|desc','Combined Score'],['vendor|asc','Vendor Name A–Z'],
+    ];
+    const currentKey = COMP.activeSort.column + '|' + COMP.activeSort.direction;
+    const sortSelect = `<select class="toolbar-btn" style="padding:6px 10px; border:1px solid #E5E7EB;" onchange="onSortSelectChange(this.value)">
+      ${sortOptions.map(o => `<option value="${o[0]}" ${currentKey===o[0]?'selected':''}>Sort by: ${o[1]}</option>`).join('')}
+    </select>`;
+    document.getElementById('toolbarLeft').innerHTML = `
+      <div class="flex items-center gap-2 flex-wrap">${chips.join('')}</div>
+      ${sortSelect}
+      <button class="toolbar-btn" onclick="toggleFilterPanel()"><i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i> Filters ${_ui.filterPanelOpen?'▴':'▾'}</button>`;
+  }
+  function renderFilterPanel(){
+    const panel = document.getElementById('filterPanel');
+    const f = COMP.activeFilters;
+    panel.innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:24px; align-items:flex-start;">
+      <div>
+        <div class="grp-label">TQ Score</div>
+        <div class="range-dual">
+          <input type="range" min="0" max="100" value="${f.tqMin}" id="fTqMin" oninput="onFilterChange('tqMin', this.value)" />
+          <input type="range" min="0" max="100" value="${f.tqMax}" id="fTqMax" oninput="onFilterChange('tqMax', this.value)" />
+        </div>
+        <div class="text-[12px] text-ink-500 mt-1" id="fTqLabel" aria-live="polite">${f.tqMin} – ${f.tqMax}</div>
+      </div>
+      <div>
+        <div class="grp-label">Quoted Amount (₹)</div>
+        <div class="flex items-center gap-2">
+          <input type="number" placeholder="Min ₹" value="${f.quoteMin==null?'':f.quoteMin}" id="fQMin" onchange="onFilterChange('quoteMin', this.value)" />
+          <span class="text-ink-400 text-[12px]">–</span>
+          <input type="number" placeholder="Max ₹" value="${f.quoteMax==null?'':f.quoteMax}" id="fQMax" onchange="onFilterChange('quoteMax', this.value)" />
+        </div>
+      </div>
+      <div>
+        <div class="grp-label">Evaluation verdict</div>
+        <div class="checkbox-row">
+          <label><input type="checkbox" ${f.showTQ?'checked':''}  onchange="onFilterChange('showTQ', this.checked)" /> TQ</label>
+          <label><input type="checkbox" ${f.showNTQ?'checked':''} onchange="onFilterChange('showNTQ', this.checked)" /> NTQ (show for reference)</label>
+          <label><input type="checkbox" ${f.showALB?'checked':''} onchange="onFilterChange('showALB', this.checked)" /> ALB flagged</label>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
+        <button class="text-[12px]" style="background:transparent; border:none; color:#6B7280; cursor:pointer;" onclick="clearAllFilters()">Clear all</button>
+        <button class="text-[12px] font-semibold" style="background:#0F5EE8; color:white; border:none; border-radius:6px; padding:7px 14px; cursor:pointer;" onclick="applyFiltersBtn()">Apply filters</button>
+      </div>
+    </div>`;
+    panel.classList.toggle('open', _ui.filterPanelOpen);
+    panel.setAttribute('aria-hidden', _ui.filterPanelOpen ? 'false' : 'true');
+  }
+  function renderColumnsMenu(){
+    const menu = document.getElementById('columnsMenu');
+    if (!menu) return;
+    const items = COLUMNS.map(c => {
+      const checked = !!COMP.columnVisibility[c.id];
+      return `<label class="menu-item"><input type="checkbox" ${checked?'checked':''} onchange="toggleColumn('${c.id}', this.checked)"> ${esc(c.label)}</label>`;
+    }).join('');
+    menu.innerHTML = `<div class="menu-section">Visible columns</div>${items}<div class="menu-divider"></div><div class="menu-item danger" onclick="resetColumns()">Reset to default</div>`;
+    menu.classList.toggle('open', _ui.columnsMenuOpen);
+  }
+  function renderTable(){
+    const rows = applySortAndFilters(computedRows().all);
+    const vc = visibleColumns();
+    // Group header spans = visible cols per group
+    const groupHeaders = GROUPS.map(g => {
+      const cols = vc.filter(c => c.group === g.id);
+      if (!cols.length) return '';
+      return `<th class="grp-header ${g.tint}" colspan="${cols.length}">${esc(g.label)}</th>`;
+    }).join('');
+    // Column headers (level 2)
+    const colHeaders = vc.map(c => {
+      if (!c.sortable) return `<th class="col-th" style="width:${c.width}; text-align:${c.align||'left'};">${esc(c.label)}</th>`;
+      const isActive = COMP.activeSort.column === c.id;
+      const ariaSort = isActive ? COMP.activeSort.direction === 'asc' ? 'ascending' : 'descending' : 'none';
+      const arrow = isActive
+        ? `<i data-lucide="${COMP.activeSort.direction==='asc'?'arrow-up':'arrow-down'}" class="sort-icon" style="width:12px; height:12px;"></i>`
+        : `<i data-lucide="chevrons-up-down" class="sort-icon" style="width:12px; height:12px;"></i>`;
+      return `<th class="col-th sortable" aria-sort="${ariaSort}" style="width:${c.width}; text-align:${c.align||'left'};" onclick="setSort('${c.id}')">${esc(c.label)}${arrow}</th>`;
+    }).join('');
+
+    // Body rows
+    const body = rows.map(r => renderTableRow(r, vc)).join('');
+
+    // Summary footer
+    const tqRows = rows.filter(r => r.pqStatus === 'q' && r.tq != null);
+    const avgTq = tqRows.length ? (tqRows.reduce((s,r) => s + (r.tq||0), 0) / tqRows.length).toFixed(1) : '—';
+    const quotes = tqRows.map(r => r.quote).filter(q => q!=null).sort((a,b)=>a-b);
+    const lowQ  = quotes.length ? quotes[0] : null;
+    const highQ = quotes.length ? quotes[quotes.length-1] : null;
+    const variances = tqRows.map(r => r.vsEstimate).filter(v => v!=null).sort((a,b)=>a-b);
+    const varRange = variances.length ? `Range: ${variances[0]>=0?'+':''}${variances[0].toFixed(1)}% to ${variances[variances.length-1]>=0?'+':''}${variances[variances.length-1].toFixed(1)}%` : '—';
+    const flaggedCount = rows.filter(r => r.flags && (r.flags.includes('alb')||r.flags.includes('high')||r.flags.includes('above-ts')||r.flags.includes('ntq'))).length;
+    const footerCells = vc.map((c, idx) => {
+      if (idx === 0) return `<td colspan="3" style="font-weight:700; color:#374151; text-transform:uppercase; font-size:11px; letter-spacing:0.04em;">Summary</td>`;
+      if (idx <= 2) return ''; // already covered by colspan
+      switch (c.id){
+        case 'tqScore':    return `<td><span style="color:#6B7280; font-size:12px;">Avg: ${avgTq}</span></td>`;
+        case 'quoted':     return `<td><span style="color:#10B981; font-size:12px; font-weight:700;">L1: ₹${lowQ?lowQ.toLocaleString('en-IN'):'—'}</span><br><span style="color:#9CA3AF; font-size:12px;">L${quotes.length}: ₹${highQ?highQ.toLocaleString('en-IN'):'—'}</span></td>`;
+        case 'vsEstimate': return `<td><span style="color:#6B7280; font-size:12px;">${esc(varRange)}</span></td>`;
+        case 'flags':      return `<td><span style="color:#6B7280; font-size:12px;">${flaggedCount} flagged</span></td>`;
+        default:           return '<td></td>';
+      }
+    }).filter(Boolean).join('');
+
+    document.getElementById('compTableHost').innerHTML = `
+      <div style="overflow-x:auto;">
+        <table class="comp-table" role="table" aria-label="Bid comparison">
+          <thead>
+            <tr>${groupHeaders}</tr>
+            <tr>${colHeaders}</tr>
+          </thead>
+          <tbody>${body || '<tr><td colspan="'+vc.length+'" style="text-align:center; color:#9CA3AF; font-style:italic;">No bids match the current filters.</td></tr>'}</tbody>
+          <tfoot><tr>${footerCells}</tr></tfoot>
+        </table>
+      </div>`;
+  }
+  function renderTableRow(r, vc){
+    const isWinner = r.rank === 1 && r.pqStatus === 'q';
+    const isNtq    = r.pqStatus !== 'q';
+    const isSelected = COMP.selectedVendor && COMP.selectedVendor === r.vendor;
+    const rowClass = [isWinner?'winner-row':'', isNtq?'ntq-row':'', isSelected?'selected-row':''].filter(Boolean).join(' ');
+
+    const cells = vc.map(c => {
+      const align = c.align || 'left';
+      switch (c.id){
+        case 'rank': {
+          if (isNtq) return `<td style="text-align:${align};"><span style="color:#9CA3AF;">—</span></td>`;
+          const bg = r.rank === 1 ? '#10B981' : r.rank === 2 ? '#6B7280' : '#D1D5DB';
+          return `<td style="text-align:${align};"><span class="rank-badge" style="background:${bg};">${r.rank}</span></td>`;
+        }
+        case 'vendor': {
+          return `<td>
+            <div style="font-size:14px; font-weight:700; color:#111827;">${esc(r.vendor)}</div>
+            <div style="font-size:11px; color:#9CA3AF; margin-top:1px; font-family:monospace;">${esc(r.ref||'')}</div>
+          </td>`;
+        }
+        case 'companyType':
+          return `<td><span style="font-size:12px; color:#374151;">${esc(r.companyType||'—')}</span></td>`;
+        case 'pqStatus':
+          return `<td>${r.pqStatus==='q' ? '<span class="pq-pill-q">✓ Qualified</span>' : '<span class="pq-pill-dq">✗ Disqualified</span>'}</td>`;
+        case 'tqScore': {
+          if (r.tq == null) return `<td><span style="color:#9CA3AF;">—</span></td>`;
+          return `<td>
+            <div style="font-size:14px; font-weight:700; color:#111827;">${r.tq}</div>
+            <div class="tq-bar-track"><div class="tq-bar-fill" style="width:${r.tq}%;"></div></div>
+          </td>`;
+        }
+        case 'tqRank':
+          return `<td>${r.tqRank && r.tqRank !== '—' ? '<span class="tq-rank-pill">'+ordinal(r.tqRank)+'</span>' : '<span style="color:#9CA3AF;">—</span>'}</td>`;
+        case 'quoted': {
+          if (r.quote == null) return `<td><span style="color:#9CA3AF;">—</span></td>`;
+          return `<td>
+            <div style="font-size:14px; font-weight:700; color:#111827;">₹${r.quote.toLocaleString('en-IN')}</div>
+            <div style="font-size:11px; color:#9CA3AF;">Financial bid</div>
+          </td>`;
+        }
+        case 'vsEstimate': {
+          if (r.vsEstimate == null) return `<td><span style="color:#9CA3AF;">—</span></td>`;
+          const color = pctColor(r.vsEstimate);
+          return `<td><span style="font-size:13px; font-weight:700; color:${color};">${r.vsEstimate>=0?'+':''}${r.vsEstimate.toFixed(1)}%</span></td>`;
+        }
+        case 'vsTs': {
+          if (r.vsTs == null) return `<td><span style="color:#9CA3AF;">—</span></td>`;
+          const color = pctColor(r.vsTs);
+          return `<td><span style="font-size:13px; font-weight:700; color:${color};">${r.vsTs>=0?'+':''}${r.vsTs.toFixed(1)}%</span></td>`;
+        }
+        case 'combined': {
+          if (r.combined == null) return `<td><span style="color:#9CA3AF;">—</span></td>`;
+          const ds = tenderDataset();
+          const t  = r.tq, T = ds.weightT, F = ds.weightF;
+          const finScore = r.quote ? Math.min(100, (Math.min(...tenderDataset().bids.filter(b => !b.flags.includes('alb') && b.quote).map(b => b.quote)) / r.quote) * 100) : 0;
+          const title = `Tech: ${t} × ${T}% = ${(t*T/100).toFixed(1)} + Fin: ${finScore.toFixed(1)} × ${F}% = ${(finScore*F/100).toFixed(1)} = ${r.combined.toFixed(1)}`;
+          return `<td><span title="${esc(title)}" style="font-size:14px; font-weight:700; color:#3C3489; cursor:help;">${r.combined.toFixed(1)}</span></td>`;
+        }
+        case 'flags': {
+          if (!r.flags || !r.flags.length) return `<td><span class="flag-pill flag-clean">✓ Clean</span></td>`;
+          const parts = r.flags.map(f => {
+            if (f === 'alb')      return '<span class="flag-pill flag-alb">ALB</span>';
+            if (f === 'high')     return '<span class="flag-pill flag-high">High quote</span>';
+            if (f === 'above-ts') return '<span class="flag-pill flag-above-ts">Above TS</span>';
+            if (f === 'ntq')      return '<span class="flag-pill flag-ntq">NTQ</span>';
+            if (f === 'clean')    return '<span class="flag-pill flag-clean">✓ Clean</span>';
+            return '';
+          }).join('');
+          return `<td>${parts}</td>`;
+        }
+        case 'notes': {
+          const notes = (COMP.notes && COMP.notes[r.vendor]) || [];
+          const cnt = notes.length;
+          return `<td style="text-align:center;"><button class="notes-btn ${cnt?'has-notes':''}" onclick="openNotesPopover('${esc(r.vendor)}', event)" aria-label="Notes for ${esc(r.vendor)}"><i data-lucide="notebook-pen" class="w-4 h-4"></i>${cnt?'<span class="note-count">'+cnt+'</span>':''}</button></td>`;
+        }
+        case 'select': {
+          if (isNtq) return `<td style="text-align:center;"><input type="radio" name="selvendor" disabled aria-label="NTQ vendor cannot be selected" /></td>`;
+          if (COMP.selectedVendor === r.vendor && COMP.locked){
+            return `<td style="text-align:center;"><span class="flag-selected">✓ Selected</span></td>`;
+          }
+          const checked = _ui.pendingVendor === r.vendor || (COMP.selectedVendor === r.vendor && !COMP.locked);
+          return `<td style="text-align:center;"><input type="radio" name="selvendor" class="select-radio" ${checked?'checked':''} ${COMP.locked?'disabled':''} onchange="selectVendor('${esc(r.vendor)}')" aria-label="Select ${esc(r.vendor)} for recommendation" /></td>`;
+        }
+      }
+      return '<td></td>';
+    }).join('');
+
+    return `<tr class="${rowClass}">${cells}</tr>`;
+  }
+  function pctColor(v){
+    if (v == null) return '#9CA3AF';
+    if (v < 0)        return '#065F46';
+    if (v <= 10)      return '#374151';
+    if (v <= 15)      return '#92400E';
+    return '#991B1B';
+  }
+  function ordinal(n){
+    if (n == null || n === '—') return '—';
+    return n === 1 ? '1st' : n === 2 ? '2nd' : n === 3 ? '3rd' : n + 'th';
+  }
+
+  // ============ SORTING ============
+  function setSort(col){
+    if (COMP.activeSort.column === col){
+      COMP.activeSort.direction = COMP.activeSort.direction === 'asc' ? 'desc' : 'asc';
+    } else {
+      COMP.activeSort.column = col;
+      COMP.activeSort.direction = 'asc';
+    }
+    saveComp();
+    renderToolbar();
+    renderTable();
+    refreshIcons();
+  }
+  function onSortSelectChange(val){
+    const [col, dir] = val.split('|');
+    COMP.activeSort.column = col;
+    COMP.activeSort.direction = dir;
+    saveComp();
+    renderToolbar();
+    renderTable();
+    refreshIcons();
+  }
+
+  // ============ FILTERS ============
+  function toggleFilterPanel(){
+    _ui.filterPanelOpen = !_ui.filterPanelOpen;
+    renderToolbar();
+    renderFilterPanel();
+    refreshIcons();
+  }
+  function onFilterChange(key, value){
+    if (key === 'tqMin' || key === 'tqMax' || key === 'quoteMin' || key === 'quoteMax'){
+      const n = value === '' ? null : parseFloat(value);
+      COMP.activeFilters[key] = isFinite(n) ? n : (key.indexOf('quote') === 0 ? null : (key === 'tqMin' ? 0 : 100));
+    } else {
+      COMP.activeFilters[key] = !!value;
+    }
+    if (key === 'tqMin' || key === 'tqMax'){
+      const label = document.getElementById('fTqLabel');
+      if (label) label.textContent = COMP.activeFilters.tqMin + ' – ' + COMP.activeFilters.tqMax;
+    }
+  }
+  function applyFiltersBtn(){
+    saveComp();
+    renderToolbar();
+    renderTable();
+    refreshIcons();
+    showToast('Filters applied');
+  }
+  function clearAllFilters(){
+    COMP.activeFilters = defaultFilters();
+    saveComp();
+    renderToolbar();
+    renderFilterPanel();
+    renderTable();
+    refreshIcons();
+  }
+  function clearFilter(which){
+    if (which === 'tq'){ COMP.activeFilters.tqMin = 0; COMP.activeFilters.tqMax = 100; }
+    else if (which === 'quoteMin') COMP.activeFilters.quoteMin = null;
+    else if (which === 'quoteMax') COMP.activeFilters.quoteMax = null;
+    saveComp();
+    renderToolbar();
+    renderFilterPanel();
+    renderTable();
+    refreshIcons();
+  }
+  function setFilter(key, value){
+    COMP.activeFilters[key] = value;
+    saveComp();
+    renderToolbar();
+    renderFilterPanel();
+    renderTable();
+    refreshIcons();
+  }
+
+  // ============ COLUMN VISIBILITY ============
+  function toggleColumnsMenu(e){
+    if (e) e.stopPropagation();
+    _ui.columnsMenuOpen = !_ui.columnsMenuOpen;
+    renderColumnsMenu();
+    refreshIcons();
+  }
+  function toggleColumn(col, checked){
+    COMP.columnVisibility[col] = !!checked;
+    saveComp();
+    renderTable();
+    refreshIcons();
+  }
+  function resetColumns(){
+    COMP.columnVisibility = defaultColumnVisibility();
+    saveComp();
+    _ui.columnsMenuOpen = false;
+    renderColumnsMenu();
+    renderTable();
+    refreshIcons();
+  }
+
+  // ============ NOTES ============
+  function openNotesPopover(vendor, e){
+    if (e) e.stopPropagation();
+    closeNotesPopover();
+    const pop = document.getElementById('notesPopover');
+    const notes = (COMP.notes && COMP.notes[vendor]) || [];
+    const existing = notes.map((n, i) => `<div class="note-card">
+      <div class="nc-text">${esc(n.text)}</div>
+      <div class="nc-meta">${esc(n.author)} · ${esc(n.timestamp)}</div>
+    </div>`).join('');
+    pop.innerHTML = `<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+        <div style="font-size:13px; font-weight:700; color:#111827;">Notes — ${esc(vendor)}</div>
+        <button onclick="closeNotesPopover()" aria-label="Close" style="background:transparent; border:none; cursor:pointer; color:#9CA3AF; font-size:18px; line-height:1;">×</button>
+      </div>
+      <div id="notesList">${existing || '<div class="text-[12px] text-ink-400 italic" style="margin-bottom:8px;">No notes yet.</div>'}</div>
+      <textarea id="newNoteText" placeholder="Add a note about this bid..."></textarea>
+      <div style="display:flex; justify-content:flex-end; margin-top:8px;"><button class="add-note-btn" onclick="addNoteToVendor('${esc(vendor)}')">Add note</button></div>`;
+    pop.classList.remove('hidden');
+    const btn = e && e.target.closest && e.target.closest('.notes-btn');
+    if (btn){
+      const r = btn.getBoundingClientRect();
+      const sx = window.scrollX, sy = window.scrollY;
+      let left = r.right + sx - 280;
+      let top  = r.bottom + sy + 6;
+      if (left < sx + 8) left = sx + 8;
+      if (left + 280 > sx + window.innerWidth - 16) left = sx + window.innerWidth - 296;
+      pop.style.left = left + 'px';
+      pop.style.top  = top + 'px';
+    }
+    refreshIcons();
+  }
+  function closeNotesPopover(){
+    const pop = document.getElementById('notesPopover');
+    if (pop) pop.classList.add('hidden');
+  }
+  function addNoteToVendor(vendor){
+    const ta = document.getElementById('newNoteText');
+    if (!ta) return;
+    const text = ta.value.trim();
+    if (!text){ showToast('Type a note first'); return; }
+    COMP.notes = COMP.notes || { general: [] };
+    COMP.notes[vendor] = COMP.notes[vendor] || [];
+    COMP.notes[vendor].push({ text, author:'Rajesh Kumar', timestamp: nowStamp() });
+    saveComp();
+    // Re-render the list with the new note flagged for fade-in
+    const list = document.getElementById('notesList');
+    if (list){
+      const last = COMP.notes[vendor][COMP.notes[vendor].length-1];
+      list.insertAdjacentHTML('beforeend', `<div class="note-card new"><div class="nc-text">${esc(last.text)}</div><div class="nc-meta">${esc(last.author)} · ${esc(last.timestamp)}</div></div>`);
+      ta.value = '';
+    }
+    renderTable(); // updates count badge
+    refreshIcons();
+  }
+  function nowStamp(){
+    try {
+      const d = new Date();
+      return d.toLocaleDateString('en-US', { month:'short', day:'numeric' }) + ', ' + d.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
+    } catch(e){ return 'now'; }
+  }
+  function toggleNotesPanel(){
+    _ui.notesPanelOpen = !_ui.notesPanelOpen;
+    renderNotesPanelIfOpen();
+  }
+  function renderNotesPanelIfOpen(){
+    const panel = document.getElementById('notesPanel');
+    if (!panel) return;
+    const ds = tenderDataset();
+    const cards = ds.bids.map(b => {
+      const notes = (COMP.notes && COMP.notes[b.vendor]) || [];
+      const inner = notes.length
+        ? notes.map(n => `<div class="note-card"><div class="nc-text">${esc(n.text)}</div><div class="nc-meta">${esc(n.author)} · ${esc(n.timestamp)}</div></div>`).join('')
+        : '<div class="text-[12px] text-ink-400 italic">No notes yet.</div>';
+      return `<div>
+        <div style="font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;">${esc(b.vendor)}</div>
+        ${inner}
+      </div>`;
+    }).join('');
+    const gen = (COMP.notes && COMP.notes.general) || [];
+    const genHTML = gen.map(n => `<div class="note-card"><div class="nc-text">${esc(n.text)}</div><div class="nc-meta">${esc(n.author)} · ${esc(n.timestamp)}</div></div>`).join('');
+    // Update count badge
+    const total = ((COMP.notes && Object.keys(COMP.notes)) || []).reduce((s, k) => s + (COMP.notes[k]||[]).length, 0);
+    const badge = document.getElementById('notesCountBadge');
+    if (badge){ badge.textContent = total; badge.classList.toggle('hidden', total === 0); }
+    panel.innerHTML = `<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+        <div style="font-size:15px; font-weight:700; color:#111827;">Comparison Notes</div>
+        <button class="text-[12px]" style="background:transparent; border:none; color:#6B7280; cursor:pointer;" onclick="toggleNotesPanel()">Collapse ▴</button>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">${cards}</div>
+      <div style="margin-top:18px; padding-top:14px; border-top:1px solid #F3F4F6;">
+        <div style="font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;">General notes</div>
+        ${genHTML || ''}
+        <textarea id="generalNoteText" placeholder="Add a general note about this comparison..." style="width:100%; min-height:64px; border:1px solid #D1D5DB; border-radius:6px; padding:8px 10px; font-size:13px; margin-top:6px;"></textarea>
+        <div style="display:flex; justify-content:flex-end; margin-top:8px;"><button class="add-note-btn" style="background:#8B5CF6; color:white; border:none; border-radius:6px; padding:6px 14px; font-size:12px; cursor:pointer;" onclick="addGeneralNote()">Add note</button></div>
+      </div>`;
+    panel.classList.toggle('open', _ui.notesPanelOpen);
+    panel.setAttribute('aria-hidden', _ui.notesPanelOpen ? 'false' : 'true');
+  }
+  function addGeneralNote(){
+    const ta = document.getElementById('generalNoteText');
+    if (!ta) return;
+    const text = ta.value.trim();
+    if (!text){ showToast('Type a note first'); return; }
+    COMP.notes.general = COMP.notes.general || [];
+    COMP.notes.general.push({ text, author:'Rajesh Kumar', timestamp: nowStamp() });
+    saveComp();
+    renderNotesPanelIfOpen();
+    refreshIcons();
+  }
+
+  // ============ SELECTION FLOW ============
+  function selectVendor(vendor){
+    if (COMP.locked) return;
+    _ui.pendingVendor = vendor;
+    renderTable();
+    renderSelectionBar();
+    refreshIcons();
+  }
+  function clearSelection(){
+    _ui.pendingVendor = null;
+    renderTable();
+    renderSelectionBar();
+    refreshIcons();
+  }
+  function renderSelectionBar(){
+    const bar = document.getElementById('selectionBar');
+    if (!bar) return;
+    if (!_ui.pendingVendor || COMP.locked){
+      bar.classList.remove('open');
+      bar.innerHTML = '';
+      return;
+    }
+    const ds = tenderDataset();
+    const b = ds.bids.find(x => x.vendor === _ui.pendingVendor);
+    if (!b) return;
+    const rank = b.rank || '—';
+    const reasonValue = COMP.selectionReason || '';
+    const isCustom = reasonValue === 'Custom reason';
+    bar.innerHTML = `<div>
+        <div style="font-size:12px; color:#6B7280;">Selected for recommendation:</div>
+        <div style="font-size:15px; font-weight:700; color:#0C447C;">${esc(b.vendor)}</div>
+        <div style="font-size:12px; color:#1D4ED8;">Rank ${rank} · ₹${(b.quote||0).toLocaleString('en-IN')} · TQ Score: ${b.tq!=null?b.tq:'—'}</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <label style="font-size:12px; color:#374151;">Selection reason <span style="color:#EF4444;">*</span></label>
+        <select class="sel-reason" id="selReason" onchange="onReasonChange(this.value)">
+          <option value="">Select a reason…</option>
+          ${SELECTION_REASONS.map(r => `<option value="${esc(r)}" ${reasonValue===r?'selected':''}>${esc(r)}</option>`).join('')}
+        </select>
+        ${isCustom ? `<input id="selCustomReason" type="text" placeholder="Enter custom reason" value="${esc(COMP.selectionCustomReason||'')}" oninput="COMP.selectionCustomReason=this.value" style="border:1px solid #D1D5DB; border-radius:6px; padding:6px 10px; font-size:13px; min-width:180px;" />` : ''}
+      </div>
+      <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+        <button class="text-[12px]" style="background:transparent; border:none; color:#6B7280; cursor:pointer;" onclick="clearSelection()">Clear selection</button>
+        <button class="btn-confirm" onclick="openConfirmModal()" ${reasonValue && (!isCustom || (COMP.selectionCustomReason||'').trim()) ? '' : 'disabled'}>Confirm selection →</button>
+      </div>`;
+    bar.classList.add('open');
+    refreshIcons();
+  }
+  function onReasonChange(val){
+    COMP.selectionReason = val;
+    saveComp();
+    renderSelectionBar();
+    refreshIcons();
+  }
+  function openConfirmModal(){
+    if (!_ui.pendingVendor) return;
+    const ds = tenderDataset();
+    const b = ds.bids.find(x => x.vendor === _ui.pendingVendor);
+    if (!b) return;
+    const reasonShown = COMP.selectionReason === 'Custom reason' ? (COMP.selectionCustomReason||'').trim() : COMP.selectionReason;
+    if (!reasonShown){ showToast('Pick a selection reason first'); return; }
+    const dlg = document.getElementById('modalDialog');
+    const bk  = document.getElementById('modalBackdrop');
+    dlg.innerHTML = `<div id="modalTitle" style="font-size:17px; font-weight:700; color:#111827; margin-bottom:8px;">Confirm final selection?</div>
+      <div style="font-size:13px; color:#374151;">You are recommending <strong>${esc(b.vendor)}</strong> for award of <strong>${esc(COMP.tnd)}</strong>. This selection will be carried forward to Bid Management.</div>
+      <div class="modal-summary">
+        <div class="row"><span class="lbl">Selected vendor</span><span class="val">${esc(b.vendor)}</span></div>
+        <div class="row"><span class="lbl">Quoted amount</span><span class="val">₹${(b.quote||0).toLocaleString('en-IN')}</span></div>
+        <div class="row"><span class="lbl">TQ Score</span><span class="val">${b.tq!=null?b.tq+'/100':'—'}</span></div>
+        <div class="row"><span class="lbl">Selection reason</span><span class="val">${esc(reasonShown)}</span></div>
+        <div class="row"><span class="lbl">Officer</span><span class="val">Rajesh Kumar</span></div>
+        <div class="row"><span class="lbl">Date</span><span class="val">${esc(todayShort())}</span></div>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:18px;">
+        <button class="toolbar-btn" onclick="closeConfirmModal()">Cancel</button>
+        <button class="btn-confirm" style="background:#0F5EE8; color:white; border:none; border-radius:8px; padding:9px 18px; font-size:13px; font-weight:700; cursor:pointer;" onclick="confirmSelection()">Confirm &amp; Proceed →</button>
+      </div>`;
+    dlg.classList.add('open');
+    bk.classList.add('open');
+    refreshIcons();
+  }
+  function closeConfirmModal(){
+    const dlg = document.getElementById('modalDialog');
+    const bk  = document.getElementById('modalBackdrop');
+    if (dlg) dlg.classList.remove('open');
+    if (bk)  bk.classList.remove('open');
+  }
+  function confirmSelection(){
+    if (!_ui.pendingVendor) return;
+    COMP.selectedVendor   = _ui.pendingVendor;
+    COMP.selectionDate    = todayISO();
+    COMP.selectionOfficer = 'Rajesh Kumar';
+    COMP.locked = true;
+    saveComp();
+    closeConfirmModal();
+    renderWorkspace();
+    showToast('Selection confirmed — '+ COMP.selectedVendor);
+  }
+  function renderPostConfirmUI(){
+    const banner = document.getElementById('wsSuccessBanner');
+    const actions = document.getElementById('postConfirmActions');
+    if (!banner || !actions) return;
+    if (COMP.selectedVendor && COMP.locked){
+      banner.innerHTML = `<i data-lucide="check-circle-2" style="width:18px; height:18px; color:#10B981;"></i>
+        <span class="sb-text">Selection confirmed — ${esc(COMP.selectedVendor)}</span>
+        <span class="sb-meta">${esc(todayShort())} · ${esc(COMP.selectionOfficer || 'Rajesh Kumar')}</span>`;
+      banner.classList.remove('hidden');
+      actions.classList.remove('hidden');
+      actions.classList.add('flex');
+    } else {
+      banner.classList.add('hidden');
+      actions.classList.add('hidden');
+      actions.classList.remove('flex');
+    }
+  }
+  function todayShort(){
+    try { return new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }); }
+    catch(e){ return ''; }
+  }
+  function todayISO(){
+    try { return new Date().toISOString().slice(0,10); } catch(e){ return ''; }
+  }
+
+  // ============ LOCK ============
   function toggleLock(){
-    if (COMP.locked){ showToast('Locked tables are immutable'); return; }
-    COMP.locked = true; COMP.lockedBy = 'Rajesh Kumar';
-    saveComp(); renderWorkspace();
+    if (COMP.locked){
+      showToast('Locked — table is immutable');
+      return;
+    }
+    COMP.locked = true;
+    saveComp();
+    renderWorkspace();
     showToast('Comparison table locked');
   }
-  function pickAlb(v){ COMP._albSel = v; renderWorkspace(); }
-  function confirmAlb(){
-    const note = (document.getElementById('albNote')||{}).value || '';
-    if (!COMP._albSel){ showToast('Select a decision'); return; }
-    if (!note.trim()){ showToast(COMP._albSel==='reject'?'Rejection reason required':'Note required'); return; }
-    COMP.albDecision = COMP._albSel; COMP.albNote = note.trim();
-    saveComp(); renderWorkspace();
-    showToast('ALB decision recorded');
-  }
-  function toggleNote(vendor, e){
-    if (e) e.stopPropagation();
-    const cur = COMP.notes[vendor] || '';
-    const val = prompt('Officer note for '+vendor+' (officer-only, not in exported PDF):', cur);
-    if (val !== null){ if (val.trim()) COMP.notes[vendor] = val.trim(); else delete COMP.notes[vendor]; saveComp(); renderWorkspace(); }
-  }
+
+  // ============ NAVIGATION ============
   function proceedToBidMgmt(){
-    if (!COMP.locked || (computed().find(r=>r.flag==='ALB') && !COMP.albDecision)){ showToast('Lock the table and record ALB decision first'); return; }
-    location.href = 'bid-management.html?tender=' + COMP.tnd;
+    if (!COMP.selectedVendor){ showToast('Select and confirm a vendor first'); return; }
+    const sel = COMP.selectedVendor.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+    location.href = 'bid-management.html?tender=' + COMP.tnd + '&selected=vendor-' + sel;
   }
+
+  // ===================== GLOBAL HANDLERS =====================
+  document.addEventListener('click', e => {
+    // Close columns menu on outside click
+    if (_ui.columnsMenuOpen){
+      const menu = document.getElementById('columnsMenu');
+      if (menu && !menu.contains(e.target) && !(e.target.closest && e.target.closest('button') && /Columns/.test(e.target.closest('button').textContent || ''))){
+        _ui.columnsMenuOpen = false;
+        renderColumnsMenu();
+      }
+    }
+    // Close notes popover on outside click
+    const pop = document.getElementById('notesPopover');
+    if (pop && !pop.classList.contains('hidden') && !pop.contains(e.target) && !(e.target.closest && e.target.closest('.notes-btn'))){
+      closeNotesPopover();
+    }
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape'){
+      closeConfirmModal();
+      closeNotesPopover();
+      _ui.columnsMenuOpen = false;
+      renderColumnsMenu();
+    }
+  });
 
   (function boot(){
     const tnd = new URLSearchParams(location.search).get('tender');
-    if (tnd){ openWorkspace(tnd); } else { renderCompList(); }
+    if (tnd){ openWorkspace(tnd); } else { renderLanding(); }
     refreshIcons();
   })();
 </script>
