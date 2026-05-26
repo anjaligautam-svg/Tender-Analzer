@@ -126,6 +126,98 @@
     /* === Change 8 — read-only banner === */
     .ro-banner { background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px; padding:12px 16px; color:#0C447C; font-size:13px; font-weight:600; display:flex; align-items:center; gap:8px; }
 
+    /* === View Bid CTA in PQ/TQ vendor row === */
+    .vendor-row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:16px; }
+    .vendor-row .vendor-tabs { margin-bottom:0; flex:1; min-width:0; }
+    .view-bid-btn { border:1px solid #0F5EE8; border-radius:8px; padding:7px 14px; font-size:13px; color:#0F5EE8; background:white; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition: background .15s ease; }
+    .view-bid-btn:hover:not(:disabled) { background:#EFF6FF; }
+    .view-bid-btn:disabled { color:#9CA3AF; border-color:#E5E7EB; cursor:not-allowed; }
+    .view-bid-btn .vb-vendor { color:#9CA3AF; font-size:12px; }
+    .view-bid-btn:disabled .vb-vendor { color:#9CA3AF; }
+
+    /* === Clarification count badge in section header === */
+    .clar-count-badge { display:inline-flex; align-items:center; background:#FFFBEB; color:#92400E; border-radius:20px; padding:2px 8px; font-size:11px; font-weight:700; margin-left:8px; }
+
+    /* === PQ verdict popover (Change 2a) === */
+    .verdict-trigger { display:inline-flex; align-items:center; gap:6px; border:1px solid transparent; border-radius:999px; padding:6px 12px; font-size:13px; font-weight:500; cursor:pointer; background:#F9FAFB; color:#6B7280; transition: filter .15s ease, border-color .15s ease; }
+    .verdict-trigger:hover { filter:brightness(0.97); }
+    .verdict-trigger.is-pass    { background:#F0FDF4; color:#065F46; border-color:#BBF7D0; }
+    .verdict-trigger.is-fail    { background:#FEF2F2; color:#991B1B; border-color:#FECACA; }
+    .verdict-trigger.is-pending { background:#FFFBEB; color:#92400E; border-color:#FDE68A; }
+    .verdict-trigger.is-clarif  { background:#FFFBEB; color:#92400E; border-color:#F59E0B; }
+    .pq-popover { position:absolute; width:340px; background:white; border:1px solid #E5E7EB; border-radius:12px; box-shadow:0 12px 32px rgba(0,0,0,0.12); padding:14px; z-index:55; }
+    .pq-popover .pq-card { display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border:1px solid #E5E7EB; border-radius:8px; cursor:pointer; transition: border-color .15s ease, background .15s ease; margin-bottom:6px; }
+    .pq-popover .pq-card:hover { border-color:#D1D5DB; }
+    .pq-popover .pq-card input[type="radio"] { margin-top:3px; accent-color:#0F5EE8; flex-shrink:0; }
+    .pq-popover .pq-card.on-pass    { border:1.5px solid #10B981; background:#F0FDF4; }
+    .pq-popover .pq-card.on-fail    { border:1.5px solid #EF4444; background:#FEF2F2; }
+    .pq-popover .pq-card.on-pending { border:1.5px solid #6B7280; background:#F9FAFB; }
+    .pq-popover .pq-card.on-clarif  { border:1.5px solid #F59E0B; background:#FFFBEB; }
+    .pq-popover .pq-card .pq-title { font-size:14px; font-weight:700; color:#111827; line-height:1.3; }
+    .pq-popover .pq-card .pq-desc  { font-size:12px; color:#6B7280; margin-top:2px; line-height:1.4; }
+    .pq-clar-form { background:#FFFBEB; border-radius:8px; padding:14px; margin-top:12px; max-height:0; overflow:hidden; transition: max-height 200ms ease; }
+    .pq-clar-form.open { max-height:420px; overflow:visible; }
+    .pq-clar-form label { display:block; font-size:12px; font-weight:700; color:#92400E; margin-bottom:4px; }
+    .pq-clar-form textarea { width:100%; min-height:72px; border:1px solid #FCD34D; border-radius:6px; padding:8px 10px; font-size:13px; background:white; resize:vertical; transition: border-color .15s ease, box-shadow .15s ease; }
+    .pq-clar-form textarea:focus { outline:none; border-color:#F59E0B; box-shadow:0 0 0 3px rgba(245,158,11,0.15); }
+    .pq-clar-form input[type="date"] { width:100%; border:1px solid #FCD34D; border-radius:6px; padding:7px 10px; font-size:13px; background:white; }
+    .pq-clar-form input[type="date"]:focus { outline:none; border-color:#F59E0B; box-shadow:0 0 0 3px rgba(245,158,11,0.15); }
+    .pq-popover-actions { display:flex; gap:8px; margin-top:12px; }
+    .pq-popover-actions .btn-save { flex:1; background:#0F5EE8; color:white; border:none; border-radius:7px; padding:8px 14px; font-size:13px; font-weight:600; cursor:pointer; transition: background .15s ease; }
+    .pq-popover-actions .btn-save:hover { background:#0B4FCB; }
+    .pq-popover-actions .btn-save.amber { background:#F59E0B; }
+    .pq-popover-actions .btn-save.amber:hover { background:#D97706; }
+    .pq-popover-actions .btn-cancel { background:transparent; color:#6B7280; border:none; padding:8px 12px; font-size:13px; cursor:pointer; }
+
+    /* === Clarification sub-row in criterion table === */
+    .clar-subrow td { padding:8px 16px 10px 32px !important; background:#FAFAFA; border-bottom:1px solid #F3F4F6 !important; }
+    .clar-subrow .csr { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+    .clar-subrow .csr-left { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+    .clar-subrow .csr-right { display:flex; align-items:center; gap:12px; }
+    .clar-subrow .csr-link { color:#0F5EE8; font-size:12px; cursor:pointer; text-decoration:none; background:transparent; border:none; padding:0; }
+    .clar-subrow .csr-link:hover { text-decoration:underline; }
+    .clar-subrow .csr-link.muted { color:#9CA3AF; }
+    .clar-subrow .csr-text { font-size:12px; }
+
+    /* === Clarification Draft Panel (Change 2d) — in-flow, 480px === */
+    .clar-panel { position:absolute; top:64px; right:0; bottom:0; width:480px; max-width:100%; background:white; border-left:1px solid #E5E7EB; box-shadow:-4px 0 16px rgba(0,0,0,0.08); transform:translateX(100%); transition: transform .25s cubic-bezier(.2,.7,.2,1); z-index:46; display:flex; flex-direction:column; }
+    .clar-panel.open { transform:translateX(0); }
+    .clar-panel-header { height:56px; background:#F9FAFB; border-bottom:1px solid #E5E7EB; padding:0 20px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+    .clar-panel-body { flex:1; overflow-y:auto; padding:24px; }
+    .clar-panel-footer { border-top:1px solid #E5E7EB; padding:14px 20px; background:white; display:flex; gap:10px; justify-content:flex-end; flex-shrink:0; }
+    .clar-summary { background:#FFFBEB; border:1px solid #FCD34D; border-radius:10px; padding:14px 16px; margin-bottom:20px; }
+    .clar-summary .row { display:flex; gap:10px; margin-bottom:6px; font-size:13px; }
+    .clar-summary .row:last-child { margin-bottom:0; }
+    .clar-summary .label { color:#6B7280; min-width:120px; flex-shrink:0; }
+    .clar-summary .value { color:#111827; font-weight:600; }
+    .clar-letter { background:white; border:1px solid #E5E7EB; border-radius:8px; padding:20px 24px; font-family:'Times New Roman', Georgia, serif; font-size:13px; line-height:1.8; color:#1a1a1a; white-space:pre-wrap; outline:none; transition: border-color .15s ease, box-shadow .15s ease; }
+    .clar-letter[contenteditable="true"]:focus { border-color:#0F5EE8; box-shadow:0 0 0 3px rgba(15,94,232,0.1); }
+    .clar-letter[contenteditable="false"] { background:#F9FAFB; }
+    .clar-placeholder { background:#FEF3C7; border-radius:3px; padding:0 3px; }
+    .clar-recip-table { width:100%; border:1px solid #E5E7EB; border-radius:8px; overflow:hidden; margin-bottom:12px; border-collapse:collapse; }
+    .clar-recip-table th { background:#F9FAFB; font-size:11px; font-weight:700; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; text-align:left; padding:9px 12px; border-bottom:1px solid #E5E7EB; }
+    .clar-recip-table td { padding:10px 12px; font-size:13px; color:#111827; border-bottom:1px solid #F3F4F6; }
+    .clar-recip-table tr:last-child td { border-bottom:none; }
+    .clar-recip-table .rm-btn { background:transparent; border:none; cursor:pointer; color:#9CA3AF; font-size:16px; line-height:1; padding:2px 6px; transition: color .15s ease, opacity .15s ease; }
+    .clar-recip-table .rm-btn:hover { color:#EF4444; }
+    .clar-recip-row.removing { opacity:0; transition: opacity 150ms ease; }
+    .clar-recip-row.appearing { opacity:0; transform:translateY(-4px); transition: opacity 200ms ease, transform 200ms ease; }
+    .clar-recip-row.appearing.in { opacity:1; transform:translateY(0); }
+    .clar-add-row { display:flex; gap:8px; align-items:center; }
+    .clar-add-row input { border:1px solid #D1D5DB; border-radius:6px; padding:7px 10px; font-size:13px; flex:2; min-width:0; }
+    .clar-add-row input:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 2px rgba(15,94,232,0.15); }
+    .clar-add-row button.add-btn { flex:0 0 auto; border:1px solid #0F5EE8; background:white; color:#0F5EE8; border-radius:6px; padding:7px 14px; font-size:13px; cursor:pointer; transition: background .15s ease; }
+    .clar-add-row button.add-btn:hover { background:#EFF6FF; }
+    .clar-btn-draft { background:white; color:#374151; border:1px solid #E5E7EB; border-radius:8px; padding:9px 16px; font-size:13px; cursor:pointer; transition: background .15s ease; }
+    .clar-btn-draft:hover { background:#F9FAFB; }
+    .clar-btn-confirm { background:#F59E0B; color:white; border:none; border-radius:8px; padding:9px 18px; font-size:13px; font-weight:700; cursor:pointer; transition: background .15s ease; }
+    .clar-btn-confirm:hover { background:#D97706; }
+    .clar-readonly-banner { background:#FFFBEB; border:1px solid #FCD34D; color:#92400E; border-radius:8px; padding:10px 14px; font-size:13px; font-weight:600; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+    .clar-readonly-banner.received { background:#F0FDF4; border-color:#BBF7D0; color:#065F46; }
+    .clar-inline-confirm { display:inline-flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:12px; }
+    .clar-inline-confirm .yes-btn { background:#10B981; color:white; border:none; border-radius:6px; padding:5px 10px; font-size:12px; font-weight:600; cursor:pointer; }
+    .clar-inline-confirm .yes-btn:hover { background:#059669; }
+
     @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
   </style>
 </head>
@@ -290,6 +382,13 @@
     <!-- Change 6: Technical Bid viewer panel (in-flow within main column, NOT position:fixed) -->
     <div id="bidDocBackdrop" class="bid-doc-backdrop" onclick="closeBidDoc()"></div>
     <aside id="bidDocPanel" class="bid-doc-panel" role="dialog" aria-modal="true" aria-label="Technical Bid Viewer"></aside>
+
+    <!-- Clarification Draft panel (in-flow within main column, NOT position:fixed) -->
+    <div id="clarBackdrop" class="bid-doc-backdrop" onclick="closeClarPanel()"></div>
+    <aside id="clarPanel" class="clar-panel" role="dialog" aria-modal="true" aria-label="Clarification Request"></aside>
+
+    <!-- PQ verdict popover (positioned absolutely on cell click) -->
+    <div id="pqPopover" class="pq-popover hidden" role="dialog" aria-modal="false"></div>
   </div>
 </div>
 
@@ -421,7 +520,8 @@
       pqConfirmed:false,
       tqConfirmed:false,
       t3confirmed:false,   // kept for backward compat with t4Body code paths
-      clarifications:{},   // key `${vendor}|${critId}` -> {sent:bool, date, requestedDoc}
+      // Array per spec — each item: { id, vendorId, criterionId, section:'PQ'|'TQ', text, deadline, recipients:[{name,designation,contact}], status:'draft'|'sent'|'received', sentAt, receivedAt }
+      clarifications:[],
       ntq:{},              // vendor -> {status:'draft'|'sent'|'signed', note}
       techComplete:false,
       readonly:false,      // Change 2: view-record read-only mode
@@ -436,8 +536,27 @@
       financialWeightage:30,
       albDecision:null,    // 'accept' | 'reject'
       albNote:'',
-      _seedV:3,
+      _seedV:4,
     };
+  }
+  // Helpers for the new array-based clarifications store
+  function findClarRecord(vendor, critId){
+    return (EVAL.clarifications||[]).find(c => c.vendorId === vendor && c.criterionId === critId);
+  }
+  function upsertClarRecord(rec){
+    EVAL.clarifications = EVAL.clarifications || [];
+    const idx = EVAL.clarifications.findIndex(c => c.vendorId === rec.vendorId && c.criterionId === rec.criterionId);
+    if (idx >= 0) EVAL.clarifications[idx] = { ...EVAL.clarifications[idx], ...rec };
+    else EVAL.clarifications.push(rec);
+  }
+  function pendingClarsForSection(section){
+    return (EVAL.clarifications||[]).filter(c => c.section === section && c.status !== 'received');
+  }
+  function todayISO(){ return new Date().toISOString().slice(0,10); }
+  function fmtDateShort(iso){
+    if (!iso) return '—';
+    try { return new Date(iso + (iso.length===10?'T00:00:00':'')).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+    catch(e){ return iso; }
   }
   function saveState(){ try { localStorage.setItem('eval_'+EVAL.tnd, JSON.stringify(EVAL)); } catch(e){} }
   function loadState(tnd){
@@ -468,6 +587,18 @@
     s.tqConfirmed = true;
     s.t3confirmed = true;
     s.ntq['Patil & Associates'] = { status:'signed', note:'Bid found Not Technically Qualified — the required ISO certification was not submitted with the bid.' };
+    // Seed one PQ + one TQ clarification so the new flow is immediately viewable
+    s.clarifications = [
+      { id:'clr-001', vendorId:'Maharashtra Roads Co.', criterionId:'wo', section:'PQ',
+        text:'Work order from Pune Municipal Corp lists scope but not order value; please share value-stamped copy.',
+        deadline:'2026-05-30', recipients:[
+          { name:'Priya Shah',  designation:'Technical Officer',           contact:'priya.shah@amc.gov.in' },
+          { name:'Amit Patil',  designation:'Evaluation Committee Member', contact:'amit.patil@amc.gov.in' },
+        ], status:'sent', sentAt:'2026-05-20', receivedAt:null },
+      { id:'clr-002', vendorId:'BuildTech Solutions', criterionId:'turnscore', section:'TQ',
+        text:'CA certificate is for combined turnover only — please provide year-wise breakdown to score turnover marks.',
+        deadline:'2026-05-28', recipients:[], status:'draft', sentAt:null, receivedAt:null },
+    ];
     s.techComplete = true;
     s.finBids = ['Rajesh Constructions','Maharashtra Roads Co.','BuildTech Solutions','NCC Infrastructure']
       .map(v => ({ vendor:v, file:'financial_bid_'+v.toLowerCase().replace(/[^a-z]/g,'_')+'.pdf', status:'parsed' }));
@@ -705,10 +836,12 @@
     try { history.replaceState(null,'','?tender='+encodeURIComponent(tnd)); } catch(e){}
     const t = EVAL_TENDERS.find(x => x.id === tnd) || EVAL_TENDERS[0];
     const loaded = loadState(tnd);
-    EVAL = (loaded && loaded._seedV === 3) ? loaded
+    EVAL = (loaded && loaded._seedV === 4) ? loaded
          : (tnd === 'TND-2026-001' ? seedDemo(tnd) : (loaded || freshState(tnd)));
-    if (t.method && !(loaded && loaded._seedV === 3)) EVAL.method = t.method;
+    if (t.method && !(loaded && loaded._seedV === 4)) EVAL.method = t.method;
     EVAL.readonly = false;
+    // Migrate old clarifications shape ({}) → array
+    if (!Array.isArray(EVAL.clarifications)) EVAL.clarifications = [];
     if (!EVAL.activeVendor && EVAL.bids.length) EVAL.activeVendor = EVAL.bids[0].vendor;
     activeView = null;   // reset F2 view toggle for each tender
     document.getElementById('wsCrumb').textContent = t.id;
@@ -802,6 +935,14 @@
   function sectionCard(key, num, title, st){
     const locked = (key==='s2' && !st.s1done) || (key==='s3' && !st.s2done) || (key==='s4' && !st.s3done);
     const expanded = EVAL.expanded === key && !locked;
+    // Change 2e: clarification count badge next to PQ/TQ section title
+    if (key === 's2' || key === 's3'){
+      const sec = key === 's2' ? 'PQ' : 'TQ';
+      const n = pendingClarsForSection(sec).length;
+      if (n > 0){
+        title += ` <span class="clar-count-badge" aria-live="polite">${n} clarification${n===1?'':'s'} pending</span>`;
+      }
+    }
     let statusPill;
     if (key==='s1') statusPill = EVAL.bids.length ? pill(EVAL.bids.length+' uploaded','#F0FDF4','#065F46') : pill('Pending','#F3F4F6','#6B7280');
     else if (key==='s2'){
@@ -1028,6 +1169,8 @@
   // In-flow overlay anchored inside .main-col (no position:fixed) so it works in the preview iframe.
   function openBidDoc(vendor){
     closeDrawer();
+    closeClarPanel();
+    closePqPopover();
     const panel = document.getElementById('bidDocPanel');
     const back  = document.getElementById('bidDocBackdrop');
     panel.innerHTML = bidDocHTML(vendor);
@@ -1215,7 +1358,8 @@
   }
 
   // ----- Sections 02 + 03 — PQ / TQ Evaluation with shared vendor tabs (Change 7 + 8) -----
-  function pqVendorComplete(v){ return PQ_CRITERIA.every(c => { const x = (EVAL.matrix[v]||{})[c.id]; return x != null && x !== 'clarif'; }); }
+  // PQ "complete" requires Pass or Fail only — 'pending' and 'clarif' both count as not-yet-decided.
+  function pqVendorComplete(v){ return PQ_CRITERIA.every(c => { const x = (EVAL.matrix[v]||{})[c.id]; return x === 'pass' || x === 'fail'; }); }
   function tqVendorComplete(v){ return TQ_CRITERIA.every(c => typeof (EVAL.matrix[v]||{})[c.id] === 'number'); }
   function vendorTabsHTML(progressKind){
     if (!EVAL.bids.length) return '';
@@ -1223,7 +1367,7 @@
     const tabs = EVAL.bids.map(b => {
       const done = progressKind === 'pq' ? pqVendorComplete(b.vendor) : tqVendorComplete(b.vendor);
       const on = b.vendor === EVAL.activeVendor;
-      return `<button class="vendor-tab ${on?'active':''}" onclick="setActiveVendor('${esc(b.vendor)}')">${done?'✓ ':''}${esc(b.vendor)}</button>`;
+      return `<button class="vendor-tab ${on?'active':''}" role="tab" aria-selected="${on}" onclick="setActiveVendor('${esc(b.vendor)}')">${done?'✓ ':''}${esc(b.vendor)}</button>`;
     }).join('');
     const doneCount = EVAL.bids.filter(b => progressKind==='pq' ? pqVendorComplete(b.vendor) : tqVendorComplete(b.vendor)).length;
     const pct = EVAL.bids.length ? Math.round(doneCount * 100 / EVAL.bids.length) : 0;
@@ -1231,11 +1375,51 @@
         <div class="text-[13px]" style="color:#6B7280;" aria-live="polite">${doneCount} of ${EVAL.bids.length} vendors evaluated</div>
         <div style="flex:1; min-width:120px; max-width:240px; height:5px; background:#F3F4F6; border-radius:3px; overflow:hidden;"><div style="height:100%; width:${pct}%; background:#0F5EE8; border-radius:3px; transition:width 200ms ease;"></div></div>
       </div>`;
-    return progress + `<div class="vendor-tabs" role="tablist" aria-label="Select vendor">${tabs}</div>`;
+    return progress + `<div class="vendor-row"><div class="vendor-tabs" role="tablist" aria-label="Select vendor">${tabs}</div>${viewBidButtonHTML()}</div>`;
+  }
+  function viewBidButtonHTML(){
+    // Change 1: View Bid CTA — dynamic label, disabled when vendor has no parsed bid yet
+    const v = EVAL.activeVendor || '';
+    const bid = EVAL.bids.find(b => b.vendor === v);
+    const hasBid = !!(bid && bid.status === 'parsed');
+    const aria = hasBid ? `View technical bid for ${v}` : `No bid uploaded for ${v} yet`;
+    const title = hasBid ? '' : 'No bid uploaded for this vendor yet';
+    return `<button class="view-bid-btn" ${hasBid?'':'disabled'} title="${esc(title)}" aria-label="${esc(aria)}" onclick="${hasBid?`openBidDoc('${esc(v)}')`:''}">
+      <i data-lucide="external-link" style="width:14px; height:14px;"></i>
+      <span>View Bid</span><span class="vb-vendor">— ${esc(v || 'select vendor')}</span>
+    </button>`;
   }
   function setActiveVendor(v){ EVAL.activeVendor = v; renderTechnical(); saveState(); }
 
   // ----- Section 02 — PQ Evaluation -----
+  function verdictTriggerHTML(val){
+    if (val === 'pass')    return `<button class="verdict-trigger is-pass">✓ Pass</button>`;
+    if (val === 'fail')    return `<button class="verdict-trigger is-fail">✗ Fail</button>`;
+    if (val === 'clarif')  return `<button class="verdict-trigger is-clarif">⏳ Clarification</button>`;
+    if (val === 'pending') return `<button class="verdict-trigger is-pending">⏳ Pending</button>`;
+    return `<button class="verdict-trigger">Set verdict</button>`;
+  }
+  function clarSubRowHTML(vendor, critId, section, colspan){
+    const rec = findClarRecord(vendor, critId);
+    if (!rec) return '';
+    const key = vendor+'|'+critId;
+    let leftHTML, rightHTML;
+    if (rec.status === 'draft'){
+      leftHTML = `<i data-lucide="clock" style="width:14px; height:14px; color:#F59E0B;"></i> <span class="csr-text" style="color:#92400E;">Clarification request drafted</span>${rec.deadline?` <span class="csr-text" style="color:#9CA3AF;">· Due ${fmtDateShort(rec.deadline)}</span>`:''}`;
+      rightHTML = `<button class="csr-link" onclick="openClarPanel('${esc(vendor)}','${critId}','${section}','draft')">Send for clarification →</button>
+                   <button class="csr-link muted" onclick="openClarPanel('${esc(vendor)}','${critId}','${section}','edit')">Edit</button>`;
+    } else if (rec.status === 'sent'){
+      const recipCount = (rec.recipients||[]).length;
+      leftHTML = `<i data-lucide="send" style="width:14px; height:14px; color:#10B981;"></i> <span class="csr-text" style="color:#065F46;">Clarification sent · ${fmtDateShort(rec.sentAt)} · ${recipCount} recipient${recipCount===1?'':'s'}</span>`;
+      const confirmId = 'csrConfirm-'+esc(vendor).replace(/[^a-zA-Z0-9_-]/g,'_')+'-'+critId;
+      rightHTML = `<span id="${confirmId}"></span><button class="csr-link" onclick="askMarkReceived('${esc(vendor)}','${critId}','${confirmId}')">Mark received</button>
+                   <button class="csr-link muted" onclick="openClarPanel('${esc(vendor)}','${critId}','${section}','view')">View record</button>`;
+    } else { // received
+      leftHTML = `<i data-lucide="check-circle-2" style="width:14px; height:14px; color:#10B981;"></i> <span class="csr-text" style="color:#065F46;">Clarification received · ${fmtDateShort(rec.receivedAt)}</span>`;
+      rightHTML = `<button class="csr-link muted" onclick="openClarPanel('${esc(vendor)}','${critId}','${section}','view')">View record</button>`;
+    }
+    return `<tr class="clar-subrow"><td colspan="${colspan}"><div class="csr"><div class="csr-left">${leftHTML}</div><div class="csr-right">${rightHTML}</div></div></td></tr>`;
+  }
   function s2PqBody(){
     if (!EVAL.bids.length) return '<div class="text-[13px] text-ink-500 italic">Upload technical bids first.</div>';
     const vendor = EVAL.activeVendor;
@@ -1247,19 +1431,16 @@
       const submittedCell = notFound
         ? `<div><span style="font-size:13px; color:#F59E0B; font-style:italic;">Not found</span> <a href="#" onclick="pqInlineEdit('${esc(vendor)}','${c.id}'); return false;" class="text-[12px] hover:underline" style="color:#0F5EE8;">Enter manually</a></div>`
         : `<div class="crit-sub">${esc(aiVal)}</div>`;
-      const verdictPills = `
-        <button class="verdict-pill ${val==='pass'?'verdict-pass':''}" style="${val==='pass'?'':'background:#F9FAFB; color:#6B7280;'}" onclick="setPqVerdict('${esc(vendor)}','${c.id}','pass')">✓ Pass</button>
-        <button class="verdict-pill ${val==='fail'?'verdict-fail':''}" style="${val==='fail'?'':'background:#F9FAFB; color:#6B7280;'} margin-left:4px;" onclick="setPqVerdict('${esc(vendor)}','${c.id}','fail')">✗ Fail</button>
-        <button class="verdict-pill ${val==='clarif'?'verdict-pending':''}" style="${val==='clarif'?'':'background:#F9FAFB; color:#6B7280;'} margin-left:4px;" onclick="setPqVerdict('${esc(vendor)}','${c.id}','clarif')">⏳ Pending</button>`;
+      const trigger = `<span onclick="openPqPopover(event,'${esc(vendor)}','${c.id}')">${verdictTriggerHTML(val)}</span>`;
       const note = (EVAL.notes||{})[vendor+'|'+c.id] || '';
       const noteBtn = `<button class="note-icon-btn" title="${note ? 'Note: '+esc(note) : 'Add note'}" onclick="editNote('${esc(vendor)}','${c.id}')"><i data-lucide="${note?'sticky-note':'pencil'}" class="w-4 h-4"></i></button>`;
       return `<tr>
         <td><div class="crit-name">${esc(c.short)}</div><div class="crit-desc">${esc(c.full)}</div></td>
         <td><div class="crit-sub">${esc(pqRequirement(c.id))}</div></td>
         <td>${submittedCell}</td>
-        <td>${verdictPills}</td>
+        <td>${trigger}</td>
         <td style="text-align:center;">${noteBtn}</td>
-      </tr>`;
+      </tr>${clarSubRowHTML(vendor, c.id, 'PQ', 5)}`;
     }).join('');
 
     // Overall PQ verdict for this vendor
@@ -1296,7 +1477,328 @@
   function setPqVerdict(vendor, critId, val){
     EVAL.matrix[vendor] = EVAL.matrix[vendor] || {};
     EVAL.matrix[vendor][critId] = val;
+    // When verdict changes to Pass / Fail / Pending, drop any clarification record on this cell
+    if (val !== 'clarif'){
+      EVAL.clarifications = (EVAL.clarifications||[]).filter(c => !(c.vendorId === vendor && c.criterionId === critId));
+    }
     renderTechnical(); saveState();
+  }
+
+  // ===================== PQ VERDICT POPOVER (Change 2a) =====================
+  function openPqPopover(e, vendor, critId){
+    e.stopPropagation();
+    closeBidDoc();
+    closeClarPanel();
+    const trigger = (e.target.closest && e.target.closest('.verdict-trigger')) || e.currentTarget;
+    const cur = (EVAL.matrix[vendor]||{})[critId];
+    const existing = findClarRecord(vendor, critId);
+    EVAL._pqPop = { vendor, critId, sel: cur || 'pass',
+      text: existing && existing.text || '',
+      deadline: existing && existing.deadline || '' };
+    renderPqPopover();
+    const pop = document.getElementById('pqPopover');
+    pop.classList.remove('hidden');
+    // Position relative to the trigger button — anchored within the viewport
+    const rect = trigger.getBoundingClientRect();
+    const sx = window.scrollX, sy = window.scrollY;
+    let left = rect.left + sx;
+    let top  = rect.bottom + sy + 6;
+    const w = 340;
+    if (left + w > sx + window.innerWidth - 16) left = sx + window.innerWidth - w - 16;
+    pop.style.left = left + 'px';
+    pop.style.top  = top + 'px';
+    refreshIcons();
+  }
+  function closePqPopover(){
+    const pop = document.getElementById('pqPopover');
+    if (pop) pop.classList.add('hidden');
+    EVAL._pqPop = null;
+  }
+  function renderPqPopover(){
+    const st = EVAL._pqPop; if (!st) return;
+    const card = (val, label, desc, cls) => `<label class="pq-card ${st.sel===val?cls:''}" onclick="pickPqSel('${val}')">
+      <input type="radio" name="pqv" value="${val}" ${st.sel===val?'checked':''} />
+      <div><div class="pq-title">${label}</div><div class="pq-desc">${desc}</div></div></label>`;
+    const isClar = st.sel === 'clarif';
+    const formHTML = `<div class="pq-clar-form ${isClar?'open':''}" id="pqClarForm">
+      <label>Clarification required</label>
+      <textarea id="pqClarText" placeholder="Describe what document or explanation is needed from the vendor...">${esc(st.text)}</textarea>
+      <label style="margin-top:10px;">Response deadline</label>
+      <input id="pqClarDeadline" type="date" value="${esc(st.deadline)}" />
+    </div>`;
+    const saveLabel = isClar ? 'Save & Create Clarification Draft' : 'Save';
+    const saveBtnClass = isClar ? 'btn-save amber' : 'btn-save';
+    const pop = document.getElementById('pqPopover');
+    pop.innerHTML = `<div class="flex items-center justify-between mb-2">
+        <div class="text-[12.5px] font-bold text-ink-900">${esc(st.vendor)} — ${esc((PQ_CRITERIA.find(c=>c.id===st.critId)||{}).short||st.critId)}</div>
+        <button onclick="closePqPopover()" aria-label="Close" style="background:transparent;border:none;cursor:pointer;color:#9CA3AF;font-size:18px;line-height:1;">×</button>
+      </div>
+      ${card('pass','✓ Pass','Documents meet the requirement','on-pass')}
+      ${card('fail','✗ Fail','Documents do not meet the requirement','on-fail')}
+      ${card('pending','⏳ Pending','Not decided yet — revisit later','on-pending')}
+      ${card('clarif','⏳ Clarification Required','Need supporting document or explanation from vendor','on-clarif')}
+      ${formHTML}
+      <div class="pq-popover-actions">
+        <button class="btn-cancel" onclick="closePqPopover()">Cancel</button>
+        <button class="${saveBtnClass}" onclick="savePqVerdict()">${saveLabel}</button>
+      </div>`;
+    refreshIcons();
+  }
+  function pickPqSel(val){
+    if (!EVAL._pqPop) return;
+    // Preserve any text already typed in the clar form before re-render
+    const t = document.getElementById('pqClarText'); if (t) EVAL._pqPop.text = t.value;
+    const d = document.getElementById('pqClarDeadline'); if (d) EVAL._pqPop.deadline = d.value;
+    EVAL._pqPop.sel = val;
+    renderPqPopover();
+  }
+  function savePqVerdict(){
+    const st = EVAL._pqPop; if (!st) return;
+    const { vendor, critId, sel } = st;
+    EVAL.matrix[vendor] = EVAL.matrix[vendor] || {};
+    if (sel === 'clarif'){
+      const text = (document.getElementById('pqClarText')?.value || '').trim();
+      const deadline = document.getElementById('pqClarDeadline')?.value || '';
+      if (!text){ showToast('Describe the clarification needed'); return; }
+      if (!deadline){ showToast('Pick a response deadline'); return; }
+      EVAL.matrix[vendor][critId] = 'clarif';
+      const existing = findClarRecord(vendor, critId);
+      upsertClarRecord({
+        id: existing?.id || 'clr-'+Date.now(),
+        vendorId: vendor, criterionId: critId, section: 'PQ',
+        text, deadline,
+        recipients: existing?.recipients || [
+          { name:'Priya Shah', designation:'Technical Officer',           contact:'priya.shah@amc.gov.in' },
+          { name:'Amit Patil', designation:'Evaluation Committee Member', contact:'amit.patil@amc.gov.in' },
+        ],
+        status: existing?.status || 'draft',
+        sentAt: existing?.sentAt || null,
+        receivedAt: existing?.receivedAt || null,
+      });
+      showToast('Clarification draft created');
+    } else {
+      EVAL.matrix[vendor][critId] = sel;
+      // Drop any clar record on this cell
+      EVAL.clarifications = (EVAL.clarifications||[]).filter(c => !(c.vendorId === vendor && c.criterionId === critId));
+    }
+    closePqPopover();
+    renderTechnical(); saveState();
+  }
+
+  // ===================== CLARIFICATION DRAFT PANEL (Change 2d) =====================
+  // mode: 'new' | 'draft' | 'edit' | 'view'
+  function openClarPanel(vendor, critId, section, mode){
+    closeBidDoc();
+    closePqPopover();
+    let rec = findClarRecord(vendor, critId);
+    if (!rec){
+      // Create a new draft record on the fly (used by TQ "Need clarification?" entry point)
+      rec = {
+        id: 'clr-'+Date.now(),
+        vendorId: vendor, criterionId: critId, section: section || 'PQ',
+        text: '', deadline: '',
+        recipients: [
+          { name:'Priya Shah', designation:'Technical Officer',           contact:'priya.shah@amc.gov.in' },
+          { name:'Amit Patil', designation:'Evaluation Committee Member', contact:'amit.patil@amc.gov.in' },
+        ],
+        status: 'draft', sentAt: null, receivedAt: null,
+      };
+      upsertClarRecord(rec);
+      saveState();
+      mode = 'edit';
+    }
+    EVAL._clarPanel = { recordId: rec.id, mode: mode || (rec.status === 'received' ? 'view' : rec.status === 'sent' ? 'view' : 'edit') };
+    renderClarPanel();
+    document.getElementById('clarBackdrop').classList.add('open');
+    document.getElementById('clarPanel').classList.add('open');
+    refreshIcons();
+  }
+  function closeClarPanel(){
+    const p = document.getElementById('clarPanel');
+    const b = document.getElementById('clarBackdrop');
+    if (p) p.classList.remove('open');
+    if (b) b.classList.remove('open');
+    EVAL._clarPanel = null;
+  }
+  function getClarRecordById(id){ return (EVAL.clarifications||[]).find(c => c.id === id); }
+  function renderClarPanel(){
+    const st = EVAL._clarPanel; if (!st) return;
+    const rec = getClarRecordById(st.recordId); if (!rec) { closeClarPanel(); return; }
+    const isReadOnly = st.mode === 'view';
+    const crit = (rec.section === 'TQ' ? TQ_CRITERIA : PQ_CRITERIA).find(c => c.id === rec.criterionId) || { short: rec.criterionId, full: rec.criterionId };
+    const today = todayISO();
+    const tName = (EVAL_TENDERS.find(t => t.id === EVAL.tnd) || AWARDED_TENDERS.find(t => t.id === EVAL.tnd) || {}).name || EVAL.tnd;
+    const tRef = (EVAL.tnd || 'TND-XXXX') + '/AMC/2026-27';
+
+    // Banner for read-only mode
+    let banner = '';
+    if (isReadOnly){
+      if (rec.status === 'received') banner = `<div class="clar-readonly-banner received"><i data-lucide="check-circle-2" style="width:14px; height:14px;"></i> Read only — clarification received</div>`;
+      else banner = `<div class="clar-readonly-banner"><i data-lucide="lock" style="width:14px; height:14px;"></i> Read only — this clarification has been sent</div>`;
+    }
+
+    // Letter draft with editable placeholders
+    const placeholder = (text) => `<span class="clar-placeholder">${esc(text)}</span>`;
+    const vendorAddr = '[Vendor Address]';
+    const officer    = 'Mr. Rajesh Kumar';
+    const letterBody = `To,
+M/s ${esc(rec.vendorId)}
+${placeholder(vendorAddr)}
+
+<strong>Subject:</strong> Request for Clarification — Tender No. ${esc(tRef)}
+
+Dear Sir/Madam,
+
+With reference to your Technical Bid submitted for the above-mentioned tender, the Evaluation Committee has reviewed the documents submitted and requires the following clarification:
+
+<strong>Criterion:</strong> ${esc(crit.short)} — ${esc(crit.full)}
+<strong>Clarification Required:</strong> ${esc(rec.text || '[Officer\'s clarification text]')}
+
+You are requested to submit the required clarification / supporting document by <strong>${esc(rec.deadline ? fmtDateShort(rec.deadline) : '[Deadline Date]')}</strong> to the following address or via the procurement portal:
+
+Tender Inviting Authority
+Ahmedabad Municipal Corporation
+Ahmedabad – 380001
+
+Please note that failure to submit the required clarification within the stipulated time may result in your bid being evaluated on the basis of documents already submitted.
+
+Yours faithfully,
+
+________________________________
+${esc(officer)}
+Designation
+Ahmedabad Municipal Corporation
+Date: ${esc(fmtDateShort(today))}`;
+
+    const recipientRows = (rec.recipients || []).map((r, i) => `<tr class="clar-recip-row" data-i="${i}">
+      <td>${esc(r.name)}</td><td>${esc(r.designation)}</td><td>${esc(r.contact)}</td>
+      <td style="text-align:right;">${isReadOnly?'':`<button class="rm-btn" aria-label="Remove recipient" onclick="removeRecipient(${i})">×</button>`}</td>
+    </tr>`).join('');
+
+    const footer = isReadOnly
+      ? `<div class="clar-panel-footer" style="justify-content:space-between;"><div class="text-[12px]" style="color:#6B7280;">${rec.status==='received'?'Received on '+fmtDateShort(rec.receivedAt):'Sent on '+fmtDateShort(rec.sentAt)}</div><button class="clar-btn-draft" onclick="showToast('Letter downloaded')"><i data-lucide="download" style="width:13px; height:13px; display:inline-block; vertical-align:-2px; margin-right:4px;"></i>Download letter</button></div>`
+      : `<div class="clar-panel-footer"><button class="clar-btn-draft" onclick="saveClarDraft()">Save Draft</button><button class="clar-btn-confirm" onclick="confirmClarSent()">Confirm &amp; Record as Sent</button></div>`;
+
+    const panel = document.getElementById('clarPanel');
+    panel.innerHTML = `<div class="clar-panel-header">
+        <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+          <i data-lucide="mail" style="width:18px; height:18px; color:#F59E0B; flex-shrink:0;"></i>
+          <div style="min-width:0;">
+            <div class="text-[14px] font-bold text-ink-900 truncate">Clarification Request</div>
+            <div class="text-[11px]" style="color:#9CA3AF;">${esc(rec.vendorId)} — ${esc(crit.short)}</div>
+          </div>
+        </div>
+        <button onclick="closeClarPanel()" aria-label="Close" style="background:transparent; border:none; cursor:pointer; color:#6B7280; font-size:20px; line-height:1; padding:4px 8px;">×</button>
+      </div>
+      <div class="clar-panel-body">
+        ${banner}
+        <div class="clar-summary">
+          <div class="row"><div class="label">Vendor</div><div class="value">${esc(rec.vendorId)}</div></div>
+          <div class="row"><div class="label">Criterion</div><div class="value">${esc(crit.short)}</div></div>
+          <div class="row"><div class="label">Clarification needed</div><div class="value" style="font-weight:500;">${esc(rec.text || '—')}</div></div>
+          <div class="row"><div class="label">Response deadline</div><div class="value">${esc(rec.deadline ? fmtDateShort(rec.deadline) : '—')}</div></div>
+        </div>
+
+        <div class="text-[14px] font-bold text-ink-900" style="margin-bottom:10px;">Clarification Letter</div>
+        <div class="clar-letter" id="clarLetter" contenteditable="${isReadOnly?'false':'true'}" spellcheck="false">${letterBody}</div>
+        ${isReadOnly?'':`<div style="margin-top:8px;"><a href="#" onclick="regenClarLetter(); return false;" class="text-[12px] hover:underline" style="color:#0F5EE8;">✦ Regenerate letter</a></div>`}
+
+        <div class="text-[14px] font-bold text-ink-900" style="margin-top:20px; margin-bottom:10px;">Send to</div>
+        <div class="text-[12px]" style="color:#6B7280; margin-bottom:14px;">Clarification requests are sent to the vendor through an external process. Record who will be responsible for delivering and following up on this request.</div>
+        <table class="clar-recip-table">
+          <thead><tr><th>Name</th><th>Designation</th><th>Contact</th><th style="width:48px;"></th></tr></thead>
+          <tbody id="clarRecipBody">${recipientRows || '<tr><td colspan="4" style="color:#9CA3AF; font-style:italic; text-align:center;">No recipients yet</td></tr>'}</tbody>
+        </table>
+        ${isReadOnly?'':`<div class="clar-add-row">
+          <input id="recName" type="text" placeholder="Full name" />
+          <input id="recDesig" type="text" placeholder="Designation" />
+          <input id="recContact" type="text" placeholder="Email or phone" />
+          <button class="add-btn" onclick="addRecipient()">Add</button>
+        </div>`}
+      </div>
+      ${footer}`;
+    refreshIcons();
+  }
+  function addRecipient(){
+    const st = EVAL._clarPanel; if (!st) return;
+    const rec = getClarRecordById(st.recordId); if (!rec) return;
+    const n = (document.getElementById('recName')?.value || '').trim();
+    const d = (document.getElementById('recDesig')?.value || '').trim();
+    const c = (document.getElementById('recContact')?.value || '').trim();
+    if (!n && !d && !c){ showToast('Enter at least one recipient field'); return; }
+    rec.recipients = rec.recipients || [];
+    rec.recipients.push({ name: n || '—', designation: d || '—', contact: c || '—' });
+    saveState();
+    renderClarPanel();
+    // Animate appearance of the newly added last row
+    requestAnimationFrame(() => {
+      const rows = document.querySelectorAll('#clarRecipBody .clar-recip-row');
+      const last = rows[rows.length - 1];
+      if (last){
+        last.classList.add('appearing');
+        requestAnimationFrame(() => last.classList.add('in'));
+      }
+    });
+  }
+  function removeRecipient(idx){
+    const st = EVAL._clarPanel; if (!st) return;
+    const rec = getClarRecordById(st.recordId); if (!rec) return;
+    const row = document.querySelector(`#clarRecipBody tr.clar-recip-row[data-i="${idx}"]`);
+    if (row){
+      row.classList.add('removing');
+      setTimeout(() => {
+        rec.recipients.splice(idx, 1);
+        saveState(); renderClarPanel();
+      }, 160);
+    } else {
+      rec.recipients.splice(idx, 1);
+      saveState(); renderClarPanel();
+    }
+  }
+  function regenClarLetter(){
+    // Re-render the panel — letter content is template-derived from rec.text/deadline,
+    // so any unsaved manual edits are intentionally discarded
+    renderClarPanel();
+    showToast('Letter regenerated');
+  }
+  function saveClarDraft(){
+    const st = EVAL._clarPanel; if (!st) return;
+    const rec = getClarRecordById(st.recordId); if (!rec) return;
+    rec.status = 'draft';
+    saveState(); renderTechnical(); closeClarPanel();
+    showToast('Clarification draft saved');
+  }
+  function confirmClarSent(){
+    const st = EVAL._clarPanel; if (!st) return;
+    const rec = getClarRecordById(st.recordId); if (!rec) return;
+    if (!(rec.recipients||[]).length){ showToast('Add at least one recipient before sending'); return; }
+    rec.status = 'sent';
+    rec.sentAt = todayISO();
+    saveState(); renderTechnical(); closeClarPanel();
+    showToast('Clarification request recorded as sent');
+  }
+
+  // ===================== MARK RECEIVED — inline confirm inside sub-row =====================
+  function askMarkReceived(vendor, critId, confirmId){
+    const el = document.getElementById(confirmId);
+    if (!el) return;
+    el.innerHTML = `<span class="clar-inline-confirm">
+      <span style="color:#374151;">Mark clarification as received from vendor?</span>
+      <button class="yes-btn" onclick="markReceivedConfirm('${esc(vendor)}','${critId}')">Yes, mark received</button>
+      <button class="csr-link muted" style="margin-right:6px;" onclick="cancelMarkReceived('${confirmId}')">Cancel</button>
+    </span>`;
+  }
+  function cancelMarkReceived(confirmId){
+    const el = document.getElementById(confirmId); if (el) el.innerHTML = '';
+  }
+  function markReceivedConfirm(vendor, critId){
+    const rec = findClarRecord(vendor, critId);
+    if (!rec) return;
+    rec.status = 'received';
+    rec.receivedAt = todayISO();
+    // Verdict remains 'clarif' (amber) per spec — officer manually updates afterwards
+    saveState(); renderTechnical();
+    showToast('Clarification marked as received');
   }
   function pqInlineEdit(vendor, critId){
     const v = prompt('Enter the value extracted from the bid for "'+(PQ_CRITERIA.find(c=>c.id===critId)?.short||critId)+'":');
@@ -1352,17 +1854,19 @@
       const val = typeof m[c.id] === 'number' ? m[c.id] : '';
       const aiScore = aiTQ(vendor, c.id);
       const note = (EVAL.notes||{})[vendor+'|'+c.id] || '';
+      const hasClar = !!findClarRecord(vendor, c.id);
       const noteBtn = `<button class="note-icon-btn" title="${note ? 'Note: '+esc(note) : 'Add note'}" onclick="editNote('${esc(vendor)}','${c.id}')"><i data-lucide="${note?'sticky-note':'pencil'}" class="w-4 h-4"></i></button>`;
+      const clarLink = hasClar ? '' : ` <a href="#" onclick="openClarPanel('${esc(vendor)}','${c.id}','TQ','new'); return false;" class="text-[12px] hover:underline" style="color:#F59E0B; margin-left:8px;" title="Request clarification from vendor">Need clarification?</a>`;
       return `<tr>
         <td><div class="crit-name">${esc(c.short)}</div><div class="crit-desc">${esc(c.full)}</div></td>
         <td><div class="crit-sub">Max ${c.max} marks</div></td>
         <td><div class="crit-sub">Auto-detected from bid</div></td>
         <td>
-          <input type="number" class="tq-score-input" min="0" max="${c.max}" value="${val}" oninput="setTqScore('${esc(vendor)}','${c.id}', this.value)" /> <span style="color:#6B7280; font-size:13px;">/ ${c.max}</span>
+          <input type="number" class="tq-score-input" min="0" max="${c.max}" value="${val}" oninput="setTqScore('${esc(vendor)}','${c.id}', this.value)" /> <span style="color:#6B7280; font-size:13px;">/ ${c.max}</span>${clarLink}
           <div style="font-size:12px; color:#9CA3AF; margin-top:4px;">AI suggests: ${aiScore}</div>
         </td>
         <td style="text-align:center;">${noteBtn}</td>
-      </tr>`;
+      </tr>${clarSubRowHTML(vendor, c.id, 'TQ', 5)}`;
     }).join('');
     const total = TQ_CRITERIA.reduce((sum, c) => sum + (typeof m[c.id] === 'number' ? m[c.id] : 0), 0);
     const maxTotal = TQ_CRITERIA.reduce((s,c) => s + c.max, 0);
@@ -1430,7 +1934,7 @@
     const tqVals = TQ_CRITERIA.map(c => m[c.id]);
     if (pqVals.every(v => v==null) && tqVals.every(v => v==null)) return 'pending-empty';
     if (pqVals.includes('fail')) return 'ntq';
-    if (pqVals.includes('clarif')) return 'pending';
+    if (pqVals.includes('clarif') || pqVals.includes('pending')) return 'pending';
     if (pqVals.some(v => v==null) || tqVals.some(v => v==null)) return 'pending';
     return (tqTotal(vendor) >= TQ_THRESHOLD) ? 'tq' : 'ntq';
   }
@@ -1530,9 +2034,10 @@
     // Sub-table A — clarification
     const clarRows = clarif.map(x => {
       const key = x.vendor+'|'+x.crit.id;
-      const c = EVAL.clarifications[key];
-      const action = c && c.sent
-        ? `<span class="text-[12px]" style="color:#0C447C;">Request sent · ${c.date}</span> <a href="#" onclick="showToast('Reminder sent'); return false;" class="text-[11px] text-primary hover:underline ml-1">Follow up</a> <a href="#" onclick="markClarifReceived('${key}'); return false;" class="text-[11px] text-success hover:underline ml-1">Mark received</a>`
+      const c = findClarRecord(x.vendor, x.crit.id);
+      const isSent = c && (c.status === 'sent' || c.status === 'received');
+      const action = isSent
+        ? `<span class="text-[12px]" style="color:#0C447C;">Request sent · ${fmtDateShort(c.sentAt) || '—'}</span> <a href="#" onclick="showToast('Reminder sent'); return false;" class="text-[11px] text-primary hover:underline ml-1">Follow up</a> <a href="#" onclick="markClarifReceived('${key}'); return false;" class="text-[11px] text-success hover:underline ml-1">Mark received</a>`
         : `<button onclick="openClarifForm('${key}')" class="px-2.5 py-1 rounded-md text-white text-[11.5px] font-medium" style="background:#F59E0B;">Send clarification request</button>`;
       return `<tr style="border-bottom:1px solid #F3F4F6;" data-clarrow="${key}">
         <td style="${tdS()}">${x.vendor}</td><td style="${tdS()}">${x.crit.short}</td>
@@ -1614,7 +2119,13 @@
   }
   function closeClarifForm(key){ const f = document.querySelector(`#stage-technical tr[data-clarform="${key}"]`); if (f) f.remove(); }
   function sendClarif(key){
-    EVAL.clarifications[key] = { sent:true, date:'May 18', requestedDoc:document.getElementById('clarDoc-'+key)?.value || '' };
+    const [vendor, critId] = key.split('|');
+    upsertClarRecord({
+      id: 'clr-' + Date.now(), vendorId: vendor, criterionId: critId, section: 'PQ',
+      text: document.getElementById('clarDoc-'+key)?.value || '',
+      deadline: document.getElementById('clarDate-'+key)?.value || '',
+      recipients: [], status: 'sent', sentAt: todayISO(), receivedAt: null,
+    });
     saveState(); renderTechnical();
     showToast('Clarification request sent');
   }
@@ -1622,7 +2133,7 @@
     const [vendor, critId] = key.split('|');
     EVAL.matrix[vendor] = EVAL.matrix[vendor]||{};
     EVAL.matrix[vendor][critId] = 'pass';
-    delete EVAL.clarifications[key];
+    EVAL.clarifications = (EVAL.clarifications||[]).filter(c => !(c.vendorId === vendor && c.criterionId === critId));
     saveState(); renderTechnical();
     showToast('Clarification received — marked Pass');
   }
@@ -2111,10 +2622,12 @@
   // ===================== GLOBAL =====================
   document.addEventListener('click', e => {
     const pop = document.getElementById('cellPopover');
-    if (!pop.classList.contains('hidden') && !pop.contains(e.target) && !e.target.closest('.matrix-cell')) closeCell();
+    if (pop && !pop.classList.contains('hidden') && !pop.contains(e.target) && !e.target.closest('.matrix-cell')) closeCell();
+    const pq = document.getElementById('pqPopover');
+    if (pq && !pq.classList.contains('hidden') && !pq.contains(e.target) && !e.target.closest('.verdict-trigger')) closePqPopover();
   });
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape'){ closeCell(); closeDrawer(); closeBidDoc(); }
+    if (e.key === 'Escape'){ closeCell(); closeDrawer(); closeBidDoc(); closePqPopover(); closeClarPanel(); }
   });
 
   (function boot(){
