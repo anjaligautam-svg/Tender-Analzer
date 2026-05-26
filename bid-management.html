@@ -32,16 +32,221 @@
     ::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 8px; }
     ::-webkit-scrollbar-thumb:hover { background: #D1D5DB; }
     ::-webkit-scrollbar-track { background: transparent; }
-    .ev-row { transition: background .15s ease; cursor: pointer; }
-    .ev-row:hover { background: #F0F7FF; }
-    .ev-tab { transition: all .15s ease; }
     .toast { transform: translateY(80px); opacity: 0; transition: transform .3s cubic-bezier(.2,.7,.2,1), opacity .25s ease; }
     .toast.show { transform: translateY(0); opacity: 1; }
     .field { border:1px solid #D1D5DB; border-radius:8px; padding:8px 12px; font-size:13px; width:100%; background:white; }
     .field:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 3px rgba(15,94,232,0.1); }
-    .radio-card { transition: all .15s ease; cursor: pointer; }
-    .radio-card:hover { border-color:#93C5FD; }
-    .radio-card.selected { border-color:#0F5EE8; background:#EFF6FF; }
+
+    /* === Landing list rows + search === */
+    .search-wrap { position:relative; }
+    .search-input { width:100%; border:1px solid #E5E7EB; border-radius:8px; padding:10px 14px 10px 38px; font-size:14px; background:white; color:#111827; transition: border-color .15s ease, box-shadow .15s ease; }
+    .search-input::placeholder { color:#9CA3AF; }
+    .search-input:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 3px rgba(15,94,232,0.1); }
+    .search-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); width:16px; height:16px; color:#9CA3AF; pointer-events:none; }
+    .ev-row { transition: background .15s ease, opacity .2s ease; cursor:pointer; }
+    .ev-row:hover { background:#F9FAFB; }
+    .ev-row.dimmed { opacity:0.3; pointer-events:none; }
+    @keyframes pulse-amber { 0%,100% { box-shadow:0 0 0 0 rgba(245,158,11,.5);} 50% { box-shadow:0 0 0 6px rgba(245,158,11,0);} }
+    .pulse-amber { animation: pulse-amber 1.6s ease-in-out infinite; }
+    @keyframes pulse-blue { 0%,100% { box-shadow:0 0 0 0 rgba(15,94,232,.4);} 50% { box-shadow:0 0 0 5px rgba(15,94,232,0);} }
+    .pulse-blue { animation: pulse-blue 1.6s ease-in-out infinite; }
+    .completed-toggle { display:inline-flex; align-items:center; gap:6px; font-size:13px; color:#6B7280; background:transparent; border:none; padding:4px 0; cursor:pointer; }
+    .completed-toggle:hover { color:#111827; }
+    .completed-zone { overflow:hidden; max-height:0; transition: max-height .2s ease; }
+    .completed-zone.open { max-height:800px; }
+
+    /* === Stats row === */
+    .stat-card { background:white; border:1px solid #E5E7EB; border-radius:12px; padding:18px 20px; display:flex; align-items:center; gap:14px; flex:1; min-width:200px; }
+    .stat-card .stat-icon { width:42px; height:42px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .stat-card .stat-icon i { width:20px; height:20px; }
+    .stat-card .stat-num { font-size:22px; font-weight:700; line-height:1; }
+    .stat-card .stat-label { font-size:13px; color:#374151; font-weight:600; margin-top:2px; }
+    .stat-card .stat-sub { font-size:11px; color:#9CA3AF; margin-top:2px; }
+
+    /* === Stage progress bar === */
+    .stage-progress { background:white; border:1px solid #E5E7EB; border-radius:12px; padding:18px 24px; margin-bottom:20px; }
+    .stage-track { display:flex; align-items:center; gap:0; }
+    .stage-node { display:flex; flex-direction:column; align-items:center; min-width:120px; flex-shrink:0; }
+    .stage-node .stage-circle { width:36px; height:36px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; border:2px solid #E5E7EB; background:white; color:#9CA3AF; transition: all 200ms ease; }
+    .stage-node.complete .stage-circle { background:#10B981; border-color:#10B981; color:white; }
+    .stage-node.active   .stage-circle { background:white; border-color:#0F5EE8; color:#0F5EE8; }
+    .stage-node.active   .stage-circle::after { content:""; position:absolute; width:36px; height:36px; border-radius:50%; box-shadow:0 0 0 0 rgba(15,94,232,0.35); animation: pulse-blue 1.6s ease-in-out infinite; }
+    .stage-node.locked   .stage-circle { background:#F3F4F6; border-color:#E5E7EB; color:#9CA3AF; }
+    .stage-node .stage-label { font-size:12px; color:#6B7280; margin-top:8px; text-align:center; font-weight:500; }
+    .stage-node.complete .stage-label { color:#065F46; }
+    .stage-node.active   .stage-label { color:#0F5EE8; font-weight:600; }
+    .stage-line { flex:1; height:2px; background:#E5E7EB; margin:0 -4px; margin-top:-22px; transition: background 200ms ease; min-width:24px; }
+    .stage-line.complete { background:#10B981; }
+
+    .stage-tabs { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+    .stage-tab { padding:7px 16px; border-radius:999px; border:1px solid #E5E7EB; background:white; color:#6B7280; font-size:13px; font-weight:500; cursor:pointer; transition: all 150ms ease; }
+    .stage-tab:hover:not(:disabled) { color:#111827; border-color:#D1D5DB; }
+    .stage-tab.active { background:#0F5EE8; border-color:#0F5EE8; color:white; }
+    .stage-tab.locked { opacity:0.55; cursor:not-allowed; }
+
+    /* === Cards / generic === */
+    .card { background:white; border:1px solid #E5E7EB; border-radius:12px; padding:20px 24px; margin-bottom:20px; }
+    .stage-header { margin-bottom:20px; }
+    .stage-header h2 { font-size:20px; font-weight:700; color:#111827; }
+    .stage-header p  { font-size:14px; color:#6B7280; margin-top:4px; line-height:1.5; }
+
+    /* Comparison table inside Stage 1 card */
+    .fig-table { width:100%; border-collapse:collapse; }
+    .fig-table tr { border-bottom:1px solid #F3F4F6; }
+    .fig-table tr:last-child { border-bottom:none; }
+    .fig-table td { padding:12px 0; vertical-align:top; }
+    .fig-table .lbl { font-size:13px; color:#6B7280; width:35%; }
+    .fig-table .val { font-size:14px; font-weight:700; color:#111827; width:25%; }
+    .fig-table .note { font-size:12px; color:#9CA3AF; font-style:italic; width:40%; }
+
+    /* Result banner cases */
+    .res-banner { border-radius:10px; padding:18px 20px; margin-bottom:14px; }
+    .res-banner.case-a { background:#F0FDF4; border:1px solid #BBF7D0; color:#065F46; }
+    .res-banner.case-b { background:#FEF2F2; border:1px solid #FECACA; color:#991B1B; }
+    .res-banner.case-c { background:#FFFBEB; border:1px solid #FCD34D; color:#92400E; }
+    .res-banner.case-d { background:#FEF2F2; border-left:3px solid #EF4444; border-radius:0 10px 10px 0; color:#991B1B; }
+    .res-banner .rb-head { display:flex; align-items:center; gap:8px; font-size:15px; font-weight:700; }
+    .res-banner .rb-body { font-size:13px; margin-top:8px; line-height:1.6; }
+    .ai-strip { border-radius:6px; padding:8px 12px; margin-top:10px; font-size:12px; }
+    .ai-strip.green { background:rgba(16,185,129,0.08); color:#065F46; }
+    .ai-strip.amber { background:rgba(245,158,11,0.15); color:#92400E; }
+
+    /* Decision cards (used in Stage 1 and Stage 2) */
+    .dec-card { border:1px solid #E5E7EB; border-radius:10px; padding:14px 16px; cursor:pointer; transition: all 150ms ease; }
+    .dec-card:hover { border-color:#D1D5DB; }
+    .dec-card.on { border:1.5px solid #0F5EE8; background:#EFF6FF; }
+    .dec-card.on.amber { border-color:#F59E0B; background:#FFFBEB; }
+    .dec-card.on.purple { border-color:#8B5CF6; background:#EEEDFE; }
+    .dec-card.on.green { border-color:#10B981; background:#F0FDF4; }
+    .dec-card .dc-title { font-size:14px; font-weight:600; color:#111827; }
+    .dec-card .dc-desc  { font-size:12px; color:#6B7280; margin-top:2px; line-height:1.4; }
+    .dec-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+    .dec-row.three { grid-template-columns:1fr 1fr 1fr; }
+    .dec-field { margin-top:12px; }
+    .dec-field label { display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px; }
+    .dec-field textarea, .dec-field select, .dec-field input[type="text"] { width:100%; border:1px solid #D1D5DB; border-radius:6px; padding:8px 10px; font-size:13px; background:white; }
+    .dec-field textarea:focus, .dec-field select:focus, .dec-field input[type="text"]:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 3px rgba(15,94,232,0.1); }
+
+    /* Stage footer (sticky-ish row below each stage body) */
+    .stage-footer { display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; padding:14px 0 0; border-top:1px solid #F3F4F6; margin-top:8px; }
+    .btn-primary { background:#0F5EE8; color:white; border:none; border-radius:8px; padding:11px 24px; font-size:14px; font-weight:700; cursor:pointer; transition: background .15s ease; }
+    .btn-primary:hover:not(:disabled) { background:#0B4FCB; }
+    .btn-primary:disabled { background:#E5E7EB; color:#9CA3AF; cursor:not-allowed; }
+    .btn-primary.full { width:100%; }
+    .btn-success { background:#10B981; color:white; border:none; border-radius:8px; padding:11px 24px; font-size:14px; font-weight:700; cursor:pointer; transition: background .15s ease; }
+    .btn-success:hover:not(:disabled) { background:#059669; }
+    .btn-success:disabled { background:#E5E7EB; color:#9CA3AF; cursor:not-allowed; }
+    .btn-success.full { width:100%; }
+    .btn-amber { background:#F59E0B; color:white; border:none; border-radius:8px; padding:9px 18px; font-size:13px; font-weight:700; cursor:pointer; transition: background .15s ease; }
+    .btn-amber:hover:not(:disabled) { background:#D97706; }
+    .btn-outline { background:white; color:#374151; border:1px solid #E5E7EB; border-radius:8px; padding:9px 16px; font-size:13px; cursor:pointer; transition: background .15s ease; }
+    .btn-outline:hover { background:#F9FAFB; }
+    .btn-outline.primary { color:#0F5EE8; border-color:#0F5EE8; }
+    .btn-outline.primary:hover { background:#EFF6FF; }
+    .btn-outline.amber { color:#F59E0B; border-color:#F59E0B; }
+    .btn-outline.amber:hover { background:#FFFBEB; }
+
+    /* Committee table */
+    .ct-table { width:100%; border-collapse:collapse; }
+    .ct-table thead th { background:#F9FAFB; font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; text-align:left; padding:10px 12px; border-bottom:1px solid #E5E7EB; }
+    .ct-table tbody td { padding:14px 12px; font-size:13px; color:#374151; border-bottom:1px solid #F3F4F6; vertical-align:middle; }
+    .ct-table tbody tr:last-child td { border-bottom:none; }
+    .avatar { width:36px; height:36px; border-radius:50%; background:#EFF6FF; color:#0F5EE8; display:inline-flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0; }
+    .you-badge { display:inline-block; background:#EFF6FF; color:#0C447C; border-radius:4px; padding:1px 6px; font-size:10px; font-weight:700; margin-left:6px; }
+    .verdict-pill { display:inline-block; border-radius:20px; padding:3px 10px; font-size:12px; font-weight:600; }
+    .verdict-pill.approve   { background:#F0FDF4; color:#065F46; }
+    .verdict-pill.pending   { background:#FFFBEB; color:#92400E; }
+    .verdict-pill.concern   { background:#FEF2F2; color:#991B1B; }
+    .verdict-pill.neg       { background:#EEEDFE; color:#3C3489; }
+    .verdict-pill.cond      { background:#EFF6FF; color:#0C447C; }
+    .ct-table .row-link { font-size:12px; color:#0F5EE8; background:transparent; border:none; cursor:pointer; padding:0; }
+    .ct-table .row-link:hover { text-decoration:underline; }
+
+    /* Mini progress bar */
+    .mini-bar { width:120px; height:4px; background:#F3F4F6; border-radius:3px; overflow:hidden; display:inline-block; vertical-align:middle; margin-left:8px; }
+    .mini-bar > div { height:100%; background:#0F5EE8; border-radius:3px; transition: width 200ms ease; }
+
+    /* Session card */
+    .session-card { border:1px solid #E5E7EB; border-radius:10px; padding:16px 18px; margin-bottom:12px; background:white; }
+    .session-card .sc-head { display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:8px; }
+    .session-card .chip { background:#F3F4F6; color:#374151; border-radius:20px; padding:2px 10px; font-size:12px; }
+    .session-card table { width:100%; border-collapse:collapse; margin-top:8px; font-size:12.5px; }
+    .session-card th { background:#F9FAFB; font-size:10.5px; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; font-weight:700; text-align:left; padding:8px 10px; }
+    .session-card td { padding:8px 10px; border-bottom:1px solid #F3F4F6; color:#374151; }
+    .session-card tr:last-child td { border-bottom:none; }
+    .session-card .total-row td { background:#F9FAFB; font-weight:700; color:#065F46; }
+
+    /* Approval chain rows */
+    .appr-row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #F3F4F6; }
+    .appr-row:last-child { border-bottom:none; }
+    .appr-row .ar-info { flex:1; min-width:0; }
+    .appr-row .ar-name { font-size:14px; font-weight:600; color:#111827; }
+    .appr-row .ar-desig { font-size:12px; color:#6B7280; }
+
+    /* LoA preview panel (in-flow within main-col) */
+    .main-col { position:relative; }
+    .loa-backdrop { position:absolute; top:64px; left:0; right:0; bottom:0; background:rgba(0,0,0,0.25); opacity:0; pointer-events:none; transition: opacity .28s ease; z-index:40; }
+    .loa-backdrop.open { opacity:1; pointer-events:auto; }
+    .loa-panel { position:absolute; top:64px; right:0; bottom:0; width:720px; max-width:100%; background:white; border-left:1px solid #E5E7EB; box-shadow:-4px 0 16px rgba(0,0,0,0.08); transform:translateX(100%); transition: transform .28s cubic-bezier(.2,.7,.2,1); z-index:45; display:flex; flex-direction:column; }
+    .loa-panel.open { transform:translateX(0); }
+    .loa-header { height:56px; background:#F9FAFB; border-bottom:1px solid #E5E7EB; padding:0 20px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+    .loa-body { flex:1; overflow-y:auto; padding:32px 40px; font-family:'Times New Roman', Georgia, serif; font-size:13px; line-height:1.8; color:#1a1a1a; background:white; }
+    .loa-body .doc-section { padding:6px 0; }
+
+    /* Confirmation modal (in-flow, NOT position:fixed) */
+    .modal-backdrop { position:absolute; top:64px; left:0; right:0; bottom:0; background:rgba(17,24,39,0.4); opacity:0; pointer-events:none; transition: opacity .2s ease; z-index:55; }
+    .modal-backdrop.open { opacity:1; pointer-events:auto; }
+    .modal-dialog { position:absolute; top:50%; left:50%; transform:translate(-50%, -50%) scale(0.96); opacity:0; pointer-events:none; width:520px; max-width:calc(100% - 32px); background:white; border:1px solid #E5E7EB; border-radius:12px; box-shadow:0 20px 48px rgba(0,0,0,0.18); padding:24px; z-index:60; transition: opacity .2s ease, transform .2s ease; }
+    .modal-dialog.open { opacity:1; pointer-events:auto; transform:translate(-50%, -50%) scale(1); }
+    .modal-summary { background:#F9FAFB; border:1px solid #E5E7EB; border-radius:8px; padding:14px 16px; margin-top:14px; }
+    .modal-summary .row { display:flex; justify-content:space-between; font-size:13px; padding:4px 0; }
+    .modal-summary .row .lbl { color:#6B7280; }
+    .modal-summary .row .val { color:#111827; font-weight:600; }
+
+    /* Success banner */
+    .success-banner { background:#F0FDF4; border:1px solid #BBF7D0; border-radius:10px; padding:14px 18px; display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+    .success-banner.large { padding:20px 24px; border-radius:12px; }
+    .success-banner .sb-text { font-size:14px; font-weight:700; color:#065F46; }
+    .success-banner .sb-meta { font-size:12px; color:#6B7280; }
+
+    /* Concern / amber resolution box */
+    .amber-box { background:#FFFBEB; border:1px solid #FCD34D; border-radius:10px; padding:14px 18px; margin-top:16px; }
+    .purple-box { background:#EEEDFE; border:1px solid #AFA9EC; border-radius:10px; padding:14px 18px; margin-bottom:20px; }
+
+    /* Form grid */
+    .form-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px 18px; }
+    .form-field label { display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:5px; }
+    .form-field input, .form-field select { width:100%; border:1px solid #D1D5DB; border-radius:8px; padding:8px 12px; font-size:13px; background:white; }
+    .form-field input:focus, .form-field select:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 3px rgba(15,94,232,0.1); }
+    .form-field input[readonly] { background:#F9FAFB; color:#6B7280; }
+
+    /* Editor area for AI-drafted note */
+    .editor-toolbar { display:flex; gap:6px; padding:8px 10px; background:#F9FAFB; border:1px solid #E5E7EB; border-bottom:none; border-radius:8px 8px 0 0; }
+    .editor-toolbar button { background:white; border:1px solid #E5E7EB; border-radius:6px; padding:4px 8px; font-size:12px; cursor:pointer; color:#374151; }
+    .editor-toolbar button:hover { background:#EFF6FF; color:#0F5EE8; }
+    .editor-area { border:1px solid #E5E7EB; border-top:none; border-radius:0 0 8px 8px; padding:14px 16px; min-height:200px; font-size:13px; line-height:1.6; color:#374151; background:white; }
+    .editor-area:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 3px rgba(15,94,232,0.1); }
+    .editor-area p { margin-bottom:10px; }
+    .ai-pill { display:inline-block; background:#EFF6FF; color:#0C447C; border-radius:20px; padding:3px 10px; font-size:11px; font-weight:600; }
+
+    /* Checklist */
+    .checklist label { display:flex; align-items:flex-start; gap:8px; padding:6px 0; font-size:13px; color:#374151; cursor:pointer; }
+    .checklist input[type="checkbox"] { margin-top:2px; accent-color:#0F5EE8; }
+    .checklist label.done { color:#065F46; }
+
+    /* Status pills */
+    .pill-amber { background:#FFFBEB; color:#92400E; border-radius:20px; padding:3px 10px; font-size:11px; font-weight:600; }
+    .pill-green { background:#F0FDF4; color:#065F46; border-radius:20px; padding:3px 10px; font-size:11px; font-weight:600; }
+    .pill-blue  { background:#EFF6FF; color:#0C447C; border-radius:20px; padding:3px 10px; font-size:11px; font-weight:600; }
+    .pill-purple{ background:#EEEDFE; color:#3C3489; border-radius:20px; padding:3px 10px; font-size:11px; font-weight:600; }
+    .pill-red   { background:#FEF2F2; color:#991B1B; border-radius:20px; padding:3px 10px; font-size:11px; font-weight:600; }
+    .pill-gray  { background:#F3F4F6; color:#6B7280; border-radius:20px; padding:3px 10px; font-size:11px; font-weight:600; }
+
+    /* Countdown */
+    .countdown-green { color:#065F46; font-weight:700; }
+    .countdown-amber { color:#92400E; font-weight:700; }
+    .countdown-red   { color:#991B1B; font-weight:700; animation: pulse-amber 1.6s ease-in-out infinite; border-radius:6px; padding:2px 6px; }
+
     @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
   </style>
 </head>
@@ -109,7 +314,7 @@
   </aside>
 
   <!-- ============ MAIN ============ -->
-  <div class="flex-1 flex flex-col min-w-0">
+  <div class="flex-1 flex flex-col min-w-0 main-col">
     <header class="h-16 bg-white border-b border-line px-6 flex items-center gap-4 sticky top-0 z-30">
       <button aria-label="Toggle sidebar" class="text-ink-500 hover:text-ink-900"><i data-lucide="panel-left" class="w-5 h-5"></i></button>
       <div class="flex-1 max-w-xl relative">
@@ -127,16 +332,38 @@
 
     <main class="flex-1 overflow-y-auto px-8 py-6">
 
-      <!-- ============ SCREEN 3A — LANDING ============ -->
+      <!-- ============ SCREEN 1 — LANDING ============ -->
       <section id="screen-landing" class="space-y-5">
         <div>
           <h1 class="text-[24px] font-bold text-ink-900 leading-tight">Bid Management</h1>
           <p class="text-[14px] text-ink-500 mt-1">Reasonableness check, committee review and award recommendation for compared tenders.</p>
         </div>
-        <div id="bmList" class="bg-white border border-line rounded-xl overflow-hidden"></div>
+        <div class="search-wrap">
+          <i data-lucide="search" class="search-icon"></i>
+          <input id="landingSearch" type="search" class="search-input" placeholder="Search tenders..." oninput="filterBmList(this.value)" aria-label="Search tenders" />
+        </div>
+        <div id="landingSearchEmpty" class="hidden text-[14px] text-ink-500 text-center" style="padding:8px 0;"></div>
+
+        <div class="flex gap-4 flex-wrap" id="statsRow"></div>
+
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.08em] font-semibold text-ink-500" style="margin-bottom:8px;">READY FOR BID MANAGEMENT</div>
+          <div id="readyList" class="bg-white border border-line rounded-xl overflow-hidden"></div>
+        </div>
+
+        <div>
+          <div class="text-[11px] uppercase tracking-[0.08em] font-semibold text-ink-500" style="margin-top:20px; margin-bottom:8px;">COMPLETED</div>
+          <button id="completedToggle" class="completed-toggle" onclick="toggleCompleted()" aria-expanded="false">
+            <span id="completedToggleText">Show 1 completed</span>
+            <i id="completedToggleIcon" data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+          </button>
+          <div id="completedZone" class="completed-zone">
+            <div id="completedList" class="bg-white border border-line rounded-xl overflow-hidden" style="margin-top:8px;"></div>
+          </div>
+        </div>
       </section>
 
-      <!-- ============ SCREEN 3B — WORKSPACE ============ -->
+      <!-- ============ SCREEN 2 — WORKSPACE ============ -->
       <section id="screen-workspace" class="hidden space-y-5">
         <div class="flex items-center justify-between gap-3 flex-wrap">
           <div class="text-[13px] text-ink-500">
@@ -147,22 +374,38 @@
           <a href="#" onclick="showLanding(); return false;" class="text-[13px] text-ink-500 hover:text-ink-900 inline-flex items-center gap-1.5"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back</a>
         </div>
 
+        <!-- Tender header bar -->
         <div class="bg-white border border-line rounded-xl flex flex-col lg:flex-row lg:items-center justify-between gap-4" style="padding:16px 20px;">
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
               <span id="wsBadge" class="text-[11.5px] font-bold text-primary font-mono" style="background:#EFF6FF; border-radius:6px; padding:2px 8px;">TND-2026-001</span>
-              <span id="wsName" class="text-[16px] font-bold text-ink-900">Supply of Desktop Computers</span>
+              <span id="wsName" class="text-[16px] font-bold text-ink-900">Supply of Desktop Computers for AMC Offices</span>
             </div>
-            <div id="wsMeta" class="text-[12px] text-ink-500 mt-1">IT · Goods · Est. ₹27,85,350</div>
+            <div id="wsMeta" class="text-[12px] text-ink-500 mt-1">IT · Goods · Est. ₹27,85,350 · TS: ₹27,00,000 · L1: ₹26,40,000 · Method: L1</div>
           </div>
-          <span id="wsStagePill" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-semibold" style="background:#EFF6FF; color:#0C447C;"><span class="w-1.5 h-1.5 rounded-full" style="background:#0F5EE8;"></span> Reasonableness check pending</span>
+          <span id="wsStagePill" aria-live="polite" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-semibold" style="background:#FFFBEB; color:#92400E;"><span class="w-1.5 h-1.5 rounded-full pulse-amber" style="background:#F59E0B;"></span> Reasonableness check pending</span>
         </div>
 
-        <div role="tablist" aria-label="Bid management stages" id="bmTabs" class="flex flex-wrap gap-2"></div>
-        <div id="bmTabBody" class="space-y-4"></div>
+        <!-- Stage progress -->
+        <div id="stageProgress" class="stage-progress"></div>
+
+        <!-- Stage tabs (jump to stage; gated) -->
+        <div id="stageTabs" role="tablist" aria-label="Bid management stages" class="stage-tabs"></div>
+
+        <!-- Active stage body -->
+        <div id="stageBody"></div>
+
         <div class="h-4"></div>
       </section>
     </main>
+
+    <!-- LoA preview side panel (in-flow within main-col) -->
+    <div id="loaBackdrop" class="loa-backdrop" onclick="closeLoaPanel()"></div>
+    <aside id="loaPanel" class="loa-panel" role="dialog" aria-modal="true" aria-label="Letter of Acceptance preview"></aside>
+
+    <!-- In-flow confirmation modal -->
+    <div id="modalBackdrop" class="modal-backdrop" onclick="closeConfirmModal()"></div>
+    <div id="modalDialog" class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle"></div>
   </div>
 </div>
 
@@ -174,6 +417,12 @@
 
 <script>
   function refreshIcons(){ if (window.lucide) lucide.createIcons(); }
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+  function fmtINR(n){ if (n == null) return '—'; return '₹'+Number(n).toLocaleString('en-IN'); }
+  function todayISO(){ try { return new Date().toISOString().slice(0,10); } catch(e){ return ''; } }
+  function fmtDate(iso){ if (!iso) return '—'; try { return new Date(iso+(iso.length===10?'T00:00:00':'')).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); } catch(e){ return iso; } }
+  function addDaysISO(iso, days){ const d = new Date((iso||todayISO())+'T00:00:00'); d.setDate(d.getDate()+days); return d.toISOString().slice(0,10); }
+  function daysBetween(a, b){ const da = new Date(a+'T00:00:00'), db = new Date(b+'T00:00:00'); return Math.round((db - da) / (1000*60*60*24)); }
   let toastT = null;
   function showToast(msg){
     const t = document.getElementById('toast');
@@ -184,405 +433,1010 @@
 
   // ===================== DATA =====================
   const BM_TENDERS = [
-    { id:'TND-2026-001', name:'Supply of Desktop Computers', dept:'IT',    sector:'Goods', cost:'₹27,85,350', stage:'pending' },
-    { id:'TND-2026-003', name:'Water Pipeline Kalyan',       dept:'Water', sector:'Works', cost:'₹1,20,00,000', stage:'committee' },
-    { id:'TND-2026-007', name:'LED Street Light',            dept:'Engineering', sector:'Goods', cost:'₹28,50,000', stage:'complete' },
+    { id:'TND-2026-001', name:'Supply of Desktop Computers for AMC Offices', dept:'IT', sector:'Goods', method:'L1',
+      estimate:2785350, ts:2700000, l1Amount:2640000, l1Vendor:'Rajesh Constructions Pvt Ltd',
+      bidsReceived:5, tqCount:4, ntqCount:1 },
+    { id:'TND-2026-003', name:'Water Pipeline Kalyan', dept:'Water', sector:'Works', method:'QCBS',
+      estimate:12000000, ts:11800000, l1Amount:11700000, l1Vendor:'Rajesh Constructions Pvt Ltd',
+      bidsReceived:5, tqCount:5, ntqCount:0 },
+    { id:'TND-2026-007', name:'LED Street Light Retrofit', dept:'Engineering', sector:'Goods', method:'L1',
+      estimate:2850000, ts:2800000, l1Amount:2720000, l1Vendor:'LED Solutions Ltd',
+      bidsReceived:3, tqCount:3, ntqCount:0 },
   ];
-  const STAGE_META = {
-    pending:   { dot:'#0F5EE8', label:'Reasonableness check pending' },
-    committee: { dot:'#0F5EE8', label:'Committee review' },
-    award:     { dot:'#0F5EE8', label:'Award recommendation' },
-    sent:      { dot:'#F59E0B', label:'Sent for approval' },
-    complete:  { dot:'#10B981', label:'Complete' },
-  };
-  const L1_VENDOR = 'Rajesh Constructions Pvt Ltd';
-  const L1_AMOUNT = 2640000;
-  const TS_VALUE  = 2700000;
   const COMMITTEE_SEED = [
-    { name:'Rajesh Kumar', role:'Super Admin',       me:true,  comment:'', verdict:null },
-    { name:'Priya Shah',   role:'Technical Officer', me:false, comment:'', verdict:null },
-    { name:'Amit Patil',   role:'Finance Officer',   me:false, comment:'', verdict:null },
+    { id:'rk', name:'Rajesh Kumar',  designation:'Procurement Officer',  initials:'RK', isYou:true,  comment:'', verdict:'pending', date:null, conditions:'', concern:'' },
+    { id:'ps', name:'Priya Shah',    designation:'Technical Officer',    initials:'PS', isYou:false, comment:'Verified technical documents. ISO certificate valid. Work orders genuine.', verdict:'approve', date:'2026-05-18', conditions:'', concern:'' },
+    { id:'ap', name:'Amit Patil',    designation:'Finance Officer',      initials:'AP', isYou:false, comment:'', verdict:'pending', date:null, conditions:'', concern:'' },
+  ];
+  const APPROVAL_CHAIN = [
+    { id:'officer', name:'Rajesh Kumar', designation:'Procurement Officer (Originator)', initials:'RK' },
+    { id:'tech',    name:'Priya Shah',   designation:'Technical Officer',              initials:'PS' },
+    { id:'commr',   name:'Sunita Rao',   designation:'Commissioner',                   initials:'SR' },
   ];
 
   // ===================== STATE =====================
   let BM = null;
   function freshBM(tnd){
+    const t = BM_TENDERS.find(x => x.id === tnd) || BM_TENDERS[0];
     return {
-      tnd, activeTab:'rc',
-      bm1:{ done:false, decision:null, reason:'' },
-      committee: JSON.parse(JSON.stringify(COMMITTEE_SEED)),
-      bm2done:false,
-      negotiation:{ triggered:false, by:'', reason:'', invited:false, newQuote:null, decided:null },
-      bm3done:false,
-      checklist:[false,false,false,false,false,false],
-      bm4sent:false, bm4approved:false,
+      tnd, stage: 1,
+      stage1Complete: false,
+      reasonablenessDecision: { kind:null, note:'', authority:'', retenderReason:'', confirmed:false },
+      stage2Complete: false,
+      committeeMembers: JSON.parse(JSON.stringify(COMMITTEE_SEED)),
+      resolutions: {},
+      negotiationTriggered: false, negotiationReason: '',
+      stage3Complete: false, invitationSent:false, invitationDate:null,
+      negotiationSessions: [], negotiationOutcome:null, negotiatedAmount:null,
+      stage4aComplete: false,
+      recommendationNote: '',
+      preApprovalChecks: { c1:false, c2:false, c3:false, c4:false, c5:false, c6:false },
+      approvalSent: false, approvalStatus: {},
+      loaIssued: false, loaIssuedDate:null,
+      loaAcknowledged: false, acknowledgementDate:null, acknowledgementBy:'',
+      loaDetails: {
+        vendorName: t.l1Vendor || '',
+        acceptedAmount: t.l1Amount || 0,
+        dateOfLoa: todayISO(),
+        performanceSecurity: Math.round((t.l1Amount||0) * 0.05),
+        securityDeadline: addDaysISO(todayISO(), 15),
+        commencementDate: addDaysISO(todayISO(), 20),
+        completionDate: addDaysISO(todayISO(), 110),
+        issuingAuthority: 'Sunita Rao',
+        designation: 'Commissioner',
+      },
     };
   }
-  function saveBM(){ try { localStorage.setItem('bidmgmt_'+BM.tnd, JSON.stringify(BM)); } catch(e){} }
   function loadBM(tnd){ try { const r = localStorage.getItem('bidmgmt_'+tnd); if (r) return JSON.parse(r); } catch(e){} return null; }
+  function saveBM(){ if (!BM) return; try { localStorage.setItem('bidmgmt_'+BM.tnd, JSON.stringify(BM)); } catch(e){} }
+  function seedCompletedDemo(tnd){
+    const s = freshBM(tnd); s.stage = 4;
+    s.stage1Complete = true; s.reasonablenessDecision = { kind:'proceed', note:'L1 within EC and TS.', authority:'', retenderReason:'', confirmed:true };
+    s.stage2Complete = true; s.committeeMembers.forEach(m => { m.verdict='approve'; m.date='2026-05-12'; if (!m.comment) m.comment='Reviewed and approved.'; });
+    s.stage4aComplete = true; s.approvalSent = true;
+    APPROVAL_CHAIN.forEach(a => s.approvalStatus[a.id] = { approved:true, date:'2026-05-13' });
+    s.loaIssued = true; s.loaIssuedDate = '2026-05-14';
+    s.loaAcknowledged = true; s.acknowledgementDate = '2026-05-15'; s.acknowledgementBy = 'Mr. K. Iyer (LED Solutions Ltd)';
+    return s;
+  }
+  function bmStatusFor(tnd){
+    const t = BM_TENDERS.find(x => x.id === tnd);
+    if (!t) return { dot:'#9CA3AF', dotCls:'', text:'—', textCol:'#6B7280' };
+    const s = loadBM(tnd) || (tnd === 'TND-2026-007' ? seedCompletedDemo(tnd) : null);
+    if (!s) return { dot:'#F59E0B', dotCls:'pulse-amber', text:'Reasonableness check pending', textCol:'#92400E' };
+    if (s.loaIssued && s.loaAcknowledged) return { dot:'#10B981', dotCls:'', text:'Complete', textCol:'#065F46' };
+    if (s.loaIssued)        return { dot:'#10B981', dotCls:'', text:'Awaiting acknowledgement', textCol:'#065F46' };
+    if (s.stage4aComplete)  return { dot:'#10B981', dotCls:'', text:'Issue LoA', textCol:'#065F46' };
+    if (s.stage === 3)      return { dot:'#8B5CF6', dotCls:'pulse-amber', text:'Negotiation', textCol:'#3C3489' };
+    if (s.stage2Complete)   return { dot:'#10B981', dotCls:'', text:'Award recommendation', textCol:'#065F46' };
+    if (s.stage1Complete)   return { dot:'#0F5EE8', dotCls:'pulse-blue', text:'Committee review', textCol:'#0C447C' };
+    return { dot:'#F59E0B', dotCls:'pulse-amber', text:'Reasonableness check pending', textCol:'#92400E' };
+  }
 
   // ===================== LANDING =====================
-  function renderBMList(){
-    document.getElementById('bmList').innerHTML = BM_TENDERS.map(t => {
-      const m = STAGE_META[t.stage];
-      return `<div class="ev-row" onclick="openWorkspace('${t.id}')" tabindex="0" role="button" onkeydown="if(event.key==='Enter')openWorkspace('${t.id}')" style="padding:14px 16px; border-bottom:1px solid #F3F4F6; display:flex; align-items:center; gap:16px;">
-        <span class="w-2 h-2 rounded-full shrink-0" style="background:${m.dot};"></span>
-        <span class="font-mono text-[12px] font-semibold text-primary shrink-0" style="background:#EFF6FF; border-radius:4px; padding:2px 6px; width:108px; text-align:center;">${t.id}</span>
-        <div class="flex-1 min-w-0">
-          <div class="text-[14px] font-medium text-ink-900 truncate">${t.name}</div>
-          <div class="text-[12px] text-ink-400">${t.dept} · ${t.sector}</div>
-        </div>
-        <div class="shrink-0 text-[12.5px] text-ink-500" style="width:220px; text-align:right;">${m.label}</div>
-        <i data-lucide="chevron-right" class="w-4 h-4 text-ink-400 shrink-0"></i>
-      </div>`;
-    }).join('');
-    refreshIcons();
-  }
   function showLanding(){
     try { history.replaceState(null,'',location.pathname); } catch(e){}
+    closeLoaPanel(); closeConfirmModal();
     document.getElementById('screen-workspace').classList.add('hidden');
     document.getElementById('screen-landing').classList.remove('hidden');
-    renderBMList();
+    renderLanding();
+    const sb = document.getElementById('landingSearch'); if (sb){ sb.value=''; filterBmList(''); }
     window.scrollTo({ top:0 });
   }
+  function renderLanding(){
+    renderStatsRow();
+    const ready = BM_TENDERS.filter(t => bmStatusFor(t.id).text !== 'Complete');
+    const completed = BM_TENDERS.filter(t => bmStatusFor(t.id).text === 'Complete');
+    document.getElementById('readyList').innerHTML = ready.map(renderLandingRow).join('');
+    document.getElementById('completedList').innerHTML = completed.map(renderLandingRow).join('');
+    const tt = document.getElementById('completedToggleText');
+    if (tt) tt.textContent = (completed.length === 1 ? 'Show 1 completed' : 'Show '+completed.length+' completed');
+    refreshIcons();
+  }
+  function renderStatsRow(){
+    const cards = [
+      { num:2, label:'Reasonableness Check', sub:'Pending decision',  iconBg:'#FFFBEB', icColor:'#92400E', numColor:'#92400E', icon:'alert-triangle' },
+      { num:1, label:'Committee Review',     sub:'Awaiting approvals',iconBg:'#EFF6FF', icColor:'#0F5EE8', numColor:'#0F5EE8', icon:'users' },
+      { num:3, label:'Award Recommendation', sub:'Ready to send',     iconBg:'#F0FDF4', icColor:'#10B981', numColor:'#10B981', icon:'gavel' },
+    ];
+    document.getElementById('statsRow').innerHTML = cards.map(c => `
+      <div class="stat-card">
+        <div class="stat-icon" style="background:${c.iconBg};"><i data-lucide="${c.icon}" style="color:${c.icColor};"></i></div>
+        <div>
+          <div class="stat-num" style="color:${c.numColor};">${c.num}</div>
+          <div class="stat-label">${esc(c.label)}</div>
+          <div class="stat-sub">${esc(c.sub)}</div>
+        </div>
+      </div>`).join('');
+  }
+  function renderLandingRow(t){
+    const st = bmStatusFor(t.id);
+    return `<div class="ev-row" data-name="${esc((t.name||'').toLowerCase())}" data-id="${esc((t.id||'').toLowerCase())}" data-dept="${esc((t.dept||'').toLowerCase())}" data-sector="${esc((t.sector||'').toLowerCase())}" onclick="openWorkspace('${esc(t.id)}')" tabindex="0" role="button" onkeydown="if(event.key==='Enter')openWorkspace('${esc(t.id)}')" style="padding:14px 16px; border-bottom:1px solid #F3F4F6; display:flex; align-items:center; gap:16px;">
+      <span class="w-2 h-2 rounded-full shrink-0 ${st.dotCls}" style="background:${st.dot};"></span>
+      <span class="font-mono text-[11px] font-bold text-primary shrink-0" style="background:#EFF6FF; border-radius:4px; padding:2px 6px; width:108px; text-align:center;">${esc(t.id)}</span>
+      <div class="flex-1 min-w-0">
+        <div class="text-[14px] font-medium text-ink-900 truncate">${esc(t.name)}</div>
+        <div class="text-[12px] text-ink-400">${esc(t.dept)} · ${esc(t.sector)} · <span style="background:#F3F4F6; border-radius:20px; padding:1px 8px; font-size:11px;">${esc(t.method)}</span></div>
+      </div>
+      <div class="shrink-0 text-[12px]" style="color:${st.textCol}; width:220px; text-align:right;">${esc(st.text)}</div>
+      <i data-lucide="chevron-right" class="w-4 h-4 text-ink-400 shrink-0"></i>
+    </div>`;
+  }
+  function filterBmList(query){
+    const q = (query||'').trim().toLowerCase();
+    const rows = document.querySelectorAll('#readyList .ev-row, #completedList .ev-row');
+    let matches = 0;
+    rows.forEach(r => {
+      const hay = (r.dataset.name||'')+' '+(r.dataset.id||'')+' '+(r.dataset.dept||'')+' '+(r.dataset.sector||'');
+      const ok = !q || hay.includes(q);
+      r.classList.toggle('dimmed', !ok);
+      if (ok) matches++;
+    });
+    const empty = document.getElementById('landingSearchEmpty');
+    if (empty){
+      if (q && matches === 0){ empty.textContent = 'No tenders found for "'+query+'"'; empty.classList.remove('hidden'); }
+      else empty.classList.add('hidden');
+    }
+  }
+  let _completedOpen = false;
+  function toggleCompleted(){
+    _completedOpen = !_completedOpen;
+    const zone = document.getElementById('completedZone');
+    const btn  = document.getElementById('completedToggle');
+    const txt  = document.getElementById('completedToggleText');
+    const icon = document.getElementById('completedToggleIcon');
+    const cc = BM_TENDERS.filter(t => bmStatusFor(t.id).text === 'Complete').length;
+    if (_completedOpen){
+      zone.classList.add('open');
+      btn.setAttribute('aria-expanded','true');
+      if (txt) txt.textContent = 'Hide completed';
+      if (icon) icon.setAttribute('data-lucide','chevron-up');
+    } else {
+      zone.classList.remove('open');
+      btn.setAttribute('aria-expanded','false');
+      if (txt) txt.textContent = (cc === 1 ? 'Show 1 completed' : 'Show '+cc+' completed');
+      if (icon) icon.setAttribute('data-lucide','chevron-down');
+    }
+    refreshIcons();
+  }
+
+  // ===================== WORKSPACE =====================
   function openWorkspace(tnd){
     try { history.replaceState(null,'','?tender='+encodeURIComponent(tnd)); } catch(e){}
+    closeLoaPanel(); closeConfirmModal();
     const t = BM_TENDERS.find(x => x.id === tnd) || BM_TENDERS[0];
-    BM = loadBM(tnd) || freshBM(tnd);
+    BM = loadBM(tnd) || (tnd === 'TND-2026-007' ? seedCompletedDemo(tnd) : freshBM(tnd));
+    if (BM.stage == null) BM.stage = 1;
+    if (!BM.committeeMembers) BM.committeeMembers = JSON.parse(JSON.stringify(COMMITTEE_SEED));
+    if (!BM.approvalStatus) BM.approvalStatus = {};
+    if (!BM.loaDetails) BM.loaDetails = freshBM(tnd).loaDetails;
     document.getElementById('wsCrumb').textContent = t.id;
     document.getElementById('wsBadge').textContent = t.id;
-    document.getElementById('wsName').textContent = t.name;
-    document.getElementById('wsMeta').textContent = `${t.dept} · ${t.sector} · Est. ${t.cost}`;
+    document.getElementById('wsName').textContent  = t.name;
+    document.getElementById('wsMeta').textContent  = `${t.dept} · ${t.sector} · Est. ${fmtINR(t.estimate)} · TS: ${fmtINR(t.ts)} · L1: ${fmtINR(t.l1Amount)} · Method: ${t.method}`;
     document.getElementById('screen-landing').classList.add('hidden');
     document.getElementById('screen-workspace').classList.remove('hidden');
-    renderTabs();
-    setTab(BM.activeTab);
+    renderWorkspace();
     window.scrollTo({ top:0 });
   }
-
-  // ===================== TABS =====================
-  function tabList(){
-    const tabs = [
-      { id:'rc', label:'Reasonableness Check', icon:'scale' },
-      { id:'cr', label:'Committee Review',     icon:'users' },
-    ];
-    if (BM.negotiation.triggered) tabs.push({ id:'ng', label:'Negotiation', icon:'handshake' });
-    tabs.push({ id:'aw', label:'Award Recommendation', icon:'trophy' });
-    return tabs;
+  function tenderInfo(){ return BM_TENDERS.find(x => x.id === BM.tnd) || BM_TENDERS[0]; }
+  function reasonablenessCase(){
+    const t = tenderInfo();
+    const ec = t.estimate, ts = t.ts, l1 = t.l1Amount;
+    if (l1 < ec * 0.85) return 'D';
+    if (l1 > ts)        return 'B';
+    if (l1 > ec * 1.10) return 'C';
+    return 'A';
   }
-  function tabUnlocked(id){
-    if (id==='rc') return true;
-    if (id==='cr') return BM.bm1.done;
-    if (id==='ng') return BM.negotiation.triggered;
-    if (id==='aw'){
-      if (BM.negotiation.triggered) return BM.bm3done;
-      return BM.bm2done;
-    }
+  function negotiationVisible(){ return !!BM.negotiationTriggered; }
+  function stageNodes(){
+    const arr = [{ key:1, label:'Reasonableness' }, { key:2, label:'Committee Review' }];
+    if (negotiationVisible()) arr.push({ key:3, label:'Negotiation' });
+    arr.push({ key:4, label:'Award & LoA' });
+    return arr;
+  }
+  function isStageComplete(key){
+    if (key === 1) return BM.stage1Complete;
+    if (key === 2) return BM.stage2Complete;
+    if (key === 3) return BM.stage3Complete;
+    if (key === 4) return BM.loaIssued;
     return false;
   }
-  function renderTabs(){
-    document.getElementById('bmTabs').innerHTML = tabList().map(t => {
-      const unlocked = tabUnlocked(t.id);
-      const active = BM.activeTab === t.id;
-      return `<button role="tab" onclick="setTab('${t.id}')" class="ev-tab px-4 py-1.5 rounded-full text-[13px] border ${active?'border-primary bg-primary text-white':(unlocked?'border-line bg-white text-ink-500':'border-line bg-white text-ink-400')}">
-        <i data-lucide="${unlocked?t.icon:'lock'}" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1"></i> ${t.label}</button>`;
+  function isStageLocked(key){
+    if (key === 1) return false;
+    if (key === 2) return !BM.stage1Complete;
+    if (key === 3) return !BM.stage2Complete || !negotiationVisible();
+    if (key === 4) return !BM.stage2Complete || (negotiationVisible() && !BM.stage3Complete);
+    return true;
+  }
+  function renderWorkspace(){
+    renderHeaderStatus();
+    renderStageProgress();
+    renderStageTabs();
+    renderStageBody();
+    refreshIcons();
+  }
+  function renderHeaderStatus(){
+    const pill = document.getElementById('wsStagePill');
+    if (!pill) return;
+    const st = bmStatusFor(BM.tnd);
+    pill.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${st.dotCls}" style="background:${st.dot};"></span> ${esc(st.text)}`;
+    pill.style.background = st.dot === '#10B981' ? '#F0FDF4' : st.dot === '#0F5EE8' ? '#EFF6FF' : st.dot === '#8B5CF6' ? '#EEEDFE' : '#FFFBEB';
+    pill.style.color = st.textCol;
+  }
+  function renderStageProgress(){
+    const nodes = stageNodes();
+    const wrap = document.getElementById('stageProgress');
+    let html = '<div class="stage-track">';
+    nodes.forEach((n, i) => {
+      const complete = isStageComplete(n.key);
+      const active = n.key === BM.stage && !complete;
+      const locked = !complete && !active && isStageLocked(n.key);
+      const cls = complete ? 'complete' : active ? 'active' : locked ? 'locked' : '';
+      const icon = complete ? '<i data-lucide="check" style="width:18px; height:18px;"></i>' : (locked ? '<i data-lucide="lock" style="width:14px; height:14px;"></i>' : String(i+1));
+      html += `<div class="stage-node ${cls}"><div style="position:relative;"><div class="stage-circle">${icon}</div></div><div class="stage-label">${esc(n.label)}</div></div>`;
+      if (i < nodes.length - 1){
+        html += `<div class="stage-line ${isStageComplete(n.key)?'complete':''}"></div>`;
+      }
+    });
+    html += '</div>';
+    wrap.innerHTML = html;
+  }
+  function renderStageTabs(){
+    const nodes = stageNodes();
+    document.getElementById('stageTabs').innerHTML = nodes.map(n => {
+      const active = n.key === BM.stage;
+      const locked = isStageLocked(n.key) && !isStageComplete(n.key);
+      return `<button class="stage-tab ${active?'active':''} ${locked?'locked':''}" role="tab" aria-selected="${active?'true':'false'}" ${locked?'disabled':''} onclick="goToStage(${n.key})">${esc(n.label)}</button>`;
     }).join('');
-    refreshIcons();
   }
-  function setTab(id){
-    if (!tabUnlocked(id)){ showToast('Complete previous stage to unlock'); return; }
-    BM.activeTab = id;
-    renderTabs(); saveBM();
-    const body = document.getElementById('bmTabBody');
-    if (id==='rc') body.innerHTML = rcBody();
-    else if (id==='cr') body.innerHTML = crBody();
-    else if (id==='ng') body.innerHTML = ngBody();
-    else body.innerHTML = awBody();
-    refreshIcons();
+  function goToStage(k){
+    if (isStageLocked(k) && !isStageComplete(k)){ showToast('Complete the previous stage first'); return; }
+    BM.stage = k; saveBM(); renderWorkspace();
   }
-  function thS(){ return 'padding:10px 12px; font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; text-align:left;'; }
-  function tdS(){ return 'padding:11px 12px; font-size:12.5px; color:#374151;'; }
+  function renderStageBody(){
+    const body = document.getElementById('stageBody');
+    if (BM.stage === 1) body.innerHTML = stage1HTML();
+    else if (BM.stage === 2) body.innerHTML = stage2HTML();
+    else if (BM.stage === 3) body.innerHTML = stage3HTML();
+    else if (BM.stage === 4) body.innerHTML = stage4HTML();
+  }
 
-  // ===================== BM1 — REASONABLENESS CHECK =====================
-  function rcBody(){
-    const variance = ((L1_AMOUNT - TS_VALUE) / TS_VALUE) * 100;
-    const within = L1_AMOUNT <= TS_VALUE;
-    const fmt = n => '₹' + n.toLocaleString('en-IN');
-    let banner;
-    if (BM.bm1.done){
-      banner = `<div class="rounded-lg p-3.5 mt-4" style="background:#F0FDF4; border:1px solid #BBF7D0;"><span class="text-[13px]" style="color:#065F46;">✓ Reasonableness check complete${BM.bm1.decision?(' — '+BM.bm1.decision):''}. Committee Review unlocked.</span></div>`;
-    } else if (within){
-      banner = `<div class="rounded-lg p-3.5 mt-4 flex items-center justify-between gap-3 flex-wrap" style="background:#F0FDF4; border:1px solid #BBF7D0;">
-        <span class="text-[13px]" style="color:#065F46;">✓ L1 quote is within Technical Sanction value. Proceed to Committee Review.</span>
-        <button onclick="rcProceed()" class="px-3.5 py-2 rounded-lg bg-success text-white text-[12.5px] font-medium">Proceed →</button>
+  // ============ STAGE 1 — REASONABLENESS ============
+  function stage1HTML(){
+    const t = tenderInfo();
+    const ec = t.estimate, ts = t.ts, l1 = t.l1Amount;
+    const vsEc = ((l1 - ec) / ec) * 100;
+    const vsTs = ts ? ((l1 - ts) / ts) * 100 : null;
+    const vsEcDiff = l1 - ec, vsTsDiff = ts ? l1 - ts : null;
+    const ecColor = vsEc < 0 ? '#065F46' : vsEc <= 10 ? '#374151' : vsEc <= 15 ? '#92400E' : '#991B1B';
+    const tsColor = vsTs == null ? '#9CA3AF' : vsTs < 0 ? '#065F46' : vsTs <= 10 ? '#374151' : vsTs <= 15 ? '#92400E' : '#991B1B';
+    const caseKey = reasonablenessCase();
+    const figureCard = `<div class="card">
+      <div class="text-[14px] font-bold text-ink-900" style="margin-bottom:14px;">Financial comparison</div>
+      <table class="fig-table">
+        <tr><td class="lbl">Estimated Cost (EC)</td><td class="val">${fmtINR(ec)}</td><td class="note">Engineer's working estimate</td></tr>
+        <tr><td class="lbl">Technical Sanction (TS)</td><td class="val">${fmtINR(ts)}</td><td class="note">Formally approved budget ceiling</td></tr>
+        <tr><td class="lbl">Recommended bid (L1)</td><td class="val">${fmtINR(l1)}</td><td class="note">${esc(t.l1Vendor)}</td></tr>
+        <tr><td class="lbl">L1 vs EC</td><td class="val" style="color:${ecColor};">${vsEc>=0?'+':''}${vsEc.toFixed(1)}%</td><td class="note">${vsEcDiff<0?'₹'+Math.abs(vsEcDiff).toLocaleString('en-IN')+' below estimate':'₹'+Math.abs(vsEcDiff).toLocaleString('en-IN')+' above estimate'}</td></tr>
+        ${ts != null ? `<tr><td class="lbl">L1 vs TS</td><td class="val" style="color:${tsColor};">${vsTs>=0?'+':''}${vsTs.toFixed(1)}%</td><td class="note">${vsTsDiff<0?'₹'+Math.abs(vsTsDiff).toLocaleString('en-IN')+' below TS value':'₹'+Math.abs(vsTsDiff).toLocaleString('en-IN')+' above TS value'}</td></tr>` : ''}
+      </table>
+    </div>`;
+    const rd = BM.reasonablenessDecision || (BM.reasonablenessDecision = { kind:null, note:'', authority:'', retenderReason:'', confirmed:false });
+    let banner = '';
+    if (caseKey === 'A'){
+      banner = `<div class="res-banner case-a" aria-live="polite">
+        <div class="rb-head"><i data-lucide="check-circle-2" style="width:20px; height:20px;"></i> L1 bid is reasonable and within budget</div>
+        <div class="rb-body">The recommended bid of ${fmtINR(l1)} is ${Math.abs(vsEc).toFixed(1)}% below the estimated cost and within the Technical Sanction value of ${fmtINR(ts)}. No additional approval is required for reasonableness.</div>
+        <div class="ai-strip green">✦ AI: This price saving of ${fmtINR(Math.abs(vsEcDiff))} (${Math.abs(vsEc).toFixed(1)}%) is within the normal range for ${esc(t.sector)} procurement. Market rates have been stable in this period.</div>
+        <button class="btn-success full" style="margin-top:14px;" onclick="confirmReasonableness('proceed')">Proceed to Committee Review →</button>
       </div>`;
+    } else if (caseKey === 'B'){
+      banner = renderCaseB(t, l1, ts, vsTs, rd);
+    } else if (caseKey === 'C'){
+      banner = renderCaseC(t, l1, ec, vsEc, rd);
     } else {
-      banner = `<div class="rounded-lg p-3.5 mt-4" style="background:#FEF2F2; border:1px solid #FECACA;">
-        <div class="text-[13px]" style="color:#991B1B;">✗ L1 quote exceeds Technical Sanction value by ${variance.toFixed(1)}%. A decision is required.</div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-3">
-          <label class="radio-card bg-white border border-line rounded-lg p-3 flex items-start gap-2.5 ${BM._rcSel==='fresh'?'selected':''}" onclick="BM._rcSel='fresh'; setTab('rc')"><input type="radio" name="rc" class="accent-primary mt-0.5" ${BM._rcSel==='fresh'?'checked':''}><div><div class="text-[13px] font-medium text-ink-900">Seek fresh financial approval</div><div class="text-[11.5px] text-ink-500">Route to HOD for a revised Technical Sanction</div></div></label>
-          <label class="radio-card bg-white border border-line rounded-lg p-3 flex items-start gap-2.5 ${BM._rcSel==='retender'?'selected':''}" onclick="BM._rcSel='retender'; setTab('rc')"><input type="radio" name="rc" class="accent-primary mt-0.5" ${BM._rcSel==='retender'?'checked':''}><div><div class="text-[13px] font-medium text-ink-900">Re-tender</div><div class="text-[11.5px] text-ink-500">Reason required — returns to tender creation</div></div></label>
-        </div>
-        <textarea id="rcReason" rows="2" class="field mt-2" placeholder="Reason (required)"></textarea>
-        <div class="flex justify-end mt-2"><button onclick="rcConfirm()" class="px-3.5 py-2 rounded-lg bg-danger text-white text-[12.5px] font-medium">Confirm</button></div>
+      const enhanced = Math.round(l1 * 0.10);
+      banner = `<div class="res-banner case-d" aria-live="polite">
+        <div class="rb-head"><i data-lucide="alert-triangle" style="width:20px; height:20px;"></i> ⚠ Abnormally low bid accepted</div>
+        <div class="rb-body">Accepting this bid without enhanced security risks contract abandonment. Vendor quoted ${fmtINR(Math.abs(vsEcDiff))} (${Math.abs(vsEc).toFixed(1)}%) below estimate.</div>
+        <div style="margin-top:10px; display:flex; align-items:center; gap:8px;"><span style="font-size:12px; color:#991B1B; font-weight:600;">Enhanced performance security status:</span> <span class="pill-red">Required — 10% additional (${fmtINR(enhanced)})</span></div>
+        <button class="btn-primary full" style="margin-top:14px;" onclick="confirmReasonableness('alb-acknowledged')">Acknowledge risk and Proceed →</button>
       </div>`;
     }
-    return `<div class="bg-white border border-line rounded-xl" style="padding:20px 24px;">
-      <div class="text-[14px] font-bold text-ink-900 mb-1">Reasonableness Check</div>
-      <div class="text-[12.5px] text-ink-500 mb-3">Confirm the L1 quote is reasonable against the Technical Sanction value before proceeding.</div>
-      <table style="width:100%; table-layout:fixed; border-collapse:collapse; border:1px solid #E5E7EB; border-radius:8px;">
-        <tbody>
-          <tr style="border-bottom:1px solid #F3F4F6;"><td style="${tdS()} color:#6B7280; width:55%;">L1 Quoted Amount</td><td style="${tdS()} font-weight:600;">${fmt(L1_AMOUNT)}</td></tr>
-          <tr style="border-bottom:1px solid #F3F4F6;"><td style="${tdS()} color:#6B7280;">Technical Sanction (TS) Value</td><td style="${tdS()} font-weight:600;">${fmt(TS_VALUE)}</td></tr>
-          <tr><td style="${tdS()} color:#6B7280;">Variance</td><td style="${tdS()} font-weight:600; color:${within?'#065F46':'#991B1B'};">${variance>0?'+':''}${variance.toFixed(1)}% ${within?'below TS ✓':'above TS'}</td></tr>
-        </tbody>
-      </table>
-      ${banner}
+    const footer = `<div class="stage-footer">
+      <div class="text-[13px] text-ink-500">Stage 1 of ${stageNodes().length}</div>
+      <button class="btn-primary" ${BM.stage1Complete?'':'disabled'} onclick="advanceStage(1)">${BM.stage1Complete?'Reasonableness check complete ✓':'Complete Reasonableness Check →'}</button>
+    </div>`;
+    return `<div class="stage-header"><h2>Reasonableness Check</h2><p>Before proceeding to committee review, verify that the recommended bid is financially reasonable compared to the estimated cost and Technical Sanction value.</p></div>
+      ${figureCard}${banner}${footer}`;
+  }
+  function renderCaseB(t, l1, ts, vsTs, rd){
+    const cards = ['fresh_approval','retender'].map(k => {
+      const titles = { fresh_approval:['Seek fresh TS approval','Escalate to competent authority for revised TS sanction'], retender:['Re-tender','Cancel this tender and re-issue with revised estimates'] };
+      const on = rd.kind === k;
+      return `<div class="dec-card ${on?'on':''}" onclick="setReasonKind('${k}')"><div class="dc-title">${titles[k][0]}</div><div class="dc-desc">${titles[k][1]}</div></div>`;
+    }).join('');
+    let form = '';
+    if (rd.kind === 'fresh_approval'){
+      form = `<div class="dec-field"><label>Justification notes</label><textarea id="rdNote" placeholder="Justification for revised TS approval...">${esc(rd.note||'')}</textarea></div>
+        <div class="dec-field"><label>Authority</label><select id="rdAuth"><option value="" ${!rd.authority?'selected':''}>Select…</option><option ${rd.authority==='HOD'?'selected':''}>HOD</option><option ${rd.authority==='Commissioner'?'selected':''}>Commissioner</option><option ${rd.authority==='Government'?'selected':''}>Government</option></select></div>`;
+    } else if (rd.kind === 'retender'){
+      form = `<div class="dec-field"><label>Reason for re-tender</label><select id="rdRetReason"><option value="" ${!rd.retenderReason?'selected':''}>Select…</option><option ${rd.retenderReason==='Bids above TS'?'selected':''}>Bids above TS</option><option ${rd.retenderReason==='Uncompetitive bids'?'selected':''}>Uncompetitive bids</option><option ${rd.retenderReason==='Scope changed'?'selected':''}>Scope changed</option><option ${rd.retenderReason==='Other'?'selected':''}>Other</option></select></div>
+        <div class="dec-field"><label>Notes</label><textarea id="rdNote" placeholder="Additional context...">${esc(rd.note||'')}</textarea></div>`;
+    }
+    const canConfirm = rd.kind && (
+      (rd.kind === 'fresh_approval' && (rd.note||'').trim() && rd.authority) ||
+      (rd.kind === 'retender' && rd.retenderReason)
+    );
+    return `<div class="res-banner case-b" aria-live="polite">
+      <div class="rb-head"><i data-lucide="alert-circle" style="width:20px; height:20px;"></i> L1 bid exceeds Technical Sanction value</div>
+      <div class="rb-body">L1 of ${fmtINR(l1)} is ${vsTs.toFixed(1)}% above the TS value of ${fmtINR(ts)}. A decision is required before proceeding.</div>
+      <div class="ai-strip amber">✦ AI: Consider whether TS value needs revision due to market rate changes, or explore negotiation with L1 vendor before re-tendering.</div>
+      <div class="dec-row">${cards}</div>
+      ${form}
+      <button class="btn-primary full" style="margin-top:14px;" ${canConfirm?'':'disabled'} onclick="confirmReasonableness('${rd.kind||''}')">Confirm decision →</button>
     </div>`;
   }
-  function rcProceed(){
-    BM.bm1.done = true;
-    BM.activeTab = 'cr';
-    saveBM(); renderTabs(); setTab('cr');
-    showToast('Committee Review unlocked');
+  function renderCaseC(t, l1, ec, vsEc, rd){
+    const cards = ['proceed','negotiate','retender'].map(k => {
+      const titles = { proceed:['Proceed with justification','Officer accepts the higher price with documented justification'], negotiate:['Initiate negotiation','Triggers a negotiation stage with the L1 vendor'], retender:['Re-tender','Cancel and re-issue'] };
+      const on = rd.kind === k;
+      const cls = k === 'negotiate' ? 'purple' : '';
+      return `<div class="dec-card ${on?'on':''} ${on?cls:''}" onclick="setReasonKind('${k}')"><div class="dc-title">${titles[k][0]}</div><div class="dc-desc">${titles[k][1]}</div></div>`;
+    }).join('');
+    let form = '';
+    if (rd.kind){
+      const lbl = rd.kind === 'retender' ? 'Reason for re-tender' : (rd.kind === 'negotiate' ? 'Negotiation context (will be visible in Stage 3)' : 'Justification notes');
+      form = `<div class="dec-field"><label>${esc(lbl)}</label><textarea id="rdNote" placeholder="Add context...">${esc(rd.note||'')}</textarea></div>`;
+    }
+    const canConfirm = rd.kind && (rd.note||'').trim();
+    return `<div class="res-banner case-c" aria-live="polite">
+      <div class="rb-head"><i data-lucide="alert-triangle" style="width:20px; height:20px;"></i> L1 bid is above estimate</div>
+      <div class="rb-body">L1 quote is ${vsEc.toFixed(1)}% above the estimated cost of ${fmtINR(ec)}. Pick how to proceed.</div>
+      <div class="ai-strip amber">✦ AI: Verify if market rates have changed since estimation. Consider negotiation before re-tender.</div>
+      <div class="dec-row three">${cards}</div>
+      ${form}
+      <button class="btn-primary full" style="margin-top:14px;" ${canConfirm?'':'disabled'} onclick="confirmReasonableness('${rd.kind||''}')">Confirm decision →</button>
+    </div>`;
   }
-  function rcConfirm(){
-    if (!BM._rcSel){ showToast('Select a decision'); return; }
-    const reason = (document.getElementById('rcReason')||{}).value || '';
-    if (!reason.trim()){ showToast('Reason is required'); return; }
-    BM.bm1 = { done:true, decision:(BM._rcSel==='fresh'?'Fresh financial approval sought':'Re-tender initiated'), reason:reason.trim() };
-    BM.activeTab = 'cr';
-    saveBM(); renderTabs(); setTab('cr');
-    showToast('Decision confirmed');
+  function setReasonKind(k){
+    const rd = BM.reasonablenessDecision;
+    const note = document.getElementById('rdNote'); if (note) rd.note = note.value;
+    const auth = document.getElementById('rdAuth'); if (auth) rd.authority = auth.value;
+    const ret  = document.getElementById('rdRetReason'); if (ret) rd.retenderReason = ret.value;
+    rd.kind = k; rd.confirmed = false;
+    saveBM(); renderStageBody(); refreshIcons();
+  }
+  function confirmReasonableness(kind){
+    const rd = BM.reasonablenessDecision || (BM.reasonablenessDecision = { kind:null, note:'', authority:'', retenderReason:'', confirmed:false });
+    const note = document.getElementById('rdNote'); if (note) rd.note = note.value;
+    const auth = document.getElementById('rdAuth'); if (auth) rd.authority = auth.value;
+    const ret  = document.getElementById('rdRetReason'); if (ret) rd.retenderReason = ret.value;
+    if (kind) rd.kind = kind;
+    rd.confirmed = true;
+    BM.stage1Complete = true;
+    if (rd.kind === 'negotiate'){
+      BM.negotiationTriggered = true;
+      BM.negotiationReason = 'L1 quote is above estimated cost — initiated via reasonableness check';
+    }
+    saveBM(); renderWorkspace();
+    showToast('Reasonableness check complete');
+  }
+  function advanceStage(currentStage){
+    if (currentStage === 1){
+      if (!BM.stage1Complete){ showToast('Confirm a decision in the result banner first'); return; }
+      BM.stage = 2; saveBM(); renderWorkspace(); return;
+    }
+    if (currentStage === 2){
+      const pending = BM.committeeMembers.filter(m => m.verdict === 'pending').length;
+      const concerns = BM.committeeMembers.filter(m => m.verdict === 'concern');
+      const unresolved = concerns.length - Object.keys(BM.resolutions||{}).length;
+      if (pending){ showToast(pending+' committee member(s) still pending'); return; }
+      if (unresolved > 0){ showToast('Resolve all concerns first'); return; }
+      BM.stage2Complete = true;
+      const negMember = BM.committeeMembers.find(m => m.verdict === 'neg');
+      if (negMember){
+        BM.negotiationTriggered = true;
+        BM.negotiationReason = `${negMember.name} (${negMember.designation}) requested negotiation — ${negMember.concern || 'L1 price should be tested'}`;
+      }
+      BM.stage = negotiationVisible() ? 3 : 4;
+      saveBM(); renderWorkspace();
+      return;
+    }
+    if (currentStage === 3){
+      if (!BM.negotiationOutcome){ showToast('Record the negotiation outcome first'); return; }
+      BM.stage3Complete = true;
+      BM.stage = 4; saveBM(); renderWorkspace(); return;
+    }
   }
 
-  // ===================== BM2 — COMMITTEE REVIEW =====================
-  function crBody(){
-    const rows = BM.committee.map((m,i) => {
-      const vPill = m.verdict==='approve' ? '<span style="color:#10B981; font-size:12px;">Approved</span>'
-        : m.verdict==='concern' ? '<span style="color:#92400E; font-size:12px;">Concern raised</span>'
-        : m.verdict==='negotiate' ? '<span style="color:#92400E; font-size:12px;">Negotiation requested</span>'
-        : '<span style="color:#F59E0B; font-size:12px;">Pending</span>';
-      let action = '';
-      if (m.verdict) action = '<span class="text-ink-400 text-[12px]">—</span>';
-      else if (m.me) action = `<button onclick="crShowForm(${i})" class="px-2.5 py-1 rounded-md bg-primary text-white text-[11.5px] font-medium">Add your comment</button>`;
-      else action = `<a href="#" onclick="crRemind(${i}); return false;" class="text-[12px] text-primary hover:underline">Send reminder</a>`;
-      return `<tr style="border-bottom:1px solid #F3F4F6;" data-crrow="${i}">
-        <td style="${tdS()} font-weight:600; color:#111827;">${m.name}${m.me?' <span class="text-[10.5px] text-primary">(you)</span>':''}</td>
-        <td style="${tdS()} color:#6B7280;">${m.role}</td>
-        <td style="${tdS()}">${m.comment ? m.comment : '<span class="text-ink-400 italic">No comment yet</span>'}</td>
-        <td style="${tdS()}">${vPill}</td>
-        <td style="${tdS()}">${action}</td>
+  // ============ STAGE 2 — COMMITTEE REVIEW ============
+  function stage2HTML(){
+    const members = BM.committeeMembers;
+    const approved = members.filter(m => m.verdict === 'approve' || m.verdict === 'cond').length;
+    const concerns = members.filter(m => m.verdict === 'concern');
+    const negs     = members.filter(m => m.verdict === 'neg');
+    const pct = members.length ? Math.round(approved * 100 / members.length) : 0;
+    const rows = members.map(m => {
+      const pillClass = m.verdict === 'approve' ? 'approve' : m.verdict === 'pending' ? 'pending' : m.verdict === 'concern' ? 'concern' : m.verdict === 'neg' ? 'neg' : 'cond';
+      const pillText  = m.verdict === 'approve' ? 'Approved' : m.verdict === 'pending' ? 'Pending' : m.verdict === 'concern' ? 'Concern raised' : m.verdict === 'neg' ? 'Negotiation requested' : 'Approved (conditional)';
+      const commentCell = m.comment ? `<span style="color:#374151;">${esc(m.comment)}</span>` : '<span style="color:#9CA3AF; font-style:italic;">No comment yet</span>';
+      const action = m.isYou
+        ? `<button class="row-link" onclick="scrollToAddComment()">Edit comment</button>`
+        : (m.verdict === 'pending' ? `<button class="btn-outline amber" style="padding:5px 10px; font-size:12px;" onclick="sendReminder('${esc(m.id)}', this)">Send reminder</button>` : '<span style="color:#9CA3AF; font-size:12px;">—</span>');
+      return `<tr>
+        <td><div style="display:flex; align-items:center; gap:10px;"><span class="avatar">${esc(m.initials)}</span><span style="font-size:13px; font-weight:600; color:#111827;">${esc(m.name)}${m.isYou?'<span class="you-badge">You</span>':''}</span></div></td>
+        <td><span style="font-size:12px; color:#6B7280;">${esc(m.designation)}</span></td>
+        <td>${commentCell}</td>
+        <td><span class="verdict-pill ${pillClass}">${esc(pillText)}</span></td>
+        <td><span style="font-size:11px; color:#9CA3AF;">${m.date ? fmtDate(m.date) : '—'}</span></td>
+        <td>${action}</td>
       </tr>`;
     }).join('');
-    const submitted = BM.committee.filter(m => m.verdict).length;
-    const approved = BM.committee.filter(m => m.verdict==='approve').length;
-    const concerns = BM.committee.filter(m => m.verdict==='concern').length;
-    const negReq = BM.committee.some(m => m.verdict==='negotiate');
-    const allSubmitted = submitted === BM.committee.length;
-    const canComplete = allSubmitted && concerns===0 && BM.bm1.done && !negReq;
-    return `<div class="bg-white border border-line rounded-xl overflow-hidden">
-      <div style="padding:14px 18px; border-bottom:1px solid #E5E7EB;"><div class="text-[14px] font-bold text-ink-900">Committee Review</div>
-        <div class="text-[12px] text-ink-500">Evaluation committee members review and record their verdict before the final recommendation.</div></div>
-      <table style="width:100%; table-layout:fixed; border-collapse:collapse;">
-        <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;">
-          <th style="${thS()} width:18%;">Member</th><th style="${thS()} width:18%;">Designation</th><th style="${thS()} width:34%;">Comment</th><th style="${thS()} width:15%;">Status</th><th style="${thS()} width:15%;">Action</th>
-        </tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-      <div style="padding:14px 18px; border-top:1px solid #E5E7EB;">
-        <div class="flex items-center gap-3 mb-2"><div class="text-[12.5px] text-ink-500" aria-live="polite">${approved} of ${BM.committee.length} members approved · ${BM.committee.length-submitted} pending</div></div>
-        <div class="h-1.5 rounded-full bg-line overflow-hidden mb-3"><div class="h-full bg-primary" style="width:${(submitted/BM.committee.length*100)}%;"></div></div>
-        ${negReq ? '<div class="rounded-lg p-2.5 mb-2 text-[12px]" style="background:#FFFBEB; color:#92400E;">A member requested negotiation — the Negotiation stage has been added.</div>' : ''}
-        <div class="flex justify-end"><button onclick="crComplete()" class="px-4 py-2 rounded-lg ${canComplete?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-medium" ${canComplete?'':'disabled'}>Complete Committee Review →</button></div>
+    const overview = `<div class="card">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-bottom:14px;">
+        <div class="text-[14px] font-bold text-ink-900">Committee members</div>
+        <div aria-live="polite"><span style="font-size:12px; color:#0F5EE8; font-weight:600;">${approved} of ${members.length} approved</span><span class="mini-bar"><div style="width:${pct}%;"></div></span></div>
+      </div>
+      <div style="border:1px solid #E5E7EB; border-radius:10px; overflow:hidden;">
+        <table class="ct-table">
+          <thead><tr><th style="width:160px;">Member</th><th style="width:140px;">Designation</th><th>Comment</th><th style="width:130px;">Verdict</th><th style="width:90px;">Date</th><th style="width:120px;">Action</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
       </div>
     </div>`;
-  }
-  function crShowForm(i){
-    const row = document.querySelector(`#bmTabBody tr[data-crrow="${i}"]`);
-    if (!row || row.nextElementSibling?.dataset?.crform) return;
-    const tr = document.createElement('tr');
-    tr.dataset.crform = i;
-    tr.innerHTML = `<td colspan="5" style="padding:14px 18px; background:#F9FAFB;">
-      <label class="block text-[11.5px] font-semibold text-ink-500 uppercase mb-1">Add your comment</label>
-      <textarea id="crComment-${i}" rows="2" class="field" placeholder="Your review comment…"></textarea>
-      <div class="flex items-center gap-4 mt-2 flex-wrap">
-        <label class="flex items-center gap-1.5 text-[12.5px] text-ink-900"><input type="radio" name="crv-${i}" value="approve" class="accent-primary"> Approve</label>
-        <label class="flex items-center gap-1.5 text-[12.5px] text-ink-900"><input type="radio" name="crv-${i}" value="concern" class="accent-primary"> Raise concern</label>
-        <label class="flex items-center gap-1.5 text-[12.5px] text-ink-900"><input type="radio" name="crv-${i}" value="negotiate" class="accent-primary"> Request negotiation</label>
-        <button onclick="crSubmit(${i})" class="ml-auto px-3 py-1.5 rounded-lg bg-primary text-white text-[12.5px] font-medium">Submit comment</button>
-      </div></td>`;
-    row.after(tr);
-  }
-  function crSubmit(i){
-    const v = document.querySelector(`input[name="crv-${i}"]:checked`);
-    if (!v){ showToast('Select a verdict'); return; }
-    const c = document.getElementById('crComment-'+i).value.trim();
-    BM.committee[i].comment = c || (v.value==='approve'?'Recommendation reviewed and found in order.':v.value==='concern'?'A concern has been recorded for discussion.':'Negotiation requested before award.');
-    BM.committee[i].verdict = v.value;
-    if (v.value==='negotiate' && !BM.negotiation.triggered){
-      BM.negotiation.triggered = true;
-      BM.negotiation.by = BM.committee[i].name;
-      BM.negotiation.reason = 'Committee concern';
+    const me = members.find(m => m.isYou);
+    const verdict = (me && me.verdict !== 'pending') ? me.verdict : (BM._draftVerdict || '');
+    const draftComment = (me && me.verdict !== 'pending') ? (me.comment || '') : (BM._draftComment || '');
+    const card = (k, title, sub, cls) => `<div class="dec-card ${verdict===k?'on '+cls:''}" onclick="pickMyVerdict('${k}')"><div class="dc-title">${esc(title)}</div><div class="dc-desc">${esc(sub)}</div></div>`;
+    let extra = '';
+    if (verdict === 'cond')   extra = `<div class="dec-field"><label>Conditions</label><textarea id="myConditions" placeholder="State the conditions...">${esc((me && me.conditions) || BM._draftConditions || '')}</textarea></div>`;
+    if (verdict === 'concern') extra = `<div class="dec-field"><label>Concern</label><textarea id="myConcern" placeholder="Describe the concern in detail...">${esc((me && me.concern) || BM._draftConcern || '')}</textarea></div>`;
+    if (verdict === 'neg')    extra = `<div class="amber-box" style="margin-top:12px;"><div style="font-size:13px; color:#92400E;">Selecting this will add a Negotiation stage after committee review is complete. The vendor will be notified.</div><label style="display:inline-flex; align-items:center; gap:6px; margin-top:8px; font-size:12px;"><input type="checkbox" id="negAck" ${BM._negAck?'checked':''} onchange="BM._negAck=this.checked; renderStageBody();"> Understood</label></div>`;
+    const addBlock = `<div class="card" style="background:#F9FAFB;">
+      <div class="text-[13px] font-bold text-ink-900" style="margin-bottom:10px;">Your review — ${esc((me&&me.name)||'Rajesh Kumar')}</div>
+      <textarea id="myComment" placeholder="Add your review comments on the bid comparison and recommended vendor..." style="width:100%; min-height:80px; border:1px solid #D1D5DB; border-radius:8px; padding:10px 12px; font-size:13px;">${esc(draftComment)}</textarea>
+      <div class="dec-row" style="margin-top:14px;">
+        ${card('approve','Approve','Proceed to recommendation','green')}
+        ${card('cond','Approve with conditions','Note conditions below','')}
+      </div>
+      <div class="dec-row" style="margin-top:8px;">
+        ${card('concern','Raise concern','Describe concern','amber')}
+        ${card('neg','Request negotiation','Triggers negotiation stage','purple')}
+      </div>
+      ${extra}
+      <div style="display:flex; justify-content:flex-end; margin-top:14px;"><button class="btn-primary" style="padding:9px 18px; font-size:13px;" onclick="submitMyReview()">Submit review</button></div>
+    </div>`;
+    let concernBlock = '';
+    if (concerns.length){
+      const items = concerns.map(c => {
+        const resolved = !!(BM.resolutions||{})[c.id];
+        return `<div style="margin-top:8px; padding:10px 12px; background:white; border:1px solid #FCD34D; border-radius:8px;">
+          <div style="font-size:13px; color:#374151;"><strong>${esc(c.name)}:</strong> ${esc(c.concern||c.comment||'(no detail)')}</div>
+          ${resolved
+            ? `<div style="font-size:12px; color:#065F46; margin-top:6px;">✓ Resolved — ${esc(BM.resolutions[c.id])}</div>`
+            : `<textarea id="res-${esc(c.id)}" placeholder="Resolution notes..." style="width:100%; min-height:50px; margin-top:8px; border:1px solid #D1D5DB; border-radius:6px; padding:6px 10px; font-size:12px;"></textarea>
+               <div style="text-align:right; margin-top:6px;"><button class="btn-amber" style="padding:6px 12px; font-size:12px;" onclick="markResolved('${esc(c.id)}')">Mark as resolved</button></div>`}
+        </div>`;
+      }).join('');
+      const unresolved = concerns.length - Object.keys(BM.resolutions||{}).length;
+      concernBlock = `<div class="amber-box"><div style="font-size:13px; font-weight:700; color:#92400E;">${unresolved} concern${unresolved===1?'':'s'} raised — resolution required before proceeding</div>${items}</div>`;
     }
-    saveBM(); renderTabs(); setTab('cr');
-    showToast('Comment submitted');
+    const pending = members.filter(m => m.verdict === 'pending').length;
+    const negCount = negs.length;
+    const unresolvedCount = concerns.length - Object.keys(BM.resolutions||{}).length;
+    const canComplete = pending === 0 && unresolvedCount === 0;
+    const footerInfo = `${approved} of ${members.length} approved · ${pending} pending${negCount?' · '+negCount+' requested negotiation':''}`;
+    const footer = `<div class="stage-footer"><div class="text-[13px] text-ink-500">${esc(footerInfo)}</div><button class="btn-primary" ${canComplete?'':'disabled'} onclick="advanceStage(2)">${BM.stage2Complete?'Committee review complete ✓':'Complete Committee Review →'}</button></div>`;
+    return `<div class="stage-header"><h2>Committee Review</h2><p>Evaluation committee members review the bid comparison and formally approve or raise concerns before the award recommendation is prepared.</p></div>
+      ${overview}${addBlock}${concernBlock}${footer}`;
   }
-  function crRemind(i){
-    BM.committee[i].verdict = 'approve';
-    BM.committee[i].comment = 'Recommendation reviewed and approved.';
-    saveBM(); setTab('cr');
-    showToast(BM.committee[i].name + ' responded — approved');
+  function pickMyVerdict(k){
+    const ta = document.getElementById('myComment'); if (ta) BM._draftComment = ta.value;
+    const cond = document.getElementById('myConditions'); if (cond) BM._draftConditions = cond.value;
+    const conc = document.getElementById('myConcern'); if (conc) BM._draftConcern = conc.value;
+    BM._draftVerdict = k;
+    saveBM(); renderStageBody(); refreshIcons();
   }
-  function crComplete(){
-    const submitted = BM.committee.every(m => m.verdict);
-    const concerns = BM.committee.some(m => m.verdict==='concern');
-    if (!submitted || concerns){ showToast('All members must submit; resolve any concerns'); return; }
-    BM.bm2done = true;
-    BM.activeTab = BM.negotiation.triggered ? 'ng' : 'aw';
-    saveBM(); renderTabs(); setTab(BM.activeTab);
-    showToast(BM.negotiation.triggered ? 'Negotiation stage unlocked' : 'Award Recommendation unlocked');
+  function submitMyReview(){
+    const me = BM.committeeMembers.find(m => m.isYou);
+    if (!me) return;
+    const v = BM._draftVerdict || me.verdict;
+    if (!v || v === 'pending'){ showToast('Pick a verdict'); return; }
+    const comment = (document.getElementById('myComment')||{}).value || me.comment || '';
+    if (!comment.trim()){ showToast('Add a comment'); return; }
+    if (v === 'cond' && !((document.getElementById('myConditions')||{}).value||'').trim()){ showToast('State the conditions'); return; }
+    if (v === 'concern' && !((document.getElementById('myConcern')||{}).value||'').trim()){ showToast('Describe the concern'); return; }
+    if (v === 'neg' && !BM._negAck){ showToast('Tick "Understood" to confirm negotiation request'); return; }
+    me.verdict = v;
+    me.comment = comment.trim();
+    me.conditions = ((document.getElementById('myConditions')||{}).value||'').trim();
+    me.concern = ((document.getElementById('myConcern')||{}).value||'').trim();
+    me.date = todayISO();
+    BM._draftVerdict = ''; BM._draftComment = ''; BM._draftConditions = ''; BM._draftConcern = ''; BM._negAck = false;
+    saveBM(); renderWorkspace();
+    showToast('Review submitted');
+  }
+  function sendReminder(memberId, btn){
+    if (btn){ btn.textContent = 'Reminder sent ✓'; btn.disabled = true; setTimeout(() => { btn.textContent = 'Send reminder'; btn.disabled = false; }, 2000); }
+    const m = BM.committeeMembers.find(x => x.id === memberId);
+    if (m) showToast('Reminder sent to '+m.name);
+  }
+  function markResolved(memberId){
+    const ta = document.getElementById('res-'+memberId);
+    const text = (ta && ta.value || '').trim();
+    if (!text){ showToast('Add resolution notes'); return; }
+    BM.resolutions = BM.resolutions || {};
+    BM.resolutions[memberId] = text;
+    saveBM(); renderStageBody(); refreshIcons();
+    showToast('Concern marked as resolved');
+  }
+  function scrollToAddComment(){
+    const ta = document.getElementById('myComment');
+    if (ta){ ta.focus(); ta.scrollIntoView({ behavior:'smooth', block:'center' }); }
   }
 
-  // ===================== BM3 — NEGOTIATION =====================
-  function ngBody(){
-    const n = BM.negotiation;
-    const orig = L1_AMOUNT;
-    const reduction = n.newQuote ? ((orig - n.newQuote) / orig) * 100 : null;
-    const statusTxt = n.decided ? (n.decided==='accept'?'Accepted':'Original retained')
-      : n.newQuote ? 'Quote updated' : n.invited ? 'Invitation sent · May 20' : 'Not started';
-    return `<div class="bg-white border border-line rounded-xl overflow-hidden">
-      <div style="padding:14px 18px; border-bottom:1px solid #E5E7EB;">
-        <div class="text-[14px] font-bold text-ink-900">Negotiation</div>
-        <div class="rounded-lg p-2.5 mt-2 text-[12px]" style="background:#FFFBEB; color:#92400E;">Negotiation requested by ${n.by||'Committee'} — Reason: ${n.reason||'Committee concern'}</div>
+  // ============ STAGE 3 — NEGOTIATION (conditional) ============
+  function stage3HTML(){
+    const t = tenderInfo();
+    const ctx = `<div class="purple-box">
+      <div style="font-size:13px; font-weight:700; color:#3C3489;">Negotiation triggered</div>
+      <div style="font-size:12px; color:#534AB7; margin-top:2px;">Reason: ${esc(BM.negotiationReason || 'Negotiation requested during evaluation')}</div>
+    </div>`;
+    const vendorRow = `<div style="background:#F9FAFB; border-radius:8px; padding:12px 14px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+      <span style="font-size:14px; font-weight:700; color:#111827;">${esc(t.l1Vendor)}</span>
+      <span class="pill-green">L1 · ${fmtINR(t.l1Amount)}</span>
+    </div>`;
+    const inviteBlock = `<div class="card">
+      <div class="text-[14px] font-bold text-ink-900" style="margin-bottom:14px;">Vendor notification</div>
+      ${vendorRow}
+      <label style="display:inline-flex; align-items:center; gap:6px; margin-top:12px; font-size:13px;"><input type="checkbox" checked> Notify vendor of negotiation invitation</label>
+      <details style="margin-top:8px;"><summary style="font-size:12px; color:#0F5EE8; cursor:pointer;">Email / portal message preview</summary>
+        <div style="background:white; border:1px solid #E5E7EB; border-radius:6px; padding:10px 12px; margin-top:8px; font-size:12px; color:#374151; white-space:pre-wrap;">Dear ${esc(t.l1Vendor)},\n\nIn reference to your bid against ${esc(t.id)}, the Evaluation Committee has identified scope for negotiation on the quoted rates. You are requested to attend a negotiation meeting at the venue and time communicated separately.\n\nKindly bring an authorised representative empowered to negotiate and sign minutes.\n\nRegards,\nProcurement, Ahmedabad Municipal Corporation</div>
+      </details>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:14px; align-items:center;">
+        ${BM.invitationSent
+          ? `<span class="pill-green">Invitation sent · ${fmtDate(BM.invitationDate)}</span><span class="pill-gray">Awaiting vendor response</span>`
+          : `<button class="btn-amber" onclick="sendNegInvitation()">Send negotiation invitation →</button>`}
       </div>
-      <table style="width:100%; table-layout:fixed; border-collapse:collapse;">
-        <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;">
-          <th style="${thS()} width:26%;">Vendor</th><th style="${thS()} width:19%;">Original Quote</th><th style="${thS()} width:19%;">Negotiated Quote</th><th style="${thS()} width:16%;">% Reduction</th><th style="${thS()} width:20%;">Status</th>
-        </tr></thead>
-        <tbody><tr style="border-bottom:1px solid #F3F4F6;">
-          <td style="${tdS()} font-weight:600;">${L1_VENDOR}</td>
-          <td style="${tdS()}">₹${orig.toLocaleString('en-IN')}</td>
-          <td style="${tdS()}">${n.newQuote?'₹'+n.newQuote.toLocaleString('en-IN'):'—'}</td>
-          <td style="${tdS()} ${reduction!=null?'color:#065F46; font-weight:600;':''}">${reduction!=null?reduction.toFixed(1)+'%':'—'}</td>
-          <td style="${tdS()}">${statusTxt}</td>
-        </tr></tbody>
+    </div>`;
+    const sessions = (BM.negotiationSessions || []);
+    const sessionsHTML = sessions.map((s, i) => renderSessionCard(s, i)).join('') || '<div style="font-size:13px; color:#9CA3AF; font-style:italic; padding:10px 0;">No negotiation sessions yet.</div>';
+    const sessionsBlock = `<div style="margin-top:20px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+        <div class="text-[14px] font-bold text-ink-900">Negotiation sessions</div>
+        <button class="row-link" onclick="addNegSession()" style="font-size:13px; color:#0F5EE8;">+ Add session</button>
+      </div>
+      ${sessionsHTML}
+    </div>`;
+    let outcome = '';
+    if (sessions.length){
+      const lastAgreed = sessions[sessions.length-1].agreedTotal || t.l1Amount;
+      const saving = t.l1Amount - lastAgreed;
+      const savingPct = (saving / t.l1Amount) * 100;
+      outcome = `<div class="success-banner" style="margin-top:18px; align-items:flex-start; padding:18px 20px; border-radius:12px;">
+        <i data-lucide="check-circle-2" style="width:20px; height:20px; color:#10B981;"></i>
+        <div style="flex:1;">
+          <div class="sb-text" style="margin-bottom:8px;">Negotiation outcome</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; font-size:13px; color:#374151;">
+            <div>Original L1 quote: ${fmtINR(t.l1Amount)}<br>Negotiated quote: <strong style="color:#0F5EE8;">${fmtINR(lastAgreed)}</strong><br>Saving: <span style="color:#065F46; font-weight:700;">${fmtINR(saving)} (${saving>=0?'-':'+'}${Math.abs(savingPct).toFixed(1)}%)</span></div>
+            <div>Sessions held: ${sessions.length}<br>Participants: ${(sessions[0].participants||[]).length}<br>Date closed: ${fmtDate(sessions[sessions.length-1].date||todayISO())}</div>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:14px;">
+            <button class="btn-success" onclick="setNegOutcome('accept')" ${BM.negotiationOutcome==='accept'?'disabled':''}>${BM.negotiationOutcome==='accept'?'Accepted ✓':'Accept negotiated quote ('+fmtINR(lastAgreed)+')'}</button>
+            <button class="btn-outline" onclick="setNegOutcome('reject')" ${BM.negotiationOutcome==='reject'?'disabled':''}>${BM.negotiationOutcome==='reject'?'Rejected ✓':'Reject — proceed with original ('+fmtINR(t.l1Amount)+')'}</button>
+          </div>
+        </div>
+      </div>`;
+    }
+    const footer = `<div class="stage-footer"><div class="text-[13px] text-ink-500">Stage 3 of ${stageNodes().length} — Negotiation</div><button class="btn-primary" ${BM.negotiationOutcome?'':'disabled'} onclick="advanceStage(3)">${BM.stage3Complete?'Negotiation complete ✓':'Complete Negotiation →'}</button></div>`;
+    return `<div class="stage-header"><h2>Negotiation</h2><p>Document the negotiation process with the recommended vendor. All sessions must be recorded with line-item breakdown.</p></div>
+      ${ctx}${inviteBlock}${sessionsBlock}${outcome}${footer}`;
+  }
+  function defaultSessionItems(){
+    return [
+      { name:'Desktop Computer (50 units)', original:42000, offered:40000, agreed:40500 },
+      { name:'Monitor (50 units)',          original:8500,  offered:8000,  agreed:8200  },
+      { name:'UPS (50 units)',              original:3200,  offered:3000,  agreed:3100  },
+    ];
+  }
+  function sessionTotals(items){
+    const units = 50;
+    const orig = items.reduce((s,i) => s + i.original * units, 0);
+    const off  = items.reduce((s,i) => s + i.offered  * units, 0);
+    const agr  = items.reduce((s,i) => s + i.agreed   * units, 0);
+    const pct  = orig ? ((agr - orig) / orig) * 100 : 0;
+    return { orig, off, agr, pct };
+  }
+  function renderSessionCard(s, i){
+    const totals = sessionTotals(s.items || defaultSessionItems());
+    const items = (s.items || defaultSessionItems()).map(it => {
+      const pct = ((it.agreed - it.original) / it.original) * 100;
+      return `<tr><td>${esc(it.name)}</td><td>${fmtINR(it.original)}/unit</td><td>${fmtINR(it.offered)}/unit</td><td><strong>${fmtINR(it.agreed)}/unit</strong></td><td style="color:${pct<0?'#065F46':'#991B1B'};">${pct>=0?'+':''}${pct.toFixed(1)}%</td></tr>`;
+    }).join('');
+    const sustainable = totals.pct >= -15;
+    const aiStrip = sustainable
+      ? `<div class="ai-strip green" style="margin-top:10px;">✦ AI: Negotiated price of ${fmtINR(totals.agr)} is ${Math.abs(totals.pct).toFixed(1)}% ${totals.pct<0?'below':'above'} original. Still sustainable — within normal market range.</div>`
+      : `<div class="ai-strip amber" style="margin-top:10px;">⚠ Negotiated price is approaching DSR floor. Risk of contractor under-delivery.</div>`;
+    const participants = (s.participants || ['Rajesh Kumar','Priya Shah','Vendor Rep — Amit Joshi']).map(p => `<span class="chip">${esc(p)}</span>`).join(' ');
+    return `<div class="session-card">
+      <div class="sc-head">
+        <div style="font-size:14px; font-weight:700; color:#111827;">Session ${i+1}</div>
+        <span style="font-size:12px; color:#6B7280;">${esc(s.date||fmtDate(todayISO()))} · ${esc(s.time||'11:00 AM')}</span>
+        <span style="font-size:12px; color:#6B7280;">${esc(s.venue||'Conference Room 2, AMC')}</span>
+      </div>
+      <div style="display:flex; gap:6px; flex-wrap:wrap;">${participants}</div>
+      <table>
+        <thead><tr><th>Item</th><th>Original Quote (₹)</th><th>Vendor Offer (₹)</th><th>Agreed Rate (₹)</th><th>% Change</th></tr></thead>
+        <tbody>${items}
+          <tr class="total-row"><td>Totals</td><td>${fmtINR(totals.orig)}</td><td>${fmtINR(totals.off)}</td><td>${fmtINR(totals.agr)}</td><td>${totals.pct>=0?'+':''}${totals.pct.toFixed(1)}%</td></tr>
+        </tbody>
       </table>
-      <div style="padding:14px 18px; border-top:1px solid #E5E7EB;">
-        ${!n.invited ? `
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div><label class="block text-[11.5px] font-semibold text-ink-500 uppercase mb-1">Reason for negotiation</label>
-              <select id="ngReason" class="field"><option>L1 above TS</option><option selected>Committee concern</option><option>Single bid</option><option>Market rates lower</option><option>Other</option></select></div>
-            <div class="flex items-end"><label class="flex items-center gap-2 text-[12.5px] text-ink-900"><input type="checkbox" checked class="accent-primary"> Notify L1 vendor of negotiation invitation</label></div>
-          </div>
-          <div class="flex justify-end mt-3"><button onclick="ngInvite()" class="px-3.5 py-2 rounded-lg text-white text-[12.5px] font-medium" style="background:#F59E0B;">Send negotiation invitation</button></div>
-        ` : !n.decided ? `
-          <div class="text-[12.5px] font-medium text-ink-900 mb-1">Updated quote from vendor</div>
-          <div class="flex items-center gap-2">
-            <input id="ngQuote" type="number" class="field" style="max-width:200px;" placeholder="2400000" value="${n.newQuote||''}"/>
-            <button onclick="ngRecord()" class="px-3.5 py-2 rounded-lg bg-primary text-white text-[12.5px] font-medium">Record updated quote</button>
-          </div>
-          ${n.newQuote ? `<div class="rounded-lg p-2.5 mt-3 text-[12px]" style="background:#FFFBEB; color:#92400E;">✦ AI note: Negotiated price of ₹${n.newQuote.toLocaleString('en-IN')} is ${(((2350000-n.newQuote)/2350000)*100).toFixed(1)}% ${n.newQuote<2350000?'below':'above'} the DSR-based estimate of ₹23,50,000. Ensure this is sustainable before proceeding.</div>
-          <div class="flex items-center gap-3 mt-3"><button onclick="ngDecide('accept')" class="px-3.5 py-2 rounded-lg bg-success text-white text-[12.5px] font-medium">Accept negotiated quote</button><button onclick="ngDecide('reject')" class="text-[12px] text-ink-500 hover:underline">Reject and proceed with original</button></div>` : ''}
-        ` : `<div class="rounded-lg p-2.5 text-[12.5px]" style="background:#F0FDF4; color:#065F46;">✓ Negotiation complete — ${n.decided==='accept'?'negotiated quote accepted':'original quote retained'}.</div>`}
+      ${aiStrip}
+      <div style="margin-top:10px;">
+        <label style="font-size:12px; font-weight:600; color:#374151;">Session notes</label>
+        <textarea oninput="updateSessionNotes(${i}, this.value)" style="width:100%; min-height:60px; margin-top:4px; border:1px solid #D1D5DB; border-radius:6px; padding:8px 10px; font-size:13px;">${esc(s.notes||'Vendor reduced quoted rates on core items after committee discussion. Agreed rates documented above.')}</textarea>
       </div>
     </div>`;
   }
-  function ngInvite(){
-    BM.negotiation.invited = true;
-    BM.negotiation.reason = document.getElementById('ngReason').value;
-    saveBM(); setTab('ng');
+  function sendNegInvitation(){
+    BM.invitationSent = true;
+    BM.invitationDate = todayISO();
+    saveBM(); renderStageBody(); refreshIcons();
     showToast('Negotiation invitation sent');
   }
-  function ngRecord(){
-    const v = parseInt(document.getElementById('ngQuote').value);
-    if (isNaN(v) || v<=0){ showToast('Enter the updated quote'); return; }
-    BM.negotiation.newQuote = v;
-    saveBM(); setTab('ng');
-    showToast('Updated quote recorded');
+  function addNegSession(){
+    BM.negotiationSessions = BM.negotiationSessions || [];
+    const items = defaultSessionItems();
+    const totals = sessionTotals(items);
+    BM.negotiationSessions.push({
+      date: todayISO(), time:'11:00 AM', venue:'Conference Room 2, AMC',
+      participants:['Rajesh Kumar','Priya Shah','Vendor Rep — Amit Joshi'],
+      items, agreedTotal: totals.agr,
+      notes:'Vendor reduced quoted rates on core items after committee discussion. Agreed rates documented above.',
+    });
+    saveBM(); renderStageBody(); refreshIcons();
   }
-  function ngDecide(d){
-    BM.negotiation.decided = d;
-    BM.bm3done = true;
-    BM.activeTab = 'aw';
-    saveBM(); renderTabs(); setTab('aw');
-    showToast(d==='accept'?'Negotiated quote accepted':'Proceeding with original quote');
+  function updateSessionNotes(idx, text){
+    if (!BM.negotiationSessions[idx]) return;
+    BM.negotiationSessions[idx].notes = text;
+    saveBM();
+  }
+  function setNegOutcome(kind){
+    BM.negotiationOutcome = kind;
+    const sessions = BM.negotiationSessions || [];
+    const last = sessions[sessions.length-1];
+    BM.negotiatedAmount = (kind === 'accept' && last) ? last.agreedTotal : tenderInfo().l1Amount;
+    saveBM(); renderStageBody(); refreshIcons();
+    showToast('Negotiation outcome recorded');
   }
 
-  // ===================== BM4 — AWARD RECOMMENDATION =====================
-  function awBody(){
-    const finalAmount = (BM.negotiation.decided==='accept' && BM.negotiation.newQuote) ? BM.negotiation.newQuote : L1_AMOUNT;
-    const variance = ((finalAmount - TS_VALUE) / TS_VALUE) * 100;
-    const aiNote = `This office recommends the award of work for the captioned tender to M/s ${L1_VENDOR}, the L1 bidder. Five bids were received against this tender, of which four were found Technically Qualified after evaluation against the prescribed PQ and TQ criteria. Per the locked comparative statement, ${L1_VENDOR} emerged as L1 with a quoted amount of ₹${finalAmount.toLocaleString('en-IN')}, which is ${Math.abs(variance).toFixed(1)}% below the Technical Sanction value of ₹${TS_VALUE.toLocaleString('en-IN')}. The Evaluation Committee has reviewed and approved this recommendation. ${BM.negotiation.triggered?('A negotiation was conducted and concluded — '+(BM.negotiation.decided==='accept'?'the negotiated rate has been adopted.':'the original rate is retained.')):''} The recommendation is placed for approval as per the delegation of financial powers.`;
-    const checkItems = ['TS value check passed','All committee members have approved','Comparative statement locked','ALB decisions recorded (if applicable)','Recommendation note reviewed and complete','I certify this recommendation is accurate'];
-    const allChecked = BM.checklist.every(Boolean);
-    return `<div class="bg-white border border-line rounded-xl" style="padding:20px 24px; margin-bottom:16px;">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <div class="text-[11px] uppercase tracking-wider text-ink-500 font-semibold">Recommended Vendor</div>
-          <div class="text-[20px] font-bold text-ink-900 mt-1">${L1_VENDOR}</div>
-          <div class="text-[24px] font-bold text-primary mt-1.5">₹${finalAmount.toLocaleString('en-IN')}</div>
-          <div class="text-[13px] mt-1" style="color:#065F46;">${variance<0?Math.abs(variance).toFixed(1)+'% below TS value ✓':'+'+variance.toFixed(1)+'% above TS'}</div>
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          ${[['Bids received','5'],['TQ bids','4'],['Evaluation method','L1'],['Committee approvals',BM.committee.filter(m=>m.verdict==='approve').length+'/'+BM.committee.length]].map(([k,v]) => `<div style="background:#F9FAFB; border-radius:8px; padding:10px 12px;"><div class="text-[11px] text-ink-500">${k}</div><div class="text-[15px] font-bold text-ink-900 mt-0.5">${v}</div></div>`).join('')}
-        </div>
-      </div>
-    </div>
-    <div class="bg-white border border-line rounded-xl" style="padding:18px 22px; margin-bottom:16px;">
-      <div class="flex items-center justify-between gap-2 mb-2">
-        <div class="flex items-center gap-2"><span class="text-[14px] font-bold text-ink-900">Recommendation Note</span><span style="background:#EFF6FF; color:#0F5EE8; border-radius:20px; padding:2px 8px; font-size:10.5px; font-weight:600;">✦ AI Drafted</span></div>
-        <button onclick="awRegen()" class="text-[12px] text-primary hover:underline">✦ Regenerate</button>
-      </div>
-      <div id="awNote" contenteditable="true" class="field" style="min-height:130px; font-size:13px; line-height:1.6;">${aiNote}</div>
-      <div class="mt-3 flex flex-col gap-1">
-        <button onclick="awToggle('bids')" class="text-[12.5px] text-primary text-left hover:underline">View bids summary ▾</button>
-        <div id="awBids" class="hidden text-[12px] text-ink-500 pl-3">Comparative statement (locked) — 4 TQ vendors ranked; L1: ${L1_VENDOR} at ₹${L1_AMOUNT.toLocaleString('en-IN')}.</div>
-        <button onclick="awToggle('tqntq')" class="text-[12.5px] text-primary text-left hover:underline mt-1">View TQ/NTQ results ▾</button>
-        <div id="awTqntq" class="hidden text-[12px] text-ink-500 pl-3">4 vendors Technically Qualified · 1 vendor Not Technically Qualified (Patil &amp; Associates — ISO certification not found).</div>
-      </div>
-    </div>
-    <div class="bg-surface border border-line rounded-xl" style="padding:16px 18px; margin-bottom:16px;">
-      <div class="text-[13px] font-bold text-ink-900 mb-2">Pre-approval checklist</div>
-      ${checkItems.map((it,i) => `<label class="flex items-center gap-2 text-[12.5px] text-ink-900 py-1"><input type="checkbox" class="accent-primary" ${BM.checklist[i]?'checked':''} onchange="BM.checklist[${i}]=this.checked; saveBM(); awRefreshSend();"> ${it}</label>`).join('')}
-    </div>
-    ${BM.bm4approved ? `<div class="rounded-lg p-3.5 flex items-center justify-between gap-3 flex-wrap" style="background:#F0FDF4; border:1px solid #BBF7D0;">
-        <span class="text-[13px]" style="color:#065F46;">Award recommendation approved ✓</span>
-        <button onclick="showToast('Letter of Acceptance — post-award module')" class="px-3.5 py-2 rounded-lg bg-success text-white text-[12.5px] font-medium">Proceed to issue Letter of Acceptance →</button>
-      </div>`
-     : BM.bm4sent ? `<div class="rounded-lg p-3.5" style="background:#FFFBEB; border:1px solid #FCD34D;">
-        <div class="text-[13px]" style="color:#92400E;">Sent for approval · May 21 — awaiting response from Commissioner</div>
-        <div class="flex justify-end mt-2"><button onclick="awApprove()" class="px-3 py-1.5 rounded-lg bg-success text-white text-[12px] font-medium">Simulate approval</button></div>
-      </div>`
-     : `<button id="awSendBtn" onclick="awSend()" class="w-full px-4 py-3 rounded-lg ${allChecked?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[14px] font-semibold" ${allChecked?'':'disabled'}>Send for Approval →</button>`}`;
+  // ============ STAGE 4 — AWARD & LOA ============
+  function finalAmount(){
+    const t = tenderInfo();
+    if (BM.negotiationOutcome === 'accept' && BM.negotiatedAmount) return BM.negotiatedAmount;
+    return t.l1Amount;
   }
-  function awRegen(){
-    document.getElementById('awNote').textContent = `The Evaluation Committee, having completed evaluation of all bids received against this tender, recommends award to M/s ${L1_VENDOR} as the L1 bidder at ₹${L1_AMOUNT.toLocaleString('en-IN')}. The quote is within the Technical Sanction value and the recommendation carries the approval of all committee members. It is accordingly placed for sanction of the competent authority.`;
+  function stage4HTML(){
+    const t = tenderInfo();
+    const amt = finalAmount();
+    const vsEc = ((amt - t.estimate) / t.estimate) * 100;
+    const negApproved = APPROVAL_CHAIN.every(a => (BM.approvalStatus[a.id]||{}).approved);
+    const allApproved = BM.approvalSent && negApproved;
+    const summary = `<div class="card">
+      <div style="display:grid; grid-template-columns:1.4fr 1fr; gap:24px;">
+        <div>
+          <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:#9CA3AF; font-weight:700;">Recommended Vendor</div>
+          <div style="font-size:22px; font-weight:700; color:#111827; margin-top:4px;">${esc(t.l1Vendor)}</div>
+          <div style="font-size:13px; color:#6B7280; margin-top:2px;">${esc(t.id)} — ${esc(t.name)}</div>
+          <div style="font-size:28px; font-weight:700; color:#0F5EE8; margin-top:12px;">${fmtINR(amt)}</div>
+          <div style="font-size:13px; color:${vsEc<0?'#065F46':'#92400E'}; margin-top:2px;">${vsEc>=0?'+':''}${vsEc.toFixed(1)}% ${vsEc<0?'below':'above'} estimated cost</div>
+          <div style="font-size:13px; color:${amt<=t.ts?'#065F46':'#991B1B'}; margin-top:2px;">${amt<=t.ts?'Within TS value of '+fmtINR(t.ts)+' ✓':'Above TS value of '+fmtINR(t.ts)+' ✗'}</div>
+          <div style="margin-top:10px;"><span class="ai-pill">${esc(t.method)} — ${t.method==='L1'?'Lowest qualified bid':'Recommended by evaluation method'}</span></div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; align-content:start;">
+          <div style="background:#F9FAFB; border-radius:8px; padding:10px 12px;"><div style="font-size:11px; color:#9CA3AF; text-transform:uppercase; font-weight:600;">Bids received</div><div style="font-size:18px; font-weight:700; color:#111827;">${t.bidsReceived}</div></div>
+          <div style="background:#F9FAFB; border-radius:8px; padding:10px 12px;"><div style="font-size:11px; color:#9CA3AF; text-transform:uppercase; font-weight:600;">TQ bids</div><div style="font-size:18px; font-weight:700; color:#10B981;">${t.tqCount}</div></div>
+          <div style="background:#F9FAFB; border-radius:8px; padding:10px 12px;"><div style="font-size:11px; color:#9CA3AF; text-transform:uppercase; font-weight:600;">Eval method</div><div style="font-size:18px; font-weight:700; color:#111827;">${esc(t.method)}</div></div>
+          <div style="background:#F9FAFB; border-radius:8px; padding:10px 12px;"><div style="font-size:11px; color:#9CA3AF; text-transform:uppercase; font-weight:600;">Committee</div><div style="font-size:18px; font-weight:700; color:#10B981;">${BM.committeeMembers.filter(m => m.verdict==='approve'||m.verdict==='cond').length}/${BM.committeeMembers.length} approved</div></div>
+        </div>
+      </div>
+    </div>`;
+    if (!BM.recommendationNote) BM.recommendationNote = defaultRecommendationNote(t, amt, vsEc);
+    const editor = `<div class="card">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+        <div class="text-[14px] font-bold text-ink-900">Recommendation Note</div>
+        <div style="display:flex; gap:8px; align-items:center;"><span class="ai-pill">✦ AI Drafted</span><button class="row-link" onclick="regenerateRecommendation()">✦ Regenerate</button></div>
+      </div>
+      <div class="editor-toolbar">
+        <button title="Bold"><strong>B</strong></button>
+        <button title="Italic"><em>I</em></button>
+        <button title="Bullet">• List</button>
+        <button title="Numbered">1. List</button>
+      </div>
+      <div id="recNoteEditor" class="editor-area" contenteditable="true" oninput="BM.recommendationNote=this.innerHTML; saveBM();">${BM.recommendationNote}</div>
+    </div>`;
+    const attachments = `<div class="card" style="padding:0;">
+      <details style="padding:14px 18px;">
+        <summary style="font-size:13px; color:#0F5EE8; cursor:pointer; font-weight:600;">Attachments ▾</summary>
+        <div style="margin-top:10px; font-size:13px; color:#374151;">
+          <div style="padding:6px 0;">✅ Bid comparison table — <a href="comparative-statement.html?tender=${esc(t.id)}" class="row-link">View</a></div>
+          <div style="padding:6px 0;">✅ TQ / NTQ evaluation results — <a href="evaluation.html?tender=${esc(t.id)}" class="row-link">View</a></div>
+          <div style="padding:6px 0;">✅ Committee review record — <a href="#" onclick="goToStage(2);return false;" class="row-link">View</a></div>
+          <div style="padding:6px 0; color:${negotiationVisible()?'#374151':'#9CA3AF'};">${negotiationVisible()?'✅':'☐'} Negotiation minutes ${negotiationVisible()?'':' (N/A — not triggered)'}</div>
+          <div style="padding:6px 0;">✅ Reasonableness check certificate — <a href="#" onclick="goToStage(1);return false;" class="row-link">View</a></div>
+        </div>
+      </details>
+    </div>`;
+    const ck = BM.preApprovalChecks;
+    const checklist = `<div class="card" style="background:#F9FAFB;">
+      <div class="text-[13px] font-bold text-ink-900" style="margin-bottom:10px;">Pre-approval checklist</div>
+      <div class="checklist">
+        <label class="${ck.c1?'done':''}"><input type="checkbox" ${ck.c1?'checked':''} onchange="togglePreCheck('c1',this.checked)"> Reasonableness check complete</label>
+        <label class="${ck.c2?'done':''}"><input type="checkbox" ${ck.c2?'checked':''} onchange="togglePreCheck('c2',this.checked)"> All committee members have approved</label>
+        <label class="${ck.c3?'done':''}"><input type="checkbox" ${ck.c3?'checked':''} onchange="togglePreCheck('c3',this.checked)"> Comparison table is locked</label>
+        <label class="${ck.c4?'done':''}"><input type="checkbox" ${ck.c4?'checked':''} onchange="togglePreCheck('c4',this.checked)"> Recommendation note reviewed and complete</label>
+        <label class="${ck.c5?'done':''}"><input type="checkbox" ${ck.c5?'checked':''} onchange="togglePreCheck('c5',this.checked)"> I certify that this recommendation is accurate and complete</label>
+        <label class="${ck.c6?'done':''}"><input type="checkbox" ${ck.c6?'checked':''} onchange="togglePreCheck('c6',this.checked)"> Rajesh Kumar — Procurement Officer (signature confirmation)</label>
+      </div>
+    </div>`;
+    const apprRows = APPROVAL_CHAIN.map(a => {
+      const st = BM.approvalStatus[a.id] || {};
+      const pillCls = st.approved ? 'pill-green' : 'pill-amber';
+      const pillText = st.approved ? 'Approved · '+fmtDate(st.date) : 'Pending';
+      const reminder = (BM.approvalSent && !st.approved) ? ` <button class="btn-outline amber" style="padding:4px 10px; font-size:12px;" onclick="sendApprovalReminder('${esc(a.id)}', this)">Send reminder</button>` : '';
+      return `<div class="appr-row"><span class="avatar">${esc(a.initials)}</span><div class="ar-info"><div class="ar-name">${esc(a.name)}</div><div class="ar-desig">${esc(a.designation)}</div></div><span class="${pillCls}">${esc(pillText)}</span>${reminder}</div>`;
+    }).join('');
+    const allChecked = Object.values(ck).every(Boolean);
+    const apprSection = `<div class="card">
+      <div class="text-[14px] font-bold text-ink-900" style="margin-bottom:10px;">Approval chain</div>
+      <div style="font-size:12px; color:#6B7280; margin-bottom:10px;">${esc(t.id)} (${fmtINR(amt)}) — ${amt < 2500000 ? 'Below ₹25L tier' : amt < 5000000 ? '₹25L–₹50L tier' : '₹50L+ tier'}</div>
+      ${apprRows}
+      ${!BM.approvalSent
+        ? `<button class="btn-primary full" style="margin-top:14px;" ${allChecked?'':'disabled'} onclick="sendForApproval()">Send for approval →</button>`
+        : `<div style="display:flex; align-items:center; justify-content:space-between; margin-top:14px; flex-wrap:wrap; gap:10px;">
+            <div style="font-size:13px; color:#6B7280;" aria-live="polite">${allApproved ? 'All approvers signed off' : 'Awaiting approval — '+((APPROVAL_CHAIN.find(a => !(BM.approvalStatus[a.id]||{}).approved)||{}).designation||'')}</div>
+            <button class="row-link" style="color:#C4C9D4; font-size:11px;" onclick="simulateAllApprovals()">Simulate all approvals</button>
+          </div>`}
+    </div>`;
+    let approvalBanner = '';
+    if (allApproved && !BM.stage4aComplete){
+      approvalBanner = `<div class="success-banner large" style="justify-content:space-between;">
+        <div style="display:flex; align-items:center; gap:12px;"><i data-lucide="check-circle-2" style="width:18px; height:18px; color:#10B981;"></i><span class="sb-text">✓ Recommendation approved by all</span></div>
+        <button class="btn-success" onclick="completeStage4a()">Proceed to issue Letter of Acceptance →</button>
+      </div>`;
+    }
+    let loaBlock = '';
+    if (BM.stage4aComplete){
+      loaBlock = renderLoASection(t, amt);
+    }
+    return `<div class="stage-header"><h2>Award Recommendation</h2><p>Prepare the formal award recommendation note. This document goes up the approval chain before the Letter of Acceptance is issued.</p></div>
+      ${summary}${editor}${attachments}${checklist}${apprSection}${approvalBanner}${loaBlock}`;
+  }
+  function defaultRecommendationNote(t, amt, vsEc){
+    return `<p><em>In accordance with the procurement procedures and the evaluation conducted for ${esc(t.id)}, this office recommends the award of work for &quot;${esc(t.name)}&quot; to M/s ${esc(t.l1Vendor)}, who have submitted the lowest (L1) bid of ${fmtINR(amt)} (Rupees ${esc(numberToWordsINR(amt))} only).</em></p>
+<p><em>A total of ${t.bidsReceived} bids were received. After validity screening and technical evaluation, ${t.tqCount} bids were found Technically Qualified (TQ). The financial bids of TQ vendors were opened on May 17, 2026. The comparative statement was prepared and locked on May 18, 2026.</em></p>
+<p><em>The L1 quote of ${fmtINR(amt)} is ${Math.abs(vsEc).toFixed(1)}% ${vsEc<0?'below':'above'} the estimated cost of ${fmtINR(t.estimate)} and is within the Technical Sanction value of ${fmtINR(t.ts)}. The Evaluation Committee reviewed the comparison on May 18, 2026 and ${BM.committeeMembers.filter(m=>m.verdict==='approve'||m.verdict==='cond').length} of ${BM.committeeMembers.length} members have approved the recommendation.</em></p>
+<p><em>It is, therefore, recommended that the work be awarded to M/s ${esc(t.l1Vendor)} at the quoted amount of ${fmtINR(amt)} subject to the standard terms and conditions of the tender document.</em></p>`;
+  }
+  function numberToWordsINR(n){
+    if (!n) return 'Zero';
+    const lakh = Math.floor(n / 100000);
+    const remainder = n % 100000;
+    const thousand = Math.floor(remainder / 1000);
+    const rest = remainder % 1000;
+    const parts = [];
+    if (lakh) parts.push(lakh + ' Lakh' + (lakh > 1 ? 's' : ''));
+    if (thousand) parts.push(thousand + ' Thousand');
+    if (rest) parts.push(rest);
+    return parts.join(' ');
+  }
+  function regenerateRecommendation(){
+    const t = tenderInfo();
+    BM.recommendationNote = defaultRecommendationNote(t, finalAmount(), ((finalAmount() - t.estimate)/t.estimate)*100);
+    saveBM(); renderStageBody(); refreshIcons();
     showToast('Recommendation note regenerated');
   }
-  function awToggle(k){ const el = document.getElementById(k==='bids'?'awBids':'awTqntq'); if (el) el.classList.toggle('hidden'); }
-  function awRefreshSend(){
-    const btn = document.getElementById('awSendBtn');
-    if (!btn) return;
-    const ok = BM.checklist.every(Boolean);
-    btn.disabled = !ok;
-    btn.className = `w-full px-4 py-3 rounded-lg ${ok?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[14px] font-semibold`;
+  function togglePreCheck(key, val){
+    BM.preApprovalChecks[key] = !!val;
+    saveBM(); renderStageBody(); refreshIcons();
   }
-  function awSend(){
-    if (!BM.checklist.every(Boolean)){ showToast('Complete all checklist items'); return; }
-    BM.bm4sent = true;
-    saveBM(); setTab('aw');
-    showToast('Recommendation sent for approval');
+  function sendForApproval(){
+    BM.approvalSent = true;
+    BM.approvalStatus['officer'] = { approved:true, date: todayISO() };
+    saveBM(); renderStageBody(); refreshIcons();
+    showToast('Sent for approval');
   }
-  function awApprove(){
-    BM.bm4approved = true;
-    saveBM(); setTab('aw');
-    showToast('Award recommendation approved');
+  function sendApprovalReminder(officerId, btn){
+    if (btn){ btn.textContent = 'Reminder sent ✓'; btn.disabled = true; setTimeout(() => { btn.textContent = 'Send reminder'; btn.disabled = false; }, 2000); }
+    showToast('Reminder sent');
   }
+  function simulateAllApprovals(){
+    APPROVAL_CHAIN.forEach(a => { BM.approvalStatus[a.id] = { approved:true, date: todayISO() }; });
+    saveBM(); renderStageBody(); refreshIcons();
+    showToast('All approvers signed off');
+  }
+  function completeStage4a(){
+    BM.stage4aComplete = true;
+    saveBM(); renderStageBody(); refreshIcons();
+    showToast('Recommendation approved — proceed to LoA');
+  }
+
+  // ============ 4B — LoA ============
+  function renderLoASection(t, amt){
+    const d = BM.loaDetails;
+    const fields = `<div class="card">
+      <div class="text-[14px] font-bold text-ink-900" style="margin-bottom:16px;">LoA Details — verify before generating</div>
+      <div class="form-grid-2">
+        <div class="form-field"><label>Vendor name</label><input type="text" value="${esc(d.vendorName)}" oninput="updateLoaField('vendorName', this.value)" ${BM.loaIssued?'readonly':''}/></div>
+        <div class="form-field"><label>Tender reference</label><input type="text" value="${esc(t.id)}/AMC/2026-27" readonly /></div>
+        <div class="form-field"><label>Accepted amount (₹)</label><input type="number" value="${d.acceptedAmount}" oninput="updateLoaField('acceptedAmount', parseFloat(this.value)||0)" ${BM.loaIssued?'readonly':''}/></div>
+        <div class="form-field"><label>Date of LoA</label><input type="date" value="${esc(d.dateOfLoa)}" oninput="updateLoaField('dateOfLoa', this.value)" ${BM.loaIssued?'readonly':''}/></div>
+        <div class="form-field"><label>Performance security (₹)</label><input type="number" value="${d.performanceSecurity}" oninput="updateLoaField('performanceSecurity', parseFloat(this.value)||0)" ${BM.loaIssued?'readonly':''}/><div style="font-size:11px; color:#9CA3AF; margin-top:4px;">Auto-calculated at 5% of ${fmtINR(d.acceptedAmount)} = ${fmtINR(Math.round(d.acceptedAmount*0.05))}. Edit if a different rate applies.</div></div>
+        <div class="form-field"><label>Security submission deadline</label><input type="date" value="${esc(d.securityDeadline)}" oninput="updateLoaField('securityDeadline', this.value)" ${BM.loaIssued?'readonly':''}/></div>
+        <div class="form-field"><label>Work commencement date</label><input type="date" value="${esc(d.commencementDate)}" oninput="updateLoaField('commencementDate', this.value)" ${BM.loaIssued?'readonly':''}/></div>
+        <div class="form-field"><label>Work completion date</label><input type="date" value="${esc(d.completionDate)}" oninput="updateLoaField('completionDate', this.value)" ${BM.loaIssued?'readonly':''}/></div>
+        <div class="form-field"><label>Issuing authority</label><input type="text" value="${esc(d.issuingAuthority)}" oninput="updateLoaField('issuingAuthority', this.value)" ${BM.loaIssued?'readonly':''}/></div>
+        <div class="form-field"><label>Designation</label><input type="text" value="${esc(d.designation)}" oninput="updateLoaField('designation', this.value)" ${BM.loaIssued?'readonly':''}/></div>
+      </div>
+      <div style="margin-top:16px;"><button class="btn-outline primary" onclick="openLoaPanel()"><i data-lucide="file-text" style="width:13px; height:13px; display:inline-block; vertical-align:-2px; margin-right:4px;"></i> Preview LoA document</button></div>
+    </div>`;
+    let ack = '';
+    if (BM.loaIssued){
+      const deadline = addDaysISO(BM.loaIssuedDate, 15);
+      const days = daysBetween(todayISO(), deadline);
+      const cls = days > 7 ? 'countdown-green' : days >= 0 ? 'countdown-amber' : 'countdown-red';
+      const cdText = days > 0 ? days+' days remaining' : days === 0 ? 'Due today' : Math.abs(days)+' days overdue';
+      ack = `<div class="card" style="background:#F9FAFB;">
+        <div class="text-[14px] font-bold text-ink-900" style="margin-bottom:8px;">Vendor acknowledgement</div>
+        <div style="font-size:13px; color:#374151; margin-bottom:6px;">LoA must be acknowledged by: <strong>${fmtDate(deadline)}</strong> <span style="color:#9CA3AF;">(15 days from issue)</span></div>
+        <div class="${cls}">${esc(cdText)}</div>
+        <div style="margin-top:14px;">
+          <label style="display:inline-flex; align-items:center; gap:6px; font-size:13px;"><input type="checkbox" ${BM.loaAcknowledged?'checked':''} onchange="toggleAcknowledged(this.checked)"> Mark acknowledged by vendor</label>
+          ${BM.loaAcknowledged ? `<div class="form-grid-2" style="margin-top:10px;"><div class="form-field"><label>Acknowledgement date</label><input type="date" value="${esc(BM.acknowledgementDate||todayISO())}" oninput="BM.acknowledgementDate=this.value; saveBM();"/></div><div class="form-field"><label>Vendor representative name</label><input type="text" value="${esc(BM.acknowledgementBy||'')}" oninput="BM.acknowledgementBy=this.value; saveBM();" placeholder="e.g. Mr. Rajesh Kumar"/></div></div>` : ''}
+        </div>
+      </div>`;
+    }
+    let ctas = '';
+    if (!BM.loaIssued){
+      ctas = `<div style="display:flex; justify-content:flex-end; gap:10px; margin-top:14px;">
+        <button class="btn-outline" onclick="showToast('LoA draft downloaded')"><i data-lucide="download" style="width:13px; height:13px; display:inline-block; vertical-align:-2px; margin-right:4px;"></i> Download LoA Draft (PDF)</button>
+        <button class="btn-primary" onclick="openIssueLoaModal()">Issue LoA &amp; Notify Vendor →</button>
+      </div>`;
+    } else {
+      ctas = `<div class="success-banner large" style="justify-content:space-between;">
+        <div style="display:flex; align-items:center; gap:12px;"><i data-lucide="check-circle-2" style="width:24px; height:24px; color:#10B981;"></i>
+          <div><div class="sb-text">Letter of Acceptance issued</div><div class="sb-meta">${esc(BM.tnd)} · ${esc(d.vendorName)} · ${fmtDate(BM.loaIssuedDate)}</div></div>
+        </div>
+        <div style="display:flex; gap:10px;"><button class="btn-outline" onclick="showToast('LoA PDF downloaded')"><i data-lucide="download" style="width:13px; height:13px; display:inline-block; vertical-align:-2px; margin-right:4px;"></i> Download LoA (PDF)</button><a href="#" class="row-link" style="font-size:13px; align-self:center;" onclick="event.preventDefault(); showToast('Acknowledgement status: '+(BM.loaAcknowledged?'Acknowledged':'Pending'));">View acknowledgement status</a></div>
+      </div>`;
+    }
+    return `<div class="stage-header"><h2>Letter of Acceptance (LoA)</h2><p>Formally accept the bid. This document is legally binding from the moment the vendor acknowledges receipt.</p></div>
+      ${fields}${ack}${ctas}`;
+  }
+  function updateLoaField(key, value){
+    BM.loaDetails[key] = value;
+    if (key === 'acceptedAmount'){
+      BM.loaDetails.performanceSecurity = Math.round(value * 0.05);
+    }
+    if (key === 'dateOfLoa'){
+      BM.loaDetails.securityDeadline = addDaysISO(value, 15);
+    }
+    saveBM(); renderStageBody(); refreshIcons();
+  }
+  function toggleAcknowledged(val){
+    BM.loaAcknowledged = !!val;
+    if (val && !BM.acknowledgementDate) BM.acknowledgementDate = todayISO();
+    saveBM(); renderWorkspace();
+    showToast(val ? 'Vendor acknowledgement recorded' : 'Acknowledgement cleared');
+  }
+  function openIssueLoaModal(){
+    const d = BM.loaDetails;
+    const dlg = document.getElementById('modalDialog');
+    const bk  = document.getElementById('modalBackdrop');
+    dlg.innerHTML = `<div id="modalTitle" style="font-size:17px; font-weight:700; color:#111827; margin-bottom:8px;">Issue Letter of Acceptance?</div>
+      <div style="font-size:13px; color:#374151;">This will formally accept ${esc(d.vendorName)}'s bid and notify them. The LoA is legally binding.</div>
+      <div class="modal-summary">
+        <div class="row"><span class="lbl">Vendor</span><span class="val">${esc(d.vendorName)}</span></div>
+        <div class="row"><span class="lbl">Accepted amount</span><span class="val">${fmtINR(d.acceptedAmount)}</span></div>
+        <div class="row"><span class="lbl">Performance security</span><span class="val">${fmtINR(d.performanceSecurity)}</span></div>
+        <div class="row"><span class="lbl">Security deadline</span><span class="val">${fmtDate(d.securityDeadline)}</span></div>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:18px;">
+        <button class="btn-outline" onclick="closeConfirmModal()">Cancel</button>
+        <button class="btn-primary" style="padding:9px 18px;" onclick="confirmIssueLoa()">Issue LoA →</button>
+      </div>`;
+    dlg.classList.add('open');
+    bk.classList.add('open');
+    refreshIcons();
+  }
+  function closeConfirmModal(){
+    const dlg = document.getElementById('modalDialog');
+    const bk  = document.getElementById('modalBackdrop');
+    if (dlg) dlg.classList.remove('open');
+    if (bk)  bk.classList.remove('open');
+  }
+  function confirmIssueLoa(){
+    BM.loaIssued = true;
+    BM.loaIssuedDate = todayISO();
+    BM.loaDetails.dateOfLoa = BM.loaDetails.dateOfLoa || todayISO();
+    BM.loaDetails.securityDeadline = BM.loaDetails.securityDeadline || addDaysISO(BM.loaIssuedDate, 15);
+    saveBM();
+    closeConfirmModal();
+    renderWorkspace();
+    showToast('Letter of Acceptance issued');
+  }
+
+  // LoA preview panel — in-flow within main-col (NOT position:fixed)
+  function openLoaPanel(){
+    const panel = document.getElementById('loaPanel');
+    const back  = document.getElementById('loaBackdrop');
+    panel.innerHTML = loaPanelHTML();
+    panel.classList.add('open');
+    back.classList.add('open');
+    refreshIcons();
+  }
+  function closeLoaPanel(){
+    const panel = document.getElementById('loaPanel');
+    const back  = document.getElementById('loaBackdrop');
+    if (panel) panel.classList.remove('open');
+    if (back)  back.classList.remove('open');
+  }
+  function loaPanelHTML(){
+    const t = tenderInfo();
+    const d = BM.loaDetails;
+    return `<div class="loa-header">
+        <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+          <i data-lucide="file-text" style="width:18px; height:18px; color:#0F5EE8; flex-shrink:0;"></i>
+          <div style="min-width:0;">
+            <div class="text-[14px] font-bold text-ink-900 truncate" style="font-family:'DM Sans', sans-serif;">Letter of Acceptance — ${esc(d.vendorName)}</div>
+            <div class="text-[11px]" style="color:#9CA3AF; font-family:'DM Sans', sans-serif;">${esc(t.id)} · Draft preview</div>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+          <button class="btn-outline" style="padding:6px 12px; font-size:12px;" onclick="showToast('LoA draft downloaded')"><i data-lucide="download" style="width:13px; height:13px;"></i> Download PDF</button>
+          <button onclick="closeLoaPanel()" aria-label="Close" style="background:transparent; border:none; cursor:pointer; color:#6B7280; font-size:20px; line-height:1; padding:4px 8px;">×</button>
+        </div>
+      </div>
+      <div class="loa-body">
+        <div class="doc-section" style="text-align:center; font-weight:700;">AHMEDABAD MUNICIPAL CORPORATION</div>
+        <div class="doc-section" style="text-align:center;">Office of the Commissioner</div>
+        <div class="doc-section" style="text-align:center;">Ahmedabad – 380001</div>
+        <div style="border-top:2px solid #111827; border-bottom:1px solid #111827; margin:14px 0; height:5px;"></div>
+        <div class="doc-section">No.: AMC/PROC/${esc(t.id)}/LOA/2026-27</div>
+        <div class="doc-section">Date: ${fmtDate(d.dateOfLoa)}</div>
+        <div class="doc-section" style="margin-top:18px;">To,</div>
+        <div class="doc-section">M/s ${esc(d.vendorName)}</div>
+        <div class="doc-section">[Registered Office Address]</div>
+        <div class="doc-section" style="margin-top:18px;"><strong>Subject:</strong> Letter of Acceptance — ${esc(t.name)}<br>Tender No.: ${esc(t.id)}/AMC/2026-27</div>
+        <div class="doc-section" style="margin-top:14px;">Dear Sir/Madam,</div>
+        <div class="doc-section" style="margin-top:8px;">With reference to your Technical and Financial Bid submitted against the above-mentioned tender, and subsequent evaluation by the Evaluation Committee, we are pleased to inform you that your bid has been accepted for the work described below:</div>
+        <div class="doc-section" style="margin-top:14px;"><strong>Name of work:</strong> ${esc(t.name)}</div>
+        <div class="doc-section"><strong>Accepted bid amount:</strong> ${fmtINR(d.acceptedAmount)} (Rupees ${esc(numberToWordsINR(d.acceptedAmount))} only)</div>
+        <div class="doc-section">Exclusive of GST</div>
+        <div class="doc-section" style="margin-top:14px;">You are required to:</div>
+        <ol style="margin:8px 0 0 22px; padding:0;">
+          <li style="margin-bottom:8px;">Acknowledge receipt of this Letter of Acceptance within 7 (seven) days of the date of issue.</li>
+          <li style="margin-bottom:8px;">Submit Performance Security of ${fmtINR(d.performanceSecurity)} (Rupees ${esc(numberToWordsINR(d.performanceSecurity))} only), being 5% of the accepted bid amount, in the form of a Bank Guarantee from a scheduled bank, within 15 (fifteen) days of the date of this letter.</li>
+          <li style="margin-bottom:8px;">Commence work not later than ${fmtDate(d.commencementDate)}.</li>
+          <li style="margin-bottom:8px;">Complete the work by ${fmtDate(d.completionDate)}.</li>
+        </ol>
+        <div class="doc-section" style="margin-top:14px;">Failure to acknowledge this letter or submit performance security within the stipulated period may result in cancellation of this acceptance and forfeiture of EMD.</div>
+        <div class="doc-section" style="margin-top:8px;">All other terms and conditions of the tender document shall apply.</div>
+        <div class="doc-section" style="margin-top:18px;">Yours faithfully,</div>
+        <div class="doc-section" style="margin-top:24px;">[Signature]<br>${esc(d.issuingAuthority)}<br>${esc(d.designation)}<br>Ahmedabad Municipal Corporation<br>Date: ${fmtDate(d.dateOfLoa)}</div>
+      </div>`;
+  }
+
+  // ===================== GLOBAL HANDLERS =====================
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape'){ closeLoaPanel(); closeConfirmModal(); }
+  });
 
   (function boot(){
     const tnd = new URLSearchParams(location.search).get('tender');
-    if (tnd){ openWorkspace(tnd); } else { renderBMList(); }
+    if (tnd){ openWorkspace(tnd); } else { renderLanding(); }
     refreshIcons();
   })();
 </script>
