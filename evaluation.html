@@ -298,6 +298,124 @@
     .pill-disq    { background:#FEF2F2; color:#991B1B; border-radius:20px; padding:3px 10px; font-size:12px; font-weight:700; }
 
     @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+    /* === Change 1 — Evidence panel (in-flow within main-col, 680px) === */
+    .ev-panel { position:absolute; top:64px; right:0; bottom:0; width:680px; max-width:100%; background:white; border-left:1px solid #E5E7EB; box-shadow:-4px 0 16px rgba(0,0,0,0.08); transform:translateX(100%); transition: transform .28s cubic-bezier(.2,.7,.2,1); z-index:46; display:flex; flex-direction:column; }
+    .ev-panel.open { transform:translateX(0); }
+    .ev-link { display:inline-flex; align-items:center; gap:4px; color:#0F5EE8; font-size:12px; background:transparent; border:none; cursor:pointer; padding:2px 0; }
+    .ev-link:hover { text-decoration:underline; }
+    .ev-doc { font-family:'Times New Roman', Georgia, serif; font-size:13px; line-height:1.8; color:#1a1a1a; }
+    .ev-doc h3 { font-family:'Times New Roman', Georgia, serif; font-weight:700; text-align:center; font-size:14px; letter-spacing:0.04em; margin-bottom:6px; }
+    .ev-doc .rule { border-top:2px solid #111827; border-bottom:1px solid #111827; margin:14px 0; height:5px; }
+    .ev-doc .seal-area { margin-top:24px; display:flex; justify-content:space-between; }
+    .ev-doc table { border-collapse:collapse; width:100%; margin:8px 0; font-family:'Times New Roman', Georgia, serif; font-size:13px; }
+    .ev-doc table td, .ev-doc table th { border:1px solid #D1D5DB; padding:6px 10px; text-align:left; }
+    .ev-doc table th { background:#F9FAFB; font-weight:700; }
+    .ev-doc .pan-card { background:linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%); color:white; border-radius:10px; padding:18px 22px; margin:16px auto; max-width:380px; font-family:'DM Sans', sans-serif; }
+    .ev-doc .pan-card .pan-num { font-size:22px; font-weight:700; letter-spacing:0.18em; margin:10px 0; font-family:'Courier New', monospace; }
+    .ev-doc .pan-card .pan-label { font-size:10px; opacity:0.85; text-transform:uppercase; letter-spacing:0.08em; }
+
+    /* === Change 2 — Committee scoring === */
+    .ct-status-bar { background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px; padding:12px 16px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+    .ct-status-bar .left { font-size:13px; font-weight:700; color:#0C447C; }
+    .ct-status-bar .right { display:flex; gap:14px; flex-wrap:wrap; }
+    .ct-status-bar .right .mem { font-size:12px; color:#374151; display:inline-flex; align-items:center; gap:4px; }
+    .ct-status-bar .right .mem.done   { color:#065F46; font-weight:600; }
+    .ct-status-bar .right .mem.pending{ color:#92400E; }
+    .tq-comm-table { width:100%; border-collapse:collapse; font-size:13px; }
+    .tq-comm-table th { background:#F9FAFB; font-size:11px; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; font-weight:700; padding:10px 10px; border-bottom:1px solid #E5E7EB; text-align:left; }
+    .tq-comm-table th .mh { display:block; font-size:11px; font-weight:700; color:#111827; text-transform:none; letter-spacing:0; cursor:help; }
+    .tq-comm-table th .ms { display:block; font-size:10px; margin-top:2px; }
+    .tq-comm-table th .ms.done { color:#10B981; }
+    .tq-comm-table th .ms.pending { color:#F59E0B; }
+    .tq-comm-table td { padding:14px 10px; border-bottom:1px solid #F3F4F6; vertical-align:middle; }
+    .tq-comm-table tr:last-child td { border-bottom:none; }
+    .tq-score-in { width:55px; border:1px solid #D1D5DB; border-radius:6px; padding:5px 8px; font-size:14px; text-align:center; }
+    .tq-score-in:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 2px rgba(15,94,232,0.15); }
+    .tq-member-cell .scored { font-size:14px; font-weight:700; color:#0F5EE8; }
+    .tq-member-cell .scored-other { font-size:14px; font-weight:700; color:#374151; }
+    .tq-member-cell .edit-pencil { font-size:10px; color:#9CA3AF; margin-left:6px; cursor:pointer; background:transparent; border:none; padding:0; }
+    .tq-member-cell .edit-pencil:hover { color:#0F5EE8; text-decoration:underline; }
+    .tq-member-cell .pending-pill { font-size:12px; color:#F59E0B; font-style:italic; }
+    .tq-member-cell .remind { font-size:10px; color:#9CA3AF; margin-left:6px; cursor:pointer; background:transparent; border:none; padding:0; text-decoration:underline; }
+    .tq-avg .avg-num { font-size:14px; font-weight:700; }
+    .tq-avg .avg-count { display:block; font-size:10px; margin-top:2px; }
+    .tq-avg .avg-count.complete { color:#10B981; }
+    .tq-avg .avg-count.partial  { color:#F59E0B; }
+    .tq-verdict .pill { background:#F0FDF4; color:#065F46; border-radius:20px; padding:4px 12px; font-size:12px; font-weight:700; display:inline-block; }
+    .tq-verdict .pill.pending { background:#F3F4F6; color:#6B7280; font-weight:500; }
+
+    /* === Change 3 — Presentation sub-section === */
+    .pres-toggle { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid #F3F4F6; cursor:pointer; margin-bottom:14px; }
+    .pres-toggle .left { display:flex; align-items:center; gap:8px; }
+    .pres-toggle .chev { transition: transform .2s ease; }
+    .pres-toggle.open .chev { transform: rotate(180deg); }
+    .pres-zone { overflow:hidden; max-height:0; transition: max-height .2s ease; }
+    .pres-zone.open { max-height:1200px; }
+    .pres-info { background:#EFF6FF; border:1px solid #BFDBFE; color:#1D4ED8; border-radius:8px; padding:10px 14px; font-size:12px; margin-bottom:14px; line-height:1.5; }
+    .pres-table { width:100%; border-collapse:collapse; font-size:13px; }
+    .pres-table th { background:#F9FAFB; font-size:11px; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; font-weight:700; padding:8px 10px; border-bottom:1px solid #E5E7EB; text-align:left; }
+    .pres-table td { padding:10px 10px; border-bottom:1px solid #F3F4F6; vertical-align:top; font-size:12.5px; }
+    .pres-table tr:last-child td { border-bottom:none; }
+    .pres-chip { display:inline-block; background:#F9FAFB; border:1px solid #E5E7EB; border-radius:6px; padding:3px 8px; font-size:11.5px; color:#374151; margin-right:4px; }
+    .pres-upload-btn { background:white; border:1px dashed #93C5FD; color:#0F5EE8; border-radius:6px; padding:4px 10px; font-size:11.5px; cursor:pointer; }
+    .pres-upload-btn:hover { background:#EFF6FF; }
+    .pres-play-btn { background:#EFF6FF; color:#0F5EE8; border:none; border-radius:6px; padding:4px 10px; font-size:11.5px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; }
+    .pres-play-btn:hover { background:#DBEAFE; }
+    .pres-note-input { width:100%; border:1px solid #D1D5DB; border-radius:6px; padding:4px 8px; font-size:12px; }
+    .pres-note-input:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 2px rgba(15,94,232,0.15); }
+    .toggle-on { width:32px; height:18px; background:#0F5EE8; border-radius:9px; position:relative; cursor:pointer; transition: background .15s ease; }
+    .toggle-on::after { content:''; position:absolute; top:2px; left:16px; width:14px; height:14px; background:white; border-radius:50%; transition: left .15s ease; }
+    .toggle-off { width:32px; height:18px; background:#D1D5DB; border-radius:9px; position:relative; cursor:pointer; transition: background .15s ease; }
+    .toggle-off::after { content:''; position:absolute; top:2px; left:2px; width:14px; height:14px; background:white; border-radius:50%; transition: left .15s ease; }
+
+    /* === Video modal === */
+    .video-modal-backdrop { position:absolute; top:64px; left:0; right:0; bottom:0; background:rgba(17,24,39,0.6); opacity:0; pointer-events:none; transition: opacity .2s ease; z-index:62; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .video-modal-backdrop.open { opacity:1; pointer-events:auto; }
+    .video-modal { background:#0a0a0a; border-radius:12px; max-width:780px; width:100%; box-shadow:0 20px 48px rgba(0,0,0,0.4); position:relative; }
+    .video-modal .vm-close { position:absolute; top:-36px; right:0; background:transparent; color:white; border:none; cursor:pointer; font-size:24px; padding:0; }
+    .video-modal video, .video-modal iframe { width:100%; max-height:70vh; border-radius:12px; display:block; background:#000; }
+
+    /* === Change 4 — Mask + reveal === */
+    .mask-pill { display:inline-block; background:#F3F4F6; color:#9CA3AF; border-radius:4px; padding:3px 10px; font-size:13px; letter-spacing:2px; font-style:normal; }
+    .reveal-anim { animation: revealBlur 400ms ease forwards; }
+    @keyframes revealBlur { 0% { filter: blur(4px); opacity: 0.5; } 100% { filter: blur(0); opacity: 1; } }
+    .eye-btn { background:transparent; border:none; cursor:pointer; color:#9CA3AF; padding:2px 4px; }
+    .eye-btn:hover { color:#0F5EE8; }
+    .eye-btn.revealed { color:#10B981; }
+    .eye-confirm { font-size:11px; color:#F59E0B; padding:2px 4px; }
+    .reveal-banner { background:#EFF6FF; border:1px solid #BFDBFE; color:#0C447C; border-radius:10px; padding:12px 16px; margin-bottom:14px; font-size:13px; display:flex; align-items:center; gap:8px; }
+    .reveal-btn-row { display:flex; justify-content:center; margin-bottom:14px; }
+    .specified-badge { display:inline-block; background:#EFF6FF; color:#0C447C; border-radius:4px; padding:1px 5px; font-size:10px; font-weight:700; margin-left:4px; vertical-align:middle; }
+    .tender-ref-note { font-size:12px; color:#6B7280; font-style:italic; margin-top:6px; }
+    .preview-ref-note { font-size:12px; color:#92400E; margin-top:6px; }
+    .preview-ref-sub  { font-size:11px; color:#9CA3AF; margin-top:2px; }
+
+    /* === Change 5 — Audit log === */
+    .audit-trigger { display:inline-flex; align-items:center; gap:6px; border:1px solid #E5E7EB; border-radius:8px; padding:6px 12px; font-size:12px; color:#6B7280; background:white; cursor:pointer; transition: background .15s ease; }
+    .audit-trigger:hover { background:#F9FAFB; color:#111827; }
+    .audit-trigger .badge { display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 5px; background:#0F5EE8; color:white; border-radius:999px; font-size:10px; font-weight:700; }
+    .audit-panel { background:white; border:1px solid #E5E7EB; border-radius:12px; overflow:hidden; max-height:0; opacity:0; transition: max-height 300ms ease, opacity .2s ease, margin .3s ease, border .3s ease; border-width:0; margin-bottom:0; }
+    .audit-panel.open { max-height:580px; opacity:1; border-width:1px; margin-bottom:20px; }
+    .audit-panel-head { padding:14px 20px; border-bottom:1px solid #E5E7EB; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+    .audit-panel-list { max-height:320px; overflow-y:auto; }
+    .audit-row { padding:10px 20px; border-bottom:1px solid #F3F4F6; display:flex; gap:14px; align-items:flex-start; }
+    .audit-row .ts { font-size:11px; color:#9CA3AF; width:60px; flex-shrink:0; }
+    .audit-row .center { flex:1; min-width:0; }
+    .audit-row .act { font-size:13px; font-weight:700; color:#111827; }
+    .audit-row .det { font-size:12px; color:#6B7280; margin-top:2px; }
+    .audit-row .sec-badge { background:#F3F4F6; color:#6B7280; border-radius:4px; padding:1px 5px; font-size:10px; margin-top:4px; display:inline-block; }
+    .audit-row .user { font-size:11px; color:#9CA3AF; flex-shrink:0; }
+    .audit-row.view    { border-left:3px solid #3B82F6; }
+    .audit-row.create  { border-left:3px solid #10B981; }
+    .audit-row.edit    { border-left:3px solid #F59E0B; }
+    .audit-row.reveal  { border-left:3px solid #8B5CF6; }
+    .audit-row.send    { border-left:3px solid #0F5EE8; }
+    .audit-empty { padding:24px; text-align:center; font-size:13px; color:#9CA3AF; }
+    .mini-trail-toggle { background:transparent; border:none; color:#9CA3AF; font-size:11px; cursor:pointer; padding:6px 0; margin-top:8px; }
+    .mini-trail-toggle:hover { color:#0F5EE8; }
+    .mini-trail { background:#F9FAFB; border-radius:8px; padding:6px 12px; margin-top:4px; }
+    .mini-trail .audit-row { padding:6px 0; border-bottom:none; }
   </style>
 </head>
 <body class="min-h-screen">
@@ -446,6 +564,16 @@
           <div id="wsStagePill" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-semibold" style="background:#FFFBEB; color:#92400E;"><span class="w-1.5 h-1.5 rounded-full pulse-amber" style="background:#F59E0B;"></span> Technical evaluation in progress</div>
         </div>
 
+        <!-- Audit log trigger row (Change 5) -->
+        <div class="flex items-center justify-end">
+          <button id="auditTriggerBtn" class="audit-trigger" onclick="toggleAuditPanel()" aria-expanded="false" aria-controls="auditPanel">
+            <i data-lucide="clipboard-list" class="w-3.5 h-3.5"></i> Audit Log
+            <span id="auditBadge" class="badge" aria-live="polite">0</span>
+          </button>
+        </div>
+        <!-- Audit log slide-down panel -->
+        <div id="auditPanel" class="audit-panel" aria-hidden="true"></div>
+
         <!-- Stage tabs -->
         <div role="tablist" aria-label="Evaluation stages" class="flex flex-wrap gap-2">
           <button role="tab" data-stab="technical" onclick="setStageTab('technical')" class="ev-tab px-4 py-1.5 rounded-full text-[13px] border border-primary bg-primary text-white"><i data-lucide="clipboard-check" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1"></i> Technical Evaluation</button>
@@ -465,6 +593,13 @@
     <!-- Clarification Draft panel (in-flow within main column, NOT position:fixed) -->
     <div id="clarBackdrop" class="bid-doc-backdrop" onclick="closeClarPanel()"></div>
     <aside id="clarPanel" class="clar-panel" role="dialog" aria-modal="true" aria-label="Clarification Request"></aside>
+
+    <!-- Evidence document panel (Change 1) -->
+    <div id="evBackdrop" class="bid-doc-backdrop" onclick="closeEvidencePanel()"></div>
+    <aside id="evPanel" class="ev-panel" role="dialog" aria-modal="true" aria-label="Evidence Document"></aside>
+
+    <!-- Vendor presentation video modal (Change 3) -->
+    <div id="videoModal" class="video-modal-backdrop" onclick="if(event.target===this) closeVideoModal()" role="dialog" aria-modal="true" aria-label="Vendor presentation video"></div>
 
     <!-- PQ verdict popover (positioned absolutely on cell click) -->
     <div id="pqPopover" class="pq-popover hidden" role="dialog" aria-modal="false"></div>
@@ -628,8 +763,51 @@
       albDecision:null,    // 'accept' | 'reject'
       albNote:'',
       reasonableness:{ decision:null, note:'', retenderReason:'', confirmed:false },
-      _seedV:5,
+      // Change 1 — evidence audit (full audit list is in EVAL.auditLog)
+      // Change 2 — committee scoring per vendor
+      tqMemberScores: {},        // { vendorName: { critId: { rk:5, ps:5, ap:null } } }
+      tqMemberSubmitted: {},     // { vendorName: { rk:true, ps:true, ap:false } }
+      // Change 3 — vendor presentations
+      presentations: {},         // { vendorName: { ppt, pptName, video, videoUrl, includeInTq, marks, notes } }
+      presOpen: false,
+      // Change 4 — winner-first reveal
+      finRevealed: {},           // { vendorName: true }  — reveal-true vendors show the real quote
+      // Change 5 — audit log
+      auditLog: [],
+      _seedV:6,
     };
+  }
+  // === Committee members for TQ scoring (Change 2) ===
+  const COMMITTEE_MEMBERS = [
+    { id:'rk', name:'Rajesh Kumar', designation:'Procurement Officer',  isYou:true  },
+    { id:'ps', name:'Priya Shah',   designation:'Technical Officer',    isYou:false },
+    { id:'ap', name:'Amit Patil',   designation:'Finance Officer',      isYou:false },
+  ];
+  // === Audit log helper (Change 5) — append-only, persisted in EVAL.auditLog ===
+  function log(section, action, detail, extra){
+    if (!EVAL || !EVAL.auditLog) return;
+    EVAL.auditLog.push({
+      id: 'audit-' + Date.now() + '-' + Math.floor(Math.random()*1000),
+      timestamp: new Date().toISOString(),
+      user: 'Rajesh Kumar',
+      userRole: 'Super Admin',
+      section: section,
+      action: action,
+      detail: detail || '',
+      ipNote: extra || 'Session: web-session-' + (EVAL.tnd||'') ,
+    });
+    saveState();
+    // Re-render the audit badge + panel without blowing away the rest of the workspace
+    renderAuditBadge();
+    if (_uiAudit && _uiAudit.open) renderAuditPanel();
+  }
+  function actionCategory(action){
+    if (/^(evidence_viewed|bid_viewed|video_viewed|panel_opened)$/.test(action)) return 'view';
+    if (/^(uploaded|created|drafted|started)|created$|uploaded$/.test(action)) return 'create';
+    if (/^(edited|changed|score_edited|verdict_changed|parsed_edited)$/.test(action)) return 'edit';
+    if (/reveal/.test(action)) return 'reveal';
+    if (/^(sent|submitted|saved|confirmed|verdict_saved|score_entered|score_submitted|signed)$/.test(action)) return 'send';
+    return 'view';
   }
   // Helpers for the new array-based clarifications store
   function findClarRecord(vendor, critId){
@@ -703,6 +881,43 @@
     s.evaluationMethod = 'L1';
     s.ts = 2700000;          // ₹27,00,000 Technical Sanction
     s.fbsBudget = ESTIMATE;  // default fixed-budget value used by FBS view
+
+    // === Committee scoring seed (Change 2) — partial scoring so the design is exercised ===
+    s.tqMemberScores = {};
+    s.tqMemberSubmitted = {};
+    const seedScoresFor = (vendor, perMember) => {
+      s.tqMemberScores[vendor] = s.tqMemberScores[vendor] || {};
+      TQ_CRITERIA.forEach(c => {
+        s.tqMemberScores[vendor][c.id] = {
+          rk: perMember.rk != null ? Math.min(perMember.rk, c.max) : null,
+          ps: perMember.ps != null ? Math.min(perMember.ps, c.max) : null,
+          ap: perMember.ap != null ? Math.min(perMember.ap, c.max) : null,
+        };
+      });
+      s.tqMemberSubmitted[vendor] = { rk: perMember.rkSubmitted, ps: perMember.psSubmitted, ap: perMember.apSubmitted };
+    };
+    seedScoresFor('Rajesh Constructions',  { rk:9,  ps:9,  ap:8,  rkSubmitted:true,  psSubmitted:true,  apSubmitted:true });
+    seedScoresFor('Maharashtra Roads Co.', { rk:7,  ps:7,  ap:7,  rkSubmitted:true,  psSubmitted:true,  apSubmitted:false });
+    seedScoresFor('BuildTech Solutions',   { rk:6,  ps:null,ap:null,rkSubmitted:false, psSubmitted:false, apSubmitted:false });
+    seedScoresFor('NCC Infrastructure',    { rk:8,  ps:8,  ap:null, rkSubmitted:true,  psSubmitted:true,  apSubmitted:false });
+    seedScoresFor('Patil & Associates',    { rk:null, ps:null, ap:null, rkSubmitted:false, psSubmitted:false, apSubmitted:false });
+
+    // === Presentation seed (Change 3) — one vendor uploaded a video ===
+    s.presentations = {
+      'Rajesh Constructions': { ppt:'rajesh_technical_pres.pdf', pptName:'rajesh_technical_pres.pdf', video:null, videoUrl:'https://www.youtube.com/embed/dQw4w9WgXcQ', includeInTq:false, marks:0, notes:'Strong demo of installation process and after-sale support.' },
+    };
+
+    // === Reveal state seed (Change 4) — keep all sealed so the design is immediately demonstrable ===
+    s.finRevealed = {};
+
+    // === Audit log seed (Change 5) — a few prior actions so the panel is not empty ===
+    const baseTs = Date.now() - 3600000; // ~1h ago
+    s.auditLog = [
+      { id:'audit-seed-1', timestamp:new Date(baseTs).toISOString(),       user:'Rajesh Kumar', userRole:'Super Admin', section:'PQ Evaluation', action:'verdict_saved',   detail:'Annual Turnover · Rajesh Constructions · Pass', ipNote:'Session: web-session-TND-2026-001' },
+      { id:'audit-seed-2', timestamp:new Date(baseTs+540000).toISOString(),user:'Priya Shah',   userRole:'Technical Officer', section:'PQ Evaluation', action:'evidence_viewed', detail:'ISO Cert · Rajesh Constructions', ipNote:'Session: web-session-TND-2026-001' },
+      { id:'audit-seed-3', timestamp:new Date(baseTs+1080000).toISOString(),user:'Rajesh Kumar', userRole:'Super Admin', section:'TQ Evaluation', action:'score_submitted', detail:'Rajesh Kumar submitted TQ scores for Rajesh Constructions', ipNote:'Session: web-session-TND-2026-001' },
+      { id:'audit-seed-4', timestamp:new Date(baseTs+1820000).toISOString(),user:'Rajesh Kumar', userRole:'Super Admin', section:'Financial Evaluation', action:'method_switched', detail:'Switched from QCBS preview back to L1 (specified method)', ipNote:'Session: web-session-TND-2026-001' },
+    ];
     return s;
   }
 
@@ -934,15 +1149,20 @@
     try { history.replaceState(null,'','?tender='+encodeURIComponent(tnd)); } catch(e){}
     const t = EVAL_TENDERS.find(x => x.id === tnd) || EVAL_TENDERS[0];
     const loaded = loadState(tnd);
-    EVAL = (loaded && loaded._seedV === 5) ? loaded
+    EVAL = (loaded && loaded._seedV === 6) ? loaded
          : (tnd === 'TND-2026-001' ? seedDemo(tnd) : (loaded || freshState(tnd)));
-    if (t.method && !(loaded && loaded._seedV === 5)) EVAL.method = t.method;
+    if (t.method && !(loaded && loaded._seedV === 6)) EVAL.method = t.method;
     if (!EVAL.evaluationMethod) EVAL.evaluationMethod = EVAL.method || 'L1';
     if (t.ts != null && EVAL.ts == null) EVAL.ts = t.ts;
     EVAL.readonly = false;
     // Migrate old clarifications shape ({}) → array
     if (!Array.isArray(EVAL.clarifications)) EVAL.clarifications = [];
     if (!EVAL.reasonableness) EVAL.reasonableness = { decision:null, note:'', retenderReason:'', confirmed:false };
+    if (!EVAL.tqMemberScores)    EVAL.tqMemberScores = {};
+    if (!EVAL.tqMemberSubmitted) EVAL.tqMemberSubmitted = {};
+    if (!EVAL.presentations)     EVAL.presentations = {};
+    if (!EVAL.finRevealed)       EVAL.finRevealed = {};
+    if (!Array.isArray(EVAL.auditLog)) EVAL.auditLog = [];
     if (!EVAL.activeVendor && EVAL.bids.length) EVAL.activeVendor = EVAL.bids[0].vendor;
     activeView = null;   // reset F2 view toggle for each tender
     document.getElementById('wsCrumb').textContent = t.id;
@@ -954,6 +1174,14 @@
     document.getElementById('screen-landing').classList.add('hidden');
     document.getElementById('screen-workspace').classList.remove('hidden');
     setStageTab(EVAL.stageTab || 'technical', true);
+    // Audit panel — restore session state + populate badge
+    renderAuditBadge();
+    if (_uiAudit && _uiAudit.open){
+      const panel = document.getElementById('auditPanel');
+      const trigger = document.getElementById('auditTriggerBtn');
+      if (panel){ renderAuditPanel(); panel.classList.add('open'); panel.setAttribute('aria-hidden','false'); }
+      if (trigger) trigger.setAttribute('aria-expanded','true');
+    }
     window.scrollTo({ top:0 });
   }
   function refreshStagePill(){
@@ -1211,6 +1439,7 @@
     EVAL.bids.push(bid);
     if (!EVAL.activeVendor) EVAL.activeVendor = vendor;
     EVAL._addBid = { vendorMode:'select', vendor:'', vendorNew:'', file:'', fileSize:'', uploaded:false, progressing:false };
+    log('Upload Technical Bids', 'bid_uploaded', `${vendor} · ${bid.file} · ${f.fileSize}`);
     renderTechnical(); saveState();
     setTimeout(() => { bid.status='parsed'; renderTechnical(); saveState(); showToast(vendor+' bid parsed'); }, 1400);
   }
@@ -1262,7 +1491,12 @@
   }
   function drawerSaveManual(vendor, kind, field, val){
     const bid = (kind==='fin' ? EVAL.finBids : EVAL.bids).find(b => b.vendor === vendor);
-    if (bid && val.trim()){ bid.parsedEdits = bid.parsedEdits||{}; bid.parsedEdits[field] = val.trim(); saveState(); }
+    if (bid && val.trim()){
+      const oldVal = (bid.parsedEdits && bid.parsedEdits[field]) || '(blank)';
+      bid.parsedEdits = bid.parsedEdits||{}; bid.parsedEdits[field] = val.trim();
+      log(kind==='fin'?'Upload Financial Bids':'Upload Technical Bids', 'parsed_edited', `${vendor} · ${field}: ${oldVal} → ${val.trim()}`);
+      saveState();
+    }
     openDrawer(vendor, kind);
   }
 
@@ -1271,6 +1505,7 @@
   function openBidDoc(vendor, kind){
     closeDrawer();
     closeClarPanel();
+    closeEvidencePanel();
     closePqPopover();
     const panel = document.getElementById('bidDocPanel');
     const back  = document.getElementById('bidDocBackdrop');
@@ -1660,14 +1895,16 @@
         ? `<div><span style="font-size:13px; color:#F59E0B; font-style:italic;">Not found</span> <a href="#" onclick="pqInlineEdit('${esc(vendor)}','${c.id}'); return false;" class="text-[12px] hover:underline" style="color:#0F5EE8;">Enter manually</a></div>`
         : `<div class="crit-sub">${esc(aiVal)}</div>`;
       const trigger = `<span onclick="openPqPopover(event,'${esc(vendor)}','${c.id}')">${verdictTriggerHTML(val)}</span>`;
-      const note = (EVAL.notes||{})[vendor+'|'+c.id] || '';
-      const noteBtn = `<button class="note-icon-btn" title="${note ? 'Note: '+esc(note) : 'Add note'}" onclick="editNote('${esc(vendor)}','${c.id}')"><i data-lucide="${note?'sticky-note':'pencil'}" class="w-4 h-4"></i></button>`;
+      const evDoc = evidenceDocFor(vendor, c.id);
+      const evidenceCell = evDoc
+        ? `<button class="ev-link" onclick="openEvidencePanel('${esc(vendor)}','${c.id}')" title="View source document"><i data-lucide="external-link" style="width:12px; height:12px;"></i> View doc</button>`
+        : `<span style="color:#9CA3AF; font-size:12px;">—</span>`;
       return `<tr>
         <td><div class="crit-name">${esc(c.short)}</div><div class="crit-desc">${esc(c.full)}</div></td>
         <td><div class="crit-sub">${esc(pqRequirement(c.id))}</div></td>
         <td>${submittedCell}</td>
+        <td>${evidenceCell}</td>
         <td>${trigger}</td>
-        <td style="text-align:center;">${noteBtn}</td>
       </tr>${clarSubRowHTML(vendor, c.id, 'PQ', 5)}`;
     }).join('');
 
@@ -1692,8 +1929,8 @@
       </div>
       <div style="border:1px solid #E5E7EB; border-radius:12px; overflow:hidden;">
         <table class="crit-table" style="table-layout:fixed;">
-          <colgroup><col style="width:25%"><col style="width:25%"><col style="width:25%"><col style="width:15%"><col style="width:10%"></colgroup>
-          <thead><tr><th>Criterion</th><th>Requirement</th><th>Submitted Value</th><th>Verdict</th><th style="text-align:center;">Notes</th></tr></thead>
+          <colgroup><col style="width:24%"><col style="width:22%"><col style="width:24%"><col style="width:13%"><col style="width:17%"></colgroup>
+          <thead><tr><th>Criterion</th><th>Requirement</th><th>Submitted Value</th><th>Evidence</th><th>Verdict</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       </div>
@@ -1703,13 +1940,193 @@
     return { incorp:'Certificate of incorporation', pangst:'Valid PAN + GST', moa:'MOA / AOA on file', turnover:'Avg ≥ ₹22.5L over 3 yrs', audit:'Audited P&L + balance sheet', iso:'≥ 1 ISO cert', blacklist:'Non-blacklisting declaration', wo:'80-60-40 work-order rule' }[id] || '—';
   }
   function setPqVerdict(vendor, critId, val){
+    const prev = (EVAL.matrix[vendor]||{})[critId];
     EVAL.matrix[vendor] = EVAL.matrix[vendor] || {};
     EVAL.matrix[vendor][critId] = val;
-    // When verdict changes to Pass / Fail / Pending, drop any clarification record on this cell
     if (val !== 'clarif'){
       EVAL.clarifications = (EVAL.clarifications||[]).filter(c => !(c.vendorId === vendor && c.criterionId === critId));
     }
+    const cShort = (PQ_CRITERIA.find(c=>c.id===critId)||{}).short || critId;
+    if (prev && prev !== val) log('PQ Evaluation', 'verdict_changed', `${cShort} · ${vendor} · ${prev} → ${val}`);
+    else log('PQ Evaluation', 'verdict_saved', `${cShort} · ${vendor} · ${val}`);
     renderTechnical(); saveState();
+  }
+
+  // ===================== EVIDENCE PANEL (Change 1) =====================
+  // Per-vendor evidence map — keyed by criterion id, returns the document file name
+  function evidenceDocFor(vendor, critId){
+    const p = PARSED_TECH[vendor] || {};
+    const map = {
+      incorp:    p['CIN'] && p['CIN'] !== '—' ? 'certificate_of_incorporation.pdf' : null,
+      pangst:    (p['PAN'] && p['GST Number']) ? 'pan_gst_documents.pdf' : null,
+      moa:       p['Company Type'] !== 'Partnership' ? 'moa_aoa.pdf' : null,
+      turnover:  p['Turnover (Last 3 yr avg)'] ? 'ca_turnover_certificate.pdf' : null,
+      audit:     'audited_balance_sheet_3yrs.pdf',
+      iso:       (p['ISO Certifications'] && p['ISO Certifications'] !== 'Not found') ? 'iso_9001_certificate.pdf' : null,
+      blacklist: 'non_blacklisting_declaration.pdf',
+      wo:        (p['Similar Work Orders'] && parseInt(p['Similar Work Orders']) > 0) ? 'work_order_evidence.pdf' : null,
+    };
+    return map[critId] || null;
+  }
+  function openEvidencePanel(vendor, critId){
+    closeBidDoc(); closeClarPanel(); closePqPopover();
+    const docName = evidenceDocFor(vendor, critId);
+    if (!docName) return;
+    const crit = (PQ_CRITERIA.find(c => c.id === critId) || { short:critId });
+    const back = document.getElementById('evBackdrop');
+    const panel = document.getElementById('evPanel');
+    panel.innerHTML = `<div class="bid-doc-header">
+        <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+          <i data-lucide="file-text" style="width:18px; height:18px; color:#0F5EE8; flex-shrink:0;"></i>
+          <div style="min-width:0;">
+            <div class="text-[14px] font-bold text-ink-900 truncate" style="font-family:'DM Sans', sans-serif;">${esc(docName)}</div>
+            <div class="text-[11px]" style="color:#9CA3AF; font-family:'DM Sans', sans-serif;">${esc(vendor)} · ${esc(crit.short)}</div>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+          <button onclick="showToast('Downloading ${esc(docName)}…')" class="inline-flex items-center gap-1.5" style="border:1px solid #E5E7EB; background:white; color:#374151; border-radius:8px; padding:6px 12px; font-size:12px; font-family:'DM Sans', sans-serif; cursor:pointer;">
+            <i data-lucide="download" style="width:13px; height:13px;"></i> Download
+          </button>
+          <button onclick="closeEvidencePanel()" aria-label="Close" style="background:transparent; border:none; cursor:pointer; color:#6B7280; font-size:20px; line-height:1; padding:4px 8px;">×</button>
+        </div>
+      </div>
+      <div class="bid-doc-body ev-doc">${evidenceDocHTML(vendor, critId)}</div>`;
+    back.classList.add('open');
+    panel.classList.add('open');
+    log('PQ Evaluation', 'evidence_viewed', `${crit.short} · ${vendor}`);
+    refreshIcons();
+  }
+  function closeEvidencePanel(){
+    const back = document.getElementById('evBackdrop');
+    const panel = document.getElementById('evPanel');
+    if (back) back.classList.remove('open');
+    if (panel) panel.classList.remove('open');
+  }
+  function evidenceDocHTML(vendor, critId){
+    const p = PARSED_TECH[vendor] || {};
+    const company = (vendor === 'Rajesh Constructions') ? 'RAJESH CONSTRUCTIONS PRIVATE LIMITED' : (vendor.toUpperCase() + ' PRIVATE LIMITED');
+    const cin = p['CIN'] || 'U72900MH2019PTC123456';
+    const pan = p['PAN'] || 'AAACR1234Q';
+    const gst = p['GST Number'] || '27AAACR1234Q1Z5';
+    const turnover3yr = p['Turnover (Last 3 yr avg)'] || '₹1,42,00,000';
+    switch (critId){
+      case 'incorp': return `
+        <h3>MINISTRY OF CORPORATE AFFAIRS<br>GOVERNMENT OF INDIA</h3>
+        <div class="rule"></div>
+        <h3 style="margin-top:14px;">CERTIFICATE OF INCORPORATION</h3>
+        <div style="margin-top:16px;">Company Name: <strong>${esc(company)}</strong></div>
+        <div>Corporate Identity Number: <strong>${esc(cin)}</strong></div>
+        <div>Date of Incorporation: 14th March 2019</div>
+        <div>Category: Company limited by shares</div>
+        <div>Sub-Category: Indian Non-Government Company</div>
+        <div style="margin-top:14px;">I hereby certify that ${esc(company)} is incorporated under the Companies Act, 2013 and that the company is limited by shares.</div>
+        <div style="margin-top:14px;">Given under my hand at Mumbai this Fourteenth day of March 2019.</div>
+        <div class="seal-area"><div>[Digital Signature]<br>Registrar of Companies<br>Mumbai, Maharashtra</div><div style="text-align:right;">[MCA SEAL]</div></div>`;
+      case 'pangst': return `
+        <h3>INCOME TAX DEPARTMENT<br>GOVERNMENT OF INDIA</h3>
+        <div class="rule"></div>
+        <h3>PERMANENT ACCOUNT NUMBER CARD</h3>
+        <div class="pan-card">
+          <div class="pan-label">Permanent Account Number</div>
+          <div class="pan-num">${esc(pan)}</div>
+          <div style="font-size:13px; font-weight:600;">${esc(company)}</div>
+          <div style="font-size:11px; opacity:0.85; margin-top:4px;">Date of incorporation: 14/03/2019</div>
+          <div style="font-size:11px; opacity:0.85;">Father's name: N/A (Company)</div>
+        </div>
+        <div style="margin-top:24px;"><strong>Linked GST Registration</strong></div>
+        <table style="margin-top:8px;"><tbody>
+          <tr><th>PAN</th><td>${esc(pan)}</td></tr>
+          <tr><th>GSTIN</th><td>${esc(gst)}</td></tr>
+          <tr><th>Legal name</th><td>${esc(company)}</td></tr>
+          <tr><th>Status</th><td>Active</td></tr>
+        </tbody></table>`;
+      case 'moa': return `
+        <h3>MEMORANDUM OF ASSOCIATION &amp; ARTICLES OF ASSOCIATION</h3>
+        <div class="rule"></div>
+        <div style="margin-top:14px;"><strong>Company:</strong> ${esc(company)}</div>
+        <div><strong>CIN:</strong> ${esc(cin)}</div>
+        <div style="margin-top:14px;">The Memorandum and Articles of Association of the Company are duly registered with the Registrar of Companies, Mumbai, Maharashtra under the Companies Act, 2013.</div>
+        <div style="margin-top:8px;">Main Objects of the Company include the supply, installation and maintenance of information technology equipment, computer hardware and peripherals to government departments, public sector undertakings and commercial organisations.</div>
+        <div style="margin-top:14px;">A duly notarised true copy of the MOA and AOA is annexed as <strong>Annexure A-4</strong> with this bid.</div>
+        <div class="seal-area"><div>For ${esc(company)}<br>[Authorised Signatory]</div><div style="text-align:right;">[Company Seal]</div></div>`;
+      case 'turnover': return `
+        <h3>Priya Mehta &amp; Associates<br><span style="font-size:12px; font-weight:400;">Chartered Accountants</span></h3>
+        <div style="text-align:center; font-size:11px; color:#374151;">Office: 45, Fort Area, Mumbai – 400001<br>Phone: 022-2345-6789 | ICAI FRN: 123456W</div>
+        <div class="rule"></div>
+        <h3>CERTIFICATE OF TURNOVER</h3>
+        <div style="margin-top:14px;">This is to certify that <strong>M/s ${esc(company)}</strong> (CIN: ${esc(cin)}) has achieved the following annual turnover as per their audited financial statements:</div>
+        <table style="margin-top:10px;"><thead><tr><th>Financial Year</th><th>Total Turnover (₹)</th></tr></thead><tbody>
+          <tr><td>FY 2022-23</td><td>₹1,28,00,000 (Rupees One Crore Twenty-Eight Lakhs only)</td></tr>
+          <tr><td>FY 2023-24</td><td>₹1,45,00,000 (Rupees One Crore Forty-Five Lakhs only)</td></tr>
+          <tr><td>FY 2024-25</td><td>₹1,53,00,000 (Rupees One Crore Fifty-Three Lakhs only)</td></tr>
+          <tr style="background:#F9FAFB;"><th>Average (3 years)</th><td><strong>${esc(turnover3yr)}</strong></td></tr>
+        </tbody></table>
+        <div style="margin-top:12px;">The above figures are as per the audited Balance Sheets and Profit &amp; Loss Accounts duly audited by us.</div>
+        <div style="margin-top:8px;">This certificate is issued for the purpose of submission in government tenders.</div>
+        <div class="seal-area"><div>CA Priya Mehta<br>Membership No.: MH-456789<br>UAN: 123456<br>Date: 10th May 2026<br>Place: Mumbai</div><div style="text-align:right;">[Stamp &amp; Signature]</div></div>`;
+      case 'audit': return `
+        <h3>AUDITED FINANCIAL STATEMENTS — LAST 3 YEARS</h3>
+        <div class="rule"></div>
+        <div style="margin-top:14px;">Audited Balance Sheets and Profit &amp; Loss Accounts of <strong>${esc(company)}</strong> for FY 2022-23, FY 2023-24 and FY 2024-25 — audited and certified by <em>Priya Mehta &amp; Associates, Chartered Accountants (ICAI FRN: 123456W)</em>.</div>
+        <table style="margin-top:14px;"><thead><tr><th>Year</th><th>Revenue (₹)</th><th>PAT (₹)</th><th>Audit Opinion</th></tr></thead><tbody>
+          <tr><td>FY 2022-23</td><td>₹1,28,00,000</td><td>₹14,20,000</td><td>Unqualified</td></tr>
+          <tr><td>FY 2023-24</td><td>₹1,45,00,000</td><td>₹16,75,000</td><td>Unqualified</td></tr>
+          <tr><td>FY 2024-25</td><td>₹1,53,00,000</td><td>₹18,80,000</td><td>Unqualified</td></tr>
+        </tbody></table>
+        <div style="margin-top:14px;">Complete audited statements are annexed as <strong>Annexure A-5</strong>.</div>`;
+      case 'iso': return `
+        <h3>BUREAU VERITAS CERTIFICATION</h3>
+        <div class="rule"></div>
+        <h3 style="margin-top:14px;">CERTIFICATE OF REGISTRATION</h3>
+        <div style="margin-top:14px;">This is to certify that the Quality Management System of:</div>
+        <div style="margin-top:8px; font-weight:700;">${esc(company)}<br>123, Business Park, Andheri East,<br>Mumbai – 400069, Maharashtra, India</div>
+        <div style="margin-top:14px;">has been assessed and found to conform to the requirements of:</div>
+        <div style="margin-top:8px; font-weight:700; font-size:14px;">ISO 9001:2015 — Quality Management Systems — Requirements</div>
+        <div style="margin-top:14px;"><strong>Scope:</strong> Supply, installation and maintenance of IT equipment and desktop computers for government and commercial organizations.</div>
+        <table style="margin-top:12px;"><tbody>
+          <tr><th>Certificate Number</th><td>QMS-BV-2024-IN-12345</td></tr>
+          <tr><th>Issue Date</th><td>15th March 2024</td></tr>
+          <tr><th>Valid Until</th><td>14th March 2027</td></tr>
+          <tr><th>Initial Certification Date</th><td>15th March 2021</td></tr>
+        </tbody></table>
+        <div class="seal-area"><div>[Certification Body Signature &amp; Seal]<br>Bureau Veritas Certification India Pvt Ltd</div><div style="text-align:right;">Accreditation: NABCB QM 017</div></div>`;
+      case 'blacklist': return `
+        <h3>NON-BLACKLISTING DECLARATION<br><span style="font-size:11px; font-weight:400;">(On Company Letterhead)</span></h3>
+        <div class="rule"></div>
+        <div style="margin-top:14px;">To,<br>The Tender Inviting Authority,<br>Ahmedabad Municipal Corporation,<br>Ahmedabad.</div>
+        <div style="margin-top:14px;"><strong>Subject:</strong> Declaration regarding non-blacklisting</div>
+        <div style="margin-top:14px;">I, Rajesh Kumar, Managing Director of <strong>M/s ${esc(company)}</strong>, do hereby solemnly declare and affirm as under:</div>
+        <ol style="margin:8px 0 0 22px;">
+          <li style="margin-bottom:8px;">That our company has not been blacklisted or debarred by any Government Department, PSU, Autonomous Body or any other Government Organization in India.</li>
+          <li style="margin-bottom:8px;">That no criminal proceedings are pending against the company or its directors.</li>
+          <li style="margin-bottom:8px;">That the company is not under liquidation or winding up proceedings.</li>
+        </ol>
+        <div style="margin-top:14px;">I am competent to make this declaration on behalf of the company.</div>
+        <div class="seal-area"><div>Signature: _______________<br>Name: Rajesh Kumar<br>Designation: Managing Director<br>Date: 14th May 2026<br>Place: Mumbai</div><div style="text-align:right;">Company Seal:<br>[SEAL]</div></div>`;
+      case 'wo': return `
+        <h3>MAHARASHTRA INFORMATION TECHNOLOGY CORPORATION<br><span style="font-size:11px; font-weight:400;">MANTRALAYA, MUMBAI – 400032</span></h3>
+        <div class="rule"></div>
+        <h3 style="margin-top:14px;">WORK ORDER</h3>
+        <table style="margin-top:14px;"><tbody>
+          <tr><th>Work Order No.</th><td>MITC/IT/WO/2023/145</td></tr>
+          <tr><th>Date</th><td>15th January 2023</td></tr>
+        </tbody></table>
+        <div style="margin-top:14px;">To,<br>M/s ${esc(company)},<br>Mumbai.</div>
+        <div style="margin-top:14px;"><strong>Sub:</strong> Supply and Installation of Desktop Computers at MITC Offices across Maharashtra</div>
+        <div style="margin-top:14px;">Dear Sir,</div>
+        <div style="margin-top:8px;">With reference to your offer and subsequent negotiations, you are hereby awarded the work of:</div>
+        <div style="margin-top:8px; font-style:italic;">"Supply and Installation of 300 Desktop Computers (Core i5, 16GB RAM, 512GB SSD) with peripherals at MITC District Offices"</div>
+        <div style="margin-top:14px;"><strong>Value of Work Order:</strong> ₹1,20,00,000 (Rupees One Crore Twenty Lakhs only)</div>
+        <div><strong>Completion Period:</strong> 6 months from date of this order</div>
+        <div style="margin-top:14px;"><strong>Terms &amp; Conditions:</strong></div>
+        <ol style="margin:6px 0 0 22px;">
+          <li>Delivery as per schedule</li>
+          <li>Performance security @ 5% within 15 days</li>
+          <li>Defect liability period: 12 months</li>
+        </ol>
+        <div class="seal-area"><div>Authorised Signatory<br>[Name &amp; Designation]<br>Maharashtra IT Corporation<br>[Stamp &amp; Seal]</div><div style="text-align:right;">Completion Certificate<br>issued on: 20th June 2023</div></div>`;
+      default: return '<div>Document not available.</div>';
+    }
   }
 
   // ===================== PQ VERDICT POPOVER (Change 2a) =====================
@@ -1817,6 +2234,7 @@
   // mode: 'new' | 'draft' | 'edit' | 'view'
   function openClarPanel(vendor, critId, section, mode){
     closeBidDoc();
+    closeEvidencePanel();
     closePqPopover();
     let rec = findClarRecord(vendor, critId);
     if (!rec){
@@ -2002,6 +2420,7 @@ Date: ${esc(fmtDateShort(today))}`;
     if (!(rec.recipients||[]).length){ showToast('Add at least one recipient before sending'); return; }
     rec.status = 'sent';
     rec.sentAt = todayISO();
+    log(rec.section==='TQ'?'TQ Evaluation':'PQ Evaluation', 'clarification_sent', `${rec.vendorId} · ${rec.criterionId} · ${rec.recipients.length} recipients`);
     saveState(); renderTechnical(); closeClarPanel();
     showToast('Clarification request recorded as sent');
   }
@@ -2024,7 +2443,7 @@ Date: ${esc(fmtDateShort(today))}`;
     if (!rec) return;
     rec.status = 'received';
     rec.receivedAt = todayISO();
-    // Verdict remains 'clarif' (amber) per spec — officer manually updates afterwards
+    log(rec.section==='TQ'?'TQ Evaluation':'PQ Evaluation', 'clarification_received', `${vendor} · ${critId}`);
     saveState(); renderTechnical();
     showToast('Clarification marked as received');
   }
@@ -2066,6 +2485,7 @@ Date: ${esc(fmtDateShort(today))}`;
     if (!allDone){ showToast('Resolve all pending PQ verdicts first'); return; }
     EVAL.pqConfirmed = true;
     EVAL.expanded = 's3';
+    log('PQ Evaluation', 'pq_confirmed', `${EVAL.bids.length} vendors`);
     renderTechnical(); saveState();
     showToast('PQ Evaluation confirmed — TQ unlocked');
   }
@@ -2077,44 +2497,243 @@ Date: ${esc(fmtDateShort(today))}`;
       return `<div style="background:#FFFBEB; border:1px solid #FDE68A; color:#92400E; border-radius:10px; padding:14px 16px; font-size:13px;"><i data-lucide="alert-triangle" class="w-4 h-4 inline-block -mt-0.5 mr-1"></i> Complete PQ Evaluation for all vendors first</div>`;
     }
     const vendor = EVAL.activeVendor;
-    const m = EVAL.matrix[vendor] || {};
-    const rows = TQ_CRITERIA.map(c => {
-      const val = typeof m[c.id] === 'number' ? m[c.id] : '';
-      const aiScore = aiTQ(vendor, c.id);
-      const note = (EVAL.notes||{})[vendor+'|'+c.id] || '';
-      const hasClar = !!findClarRecord(vendor, c.id);
-      const noteBtn = `<button class="note-icon-btn" title="${note ? 'Note: '+esc(note) : 'Add note'}" onclick="editNote('${esc(vendor)}','${c.id}')"><i data-lucide="${note?'sticky-note':'pencil'}" class="w-4 h-4"></i></button>`;
-      const clarLink = hasClar ? '' : ` <a href="#" onclick="openClarPanel('${esc(vendor)}','${c.id}','TQ','new'); return false;" class="text-[12px] hover:underline" style="color:#F59E0B; margin-left:8px;" title="Request clarification from vendor">Need clarification?</a>`;
-      return `<tr>
-        <td><div class="crit-name">${esc(c.short)}</div><div class="crit-desc">${esc(c.full)}</div></td>
-        <td><div class="crit-sub">Max ${c.max} marks</div></td>
-        <td><div class="crit-sub">Auto-detected from bid</div></td>
-        <td>
-          <input type="number" class="tq-score-input" min="0" max="${c.max}" value="${val}" oninput="setTqScore('${esc(vendor)}','${c.id}', this.value)" /> <span style="color:#6B7280; font-size:13px;">/ ${c.max}</span>${clarLink}
-          <div style="font-size:12px; color:#9CA3AF; margin-top:4px;">AI suggests: ${aiScore}</div>
-        </td>
-        <td style="text-align:center;">${noteBtn}</td>
-      </tr>${clarSubRowHTML(vendor, c.id, 'TQ', 5)}`;
+
+    // === Committee status header (Change 2) ===
+    const memStatus = COMMITTEE_MEMBERS.map(mb => {
+      const submitted = ((EVAL.tqMemberSubmitted||{})[vendor]||{})[mb.id];
+      const cls = submitted ? 'done' : 'pending';
+      const icon = submitted ? '✓' : '⏳';
+      return `<span class="mem ${cls}">${esc(mb.name)} ${icon}</span>`;
     }).join('');
-    const total = TQ_CRITERIA.reduce((sum, c) => sum + (typeof m[c.id] === 'number' ? m[c.id] : 0), 0);
-    const maxTotal = TQ_CRITERIA.reduce((s,c) => s + c.max, 0);
-    const totalRow = `<tr style="background:#F9FAFB;"><td colspan="3" style="font-weight:700; color:#111827;">TQ Score</td><td style="font-weight:700; color:#111827;">${total} / ${maxTotal}</td><td></td></tr>`;
-    const allScored = EVAL.bids.every(b => TQ_CRITERIA.every(c => typeof (EVAL.matrix[b.vendor]||{})[c.id] === 'number'));
-    const confirmBtn = `<button onclick="confirmTQ()" class="px-4 py-2 rounded-lg ${allScored?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-medium" ${allScored?'':'disabled'}>Confirm TQ Evaluation</button>`;
-    return `<div class="flex items-center justify-between gap-3 flex-wrap mb-2">
-        <div class="text-[12.5px] text-ink-500">Score each criterion out of its maximum. Running total updates live.</div>
-        <button onclick="aiPrescreenTQ()" class="px-3 py-1.5 rounded-lg border border-primary text-primary text-[12px] font-medium hover:bg-primary-light inline-flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> ✦ AI Pre-score TQ</button>
+    const committeeBar = `<div class="ct-status-bar">
+        <div class="left">Committee scoring — minimum 3 members required</div>
+        <div class="right" aria-live="polite">${memStatus}</div>
+      </div>`;
+
+    // === Vendor presentations sub-section (Change 3) — collapsed by default ===
+    const presOpen = !!EVAL.presOpen;
+    const presBlock = `<div class="pres-toggle ${presOpen?'open':''}" onclick="togglePresSection()" role="button" aria-expanded="${presOpen?'true':'false'}">
+        <div class="left"><i data-lucide="presentation" style="width:16px; height:16px; color:#8B5CF6;"></i><span style="font-size:14px; font-weight:700; color:#111827;">Vendor Presentations</span><span style="font-size:12px; color:#9CA3AF;">Optional — for tenders requiring demonstration</span></div>
+        <div style="display:flex; align-items:center; gap:8px;"><span style="font-size:12px; color:#0F5EE8;">Upload ▾</span><i data-lucide="chevron-down" class="chev w-3.5 h-3.5"></i></div>
       </div>
+      <div class="pres-zone ${presOpen?'open':''}">
+        <div class="pres-info">ℹ Presentations are held during the technical evaluation phase for complex or high-value tenders. Record video evidence and scores here for audit purposes. GFR guidelines require all evaluation criteria and scores to be documented.</div>
+        <div style="border:1px solid #E5E7EB; border-radius:10px; overflow:hidden; margin-bottom:18px;">
+          <table class="pres-table">
+            <thead><tr><th style="width:22%;">Vendor</th><th style="width:18%;">Presentation</th><th style="width:18%;">Video / Demo</th><th style="width:24%;">Score contribution</th><th style="width:18%;">Notes</th></tr></thead>
+            <tbody>${EVAL.bids.map(b => renderPresRow(b.vendor)).join('')}</tbody>
+          </table>
+        </div>
+      </div>`;
+
+    // === Criterion rows with 3-member columns (Change 2) ===
+    const memHeader = mb => {
+      const sub = ((EVAL.tqMemberSubmitted||{})[vendor]||{})[mb.id];
+      return `<th><span class="mh" title="${esc(mb.name)} · ${esc(mb.designation)}">${esc(mb.name)}${mb.isYou?' (you)':''}</span><span class="ms ${sub?'done':'pending'}">${sub?'✓ Scored':'Pending'}</span></th>`;
+    };
+    const rows = TQ_CRITERIA.map(c => renderTqRow(c, vendor)).join('');
+
+    // === Submit button (logged-in user only) ===
+    const meSubmitted = ((EVAL.tqMemberSubmitted||{})[vendor]||{}).rk;
+    const meAllScored = TQ_CRITERIA.every(c => typeof (((EVAL.tqMemberScores||{})[vendor]||{})[c.id]||{}).rk === 'number');
+    const submitBtn = meSubmitted
+      ? `<button class="px-4 py-2 rounded-lg bg-success-light text-success border border-success text-[13px] font-medium cursor-not-allowed" disabled>Submitted ✓ — ${esc(vendor)}</button>`
+      : `<button onclick="submitMyTqScores('${esc(vendor)}')" class="px-4 py-2 rounded-lg ${meAllScored?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-medium" ${meAllScored?'':'disabled'}>Submit my scores for ${esc(vendor)} →</button>`;
+
+    // === Confirm TQ Evaluation gate (all members for all vendors) ===
+    const allDoneEverywhere = EVAL.bids.every(b => COMMITTEE_MEMBERS.every(mb => ((EVAL.tqMemberSubmitted||{})[b.vendor]||{})[mb.id]));
+    const confirmBtn = `<button onclick="confirmTQ()" class="px-4 py-2 rounded-lg ${allDoneEverywhere?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-medium" ${allDoneEverywhere?'':'disabled'}>Confirm TQ Evaluation</button>`;
+
+    // === Per-vendor "all 3 submitted" banner ===
+    const allSubmittedForVendor = COMMITTEE_MEMBERS.every(mb => ((EVAL.tqMemberSubmitted||{})[vendor]||{})[mb.id]);
+    const completeBanner = allSubmittedForVendor
+      ? `<div style="background:#F0FDF4; border:1px solid #BBF7D0; color:#065F46; border-radius:8px; padding:10px 14px; font-size:13px; font-weight:600; margin-top:14px;">✓ TQ scoring complete for ${esc(vendor)} — committee average finalised</div>`
+      : '';
+
+    return `<div class="flex items-center justify-between gap-3 flex-wrap mb-2">
+        <div class="text-[12.5px] text-ink-500">Each criterion is scored by three committee members. Average is auto-computed; verdict is the final allocated marks.</div>
+        <button onclick="aiPrescreenTQ()" class="px-3 py-1.5 rounded-lg border border-primary text-primary text-[12px] font-medium hover:bg-primary-light inline-flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> ✦ AI Pre-score TQ (your column)</button>
+      </div>
+      ${committeeBar}
       ${vendorTabsHTML('tq')}
+      ${presBlock}
       <div class="text-[13.5px] font-bold text-ink-900 mb-2">${esc(vendor)}</div>
       <div style="border:1px solid #E5E7EB; border-radius:12px; overflow:hidden;">
-        <table class="crit-table" style="table-layout:fixed;">
-          <colgroup><col style="width:25%"><col style="width:25%"><col style="width:25%"><col style="width:15%"><col style="width:10%"></colgroup>
-          <thead><tr><th>Criterion</th><th>Requirement</th><th>Submitted Value</th><th>Score</th><th style="text-align:center;">Notes</th></tr></thead>
-          <tbody>${rows}${totalRow}</tbody>
+        <table class="tq-comm-table" style="table-layout:fixed;">
+          <colgroup><col style="width:22%"><col style="width:9%"><col style="width:13%"><col style="width:13%"><col style="width:13%"><col style="width:13%"><col style="width:17%"></colgroup>
+          <thead><tr><th>Criterion</th><th>Max marks</th>${COMMITTEE_MEMBERS.map(memHeader).join('')}<th>Average</th><th>Verdict</th></tr></thead>
+          <tbody>${rows}</tbody>
         </table>
       </div>
-      <div class="flex justify-end mt-3">${confirmBtn}</div>`;
+      ${completeBanner}
+      <div class="flex justify-between items-center mt-4 flex-wrap gap-2">${submitBtn}${confirmBtn}</div>`;
+  }
+  // === Committee scoring helpers (Change 2) ===
+  function memberScore(vendor, critId, memberId){
+    const v = ((EVAL.tqMemberScores||{})[vendor]||{})[critId];
+    return v && typeof v[memberId] === 'number' ? v[memberId] : null;
+  }
+  function memberAvg(vendor, critId){
+    const scores = COMMITTEE_MEMBERS.map(mb => memberScore(vendor, critId, mb.id)).filter(v => typeof v === 'number');
+    if (!scores.length) return { avg:null, count:0 };
+    return { avg: scores.reduce((s,v) => s+v, 0) / scores.length, count: scores.length };
+  }
+  function tieredMarks(critId, avg, max){
+    if (avg == null) return null;
+    // For WO + ISO tier — avg ≥ 8 → 10, ≥ 5 → 5, ≥ 2 → 2, else 0
+    if (critId === 'woscore' || critId === 'isoscore'){
+      if (avg >= 8) return 10;
+      if (avg >= 5) return 5;
+      if (avg >= 2) return 2;
+      return 0;
+    }
+    return Math.round(avg);
+  }
+  function renderTqRow(c, vendor){
+    const cellHTML = (mb) => {
+      const sc = memberScore(vendor, c.id, mb.id);
+      const submitted = ((EVAL.tqMemberSubmitted||{})[vendor]||{})[mb.id];
+      if (mb.isYou){
+        if (submitted){
+          return `<td class="tq-member-cell"><span class="scored">${sc != null ? sc : '—'}</span> <span style="color:#6B7280; font-size:11px;">/ ${c.max}</span></td>`;
+        }
+        return `<td class="tq-member-cell"><input class="tq-score-in" type="number" min="0" max="${c.max}" value="${sc != null ? sc : ''}" oninput="setMemberScore('${esc(vendor)}','${c.id}','rk', this.value)" /> <span style="color:#6B7280; font-size:11px;">/ ${c.max}</span></td>`;
+      }
+      if (sc != null) return `<td class="tq-member-cell"><span class="scored-other">${sc}</span> <span style="color:#6B7280; font-size:11px;">/ ${c.max}</span></td>`;
+      return `<td class="tq-member-cell"><span class="pending-pill">Pending</span> <button class="remind" onclick="sendMemberReminder('${esc(mb.name)}')">Remind</button></td>`;
+    };
+    const { avg, count } = memberAvg(vendor, c.id);
+    const avgCell = avg != null
+      ? `<td class="tq-avg"><span class="avg-num" style="color:${count===3?'#0F5EE8':'#374151'};">${avg.toFixed(1)}</span><span class="avg-count ${count===3?'complete':'partial'}">(${count}/3)${count<3?' · Provisional':''}</span></td>`
+      : `<td class="tq-avg"><span class="avg-num" style="color:#9CA3AF;">—</span><span class="avg-count partial">(0/3)</span></td>`;
+    const marks = tieredMarks(c.id, avg, c.max);
+    const verdictCell = marks != null
+      ? `<td class="tq-verdict"><span class="pill">${marks} / ${c.max}</span></td>`
+      : `<td class="tq-verdict"><span class="pill pending">Pending</span></td>`;
+    return `<tr>
+      <td><div style="font-weight:600; color:#111827; font-size:14px;">${esc(c.short)}</div><div style="font-size:12px; color:#6B7280; margin-top:2px;">${esc(c.full)}</div></td>
+      <td><span style="font-size:13px; color:#374151;">${c.max}</span></td>
+      ${COMMITTEE_MEMBERS.map(cellHTML).join('')}
+      ${avgCell}
+      ${verdictCell}
+    </tr>`;
+  }
+  function setMemberScore(vendor, critId, memberId, raw){
+    const c = TQ_CRITERIA.find(x => x.id === critId); if (!c) return;
+    const n = parseInt(raw);
+    const old = memberScore(vendor, critId, memberId);
+    EVAL.tqMemberScores[vendor] = EVAL.tqMemberScores[vendor] || {};
+    EVAL.tqMemberScores[vendor][critId] = EVAL.tqMemberScores[vendor][critId] || { rk:null, ps:null, ap:null };
+    if (isNaN(n)){ EVAL.tqMemberScores[vendor][critId][memberId] = null; }
+    else { EVAL.tqMemberScores[vendor][critId][memberId] = Math.max(0, Math.min(c.max, n)); }
+    saveState();
+    // Update matrix with tiered/averaged final mark so downstream verdict still computes
+    const { avg } = memberAvg(vendor, critId);
+    const final = tieredMarks(critId, avg, c.max);
+    EVAL.matrix[vendor] = EVAL.matrix[vendor] || {};
+    if (final != null) EVAL.matrix[vendor][critId] = final;
+    const mbName = (COMMITTEE_MEMBERS.find(m => m.id===memberId)||{}).name || memberId;
+    if (old != null && old !== EVAL.tqMemberScores[vendor][critId][memberId]) log('TQ Evaluation', 'score_edited', `${c.short} · ${vendor} · ${mbName}: ${old}→${EVAL.tqMemberScores[vendor][critId][memberId]}`);
+    else log('TQ Evaluation', 'score_entered', `${c.short} · ${vendor} · ${mbName}: ${EVAL.tqMemberScores[vendor][critId][memberId]}`);
+  }
+  function submitMyTqScores(vendor){
+    const allScored = TQ_CRITERIA.every(c => typeof (((EVAL.tqMemberScores||{})[vendor]||{})[c.id]||{}).rk === 'number');
+    if (!allScored){ showToast('Score all criteria for this vendor first'); return; }
+    EVAL.tqMemberSubmitted[vendor] = EVAL.tqMemberSubmitted[vendor] || {};
+    EVAL.tqMemberSubmitted[vendor].rk = true;
+    log('TQ Evaluation', 'score_submitted', `Rajesh Kumar submitted TQ scores for ${vendor}`);
+    saveState(); renderTechnical();
+    showToast('Your TQ scores submitted for '+vendor);
+  }
+  function sendMemberReminder(memberName){
+    showToast('Reminder sent to '+memberName);
+  }
+  // === Presentation sub-section helpers (Change 3) ===
+  function togglePresSection(){ EVAL.presOpen = !EVAL.presOpen; saveState(); renderTechnical(); }
+  function renderPresRow(vendor){
+    const p = (EVAL.presentations||{})[vendor] || {};
+    const pptCell = p.ppt
+      ? `<span class="pres-chip">📎 ${esc(p.pptName||'pres.pdf')}</span> <button class="ev-link" onclick="openVendorPpt('${esc(vendor)}')">View</button>`
+      : `<button class="pres-upload-btn" onclick="presUploadPpt('${esc(vendor)}')">+ Upload PPT/PDF</button>`;
+    let videoCell;
+    if (p.video || p.videoUrl){
+      videoCell = `<button class="pres-play-btn" onclick="openVideoModal('${esc(vendor)}')">▶ Play</button>`;
+    } else {
+      videoCell = `<button class="pres-upload-btn" onclick="presUploadVideo('${esc(vendor)}')">+ Upload video</button> <button class="pres-upload-btn" onclick="presLinkVideo('${esc(vendor)}')">+ Paste link</button>`;
+    }
+    const toggleHTML = p.includeInTq
+      ? `<span class="toggle-on" onclick="togglePresInclude('${esc(vendor)}')" role="switch" aria-checked="true"></span> <input type="number" min="0" max="20" value="${p.marks||0}" oninput="setPresMarks('${esc(vendor)}', this.value)" style="width:55px; border:1px solid #D1D5DB; border-radius:6px; padding:4px 8px; font-size:12.5px; text-align:center;" /> <span style="font-size:11px; color:#6B7280;">/ 20</span>`
+      : `<span class="toggle-off" onclick="togglePresInclude('${esc(vendor)}')" role="switch" aria-checked="false"></span> <span style="font-size:11px; color:#9CA3AF;">Include in TQ scoring</span>`;
+    const notesCell = `<input class="pres-note-input" type="text" placeholder="Notes…" value="${esc(p.notes||'')}" oninput="setPresNotes('${esc(vendor)}', this.value)" />`;
+    return `<tr><td><strong>${esc(vendor)}</strong></td><td>${pptCell}</td><td>${videoCell}</td><td>${toggleHTML}</td><td>${notesCell}</td></tr>`;
+  }
+  function presUploadPpt(vendor){
+    EVAL.presentations[vendor] = EVAL.presentations[vendor] || {};
+    EVAL.presentations[vendor].ppt = 'pres_'+vendor.toLowerCase().replace(/[^a-z0-9]+/g,'_')+'.pdf';
+    EVAL.presentations[vendor].pptName = EVAL.presentations[vendor].ppt;
+    log('TQ Evaluation', 'presentation_uploaded', `${vendor} · PPT/PDF`);
+    saveState(); renderTechnical();
+    showToast('Presentation uploaded');
+  }
+  function presUploadVideo(vendor){
+    EVAL.presentations[vendor] = EVAL.presentations[vendor] || {};
+    EVAL.presentations[vendor].video = 'pres_video_'+vendor.toLowerCase().replace(/[^a-z0-9]+/g,'_')+'.mp4';
+    log('TQ Evaluation', 'presentation_uploaded', `${vendor} · Video`);
+    saveState(); renderTechnical();
+    showToast('Presentation video uploaded');
+  }
+  function presLinkVideo(vendor){
+    const url = prompt('Paste YouTube or Google Drive video URL:', 'https://www.youtube.com/embed/dQw4w9WgXcQ');
+    if (!url) return;
+    EVAL.presentations[vendor] = EVAL.presentations[vendor] || {};
+    EVAL.presentations[vendor].videoUrl = url.trim();
+    log('TQ Evaluation', 'presentation_uploaded', `${vendor} · Video link`);
+    saveState(); renderTechnical();
+    showToast('Video link saved');
+  }
+  function openVendorPpt(vendor){
+    showToast('Opening '+((EVAL.presentations[vendor]||{}).pptName||'presentation'));
+    log('TQ Evaluation', 'presentation_viewed', `${vendor} · PPT/PDF`);
+  }
+  function togglePresInclude(vendor){
+    EVAL.presentations[vendor] = EVAL.presentations[vendor] || {};
+    EVAL.presentations[vendor].includeInTq = !EVAL.presentations[vendor].includeInTq;
+    if (EVAL.presentations[vendor].includeInTq && EVAL.presentations[vendor].marks == null) EVAL.presentations[vendor].marks = 10;
+    log('TQ Evaluation', 'presentation_include_toggled', `${vendor} · include=${EVAL.presentations[vendor].includeInTq}`);
+    saveState(); renderTechnical();
+  }
+  function setPresMarks(vendor, val){
+    EVAL.presentations[vendor] = EVAL.presentations[vendor] || {};
+    EVAL.presentations[vendor].marks = parseInt(val) || 0;
+    saveState();
+  }
+  function setPresNotes(vendor, val){
+    EVAL.presentations[vendor] = EVAL.presentations[vendor] || {};
+    EVAL.presentations[vendor].notes = val;
+    saveState();
+  }
+  // === Video modal ===
+  function openVideoModal(vendor){
+    const p = EVAL.presentations[vendor] || {};
+    const modal = document.getElementById('videoModal');
+    if (!modal) return;
+    let media;
+    if (p.videoUrl){
+      media = `<iframe src="${esc(p.videoUrl)}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+    } else if (p.video){
+      media = `<video controls autoplay><source src="${esc(p.video)}" type="video/mp4">Your browser does not support the video tag.</video>`;
+    } else {
+      media = '<div style="padding:60px; color:#9CA3AF; text-align:center;">No video uploaded.</div>';
+    }
+    modal.innerHTML = `<div class="video-modal"><button class="vm-close" onclick="closeVideoModal()" aria-label="Close">×</button>${media}</div>`;
+    modal.classList.add('open');
+    log('TQ Evaluation', 'video_viewed', `${vendor} · presentation video`);
+  }
+  function closeVideoModal(){
+    const modal = document.getElementById('videoModal');
+    if (!modal) return;
+    modal.classList.remove('open');
+    modal.innerHTML = ''; // stop video playback
   }
   function setTqScore(vendor, critId, val){
     const n = parseInt(val);
@@ -2143,8 +2762,9 @@ Date: ${esc(fmtDateShort(today))}`;
     const allScored = EVAL.bids.every(b => TQ_CRITERIA.every(c => typeof (EVAL.matrix[b.vendor]||{})[c.id] === 'number'));
     if (!allScored){ showToast('Score all vendors first'); return; }
     EVAL.tqConfirmed = true;
-    EVAL.t3confirmed = true; // back-compat with Results section
+    EVAL.t3confirmed = true;
     EVAL.expanded = 's4';
+    log('TQ Evaluation', 'tq_confirmed', `${EVAL.bids.length} vendors`);
     renderTechnical(); saveState();
     showToast('TQ Evaluation confirmed — Results unlocked');
   }
@@ -2716,6 +3336,7 @@ Date: ${esc(fmtDateShort(today))}`;
     const bid = { vendor:f.vendor, file:f.file, status:'processing' };
     EVAL.finBids.push(bid);
     EVAL._addFinBid = { vendor:'', file:'', fileSize:'', uploaded:false, progressing:false };
+    log('Upload Financial Bids', 'bid_uploaded', `${f.vendor} · ${bid.file}`);
     renderFinancial(); saveState();
     setTimeout(() => { bid.status='parsed'; renderFinancial(); saveState(); showToast(f.vendor+' financial bid parsed'); }, 1400);
   }
@@ -2761,14 +3382,20 @@ Date: ${esc(fmtDateShort(today))}`;
     const alb = albBid ? { vendor:albBid.vendor, quote:albBid.quote } : null;
     const tName = (EVAL_TENDERS.find(t => t.id===EVAL.tnd)||AWARDED_TENDERS.find(t => t.id===EVAL.tnd)||{}).name || EVAL.tnd;
 
-    // === Dynamic method banner (Change 2) ===
+    // === Dynamic method banner (Change 2) + tender-reference note (Change 4A) ===
     const meta = METHOD_META[m] || METHOD_META.L1;
     const commonBadge = meta.mostCommon ? '<span class="method-badge-common">Most common</span>' : '';
+    const nativeM = EVAL.method || 'L1';
+    const isPreview = m !== nativeM;
+    const refNote = isPreview
+      ? `<div class="preview-ref-note">ℹ You are viewing a preview using ${esc(METHOD_LABELS[m]||m)}. The tender specifies ${esc(METHOD_LABELS[nativeM]||nativeM)} as the evaluation method.</div><div class="preview-ref-sub">This result is for reference only.</div>`
+      : `<div class="tender-ref-note">This evaluation method (${esc(METHOD_LABELS[m]||m)}) was specified in the original tender document (${esc(EVAL.tnd)}, Step 1 — Classification).</div>`;
     const banner = `<div class="method-banner" id="methodBanner" style="background:${meta.bg}; border-color:${meta.border}; color:${meta.text};">
       <i id="mbIcon" data-lucide="${meta.icon}" style="width:18px; height:18px; color:${meta.sub}; flex-shrink:0; margin-top:1px;"></i>
       <div style="flex:1; min-width:0;">
         <div class="text-[13px] font-bold" style="color:${meta.text};"><span id="mbName">${esc(meta.name)}</span>${commonBadge}</div>
         <div class="text-[12px]" id="mbDesc" style="color:${meta.sub};">${esc(meta.desc)}</div>
+        ${refNote}
       </div>
     </div>`;
 
@@ -2776,7 +3403,8 @@ Date: ${esc(fmtDateShort(today))}`;
     const segBtn = (key) => {
       const on = m === key;
       const mm = METHOD_META[key];
-      const badge = mm.mostCommon ? '<span class="method-badge-common">Most common</span>' : '';
+      const isNative = key === nativeM;
+      const badge = mm.mostCommon ? '<span class="method-badge-common">Most common</span>' : (isNative ? '<span class="specified-badge">Specified</span>' : '');
       return `<button data-method="${key}" class="${on?'on':''}" aria-pressed="${on?'true':'false'}" aria-label="Evaluation method ${esc(mm.name)}" onclick="switchMethod('${key}')">${esc(mm.short)}${badge}</button>`;
     };
     const segments = `<div class="method-segments" role="tablist" id="methodSegments" aria-label="Evaluation method">
@@ -2798,6 +3426,7 @@ Date: ${esc(fmtDateShort(today))}`;
   function switchMethod(newM){
     if (!METHOD_META[newM]) return;
     if (newM === EVAL.evaluationMethod) return;
+    log('Financial Evaluation', 'method_switched', `${EVAL.evaluationMethod || 'L1'} → ${newM}`);
     EVAL.evaluationMethod = newM;
     activeView = newM;
     saveState();
@@ -2849,48 +3478,156 @@ Date: ${esc(fmtDateShort(today))}`;
   }
   // Legacy alias — old code paths may still call switchFinView
   function switchFinView(v){ switchMethod(v); }
+  // === Change 4C — winner-first reveal helpers ===
+  function isRevealed(vendor){ return !!(EVAL.finRevealed || {})[vendor]; }
+  function maskedQuoteCell(vendor, quote, isWinner){
+    const reveal = isRevealed(vendor);
+    if (reveal){
+      return `<span class="reveal-anim" style="font-weight:700; color:#111827;">₹${quote.toLocaleString('en-IN')}</span>`;
+    }
+    if (isWinner) return `<span class="reveal-anim" style="font-weight:700; color:#111827;">₹${quote.toLocaleString('en-IN')}</span>`;
+    return `<span class="mask-pill">••••••</span> <button class="eye-btn" onclick="revealVendor('${esc(vendor)}', this)" aria-label="Reveal bid amount for ${esc(vendor)}"><i data-lucide="eye" style="width:14px; height:14px;"></i></button>`;
+  }
+  function maskedPctCell(vendor, pct, isWinner){
+    if (isRevealed(vendor) || isWinner){
+      const color = pct < 0 ? '#065F46' : pct > 10 ? '#991B1B' : pct > 0 ? '#92400E' : '#374151';
+      return `<span class="reveal-anim" style="color:${color}; font-weight:600;">${pct>=0?'+':''}${pct.toFixed(1)}%</span>`;
+    }
+    return `<span class="mask-pill">••••</span>`;
+  }
+  function winnerRevealed(){
+    // Winner = rank 1 under current method
+    const rows = (function(){
+      const m = activeMethod();
+      const ds = tenderDataset();
+      const tq = ds.bids.filter(b => b.pqStatus === 'q');
+      if (m === 'QCBS' || m === 'LCS') return tq.slice().sort((a,b) => (b.combined||0)-(a.combined||0));
+      if (m === 'QBS')                  return tq.slice().sort((a,b) => (b.tq||0)-(a.tq||0));
+      const nonAlb = tq.filter(b => !b.flags.includes('alb')).sort((a,b) => (a.quote||0)-(b.quote||0));
+      const albs   = tq.filter(b =>  b.flags.includes('alb')).sort((a,b) => (a.quote||0)-(b.quote||0));
+      return nonAlb.concat(albs);
+    })();
+    const winner = rows[0];
+    return winner ? !!EVAL.finRevealed[winner.vendor] : false;
+  }
+  function allRevealed(){
+    const ds = tenderDataset();
+    const tq = ds.bids.filter(b => b.pqStatus === 'q');
+    return tq.length > 0 && tq.every(b => !!EVAL.finRevealed[b.vendor]);
+  }
+  function openRevealWinnerModal(){
+    const dlg = document.getElementById('modalDialog'); const bk = document.getElementById('modalBackdrop');
+    if (!dlg) return;
+    dlg.innerHTML = `<div id="modalTitle" style="font-size:17px; font-weight:700; color:#111827; margin-bottom:8px;">Reveal the winning bid?</div>
+      <div style="font-size:13px; color:#374151;">This will show the rank 1 vendor and their quoted amount. All other bids remain sealed until you choose to reveal them.</div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:18px;">
+        <button class="px-4 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface" onclick="closeRevealModal()">Cancel</button>
+        <button class="px-4 py-2 rounded-lg bg-primary text-white text-[13px] font-semibold hover:bg-primary/90" onclick="confirmRevealWinner()">Reveal winner →</button>
+      </div>`;
+    dlg.classList.add('open'); bk.classList.add('open');
+    refreshIcons();
+  }
+  function closeRevealModal(){
+    const dlg = document.getElementById('modalDialog'); const bk = document.getElementById('modalBackdrop');
+    if (dlg) dlg.classList.remove('open'); if (bk) bk.classList.remove('open');
+  }
+  function confirmRevealWinner(){
+    const m = activeMethod();
+    const ds = tenderDataset();
+    const tq = ds.bids.filter(b => b.pqStatus === 'q');
+    let winner;
+    if (m === 'QCBS' || m === 'LCS') winner = tq.slice().sort((a,b) => (b.combined||0)-(a.combined||0))[0];
+    else if (m === 'QBS')            winner = tq.slice().sort((a,b) => (b.tq||0)-(a.tq||0))[0];
+    else {
+      const nonAlb = tq.filter(b => !b.flags.includes('alb')).sort((a,b) => (a.quote||0)-(b.quote||0));
+      const albs   = tq.filter(b =>  b.flags.includes('alb')).sort((a,b) => (a.quote||0)-(b.quote||0));
+      winner = nonAlb.concat(albs)[0];
+    }
+    if (winner){
+      EVAL.finRevealed[winner.vendor] = true;
+      log('Financial Evaluation', 'winner_revealed', `${winner.vendor} · ${fmtINR ? fmtINR(winner.quote) : '₹'+(winner.quote||0).toLocaleString('en-IN')}`);
+    }
+    closeRevealModal();
+    saveState();
+    renderFinancial();
+    refreshIcons();
+  }
+  // Two-click reveal for non-winner rows
+  function revealVendor(vendor, btn){
+    if (btn._armed){
+      EVAL.finRevealed[vendor] = true;
+      const ds = tenderDataset();
+      const b = ds.bids.find(x => x.vendor === vendor);
+      log('Financial Evaluation', 'bid_revealed', `${vendor} · ${b ? '₹'+b.quote.toLocaleString('en-IN') : ''} (revealed by Rajesh Kumar)`);
+      saveState(); renderFinancial(); refreshIcons();
+      return;
+    }
+    btn._armed = true;
+    btn.outerHTML = `<span class="eye-confirm">Click again to reveal</span><button class="eye-btn" onclick="revealVendor('${esc(vendor)}', this)" data-armed="1" aria-label="Confirm reveal"><i data-lucide="eye" style="width:14px; height:14px;"></i></button>`;
+    // After 2s, reset
+    setTimeout(() => { renderFinancial(); refreshIcons(); }, 2000);
+    refreshIcons();
+  }
+  // Render the reveal-winner button + status banner at the top of the active financial view body
+  function revealHeaderHTML(){
+    if (!EVAL.finRun) return '';
+    if (allRevealed()) return `<div style="font-size:12px; color:#10B981; margin-bottom:10px; font-weight:600;">All financial bids have been revealed. Comparison is now complete.</div>`;
+    if (winnerRevealed()) return '';  // winner shown, eye icons appear inline on other rows
+    return `<div class="reveal-banner"><i data-lucide="info" style="width:14px; height:14px;"></i> Financial bid amounts are sealed. Evaluation has been run. Reveal the winner first, then other bids.</div>
+      <div class="reveal-btn-row"><button class="px-5 py-2.5 rounded-lg bg-primary text-white text-[14px] font-bold hover:bg-primary/90 inline-flex items-center gap-2" onclick="openRevealWinnerModal()"><i data-lucide="eye" style="width:16px; height:16px;"></i> Reveal winner</button></div>`;
+  }
+  // Indian-rupee shortcut used by audit log details (small helper, separate from comparative-statement)
+  function fmtINR(n){ if (n==null) return '—'; return '₹'+Number(n).toLocaleString('en-IN'); }
+
   function l1ViewBody(tName){
     const rows = l1Rows();
+    const winnerShown = winnerRevealed();
     const tableRows = rows.map((r,i) => {
       const win = i===0 && !r.alb;
       const dev = ((r.quote-ESTIMATE)/ESTIMATE)*100;
-      const devCls = r.alb?'#991B1B':dev<0?'#065F46':dev>10?'#991B1B':'#92400E';
-      const stat = r.alb ? pill('ALB','#FEF2F2','#991B1B') : win ? pill('L1','#F0FDF4','#065F46') : dev>10 ? pill('High','#FFFBEB','#92400E') : pill('L'+r.rank,'#F3F4F6','#6B7280');
-      return `<tr style="border-bottom:1px solid #F3F4F6; ${win?'background:#F0FDF4;':''}">
-        <td style="${tdS()} ${win?'border-left:3px solid #10B981;':''}">${rankBadgeHTML(r.rank,win)}</td>
-        <td style="${tdS()}"><div class="font-medium text-ink-900">${r.vendor}</div><div class="text-[11px] text-ink-400">TQ Score: ${r.tq}/100</div></td>
-        <td style="${tdS()} ${win?'font-weight:700;':''}">₹${r.quote.toLocaleString('en-IN')}</td>
-        <td style="${tdS()} color:${devCls}; font-weight:600;">${dev>0?'+':''}${dev.toFixed(1)}%</td>
+      const reveal = isRevealed(r.vendor) || win;
+      const stat = r.alb ? pill('ALB','#FEF2F2','#991B1B') : (win && winnerShown) ? '<span class="pill-green" style="background:#F0FDF4; color:#065F46; border-radius:20px; padding:3px 10px; font-size:12px; font-weight:700;">Winner ✓</span>' : reveal ? pill('L'+r.rank,'#F3F4F6','#6B7280') : pill('—','#F3F4F6','#9CA3AF');
+      const rowHi = (win && winnerShown) ? 'background:#FAFFFE;' : '';
+      const borderHi = (win && winnerShown) ? 'border-left:3px solid #10B981;' : '';
+      const rankCell = (win && winnerShown) ? rankBadgeHTML(r.rank, true) : (reveal ? rankBadgeHTML(r.rank,false) : '<span style="color:#9CA3AF;">—</span>');
+      return `<tr style="border-bottom:1px solid #F3F4F6; ${rowHi}">
+        <td style="${tdS()} ${borderHi}">${rankCell}</td>
+        <td style="${tdS()}"><div class="font-medium text-ink-900">${esc(r.vendor)}</div><div class="text-[11px] text-ink-400">TQ Score: ${r.tq}/100</div></td>
+        <td style="${tdS()}">${maskedQuoteCell(r.vendor, r.quote, win && winnerShown)}</td>
+        <td style="${tdS()}">${maskedPctCell(r.vendor, dev, win && winnerShown)}</td>
         <td style="${tdS()}">${stat}</td></tr>`;
     }).join('');
-    return `<div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
+    return `${revealHeaderHTML()}<div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
         <div><span class="text-[14px] font-bold text-ink-900">Financial bids — ${tName}</span> <span class="text-[12px] text-ink-500">${rows.length} vendors</span></div>
         <button onclick="showToast('Financial evaluation PDF exported')" class="px-3 py-1.5 rounded-lg border border-line text-[12px] text-ink-900 hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Export PDF</button>
       </div>
       <div style="border:1px solid #E5E7EB; border-radius:12px; overflow:hidden;">
         <table style="width:100%; table-layout:fixed; border-collapse:collapse;">
-          <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:52px;">Rank</th><th style="${thS()} width:30%;">Vendor</th><th style="${thS()} width:20%;">Quoted Amount (₹)</th><th style="${thS()} width:16%;">vs Estimate</th><th style="${thS()} width:15%;">Status</th></tr></thead>
+          <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:52px;">Rank</th><th style="${thS()} width:30%;">Vendor</th><th style="${thS()} width:24%;">Quoted Amount (₹)</th><th style="${thS()} width:14%;">vs Estimate</th><th style="${thS()} width:15%;">Status</th></tr></thead>
           <tbody>${tableRows}</tbody>
         </table>
       </div>`;
   }
   function qcbsViewBody(tName, T, F){
     const rows = qcbsRows(T, F);
+    const winnerShown = winnerRevealed();
     const tableRows = rows.map((r,i) => {
       const win = i===0;
-      const stat = win ? pill('1st','#F0FDF4','#065F46') : pill(ordinal(r.rank),'#F3F4F6','#6B7280');
-      const quotedCell = `₹${r.quote.toLocaleString('en-IN')}${r.alb?' <span style="background:#FFFBEB; color:#92400E; border-radius:20px; padding:1px 7px; font-size:10px; font-weight:600;">ALB</span>':''}`;
-      return `<tr data-vendor="${r.vendor}" style="border-bottom:1px solid #F3F4F6; ${win?'background:#F0FDF4;':''} transition:background 300ms ease;">
-        <td style="${tdS()} ${win?'border-left:3px solid #10B981;':''}">${rankBadgeHTML(r.rank,win)}</td>
-        <td style="${tdS()} font-weight:600; color:#111827;">${r.vendor}</td>
+      const rev = isRevealed(r.vendor) || (win && winnerShown);
+      const stat = (win && winnerShown) ? '<span style="background:#F0FDF4; color:#065F46; border-radius:20px; padding:3px 10px; font-size:12px; font-weight:700;">Winner ✓</span>' : rev ? pill(ordinal(r.rank),'#F3F4F6','#6B7280') : pill('—','#F3F4F6','#9CA3AF');
+      const quotedCell = maskedQuoteCell(r.vendor, r.quote, win && winnerShown) + (rev && r.alb ? ' <span style="background:#FFFBEB; color:#92400E; border-radius:20px; padding:1px 7px; font-size:10px; font-weight:600;">ALB</span>' : '');
+      const rankCell = (win && winnerShown) ? rankBadgeHTML(r.rank, true) : (rev ? rankBadgeHTML(r.rank, false) : '<span style="color:#9CA3AF;">—</span>');
+      return `<tr data-vendor="${esc(r.vendor)}" style="border-bottom:1px solid #F3F4F6; ${(win && winnerShown)?'background:#FAFFFE;':''} transition:background 300ms ease;">
+        <td style="${tdS()} ${(win && winnerShown)?'border-left:3px solid #10B981;':''}">${rankCell}</td>
+        <td style="${tdS()} font-weight:600; color:#111827;">${esc(r.vendor)}</td>
         <td style="${tdS()}">${scoreBar(r.tq, 100, '#0F5EE8')}</td>
         <td style="${tdS()}">${scoreBar(r.fin, 100, '#10B981')}</td>
-        <td style="${tdS()} font-weight:700; color:#111827;">${r.combined.toFixed(1)}${win?' <span style="background:#EFF6FF; color:#0C447C; border-radius:4px; padding:1px 6px; font-size:10px; white-space:nowrap;">✦ Recommended</span>':''}</td>
+        <td style="${tdS()} font-weight:700; color:#111827;">${r.combined.toFixed(1)}${(win && winnerShown)?' <span style="background:#EFF6FF; color:#0C447C; border-radius:4px; padding:1px 6px; font-size:10px; white-space:nowrap;">✦ Recommended</span>':''}</td>
         <td style="${tdS()}">${quotedCell}</td>
         <td style="${tdS()}">${stat}</td></tr>`;
     }).join('');
     const sumOk = (T+F)===100;
-    return `<div style="background:#F9FAFB; border:1px solid #E5E7EB; border-radius:10px; padding:14px 18px; margin-bottom:14px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+    return `${revealHeaderHTML()}<div style="background:#F9FAFB; border:1px solid #E5E7EB; border-radius:10px; padding:14px 18px; margin-bottom:14px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
         <div class="text-[13px] font-bold text-ink-900">Weightage</div>
         <div><div class="text-[10.5px] font-semibold text-ink-500 uppercase mb-0.5">Technical %</div><input id="wTech" type="number" min="0" max="100" step="1" value="${T}" oninput="onWeightInput('tech')" class="field" style="width:70px; padding:6px 8px;"/></div>
         <div class="text-ink-400 text-[15px]" style="margin-top:14px;">+</div>
@@ -3018,27 +3755,30 @@ Date: ${esc(fmtDateShort(today))}`;
     below.forEach(b => b.rank = '—');
     const winner = above[0];
     const ordered = above.concat(below);
+    const winnerShown = winnerRevealed();
     const rows = ordered.map((r) => {
       const isWin = r === winner;
       const dev = ((r.quote - ESTIMATE) / ESTIMATE) * 100;
-      const devCls = dev < 0 ? '#065F46' : dev > 10 ? '#991B1B' : '#92400E';
       const dimCls = r.tq < cutoff ? 'below-cutoff' : '';
       const cutoffPill = r.tq >= cutoff ? '<span class="pill-above">✓ Above cutoff</span>' : '<span class="pill-below">Below cutoff</span>';
-      const stat = r.tq < cutoff ? '<span class="pill-disq">Disqualified</span>' : isWin ? pill('L1','#F0FDF4','#065F46') : pill('Eligible','#F3F4F6','#6B7280');
+      const winnerActive = isWin && winnerShown;
+      const stat = r.tq < cutoff ? '<span class="pill-disq">Disqualified</span>' : winnerActive ? '<span style="background:#F0FDF4; color:#065F46; border-radius:20px; padding:3px 10px; font-size:12px; font-weight:700;">Winner ✓</span>' : (isRevealed(r.vendor)?pill('Eligible','#F3F4F6','#6B7280'):pill('—','#F3F4F6','#9CA3AF'));
+      // Below-cutoff rows skip reveal flow — always show strike-through
       const quoteText = r.tq < cutoff
         ? `<span class="strike-quote">₹${r.quote.toLocaleString('en-IN')}</span>`
-        : `<span ${isWin?'style="font-weight:700;"':''}>₹${r.quote.toLocaleString('en-IN')}</span>`;
-      return `<tr class="${dimCls}" style="border-bottom:1px solid #F3F4F6; ${isWin?'background:#F0FDF4;':''}">
-        <td style="${tdS()} ${isWin?'border-left:3px solid #10B981;':''}">${typeof r.rank==='number'?rankBadgeHTML(r.rank,isWin):'<span style="color:#9CA3AF;">—</span>'}</td>
+        : maskedQuoteCell(r.vendor, r.quote, winnerActive);
+      const rankCell = winnerActive ? rankBadgeHTML(r.rank, true) : (typeof r.rank === 'number' && isRevealed(r.vendor) ? rankBadgeHTML(r.rank, false) : '<span style="color:#9CA3AF;">—</span>');
+      return `<tr class="${dimCls}" style="border-bottom:1px solid #F3F4F6; ${winnerActive?'background:#FAFFFE;':''}">
+        <td style="${tdS()} ${winnerActive?'border-left:3px solid #10B981;':''}">${rankCell}</td>
         <td style="${tdS()}"><div class="font-medium text-ink-900">${esc(r.vendor)}</div></td>
         <td style="${tdS()} font-weight:600;">${r.tq} / 100</td>
         <td style="${tdS()}">${cutoffPill}</td>
         <td style="${tdS()}">${quoteText}</td>
-        <td style="${tdS()} color:${devCls}; font-weight:600;">${dev>0?'+':''}${dev.toFixed(1)}%</td>
+        <td style="${tdS()}">${r.tq < cutoff ? `<span style="color:#9CA3AF;">${dev>=0?'+':''}${dev.toFixed(1)}%</span>` : maskedPctCell(r.vendor, dev, winnerActive)}</td>
         <td style="${tdS()}">${stat}</td>
       </tr>`;
     }).join('');
-    return `<div class="info-box-blue">LCS awards to the lowest-cost vendor who meets or exceeds the minimum technical cutoff score. Vendors below the cutoff are disqualified regardless of price.</div>
+    return `${revealHeaderHTML()}<div class="info-box-blue">LCS awards to the lowest-cost vendor who meets or exceeds the minimum technical cutoff score. Vendors below the cutoff are disqualified regardless of price.</div>
       <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:16px;">
         <span class="text-[13px] font-bold text-ink-900">Minimum technical cutoff score:</span>
         <input id="lcsCutoffInput" type="number" min="0" max="100" step="1" value="${cutoff}" class="field" style="width:80px; padding:6px 8px;" oninput="onLcsCutoffInput(this.value)" />
@@ -3132,22 +3872,28 @@ Date: ${esc(fmtDateShort(today))}`;
     above.forEach(b => b.rank = '—');
     const winner = within[0];
     const ordered = within.concat(above);
+    const winnerShown = winnerRevealed();
     const rows = ordered.map((r) => {
       const isWin = r === winner;
       const overBudget = r.quote > budget;
       const dimCls = overBudget ? 'below-cutoff' : '';
       const budgetPill = overBudget ? '<span class="pill-below">Above budget</span>' : '<span class="pill-above">✓ Within budget</span>';
-      const stat = overBudget ? '<span class="pill-disq">Disqualified</span>' : isWin ? '<span style="background:#FAEEDA; color:#92400E; border-radius:20px; padding:4px 12px; font-size:13px; font-weight:700;">Selected</span>' : '<span class="text-ink-400">—</span>';
-      return `<tr class="${dimCls}" style="border-bottom:1px solid #F3F4F6; ${isWin?'background:#FFFBEB;':''}">
-        <td style="${tdS()} ${isWin?'border-left:3px solid #F59E0B;':''}">${typeof r.rank==='number'?rankBadgeHTML(r.rank,isWin):'<span style="color:#9CA3AF;">—</span>'}</td>
+      const winnerActive = isWin && winnerShown;
+      const stat = overBudget ? '<span class="pill-disq">Disqualified</span>' : winnerActive ? '<span style="background:#F0FDF4; color:#065F46; border-radius:20px; padding:3px 10px; font-size:12px; font-weight:700;">Winner ✓</span>' : isRevealed(r.vendor) ? '<span class="pill-gray">Eligible</span>' : '<span class="pill-gray">—</span>';
+      const quoteCell = overBudget
+        ? `<span class="strike-quote">₹${r.quote.toLocaleString('en-IN')}</span>`
+        : maskedQuoteCell(r.vendor, r.quote, winnerActive);
+      const rankCell = winnerActive ? rankBadgeHTML(r.rank, true) : (typeof r.rank === 'number' && isRevealed(r.vendor) ? rankBadgeHTML(r.rank, false) : '<span style="color:#9CA3AF;">—</span>');
+      return `<tr class="${dimCls}" style="border-bottom:1px solid #F3F4F6; ${winnerActive?'background:#FAFFFE;':''}">
+        <td style="${tdS()} ${winnerActive?'border-left:3px solid #10B981;':''}">${rankCell}</td>
         <td style="${tdS()} font-weight:600;">${esc(r.vendor)}</td>
-        <td style="${tdS()}"><span ${overBudget?'class="strike-quote"':''}>₹${r.quote.toLocaleString('en-IN')}</span></td>
+        <td style="${tdS()}">${quoteCell}</td>
         <td style="${tdS()}">${budgetPill}</td>
         <td style="${tdS()} font-weight:700;">${r.tq} / 100</td>
         <td style="${tdS()}">${stat}</td>
       </tr>`;
     }).join('');
-    return `<div class="info-box-amber">FBS selects the highest technical score among vendors whose quoted price is within the fixed budget. Vendors quoting above the budget are disqualified.</div>
+    return `${revealHeaderHTML()}<div class="info-box-amber">FBS selects the highest technical score among vendors whose quoted price is within the fixed budget. Vendors quoting above the budget are disqualified.</div>
       <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:16px;">
         <span class="text-[13px] font-bold text-ink-900">Fixed budget limit (₹):</span>
         <div style="position:relative;">
@@ -3464,6 +4210,95 @@ Date: ${esc(fmtDateShort(today))}`;
     location.href = 'comparative-statement.html?tender=' + EVAL.tnd;
   }
 
+  // ===================== AUDIT LOG PANEL (Change 5) =====================
+  let _uiAudit = { open:false, filter:'all' };
+  try { _uiAudit.open = sessionStorage.getItem('auditPanelOpen') === '1'; } catch(e){}
+  function renderAuditBadge(){
+    const b = document.getElementById('auditBadge');
+    if (!b || !EVAL) return;
+    const today = new Date().toISOString().slice(0,10);
+    const todayCount = (EVAL.auditLog||[]).filter(e => (e.timestamp||'').slice(0,10) === today).length;
+    const total = (EVAL.auditLog||[]).length;
+    b.textContent = todayCount > 0 ? todayCount : total;
+  }
+  function toggleAuditPanel(){
+    _uiAudit.open = !_uiAudit.open;
+    try { sessionStorage.setItem('auditPanelOpen', _uiAudit.open ? '1' : '0'); } catch(e){}
+    const panel = document.getElementById('auditPanel');
+    const trigger = document.getElementById('auditTriggerBtn');
+    if (trigger) trigger.setAttribute('aria-expanded', _uiAudit.open ? 'true' : 'false');
+    if (_uiAudit.open){
+      renderAuditPanel();
+      panel.classList.add('open');
+      panel.setAttribute('aria-hidden','false');
+    } else {
+      panel.classList.remove('open');
+      panel.setAttribute('aria-hidden','true');
+    }
+    refreshIcons();
+  }
+  function setAuditFilter(v){ _uiAudit.filter = v; renderAuditPanel(); refreshIcons(); }
+  function renderAuditPanel(){
+    const panel = document.getElementById('auditPanel');
+    if (!panel || !EVAL) return;
+    const all = (EVAL.auditLog||[]).slice().reverse(); // newest first
+    let list;
+    const today = new Date().toISOString().slice(0,10);
+    if (_uiAudit.filter === 'today') list = all.filter(e => (e.timestamp||'').slice(0,10) === today);
+    else if (_uiAudit.filter === 'all') list = all;
+    else list = all.filter(e => e.section === _uiAudit.filter);
+    const entries = list.length
+      ? list.map(e => renderAuditRow(e)).join('')
+      : '<div class="audit-empty">No audit entries yet. Actions will be recorded here as you work through the evaluation.</div>';
+    panel.innerHTML = `<div class="audit-panel-head">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <span class="text-[14px] font-bold text-ink-900">Audit Log — ${esc(EVAL.tnd)}</span>
+          <span class="text-[12px] text-ink-500" aria-live="polite">${list.length} entr${list.length===1?'y':'ies'}</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <select onchange="setAuditFilter(this.value)" style="border:1px solid #E5E7EB; border-radius:6px; padding:5px 8px; font-size:12px; color:#374151; background:white; cursor:pointer;">
+            <option value="all"                  ${_uiAudit.filter==='all'?'selected':''}>All sections</option>
+            <option value="PQ Evaluation"        ${_uiAudit.filter==='PQ Evaluation'?'selected':''}>PQ Evaluation</option>
+            <option value="TQ Evaluation"        ${_uiAudit.filter==='TQ Evaluation'?'selected':''}>TQ Evaluation</option>
+            <option value="Financial Evaluation" ${_uiAudit.filter==='Financial Evaluation'?'selected':''}>Financial Evaluation</option>
+            <option value="Results & Actions"    ${_uiAudit.filter==='Results & Actions'?'selected':''}>Results &amp; Actions</option>
+            <option value="today"                ${_uiAudit.filter==='today'?'selected':''}>Today only</option>
+          </select>
+          <button onclick="exportAuditLog()" class="px-3 py-1.5 rounded-lg border border-line text-[12px] text-ink-900 hover:bg-surface">Export log</button>
+          <button onclick="toggleAuditPanel()" class="text-[12px] text-ink-400 hover:text-ink-900" style="background:transparent; border:none; cursor:pointer;">Collapse ▴</button>
+        </div>
+      </div>
+      <div class="audit-panel-list">${entries}</div>`;
+  }
+  function renderAuditRow(e){
+    const cat = actionCategory(e.action);
+    const ts = (e.timestamp || '').slice(11,16);
+    const actionLabel = (e.action || '').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    return `<div class="audit-row ${cat}">
+        <div class="ts">${esc(ts)}</div>
+        <div class="center">
+          <div class="act">${esc(actionLabel)}</div>
+          <div class="det">${esc(e.detail||'')}</div>
+          <div class="sec-badge">${esc(e.section||'')}</div>
+        </div>
+        <div class="user">${esc(e.user||'')}</div>
+      </div>`;
+  }
+  function exportAuditLog(){
+    showToast('Audit log exported as CSV');
+    log('System', 'audit_log_exported', `${(EVAL.auditLog||[]).length} entries · CSV`);
+  }
+  // === Mini-trail at the bottom of each section ===
+  function miniTrailHTML(section, limit){
+    const recent = (EVAL.auditLog||[]).filter(e => e.section === section).slice(-Math.max(1, limit||5)).reverse();
+    if (!recent.length) return '';
+    const id = 'mini-trail-' + section.toLowerCase().replace(/[^a-z]/g,'-');
+    return `<div style="margin-top:14px;">
+        <button class="mini-trail-toggle" onclick="document.getElementById('${id}').classList.toggle('hidden'); this.textContent = this.textContent.includes('▾') ? 'Section activity ▴' : 'Section activity ▾';">Section activity ▾</button>
+        <div id="${id}" class="mini-trail hidden">${recent.map(renderAuditRow).join('')}</div>
+      </div>`;
+  }
+
   // ===================== GLOBAL =====================
   document.addEventListener('click', e => {
     const pop = document.getElementById('cellPopover');
@@ -3472,7 +4307,7 @@ Date: ${esc(fmtDateShort(today))}`;
     if (pq && !pq.classList.contains('hidden') && !pq.contains(e.target) && !e.target.closest('.verdict-trigger')) closePqPopover();
   });
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape'){ closeCell(); closeDrawer(); closeBidDoc(); closePqPopover(); closeClarPanel(); }
+    if (e.key === 'Escape'){ closeCell(); closeDrawer(); closeBidDoc(); closePqPopover(); closeClarPanel(); closeEvidencePanel(); closeVideoModal(); closeRevealModal(); }
   });
 
   (function boot(){
