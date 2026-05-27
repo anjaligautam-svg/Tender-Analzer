@@ -3495,25 +3495,39 @@ Date: ${esc(fmtDateShort(today))}`;
     }
     return `<span class="mask-pill">••••</span>`;
   }
+  // Compute the current method's rank-1 vendor from finBidsBase() (evaluation.html data)
+  function currentFinWinner(){
+    const m = activeMethod();
+    const bids = finBidsBase();
+    if (!bids.length) return null;
+    if (m === 'QCBS'){
+      const T = EVAL.technicalWeightage, F = EVAL.financialWeightage;
+      return qcbsRows(T, F)[0] || null;
+    }
+    if (m === 'LCS'){
+      const cutoff = EVAL.lcsCutoff != null ? EVAL.lcsCutoff : 75;
+      const above = bids.filter(b => b.tq >= cutoff).sort((a,b) => (a.quote||0)-(b.quote||0));
+      return above[0] || null;
+    }
+    if (m === 'QBS'){
+      return bids.slice().sort((a,b) => (b.tq||0)-(a.tq||0))[0] || null;
+    }
+    if (m === 'FBS'){
+      const budget = EVAL.fbsBudget != null ? EVAL.fbsBudget : ESTIMATE;
+      const within = bids.filter(b => (b.quote||0) <= budget).sort((a,b) => (b.tq||0)-(a.tq||0));
+      return within[0] || null;
+    }
+    // L1
+    const valid = bids.filter(b => !b.alb).sort((a,b) => (a.quote||0)-(b.quote||0));
+    return valid[0] || bids.slice().sort((a,b) => (a.quote||0)-(b.quote||0))[0] || null;
+  }
   function winnerRevealed(){
-    // Winner = rank 1 under current method
-    const rows = (function(){
-      const m = activeMethod();
-      const ds = tenderDataset();
-      const tq = ds.bids.filter(b => b.pqStatus === 'q');
-      if (m === 'QCBS' || m === 'LCS') return tq.slice().sort((a,b) => (b.combined||0)-(a.combined||0));
-      if (m === 'QBS')                  return tq.slice().sort((a,b) => (b.tq||0)-(a.tq||0));
-      const nonAlb = tq.filter(b => !b.flags.includes('alb')).sort((a,b) => (a.quote||0)-(b.quote||0));
-      const albs   = tq.filter(b =>  b.flags.includes('alb')).sort((a,b) => (a.quote||0)-(b.quote||0));
-      return nonAlb.concat(albs);
-    })();
-    const winner = rows[0];
-    return winner ? !!EVAL.finRevealed[winner.vendor] : false;
+    const w = currentFinWinner();
+    return w ? !!(EVAL.finRevealed||{})[w.vendor] : false;
   }
   function allRevealed(){
-    const ds = tenderDataset();
-    const tq = ds.bids.filter(b => b.pqStatus === 'q');
-    return tq.length > 0 && tq.every(b => !!EVAL.finRevealed[b.vendor]);
+    const bids = finBidsBase();
+    return bids.length > 0 && bids.every(b => !!(EVAL.finRevealed||{})[b.vendor]);
   }
   function openRevealWinnerModal(){
     const dlg = document.getElementById('modalDialog'); const bk = document.getElementById('modalBackdrop');
@@ -3532,20 +3546,10 @@ Date: ${esc(fmtDateShort(today))}`;
     if (dlg) dlg.classList.remove('open'); if (bk) bk.classList.remove('open');
   }
   function confirmRevealWinner(){
-    const m = activeMethod();
-    const ds = tenderDataset();
-    const tq = ds.bids.filter(b => b.pqStatus === 'q');
-    let winner;
-    if (m === 'QCBS' || m === 'LCS') winner = tq.slice().sort((a,b) => (b.combined||0)-(a.combined||0))[0];
-    else if (m === 'QBS')            winner = tq.slice().sort((a,b) => (b.tq||0)-(a.tq||0))[0];
-    else {
-      const nonAlb = tq.filter(b => !b.flags.includes('alb')).sort((a,b) => (a.quote||0)-(b.quote||0));
-      const albs   = tq.filter(b =>  b.flags.includes('alb')).sort((a,b) => (a.quote||0)-(b.quote||0));
-      winner = nonAlb.concat(albs)[0];
-    }
+    const winner = currentFinWinner();
     if (winner){
       EVAL.finRevealed[winner.vendor] = true;
-      log('Financial Evaluation', 'winner_revealed', `${winner.vendor} · ${fmtINR ? fmtINR(winner.quote) : '₹'+(winner.quote||0).toLocaleString('en-IN')}`);
+      log('Financial Evaluation', 'winner_revealed', `${winner.vendor} · ₹${(winner.quote||0).toLocaleString('en-IN')}`);
     }
     closeRevealModal();
     saveState();
@@ -3556,8 +3560,7 @@ Date: ${esc(fmtDateShort(today))}`;
   function revealVendor(vendor, btn){
     if (btn._armed){
       EVAL.finRevealed[vendor] = true;
-      const ds = tenderDataset();
-      const b = ds.bids.find(x => x.vendor === vendor);
+      const b = finBidsBase().find(x => x.vendor === vendor);
       log('Financial Evaluation', 'bid_revealed', `${vendor} · ${b ? '₹'+b.quote.toLocaleString('en-IN') : ''} (revealed by Rajesh Kumar)`);
       saveState(); renderFinancial(); refreshIcons();
       return;
