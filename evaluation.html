@@ -3342,7 +3342,7 @@ Date: ${esc(fmtDateShort(today))}`;
   }
   // ---- Financial row computations (per view) ----
   function finBidsBase(){
-    return EVAL.finBids.map(b => {
+    return (EVAL && EVAL.finBids ? EVAL.finBids : []).map(b => {
       const q = finQuote(b.vendor);
       return { vendor:b.vendor, quote:q, alb:isALB(q), tq:tqTotal(b.vendor)||0 };
     });
@@ -3388,8 +3388,8 @@ Date: ${esc(fmtDateShort(today))}`;
     const nativeM = EVAL.method || 'L1';
     const isPreview = m !== nativeM;
     const refNote = isPreview
-      ? `<div class="preview-ref-note">ℹ You are viewing a preview using ${esc(METHOD_LABELS[m]||m)}. The tender specifies ${esc(METHOD_LABELS[nativeM]||nativeM)} as the evaluation method.</div><div class="preview-ref-sub">This result is for reference only.</div>`
-      : `<div class="tender-ref-note">This evaluation method (${esc(METHOD_LABELS[m]||m)}) was specified in the original tender document (${esc(EVAL.tnd)}, Step 1 — Classification).</div>`;
+      ? `<div class="preview-ref-note">ℹ You are viewing a preview using ${esc((METHOD_META[m]||{}).short||m)}. The tender specifies ${esc((METHOD_META[nativeM]||{}).short||nativeM)} as the evaluation method.</div><div class="preview-ref-sub">This result is for reference only.</div>`
+      : `<div class="tender-ref-note">This evaluation method (${esc((METHOD_META[m]||{}).short||m)}) was specified in the original tender document (${esc(EVAL.tnd)}, Step 1 — Classification).</div>`;
     const banner = `<div class="method-banner" id="methodBanner" style="background:${meta.bg}; border-color:${meta.border}; color:${meta.text};">
       <i id="mbIcon" data-lucide="${meta.icon}" style="width:18px; height:18px; color:${meta.sub}; flex-shrink:0; margin-top:1px;"></i>
       <div style="flex:1; min-width:0;">
@@ -3497,7 +3497,7 @@ Date: ${esc(fmtDateShort(today))}`;
   }
   // Compute the current method's rank-1 vendor from finBidsBase() (evaluation.html data)
   function currentFinWinner(){
-    const m = activeMethod();
+    const m = (EVAL && (EVAL.evaluationMethod || EVAL.method)) || 'L1';
     const bids = finBidsBase();
     if (!bids.length) return null;
     if (m === 'QCBS'){
