@@ -344,6 +344,22 @@
     .tq-avg .avg-count.partial  { color:#F59E0B; }
     .tq-verdict .pill { background:#F0FDF4; color:#065F46; border-radius:20px; padding:4px 12px; font-size:12px; font-weight:700; display:inline-block; }
     .tq-verdict .pill.pending { background:#F3F4F6; color:#6B7280; font-weight:500; }
+    /* Fix 4 — verdict pill colored by % of max marks (in sync with average) */
+    .tq-verdict .pill.tier-green { background:#F0FDF4; color:#065F46; }
+    .tq-verdict .pill.tier-blue  { background:#EFF6FF; color:#0C447C; }
+    .tq-verdict .pill.tier-amber { background:#FFFBEB; color:#92400E; }
+    .tq-verdict .pill.tier-red   { background:#FEF2F2; color:#991B1B; }
+    /* Fix 3 — Edit-saved-score affordances for Member 1 */
+    .tq-member-cell .edit-link { font-size:10px; color:#9CA3AF; margin-left:6px; cursor:pointer; background:transparent; border:none; padding:0; vertical-align:baseline; }
+    .tq-member-cell .edit-link:hover { color:#0F5EE8; text-decoration:underline; }
+    .tq-member-cell .locked-label { font-size:10px; color:#9CA3AF; margin-left:6px; cursor:help; }
+    .tq-member-cell .save-btn { background:transparent; border:none; color:#10B981; font-size:14px; cursor:pointer; padding:0 4px; vertical-align:baseline; }
+    .tq-member-cell .save-btn:hover { color:#047857; }
+    /* TQ running total row at the bottom of each vendor's scoring table */
+    .tq-total-row { padding:14px 18px; background:#F9FAFB; border-top:1px solid #E5E7EB; display:flex; align-items:center; justify-content:flex-end; gap:8px; }
+    .tq-total-row .tq-total-label { font-size:13px; color:#6B7280; font-weight:500; }
+    .tq-total-row .tq-total-value { font-size:16px; font-weight:700; color:#0F5EE8; }
+    .tq-total-row .tq-total-max   { font-size:13px; color:#9CA3AF; }
 
     /* === Change 3 — Presentation sub-section === */
     .pres-toggle { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid #F3F4F6; cursor:pointer; margin-bottom:14px; }
@@ -353,10 +369,16 @@
     .pres-zone { overflow:hidden; max-height:0; transition: max-height .2s ease; }
     .pres-zone.open { max-height:1200px; }
     .pres-info { background:#EFF6FF; border:1px solid #BFDBFE; color:#1D4ED8; border-radius:8px; padding:10px 14px; font-size:12px; margin-bottom:14px; line-height:1.5; }
-    .pres-table { width:100%; border-collapse:collapse; font-size:13px; }
+    .pres-table { width:100%; border-collapse:collapse; font-size:13px; table-layout:fixed; }
     .pres-table th { background:#F9FAFB; font-size:11px; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; font-weight:700; padding:8px 10px; border-bottom:1px solid #E5E7EB; text-align:left; }
     .pres-table td { padding:10px 10px; border-bottom:1px solid #F3F4F6; vertical-align:top; font-size:12.5px; }
     .pres-table tr:last-child td { border-bottom:none; }
+    .pres-table th.pres-score-col, .pres-table td.pres-score-col { min-width:160px; }
+    .pres-score-cell { display:flex; flex-direction:column; gap:6px; align-items:flex-start; }
+    .pres-score-cell .pres-toggle-label { font-size:12px; color:#6B7280; white-space:nowrap; }
+    .pres-score-cell .pres-marks-input { display:flex; align-items:center; gap:6px; }
+    .pres-notes-toggle { background:transparent; border:none; color:#0F5EE8; font-size:10px; cursor:pointer; padding:0; text-transform:none; letter-spacing:0; font-weight:500; margin-left:6px; }
+    .pres-notes-toggle:hover { text-decoration:underline; }
     .pres-chip { display:inline-block; background:#F9FAFB; border:1px solid #E5E7EB; border-radius:6px; padding:3px 8px; font-size:11.5px; color:#374151; margin-right:4px; }
     .pres-upload-btn { background:white; border:1px dashed #93C5FD; color:#0F5EE8; border-radius:6px; padding:4px 10px; font-size:11.5px; cursor:pointer; }
     .pres-upload-btn:hover { background:#EFF6FF; }
@@ -395,17 +417,29 @@
     .audit-trigger { display:inline-flex; align-items:center; gap:6px; border:1px solid #E5E7EB; border-radius:8px; padding:6px 12px; font-size:12px; color:#6B7280; background:white; cursor:pointer; transition: background .15s ease; }
     .audit-trigger:hover { background:#F9FAFB; color:#111827; }
     .audit-trigger .badge { display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 5px; background:#0F5EE8; color:white; border-radius:999px; font-size:10px; font-weight:700; }
-    .audit-panel { background:white; border:1px solid #E5E7EB; border-radius:12px; overflow:hidden; max-height:0; opacity:0; transition: max-height 300ms ease, opacity .2s ease, margin .3s ease, border .3s ease; border-width:0; margin-bottom:0; }
-    .audit-panel.open { max-height:580px; opacity:1; border-width:1px; margin-bottom:20px; }
-    .audit-panel-head { padding:14px 20px; border-bottom:1px solid #E5E7EB; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
-    .audit-panel-list { max-height:320px; overflow-y:auto; }
-    .audit-row { padding:10px 20px; border-bottom:1px solid #F3F4F6; display:flex; gap:14px; align-items:flex-start; }
-    .audit-row .ts { font-size:11px; color:#9CA3AF; width:60px; flex-shrink:0; }
-    .audit-row .center { flex:1; min-width:0; }
-    .audit-row .act { font-size:13px; font-weight:700; color:#111827; }
-    .audit-row .det { font-size:12px; color:#6B7280; margin-top:2px; }
-    .audit-row .sec-badge { background:#F3F4F6; color:#6B7280; border-radius:4px; padding:1px 5px; font-size:10px; margin-top:4px; display:inline-block; }
-    .audit-row .user { font-size:11px; color:#9CA3AF; flex-shrink:0; }
+    /* Right-side slide-in panel — viewport-fixed, no backdrop, always on top */
+    .audit-panel { position:fixed; top:0; right:0; width:320px; height:100vh; background:white; border-left:1px solid #E5E7EB; box-shadow:-4px 0 16px rgba(0,0,0,0.08); transform:translateX(100%); transition: transform 280ms cubic-bezier(0.4,0,0.2,1); z-index:200; display:flex; flex-direction:column; }
+    .audit-panel.open { transform:translateX(0); }
+    .audit-panel-head { padding:16px 18px; border-bottom:1px solid #E5E7EB; display:flex; align-items:center; justify-content:space-between; gap:8px; background:#F9FAFB; flex-shrink:0; }
+    .audit-panel-head .ap-title { display:flex; align-items:center; gap:8px; min-width:0; }
+    .audit-panel-head .ap-title-text { font-size:14px; font-weight:700; color:#111827; }
+    .audit-panel-head .ap-count { font-size:12px; color:#9CA3AF; }
+    .audit-panel-head .ap-close { background:transparent; border:none; color:#6B7280; font-size:20px; line-height:1; cursor:pointer; padding:2px 6px; border-radius:4px; }
+    .audit-panel-head .ap-close:hover { background:#E5E7EB; color:#111827; }
+    .audit-panel-filter { padding:10px 18px; border-bottom:1px solid #E5E7EB; flex-shrink:0; }
+    .audit-panel-filter select { width:100%; border:1px solid #E5E7EB; border-radius:6px; padding:5px 10px; font-size:12px; color:#374151; background:white; cursor:pointer; }
+    .audit-panel-list { flex:1; overflow-y:auto; padding:0; }
+    .audit-panel-export { border-top:1px solid #E5E7EB; padding:12px 18px; background:white; flex-shrink:0; }
+    .audit-panel-export button { width:100%; border:1px solid #E5E7EB; background:white; color:#374151; border-radius:6px; padding:7px 12px; font-size:12px; font-weight:500; cursor:pointer; transition: background .15s ease; }
+    .audit-panel-export button:hover { background:#F9FAFB; color:#111827; }
+    .audit-row { padding:10px 18px; border-bottom:1px solid #F3F4F6; display:flex; flex-direction:column; gap:3px; }
+    .audit-row .r1 { display:flex; align-items:baseline; justify-content:space-between; gap:8px; }
+    .audit-row .act { font-size:13px; font-weight:700; color:#111827; min-width:0; }
+    .audit-row .ts  { font-size:11px; color:#9CA3AF; flex-shrink:0; }
+    .audit-row .det { font-size:12px; color:#6B7280; }
+    .audit-row .r3 { display:flex; align-items:center; gap:6px; }
+    .audit-row .sec-badge { background:#F3F4F6; color:#6B7280; border-radius:4px; padding:1px 5px; font-size:10px; display:inline-block; }
+    .audit-row .user { font-size:10px; color:#9CA3AF; }
     .audit-row.view    { border-left:3px solid #3B82F6; }
     .audit-row.create  { border-left:3px solid #10B981; }
     .audit-row.edit    { border-left:3px solid #F59E0B; }
@@ -571,8 +605,8 @@
             <span id="auditBadge" class="badge" aria-live="polite">0</span>
           </button>
         </div>
-        <!-- Audit log slide-down panel -->
-        <div id="auditPanel" class="audit-panel" aria-hidden="true"></div>
+        <!-- Audit log right-side slide-in panel (viewport-fixed) -->
+        <aside id="auditPanel" class="audit-panel" role="complementary" aria-label="Audit log" aria-hidden="true"></aside>
 
         <!-- Stage tabs -->
         <div role="tablist" aria-label="Evaluation stages" class="flex flex-wrap gap-2">
@@ -2543,7 +2577,7 @@ Date: ${esc(fmtDateShort(today))}`;
         <div class="pres-info">ℹ Presentations are held during the technical evaluation phase for complex or high-value tenders. Record video evidence and scores here for audit purposes. GFR guidelines require all evaluation criteria and scores to be documented.</div>
         <div style="border:1px solid #E5E7EB; border-radius:10px; overflow:hidden; margin-bottom:18px;">
           <table class="pres-table">
-            <thead><tr><th style="width:22%;">Vendor</th><th style="width:18%;">Presentation</th><th style="width:18%;">Video / Demo</th><th style="width:24%;">Score contribution</th><th style="width:18%;">Notes</th></tr></thead>
+            <thead><tr><th style="width:24%;">Vendor</th><th style="width:22%;">Presentation</th><th style="width:22%;">Video / Demo</th><th class="pres-score-col" style="width:${_uiPresNotes?'18%':'32%'};">Score contribution</th>${_uiPresNotes?`<th style="width:14%;">Notes <button class="pres-notes-toggle" onclick="togglePresNotes()" type="button" aria-label="Hide notes column">Hide ▴</button></th>`:`<th style="width:0; padding:0;"><button class="pres-notes-toggle" onclick="togglePresNotes()" type="button" aria-label="Show notes column" style="margin-left:0;">Show notes ▾</button></th>`}</tr></thead>
             <tbody>${EVAL.bids.map(b => renderPresRow(b.vendor)).join('')}</tbody>
           </table>
         </div>
@@ -2574,7 +2608,7 @@ Date: ${esc(fmtDateShort(today))}`;
       : '';
 
     return `<div class="flex items-center justify-between gap-3 flex-wrap mb-2">
-        <div class="text-[12.5px] text-ink-500">Each criterion is scored by three committee members. Average is auto-computed; verdict is the final allocated marks.</div>
+        <div class="text-[12.5px] text-ink-500">Each criterion is scored by three committee members. Average is auto-computed; verdict shows the same score as a colored pill.</div>
         <button onclick="aiPrescreenTQ()" class="px-3 py-1.5 rounded-lg border border-primary text-primary text-[12px] font-medium hover:bg-primary-light inline-flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> ✦ AI Pre-score TQ (your column)</button>
       </div>
       ${committeeBar}
@@ -2587,6 +2621,21 @@ Date: ${esc(fmtDateShort(today))}`;
           <thead><tr><th>Criterion</th><th>Max marks</th>${COMMITTEE_MEMBERS.map(memHeader).join('')}<th>Average</th><th>Verdict</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
+        ${(function(){
+          // Fix 4 — running total = sum of VERDICT scores (which equal the averages)
+          const totalMax = TQ_CRITERIA.reduce((s,c) => s + c.max, 0);
+          let sum = 0, any = false;
+          TQ_CRITERIA.forEach(c => {
+            const { avg } = memberAvg(vendor, c.id);
+            if (avg != null){ sum += avg; any = true; }
+          });
+          const display = any ? sum.toFixed(1) : '—';
+          return `<div class="tq-total-row" data-tq-total="${esc(vendor)}" aria-live="polite">
+              <span class="tq-total-label">TQ Score:</span>
+              <span class="tq-total-value">${display}</span>
+              <span class="tq-total-max">/ ${totalMax}</span>
+            </div>`;
+        })()}
       </div>
       ${completeBanner}
       <div class="flex justify-between items-center mt-4 flex-wrap gap-2">${submitBtn}${confirmBtn}</div>`;
@@ -2612,13 +2661,59 @@ Date: ${esc(fmtDateShort(today))}`;
     }
     return Math.round(avg);
   }
+  function verdictTier(avg, max){
+    if (avg == null || !max) return '';
+    const pct = (avg / max) * 100;
+    if (pct >= 80) return 'tier-green';
+    if (pct >= 50) return 'tier-blue';
+    if (pct >= 30) return 'tier-amber';
+    return 'tier-red';
+  }
+  function isEditingScore(vendor, critId){
+    return !!(_uiEditingScores && _uiEditingScores[vendor+'|'+critId]);
+  }
+  function startEditScore(vendor, critId){
+    _uiEditingScores[vendor+'|'+critId] = true;
+    renderTechnical();
+    refreshIcons();
+    // Focus the input that just rendered
+    setTimeout(() => {
+      const inp = document.querySelector(`input.tq-score-in[data-edit="${vendor}|${critId}"]`);
+      if (inp){ inp.focus(); inp.select(); }
+    }, 0);
+  }
+  function saveEditScore(vendor, critId, raw){
+    setMemberScore(vendor, critId, 'rk', raw);
+    delete _uiEditingScores[vendor+'|'+critId];
+    renderTechnical();
+    refreshIcons();
+  }
+  function cancelEditScore(vendor, critId){
+    delete _uiEditingScores[vendor+'|'+critId];
+    renderTechnical();
+    refreshIcons();
+  }
+  function onEditKey(ev, vendor, critId){
+    if (ev.key === 'Enter'){ ev.preventDefault(); saveEditScore(vendor, critId, ev.target.value); }
+    else if (ev.key === 'Escape'){ ev.preventDefault(); cancelEditScore(vendor, critId); }
+  }
   function renderTqRow(c, vendor){
+    const allSubmitted = COMMITTEE_MEMBERS.every(mb => ((EVAL.tqMemberSubmitted||{})[vendor]||{})[mb.id]);
+    const editingThis = isEditingScore(vendor, c.id);
     const cellHTML = (mb) => {
       const sc = memberScore(vendor, c.id, mb.id);
       const submitted = ((EVAL.tqMemberSubmitted||{})[vendor]||{})[mb.id];
       if (mb.isYou){
+        // While editing — show input + green save button (Enter/Esc also work)
+        if (editingThis){
+          return `<td class="tq-member-cell"><input class="tq-score-in" data-edit="${esc(vendor)}|${c.id}" type="number" min="0" max="${c.max}" value="${sc != null ? sc : ''}" onkeydown="onEditKey(event,'${esc(vendor)}','${c.id}')" /> <span style="color:#6B7280; font-size:11px;">/ ${c.max}</span> <button class="save-btn" title="Save (Enter)" onclick="saveEditScore('${esc(vendor)}','${c.id}', this.parentNode.querySelector('input.tq-score-in').value)">✓</button></td>`;
+        }
         if (submitted){
-          return `<td class="tq-member-cell"><span class="scored">${sc != null ? sc : '—'}</span> <span style="color:#6B7280; font-size:11px;">/ ${c.max}</span></td>`;
+          // Locked when all 3 members have submitted; otherwise editable via Edit ✎
+          const editAffordance = allSubmitted
+            ? `<span class="locked-label" title="All committee members have submitted. Scores are locked.">Locked</span>`
+            : `<button class="edit-link" onclick="startEditScore('${esc(vendor)}','${c.id}')" aria-label="Edit your score">Edit ✎</button>`;
+          return `<td class="tq-member-cell"><span class="scored">${sc != null ? sc : '—'}</span> <span style="color:#6B7280; font-size:11px;">/ ${c.max}</span>${editAffordance}</td>`;
         }
         return `<td class="tq-member-cell"><input class="tq-score-in" type="number" min="0" max="${c.max}" value="${sc != null ? sc : ''}" oninput="setMemberScore('${esc(vendor)}','${c.id}','rk', this.value)" /> <span style="color:#6B7280; font-size:11px;">/ ${c.max}</span></td>`;
       }
@@ -2627,12 +2722,12 @@ Date: ${esc(fmtDateShort(today))}`;
     };
     const { avg, count } = memberAvg(vendor, c.id);
     const avgCell = avg != null
-      ? `<td class="tq-avg"><span class="avg-num" style="color:${count===3?'#0F5EE8':'#374151'};">${avg.toFixed(1)}</span><span class="avg-count ${count===3?'complete':'partial'}">(${count}/3)${count<3?' · Provisional':''}</span></td>`
-      : `<td class="tq-avg"><span class="avg-num" style="color:#9CA3AF;">—</span><span class="avg-count partial">(0/3)</span></td>`;
-    const marks = tieredMarks(c.id, avg, c.max);
-    const verdictCell = marks != null
-      ? `<td class="tq-verdict"><span class="pill">${marks} / ${c.max}</span></td>`
-      : `<td class="tq-verdict"><span class="pill pending">Pending</span></td>`;
+      ? `<td class="tq-avg" data-avg-cell="${esc(vendor)}|${c.id}"><span class="avg-num" style="color:${count===3?'#0F5EE8':'#374151'};">${avg.toFixed(1)}</span><span class="avg-count ${count===3?'complete':'partial'}">(${count}/3)${count<3?' · Provisional':''}</span></td>`
+      : `<td class="tq-avg" data-avg-cell="${esc(vendor)}|${c.id}"><span class="avg-num" style="color:#9CA3AF;">—</span><span class="avg-count partial">(0/3)</span></td>`;
+    // Fix 4 — verdict = same as average, displayed as a colored pill (no independent tier mapping)
+    const verdictCell = avg != null
+      ? `<td class="tq-verdict" data-verdict-cell="${esc(vendor)}|${c.id}"><span class="pill ${verdictTier(avg, c.max)}">${avg.toFixed(1)}</span></td>`
+      : `<td class="tq-verdict" data-verdict-cell="${esc(vendor)}|${c.id}"><span class="pill pending">Pending</span></td>`;
     return `<tr>
       <td><div style="font-weight:600; color:#111827; font-size:14px;">${esc(c.short)}</div><div style="font-size:12px; color:#6B7280; margin-top:2px;">${esc(c.full)}</div></td>
       <td><span style="font-size:13px; color:#374151;">${c.max}</span></td>
@@ -2650,14 +2745,48 @@ Date: ${esc(fmtDateShort(today))}`;
     if (isNaN(n)){ EVAL.tqMemberScores[vendor][critId][memberId] = null; }
     else { EVAL.tqMemberScores[vendor][critId][memberId] = Math.max(0, Math.min(c.max, n)); }
     saveState();
-    // Update matrix with tiered/averaged final mark so downstream verdict still computes
+    // Fix 4 — verdict = average (no tier mapping). Store the raw average so downstream tqTotal sums match VERDICT.
     const { avg } = memberAvg(vendor, critId);
-    const final = tieredMarks(critId, avg, c.max);
     EVAL.matrix[vendor] = EVAL.matrix[vendor] || {};
-    if (final != null) EVAL.matrix[vendor][critId] = final;
+    if (avg != null) EVAL.matrix[vendor][critId] = avg;
+    else delete EVAL.matrix[vendor][critId];
+    // Live-update the AVG cell, VERDICT cell, and the TQ running total — without losing input focus
+    updateLiveTotals(vendor, critId);
     const mbName = (COMMITTEE_MEMBERS.find(m => m.id===memberId)||{}).name || memberId;
     if (old != null && old !== EVAL.tqMemberScores[vendor][critId][memberId]) log('TQ Evaluation', 'score_edited', `${c.short} · ${vendor} · ${mbName}: ${old}→${EVAL.tqMemberScores[vendor][critId][memberId]}`);
     else log('TQ Evaluation', 'score_entered', `${c.short} · ${vendor} · ${mbName}: ${EVAL.tqMemberScores[vendor][critId][memberId]}`);
+  }
+  function updateLiveTotals(vendor, critId){
+    const c = TQ_CRITERIA.find(x => x.id === critId);
+    if (!c) return;
+    // Update the AVG cell
+    const avgCell = document.querySelector(`td[data-avg-cell="${vendor}|${c.id}"]`);
+    if (avgCell){
+      const { avg, count } = memberAvg(vendor, c.id);
+      avgCell.innerHTML = avg != null
+        ? `<span class="avg-num" style="color:${count===3?'#0F5EE8':'#374151'};">${avg.toFixed(1)}</span><span class="avg-count ${count===3?'complete':'partial'}">(${count}/3)${count<3?' · Provisional':''}</span>`
+        : `<span class="avg-num" style="color:#9CA3AF;">—</span><span class="avg-count partial">(0/3)</span>`;
+    }
+    // Update the VERDICT cell — colored pill matching the average
+    const verCell = document.querySelector(`td[data-verdict-cell="${vendor}|${c.id}"]`);
+    if (verCell){
+      const { avg } = memberAvg(vendor, c.id);
+      verCell.innerHTML = avg != null
+        ? `<span class="pill ${verdictTier(avg, c.max)}">${avg.toFixed(1)}</span>`
+        : `<span class="pill pending">Pending</span>`;
+    }
+    // Update the running TQ Score total
+    const totalRow = document.querySelector(`div[data-tq-total="${vendor}"]`);
+    if (totalRow){
+      const totalMax = TQ_CRITERIA.reduce((s,x) => s + x.max, 0);
+      let sum = 0, any = false;
+      TQ_CRITERIA.forEach(x => {
+        const { avg: a } = memberAvg(vendor, x.id);
+        if (a != null){ sum += a; any = true; }
+      });
+      const display = any ? sum.toFixed(1) : '—';
+      totalRow.innerHTML = `<span class="tq-total-label">TQ Score:</span><span class="tq-total-value">${display}</span><span class="tq-total-max">/ ${totalMax}</span>`;
+    }
   }
   function submitMyTqScores(vendor){
     const allScored = TQ_CRITERIA.every(c => typeof (((EVAL.tqMemberScores||{})[vendor]||{})[c.id]||{}).rk === 'number');
@@ -2685,10 +2814,29 @@ Date: ${esc(fmtDateShort(today))}`;
       videoCell = `<button class="pres-upload-btn" onclick="presUploadVideo('${esc(vendor)}')">+ Upload video</button> <button class="pres-upload-btn" onclick="presLinkVideo('${esc(vendor)}')">+ Paste link</button>`;
     }
     const toggleHTML = p.includeInTq
-      ? `<span class="toggle-on" onclick="togglePresInclude('${esc(vendor)}')" role="switch" aria-checked="true"></span> <input type="number" min="0" max="20" value="${p.marks||0}" oninput="setPresMarks('${esc(vendor)}', this.value)" style="width:55px; border:1px solid #D1D5DB; border-radius:6px; padding:4px 8px; font-size:12.5px; text-align:center;" /> <span style="font-size:11px; color:#6B7280;">/ 20</span>`
-      : `<span class="toggle-off" onclick="togglePresInclude('${esc(vendor)}')" role="switch" aria-checked="false"></span> <span style="font-size:11px; color:#9CA3AF;">Include in TQ scoring</span>`;
-    const notesCell = `<input class="pres-note-input" type="text" placeholder="Notes…" value="${esc(p.notes||'')}" oninput="setPresNotes('${esc(vendor)}', this.value)" />`;
-    return `<tr><td><strong>${esc(vendor)}</strong></td><td>${pptCell}</td><td>${videoCell}</td><td>${toggleHTML}</td><td>${notesCell}</td></tr>`;
+      ? `<div class="pres-score-cell">
+           <span class="toggle-on" onclick="togglePresInclude('${esc(vendor)}')" role="switch" aria-checked="true"></span>
+           <span class="pres-toggle-label">Include in TQ scoring</span>
+           <div class="pres-marks-input">
+             <input type="number" min="0" max="20" value="${p.marks||0}" oninput="setPresMarks('${esc(vendor)}', this.value)" style="width:55px; border:1px solid #D1D5DB; border-radius:6px; padding:4px 8px; font-size:12.5px; text-align:center;" />
+             <span style="font-size:11px; color:#6B7280;">/ 20</span>
+           </div>
+         </div>`
+      : `<div class="pres-score-cell">
+           <span class="toggle-off" onclick="togglePresInclude('${esc(vendor)}')" role="switch" aria-checked="false"></span>
+           <span class="pres-toggle-label">Include in TQ scoring</span>
+         </div>`;
+    const notesCell = _uiPresNotes
+      ? `<td><input class="pres-note-input" type="text" placeholder="Notes…" value="${esc(p.notes||'')}" oninput="setPresNotes('${esc(vendor)}', this.value)" /></td>`
+      : `<td style="padding:0;"></td>`;
+    return `<tr><td><strong>${esc(vendor)}</strong></td><td>${pptCell}</td><td>${videoCell}</td><td class="pres-score-col">${toggleHTML}</td>${notesCell}</tr>`;
+  }
+  // _uiPresNotes is the transient flag for hiding/showing the Notes column
+  function togglePresNotes(){
+    _uiPresNotes = !_uiPresNotes;
+    try { sessionStorage.setItem('presNotesVisible', _uiPresNotes ? '1' : '0'); } catch(e){}
+    renderTechnical();
+    refreshIcons();
   }
   function presUploadPpt(vendor){
     EVAL.presentations[vendor] = EVAL.presentations[vendor] || {};
@@ -4239,6 +4387,11 @@ Date: ${esc(fmtDateShort(today))}`;
   // ===================== AUDIT LOG PANEL (Change 5) =====================
   let _uiAudit = { open:false, filter:'all' };
   try { _uiAudit.open = sessionStorage.getItem('auditPanelOpen') === '1'; } catch(e){}
+  // Presentations notes-column visibility (Fix 2) — hidden by default, restored from session
+  let _uiPresNotes = false;
+  try { _uiPresNotes = sessionStorage.getItem('presNotesVisible') === '1'; } catch(e){}
+  // Transient per-cell edit state for Member 1 TQ scores (Fix 3). Keyed `${vendor}|${critId}`.
+  let _uiEditingScores = {};
   function renderAuditBadge(){
     const b = document.getElementById('auditBadge');
     if (!b || !EVAL) return;
@@ -4248,19 +4401,32 @@ Date: ${esc(fmtDateShort(today))}`;
     b.textContent = todayCount > 0 ? todayCount : total;
   }
   function toggleAuditPanel(){
-    _uiAudit.open = !_uiAudit.open;
-    try { sessionStorage.setItem('auditPanelOpen', _uiAudit.open ? '1' : '0'); } catch(e){}
+    if (_uiAudit.open) { closeAuditPanel(); return; }
+    _uiAudit.open = true;
+    try { sessionStorage.setItem('auditPanelOpen', '1'); } catch(e){}
     const panel = document.getElementById('auditPanel');
     const trigger = document.getElementById('auditTriggerBtn');
-    if (trigger) trigger.setAttribute('aria-expanded', _uiAudit.open ? 'true' : 'false');
-    if (_uiAudit.open){
+    if (trigger) trigger.setAttribute('aria-expanded', 'true');
+    if (panel){
       renderAuditPanel();
       panel.classList.add('open');
       panel.setAttribute('aria-hidden','false');
-    } else {
+    }
+    refreshIcons();
+  }
+  function closeAuditPanel(){
+    if (!_uiAudit.open) return;
+    _uiAudit.open = false;
+    try { sessionStorage.setItem('auditPanelOpen', '0'); } catch(e){}
+    const panel = document.getElementById('auditPanel');
+    const trigger = document.getElementById('auditTriggerBtn');
+    if (trigger) trigger.setAttribute('aria-expanded', 'false');
+    if (panel){
       panel.classList.remove('open');
       panel.setAttribute('aria-hidden','true');
     }
+    // Return focus to the Audit Log trigger button
+    if (trigger) trigger.focus();
     refreshIcons();
   }
   function setAuditFilter(v){ _uiAudit.filter = v; renderAuditPanel(); refreshIcons(); }
@@ -4277,37 +4443,42 @@ Date: ${esc(fmtDateShort(today))}`;
       ? list.map(e => renderAuditRow(e)).join('')
       : '<div class="audit-empty">No audit entries yet. Actions will be recorded here as you work through the evaluation.</div>';
     panel.innerHTML = `<div class="audit-panel-head">
-        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-          <span class="text-[14px] font-bold text-ink-900">Audit Log — ${esc(EVAL.tnd)}</span>
-          <span class="text-[12px] text-ink-500" aria-live="polite">${list.length} entr${list.length===1?'y':'ies'}</span>
+        <div class="ap-title">
+          <i data-lucide="clipboard-list" style="width:16px; height:16px; color:#0F5EE8;"></i>
+          <span class="ap-title-text">Audit Log</span>
+          <span class="ap-count" aria-live="polite">(${list.length} ${list.length===1?'entry':'entries'})</span>
         </div>
-        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-          <select onchange="setAuditFilter(this.value)" style="border:1px solid #E5E7EB; border-radius:6px; padding:5px 8px; font-size:12px; color:#374151; background:white; cursor:pointer;">
-            <option value="all"                  ${_uiAudit.filter==='all'?'selected':''}>All sections</option>
-            <option value="PQ Evaluation"        ${_uiAudit.filter==='PQ Evaluation'?'selected':''}>PQ Evaluation</option>
-            <option value="TQ Evaluation"        ${_uiAudit.filter==='TQ Evaluation'?'selected':''}>TQ Evaluation</option>
-            <option value="Financial Evaluation" ${_uiAudit.filter==='Financial Evaluation'?'selected':''}>Financial Evaluation</option>
-            <option value="Results & Actions"    ${_uiAudit.filter==='Results & Actions'?'selected':''}>Results &amp; Actions</option>
-            <option value="today"                ${_uiAudit.filter==='today'?'selected':''}>Today only</option>
-          </select>
-          <button onclick="exportAuditLog()" class="px-3 py-1.5 rounded-lg border border-line text-[12px] text-ink-900 hover:bg-surface">Export log</button>
-          <button onclick="toggleAuditPanel()" class="text-[12px] text-ink-400 hover:text-ink-900" style="background:transparent; border:none; cursor:pointer;">Collapse ▴</button>
-        </div>
+        <button class="ap-close" onclick="closeAuditPanel()" aria-label="Close audit log">×</button>
       </div>
-      <div class="audit-panel-list">${entries}</div>`;
+      <div class="audit-panel-filter">
+        <select onchange="setAuditFilter(this.value)" aria-label="Filter audit log by section">
+          <option value="all"                  ${_uiAudit.filter==='all'?'selected':''}>Section: All</option>
+          <option value="PQ Evaluation"        ${_uiAudit.filter==='PQ Evaluation'?'selected':''}>PQ Evaluation</option>
+          <option value="TQ Evaluation"        ${_uiAudit.filter==='TQ Evaluation'?'selected':''}>TQ Evaluation</option>
+          <option value="Financial Evaluation" ${_uiAudit.filter==='Financial Evaluation'?'selected':''}>Financial Evaluation</option>
+          <option value="Results & Actions"    ${_uiAudit.filter==='Results & Actions'?'selected':''}>Results &amp; Actions</option>
+          <option value="today"                ${_uiAudit.filter==='today'?'selected':''}>Today only</option>
+        </select>
+      </div>
+      <div class="audit-panel-list">${entries}</div>
+      <div class="audit-panel-export">
+        <button onclick="exportAuditLog()">Export as CSV</button>
+      </div>`;
   }
   function renderAuditRow(e){
     const cat = actionCategory(e.action);
     const ts = (e.timestamp || '').slice(11,16);
     const actionLabel = (e.action || '').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
     return `<div class="audit-row ${cat}">
-        <div class="ts">${esc(ts)}</div>
-        <div class="center">
+        <div class="r1">
           <div class="act">${esc(actionLabel)}</div>
-          <div class="det">${esc(e.detail||'')}</div>
-          <div class="sec-badge">${esc(e.section||'')}</div>
+          <div class="ts">${esc(ts)}</div>
         </div>
-        <div class="user">${esc(e.user||'')}</div>
+        <div class="det">${esc(e.detail||'')}</div>
+        <div class="r3">
+          <span class="sec-badge">${esc(e.section||'')}</span>
+          <span class="user">${esc(e.user||'')}</span>
+        </div>
       </div>`;
   }
   function exportAuditLog(){
@@ -4333,7 +4504,7 @@ Date: ${esc(fmtDateShort(today))}`;
     if (pq && !pq.classList.contains('hidden') && !pq.contains(e.target) && !e.target.closest('.verdict-trigger')) closePqPopover();
   });
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape'){ closeCell(); closeDrawer(); closeBidDoc(); closePqPopover(); closeClarPanel(); closeEvidencePanel(); closeVideoModal(); closeRevealModal(); }
+    if (e.key === 'Escape'){ closeCell(); closeDrawer(); closeBidDoc(); closePqPopover(); closeClarPanel(); closeEvidencePanel(); closeVideoModal(); closeRevealModal(); closeAuditPanel(); }
   });
 
   (function boot(){
