@@ -155,8 +155,8 @@
     .pq-popover .pq-card.on-clarif  { border:1.5px solid #F59E0B; background:#FFFBEB; }
     .pq-popover .pq-card .pq-title { font-size:14px; font-weight:700; color:#111827; line-height:1.3; }
     .pq-popover .pq-card .pq-desc  { font-size:12px; color:#6B7280; margin-top:2px; line-height:1.4; }
-    .pq-clar-form { background:#FFFBEB; border-radius:8px; padding:14px; margin-top:12px; max-height:0; overflow:hidden; transition: max-height 200ms ease; }
-    .pq-clar-form.open { max-height:420px; overflow:visible; }
+    .pq-clar-form { background:#FFFBEB; border-radius:8px; padding:14px; margin-top:12px; max-height:0; opacity:0; overflow:hidden; transition: max-height 200ms ease, opacity 150ms ease; }
+    .pq-clar-form.open { max-height:420px; opacity:1; overflow:visible; }
     .pq-clar-form label { display:block; font-size:12px; font-weight:700; color:#92400E; margin-bottom:4px; }
     .pq-clar-form textarea { width:100%; min-height:72px; border:1px solid #FCD34D; border-radius:6px; padding:8px 10px; font-size:13px; background:white; resize:vertical; transition: border-color .15s ease, box-shadow .15s ease; }
     .pq-clar-form textarea:focus { outline:none; border-color:#F59E0B; box-shadow:0 0 0 3px rgba(245,158,11,0.15); }
@@ -2132,17 +2132,31 @@
   // ===================== PQ VERDICT POPOVER (Change 2a) =====================
   function openPqPopover(e, vendor, critId){
     e.stopPropagation();
+    // Toggle behaviour — clicking the same cell while popover is open closes it (per safeguards)
+    if (EVAL._pqPop && EVAL._pqPop.vendor === vendor && EVAL._pqPop.critId === critId){
+      const pop0 = document.getElementById('pqPopover');
+      if (pop0 && !pop0.classList.contains('hidden')){ closePqPopover(); return; }
+    }
     closeBidDoc();
     closeClarPanel();
+    closeEvidencePanel();
     const trigger = (e.target.closest && e.target.closest('.verdict-trigger')) || e.currentTarget;
     const cur = (EVAL.matrix[vendor]||{})[critId];
     const existing = findClarRecord(vendor, critId);
     EVAL._pqPop = { vendor, critId, sel: cur || 'pass',
       text: existing && existing.text || '',
-      deadline: existing && existing.deadline || '' };
+      deadline: existing && existing.deadline || '',
+      trigger: trigger,        // captured for focus-return on close
+    };
     renderPqPopover();
     const pop = document.getElementById('pqPopover');
     pop.classList.remove('hidden');
+    // BUG 1 FIX: stop clicks inside the popover from bubbling to the document-level
+    // outside-click handler. Without this, pickPqSel() replaces innerHTML on a
+    // radio click, the clicked <label> becomes a detached node, pop.contains(e.target)
+    // is false at the document handler, and the close handler fires. Setting .onclick
+    // (not addEventListener) is idempotent across repeated opens — no handler leak.
+    pop.onclick = function(ev){ ev.stopPropagation(); };
     // Position relative to the trigger button — anchored within the viewport
     const rect = trigger.getBoundingClientRect();
     const sx = window.scrollX, sy = window.scrollY;
@@ -2153,30 +2167,39 @@
     pop.style.left = left + 'px';
     pop.style.top  = top + 'px';
     refreshIcons();
+    // Focus the currently selected radio so keyboard users land on the right card
+    requestAnimationFrame(() => {
+      const sel = pop.querySelector('input[name="pqv"]:checked') || pop.querySelector('input[name="pqv"]');
+      if (sel) sel.focus();
+    });
   }
   function closePqPopover(){
     const pop = document.getElementById('pqPopover');
     if (pop) pop.classList.add('hidden');
+    const tr = EVAL && EVAL._pqPop && EVAL._pqPop.trigger;
     EVAL._pqPop = null;
+    // Return focus to the trigger cell on close
+    if (tr && typeof tr.focus === 'function') tr.focus();
   }
   function renderPqPopover(){
     const st = EVAL._pqPop; if (!st) return;
-    const card = (val, label, desc, cls) => `<label class="pq-card ${st.sel===val?cls:''}" onclick="pickPqSel('${val}')">
-      <input type="radio" name="pqv" value="${val}" ${st.sel===val?'checked':''} />
+    // Each card stops propagation defensively (the root pop.onclick already does too)
+    const card = (val, label, desc, cls) => `<label class="pq-card ${st.sel===val?cls:''}" onclick="event.stopPropagation(); pickPqSel('${val}')">
+      <input type="radio" name="pqv" value="${val}" ${st.sel===val?'checked':''} onclick="event.stopPropagation();" />
       <div><div class="pq-title">${label}</div><div class="pq-desc">${desc}</div></div></label>`;
     const isClar = st.sel === 'clarif';
     const formHTML = `<div class="pq-clar-form ${isClar?'open':''}" id="pqClarForm">
       <label>Clarification required</label>
-      <textarea id="pqClarText" placeholder="Describe what document or explanation is needed from the vendor...">${esc(st.text)}</textarea>
+      <textarea id="pqClarText" placeholder="Describe what document or explanation is needed from the vendor..." onclick="event.stopPropagation();">${esc(st.text)}</textarea>
       <label style="margin-top:10px;">Response deadline</label>
-      <input id="pqClarDeadline" type="date" value="${esc(st.deadline)}" />
+      <input id="pqClarDeadline" type="date" value="${esc(st.deadline)}" onclick="event.stopPropagation();" />
     </div>`;
     const saveLabel = isClar ? 'Save & Create Clarification Draft' : 'Save';
     const saveBtnClass = isClar ? 'btn-save amber' : 'btn-save';
     const pop = document.getElementById('pqPopover');
     pop.innerHTML = `<div class="flex items-center justify-between mb-2">
         <div class="text-[12.5px] font-bold text-ink-900">${esc(st.vendor)} — ${esc((PQ_CRITERIA.find(c=>c.id===st.critId)||{}).short||st.critId)}</div>
-        <button onclick="closePqPopover()" aria-label="Close" style="background:transparent;border:none;cursor:pointer;color:#9CA3AF;font-size:18px;line-height:1;">×</button>
+        <button onclick="event.stopPropagation(); closePqPopover();" aria-label="Close" style="background:transparent;border:none;cursor:pointer;color:#9CA3AF;font-size:18px;line-height:1;">×</button>
       </div>
       ${card('pass','✓ Pass','Documents meet the requirement','on-pass')}
       ${card('fail','✗ Fail','Documents do not meet the requirement','on-fail')}
@@ -2184,8 +2207,8 @@
       ${card('clarif','⏳ Clarification Required','Need supporting document or explanation from vendor','on-clarif')}
       ${formHTML}
       <div class="pq-popover-actions">
-        <button class="btn-cancel" onclick="closePqPopover()">Cancel</button>
-        <button class="${saveBtnClass}" onclick="savePqVerdict()">${saveLabel}</button>
+        <button class="btn-cancel" onclick="event.stopPropagation(); closePqPopover();">Cancel</button>
+        <button class="${saveBtnClass}" onclick="event.stopPropagation(); savePqVerdict();">${saveLabel}</button>
       </div>`;
     refreshIcons();
   }
