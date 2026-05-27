@@ -332,12 +332,27 @@
     .tq-comm-table tr:last-child td { border-bottom:none; }
     .tq-score-in { width:55px; border:1px solid #D1D5DB; border-radius:6px; padding:5px 8px; font-size:14px; text-align:center; }
     .tq-score-in:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 2px rgba(15,94,232,0.15); }
-    .tq-member-cell .scored { font-size:14px; font-weight:700; color:#0F5EE8; }
+    .tq-member-cell .scored { font-size:14px; font-weight:700; color:#0F5EE8; background:transparent; border:none; padding:0; cursor:pointer; font-family:inherit; line-height:inherit; transition: color .15s ease, text-decoration-color .15s ease; }
+    .tq-member-cell .scored:hover { color:#0B4BC4; text-decoration:underline dotted; text-underline-offset:3px; }
+    .tq-member-cell .scored:focus-visible { outline:2px solid #0F5EE8; outline-offset:2px; border-radius:3px; }
+    .tq-member-cell .scored.locked { color:#374151; cursor:default; }
+    .tq-member-cell .scored.locked:hover { color:#374151; text-decoration:none; }
     .tq-member-cell .scored-other { font-size:14px; font-weight:700; color:#374151; }
-    .tq-member-cell .edit-pencil { font-size:10px; color:#9CA3AF; margin-left:6px; cursor:pointer; background:transparent; border:none; padding:0; }
-    .tq-member-cell .edit-pencil:hover { color:#0F5EE8; text-decoration:underline; }
     .tq-member-cell .pending-pill { font-size:12px; color:#F59E0B; font-style:italic; }
     .tq-member-cell .remind { font-size:10px; color:#9CA3AF; margin-left:6px; cursor:pointer; background:transparent; border:none; padding:0; text-decoration:underline; }
+    .tq-member-cell .locked-label { font-size:10px; color:#9CA3AF; margin-left:6px; cursor:help; }
+    /* Inline edit-state row for Member 1 scoring (Change 1) */
+    .tq-edit-row { display:flex; align-items:center; gap:6px; }
+    .tq-edit-input { width:52px; border:1.5px solid #0F5EE8; border-radius:6px; padding:5px 8px; font-size:14px; font-weight:600; color:#0F5EE8; text-align:center; background:white; transition: border-color .15s ease, box-shadow .15s ease; }
+    .tq-edit-input:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 2px rgba(15,94,232,0.15); }
+    .tq-edit-input.flash-error { border-color:#EF4444 !important; box-shadow:0 0 0 2px rgba(239,68,68,0.20) !important; animation: tqFlashRed 350ms ease; }
+    @keyframes tqFlashRed { 0%{ background:#FEF2F2; } 100%{ background:white; } }
+    .tq-save-btn { width:26px; height:26px; border-radius:6px; background:#10B981; color:white; border:none; cursor:pointer; font-size:13px; display:inline-flex; align-items:center; justify-content:center; transition: background .15s ease; }
+    .tq-save-btn:hover { background:#059669; }
+    .tq-save-btn:focus-visible { outline:2px solid #0F5EE8; outline-offset:2px; }
+    .tq-cancel-btn { width:26px; height:26px; border-radius:6px; background:#F3F4F6; color:#6B7280; border:none; cursor:pointer; font-size:13px; display:inline-flex; align-items:center; justify-content:center; transition: background .15s ease, color .15s ease; }
+    .tq-cancel-btn:hover { background:#FEF2F2; color:#EF4444; }
+    .tq-cancel-btn:focus-visible { outline:2px solid #0F5EE8; outline-offset:2px; }
     .tq-avg .avg-num { font-size:14px; font-weight:700; }
     .tq-avg .avg-count { display:block; font-size:10px; margin-top:2px; }
     .tq-avg .avg-count.complete { color:#10B981; }
@@ -349,12 +364,6 @@
     .tq-verdict .pill.tier-blue  { background:#EFF6FF; color:#0C447C; }
     .tq-verdict .pill.tier-amber { background:#FFFBEB; color:#92400E; }
     .tq-verdict .pill.tier-red   { background:#FEF2F2; color:#991B1B; }
-    /* Fix 3 — Edit-saved-score affordances for Member 1 */
-    .tq-member-cell .edit-link { font-size:10px; color:#9CA3AF; margin-left:6px; cursor:pointer; background:transparent; border:none; padding:0; vertical-align:baseline; }
-    .tq-member-cell .edit-link:hover { color:#0F5EE8; text-decoration:underline; }
-    .tq-member-cell .locked-label { font-size:10px; color:#9CA3AF; margin-left:6px; cursor:help; }
-    .tq-member-cell .save-btn { background:transparent; border:none; color:#10B981; font-size:14px; cursor:pointer; padding:0 4px; vertical-align:baseline; }
-    .tq-member-cell .save-btn:hover { color:#047857; }
     /* TQ running total row at the bottom of each vendor's scoring table */
     .tq-total-row { padding:14px 18px; background:#F9FAFB; border-top:1px solid #E5E7EB; display:flex; align-items:center; justify-content:flex-end; gap:8px; }
     .tq-total-row .tq-total-label { font-size:13px; color:#6B7280; font-weight:500; }
@@ -406,7 +415,76 @@
     .eye-btn:hover { color:#0F5EE8; }
     .eye-btn.revealed { color:#10B981; }
     .eye-confirm { font-size:11px; color:#F59E0B; padding:2px 4px; }
-    .reveal-banner { background:#EFF6FF; border:1px solid #BFDBFE; color:#0C447C; border-radius:10px; padding:12px 16px; margin-bottom:14px; font-size:13px; display:flex; align-items:center; gap:8px; }
+    .reveal-banner { background:#EFF6FF; border:1px solid #BFDBFE; color:#0C447C; border-radius:10px; padding:14px 16px; margin-bottom:16px; font-size:13px; display:flex; align-items:center; gap:10px; }
+    /* Change 3 — Phase 1/2/3 controls + non-default warning + winner card */
+    .phase-action-btn { display:inline-flex; align-items:center; gap:8px; border:none; border-radius:10px; padding:13px 32px; font-size:15px; font-weight:600; cursor:pointer; transition: background .15s ease, transform .15s ease, box-shadow .15s ease; color:white; }
+    .phase-action-btn:focus-visible { outline:2px solid #0F5EE8; outline-offset:2px; }
+    .phase-action-btn.evaluate { background:#0F5EE8; }
+    .phase-action-btn.evaluate:hover { background:#0B4BC4; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(15,94,232,0.25); }
+    .phase-action-btn.reveal-winner { background:#10B981; }
+    .phase-action-btn.reveal-winner:hover { background:#059669; transform: translateY(-1px); }
+    .phase-action-btn[disabled] { opacity:0.65; cursor:not-allowed; }
+    .phase-action-wrap { display:flex; justify-content:center; margin-top:24px; }
+    .phase-spinner { width:16px; height:16px; border:2px solid rgba(255,255,255,0.3); border-top:2px solid white; border-radius:50%; animation: phaseSpin 0.8s linear infinite; }
+    @keyframes phaseSpin { to { transform: rotate(360deg); } }
+    .phase-row-flash { animation: phaseRowFlash 700ms ease; }
+    @keyframes phaseRowFlash { 0%,50%{ background:#EFF6FF; } 100%{ background:transparent; } }
+    .nondefault-warning { background:#FFFBEB; border:1px solid #FCD34D; border-radius:8px; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:14px; overflow:hidden; max-height:0; opacity:0; transition: max-height 200ms ease, opacity 200ms ease, padding 200ms ease, margin-bottom 200ms ease; padding-top:0; padding-bottom:0; }
+    .nondefault-warning.open { max-height:96px; opacity:1; padding-top:12px; padding-bottom:12px; }
+    .nondefault-warning .ndw-left { font-size:13px; color:#92400E; flex:1; min-width:0; }
+    .nondefault-warning .ndw-cancel { background:transparent; border:none; color:#9CA3AF; font-size:12px; cursor:pointer; padding:6px 8px; }
+    .nondefault-warning .ndw-cancel:hover { color:#374151; }
+    .nondefault-warning .ndw-continue { border:1px solid #F59E0B; color:#F59E0B; background:white; border-radius:6px; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer; }
+    .nondefault-warning .ndw-continue:hover { background:#FFFBEB; }
+    .preview-mini-banner { background:#FFFBEB; border-radius:6px; padding:6px 12px; font-size:11px; color:#92400E; margin-bottom:14px; display:inline-block; }
+    .reeval-strip { background:#FEF2F2; border:1px solid #FECACA; border-radius:8px; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; gap:14px; margin-top:14px; overflow:hidden; max-height:0; opacity:0; transition: max-height 200ms ease, opacity 200ms ease, padding 200ms ease, margin-top 200ms ease; padding-top:0; padding-bottom:0; }
+    .reeval-strip.open { max-height:96px; opacity:1; padding-top:12px; padding-bottom:12px; }
+    .reeval-strip .res-left { font-size:13px; color:#991B1B; flex:1; min-width:0; }
+    .reeval-strip .res-cancel { background:transparent; border:none; color:#9CA3AF; font-size:12px; cursor:pointer; padding:6px 8px; }
+    .reeval-strip .res-cancel:hover { color:#374151; }
+    .reeval-strip .res-reset { background:#EF4444; border:none; color:white; border-radius:6px; padding:5px 14px; font-size:12px; font-weight:600; cursor:pointer; }
+    .reeval-strip .res-reset:hover { background:#DC2626; }
+    /* Winner card */
+    .winner-card { margin-top:24px; border-radius:14px; overflow:hidden; box-shadow: 0 8px 24px rgba(6,95,70,0.08); animation: winnerCardEntry 400ms ease forwards; }
+    @keyframes winnerCardEntry { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+    .winner-card.no-anim { animation: none; }
+    .winner-card-head { background: linear-gradient(135deg, #065F46 0%, #047857 100%); padding:24px 28px; display:flex; align-items:flex-start; gap:20px; }
+    .winner-card-head .wc-trophy { color:rgba(255,255,255,0.85); flex-shrink:0; margin-top:4px; width:32px; height:32px; }
+    .winner-card-head .wc-label { font-size:11px; font-weight:700; color:white; letter-spacing:0.08em; text-transform:uppercase; }
+    .winner-card-head .wc-name { font-size:22px; font-weight:700; color:white; margin-top:4px; }
+    .winner-card-head .wc-co { font-size:13px; color:rgba(255,255,255,0.65); margin-top:2px; }
+    .winner-card-head .wc-amount { font-size:32px; font-weight:700; color:white; margin-top:8px; }
+    .winner-card-head .wc-words { font-size:13px; color:rgba(255,255,255,0.55); font-style:italic; margin-top:3px; }
+    .winner-card-body { background:#F0FDF4; padding:24px 28px; }
+    .winner-card-body .wc-body-label { font-size:13px; font-weight:700; color:#065F46; margin-bottom:14px; }
+    .winner-card-body .wc-bullet { display:flex; gap:8px; margin-bottom:8px; }
+    .winner-card-body .wc-bullet .wc-tick { font-size:13px; font-weight:700; color:#10B981; flex-shrink:0; }
+    .winner-card-body .wc-bullet .wc-text { font-size:13px; color:#065F46; }
+    .winner-card-body .wc-sub { padding-left:20px; color:#374151; font-size:12px; margin-top:2px; margin-bottom:4px; }
+    .winner-card-foot { background:white; border-top:1px solid #BBF7D0; padding:16px 28px; display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+    .winner-card-foot .wc-foot-meta { display:flex; flex-direction:column; gap:2px; }
+    .winner-card-foot .wc-foot-meta .wc-meta-method { font-size:12px; color:#6B7280; }
+    .winner-card-foot .wc-foot-meta .wc-meta-spec { font-size:11px; color:#065F46; }
+    .winner-card-foot .wc-foot-meta .wc-meta-spec.preview { color:#92400E; }
+    .winner-card-foot .wc-foot-actions { display:flex; gap:10px; }
+    .winner-card-foot .wc-reeval { background:white; border:1px solid #E5E7EB; border-radius:7px; padding:8px 14px; font-size:12px; color:#374151; cursor:pointer; transition: background .15s ease; }
+    .winner-card-foot .wc-reeval:hover { background:#F9FAFB; }
+    .winner-card-foot .wc-send { background:#0F5EE8; border:none; border-radius:7px; padding:8px 18px; font-size:13px; font-weight:700; color:white; cursor:pointer; transition: background .15s ease; }
+    .winner-card-foot .wc-send:hover { background:#0B4BC4; }
+    /* Phase 3 rank badge entry */
+    .rank-badge-enter { opacity:0; animation: rankEnter 150ms ease forwards; }
+    @keyframes rankEnter { to { opacity:1; } }
+    /* New Specified-in-tender pill (replaces the .specified-badge styling for the segment label) */
+    .specified-pill { display:inline-flex; align-items:center; background:#F0FDF4; color:#065F46; border:1px solid #BBF7D0; border-radius:20px; padding:2px 10px; font-size:11px; font-weight:700; margin-left:6px; vertical-align:middle; }
+    .method-segments button.on .specified-pill { background:rgba(255,255,255,0.18); color:white; border-color:rgba(255,255,255,0.3); }
+    /* Phase 2 eye button (refined) */
+    .eye-btn { width:28px; height:28px; border-radius:6px; border:1px solid #E5E7EB; background:white; color:#9CA3AF; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; transition: border-color .15s ease, color .15s ease, background .15s ease; padding:0; }
+    .eye-btn:hover { border-color:#0F5EE8; color:#0F5EE8; background:#EFF6FF; }
+    .eye-btn:focus-visible { outline:2px solid #0F5EE8; outline-offset:2px; }
+    .eye-btn.pending { border-color:#F59E0B; color:#F59E0B; background:#FFFBEB; }
+    .eye-btn.revealed { border-color:#10B981; color:#10B981; background:#F0FDF4; cursor:default; pointer-events:none; }
+    .eye-confirm-pill { background:#FFFBEB; color:#92400E; border-radius:4px; padding:2px 8px; font-size:11px; }
+    .quote-cell { display:inline-flex; align-items:center; gap:8px; }
     .reveal-btn-row { display:flex; justify-content:center; margin-bottom:14px; }
     .specified-badge { display:inline-block; background:#EFF6FF; color:#0C447C; border-radius:4px; padding:1px 5px; font-size:10px; font-weight:700; margin-left:4px; vertical-align:middle; }
     .tender-ref-note { font-size:12px; color:#6B7280; font-style:italic; margin-top:6px; }
@@ -601,12 +679,12 @@
         <!-- Audit log trigger row (Change 5) -->
         <div class="flex items-center justify-end">
           <button id="auditTriggerBtn" class="audit-trigger" onclick="toggleAuditPanel()" aria-expanded="false" aria-controls="auditPanel">
-            <i data-lucide="clipboard-list" class="w-3.5 h-3.5"></i> Audit Log
+            <i data-lucide="clipboard-list" class="w-3.5 h-3.5"></i> Activity Trail
             <span id="auditBadge" class="badge" aria-live="polite">0</span>
           </button>
         </div>
-        <!-- Audit log right-side slide-in panel (viewport-fixed) -->
-        <aside id="auditPanel" class="audit-panel" role="complementary" aria-label="Audit log" aria-hidden="true"></aside>
+        <!-- Activity Trail right-side slide-in panel (viewport-fixed) -->
+        <aside id="auditPanel" class="audit-panel" role="complementary" aria-label="Activity trail" aria-hidden="true"></aside>
 
         <!-- Stage tabs -->
         <div role="tablist" aria-label="Evaluation stages" class="flex flex-wrap gap-2">
@@ -2676,25 +2754,42 @@ Date: ${esc(fmtDateShort(today))}`;
     _uiEditingScores[vendor+'|'+critId] = true;
     renderTechnical();
     refreshIcons();
-    // Focus the input that just rendered
+    // Auto-focus the input that just rendered
     setTimeout(() => {
-      const inp = document.querySelector(`input.tq-score-in[data-edit="${vendor}|${critId}"]`);
+      const inp = document.querySelector(`input.tq-edit-input[data-edit="${vendor}|${critId}"]`);
       if (inp){ inp.focus(); inp.select(); }
     }, 0);
-  }
-  function saveEditScore(vendor, critId, raw){
-    setMemberScore(vendor, critId, 'rk', raw);
-    delete _uiEditingScores[vendor+'|'+critId];
-    renderTechnical();
-    refreshIcons();
   }
   function cancelEditScore(vendor, critId){
     delete _uiEditingScores[vendor+'|'+critId];
     renderTechnical();
     refreshIcons();
   }
+  // Commit save with validation: empty → no save; > max → flash red border; else save + exit
+  function commitEditScore(vendor, critId, btn){
+    const c = TQ_CRITERIA.find(x => x.id === critId); if (!c) return;
+    const row = btn ? btn.closest('.tq-edit-row') : document.querySelector(`[data-edit-row="${vendor}|${critId}"]`);
+    const inp = row ? row.querySelector('input.tq-edit-input') : document.querySelector(`input.tq-edit-input[data-edit="${vendor}|${critId}"]`);
+    if (!inp) return;
+    const raw = (inp.value || '').trim();
+    if (raw === ''){ flashInputError(inp); return; }
+    const n = Number(raw);
+    if (!Number.isFinite(n) || n < 0 || n > c.max){ flashInputError(inp); return; }
+    setMemberScore(vendor, critId, 'rk', String(n));   // existing fn handles clamp + log + matrix update
+    delete _uiEditingScores[vendor+'|'+critId];
+    renderTechnical();
+    refreshIcons();
+  }
+  function flashInputError(inp){
+    if (!inp) return;
+    inp.classList.add('flash-error');
+    // Remove the class after the animation so subsequent edits can re-trigger it
+    setTimeout(() => inp.classList.remove('flash-error'), 600);
+    inp.focus();
+    inp.select();
+  }
   function onEditKey(ev, vendor, critId){
-    if (ev.key === 'Enter'){ ev.preventDefault(); saveEditScore(vendor, critId, ev.target.value); }
+    if (ev.key === 'Enter'){ ev.preventDefault(); commitEditScore(vendor, critId, ev.target); }
     else if (ev.key === 'Escape'){ ev.preventDefault(); cancelEditScore(vendor, critId); }
   }
   function renderTqRow(c, vendor){
@@ -2704,18 +2799,27 @@ Date: ${esc(fmtDateShort(today))}`;
       const sc = memberScore(vendor, c.id, mb.id);
       const submitted = ((EVAL.tqMemberSubmitted||{})[vendor]||{})[mb.id];
       if (mb.isYou){
-        // While editing — show input + green save button (Enter/Esc also work)
+        // EDIT STATE — input + ✓ Save + ✕ Cancel (Enter saves, Escape cancels)
         if (editingThis){
-          return `<td class="tq-member-cell"><input class="tq-score-in" data-edit="${esc(vendor)}|${c.id}" type="number" min="0" max="${c.max}" value="${sc != null ? sc : ''}" onkeydown="onEditKey(event,'${esc(vendor)}','${c.id}')" /> <span style="color:#6B7280; font-size:11px;">/ ${c.max}</span> <button class="save-btn" title="Save (Enter)" onclick="saveEditScore('${esc(vendor)}','${c.id}', this.parentNode.querySelector('input.tq-score-in').value)">✓</button></td>`;
+          return `<td class="tq-member-cell">
+            <div class="tq-edit-row" data-edit-row="${esc(vendor)}|${c.id}">
+              <input class="tq-edit-input" data-edit="${esc(vendor)}|${c.id}" type="number" min="0" max="${c.max}" value="${sc != null ? sc : ''}" onkeydown="onEditKey(event,'${esc(vendor)}','${c.id}')" aria-label="Edit your score for ${esc(c.short)} (max ${c.max})" />
+              <span style="color:#6B7280; font-size:13px;">/ ${c.max}</span>
+              <button class="tq-save-btn" type="button" title="Save (Enter)" aria-label="Save score" onclick="commitEditScore('${esc(vendor)}','${c.id}', this)">✓</button>
+              <button class="tq-cancel-btn" type="button" title="Cancel (Escape)" aria-label="Cancel edit" onclick="cancelEditScore('${esc(vendor)}','${c.id}')">✕</button>
+            </div>
+          </td>`;
         }
-        if (submitted){
-          // Locked when all 3 members have submitted; otherwise editable via Edit ✎
-          const editAffordance = allSubmitted
-            ? `<span class="locked-label" title="All committee members have submitted. Scores are locked.">Locked</span>`
-            : `<button class="edit-link" onclick="startEditScore('${esc(vendor)}','${c.id}')" aria-label="Edit your score">Edit ✎</button>`;
-          return `<td class="tq-member-cell"><span class="scored">${sc != null ? sc : '—'}</span> <span style="color:#6B7280; font-size:11px;">/ ${c.max}</span>${editAffordance}</td>`;
+        // VIEW STATE WITH SCORE — clickable score number; locked when all 3 submitted
+        if (sc != null){
+          if (allSubmitted){
+            return `<td class="tq-member-cell"><span class="scored locked" title="All committee members have submitted. Scores are locked.">${sc}</span> <span style="color:#6B7280; font-size:13px;">/ ${c.max}</span> <span class="locked-label" title="All committee members have submitted. Scores are locked.">Locked</span></td>`;
+          }
+          // Use a <button> for native keyboard / focus support; style strips the chrome via .scored
+          return `<td class="tq-member-cell"><button class="scored" type="button" title="Click to edit" aria-label="Edit score: currently ${sc} of ${c.max}" onclick="startEditScore('${esc(vendor)}','${c.id}')">${sc}</button> <span style="color:#6B7280; font-size:13px;">/ ${c.max}</span></td>`;
         }
-        return `<td class="tq-member-cell"><input class="tq-score-in" type="number" min="0" max="${c.max}" value="${sc != null ? sc : ''}" oninput="setMemberScore('${esc(vendor)}','${c.id}','rk', this.value)" /> <span style="color:#6B7280; font-size:11px;">/ ${c.max}</span></td>`;
+        // FIRST-ENTRY (no score yet) — input fires on commit (Enter/blur)
+        return `<td class="tq-member-cell"><input class="tq-score-in" type="number" min="0" max="${c.max}" value="" placeholder="—" oninput="setMemberScore('${esc(vendor)}','${c.id}','rk', this.value)" aria-label="Enter your score for ${esc(c.short)} (max ${c.max})" /> <span style="color:#6B7280; font-size:11px;">/ ${c.max}</span></td>`;
       }
       if (sc != null) return `<td class="tq-member-cell"><span class="scored-other">${sc}</span> <span style="color:#6B7280; font-size:11px;">/ ${c.max}</span></td>`;
       return `<td class="tq-member-cell"><span class="pending-pill">Pending</span> <button class="remind" onclick="sendMemberReminder('${esc(mb.name)}')">Remind</button></td>`;
@@ -3328,10 +3432,12 @@ Date: ${esc(fmtDateShort(today))}`;
     const f1exp = (EVAL.finExpanded||'f1') === 'f1';
     const f2locked = !EVAL.finRun;
     const f2exp = EVAL.finExpanded === 'f2' && !f2locked;
-    const f3exp = EVAL.finExpanded === 'f3' && EVAL.finRun;
+    // F3 (reasonableness) unlocks only when the NATIVE method reaches Phase 3 (winner revealed)
+    const f3unlocked = !f2locked && nativeMethodPhase() === 3;
+    const f3exp = EVAL.finExpanded === 'f3' && f3unlocked;
     wrap.innerHTML = finCard('f1','01','Upload Financial Bids', f1StatusPill(), f1exp, false, f1Body())
                    + finCard('f2','02','Financial Evaluation',   f2StatusPill(), f2exp, f2locked, f2locked ? '' : f2Body())
-                   + (EVAL.finRun ? finCard('f3','03','Reasonableness Check', f3StatusPill(), f3exp, false, f3Body()) : '');
+                   + (f3unlocked ? finCard('f3','03','Reasonableness Check', f3StatusPill(), f3exp, false, f3Body()) : '');
     refreshIcons();
   }
   function f3StatusPill(){
@@ -3340,7 +3446,7 @@ Date: ${esc(fmtDateShort(today))}`;
       : pill('Pending','#F3F4F6','#6B7280');
   }
   function finCard(key, num, title, statusPill, expanded, locked, body){
-    return `<div class="bg-white border border-line rounded-xl overflow-hidden">
+    return `<div id="${key}-card" class="bg-white border border-line rounded-xl overflow-hidden">
       <div class="flex items-center gap-3 ${locked?'opacity-50':'cursor-pointer'}" ${locked?'':`onclick="toggleFinSection('${key}')"`} style="padding:14px 18px;">
         <span class="text-[11px] font-bold" style="background:#F3F4F6; color:#6B7280; border-radius:6px; padding:3px 8px;">${num}</span>
         <span class="text-[14px] font-bold text-ink-900 flex-1">${title}</span>
@@ -3553,39 +3659,54 @@ Date: ${esc(fmtDateShort(today))}`;
     const alb = albBid ? { vendor:albBid.vendor, quote:albBid.quote } : null;
     const tName = (EVAL_TENDERS.find(t => t.id===EVAL.tnd)||AWARDED_TENDERS.find(t => t.id===EVAL.tnd)||{}).name || EVAL.tnd;
 
-    // === Dynamic method banner (Change 2) + tender-reference note (Change 4A) ===
+    // === Dynamic method banner (Change 3 — Most Common badge removed) ===
     const meta = METHOD_META[m] || METHOD_META.L1;
-    const commonBadge = meta.mostCommon ? '<span class="method-badge-common">Most common</span>' : '';
     const nativeM = EVAL.method || 'L1';
     const isPreview = m !== nativeM;
+    // Tender-reference italic note below description
     const refNote = isPreview
-      ? `<div class="preview-ref-note">ℹ You are viewing a preview using ${esc((METHOD_META[m]||{}).short||m)}. The tender specifies ${esc((METHOD_META[nativeM]||{}).short||nativeM)} as the evaluation method.</div><div class="preview-ref-sub">This result is for reference only.</div>`
-      : `<div class="tender-ref-note">This evaluation method (${esc((METHOD_META[m]||{}).short||m)}) was specified in the original tender document (${esc(EVAL.tnd)}, Step 1 — Classification).</div>`;
+      ? `<div class="preview-ref-note" style="font-style:italic;">ℹ You are viewing a preview using ${esc((METHOD_META[m]||{}).short||m)}. The tender specifies ${esc((METHOD_META[nativeM]||{}).short||nativeM)} as the evaluation method.</div>`
+      : `<div class="tender-ref-note" style="font-style:italic;">This evaluation method was specified in Tender ${esc(EVAL.tnd)} (Step 1 — Classification). It will be used as the default for winner determination.</div>`;
     const banner = `<div class="method-banner" id="methodBanner" style="background:${meta.bg}; border-color:${meta.border}; color:${meta.text};">
       <i id="mbIcon" data-lucide="${meta.icon}" style="width:18px; height:18px; color:${meta.sub}; flex-shrink:0; margin-top:1px;"></i>
       <div style="flex:1; min-width:0;">
-        <div class="text-[13px] font-bold" style="color:${meta.text};"><span id="mbName">${esc(meta.name)}</span>${commonBadge}</div>
+        <div class="text-[13px] font-bold" style="color:${meta.text};"><span id="mbName">${esc(meta.name)}</span></div>
         <div class="text-[12px]" id="mbDesc" style="color:${meta.sub};">${esc(meta.desc)}</div>
         ${refNote}
       </div>
     </div>`;
 
-    // === 5-method pill selector (Change 3) ===
+    // === 5-method pill selector — green "Specified in tender" pill on native, Most Common removed ===
     const segBtn = (key) => {
       const on = m === key;
       const mm = METHOD_META[key];
       const isNative = key === nativeM;
-      const badge = mm.mostCommon ? '<span class="method-badge-common">Most common</span>' : (isNative ? '<span class="specified-badge">Specified</span>' : '');
-      return `<button data-method="${key}" class="${on?'on':''}" aria-pressed="${on?'true':'false'}" aria-label="Evaluation method ${esc(mm.name)}" onclick="switchMethod('${key}')">${esc(mm.short)}${badge}</button>`;
+      const pill = isNative ? '<span class="specified-pill">Specified in tender</span>' : '';
+      return `<button data-method="${key}" class="${on?'on':''}" aria-pressed="${on?'true':'false'}" aria-label="Evaluation method ${esc(mm.name)}${isNative?' — specified in tender':''}" onclick="onMethodTabClick('${key}')">${esc(mm.short)}${pill}</button>`;
     };
     const segments = `<div class="method-segments" role="tablist" id="methodSegments" aria-label="Evaluation method">
       ${segBtn('L1')}${segBtn('QCBS')}${segBtn('LCS')}${segBtn('QBS')}${segBtn('FBS')}
     </div>`;
 
-    // === Render all 5 view bodies; only active visible. Switching animates opacity. ===
+    // Inline non-default switch warning bar — collapsed by default, shown when user clicks a non-native tab
+    const warningBar = `<div id="nonDefaultWarn" class="nondefault-warning" role="status" aria-hidden="true">
+      <div class="ndw-left" id="nonDefaultWarnText"></div>
+      <div style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+        <button class="ndw-cancel" type="button" onclick="cancelMethodSwitch()">Cancel</button>
+        <button class="ndw-continue" type="button" onclick="confirmMethodSwitch()">Continue anyway →</button>
+      </div>
+    </div>`;
+
+    // Persistent preview-mode mini banner
+    const previewMini = isPreview
+      ? `<div class="preview-mini-banner">Preview only — ${esc((METHOD_META[m]||{}).short||m)} was not specified in this tender. Results are for reference only.</div>`
+      : '';
+
+    // === Render all 5 view bodies; only active visible. ===
     const view = (k, body) => `<div id="finView${k}" class="fin-view ${m===k?'':'hidden-view'}" style="opacity:1;">${body}</div>`;
 
-    return `${banner}${segments}
+    // F3 (reasonableness) — gated on native method phase 3 (handled in renderFinancial)
+    return `${banner}${segments}${warningBar}${previewMini}
       ${view('L1',   l1ViewBody(tName))}
       ${view('QCBS', qcbsViewBody(tName, T, F))}
       ${view('LCS',  lcsViewBody(tName))}
@@ -3593,7 +3714,65 @@ Date: ${esc(fmtDateShort(today))}`;
       ${view('FBS',  fbsViewBody(tName))}
       <div id="finAlbZone">${alb ? albDecisionHTML(alb) : ''}</div>`;
   }
-  // === Method switch — animates inner view + updates banner without full re-render ===
+  // ===== Per-method 3-phase state — stored under localStorage key `finEval_<TND>_<METHOD>` =====
+  function finEvalKey(method){ return 'finEval_' + (EVAL ? EVAL.tnd : '') + '_' + method; }
+  function getFinEval(method){
+    try {
+      const raw = localStorage.getItem(finEvalKey(method));
+      if (raw){
+        const o = JSON.parse(raw);
+        if (o && typeof o === 'object') return Object.assign({ phase:1, revealedVendors:[], evaluatedAt:null, winnerRevealedAt:null }, o);
+      }
+    } catch(e){}
+    return { phase:1, revealedVendors:[], evaluatedAt:null, winnerRevealedAt:null };
+  }
+  function setFinEval(method, partial){
+    const cur = getFinEval(method);
+    const next = Object.assign({}, cur, partial);
+    try { localStorage.setItem(finEvalKey(method), JSON.stringify(next)); } catch(e){}
+    return next;
+  }
+  function resetFinEvalStorage(method){
+    try { localStorage.removeItem(finEvalKey(method)); } catch(e){}
+  }
+  function currentFinMethod(){ return (EVAL && (EVAL.evaluationMethod || EVAL.method)) || 'L1'; }
+  function currentFinPhase(){ return getFinEval(currentFinMethod()).phase; }
+  function nativeMethodPhase(){ return getFinEval(EVAL.method || 'L1').phase; }
+  function isMethodNative(method){ return method === (EVAL.method || 'L1'); }
+  // === Method tab click — shows non-default warning bar for non-native methods, otherwise switches directly ===
+  let _pendingMethodSwitch = null;
+  function onMethodTabClick(newM){
+    if (!METHOD_META[newM]) return;
+    if (newM === EVAL.evaluationMethod) return;
+    const nativeM = EVAL.method || 'L1';
+    if (newM === nativeM){
+      // Native method — switch directly, no warning
+      switchMethod(newM);
+      return;
+    }
+    // Non-default — show inline confirmation bar
+    _pendingMethodSwitch = newM;
+    const warnBar = document.getElementById('nonDefaultWarn');
+    const warnText = document.getElementById('nonDefaultWarnText');
+    if (warnText) warnText.innerHTML = `⚠ This tender specifies <strong>${esc((METHOD_META[nativeM]||{}).short||nativeM)}</strong> as its evaluation method. You are switching to <strong>${esc((METHOD_META[newM]||{}).short||newM)}</strong> which was not mentioned in the tender.`;
+    if (warnBar){
+      warnBar.classList.add('open');
+      warnBar.setAttribute('aria-hidden', 'false');
+    }
+  }
+  function cancelMethodSwitch(){
+    _pendingMethodSwitch = null;
+    const warnBar = document.getElementById('nonDefaultWarn');
+    if (warnBar){ warnBar.classList.remove('open'); warnBar.setAttribute('aria-hidden','true'); }
+  }
+  function confirmMethodSwitch(){
+    if (!_pendingMethodSwitch) return;
+    const target = _pendingMethodSwitch;
+    _pendingMethodSwitch = null;
+    const warnBar = document.getElementById('nonDefaultWarn');
+    if (warnBar){ warnBar.classList.remove('open'); warnBar.setAttribute('aria-hidden','true'); }
+    switchMethod(target);
+  }
   function switchMethod(newM){
     if (!METHOD_META[newM]) return;
     if (newM === EVAL.evaluationMethod) return;
@@ -3601,66 +3780,40 @@ Date: ${esc(fmtDateShort(today))}`;
     EVAL.evaluationMethod = newM;
     activeView = newM;
     saveState();
-    // 1. Fade out current visible view, show new one with opacity 0 → 1
-    document.querySelectorAll('#stage-financial .fin-view').forEach(v => v.classList.add('hidden-view'));
-    const target = document.getElementById('finView' + newM);
-    if (target){
-      target.classList.remove('hidden-view');
-      target.style.opacity = '0';
-      requestAnimationFrame(() => { target.style.opacity = '1'; });
-    }
-    // 2. Update banner DOM directly (transition: all 200ms ease)
-    updateMethodBanner(newM);
-    // 3. Update segments highlight
-    document.querySelectorAll('#methodSegments button').forEach(btn => {
-      const on = btn.dataset.method === newM;
-      btn.classList.toggle('on', on);
-      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-    });
-    // 4. Re-render F3 body since reasonableness depends on method
-    if (EVAL.finRun) renderFinancial();
-  }
-  function updateMethodBanner(m){
-    const meta = METHOD_META[m] || METHOD_META.L1;
-    const banner = document.getElementById('methodBanner');
-    if (!banner) return;
-    banner.style.background   = meta.bg;
-    banner.style.borderColor  = meta.border;
-    banner.style.color        = meta.text;
-    const name = document.getElementById('mbName');
-    const desc = document.getElementById('mbDesc');
-    const icon = document.getElementById('mbIcon');
-    if (name) name.textContent = meta.name;
-    if (desc){ desc.textContent = meta.desc; desc.style.color = meta.sub; }
-    if (icon){
-      icon.setAttribute('data-lucide', meta.icon);
-      icon.style.color = meta.sub;
-    }
-    // Most-common badge management — only L1 shows it (next to mbName)
-    const headerDiv = name ? name.parentElement : null;
-    if (headerDiv){
-      const existingBadge = headerDiv.querySelector('.method-badge-common');
-      if (meta.mostCommon){
-        if (!existingBadge) name.insertAdjacentHTML('afterend', '<span class="method-badge-common">Most common</span>');
-      } else if (existingBadge) existingBadge.remove();
-      headerDiv.style.color = meta.text;
-    }
+    // Full re-render so per-method phase + preview-mini banner + bodies all reflect the new method
+    renderFinancial();
     refreshIcons();
   }
   // Legacy alias — old code paths may still call switchFinView
   function switchFinView(v){ switchMethod(v); }
-  // === Change 4C — winner-first reveal helpers ===
-  function isRevealed(vendor){ return !!(EVAL.finRevealed || {})[vendor]; }
-  function maskedQuoteCell(vendor, quote, isWinner){
-    const reveal = isRevealed(vendor);
-    if (reveal){
-      return `<span class="reveal-anim" style="font-weight:700; color:#111827;">₹${quote.toLocaleString('en-IN')}</span>`;
-    }
-    if (isWinner) return `<span class="reveal-anim" style="font-weight:700; color:#111827;">₹${quote.toLocaleString('en-IN')}</span>`;
-    return `<span class="mask-pill">••••••</span> <button class="eye-btn" onclick="revealVendor('${esc(vendor)}', this)" aria-label="Reveal bid amount for ${esc(vendor)}"><i data-lucide="eye" style="width:14px; height:14px;"></i></button>`;
+  // === 3-phase reveal helpers (Change 3) — read from per-method localStorage ===
+  function isRevealed(vendor){
+    const st = getFinEval(currentFinMethod());
+    if (st.phase === 3) return true;          // Phase 3 → everyone revealed
+    return st.revealedVendors.indexOf(vendor) !== -1;
   }
-  function maskedPctCell(vendor, pct, isWinner){
-    if (isRevealed(vendor) || isWinner){
+  // Cell renderer aware of current method's phase
+  function maskedQuoteCell(vendor, quote, _ignoredIsWinner){
+    const phase = currentFinPhase();
+    if (phase === 1){
+      // Phase 1 — fully sealed, no eye icons
+      return `<span class="mask-pill">₹ ••••••</span>`;
+    }
+    if (phase === 3 || isRevealed(vendor)){
+      return `<span class="reveal-anim" style="font-weight:600; color:#374151;" data-revealed-amount="${esc(vendor)}">₹${quote.toLocaleString('en-IN')}</span>`;
+    }
+    // Phase 2 — masked + eye icon for everyone
+    return `<span class="quote-cell">
+        <span class="mask-pill" data-mask-cell="${esc(vendor)}">₹ ••••••</span>
+        <button class="eye-btn" data-eye-btn="${esc(vendor)}" onclick="revealVendor('${esc(vendor)}', this)" aria-label="Reveal quoted amount for ${esc(vendor)}" type="button">
+          <i data-lucide="eye" style="width:14px; height:14px;"></i>
+        </button>
+      </span>`;
+  }
+  function maskedPctCell(vendor, pct, _ignoredIsWinner){
+    const phase = currentFinPhase();
+    if (phase === 1) return `<span class="mask-pill">••••</span>`;
+    if (phase === 3 || isRevealed(vendor)){
       const color = pct < 0 ? '#065F46' : pct > 10 ? '#991B1B' : pct > 0 ? '#92400E' : '#374151';
       return `<span class="reveal-anim" style="color:${color}; font-weight:600;">${pct>=0?'+':''}${pct.toFixed(1)}%</span>`;
     }
@@ -3692,83 +3845,338 @@ Date: ${esc(fmtDateShort(today))}`;
     const valid = bids.filter(b => !b.alb).sort((a,b) => (a.quote||0)-(b.quote||0));
     return valid[0] || bids.slice().sort((a,b) => (a.quote||0)-(b.quote||0))[0] || null;
   }
-  function winnerRevealed(){
-    const w = currentFinWinner();
-    return w ? !!(EVAL.finRevealed||{})[w.vendor] : false;
-  }
-  function allRevealed(){
-    const bids = finBidsBase();
-    return bids.length > 0 && bids.every(b => !!(EVAL.finRevealed||{})[b.vendor]);
-  }
-  function openRevealWinnerModal(){
-    const dlg = document.getElementById('modalDialog'); const bk = document.getElementById('modalBackdrop');
-    if (!dlg) return;
-    dlg.innerHTML = `<div id="modalTitle" style="font-size:17px; font-weight:700; color:#111827; margin-bottom:8px;">Reveal the winning bid?</div>
-      <div style="font-size:13px; color:#374151;">This will show the rank 1 vendor and their quoted amount. All other bids remain sealed until you choose to reveal them.</div>
-      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:18px;">
-        <button class="px-4 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface" onclick="closeRevealModal()">Cancel</button>
-        <button class="px-4 py-2 rounded-lg bg-primary text-white text-[13px] font-semibold hover:bg-primary/90" onclick="confirmRevealWinner()">Reveal winner →</button>
-      </div>`;
-    dlg.classList.add('open'); bk.classList.add('open');
-    refreshIcons();
-  }
-  function closeRevealModal(){
-    const dlg = document.getElementById('modalDialog'); const bk = document.getElementById('modalBackdrop');
-    if (dlg) dlg.classList.remove('open'); if (bk) bk.classList.remove('open');
-  }
-  function confirmRevealWinner(){
-    const winner = currentFinWinner();
-    if (winner){
-      EVAL.finRevealed[winner.vendor] = true;
-      log('Financial Evaluation', 'winner_revealed', `${winner.vendor} · ₹${(winner.quote||0).toLocaleString('en-IN')}`);
+  function winnerRevealed(){ return currentFinPhase() >= 3; }
+  function allRevealed(){ return currentFinPhase() >= 3; }
+
+  // ===== Phase 1 → 2: run evaluation with simulated loading + row flash =====
+  function runEvaluateBids(){
+    const method = currentFinMethod();
+    if (getFinEval(method).phase !== 1) return;
+    const btn = document.getElementById('evaluateBidsBtn');
+    if (btn){
+      btn.disabled = true;
+      btn.innerHTML = `<span class="phase-spinner"></span> Evaluating...`;
     }
-    closeRevealModal();
+    // Stagger-flash visible rows for visual feedback (80ms apart)
+    const rows = document.querySelectorAll('#stage-financial .fin-view:not(.hidden-view) tbody tr');
+    rows.forEach((tr, i) => setTimeout(() => tr.classList.add('phase-row-flash'), i * 80));
+    // After 1200ms total, commit phase=2 + log + re-render
+    setTimeout(() => {
+      setFinEval(method, { phase:2, evaluatedAt: new Date().toISOString() });
+      EVAL.finRun = true; saveState();
+      const bids = finBidsBase();
+      log('Financial Evaluation', 'bids_evaluated', `${(METHOD_META[method]||{}).short||method} · ${bids.length} vendors`);
+      renderFinancial();
+      refreshIcons();
+    }, 1200);
+  }
+
+  // ===== Phase 2 → 3: reveal winner; auto-reveal remaining with stagger; show winner card =====
+  function revealWinnerNow(){
+    const method = currentFinMethod();
+    const st = getFinEval(method);
+    if (st.phase !== 2) return;
+    const winner = currentFinWinner();
+    const bids = finBidsBase();
+    // Log immediately (per spec: fires the moment the button is clicked, before animations)
+    log('Financial Evaluation', 'winner_revealed', `${(METHOD_META[method]||{}).short||method}${winner ? ' · '+winner.vendor+' · ₹'+(winner.quote||0).toLocaleString('en-IN') : ''}`);
+    // Determine which vendors are NOT yet revealed → they get the staggered animation
+    const unrevealed = bids.map(b => b.vendor).filter(v => !st.revealedVendors.includes(v));
+    // Commit phase=3 + revealedVendors=[all] immediately so re-render shows the final state
+    setFinEval(method, { phase:3, revealedVendors: bids.map(b => b.vendor), winnerRevealedAt: new Date().toISOString() });
     saveState();
+    // Re-render fully — table shows all revealed + ranks + winner card.
+    // Mark this re-render as a transition so the winner-card animates in (default behavior).
+    _finJustRevealed = true;
     renderFinancial();
     refreshIcons();
+    // After render, apply staggered reveal animation to the newly-revealed cells (visual only)
+    setTimeout(() => {
+      unrevealed.forEach((vendor, i) => {
+        setTimeout(() => {
+          const cell = document.querySelector(`[data-revealed-amount="${vendor}"]`);
+          if (cell){ cell.classList.remove('reveal-anim'); /* re-trigger */ void cell.offsetWidth; cell.classList.add('reveal-anim'); }
+        }, i * 100);
+      });
+    }, 0);
   }
-  // Two-click reveal for non-winner rows
+  // Transient flag — true when the last renderFinancial was triggered by revealWinnerNow
+  let _finJustRevealed = false;
+
+  // ===== Two-click reveal for individual vendor amounts (Phase 2) =====
+  // Module-level: only one pending reveal at a time across the table.
+  let pendingRevealVendor = null;
+  let pendingRevealTimeout = null;
+  function resetPendingReveal(vendor){
+    if (pendingRevealTimeout){ clearTimeout(pendingRevealTimeout); pendingRevealTimeout = null; }
+    if (pendingRevealVendor !== vendor && vendor != null) return; // ignore mismatched resets
+    pendingRevealVendor = null;
+    // Restore eye button + masked pill in DOM
+    const btn = document.querySelector(`button.eye-btn[data-eye-btn="${vendor}"]`);
+    const mask = document.querySelector(`[data-mask-cell="${vendor}"]`);
+    if (btn){ btn.classList.remove('pending'); }
+    if (mask){ mask.outerHTML = `<span class="mask-pill" data-mask-cell="${vendor}">₹ ••••••</span>`; }
+  }
   function revealVendor(vendor, btn){
-    if (btn._armed){
-      EVAL.finRevealed[vendor] = true;
-      const b = finBidsBase().find(x => x.vendor === vendor);
-      log('Financial Evaluation', 'bid_revealed', `${vendor} · ${b ? '₹'+b.quote.toLocaleString('en-IN') : ''} (revealed by Rajesh Kumar)`);
-      saveState(); renderFinancial(); refreshIcons();
+    const method = currentFinMethod();
+    const st = getFinEval(method);
+    if (st.phase !== 2) return;            // only in Phase 2
+    if (st.revealedVendors.includes(vendor)) return;
+    // First click — different vendor pending → cancel that pending first
+    if (pendingRevealVendor && pendingRevealVendor !== vendor){
+      resetPendingReveal(pendingRevealVendor);
+    }
+    if (pendingRevealVendor !== vendor){
+      // FIRST CLICK on this vendor
+      pendingRevealVendor = vendor;
+      btn.classList.add('pending');
+      const mask = btn.parentElement.querySelector(`[data-mask-cell="${vendor}"]`);
+      if (mask) mask.outerHTML = `<span class="eye-confirm-pill" data-mask-cell="${vendor}">Click again to reveal</span>`;
+      pendingRevealTimeout = setTimeout(() => resetPendingReveal(vendor), 3000);
       return;
     }
-    btn._armed = true;
-    btn.outerHTML = `<span class="eye-confirm">Click again to reveal</span><button class="eye-btn" onclick="revealVendor('${esc(vendor)}', this)" data-armed="1" aria-label="Confirm reveal"><i data-lucide="eye" style="width:14px; height:14px;"></i></button>`;
-    // After 2s, reset
-    setTimeout(() => { renderFinancial(); refreshIcons(); }, 2000);
-    refreshIcons();
+    // SECOND CLICK — within 3s, same vendor
+    clearTimeout(pendingRevealTimeout); pendingRevealTimeout = null;
+    pendingRevealVendor = null;
+    // Persist
+    const next = Object.assign({}, st);
+    next.revealedVendors = st.revealedVendors.slice();
+    if (!next.revealedVendors.includes(vendor)) next.revealedVendors.push(vendor);
+    setFinEval(method, { revealedVendors: next.revealedVendors });
+    const b = finBidsBase().find(x => x.vendor === vendor);
+    log('Financial Evaluation', 'amount_revealed', `${vendor} · ${(METHOD_META[method]||{}).short||method}${b ? ' · ₹'+b.quote.toLocaleString('en-IN') : ''}`);
+    // Inline DOM update — blur-reveal animation, eye → revealed state
+    const cell = btn.parentElement;
+    if (cell){
+      const quote = b ? '₹'+b.quote.toLocaleString('en-IN') : '';
+      cell.outerHTML = `<span class="reveal-anim" style="font-weight:600; color:#374151;" data-revealed-amount="${esc(vendor)}">${quote}</span>`;
+    }
   }
-  // Render the reveal-winner button + status banner at the top of the active financial view body
-  function revealHeaderHTML(){
+
+  // ===== Phase header — banner + action button per phase =====
+  function phaseHeaderHTML(){
     if (!EVAL.finRun) return '';
-    if (allRevealed()) return `<div style="font-size:12px; color:#10B981; margin-bottom:10px; font-weight:600;">All financial bids have been revealed. Comparison is now complete.</div>`;
-    if (winnerRevealed()) return '';  // winner shown, eye icons appear inline on other rows
-    return `<div class="reveal-banner"><i data-lucide="info" style="width:14px; height:14px;"></i> Financial bid amounts are sealed. Evaluation has been run. Reveal the winner first, then other bids.</div>
-      <div class="reveal-btn-row"><button class="px-5 py-2.5 rounded-lg bg-primary text-white text-[14px] font-bold hover:bg-primary/90 inline-flex items-center gap-2" onclick="openRevealWinnerModal()"><i data-lucide="eye" style="width:16px; height:16px;"></i> Reveal winner</button></div>`;
+    const phase = currentFinPhase();
+    const method = currentFinMethod();
+    const mShort = (METHOD_META[method]||{}).short || method;
+    if (phase === 1){
+      return `<div class="reveal-banner" aria-live="polite">
+          <i data-lucide="lock" style="width:16px; height:16px; color:#0C447C;"></i>
+          <span>All financial bid amounts are sealed. Click 'Evaluate Bids' to run the ${esc(mShort)} evaluation and reveal individual amounts.</span>
+        </div>`;
+    }
+    if (phase === 2){
+      return `<div class="reveal-banner" aria-live="polite">
+          <i data-lucide="eye" style="width:16px; height:16px; color:#0C447C;"></i>
+          <span>Evaluation complete. Click 👁 on any row to reveal that vendor's amount individually. Click 'Reveal Winner' when ready to see the final result.</span>
+        </div>`;
+    }
+    // Phase 3 — no header banner (winner card replaces it)
+    return '';
   }
+  function phaseActionHTML(){
+    if (!EVAL.finRun) return '';
+    const phase = currentFinPhase();
+    if (phase === 1){
+      return `<div class="phase-action-wrap">
+        <button id="evaluateBidsBtn" class="phase-action-btn evaluate" type="button" onclick="runEvaluateBids()">
+          <i data-lucide="calculator" style="width:16px; height:16px;"></i> Evaluate Bids
+        </button>
+      </div>`;
+    }
+    if (phase === 2){
+      return `<div class="phase-action-wrap">
+        <button id="revealWinnerBtn" class="phase-action-btn reveal-winner" type="button" onclick="revealWinnerNow()">
+          <i data-lucide="trophy" style="width:16px; height:16px;"></i> Reveal Winner
+        </button>
+      </div>`;
+    }
+    // Phase 3 — winner card supplies the actions
+    return '';
+  }
+  // Back-compat: any old code paths that reference revealHeaderHTML get the new phase header
+  function revealHeaderHTML(){ return phaseHeaderHTML(); }
   // Indian-rupee shortcut used by audit log details (small helper, separate from comparative-statement)
   function fmtINR(n){ if (n==null) return '—'; return '₹'+Number(n).toLocaleString('en-IN'); }
 
+  // ===== Phase 3 — winner card =====
+  // Lightweight Indian-rupee → words. Good enough for demo display under the amount.
+  function rupeesInWords(n){
+    if (n == null || isNaN(n)) return '';
+    n = Math.round(Number(n));
+    if (n === 0) return 'Zero rupees only';
+    const ones = ['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+    const tens = ['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+    function two(x){ if (x<20) return ones[x]; return tens[Math.floor(x/10)] + (x%10 ? ' '+ones[x%10] : ''); }
+    function three(x){ const h = Math.floor(x/100); const r = x%100; return (h ? ones[h]+' Hundred' + (r?' ':'') : '') + (r ? two(r) : ''); }
+    let crore = Math.floor(n / 10000000); n %= 10000000;
+    let lakh  = Math.floor(n / 100000);   n %= 100000;
+    let thou  = Math.floor(n / 1000);     n %= 1000;
+    let rest  = n;
+    const parts = [];
+    if (crore) parts.push(two(crore) + ' Crore');
+    if (lakh)  parts.push(two(lakh) + ' Lakh');
+    if (thou)  parts.push(two(thou) + ' Thousand');
+    if (rest)  parts.push(three(rest));
+    return parts.join(' ').trim() + ' Rupees only';
+  }
+  function vendorCompanyType(vendor){
+    const v = (VENDOR_OPTIONS || []).find(x => x.name === vendor || x === vendor);
+    if (v && typeof v === 'object') return v.company || v.type || '';
+    return '';
+  }
+  function winnerExplanationBullets(method){
+    const winner = currentFinWinner();
+    if (!winner) return [];
+    const quote = (winner.quote||0).toLocaleString('en-IN');
+    const ec = ESTIMATE.toLocaleString('en-IN');
+    const tsVal = EVAL.ts != null ? EVAL.ts : 2700000;
+    const ts = tsVal.toLocaleString('en-IN');
+    const devEC = ((winner.quote - ESTIMATE)/ESTIMATE)*100;
+    const devSign = devEC < 0 ? 'below' : 'above';
+    if (method === 'L1'){
+      return [
+        { text:`Lowest quoted amount among all Technically Qualified (TQ) vendors` },
+        { text:`Quote of ₹${quote} is ${Math.abs(devEC).toFixed(1)}% ${devSign} the estimated cost of ₹${ec}` },
+        { text:`Within Technical Sanction (TS) value of ₹${ts}` },
+        { text:`All Pre-Qualification (PQ) and Technical Qualification (TQ) criteria satisfied` },
+      ];
+    }
+    if (method === 'QCBS'){
+      const T = EVAL.technicalWeightage || 70, F = EVAL.financialWeightage || 30;
+      const tq = winner.tq||0, fin = winner.fin||100, combined = winner.combined!=null?winner.combined:0;
+      return [
+        { text:`Highest combined QCBS score: ${combined.toFixed(1)} / 100`, subs:[
+          `Technical: ${tq}/100 × ${T}% = ${(tq*T/100).toFixed(1)}`,
+          `Financial: ${fin}/100 × ${F}% = ${(fin*F/100).toFixed(1)}`,
+        ]},
+        { text:`Best quality-cost balance among all TQ vendors` },
+        { text:`Quote is within the estimated cost range` },
+      ];
+    }
+    if (method === 'LCS'){
+      const cutoff = EVAL.lcsCutoff != null ? EVAL.lcsCutoff : 75;
+      return [
+        { text:`Lowest cost among vendors who met the minimum TQ cutoff score`, subs:[
+          `TQ Score: ${winner.tq||0}/100 — above cutoff of ${cutoff}`,
+        ]},
+        { text:`Quoted ₹${quote} — lowest among eligible above-cutoff vendors` },
+      ];
+    }
+    if (method === 'QBS'){
+      return [
+        { text:`Highest Technical Qualification score: ${winner.tq||0} / 100` },
+        { text:`Selected on technical merit alone — price is not a selection factor under QBS` },
+        { text:`Financial bid will be opened separately for price negotiation` },
+      ];
+    }
+    if (method === 'FBS'){
+      const budget = EVAL.fbsBudget != null ? EVAL.fbsBudget : ESTIMATE;
+      return [
+        { text:`Highest TQ score among vendors within the fixed budget`, subs:[
+          `TQ Score: ${winner.tq||0} / 100`,
+        ]},
+        { text:`Quoted ₹${quote} — within fixed budget of ₹${budget.toLocaleString('en-IN')}` },
+      ];
+    }
+    return [];
+  }
+  function winnerCardHTML(){
+    if (currentFinPhase() !== 3) return '';
+    const method = currentFinMethod();
+    const winner = currentFinWinner();
+    if (!winner) return '';
+    const meta = METHOD_META[method] || METHOD_META.L1;
+    const native = isMethodNative(method);
+    const noAnim = !_finJustRevealed; // initial load → no animation; transition → animate
+    if (_finJustRevealed) _finJustRevealed = false; // consume the flag
+    const bullets = winnerExplanationBullets(method);
+    const bulletsHTML = bullets.map(b => `<div class="wc-bullet">
+        <span class="wc-tick">✓</span>
+        <div style="min-width:0; flex:1;">
+          <span class="wc-text">${esc(b.text)}</span>
+          ${b.subs ? b.subs.map(s => `<div class="wc-sub">${esc(s)}</div>`).join('') : ''}
+        </div>
+      </div>`).join('');
+    return `<div class="winner-card ${noAnim?'no-anim':''}" role="status" aria-label="Winner card for ${esc(meta.name)}">
+        <div class="winner-card-head">
+          <i data-lucide="trophy" class="wc-trophy"></i>
+          <div style="min-width:0; flex:1;">
+            <div class="wc-label">Winner</div>
+            <div class="wc-name">${esc(winner.vendor)}</div>
+            <div class="wc-co">${esc(vendorCompanyType(winner.vendor) || 'Technically Qualified vendor')}</div>
+            <div class="wc-amount">₹${(winner.quote||0).toLocaleString('en-IN')}</div>
+            <div class="wc-words">${esc(rupeesInWords(winner.quote))}</div>
+          </div>
+        </div>
+        <div class="winner-card-body">
+          <div class="wc-body-label">Why this vendor won</div>
+          ${bulletsHTML}
+        </div>
+        <div class="winner-card-foot">
+          <div class="wc-foot-meta">
+            <div class="wc-meta-method">Evaluation method: ${esc(meta.name)}</div>
+            <div class="wc-meta-spec ${native?'':'preview'}">${native ? 'Specified in tender ✓' : 'Preview method — not specified in tender'}</div>
+          </div>
+          <div class="wc-foot-actions">
+            <button class="wc-reeval" type="button" onclick="openReevalStrip()">↺ Re-evaluate</button>
+            <button class="wc-send" type="button" onclick="sendToBidComparison()">Send to Bid Comparison →</button>
+          </div>
+        </div>
+      </div>
+      ${reevalStripHTML()}`;
+  }
+  function reevalStripHTML(){
+    const method = currentFinMethod();
+    const mShort = (METHOD_META[method]||{}).short || method;
+    return `<div id="reevalStrip" class="reeval-strip" role="alert" aria-hidden="true">
+        <div class="res-left">Re-running will reset this evaluation and all individual amount reveals for ${esc(mShort)}.</div>
+        <div style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+          <button class="res-cancel" type="button" onclick="cancelReevalStrip()">Cancel</button>
+          <button class="res-reset" type="button" onclick="confirmReeval()">Yes, reset</button>
+        </div>
+      </div>`;
+  }
+  function openReevalStrip(){
+    const el = document.getElementById('reevalStrip');
+    if (el){ el.classList.add('open'); el.setAttribute('aria-hidden','false'); }
+  }
+  function cancelReevalStrip(){
+    const el = document.getElementById('reevalStrip');
+    if (el){ el.classList.remove('open'); el.setAttribute('aria-hidden','true'); }
+  }
+  function confirmReeval(){
+    const method = currentFinMethod();
+    resetFinEvalStorage(method);
+    log('Financial Evaluation', 'evaluation_reset', `${(METHOD_META[method]||{}).short||method} — phase reset to 1`);
+    // Note: EVAL.finRun stays true so F2 stays unlocked. Individual method state was reset.
+    renderFinancial();
+    refreshIcons();
+    showToast('Evaluation reset to Phase 1');
+  }
+  function sendToBidComparison(){
+    // F3 reasonableness must be completed before navigation — scroll user to F3 card if it's visible
+    const f3 = document.getElementById('f3-card');
+    if (f3){ f3.scrollIntoView({ behavior:'smooth', block:'start' }); return; }
+    // Fallback: navigate to Bid Comparison directly
+    location.href = 'comparative-statement.html?tender=' + encodeURIComponent(EVAL.tnd);
+  }
+
   function l1ViewBody(tName){
     const rows = l1Rows();
-    const winnerShown = winnerRevealed();
+    const finalized = winnerRevealed(); // phase === 3 → rank/status pill/row-highlight unlocked
     const tableRows = rows.map((r,i) => {
       const win = i===0 && !r.alb;
       const dev = ((r.quote-ESTIMATE)/ESTIMATE)*100;
-      const reveal = isRevealed(r.vendor) || win;
-      const stat = r.alb ? pill('ALB','#FEF2F2','#991B1B') : (win && winnerShown) ? '<span class="pill-green" style="background:#F0FDF4; color:#065F46; border-radius:20px; padding:3px 10px; font-size:12px; font-weight:700;">Winner ✓</span>' : reveal ? pill('L'+r.rank,'#F3F4F6','#6B7280') : pill('—','#F3F4F6','#9CA3AF');
-      const rowHi = (win && winnerShown) ? 'background:#FAFFFE;' : '';
-      const borderHi = (win && winnerShown) ? 'border-left:3px solid #10B981;' : '';
-      const rankCell = (win && winnerShown) ? rankBadgeHTML(r.rank, true) : (reveal ? rankBadgeHTML(r.rank,false) : '<span style="color:#9CA3AF;">—</span>');
+      const stat = r.alb ? pill('ALB','#FEF2F2','#991B1B') : (win && finalized) ? '<span class="pill-green" style="background:#F0FDF4; color:#065F46; border-radius:20px; padding:3px 10px; font-size:12px; font-weight:700;">Winner ✓</span>' : finalized ? pill('L'+r.rank,'#F3F4F6','#6B7280') : pill('—','#F3F4F6','#9CA3AF');
+      const rowHi = (win && finalized) ? 'background:#FAFFFE;' : '';
+      const borderHi = (win && finalized) ? 'border-left:3px solid #10B981;' : '';
+      const rankCell = finalized ? rankBadgeHTML(r.rank, win) : '<span style="color:#9CA3AF;">—</span>';
       return `<tr style="border-bottom:1px solid #F3F4F6; ${rowHi}">
         <td style="${tdS()} ${borderHi}">${rankCell}</td>
         <td style="${tdS()}"><div class="font-medium text-ink-900">${esc(r.vendor)}</div><div class="text-[11px] text-ink-400">TQ Score: ${r.tq}/100</div></td>
-        <td style="${tdS()}">${maskedQuoteCell(r.vendor, r.quote, win && winnerShown)}</td>
-        <td style="${tdS()}">${maskedPctCell(r.vendor, dev, win && winnerShown)}</td>
+        <td style="${tdS()}">${maskedQuoteCell(r.vendor, r.quote, win && finalized)}</td>
+        <td style="${tdS()}">${maskedPctCell(r.vendor, dev, win && finalized)}</td>
         <td style="${tdS()}">${stat}</td></tr>`;
     }).join('');
     return `${revealHeaderHTML()}<div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
@@ -3780,23 +4188,24 @@ Date: ${esc(fmtDateShort(today))}`;
           <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:52px;">Rank</th><th style="${thS()} width:30%;">Vendor</th><th style="${thS()} width:24%;">Quoted Amount (₹)</th><th style="${thS()} width:14%;">vs Estimate</th><th style="${thS()} width:15%;">Status</th></tr></thead>
           <tbody>${tableRows}</tbody>
         </table>
-      </div>`;
+      </div>
+      ${phaseActionHTML()}
+      ${winnerCardHTML()}`;
   }
   function qcbsViewBody(tName, T, F){
     const rows = qcbsRows(T, F);
-    const winnerShown = winnerRevealed();
+    const finalized = winnerRevealed(); // phase 3 only
     const tableRows = rows.map((r,i) => {
       const win = i===0;
-      const rev = isRevealed(r.vendor) || (win && winnerShown);
-      const stat = (win && winnerShown) ? '<span style="background:#F0FDF4; color:#065F46; border-radius:20px; padding:3px 10px; font-size:12px; font-weight:700;">Winner ✓</span>' : rev ? pill(ordinal(r.rank),'#F3F4F6','#6B7280') : pill('—','#F3F4F6','#9CA3AF');
-      const quotedCell = maskedQuoteCell(r.vendor, r.quote, win && winnerShown) + (rev && r.alb ? ' <span style="background:#FFFBEB; color:#92400E; border-radius:20px; padding:1px 7px; font-size:10px; font-weight:600;">ALB</span>' : '');
-      const rankCell = (win && winnerShown) ? rankBadgeHTML(r.rank, true) : (rev ? rankBadgeHTML(r.rank, false) : '<span style="color:#9CA3AF;">—</span>');
-      return `<tr data-vendor="${esc(r.vendor)}" style="border-bottom:1px solid #F3F4F6; ${(win && winnerShown)?'background:#FAFFFE;':''} transition:background 300ms ease;">
-        <td style="${tdS()} ${(win && winnerShown)?'border-left:3px solid #10B981;':''}">${rankCell}</td>
+      const stat = (win && finalized) ? '<span style="background:#F0FDF4; color:#065F46; border-radius:20px; padding:3px 10px; font-size:12px; font-weight:700;">Winner ✓</span>' : finalized ? pill(ordinal(r.rank),'#F3F4F6','#6B7280') : pill('—','#F3F4F6','#9CA3AF');
+      const quotedCell = maskedQuoteCell(r.vendor, r.quote, win && finalized) + (finalized && r.alb ? ' <span style="background:#FFFBEB; color:#92400E; border-radius:20px; padding:1px 7px; font-size:10px; font-weight:600;">ALB</span>' : '');
+      const rankCell = finalized ? rankBadgeHTML(r.rank, win) : '<span style="color:#9CA3AF;">—</span>';
+      return `<tr data-vendor="${esc(r.vendor)}" style="border-bottom:1px solid #F3F4F6; ${(win && finalized)?'background:#FAFFFE;':''} transition:background 300ms ease;">
+        <td style="${tdS()} ${(win && finalized)?'border-left:3px solid #10B981;':''}">${rankCell}</td>
         <td style="${tdS()} font-weight:600; color:#111827;">${esc(r.vendor)}</td>
         <td style="${tdS()}">${scoreBar(r.tq, 100, '#0F5EE8')}</td>
         <td style="${tdS()}">${scoreBar(r.fin, 100, '#10B981')}</td>
-        <td style="${tdS()} font-weight:700; color:#111827;">${r.combined.toFixed(1)}${(win && winnerShown)?' <span style="background:#EFF6FF; color:#0C447C; border-radius:4px; padding:1px 6px; font-size:10px; white-space:nowrap;">✦ Recommended</span>':''}</td>
+        <td style="${tdS()} font-weight:700; color:#111827;">${r.combined.toFixed(1)}${(win && finalized)?' <span style="background:#EFF6FF; color:#0C447C; border-radius:4px; padding:1px 6px; font-size:10px; white-space:nowrap;">✦ Recommended</span>':''}</td>
         <td style="${tdS()}">${quotedCell}</td>
         <td style="${tdS()}">${stat}</td></tr>`;
     }).join('');
@@ -3825,7 +4234,9 @@ Date: ${esc(fmtDateShort(today))}`;
           <tbody id="qcbsTbody">${tableRows}</tbody>
         </table>
       </div>
-      <div id="qcbsRankWarn" aria-live="polite" style="display:none; background:#FFFBEB; border-radius:8px; padding:10px 14px; margin-top:10px; font-size:12px; color:#92400E;"></div>`;
+      <div id="qcbsRankWarn" aria-live="polite" style="display:none; background:#FFFBEB; border-radius:8px; padding:10px 14px; margin-top:10px; font-size:12px; color:#92400E;"></div>
+      ${phaseActionHTML()}
+      ${winnerCardHTML()}`;
   }
   function switchFinView(v){
     if (v === activeView) return;
@@ -3929,19 +4340,19 @@ Date: ${esc(fmtDateShort(today))}`;
     below.forEach(b => b.rank = '—');
     const winner = above[0];
     const ordered = above.concat(below);
-    const winnerShown = winnerRevealed();
+    const finalized = winnerRevealed(); // phase 3 only
     const rows = ordered.map((r) => {
       const isWin = r === winner;
       const dev = ((r.quote - ESTIMATE) / ESTIMATE) * 100;
       const dimCls = r.tq < cutoff ? 'below-cutoff' : '';
       const cutoffPill = r.tq >= cutoff ? '<span class="pill-above">✓ Above cutoff</span>' : '<span class="pill-below">Below cutoff</span>';
-      const winnerActive = isWin && winnerShown;
-      const stat = r.tq < cutoff ? '<span class="pill-disq">Disqualified</span>' : winnerActive ? '<span style="background:#F0FDF4; color:#065F46; border-radius:20px; padding:3px 10px; font-size:12px; font-weight:700;">Winner ✓</span>' : (isRevealed(r.vendor)?pill('Eligible','#F3F4F6','#6B7280'):pill('—','#F3F4F6','#9CA3AF'));
+      const winnerActive = isWin && finalized;
+      const stat = r.tq < cutoff ? '<span class="pill-disq">Disqualified</span>' : winnerActive ? '<span style="background:#F0FDF4; color:#065F46; border-radius:20px; padding:3px 10px; font-size:12px; font-weight:700;">Winner ✓</span>' : (finalized ? pill('Eligible','#F3F4F6','#6B7280') : pill('—','#F3F4F6','#9CA3AF'));
       // Below-cutoff rows skip reveal flow — always show strike-through
       const quoteText = r.tq < cutoff
         ? `<span class="strike-quote">₹${r.quote.toLocaleString('en-IN')}</span>`
         : maskedQuoteCell(r.vendor, r.quote, winnerActive);
-      const rankCell = winnerActive ? rankBadgeHTML(r.rank, true) : (typeof r.rank === 'number' && isRevealed(r.vendor) ? rankBadgeHTML(r.rank, false) : '<span style="color:#9CA3AF;">—</span>');
+      const rankCell = (finalized && typeof r.rank === 'number') ? rankBadgeHTML(r.rank, isWin) : '<span style="color:#9CA3AF;">—</span>';
       return `<tr class="${dimCls}" style="border-bottom:1px solid #F3F4F6; ${winnerActive?'background:#FAFFFE;':''}">
         <td style="${tdS()} ${winnerActive?'border-left:3px solid #10B981;':''}">${rankCell}</td>
         <td style="${tdS()}"><div class="font-medium text-ink-900">${esc(r.vendor)}</div></td>
@@ -3968,7 +4379,9 @@ Date: ${esc(fmtDateShort(today))}`;
           <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:52px;">Rank</th><th style="${thS()} width:22%;">Vendor</th><th style="${thS()} width:14%;">TQ Score</th><th style="${thS()} width:17%;">Cutoff Status</th><th style="${thS()} width:18%;">Quoted Amount</th><th style="${thS()} width:14%;">vs Estimate</th><th style="${thS()} width:13%;">Status</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
-      </div>`;
+      </div>
+      ${phaseActionHTML()}
+      ${winnerCardHTML()}`;
   }
   function onLcsCutoffInput(v){ const n = parseInt(v); if (!isNaN(n)) EVAL.lcsCutoff = Math.max(0, Math.min(100, n)); }
   function applyLcsCutoff(){
@@ -4025,7 +4438,9 @@ Date: ${esc(fmtDateShort(today))}`;
           <tbody>${rows}</tbody>
         </table>
       </div>
-      ${winner ? `<div style="display:flex; justify-content:flex-end;"><button onclick="showToast('Negotiation initiated in Bid Management')" style="background:#0F5D4B; color:white; border:none; border-radius:8px; padding:9px 18px; font-size:13px; font-weight:600; cursor:pointer;">Proceed to negotiation with ${esc(winner.vendor)} →</button></div>` : ''}`;
+      ${winner ? `<div style="display:flex; justify-content:flex-end;"><button onclick="showToast('Negotiation initiated in Bid Management')" style="background:#0F5D4B; color:white; border:none; border-radius:8px; padding:9px 18px; font-size:13px; font-weight:600; cursor:pointer;">Proceed to negotiation with ${esc(winner.vendor)} →</button></div>` : ''}
+      ${phaseActionHTML()}
+      ${winnerCardHTML()}`;
   }
   function toggleQbsBreakdown(id){
     const el = document.getElementById(id);
@@ -4046,18 +4461,18 @@ Date: ${esc(fmtDateShort(today))}`;
     above.forEach(b => b.rank = '—');
     const winner = within[0];
     const ordered = within.concat(above);
-    const winnerShown = winnerRevealed();
+    const finalized = winnerRevealed(); // phase 3 only
     const rows = ordered.map((r) => {
       const isWin = r === winner;
       const overBudget = r.quote > budget;
       const dimCls = overBudget ? 'below-cutoff' : '';
       const budgetPill = overBudget ? '<span class="pill-below">Above budget</span>' : '<span class="pill-above">✓ Within budget</span>';
-      const winnerActive = isWin && winnerShown;
-      const stat = overBudget ? '<span class="pill-disq">Disqualified</span>' : winnerActive ? '<span style="background:#F0FDF4; color:#065F46; border-radius:20px; padding:3px 10px; font-size:12px; font-weight:700;">Winner ✓</span>' : isRevealed(r.vendor) ? '<span class="pill-gray">Eligible</span>' : '<span class="pill-gray">—</span>';
+      const winnerActive = isWin && finalized;
+      const stat = overBudget ? '<span class="pill-disq">Disqualified</span>' : winnerActive ? '<span style="background:#F0FDF4; color:#065F46; border-radius:20px; padding:3px 10px; font-size:12px; font-weight:700;">Winner ✓</span>' : finalized ? '<span class="pill-gray">Eligible</span>' : '<span class="pill-gray">—</span>';
       const quoteCell = overBudget
         ? `<span class="strike-quote">₹${r.quote.toLocaleString('en-IN')}</span>`
         : maskedQuoteCell(r.vendor, r.quote, winnerActive);
-      const rankCell = winnerActive ? rankBadgeHTML(r.rank, true) : (typeof r.rank === 'number' && isRevealed(r.vendor) ? rankBadgeHTML(r.rank, false) : '<span style="color:#9CA3AF;">—</span>');
+      const rankCell = (finalized && typeof r.rank === 'number') ? rankBadgeHTML(r.rank, isWin) : '<span style="color:#9CA3AF;">—</span>';
       return `<tr class="${dimCls}" style="border-bottom:1px solid #F3F4F6; ${winnerActive?'background:#FAFFFE;':''}">
         <td style="${tdS()} ${winnerActive?'border-left:3px solid #10B981;':''}">${rankCell}</td>
         <td style="${tdS()} font-weight:600;">${esc(r.vendor)}</td>
@@ -4085,7 +4500,9 @@ Date: ${esc(fmtDateShort(today))}`;
           <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"><th style="${thS()} width:52px;">Rank</th><th style="${thS()} width:24%;">Vendor</th><th style="${thS()} width:20%;">Quoted Amount</th><th style="${thS()} width:18%;">Budget Status</th><th style="${thS()} width:14%;">TQ Score</th><th style="${thS()} width:18%;">Status</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
-      </div>`;
+      </div>
+      ${phaseActionHTML()}
+      ${winnerCardHTML()}`;
   }
   function onFbsBudgetInput(v){ const n = parseFloat(v); if (!isNaN(n)) EVAL.fbsBudget = Math.max(0, n); }
   function applyFbsBudget(){
@@ -4384,9 +4801,9 @@ Date: ${esc(fmtDateShort(today))}`;
     location.href = 'comparative-statement.html?tender=' + EVAL.tnd;
   }
 
-  // ===================== AUDIT LOG PANEL (Change 5) =====================
+  // ===================== ACTIVITY TRAIL PANEL (formerly Audit Log) =====================
   let _uiAudit = { open:false, filter:'all' };
-  try { _uiAudit.open = sessionStorage.getItem('auditPanelOpen') === '1'; } catch(e){}
+  try { _uiAudit.open = sessionStorage.getItem('activityTrailOpen') === '1'; } catch(e){}
   // Presentations notes-column visibility (Fix 2) — hidden by default, restored from session
   let _uiPresNotes = false;
   try { _uiPresNotes = sessionStorage.getItem('presNotesVisible') === '1'; } catch(e){}
@@ -4403,7 +4820,7 @@ Date: ${esc(fmtDateShort(today))}`;
   function toggleAuditPanel(){
     if (_uiAudit.open) { closeAuditPanel(); return; }
     _uiAudit.open = true;
-    try { sessionStorage.setItem('auditPanelOpen', '1'); } catch(e){}
+    try { sessionStorage.setItem('activityTrailOpen', '1'); } catch(e){}
     const panel = document.getElementById('auditPanel');
     const trigger = document.getElementById('auditTriggerBtn');
     if (trigger) trigger.setAttribute('aria-expanded', 'true');
@@ -4417,7 +4834,7 @@ Date: ${esc(fmtDateShort(today))}`;
   function closeAuditPanel(){
     if (!_uiAudit.open) return;
     _uiAudit.open = false;
-    try { sessionStorage.setItem('auditPanelOpen', '0'); } catch(e){}
+    try { sessionStorage.setItem('activityTrailOpen', '0'); } catch(e){}
     const panel = document.getElementById('auditPanel');
     const trigger = document.getElementById('auditTriggerBtn');
     if (trigger) trigger.setAttribute('aria-expanded', 'false');
@@ -4445,13 +4862,13 @@ Date: ${esc(fmtDateShort(today))}`;
     panel.innerHTML = `<div class="audit-panel-head">
         <div class="ap-title">
           <i data-lucide="clipboard-list" style="width:16px; height:16px; color:#0F5EE8;"></i>
-          <span class="ap-title-text">Audit Log</span>
+          <span class="ap-title-text">Activity Trail</span>
           <span class="ap-count" aria-live="polite">(${list.length} ${list.length===1?'entry':'entries'})</span>
         </div>
-        <button class="ap-close" onclick="closeAuditPanel()" aria-label="Close audit log">×</button>
+        <button class="ap-close" onclick="closeAuditPanel()" aria-label="Close activity trail">×</button>
       </div>
       <div class="audit-panel-filter">
-        <select onchange="setAuditFilter(this.value)" aria-label="Filter audit log by section">
+        <select onchange="setAuditFilter(this.value)" aria-label="Filter activity trail by section">
           <option value="all"                  ${_uiAudit.filter==='all'?'selected':''}>Section: All</option>
           <option value="PQ Evaluation"        ${_uiAudit.filter==='PQ Evaluation'?'selected':''}>PQ Evaluation</option>
           <option value="TQ Evaluation"        ${_uiAudit.filter==='TQ Evaluation'?'selected':''}>TQ Evaluation</option>
@@ -4504,7 +4921,7 @@ Date: ${esc(fmtDateShort(today))}`;
     if (pq && !pq.classList.contains('hidden') && !pq.contains(e.target) && !e.target.closest('.verdict-trigger')) closePqPopover();
   });
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape'){ closeCell(); closeDrawer(); closeBidDoc(); closePqPopover(); closeClarPanel(); closeEvidencePanel(); closeVideoModal(); closeRevealModal(); closeAuditPanel(); }
+    if (e.key === 'Escape'){ closeCell(); closeDrawer(); closeBidDoc(); closePqPopover(); closeClarPanel(); closeEvidencePanel(); closeVideoModal(); closeAuditPanel(); cancelMethodSwitch(); cancelReevalStrip(); if (pendingRevealVendor) resetPendingReveal(pendingRevealVendor); }
   });
 
   (function boot(){
