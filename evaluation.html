@@ -332,15 +332,14 @@
     .tq-comm-table tr:last-child td { border-bottom:none; }
     .tq-score-in { width:55px; border:1px solid #D1D5DB; border-radius:6px; padding:5px 8px; font-size:14px; text-align:center; }
     .tq-score-in:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 2px rgba(15,94,232,0.15); }
-    .tq-member-cell .scored { font-size:14px; font-weight:700; color:#0F5EE8; background:transparent; border:none; padding:0; cursor:pointer; font-family:inherit; line-height:inherit; transition: color .15s ease, text-decoration-color .15s ease; }
-    .tq-member-cell .scored:hover { color:#0B4BC4; text-decoration:underline dotted; text-underline-offset:3px; }
-    .tq-member-cell .scored:focus-visible { outline:2px solid #0F5EE8; outline-offset:2px; border-radius:3px; }
-    .tq-member-cell .scored.locked { color:#374151; cursor:default; }
-    .tq-member-cell .scored.locked:hover { color:#374151; text-decoration:none; }
+    .tq-member-cell .scored { font-size:14px; font-weight:700; color:#0F5EE8; }
     .tq-member-cell .scored-other { font-size:14px; font-weight:700; color:#374151; }
+    .tq-view-row { display:inline-flex; align-items:center; gap:6px; }
+    .tq-pencil-btn { width:24px; height:24px; border-radius:5px; border:1px solid #E5E7EB; background:white; color:#9CA3AF; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; transition: border-color .15s ease, color .15s ease, background .15s ease; padding:0; }
+    .tq-pencil-btn:hover { border-color:#0F5EE8; color:#0F5EE8; background:#EFF6FF; }
+    .tq-pencil-btn:focus-visible { outline:2px solid #0F5EE8; outline-offset:2px; }
     .tq-member-cell .pending-pill { font-size:12px; color:#F59E0B; font-style:italic; }
     .tq-member-cell .remind { font-size:10px; color:#9CA3AF; margin-left:6px; cursor:pointer; background:transparent; border:none; padding:0; text-decoration:underline; }
-    .tq-member-cell .locked-label { font-size:10px; color:#9CA3AF; margin-left:6px; cursor:help; }
     /* Inline edit-state row for Member 1 scoring (Change 1) */
     .tq-edit-row { display:flex; align-items:center; gap:6px; }
     .tq-edit-input { width:52px; border:1.5px solid #0F5EE8; border-radius:6px; padding:5px 8px; font-size:14px; font-weight:600; color:#0F5EE8; text-align:center; background:white; transition: border-color .15s ease, box-shadow .15s ease; }
@@ -528,6 +527,105 @@
     .mini-trail-toggle:hover { color:#0F5EE8; }
     .mini-trail { background:#F9FAFB; border-radius:8px; padding:6px 12px; margin-top:4px; }
     .mini-trail .audit-row { padding:6px 0; border-bottom:none; }
+    /* ===== Evaluation Committee tab ===== */
+    .com-section-title { font-size:18px; font-weight:700; color:#111827; margin-bottom:4px; }
+    .com-section-sub   { font-size:13px; color:#6B7280; margin-bottom:20px; }
+    .com-status-bar    { background:white; border:1px solid #E5E7EB; border-radius:12px; padding:16px 20px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+    .com-status-bar .chips { display:flex; gap:24px; flex-wrap:wrap; }
+    .com-status-bar .chip { display:flex; flex-direction:column; gap:2px; }
+    .com-status-bar .chip .label { font-size:11px; color:#9CA3AF; }
+    .com-status-bar .chip .value { font-size:22px; font-weight:700; line-height:1.1; }
+    .com-status-bar .chip .value.total   { color:#111827; }
+    .com-status-bar .chip .value.scored  { color:#10B981; }
+    .com-status-bar .chip .value.pending { color:#F59E0B; }
+    .com-quorum-pill { border-radius:20px; padding:5px 14px; font-size:12px; font-weight:700; }
+    .com-quorum-pill.ok   { background:#F0FDF4; color:#065F46; }
+    .com-quorum-pill.warn { background:#FFFBEB; color:#92400E; }
+    .com-card { border:1px solid #E5E7EB; border-radius:12px; overflow:hidden; margin-bottom:20px; background:white; }
+    .com-card.padded { padding:16px 18px; }
+    .com-card-title { font-size:13px; font-weight:700; color:#111827; margin-bottom:4px; }
+    .com-card-sub   { font-size:12px; color:#6B7280; margin-bottom:14px; }
+    .com-table { width:100%; border-collapse:collapse; font-size:13px; }
+    .com-table thead th { background:#F9FAFB; padding:10px 14px; font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; text-align:left; border-bottom:1px solid #E5E7EB; }
+    .com-table tbody td { padding:12px 14px; border-bottom:1px solid #F3F4F6; vertical-align:middle; }
+    .com-table tbody tr:last-child td { border-bottom:none; }
+    .com-table tbody tr:hover { background:#F9FAFB; }
+    .com-table tbody tr.com-row-pending-remove { background:#FEF2F2 !important; }
+    .com-table tbody tr.com-row-removing { max-height:0; opacity:0; transition: max-height 200ms ease, opacity 200ms ease; overflow:hidden; }
+    .com-table tbody tr.com-row-adding { animation: comRowAdd 200ms ease; }
+    @keyframes comRowAdd { from { opacity:0; transform: translateY(-4px); } to { opacity:1; transform: translateY(0); } }
+    .com-avatar { width:36px; height:36px; border-radius:50%; background:#EFF6FF; color:#0F5EE8; font-size:13px; font-weight:600; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .com-avatar.sm { width:28px; height:28px; font-size:11px; }
+    .com-member-cell { display:flex; align-items:center; gap:10px; }
+    .com-member-name { font-size:14px; font-weight:700; color:#111827; }
+    .com-member-email { font-size:12px; color:#9CA3AF; }
+    .com-you-pill { background:#EFF6FF; color:#0F5EE8; border-radius:4px; padding:1px 6px; font-size:10px; font-weight:700; margin-left:6px; vertical-align:middle; }
+    .com-role-pill { border-radius:20px; padding:3px 10px; font-size:12px; cursor:pointer; border:none; font-weight:500; transition: filter .15s ease; }
+    .com-role-pill:hover { filter: brightness(0.96); }
+    .com-role-pill:focus-visible { outline:2px solid #0F5EE8; outline-offset:2px; }
+    .com-role-pill.role-chair    { background:#EEEDFE; color:#3C3489; }
+    .com-role-pill.role-tech     { background:#EFF6FF; color:#0C447C; }
+    .com-role-pill.role-fin      { background:#F0FDF4; color:#065F46; }
+    .com-role-pill.role-legal    { background:#FEF3C7; color:#92400E; }
+    .com-role-pill.role-expert   { background:#F3F4F6; color:#374151; }
+    .com-role-pill.role-observer { background:#F9FAFB; color:#9CA3AF; }
+    .com-role-pill.role-default  { background:#F3F4F6; color:#6B7280; }
+    .com-role-dropdown { position:absolute; background:white; border:1px solid #E5E7EB; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.08); padding:6px 0; z-index:80; min-width:170px; }
+    .com-role-dropdown button { width:100%; text-align:left; background:transparent; border:none; padding:7px 14px; font-size:12.5px; color:#374151; cursor:pointer; }
+    .com-role-dropdown button:hover { background:#F9FAFB; color:#111827; }
+    .com-role-dropdown button.active { background:#EFF6FF; color:#0F5EE8; font-weight:600; }
+    .com-cell-center { text-align:center; }
+    .com-status-text { font-size:12px; }
+    .com-status-text.green { color:#10B981; }
+    .com-status-text.amber { color:#F59E0B; }
+    .com-status-text.gray  { color:#9CA3AF; }
+    .com-status-text.blue  { color:#0F5EE8; }
+    .com-status-sub { font-size:10px; color:#9CA3AF; margin-top:1px; }
+    .com-action-row { display:flex; gap:6px; align-items:center; }
+    .com-icon-btn { width:28px; height:28px; border-radius:6px; border:1px solid #E5E7EB; background:white; color:#9CA3AF; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition: border-color .15s ease, color .15s ease, background .15s ease; padding:0; }
+    .com-icon-btn:hover { color:#0F5EE8; border-color:#0F5EE8; }
+    .com-icon-btn.danger:hover { color:#EF4444; border-color:#EF4444; }
+    .com-icon-btn[disabled] { opacity:0.3; cursor:not-allowed; pointer-events:none; }
+    .com-icon-btn:focus-visible { outline:2px solid #0F5EE8; outline-offset:2px; }
+    .com-icon-btn.sent { color:#10B981; border-color:#10B981; font-size:11px; font-weight:700; }
+    /* Add member panel */
+    .com-add-panel { background:#F9FAFB; border:1px solid #E5E7EB; border-radius:10px; padding:16px 18px; margin-bottom:20px; }
+    .com-add-grid-3 { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; margin-bottom:12px; }
+    .com-add-grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:12px; align-items:center; }
+    .com-add-field label { display:block; font-size:11px; color:#6B7280; margin-bottom:4px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; }
+    .com-add-field input, .com-add-field select { width:100%; border:1px solid #D1D5DB; border-radius:8px; padding:8px 10px; font-size:13px; color:#111827; background:white; }
+    .com-add-field input:focus, .com-add-field select:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 2px rgba(15,94,232,0.15); }
+    .com-add-toggle-row { display:flex; align-items:center; gap:10px; }
+    .com-add-toggle-row .label { font-size:12px; color:#6B7280; }
+    .com-add-btn-row { display:flex; justify-content:flex-end; margin-top:12px; }
+    .com-add-btn { background:#0F5EE8; color:white; border:none; border-radius:8px; padding:8px 18px; font-size:13px; font-weight:700; cursor:pointer; transition: background .15s ease; }
+    .com-add-btn:hover { background:#0B4BC4; }
+    .com-add-btn[disabled] { opacity:0.5; cursor:not-allowed; }
+    .com-add-btn:focus-visible { outline:2px solid #0F5EE8; outline-offset:2px; }
+    /* Inline removal confirmation row */
+    .com-confirm-remove { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .com-confirm-remove .msg { font-size:12px; color:#991B1B; flex:1; min-width:0; }
+    .com-confirm-remove .btn-yes { background:#EF4444; color:white; border:none; border-radius:6px; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer; }
+    .com-confirm-remove .btn-yes:hover { background:#DC2626; }
+    .com-confirm-remove .btn-cancel { background:transparent; border:none; color:#6B7280; font-size:12px; cursor:pointer; padding:5px 8px; }
+    .com-confirm-remove .btn-cancel:hover { color:#374151; }
+    .com-confirm-warn { font-size:12px; color:#92400E; margin-top:6px; flex-basis:100%; }
+    /* Sign-off CTAs */
+    .com-cta-primary { background:#0F5EE8; color:white; border:none; border-radius:6px; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer; }
+    .com-cta-primary:hover { background:#0B4BC4; }
+    .com-cta-outlined { background:white; color:#6B7280; border:1px solid #E5E7EB; border-radius:6px; padding:5px 12px; font-size:12px; font-weight:500; cursor:pointer; }
+    .com-cta-outlined:hover { background:#F9FAFB; }
+    .com-cta-link { background:transparent; border:none; color:#0F5EE8; font-size:12px; cursor:pointer; padding:0; text-decoration:none; }
+    .com-cta-link:hover { text-decoration:underline; }
+    .com-cta-link.gray { color:#6B7280; }
+    .com-cta-link.gray:hover { color:#111827; }
+    .com-signoff-success { background:#F0FDF4; border:1px solid #BBF7D0; color:#065F46; border-radius:8px; padding:10px 14px; font-size:13px; font-weight:600; margin-top:12px; }
+    .com-signoff-pending { font-size:12px; color:#92400E; margin-top:12px; }
+    /* Inline sign-off confirmation strip */
+    .com-signoff-confirm { display:inline-flex; align-items:center; gap:8px; }
+    .com-signoff-confirm .msg { font-size:12px; color:#374151; }
+    .com-signoff-confirm .btn-confirm { background:#10B981; color:white; border:none; border-radius:6px; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer; }
+    .com-signoff-confirm .btn-confirm:hover { background:#059669; }
   </style>
 </head>
 <body class="min-h-screen">
@@ -690,10 +788,12 @@
         <div role="tablist" aria-label="Evaluation stages" class="flex flex-wrap gap-2">
           <button role="tab" data-stab="technical" onclick="setStageTab('technical')" class="ev-tab px-4 py-1.5 rounded-full text-[13px] border border-primary bg-primary text-white"><i data-lucide="clipboard-check" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1"></i> Technical Evaluation</button>
           <button role="tab" data-stab="financial" onclick="setStageTab('financial')" class="ev-tab px-4 py-1.5 rounded-full text-[13px] border border-line bg-white text-ink-400"><i data-lucide="lock" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1"></i> Financial Evaluation</button>
+          <button role="tab" data-stab="committee" onclick="setStageTab('committee')" class="ev-tab px-4 py-1.5 rounded-full text-[13px] border border-line bg-white text-ink-500"><i data-lucide="users" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1"></i> Evaluation Committee</button>
         </div>
 
         <section id="stage-technical" class="space-y-3"></section>
         <section id="stage-financial" class="hidden space-y-4"></section>
+        <section id="stage-committee" class="hidden space-y-4"></section>
         <div class="h-4"></div>
       </section>
     </main>
@@ -886,6 +986,10 @@
       finRevealed: {},           // { vendorName: true }  — reveal-true vendors show the real quote
       // Change 5 — audit log
       auditLog: [],
+      // === Evaluation Committee tab state ===
+      committeeMembers: defaultCommitteeMembers(),
+      signoffs: {},               // { memberId: { TQ:bool, financial:bool, dateTQ, dateFin } }
+      conflictDeclarations: {},   // { memberId: { declared:bool, date } }
       _seedV:6,
     };
   }
@@ -895,6 +999,33 @@
     { id:'ps', name:'Priya Shah',   designation:'Technical Officer',    isYou:false },
     { id:'ap', name:'Amit Patil',   designation:'Finance Officer',      isYou:false },
   ];
+  // === Evaluation Committee — default members for the Evaluation Committee tab ===
+  // Same trio as COMMITTEE_MEMBERS (TQ scoring) plus the extended fields the tab needs.
+  function defaultCommitteeMembers(){
+    return [
+      { id:'rk', name:'Rajesh Kumar', email:'rajesh.kumar@amc.gov.in', designation:'Super Admin',         role:'Chairperson',       finEval:true,  addedOn:'2026-05-15', isYou:true  },
+      { id:'ps', name:'Priya Shah',   email:'priya.shah@amc.gov.in',   designation:'Technical Officer',   role:'Technical Member',  finEval:true,  addedOn:'2026-05-15', isYou:false },
+      { id:'ap', name:'Amit Patil',   email:'amit.patil@amc.gov.in',   designation:'Finance Officer',     role:'Finance Member',    finEval:false, addedOn:'2026-05-15', isYou:false },
+    ];
+  }
+  const ROLE_OPTIONS = ['Chairperson','Technical Member','Finance Member','Legal Advisor','Subject Expert','Observer'];
+  function roleClass(role){
+    if (role === 'Chairperson')        return 'role-chair';
+    if (role === 'Technical Member')   return 'role-tech';
+    if (role === 'Finance Member')     return 'role-fin';
+    if (role === 'Legal Advisor')      return 'role-legal';
+    if (role === 'Subject Expert')     return 'role-expert';
+    if (role === 'Observer')           return 'role-observer';
+    return 'role-default';
+  }
+  function memberInitials(name){
+    return (name||'').trim().split(/\s+/).slice(0,2).map(p => p[0]||'').join('').toUpperCase() || '·';
+  }
+  function fmtCommitteeDate(iso){
+    if (!iso) return '—';
+    try { return new Date(iso + (iso.length===10?'T00:00:00':'')).toLocaleDateString('en-US',{month:'short', day:'numeric'}); }
+    catch(e){ return iso; }
+  }
   // === Audit log helper (Change 5) — append-only, persisted in EVAL.auditLog ===
   function log(section, action, detail, extra){
     if (!EVAL || !EVAL.auditLog) return;
@@ -1275,6 +1406,9 @@
     if (!EVAL.presentations)     EVAL.presentations = {};
     if (!EVAL.finRevealed)       EVAL.finRevealed = {};
     if (!Array.isArray(EVAL.auditLog)) EVAL.auditLog = [];
+    if (!Array.isArray(EVAL.committeeMembers) || !EVAL.committeeMembers.length) EVAL.committeeMembers = defaultCommitteeMembers();
+    if (!EVAL.signoffs)              EVAL.signoffs = {};
+    if (!EVAL.conflictDeclarations)  EVAL.conflictDeclarations = {};
     if (!EVAL.activeVendor && EVAL.bids.length) EVAL.activeVendor = EVAL.bids[0].vendor;
     activeView = null;   // reset F2 view toggle for each tender
     document.getElementById('wsCrumb').textContent = t.id;
@@ -1312,6 +1446,8 @@
     EVAL.stageTab = name;
     document.getElementById('stage-technical').classList.toggle('hidden', name !== 'technical');
     document.getElementById('stage-financial').classList.toggle('hidden', name !== 'financial');
+    const ce = document.getElementById('stage-committee');
+    if (ce) ce.classList.toggle('hidden', name !== 'committee');
     document.querySelectorAll('[data-stab]').forEach(b => {
       const on = b.dataset.stab === name;
       const locked = b.dataset.stab === 'financial' && !EVAL.techComplete;
@@ -1324,9 +1460,11 @@
       b.classList.toggle('text-ink-500', !on && !locked);
       const ic = b.querySelector('i');
       if (b.dataset.stab === 'financial' && ic){ ic.setAttribute('data-lucide', locked ? 'lock' : 'indian-rupee'); }
+      if (b.dataset.stab === 'committee' && ic){ ic.setAttribute('data-lucide', 'users'); }
     });
-    if (name === 'technical') renderTechnical();
-    else renderFinancial();
+    if (name === 'technical')       renderTechnical();
+    else if (name === 'financial')  renderFinancial();
+    else if (name === 'committee')  renderCommittee();
     saveState();
     refreshIcons();
   }
@@ -2751,7 +2889,25 @@ Date: ${esc(fmtDateShort(today))}`;
     return !!(_uiEditingScores && _uiEditingScores[vendor+'|'+critId]);
   }
   function startEditScore(vendor, critId){
-    _uiEditingScores[vendor+'|'+critId] = true;
+    const newKey = vendor+'|'+critId;
+    // Only one cell may be in edit mode at a time — silently save any other open edit (if value valid + changed)
+    Object.keys(_uiEditingScores).forEach(otherKey => {
+      if (otherKey === newKey || !_uiEditingScores[otherKey]) return;
+      const [ov, oc] = otherKey.split('|');
+      const inp = document.querySelector(`input.tq-edit-input[data-edit="${otherKey}"]`);
+      if (inp){
+        const crit = TQ_CRITERIA.find(x => x.id === oc);
+        const raw = (inp.value || '').trim();
+        const n = Number(raw);
+        const oldVal = memberScore(ov, oc, 'rk');
+        // Save only if valid + changed
+        if (raw !== '' && crit && Number.isFinite(n) && n >= 0 && n <= crit.max && n !== oldVal){
+          setMemberScore(ov, oc, 'rk', String(n));
+        }
+      }
+      delete _uiEditingScores[otherKey];
+    });
+    _uiEditingScores[newKey] = true;
     renderTechnical();
     refreshIcons();
     // Auto-focus the input that just rendered
@@ -2793,34 +2949,35 @@ Date: ${esc(fmtDateShort(today))}`;
     else if (ev.key === 'Escape'){ ev.preventDefault(); cancelEditScore(vendor, critId); }
   }
   function renderTqRow(c, vendor){
-    const allSubmitted = COMMITTEE_MEMBERS.every(mb => ((EVAL.tqMemberSubmitted||{})[vendor]||{})[mb.id]);
     const editingThis = isEditingScore(vendor, c.id);
     const cellHTML = (mb) => {
       const sc = memberScore(vendor, c.id, mb.id);
-      const submitted = ((EVAL.tqMemberSubmitted||{})[vendor]||{})[mb.id];
       if (mb.isYou){
         // EDIT STATE — input + ✓ Save + ✕ Cancel (Enter saves, Escape cancels)
         if (editingThis){
           return `<td class="tq-member-cell">
             <div class="tq-edit-row" data-edit-row="${esc(vendor)}|${c.id}">
               <input class="tq-edit-input" data-edit="${esc(vendor)}|${c.id}" type="number" min="0" max="${c.max}" value="${sc != null ? sc : ''}" onkeydown="onEditKey(event,'${esc(vendor)}','${c.id}')" aria-label="Edit your score for ${esc(c.short)} (max ${c.max})" />
-              <span style="color:#6B7280; font-size:13px;">/ ${c.max}</span>
+              <span style="color:#9CA3AF; font-size:13px;">/ ${c.max}</span>
               <button class="tq-save-btn" type="button" title="Save (Enter)" aria-label="Save score" onclick="commitEditScore('${esc(vendor)}','${c.id}', this)">✓</button>
               <button class="tq-cancel-btn" type="button" title="Cancel (Escape)" aria-label="Cancel edit" onclick="cancelEditScore('${esc(vendor)}','${c.id}')">✕</button>
             </div>
           </td>`;
         }
-        // VIEW STATE WITH SCORE — clickable score number; locked when all 3 submitted
+        // VIEW STATE — always editable: score + / max + pencil-icon button (no Lock condition)
         if (sc != null){
-          if (allSubmitted){
-            return `<td class="tq-member-cell"><span class="scored locked" title="All committee members have submitted. Scores are locked.">${sc}</span> <span style="color:#6B7280; font-size:13px;">/ ${c.max}</span> <span class="locked-label" title="All committee members have submitted. Scores are locked.">Locked</span></td>`;
-          }
-          // Use a <button> for native keyboard / focus support; style strips the chrome via .scored
-          return `<td class="tq-member-cell"><button class="scored" type="button" title="Click to edit" aria-label="Edit score: currently ${sc} of ${c.max}" onclick="startEditScore('${esc(vendor)}','${c.id}')">${sc}</button> <span style="color:#6B7280; font-size:13px;">/ ${c.max}</span></td>`;
+          return `<td class="tq-member-cell">
+            <span class="tq-view-row">
+              <span class="scored">${sc}</span>
+              <span style="color:#9CA3AF; font-size:13px;">/ ${c.max}</span>
+              <button class="tq-pencil-btn" type="button" aria-label="Edit score for ${esc(c.short)} — ${esc(vendor)}" title="Edit score" onclick="startEditScore('${esc(vendor)}','${c.id}')"><i data-lucide="pencil" style="width:12px; height:12px;"></i></button>
+            </span>
+          </td>`;
         }
         // FIRST-ENTRY (no score yet) — input fires on commit (Enter/blur)
         return `<td class="tq-member-cell"><input class="tq-score-in" type="number" min="0" max="${c.max}" value="" placeholder="—" oninput="setMemberScore('${esc(vendor)}','${c.id}','rk', this.value)" aria-label="Enter your score for ${esc(c.short)} (max ${c.max})" /> <span style="color:#6B7280; font-size:11px;">/ ${c.max}</span></td>`;
       }
+      // Members 2 & 3 — always read-only, no pencil
       if (sc != null) return `<td class="tq-member-cell"><span class="scored-other">${sc}</span> <span style="color:#6B7280; font-size:11px;">/ ${c.max}</span></td>`;
       return `<td class="tq-member-cell"><span class="pending-pill">Pending</span> <button class="remind" onclick="sendMemberReminder('${esc(mb.name)}')">Remind</button></td>`;
     };
@@ -4913,15 +5070,503 @@ Date: ${esc(fmtDateShort(today))}`;
       </div>`;
   }
 
+  // ===================== EVALUATION COMMITTEE TAB =====================
+  // Transient UI state (not persisted)
+  let _comAddForm = { name:'', designation:'', email:'', role:'', finEval:true };
+  let _comPendingRemove = null;        // memberId currently in inline-confirmation state
+  let _comOpenRoleDropdown = null;     // memberId whose role dropdown is open
+  let _comSignoffConfirm = null;       // 'TQ' | 'financial' — which sign-off is in inline confirm
+
+  function renderCommittee(){
+    const wrap = document.getElementById('stage-committee');
+    if (!wrap) return;
+    const members = EVAL.committeeMembers || [];
+    const total = members.length;
+    // For "TQ scored" stat: count of non-Observer members who have submitted TQ scores for any vendor
+    const tqScored = members.filter(m => {
+      if (m.role === 'Observer') return false;
+      const subs = EVAL.tqMemberSubmitted || {};
+      return Object.keys(subs).some(v => subs[v] && subs[v][m.id]);
+    }).length;
+    const tqPending = Math.max(0, members.filter(m => m.role !== 'Observer').length - tqScored);
+    const quorumOk = total >= 3;
+    wrap.innerHTML = `
+      <div>
+        <div class="com-section-title">Evaluation Committee</div>
+        <div class="com-section-sub">Define and manage the committee responsible for evaluating bids for this tender. A minimum of 3 members is required.</div>
+      </div>
+      ${committeeStatusBarHTML(total, tqScored, tqPending, quorumOk)}
+      ${committeeMembersTableHTML(members)}
+      ${committeeAddPanelHTML()}
+      ${conflictOfInterestSectionHTML(members)}
+      ${signoffSectionHTML(members)}
+    `;
+    refreshIcons();
+  }
+
+  function committeeStatusBarHTML(total, tqScored, tqPending, quorumOk){
+    const quorum = quorumOk
+      ? `<span class="com-quorum-pill ok" aria-live="polite">✓ Quorum met</span>`
+      : `<span class="com-quorum-pill warn" role="alert" aria-live="polite">⚠ Minimum 3 members required</span>`;
+    return `<div class="com-status-bar">
+        <div class="chips">
+          <div class="chip"><span class="label">Total members</span><span class="value total" aria-live="polite">${total}</span></div>
+          <div class="chip"><span class="label">TQ scored</span><span class="value scored">${tqScored}</span></div>
+          <div class="chip"><span class="label">Pending</span><span class="value pending">${tqPending}</span></div>
+        </div>
+        <div>${quorum}</div>
+      </div>`;
+  }
+
+  function committeeMembersTableHTML(members){
+    const rows = members.map(m => committeeMemberRowHTML(m, members.length)).join('');
+    return `<div class="com-card">
+        <table class="com-table">
+          <thead><tr>
+            <th>Member</th>
+            <th style="width:160px;">Designation</th>
+            <th style="width:140px;">Role</th>
+            <th style="width:110px; text-align:center;">TQ Scoring</th>
+            <th style="width:110px; text-align:center;">Fin. Eval</th>
+            <th style="width:100px;">Added On</th>
+            <th style="width:90px;"></th>
+          </tr></thead>
+          <tbody id="comMembersTbody">${rows}</tbody>
+        </table>
+      </div>`;
+  }
+
+  function committeeMemberRowHTML(m, totalMembers){
+    // If this row is in pending-remove state, render the in-row confirmation
+    if (_comPendingRemove === m.id){
+      const willDropBelow = totalMembers <= 3;
+      return `<tr data-mid="${esc(m.id)}" class="com-row-pending-remove">
+        <td colspan="7" style="padding:14px 16px;">
+          <div class="com-confirm-remove">
+            <div class="msg">Remove <strong>${esc(m.name)}</strong> from committee?</div>
+            <button class="btn-yes" type="button" onclick="confirmRemoveMember('${esc(m.id)}')">Yes, remove</button>
+            <button class="btn-cancel" type="button" onclick="cancelRemoveMember()">Cancel</button>
+            ${willDropBelow ? `<div class="com-confirm-warn">Removing this member will drop below the minimum required 3. Add a replacement first.</div>` : ''}
+          </div>
+        </td>
+      </tr>`;
+    }
+    // TQ status cell — checks tqMemberSubmitted for any vendor
+    const subs = EVAL.tqMemberSubmitted || {};
+    const tqAnySubmitted = Object.keys(subs).some(v => subs[v] && subs[v][m.id]);
+    let tqCell;
+    if (m.role === 'Observer'){
+      tqCell = `<span class="com-status-text gray">—</span>`;
+    } else if (tqAnySubmitted){
+      tqCell = `<span class="com-status-text green">✓ Scored</span><div class="com-status-sub">May 18</div>`;
+    } else {
+      tqCell = `<span class="com-status-text amber">Pending</span>`;
+    }
+    // Fin Eval cell
+    let finCell;
+    if (m.role === 'Observer'){
+      finCell = `<span class="com-status-text gray">—</span>`;
+    } else if (m.finEval){
+      finCell = `<span class="com-status-text blue">Participating</span>`;
+    } else {
+      finCell = `<span class="com-status-text gray">Not participating</span>`;
+    }
+    const trashDisabled = m.isYou;
+    return `<tr data-mid="${esc(m.id)}">
+      <td>
+        <div class="com-member-cell">
+          <div class="com-avatar">${esc(memberInitials(m.name))}</div>
+          <div>
+            <div class="com-member-name">${esc(m.name)}${m.isYou ? '<span class="com-you-pill">(you)</span>' : ''}</div>
+            <div class="com-member-email">${esc(m.email || '')}</div>
+          </div>
+        </div>
+      </td>
+      <td><span style="font-size:13px; color:#374151;">${esc(m.designation || '—')}</span></td>
+      <td style="position:relative;">
+        <button class="com-role-pill ${roleClass(m.role)}" type="button" onclick="toggleRoleDropdown(event, '${esc(m.id)}')" aria-haspopup="listbox" aria-expanded="${_comOpenRoleDropdown===m.id ? 'true':'false'}">${esc(m.role || 'Select role')} ▾</button>
+        ${_comOpenRoleDropdown === m.id ? roleDropdownHTML(m) : ''}
+      </td>
+      <td class="com-cell-center">${tqCell}</td>
+      <td class="com-cell-center">${finCell}</td>
+      <td><span style="font-size:12px; color:#9CA3AF;">${esc(fmtCommitteeDate(m.addedOn))}</span></td>
+      <td>
+        <div class="com-action-row">
+          <button class="com-icon-btn" type="button" onclick="sendCommitteeReminder('${esc(m.id)}', this)" title="Send reminder" aria-label="Send reminder to ${esc(m.name)}"><i data-lucide="mail" style="width:14px; height:14px;"></i></button>
+          <button class="com-icon-btn danger" type="button" onclick="startRemoveMember('${esc(m.id)}')" ${trashDisabled?'disabled':''} title="${trashDisabled?'You cannot remove yourself':'Remove member'}" aria-label="Remove ${esc(m.name)}"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button>
+        </div>
+      </td>
+    </tr>`;
+  }
+
+  function roleDropdownHTML(m){
+    return `<div class="com-role-dropdown" role="listbox" aria-label="Select role for ${esc(m.name)}" style="top:calc(100% - 4px); left:14px;">
+      ${ROLE_OPTIONS.map(r => `<button type="button" class="${r===m.role?'active':''}" onclick="pickRole('${esc(m.id)}','${esc(r)}')">${esc(r)}</button>`).join('')}
+    </div>`;
+  }
+
+  function toggleRoleDropdown(ev, memberId){
+    ev.stopPropagation();
+    _comOpenRoleDropdown = (_comOpenRoleDropdown === memberId) ? null : memberId;
+    renderCommittee();
+  }
+  function pickRole(memberId, role){
+    const m = (EVAL.committeeMembers||[]).find(x => x.id === memberId);
+    if (!m) return;
+    const prev = m.role;
+    m.role = role;
+    _comOpenRoleDropdown = null;
+    log('Evaluation Committee', 'role_changed', `${m.name}: ${prev||'—'} → ${role}`);
+    saveState();
+    renderCommittee();
+  }
+  function closeRoleDropdown(){
+    if (_comOpenRoleDropdown){
+      _comOpenRoleDropdown = null;
+      // Only re-render if we're on the committee tab
+      if (EVAL && EVAL.stageTab === 'committee') renderCommittee();
+    }
+  }
+
+  // ===== Add member =====
+  function committeeAddPanelHTML(){
+    const f = _comAddForm;
+    const canAdd = (f.name||'').trim() && (f.role||'').trim();
+    return `<div class="com-add-panel">
+      <div class="com-card-title" style="margin-bottom:14px;">Add committee member</div>
+      <div class="com-add-grid-3">
+        <div class="com-add-field">
+          <label for="comAddName">Name *</label>
+          <input id="comAddName" type="text" placeholder="Full name" value="${esc(f.name||'')}" oninput="setComAdd('name', this.value)" />
+        </div>
+        <div class="com-add-field">
+          <label for="comAddDesig">Designation</label>
+          <input id="comAddDesig" type="text" placeholder="e.g. Deputy Commissioner" value="${esc(f.designation||'')}" oninput="setComAdd('designation', this.value)" />
+        </div>
+        <div class="com-add-field">
+          <label for="comAddEmail">Email</label>
+          <input id="comAddEmail" type="email" placeholder="official email address" value="${esc(f.email||'')}" oninput="setComAdd('email', this.value)" />
+        </div>
+      </div>
+      <div class="com-add-grid-2">
+        <div class="com-add-field">
+          <label for="comAddRole">Role *</label>
+          <select id="comAddRole" onchange="setComAdd('role', this.value)">
+            <option value="" ${!f.role?'selected':''}>Select role</option>
+            ${ROLE_OPTIONS.map(r => `<option value="${esc(r)}" ${f.role===r?'selected':''}>${esc(r)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="com-add-field">
+          <label>Financial evaluation</label>
+          <div class="com-add-toggle-row">
+            <span class="${f.finEval?'toggle-on':'toggle-off'}" role="switch" aria-checked="${f.finEval?'true':'false'}" onclick="toggleComAddFin()"></span>
+            <span class="label">Include in financial evaluation</span>
+          </div>
+        </div>
+      </div>
+      <div class="com-add-btn-row">
+        <button class="com-add-btn" type="button" onclick="addCommitteeMember()" ${canAdd?'':'disabled'}>Add to committee</button>
+      </div>
+    </div>`;
+  }
+  function setComAdd(field, value){
+    _comAddForm[field] = value;
+    // Live-enable the add button by toggling the disabled attribute
+    const btn = document.querySelector('.com-add-btn');
+    if (btn){
+      const canAdd = (_comAddForm.name||'').trim() && (_comAddForm.role||'').trim();
+      btn.disabled = !canAdd;
+    }
+  }
+  function toggleComAddFin(){
+    _comAddForm.finEval = !_comAddForm.finEval;
+    renderCommittee();
+  }
+  function addCommitteeMember(){
+    const f = _comAddForm;
+    const name = (f.name||'').trim();
+    const role = (f.role||'').trim();
+    if (!name || !role){ showToast('Name and Role are required'); return; }
+    const newId = 'cm-' + Date.now().toString(36);
+    const newM = {
+      id: newId,
+      name,
+      email: (f.email||'').trim(),
+      designation: (f.designation||'').trim(),
+      role,
+      finEval: !!f.finEval,
+      addedOn: new Date().toISOString().slice(0,10),
+      isYou: false,
+      _isNew: true,
+    };
+    EVAL.committeeMembers = (EVAL.committeeMembers || []).concat([newM]);
+    log('Evaluation Committee', 'committee_member_added', `${name} · ${role}`);
+    // Reset form
+    _comAddForm = { name:'', designation:'', email:'', role:'', finEval:true };
+    saveState();
+    renderCommittee();
+    // Animate the newly inserted row
+    setTimeout(() => {
+      const tr = document.querySelector(`#comMembersTbody tr[data-mid="${newId}"]`);
+      if (tr){ tr.classList.add('com-row-adding'); setTimeout(() => tr.classList.remove('com-row-adding'), 220); }
+      delete newM._isNew;
+    }, 0);
+    showToast(name + ' added to committee');
+  }
+
+  // ===== Remove member =====
+  function startRemoveMember(memberId){
+    _comPendingRemove = memberId;
+    renderCommittee();
+    // Auto-cancel after 3s if no decision
+    if (window._comRemoveTimer) clearTimeout(window._comRemoveTimer);
+    window._comRemoveTimer = setTimeout(() => {
+      if (_comPendingRemove === memberId){ cancelRemoveMember(); }
+    }, 3000);
+  }
+  function cancelRemoveMember(){
+    if (window._comRemoveTimer){ clearTimeout(window._comRemoveTimer); window._comRemoveTimer = null; }
+    _comPendingRemove = null;
+    if (EVAL && EVAL.stageTab === 'committee') renderCommittee();
+  }
+  function confirmRemoveMember(memberId){
+    if (window._comRemoveTimer){ clearTimeout(window._comRemoveTimer); window._comRemoveTimer = null; }
+    const m = (EVAL.committeeMembers||[]).find(x => x.id === memberId);
+    if (!m){ _comPendingRemove = null; renderCommittee(); return; }
+    const tr = document.querySelector(`#comMembersTbody tr[data-mid="${memberId}"]`);
+    if (tr){
+      tr.classList.add('com-row-removing');
+      // After slide-out animation, mutate state + re-render
+      setTimeout(() => {
+        EVAL.committeeMembers = (EVAL.committeeMembers||[]).filter(x => x.id !== memberId);
+        delete (EVAL.signoffs||{})[memberId];
+        delete (EVAL.conflictDeclarations||{})[memberId];
+        log('Evaluation Committee', 'committee_member_removed', m.name);
+        _comPendingRemove = null;
+        saveState();
+        renderCommittee();
+      }, 210);
+    } else {
+      EVAL.committeeMembers = (EVAL.committeeMembers||[]).filter(x => x.id !== memberId);
+      log('Evaluation Committee', 'committee_member_removed', m.name);
+      _comPendingRemove = null;
+      saveState();
+      renderCommittee();
+    }
+    showToast(m.name + ' removed from committee');
+  }
+
+  // ===== Send reminder =====
+  function sendCommitteeReminder(memberId, btn){
+    const m = (EVAL.committeeMembers||[]).find(x => x.id === memberId);
+    if (!m) return;
+    log('Evaluation Committee', 'committee_reminder_sent', `Reminder sent to ${m.name}`);
+    if (btn){
+      const originalHTML = btn.innerHTML;
+      btn.classList.add('sent');
+      btn.innerHTML = '✓ Sent';
+      btn.disabled = true;
+      setTimeout(() => {
+        btn.classList.remove('sent');
+        btn.innerHTML = originalHTML;
+        btn.disabled = false;
+        // Re-init icons since innerHTML was restored
+        if (window.lucide && typeof window.lucide.createIcons === 'function'){
+          window.lucide.createIcons({ icons:{ mail: window.lucide.icons.mail }});
+        } else refreshIcons();
+      }, 2000);
+    }
+    showToast('Reminder sent to ' + m.name);
+  }
+
+  // ===== Conflict of Interest =====
+  function conflictOfInterestSectionHTML(members){
+    const rows = members.map(m => {
+      const cd = (EVAL.conflictDeclarations||{})[m.id];
+      const declared = !!(cd && cd.declared);
+      const status = declared
+        ? `<span class="com-status-text green">Declared ✓</span>`
+        : `<span class="com-status-text amber">Pending</span>`;
+      const date = declared && cd.date ? fmtCommitteeDate(cd.date) : '—';
+      const cta = declared
+        ? `<button class="com-cta-link gray" type="button" onclick="viewConflictDeclaration('${esc(m.id)}')">View declaration</button>`
+        : `<button class="com-cta-link" type="button" onclick="sendConflictRequest('${esc(m.id)}')">Send declaration request</button>`;
+      return `<tr>
+        <td><div class="com-member-cell"><div class="com-avatar sm">${esc(memberInitials(m.name))}</div><div class="com-member-name" style="font-size:13px;">${esc(m.name)}${m.isYou ? '<span class="com-you-pill">(you)</span>' : ''}</div></div></td>
+        <td>${status}</td>
+        <td><span style="font-size:12px; color:#9CA3AF;">${esc(date)}</span></td>
+        <td>${cta}</td>
+      </tr>`;
+    }).join('');
+    const pendingCount = members.filter(m => !((EVAL.conflictDeclarations||{})[m.id]||{}).declared).length;
+    const overall = pendingCount === 0
+      ? `<div class="com-status-text green" style="margin-top:12px; font-weight:600;">✓ All members have declared no conflict of interest</div>`
+      : `<div style="margin-top:12px; display:flex; align-items:center; gap:10px;">
+          <span class="com-status-text amber">⚠ ${pendingCount} member${pendingCount===1?'':'s'} yet to declare</span>
+          <button class="com-cta-link" type="button" onclick="sendAllConflictRequests()">Send all pending</button>
+        </div>`;
+    return `<div class="com-card padded">
+        <div class="com-card-title">Conflict of Interest</div>
+        <div class="com-card-sub">All committee members must declare no conflict of interest with any bidding vendor before evaluation can be finalised.</div>
+        <table class="com-table">
+          <thead><tr>
+            <th>Member</th><th style="width:140px;">Declaration</th><th style="width:120px;">Date</th><th>Action</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        ${overall}
+      </div>`;
+  }
+  function sendConflictRequest(memberId){
+    const m = (EVAL.committeeMembers||[]).find(x => x.id === memberId);
+    if (!m) return;
+    log('Evaluation Committee', 'conflict_request_sent', `${m.name}`);
+    // For demo: also auto-mark logged-in user as declared if they request their own
+    if (m.isYou){
+      EVAL.conflictDeclarations = EVAL.conflictDeclarations || {};
+      EVAL.conflictDeclarations[memberId] = { declared:true, date: new Date().toISOString().slice(0,10) };
+      log('Evaluation Committee', 'conflict_declared', `${m.name} declared no conflict of interest`);
+      saveState();
+      renderCommittee();
+    }
+    showToast('Declaration request sent to ' + m.name);
+  }
+  function viewConflictDeclaration(memberId){
+    const m = (EVAL.committeeMembers||[]).find(x => x.id === memberId);
+    if (!m) return;
+    showToast('Opening ' + m.name + "'s declaration");
+  }
+  function sendAllConflictRequests(){
+    (EVAL.committeeMembers||[]).forEach(m => {
+      const declared = ((EVAL.conflictDeclarations||{})[m.id]||{}).declared;
+      if (!declared){
+        log('Evaluation Committee', 'conflict_request_sent', `${m.name}`);
+      }
+    });
+    showToast('Declaration requests sent to all pending members');
+  }
+
+  // ===== Sign-off =====
+  function signoffSectionHTML(members){
+    const rows = members.map(m => signoffRowHTML(m)).join('');
+    // Count members who must sign off (excluding Observer for TQ, excluding non-finEval for financial)
+    const tqNeeded = members.filter(m => m.role !== 'Observer');
+    const finNeeded = members.filter(m => m.role !== 'Observer' && m.finEval);
+    const tqSigned = tqNeeded.filter(m => ((EVAL.signoffs||{})[m.id]||{}).TQ).length;
+    const finSigned = finNeeded.filter(m => ((EVAL.signoffs||{})[m.id]||{}).financial).length;
+    const totalNeeded = tqNeeded.length + finNeeded.length;
+    const totalSigned = tqSigned + finSigned;
+    const pending = totalNeeded - totalSigned;
+    const overall = pending === 0
+      ? `<div class="com-signoff-success">✓ All committee members have signed off — evaluation is ready to lock</div>`
+      : `<div class="com-signoff-pending">${pending} sign-off${pending===1?'':'s'} pending before evaluation can be locked</div>`;
+    return `<div class="com-card padded">
+        <div class="com-card-title">Evaluation Sign-off</div>
+        <div class="com-card-sub">Once all evaluation is complete, each committee member must formally sign off before the comparison can be locked.</div>
+        <table class="com-table">
+          <thead><tr>
+            <th>Member</th><th style="width:160px;">TQ Sign-off</th><th style="width:170px;">Financial Sign-off</th><th>Action</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        ${overall}
+      </div>`;
+  }
+  function signoffRowHTML(m){
+    const so = (EVAL.signoffs||{})[m.id] || {};
+    const tqApplicable = m.role !== 'Observer';
+    const finApplicable = m.role !== 'Observer' && m.finEval;
+    const tqCell = !tqApplicable
+      ? `<span class="com-status-text gray">—</span>`
+      : so.TQ
+        ? `<span class="com-status-text green">Signed ✓</span><div class="com-status-sub">${esc(fmtCommitteeDate(so.dateTQ))}</div>`
+        : `<span class="com-status-text amber">Pending</span>`;
+    const finCell = !finApplicable
+      ? `<span class="com-status-text gray">—</span>`
+      : so.financial
+        ? `<span class="com-status-text green">Signed ✓</span><div class="com-status-sub">${esc(fmtCommitteeDate(so.dateFin))}</div>`
+        : `<span class="com-status-text amber">Pending</span>`;
+    // CTA — only show if at least one pending
+    let cta = '';
+    const tqPending  = tqApplicable && !so.TQ;
+    const finPending = finApplicable && !so.financial;
+    if (tqPending || finPending){
+      // Logged-in user: inline confirm; others: send-request outlined
+      if (m.isYou){
+        const which = _comSignoffConfirm && _comSignoffConfirm.memberId === m.id ? _comSignoffConfirm.type : null;
+        if (which){
+          cta = `<div class="com-signoff-confirm">
+            <span class="msg">Confirm your sign-off on this evaluation?</span>
+            <button class="btn-confirm" type="button" onclick="confirmSignoff('${esc(m.id)}','${esc(which)}')">Confirm</button>
+            <button class="com-cta-link gray" type="button" onclick="cancelSignoffConfirm()">Cancel</button>
+          </div>`;
+        } else {
+          // Prefer TQ first if pending, else financial
+          const type = tqPending ? 'TQ' : 'financial';
+          cta = `<button class="com-cta-primary" type="button" onclick="startSignoffConfirm('${esc(m.id)}','${esc(type)}')">Sign off</button>`;
+        }
+      } else {
+        cta = `<button class="com-cta-outlined" type="button" onclick="sendSignoffRequest('${esc(m.id)}')">Send request</button>`;
+      }
+    } else if (!tqApplicable && !finApplicable){
+      cta = `<span class="com-status-text gray">—</span>`;
+    } else {
+      cta = `<span class="com-status-text green">All signed</span>`;
+    }
+    return `<tr>
+      <td><div class="com-member-cell"><div class="com-avatar sm">${esc(memberInitials(m.name))}</div><div class="com-member-name" style="font-size:13px;">${esc(m.name)}${m.isYou ? '<span class="com-you-pill">(you)</span>' : ''}</div></div></td>
+      <td>${tqCell}</td>
+      <td>${finCell}</td>
+      <td>${cta}</td>
+    </tr>`;
+  }
+  function startSignoffConfirm(memberId, type){
+    _comSignoffConfirm = { memberId, type };
+    renderCommittee();
+  }
+  function cancelSignoffConfirm(){
+    _comSignoffConfirm = null;
+    if (EVAL && EVAL.stageTab === 'committee') renderCommittee();
+  }
+  function confirmSignoff(memberId, type){
+    const m = (EVAL.committeeMembers||[]).find(x => x.id === memberId);
+    if (!m) return;
+    EVAL.signoffs = EVAL.signoffs || {};
+    EVAL.signoffs[memberId] = EVAL.signoffs[memberId] || {};
+    const today = new Date().toISOString().slice(0,10);
+    if (type === 'TQ'){
+      EVAL.signoffs[memberId].TQ = true;
+      EVAL.signoffs[memberId].dateTQ = today;
+    } else {
+      EVAL.signoffs[memberId].financial = true;
+      EVAL.signoffs[memberId].dateFin = today;
+    }
+    log('Evaluation Committee', 'signoff_completed', `${m.name} · ${type}`);
+    _comSignoffConfirm = null;
+    saveState();
+    renderCommittee();
+    showToast(type + ' sign-off recorded');
+  }
+  function sendSignoffRequest(memberId){
+    const m = (EVAL.committeeMembers||[]).find(x => x.id === memberId);
+    if (!m) return;
+    log('Evaluation Committee', 'signoff_request_sent', `Request sent to ${m.name}`);
+    showToast('Sign-off request sent to ' + m.name);
+  }
+
   // ===================== GLOBAL =====================
   document.addEventListener('click', e => {
     const pop = document.getElementById('cellPopover');
     if (pop && !pop.classList.contains('hidden') && !pop.contains(e.target) && !e.target.closest('.matrix-cell')) closeCell();
     const pq = document.getElementById('pqPopover');
     if (pq && !pq.classList.contains('hidden') && !pq.contains(e.target) && !e.target.closest('.verdict-trigger')) closePqPopover();
+    // Close any open committee role dropdown when clicking outside it
+    if (_comOpenRoleDropdown && !e.target.closest('.com-role-dropdown') && !e.target.closest('.com-role-pill')){
+      closeRoleDropdown();
+    }
   });
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape'){ closeCell(); closeDrawer(); closeBidDoc(); closePqPopover(); closeClarPanel(); closeEvidencePanel(); closeVideoModal(); closeAuditPanel(); cancelMethodSwitch(); cancelReevalStrip(); if (pendingRevealVendor) resetPendingReveal(pendingRevealVendor); }
+    if (e.key === 'Escape'){ closeCell(); closeDrawer(); closeBidDoc(); closePqPopover(); closeClarPanel(); closeEvidencePanel(); closeVideoModal(); closeAuditPanel(); cancelMethodSwitch(); cancelReevalStrip(); closeRoleDropdown(); cancelRemoveMember(); cancelSignoffConfirm(); if (pendingRevealVendor) resetPendingReveal(pendingRevealVendor); }
   });
 
   (function boot(){
