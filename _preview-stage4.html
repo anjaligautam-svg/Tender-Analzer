@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Preview · Stage 4</title></head>
+<body style="font-family:'DM Sans',system-ui,sans-serif; padding:24px;">
+<p>Seeding state and opening Bid Management — Stage 4 (Award + LoA form)…</p>
+<script>
+  // One-shot helper: seeds bidmgmt_TND-2026-001 with Stage 1, 2, 4A complete
+  // (all approvers approved, all pre-checks ticked) and the LoA NOT yet issued,
+  // so both the Award Recommendation flow and the LoA Details form are visible.
+  const seed = {
+    tnd: 'TND-2026-001', stage: 4,
+    stage1Complete: true,
+    reasonablenessDecision: { kind:'proceed', note:'L1 within EC and TS.', authority:'', retenderReason:'', confirmed:true },
+    stage2Complete: true,
+    committeeMembers: [
+      { id:'rk', name:'Rajesh Kumar', designation:'Procurement Officer', initials:'RK', isYou:true,  comment:'Strong bid from Rajesh Constructions. Price is reasonable and well within TS.', verdict:'approve', date:'2026-05-18', conditions:'', concern:'' },
+      { id:'ps', name:'Priya Shah',   designation:'Technical Officer',   initials:'PS', isYou:false, comment:'Verified technical documents. ISO certificate valid. Work orders genuine.', verdict:'approve', date:'2026-05-18', conditions:'', concern:'' },
+      { id:'ap', name:'Amit Patil',   designation:'Finance Officer',     initials:'AP', isYou:false, comment:'Numbers reviewed. Approved.', verdict:'approve', date:'2026-05-19', conditions:'', concern:'' },
+    ],
+    resolutions: {},
+    negotiationTriggered: false, negotiationReason: '',
+    stage3Complete: false, invitationSent:false, invitationDate:null,
+    negotiationSessions: [], negotiationOutcome:null, negotiatedAmount:null,
+    stage4aComplete: true,
+    recommendationNote: '',
+    preApprovalChecks: { c1:true, c2:true, c3:true, c4:true, c5:true, c6:true },
+    approvalSent: true,
+    approvalStatus: {
+      officer: { approved:true, date:'2026-05-19' },
+      tech:    { approved:true, date:'2026-05-19' },
+      commr:   { approved:true, date:'2026-05-20' },
+    },
+    loaIssued: false, loaIssuedDate: null,
+    loaAcknowledged: false, acknowledgementDate:null, acknowledgementBy:'',
+    loaDetails: {
+      vendorName: 'Rajesh Constructions Pvt Ltd',
+      acceptedAmount: 2640000,
+      dateOfLoa: '2026-05-20',
+      performanceSecurity: 132000,
+      securityDeadline: '2026-06-04',
+      commencementDate: '2026-06-09',
+      completionDate: '2026-09-07',
+      issuingAuthority: 'Sunita Rao',
+      designation: 'Commissioner',
+    },
+  };
+  localStorage.setItem('bidmgmt_TND-2026-001', JSON.stringify(seed));
+  location.replace('bid-management.html?tender=TND-2026-001');
+</script>
+</body></html>
