@@ -246,6 +246,91 @@
     .ai-conf-popover.tier-low .ai-pop-tier { color:#991B1B; }
     /* Low-confidence banner above criteria table */
     .low-conf-banner { background:#FFFBEB; border:1px solid #FCD34D; border-radius:8px; padding:10px 14px; margin-bottom:12px; display:flex; align-items:center; gap:10px; font-size:13px; color:#92400E; }
+
+    /* ===== Bid Comparison tab (live, in-page) ===== */
+    .cmp-freshness { background:#F0FDF4; border:1px solid #BBF7D0; border-radius:8px; padding:10px 16px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .cmp-freshness .left { display:flex; align-items:center; gap:8px; font-size:12px; color:#065F46; }
+    .cmp-freshness .ts { font-size:11px; color:#9CA3AF; }
+    .cmp-stage-strip { background:#F9FAFB; border:1px solid #E5E7EB; border-radius:8px; padding:10px 16px; margin-bottom:16px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+    .cmp-stage-strip .stage-item { display:flex; align-items:center; gap:8px; font-size:12px; }
+    .cmp-stage-strip .stage-item .label { color:#6B7280; font-weight:500; }
+    .cmp-stage-strip .sep { width:4px; height:4px; border-radius:50%; background:#D1D5DB; }
+    .cmp-stage-strip .pill-s { display:inline-flex; align-items:center; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:600; }
+    .cmp-stage-strip .pill-s.done    { background:#F0FDF4; color:#065F46; }
+    .cmp-stage-strip .pill-s.partial { background:#FFFBEB; color:#92400E; }
+    .cmp-stage-strip .pill-s.none    { background:#F3F4F6; color:#6B7280; }
+    .cmp-stage-strip .pill-s.active  { background:#EFF6FF; color:#0C447C; }
+    .cmp-ctx-banner { border-radius:8px; padding:10px 14px; margin-bottom:16px; font-size:12px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+    .cmp-ctx-banner.info  { background:#EFF6FF; border:1px solid #BFDBFE; color:#0C447C; }
+    .cmp-ctx-banner.warn  { background:#FFFBEB; border:1px solid #FCD34D; color:#92400E; }
+    .cmp-ctx-banner.ok    { background:#F0FDF4; border:1px solid #BBF7D0; color:#065F46; }
+    .cmp-ctx-banner .link { color:#0F5EE8; font-size:12px; text-decoration:none; background:transparent; border:none; cursor:pointer; padding:0; font-weight:600; }
+    .cmp-ctx-banner .link:hover { text-decoration:underline; }
+    .cmp-ntq-sub { font-size:12px; color:#9CA3AF; font-style:italic; margin-bottom:14px; }
+    .cmp-toolbar { display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
+    .cmp-toolbar .grow { flex:1; }
+    .cmp-toolbar button, .cmp-toolbar select { background:white; border:1px solid #E5E7EB; border-radius:8px; padding:7px 12px; font-size:12.5px; color:#374151; cursor:pointer; transition: background .15s ease, border-color .15s ease; }
+    .cmp-toolbar button:hover { border-color:#9CA3AF; }
+    .cmp-toolbar .lock-btn { background:#10B981; color:white; border-color:#10B981; font-weight:700; }
+    .cmp-toolbar .lock-btn:hover { background:#059669; }
+    .cmp-table-wrap { background:white; border:1px solid #E5E7EB; border-radius:12px; overflow:hidden; }
+    .cmp-table { width:100%; border-collapse:collapse; font-size:12.5px; }
+    .cmp-table thead th { background:#F9FAFB; padding:10px 12px; font-size:10.5px; font-weight:700; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; text-align:left; border-bottom:1px solid #E5E7EB; white-space:nowrap; }
+    .cmp-table tbody td { padding:12px; border-bottom:1px solid #F3F4F6; vertical-align:middle; }
+    .cmp-table tbody tr:last-child td { border-bottom:none; }
+    .cmp-table tbody tr { transition: background .15s ease; }
+    .cmp-table tbody tr:hover { background:#F9FAFB; }
+    .cmp-table tbody tr.ntq { opacity:0.45; border-left:3px solid #EF4444; }
+    .cmp-table .v-name { font-weight:700; color:#111827; }
+    .cmp-table .v-sub { font-size:11px; color:#9CA3AF; margin-top:2px; }
+    .cmp-table .rank-circle { display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50%; font-size:12px; font-weight:700; }
+    .cmp-table .rank-circle.r1 { background:#10B981; color:white; }
+    .cmp-table .rank-circle.other { background:#D1D5DB; color:#374151; }
+    .cmp-table .rank-tq { background:#EFF6FF; color:#0C447C; padding:2px 6px; border-radius:6px; font-size:10px; font-weight:700; }
+    .cmp-table .pill-q   { background:#F0FDF4; color:#065F46; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:600; }
+    .cmp-table .pill-dq  { background:#FEF2F2; color:#991B1B; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:600; }
+    .cmp-table .pill-pend { background:#FFFBEB; color:#92400E; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:600; }
+    .cmp-table .pill-none { background:#F3F4F6; color:#6B7280; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:600; }
+    .cmp-table .tq-bar { display:inline-flex; flex-direction:column; gap:3px; min-width:70px; }
+    .cmp-table .tq-bar-num { font-size:13px; font-weight:700; color:#0F5EE8; }
+    .cmp-table .tq-bar-num.prov { color:#92400E; font-style:italic; }
+    .cmp-table .tq-bar-rail { width:100%; height:3px; background:#E5E7EB; border-radius:2px; overflow:hidden; }
+    .cmp-table .tq-bar-fill { height:100%; background:#0F5EE8; border-radius:2px; }
+    .cmp-table .tq-prov-badge { background:#FFFBEB; color:#92400E; font-size:9px; padding:1px 4px; border-radius:4px; font-weight:700; }
+    .cmp-table .amount-masked { background:#F3F4F6; color:#9CA3AF; border-radius:4px; padding:3px 8px; font-size:12px; display:inline-block; }
+    .cmp-table .amount { font-weight:700; color:#111827; font-size:13px; }
+    .cmp-table .amount-pending { font-size:11px; color:#9CA3AF; font-style:italic; }
+    .cmp-table .amount-ntq { font-size:11px; color:#EF4444; font-weight:600; }
+    .cmp-table .vs-cell.pos { color:#991B1B; font-weight:600; }
+    .cmp-table .vs-cell.neg { color:#065F46; font-weight:600; }
+    .cmp-table .flag-stack { display:flex; flex-direction:column; gap:3px; }
+    .cmp-table .flag-badge { display:inline-flex; align-items:center; gap:4px; padding:2px 7px; border-radius:6px; font-size:10px; font-weight:700; white-space:nowrap; }
+    .cmp-table .flag-badge.alb  { background:#FEF2F2; color:#991B1B; }
+    .cmp-table .flag-badge.high { background:#FEF2F2; color:#991B1B; }
+    .cmp-table .flag-badge.ntq  { background:#FEF2F2; color:#991B1B; }
+    .cmp-table .flag-badge.lowconf { background:#EFF6FF; color:#0C447C; }
+    .cmp-table .select-cell { text-align:center; }
+    .cmp-table .select-cell input[type="radio"] { accent-color:#0F5EE8; cursor:pointer; }
+    .cmp-table .select-cell input[type="radio"][disabled] { cursor:not-allowed; opacity:0.5; }
+    .cmp-table .notes-btn { background:transparent; border:none; cursor:pointer; color:#6B7280; padding:2px; border-radius:4px; }
+    .cmp-table .notes-btn:hover { background:#EFF6FF; color:#0F5EE8; }
+    .cmp-table .notes-btn .badge { background:#0F5EE8; color:white; border-radius:999px; padding:0 5px; font-size:9px; font-weight:700; margin-left:2px; }
+    .cmp-cell-flash { animation: cmpCellFlash 800ms ease; }
+    @keyframes cmpCellFlash { from { background:#FFFBEB; } to { background:transparent; } }
+    .cmp-selection-bar { background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:14px 18px; margin-top:14px; display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+    .cmp-selection-bar .left { font-size:13px; color:#0C447C; }
+    .cmp-selection-bar .left strong { color:#111827; }
+    .cmp-locked-banner { background:#F0FDF4; border:1px solid #BBF7D0; border-radius:8px; padding:14px 18px; margin-top:14px; display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+    .cmp-locked-banner .msg { font-size:13px; color:#065F46; font-weight:600; }
+    .cmp-locked-banner button { background:#10B981; color:white; border:none; border-radius:6px; padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer; }
+    .cmp-locked-banner button:hover { background:#059669; }
+    .cmp-notes-pop { position:absolute; background:white; border:1px solid #E5E7EB; border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,0.1); padding:12px 14px; width:300px; z-index:60; }
+    .cmp-notes-pop h4 { font-size:12px; font-weight:700; color:#111827; margin-bottom:8px; }
+    .cmp-notes-pop .note { background:#F9FAFB; border-radius:6px; padding:8px 10px; font-size:12px; color:#374151; margin-bottom:6px; }
+    .cmp-notes-pop .note .meta { font-size:10px; color:#9CA3AF; margin-top:3px; }
+    .cmp-notes-pop textarea { width:100%; min-height:60px; border:1px solid #D1D5DB; border-radius:6px; padding:6px 8px; font-size:12px; }
+    .cmp-notes-pop .add-row { display:flex; gap:6px; margin-top:6px; }
+    .cmp-notes-pop .add-row button { background:#0F5EE8; color:white; border:none; border-radius:5px; padding:5px 12px; font-size:11.5px; font-weight:600; cursor:pointer; }
     .pq-popover { position:absolute; width:340px; background:white; border:1px solid #E5E7EB; border-radius:12px; box-shadow:0 12px 32px rgba(0,0,0,0.12); padding:14px; z-index:55; }
     .pq-popover .pq-card { display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border:1px solid #E5E7EB; border-radius:8px; cursor:pointer; transition: border-color .15s ease, background .15s ease; margin-bottom:6px; }
     .pq-popover .pq-card:hover { border-color:#D1D5DB; }
@@ -770,7 +855,6 @@
         <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">EVALUATING</div>
         <ul class="space-y-0.5">
           <li><a href="evaluation.html" aria-current="page" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] bg-primary-light text-primary font-medium"><i data-lucide="clipboard-check" class="w-4 h-4"></i> Bid Evaluation</a></li>
-          <li><a href="comparative-statement.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="git-compare" class="w-4 h-4"></i> Bid Comparison</a></li>
           <li><a href="bid-management.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="gavel" class="w-4 h-4"></i> Bid Management</a></li>
           <li><a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="sparkles" class="w-4 h-4"></i> AI Assistant</a></li>
         </ul>
@@ -900,11 +984,13 @@
           <button role="tab" data-stab="technical" onclick="setStageTab('technical')" class="ev-tab px-4 py-1.5 rounded-full text-[13px] border border-primary bg-primary text-white"><i data-lucide="clipboard-check" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1"></i> Technical Evaluation</button>
           <button role="tab" data-stab="financial" onclick="setStageTab('financial')" class="ev-tab px-4 py-1.5 rounded-full text-[13px] border border-line bg-white text-ink-400"><i data-lucide="lock" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1"></i> Financial Evaluation</button>
           <button role="tab" data-stab="committee" onclick="setStageTab('committee')" class="ev-tab px-4 py-1.5 rounded-full text-[13px] border border-line bg-white text-ink-500"><i data-lucide="users" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1"></i> Evaluation Committee</button>
+          <button role="tab" data-stab="comparison" onclick="setStageTab('comparison')" class="ev-tab px-4 py-1.5 rounded-full text-[13px] border border-line bg-white text-ink-500"><i data-lucide="git-compare" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1"></i> Bid Comparison <span id="cmpTabBadge" class="hidden" style="background:#FFFBEB; color:#92400E; border-radius:20px; padding:1px 6px; font-size:10px; font-weight:700; margin-left:4px;"></span></button>
         </div>
 
         <section id="stage-technical" class="space-y-3"></section>
         <section id="stage-financial" class="hidden space-y-4"></section>
         <section id="stage-committee" class="hidden space-y-4"></section>
+        <section id="stage-comparison" class="hidden space-y-4"></section>
         <div class="h-4"></div>
       </section>
     </main>
@@ -1664,7 +1750,10 @@
     document.getElementById('wsReadOnly').classList.add('hidden');
     document.getElementById('screen-landing').classList.add('hidden');
     document.getElementById('screen-workspace').classList.remove('hidden');
-    setStageTab(EVAL.stageTab || 'technical', true);
+    // If URL hash requests a specific tab, honour it (e.g. #comparison from external links)
+    const hashTab = (location.hash || '').replace('#','');
+    const initialTab = (['technical','financial','committee','comparison'].includes(hashTab)) ? hashTab : (EVAL.stageTab || 'technical');
+    setStageTab(initialTab, true);
     // Audit panel — restore session state + populate badge
     renderAuditBadge();
     if (_uiAudit && _uiAudit.open){
@@ -1688,11 +1777,17 @@
       if (!silent) showToast('Complete previous stage to unlock');
       name = 'technical';
     }
+    // Bid Comparison tab: when leaving it, tear down the live refresh hooks
+    if (EVAL.stageTab === 'comparison' && name !== 'comparison' && typeof teardownComparison === 'function'){
+      teardownComparison();
+    }
     EVAL.stageTab = name;
     document.getElementById('stage-technical').classList.toggle('hidden', name !== 'technical');
     document.getElementById('stage-financial').classList.toggle('hidden', name !== 'financial');
     const ce = document.getElementById('stage-committee');
     if (ce) ce.classList.toggle('hidden', name !== 'committee');
+    const cmp = document.getElementById('stage-comparison');
+    if (cmp) cmp.classList.toggle('hidden', name !== 'comparison');
     document.querySelectorAll('[data-stab]').forEach(b => {
       const on = b.dataset.stab === name;
       const locked = b.dataset.stab === 'financial' && !EVAL.techComplete;
@@ -1706,10 +1801,12 @@
       const ic = b.querySelector('i');
       if (b.dataset.stab === 'financial' && ic){ ic.setAttribute('data-lucide', locked ? 'lock' : 'indian-rupee'); }
       if (b.dataset.stab === 'committee' && ic){ ic.setAttribute('data-lucide', 'users'); }
+      if (b.dataset.stab === 'comparison' && ic){ ic.setAttribute('data-lucide', 'git-compare'); }
     });
     if (name === 'technical')       renderTechnical();
     else if (name === 'financial')  renderFinancial();
     else if (name === 'committee')  renderCommittee();
+    else if (name === 'comparison') renderComparison();
     saveState();
     refreshIcons();
   }
@@ -3294,6 +3391,8 @@
       });
     });
     try { localStorage.setItem('tqEval_' + EVAL.tnd, JSON.stringify(payload)); } catch(e){}
+    // Live-update the Bid Comparison tab if it's open (storage events don't fire within the same window)
+    if (typeof refreshComparisonTable === 'function') refreshComparisonTable();
   }
 
   // C4 — write PQ matrix + comments + confidence to localStorage in the spec'd shape
@@ -3322,6 +3421,8 @@
       });
     });
     try { localStorage.setItem('pqEval_' + EVAL.tnd, JSON.stringify(payload)); } catch(e){}
+    // Live-update the Bid Comparison tab if it's open (storage events don't fire within the same window)
+    if (typeof refreshComparisonTable === 'function') refreshComparisonTable();
   }
   function pqShowSavedIndicator(){
     const el = document.getElementById('pqSavedIndicator');
@@ -4726,6 +4827,8 @@ Date: ${esc(fmtDateShort(today))}`;
     const cur = getFinEval(method);
     const next = Object.assign({}, cur, partial);
     try { localStorage.setItem(finEvalKey(method), JSON.stringify(next)); } catch(e){}
+    // Live-update the Bid Comparison tab if it's open (storage events don't fire within the same window)
+    if (typeof refreshComparisonTable === 'function') refreshComparisonTable();
     return next;
   }
   function resetFinEvalStorage(method){
@@ -5154,8 +5257,8 @@ Date: ${esc(fmtDateShort(today))}`;
     // F3 reasonableness must be completed before navigation — scroll user to F3 card if it's visible
     const f3 = document.getElementById('f3-card');
     if (f3){ f3.scrollIntoView({ behavior:'smooth', block:'start' }); return; }
-    // Fallback: navigate to Bid Comparison directly
-    location.href = 'comparative-statement.html?tender=' + encodeURIComponent(EVAL.tnd);
+    // Switch to the in-page Bid Comparison tab (no full-page navigation needed any more)
+    if (typeof setStageTab === 'function') setStageTab('comparison');
   }
 
   function l1ViewBody(tName){
@@ -5794,8 +5897,597 @@ Date: ${esc(fmtDateShort(today))}`;
     }
     EVAL.finComplete = true;
     refreshStagePill(); saveState();
-    location.href = 'comparative-statement.html?tender=' + EVAL.tnd;
+    // Switch to the in-page Bid Comparison tab
+    if (typeof setStageTab === 'function') setStageTab('comparison');
   }
+
+  // ===================== BID COMPARISON TAB (live, in-page) =====================
+  // Reads from pqEval_<TND>, tqEval_<TND>, finEval_<TND>_<METHOD>. Re-renders cell-level
+  // on storage events (other tabs/windows) and direct calls (same window). Selection is
+  // gated by financial Phase 3. Notes persist in comparison_<TND>.
+  let _cmpStorageListener = null;
+  let _cmpRefreshTimer = null;
+  let _cmpLastRefreshAt = null;
+  let _cmpOpenNotesFor = null;
+
+  function cmpKey(suffix){ return suffix + '_' + (EVAL.tnd || 'unknown'); }
+  function cmpReadJSON(key){ try { return JSON.parse(localStorage.getItem(key) || '{}'); } catch(e){ return {}; } }
+  function cmpReadFinAll(){
+    // Look at all five method buckets — return whichever has revealed data, prefer L1 if multiple
+    const tnd = EVAL.tnd;
+    const methods = ['L1','QCBS','LCS','QBS','FBS'];
+    const all = {};
+    methods.forEach(m => { all[m] = cmpReadJSON('finEval_' + tnd + '_' + m); });
+    return all;
+  }
+  function cmpComparisonState(){
+    // Local notes/selection state for THIS tender, persisted in comparison_<TND>
+    try {
+      const s = JSON.parse(localStorage.getItem('comparison_' + EVAL.tnd) || '{}');
+      return Object.assign({ notes:{}, selectedVendor:null, locked:false, selectionReason:'' }, s);
+    } catch(e){ return { notes:{}, selectedVendor:null, locked:false, selectionReason:'' }; }
+  }
+  function cmpSaveState(s){ try { localStorage.setItem('comparison_' + EVAL.tnd, JSON.stringify(s)); } catch(e){} }
+
+  // ---- Stage derivation: PQ/TQ/Financial/Reasonableness status ----
+  function cmpStagePQTQ(){
+    // Combines PQ + TQ from EVAL state (truthier than localStorage because the in-page tabs sync there first)
+    if (!EVAL.bids.length) return 'none';
+    if (EVAL.pqConfirmed && EVAL.tqConfirmed) return 'done';
+    if (EVAL.pqConfirmed || EVAL.bids.some(b => PQ_CRITERIA.some(c => (EVAL.matrix[b.vendor]||{})[c.id] != null))) return 'partial';
+    return 'none';
+  }
+  function cmpStageFin(){
+    if (EVAL.finComplete) return 'done';
+    if ((EVAL.finBids||[]).length || EVAL.finRun) return 'partial';
+    return 'none';
+  }
+  function cmpStageReason(){
+    const r = EVAL.reasonableness || {};
+    if (r.confirmed) return 'done';
+    if (r.decision)  return 'partial';
+    return 'none';
+  }
+  function cmpFinPhaseForActive(){
+    // Returns 1 | 2 | 3 based on the currently active method's localStorage snapshot
+    const m = (EVAL.evaluationMethod || EVAL.method || 'L1').toUpperCase();
+    const key = 'finEval_' + EVAL.tnd + '_' + m;
+    const snap = cmpReadJSON(key);
+    return snap.phase || 1;
+  }
+
+  // ---- Per-vendor data derivation ----
+  function cmpDerivePQ(vendor){
+    const m = EVAL.matrix[vendor] || {};
+    const vals = PQ_CRITERIA.map(c => m[c.id]);
+    if (vals.every(v => v == null)) return { status:'none', label:'Not evaluated', n:0, total:PQ_CRITERIA.length };
+    const decided = vals.filter(v => v === 'pass' || v === 'fail').length;
+    if (vals.includes('fail')) return { status:'dq', label:'Disqualified', n:decided, total:PQ_CRITERIA.length };
+    if (vals.every(v => v === 'pass')) return { status:'q', label:'Qualified', n:decided, total:PQ_CRITERIA.length };
+    return { status:'pending', label:'In progress', n:decided, total:PQ_CRITERIA.length };
+  }
+  function cmpDeriveTQ(vendor){
+    const subs = (EVAL.tqMemberSubmitted || {})[vendor] || {};
+    const submittedCount = COMMITTEE_MEMBERS.filter(mb => subs[mb.id]).length;
+    const t = typeof tqTotal === 'function' ? tqTotal(vendor) : null;
+    if (t == null) return { score:null, members:submittedCount, provisional:false };
+    return { score: t, members:submittedCount, provisional: submittedCount < 3 };
+  }
+  function cmpDeriveFin(vendor){
+    // Quoted amount + reveal phase + financial score (L1 = inverse of quote, normalized)
+    const m = (EVAL.evaluationMethod || EVAL.method || 'L1').toUpperCase();
+    const fin = cmpReadJSON('finEval_' + EVAL.tnd + '_' + m);
+    const phase = fin.phase || 1;
+    const revealedAll = phase === 3;
+    const revealedList = fin.revealedVendors || [];
+    const revealed = revealedAll || revealedList.includes(vendor);
+    const quote = (QUOTE_NUM || {})[vendor];
+    return { phase, revealed, quote, method:m };
+  }
+  function cmpDeriveCombinedScore(vendor, tqScore, quote){
+    // QCBS combined: T% × tqNorm + F% × finNorm
+    const m = (EVAL.evaluationMethod || EVAL.method || 'L1').toUpperCase();
+    if (m !== 'QCBS' || tqScore == null || !quote) return null;
+    // Normalise financial = lowest quote / this quote × 100
+    const quotes = EVAL.bids.map(b => (QUOTE_NUM||{})[b.vendor]).filter(q => typeof q === 'number');
+    if (!quotes.length) return null;
+    const minQ = Math.min(...quotes);
+    const finNorm = (minQ / quote) * 100;
+    const wT = (EVAL.technicalWeightage || 70) / 100;
+    const wF = (EVAL.financialWeightage || 30) / 100;
+    return tqScore * wT + finNorm * wF;
+  }
+  function cmpVsEstimate(quote){
+    if (!quote || !ESTIMATE) return null;
+    return ((quote - ESTIMATE) / ESTIMATE) * 100;
+  }
+  function cmpVsTS(quote){
+    const ts = EVAL.ts;
+    if (!quote || !ts) return null;
+    return ((quote - ts) / ts) * 100;
+  }
+  function cmpDeriveFlags(vendor, pq, tq, fin, vsEst){
+    const flags = [];
+    // Low confidence — derive from pqConfidence/tqConfidence
+    const pqConfs = (EVAL.pqConfidence || {})[vendor] || {};
+    const lowPq = Object.values(pqConfs).some(c => c && typeof c.score === 'number' && c.score < 45);
+    if (lowPq) flags.push({ kind:'lowconf', label:'Low confidence' });
+    if (pq.status === 'dq') flags.push({ kind:'ntq', label:'NTQ' });
+    if (fin.revealed && fin.quote){
+      if (vsEst != null && vsEst <= -15) flags.push({ kind:'alb', label:'ALB' });
+      if (vsEst != null && vsEst >= 10)  flags.push({ kind:'high', label:'High quote' });
+    }
+    return flags;
+  }
+  function cmpBuildRow(vendor){
+    const bid = EVAL.bids.find(b => b.vendor === vendor) || {};
+    const parsed = (PARSED_TECH || {})[vendor] || {};
+    const pq = cmpDerivePQ(vendor);
+    const tq = cmpDeriveTQ(vendor);
+    const fin = cmpDeriveFin(vendor);
+    const quote = fin.quote;
+    const vsEst = quote && fin.revealed ? cmpVsEstimate(quote) : null;
+    const vsTs  = quote && fin.revealed ? cmpVsTS(quote) : null;
+    const combined = (fin.revealed && tq.score != null && quote) ? cmpDeriveCombinedScore(vendor, tq.score, quote) : null;
+    const flags = cmpDeriveFlags(vendor, pq, tq, fin, vsEst);
+    const isNtq = pq.status === 'dq' || (tq.score != null && tq.score < TQ_THRESHOLD);
+    return { vendor, companyType: parsed['Company Type'] || '—', pq, tq, fin, quote, vsEst, vsTs, combined, flags, isNtq };
+  }
+  function buildComparisonData(){
+    return EVAL.bids.map(b => cmpBuildRow(b.vendor));
+  }
+
+  // ---- Ranking ----
+  function cmpRankRows(rows){
+    const m = (EVAL.evaluationMethod || EVAL.method || 'L1').toUpperCase();
+    const finPhase3 = rows.length && rows.every(r => r.fin.phase === 3);
+    // NTQ rows always last and unranked
+    const eligible = rows.filter(r => !r.isNtq);
+    const ntq      = rows.filter(r =>  r.isNtq);
+    let ranked;
+    if (finPhase3 && eligible.every(r => r.quote)){
+      // Final ranking by tender method
+      if (m === 'L1' || m === 'LCS' || m === 'FBS'){
+        ranked = eligible.slice().sort((a,b) => (a.quote||Infinity) - (b.quote||Infinity));
+      } else if (m === 'QCBS'){
+        ranked = eligible.slice().sort((a,b) => (b.combined||0) - (a.combined||0));
+      } else if (m === 'QBS'){
+        ranked = eligible.slice().sort((a,b) => (b.tq.score||0) - (a.tq.score||0));
+      } else {
+        ranked = eligible;
+      }
+      ranked.forEach((r, i) => { r.rank = i + 1; r.rankFinal = true; });
+    } else {
+      // Provisional ranking by TQ score
+      ranked = eligible.slice().sort((a,b) => (b.tq.score||0) - (a.tq.score||0));
+      ranked.forEach((r, i) => { r.rank = i + 1; r.rankFinal = false; });
+    }
+    ntq.forEach(r => { r.rank = null; r.rankFinal = finPhase3; });
+    return ranked.concat(ntq);
+  }
+
+  // ---- Render ----
+  function fmtINRn(n){ return n == null ? '—' : '₹' + Number(n).toLocaleString('en-IN'); }
+  function fmtPct(n){ if (n == null) return '—'; return (n >= 0 ? '+' : '') + n.toFixed(1) + '%'; }
+  function cmpRelativeTimestamp(){
+    if (!_cmpLastRefreshAt) return 'just now';
+    const sec = Math.floor((Date.now() - _cmpLastRefreshAt) / 1000);
+    if (sec < 5) return 'just now';
+    if (sec < 60) return sec + ' second' + (sec===1?'':'s') + ' ago';
+    const min = Math.floor(sec / 60);
+    if (min < 60) return min + ' minute' + (min===1?'':'s') + ' ago';
+    return Math.floor(min / 60) + ' hour' + (Math.floor(min/60)===1?'':'s') + ' ago';
+  }
+  function cmpRowHTML(row, locked, selectedVendor, financialDone){
+    const notes = (cmpComparisonState().notes || {})[row.vendor] || [];
+    const notesCount = notes.length;
+    // Rank cell
+    let rankCell;
+    if (row.isNtq){
+      rankCell = `<span class="amount-ntq" style="font-size:10px;">—</span>`;
+    } else if (row.rankFinal && row.rank){
+      rankCell = `<span class="rank-circle ${row.rank===1?'r1':'other'}">${row.rank}</span>`;
+    } else if (row.rank){
+      rankCell = `<span class="rank-tq">TQ: ${row.rank}${ordinal(row.rank)}</span>`;
+    } else {
+      rankCell = '—';
+    }
+    // PQ
+    const pqClass = row.pq.status === 'q' ? 'pill-q' : row.pq.status === 'dq' ? 'pill-dq' : row.pq.status === 'pending' ? 'pill-pend' : 'pill-none';
+    const pqLabel = row.pq.status === 'q' ? '✓ Qualified' : row.pq.status === 'dq' ? '✗ Disqualified' : row.pq.status === 'pending' ? 'In progress' : 'Not evaluated';
+    const pqSub = row.pq.status === 'pending' ? `<div class="v-sub">${row.pq.n}/${row.pq.total} criteria</div>` : '';
+    // TQ
+    let tqCell;
+    if (row.tq.score == null){
+      tqCell = '<span style="color:#9CA3AF;">—</span>';
+    } else {
+      const cls = row.tq.provisional ? 'prov' : '';
+      const pct = Math.min(100, row.tq.score);
+      const provBadge = row.tq.provisional ? ` <span class="tq-prov-badge">${row.tq.members}/3 PROV</span>` : '';
+      tqCell = `<div class="tq-bar"><div class="tq-bar-num ${cls}">${row.tq.score.toFixed(1)}${provBadge}</div><div class="tq-bar-rail"><div class="tq-bar-fill" style="width:${pct}%;"></div></div></div>`;
+    }
+    // Quote / Fin
+    let quoteCell, vsEstCell, vsTsCell;
+    if (row.isNtq){
+      quoteCell = '<span class="amount-ntq">NTQ — excluded</span>';
+      vsEstCell = '<span class="amount-ntq">—</span>';
+      vsTsCell  = '<span class="amount-ntq">—</span>';
+    } else if (row.fin.phase === 3 && row.quote){
+      quoteCell = `<span class="amount">${fmtINRn(row.quote)}</span>`;
+      vsEstCell = row.vsEst != null ? `<span class="vs-cell ${row.vsEst >= 0 ? 'pos' : 'neg'}">${fmtPct(row.vsEst)}</span>` : '—';
+      vsTsCell  = row.vsTs  != null ? `<span class="vs-cell ${row.vsTs  >= 0 ? 'pos' : 'neg'}">${fmtPct(row.vsTs)}</span>` : '—';
+    } else if (row.fin.phase === 2){
+      quoteCell = `<span class="amount-masked">••••••</span>`;
+      vsEstCell = '—';
+      vsTsCell  = '—';
+    } else {
+      quoteCell = '<span class="amount-pending">Pending financial bid</span>';
+      vsEstCell = '—';
+      vsTsCell  = '—';
+    }
+    // Combined
+    let combinedCell;
+    if (row.combined != null){
+      combinedCell = `<span class="amount">${row.combined.toFixed(1)}</span>`;
+    } else if (row.tq.score != null && row.fin.phase < 3){
+      combinedCell = `<span class="amount-pending">TQ: ${row.tq.score.toFixed(1)} · Fin: pending</span>`;
+    } else {
+      combinedCell = '<span style="color:#9CA3AF;">—</span>';
+    }
+    // Flags
+    const flagsCell = row.flags.length
+      ? `<div class="flag-stack">${row.flags.map(f => `<span class="flag-badge ${f.kind}">${esc(f.label)}</span>`).join('')}</div>`
+      : '<span style="color:#D1D5DB;">—</span>';
+    // Notes
+    const notesBtn = `<button class="notes-btn" type="button" onclick="event.stopPropagation(); cmpOpenNotes('${esc(row.vendor)}', event)" aria-label="Notes for ${esc(row.vendor)}"><i data-lucide="message-square" style="width:14px; height:14px;"></i>${notesCount ? '<span class="badge">' + notesCount + '</span>' : ''}</button>`;
+    // Select radio
+    const isSelected = selectedVendor === row.vendor;
+    const selectDisabled = !financialDone || row.isNtq || locked;
+    const selectTitle = !financialDone ? 'Complete financial evaluation to make a final selection' : row.isNtq ? 'NTQ vendor cannot be selected' : '';
+    const selectCell = `<input type="radio" name="cmpSelect" ${isSelected?'checked':''} ${selectDisabled?'disabled':''} title="${esc(selectTitle)}" onclick="cmpSelectVendor('${esc(row.vendor)}')" />`;
+
+    return `<tr class="${row.isNtq?'ntq':''}" data-vendor="${esc(row.vendor)}">
+      <td data-col="rank">${rankCell}</td>
+      <td data-col="vendor"><div class="v-name">${esc(row.vendor)}</div></td>
+      <td data-col="companyType">${esc(row.companyType)}</td>
+      <td data-col="pqStatus"><span class="${pqClass}">${pqLabel}</span>${pqSub}</td>
+      <td data-col="tqScore">${tqCell}</td>
+      <td data-col="quote">${quoteCell}</td>
+      <td data-col="combined">${combinedCell}</td>
+      <td data-col="vsEstimate">${vsEstCell}</td>
+      <td data-col="vsTS">${vsTsCell}</td>
+      <td data-col="flags">${flagsCell}</td>
+      <td data-col="notes" style="text-align:center;">${notesBtn}</td>
+      <td data-col="select" class="select-cell">${selectCell}</td>
+    </tr>`;
+  }
+  function ordinal(n){
+    if (!n) return '';
+    const r = n % 100;
+    if (r >= 11 && r <= 13) return 'th';
+    const u = n % 10;
+    return u === 1 ? 'st' : u === 2 ? 'nd' : u === 3 ? 'rd' : 'th';
+  }
+
+  function cmpStageStripHTML(){
+    const stages = [
+      { label:'PQ/TQ',         st:cmpStagePQTQ() },
+      { label:'Financial',     st:cmpStageFin() },
+      { label:'Reasonableness',st:cmpStageReason() },
+      { label:'Comparison',    st:'active' },
+    ];
+    const cls = (st) => st === 'done' ? 'done' : st === 'partial' ? 'partial' : st === 'active' ? 'active' : 'none';
+    const label = (st) => st === 'done' ? '✓ Complete' : st === 'partial' ? 'In progress' : st === 'active' ? 'Active' : 'Not started';
+    return `<div class="cmp-stage-strip" aria-live="polite">${stages.map((s, i) => `<div class="stage-item"><span class="label">${esc(s.label)}</span><span class="pill-s ${cls(s.st)}">${label(s.st)}</span></div>${i < stages.length - 1 ? '<span class="sep"></span>' : ''}`).join('')}</div>`;
+  }
+  function cmpContextBannerHTML(){
+    const pqtq   = cmpStagePQTQ();
+    const fin    = cmpStageFin();
+    const finPhase = cmpFinPhaseForActive();
+    const finalReady = pqtq === 'done' && fin === 'done';
+    const hasNtq = buildComparisonData().some(r => r.isNtq);
+    let banner;
+    if (finalReady){
+      banner = `<div class="cmp-ctx-banner ok" role="status">
+        <span>✓ All evaluation complete. This comparison is now ready to lock and proceed to Bid Management.</span>
+        <button class="link" type="button" style="background:#10B981; color:white; border-radius:6px; padding:6px 14px; font-size:12px; font-weight:700;" onclick="cmpLockAndProceed()">Lock &amp; Proceed to Bid Management →</button>
+      </div>`;
+    } else if (fin === 'partial' && finPhase < 3){
+      banner = `<div class="cmp-ctx-banner warn" role="status">
+        <span>⏳ Financial bids uploaded but amounts not yet revealed. Go to Financial Evaluation to reveal bids.</span>
+        <button class="link" type="button" onclick="setStageTab('financial')">Go to Financial Evaluation →</button>
+      </div>`;
+    } else if (pqtq !== 'none' && fin === 'none'){
+      banner = `<div class="cmp-ctx-banner info" role="status">
+        <span>ℹ Technical evaluation data shown. Financial bid amounts will appear here once financial evaluation is complete.</span>
+      </div>`;
+    } else {
+      banner = '';
+    }
+    const ntqSub = hasNtq ? `<div class="cmp-ntq-sub">NTQ vendor(s) are excluded from financial comparison. Their rows are shown dimmed for reference.</div>` : '';
+    return banner + ntqSub;
+  }
+  function cmpFreshnessHTML(){
+    return `<div class="cmp-freshness" role="status">
+      <div class="left"><i data-lucide="refresh-cw" style="width:14px; height:14px; color:#10B981;"></i> Live comparison — updates as evaluation progresses</div>
+      <div class="ts" id="cmpFreshTs" aria-live="polite">Last updated: just now</div>
+    </div>`;
+  }
+
+  function renderComparison(){
+    const wrap = document.getElementById('stage-comparison');
+    if (!wrap) return;
+    if (!EVAL.bids.length){
+      wrap.innerHTML = `<div style="background:white; border:1px solid #E5E7EB; border-radius:12px; padding:32px; text-align:center; color:#6B7280; font-size:13px;">Upload technical bids first to see the live comparison.</div>`;
+      return;
+    }
+    const data = cmpRankRows(buildComparisonData());
+    const state = cmpComparisonState();
+    const finalReady = cmpStagePQTQ() === 'done' && cmpStageFin() === 'done';
+    const locked = !!state.locked;
+    const rows = data.map(r => cmpRowHTML(r, locked, state.selectedVendor, finalReady)).join('');
+
+    // Selection bar / locked banner
+    let bottomBar = '';
+    if (locked){
+      bottomBar = `<div class="cmp-locked-banner" role="status">
+        <div class="msg">✓ Comparison locked. Selection: <strong>${esc(state.selectedVendor || '—')}</strong>${state.selectionReason ? ' · ' + esc(state.selectionReason) : ''}</div>
+        <div style="display:flex; gap:8px;">
+          <button type="button" onclick="showToast('PDF download (mock)')" style="background:white; color:#0F5EE8; border:1px solid #0F5EE8;">Download Comparative Statement (PDF)</button>
+          <button type="button" onclick="cmpProceedToBidMgmt()">Proceed to Bid Management →</button>
+        </div>
+      </div>`;
+    } else if (state.selectedVendor){
+      bottomBar = `<div class="cmp-selection-bar">
+        <div class="left">Selection: <strong>${esc(state.selectedVendor)}</strong></div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button type="button" onclick="cmpClearSelection()" style="background:transparent; border:none; color:#6B7280; cursor:pointer; font-size:12px;">Clear</button>
+          <button type="button" onclick="cmpConfirmSelection()" style="background:#0F5EE8; color:white; border:none; border-radius:6px; padding:7px 14px; font-size:12.5px; font-weight:600; cursor:pointer;">Confirm &amp; Lock →</button>
+        </div>
+      </div>`;
+    }
+
+    wrap.innerHTML = `${cmpFreshnessHTML()}
+      ${cmpStageStripHTML()}
+      ${cmpContextBannerHTML()}
+      <div class="cmp-toolbar">
+        <select id="cmpSortSel" onchange="cmpSortChange(this.value)">
+          <option value="rank">Sort by: Rank</option>
+          <option value="tq">Sort by: TQ Score</option>
+          <option value="quote">Sort by: Quoted Amount</option>
+          <option value="vendor">Sort by: Vendor</option>
+        </select>
+        <span class="grow"></span>
+        <button type="button" onclick="showToast('Filters (mock)')">Filters ▾</button>
+        <button type="button" onclick="showToast('Columns (mock)')">Columns ▾</button>
+        <button type="button" onclick="showToast('PDF export (mock)')">Export PDF</button>
+        <button type="button" onclick="showToast('Excel export (mock)')">Export Excel</button>
+      </div>
+      <div class="cmp-table-wrap">
+        <table class="cmp-table" id="cmpTable">
+          <thead><tr>
+            <th data-col="rank">Rank</th>
+            <th data-col="vendor">Vendor</th>
+            <th data-col="companyType">Company Type</th>
+            <th data-col="pqStatus">PQ Status</th>
+            <th data-col="tqScore">TQ Score</th>
+            <th data-col="quote">Quoted (₹)</th>
+            <th data-col="combined">Combined Score</th>
+            <th data-col="vsEstimate">vs Estimate</th>
+            <th data-col="vsTS">vs TS</th>
+            <th data-col="flags">Flags</th>
+            <th data-col="notes" style="text-align:center;">Notes</th>
+            <th data-col="select" style="text-align:center;">Select</th>
+          </tr></thead>
+          <tbody id="cmpTableBody">${rows}</tbody>
+        </table>
+      </div>
+      ${bottomBar}`;
+    refreshIcons();
+    setupComparison();
+    cmpUpdateTabBadge();
+  }
+
+  // ---- Cell-level refresh (avoid full re-render) ----
+  function refreshComparisonTable(){
+    const wrap = document.getElementById('stage-comparison');
+    if (!wrap || wrap.classList.contains('hidden')) return;
+    const tbody = document.getElementById('cmpTableBody');
+    if (!tbody){ renderComparison(); return; }
+    const data = cmpRankRows(buildComparisonData());
+    const state = cmpComparisonState();
+    const finalReady = cmpStagePQTQ() === 'done' && cmpStageFin() === 'done';
+    const locked = !!state.locked;
+    // Build new rows; replace in place to keep refs but flash changed cells
+    const existing = {};
+    Array.from(tbody.querySelectorAll('tr[data-vendor]')).forEach(tr => { existing[tr.getAttribute('data-vendor')] = tr; });
+    let cursor = null;
+    data.forEach((row, idx) => {
+      const html = cmpRowHTML(row, locked, state.selectedVendor, finalReady);
+      const tmp = document.createElement('template');
+      tmp.innerHTML = html.trim();
+      const newTr = tmp.content.firstChild;
+      const oldTr = existing[row.vendor];
+      if (oldTr){
+        // Replace cell-by-cell; flash any cell whose content changed
+        const oldCells = oldTr.querySelectorAll('td[data-col]');
+        const newCells = newTr.querySelectorAll('td[data-col]');
+        newCells.forEach((nc, i) => {
+          const oc = oldCells[i];
+          if (oc && oc.innerHTML !== nc.innerHTML){
+            oc.innerHTML = nc.innerHTML;
+            oc.classList.add('cmp-cell-flash');
+            setTimeout(() => oc.classList.remove('cmp-cell-flash'), 850);
+          }
+        });
+        oldTr.className = newTr.className;
+        // Re-position to keep visual rank order
+        if (cursor){
+          if (cursor.nextSibling !== oldTr) cursor.parentNode.insertBefore(oldTr, cursor.nextSibling);
+        } else {
+          if (tbody.firstChild !== oldTr) tbody.insertBefore(oldTr, tbody.firstChild);
+        }
+        cursor = oldTr;
+      } else {
+        // New vendor row — append
+        tbody.appendChild(newTr);
+        cursor = newTr;
+      }
+    });
+    // Remove vendors no longer in data
+    const dataVendors = new Set(data.map(r => r.vendor));
+    Array.from(tbody.querySelectorAll('tr[data-vendor]')).forEach(tr => {
+      if (!dataVendors.has(tr.getAttribute('data-vendor'))) tr.remove();
+    });
+
+    // Update stage strip + context banner
+    _cmpLastRefreshAt = Date.now();
+    cmpUpdateTimestamp();
+    const strip = wrap.querySelector('.cmp-stage-strip');
+    if (strip){
+      const fresh = document.createElement('div');
+      fresh.innerHTML = cmpStageStripHTML();
+      strip.replaceWith(fresh.firstChild);
+    }
+    const oldBanner = wrap.querySelector('.cmp-ctx-banner');
+    const oldNtq = wrap.querySelector('.cmp-ntq-sub');
+    if (oldBanner) oldBanner.remove();
+    if (oldNtq) oldNtq.remove();
+    const stripEl = wrap.querySelector('.cmp-stage-strip');
+    if (stripEl){
+      const ctx = document.createElement('div');
+      ctx.innerHTML = cmpContextBannerHTML();
+      while (ctx.firstChild) stripEl.parentNode.insertBefore(ctx.firstChild, stripEl.nextSibling);
+    }
+    cmpUpdateTabBadge();
+    refreshIcons();
+  }
+  function cmpUpdateTimestamp(){
+    const el = document.getElementById('cmpFreshTs');
+    if (el) el.textContent = 'Last updated: ' + cmpRelativeTimestamp();
+  }
+  function cmpUpdateTabBadge(){
+    const badge = document.getElementById('cmpTabBadge');
+    if (!badge) return;
+    if (!EVAL.bids.length){ badge.classList.add('hidden'); return; }
+    const data = buildComparisonData();
+    const flagCount = data.reduce((acc, r) => acc + r.flags.filter(f => f.kind === 'alb' || f.kind === 'high' || f.kind === 'lowconf').length, 0);
+    if (flagCount > 0){
+      badge.classList.remove('hidden');
+      badge.textContent = '⚠ ' + flagCount;
+    } else {
+      badge.classList.add('hidden');
+    }
+  }
+
+  // ---- Lifecycle: storage event listener + interval ticker ----
+  function setupComparison(){
+    teardownComparison(); // ensure no duplicates
+    _cmpLastRefreshAt = Date.now();
+    _cmpStorageListener = function(e){
+      const tnd = EVAL.tnd;
+      if (!tnd || !e || !e.key) return;
+      const relevant = [
+        'pqEval_' + tnd,
+        'tqEval_' + tnd,
+        'finEval_' + tnd + '_L1',
+        'finEval_' + tnd + '_QCBS',
+        'finEval_' + tnd + '_LCS',
+        'finEval_' + tnd + '_QBS',
+        'finEval_' + tnd + '_FBS',
+      ];
+      if (relevant.includes(e.key)) refreshComparisonTable();
+    };
+    window.addEventListener('storage', _cmpStorageListener);
+    // Ticker for "Last updated: X ago" relative timestamp
+    _cmpRefreshTimer = setInterval(cmpUpdateTimestamp, 30000);
+  }
+  function teardownComparison(){
+    if (_cmpStorageListener){ window.removeEventListener('storage', _cmpStorageListener); _cmpStorageListener = null; }
+    if (_cmpRefreshTimer){ clearInterval(_cmpRefreshTimer); _cmpRefreshTimer = null; }
+  }
+
+  // ---- Sort, selection, notes, lock ----
+  function cmpSortChange(_kind){ refreshComparisonTable(); }
+  window.cmpSelectVendor = function(vendor){
+    const s = cmpComparisonState();
+    if (s.locked) return;
+    s.selectedVendor = vendor;
+    cmpSaveState(s);
+    refreshComparisonTable();
+  };
+  window.cmpClearSelection = function(){
+    const s = cmpComparisonState();
+    if (s.locked) return;
+    s.selectedVendor = null;
+    cmpSaveState(s);
+    renderComparison();
+  };
+  window.cmpConfirmSelection = function(){
+    const s = cmpComparisonState();
+    if (!s.selectedVendor){ showToast('Pick a vendor first'); return; }
+    s.locked = true;
+    s.selectionReason = s.selectionReason || 'Selected by L1';
+    cmpSaveState(s);
+    log('Results & Actions', 'comparison_locked', `Selected: ${s.selectedVendor}`);
+    renderComparison();
+    showToast('Comparison locked');
+  };
+  window.cmpLockAndProceed = function(){
+    const s = cmpComparisonState();
+    if (!s.selectedVendor){
+      // Auto-select rank-1 vendor if none chosen
+      const data = cmpRankRows(buildComparisonData());
+      const r1 = data.find(r => r.rankFinal && r.rank === 1);
+      if (r1) s.selectedVendor = r1.vendor;
+    }
+    s.locked = true;
+    cmpSaveState(s);
+    cmpProceedToBidMgmt();
+  };
+  window.cmpProceedToBidMgmt = function(){
+    location.href = 'bid-management.html?tender=' + encodeURIComponent(EVAL.tnd);
+  };
+  window.cmpOpenNotes = function(vendor, ev){
+    if (ev) ev.stopPropagation();
+    // Close existing
+    document.querySelectorAll('.cmp-notes-pop').forEach(p => p.remove());
+    if (_cmpOpenNotesFor === vendor){ _cmpOpenNotesFor = null; return; }
+    _cmpOpenNotesFor = vendor;
+    const s = cmpComparisonState();
+    const notes = (s.notes || {})[vendor] || [];
+    const pop = document.createElement('div');
+    pop.className = 'cmp-notes-pop';
+    pop.onclick = e => e.stopPropagation();
+    pop.innerHTML = `<h4>Notes — ${esc(vendor)}</h4>
+      ${notes.length ? notes.map(n => `<div class="note">${esc(n.text)}<div class="meta">— ${esc(n.author||'Rajesh Kumar')} · ${esc(n.timestamp||'')}</div></div>`).join('') : '<div style="font-size:12px; color:#9CA3AF; font-style:italic;">No notes yet</div>'}
+      <textarea id="cmpNewNote" placeholder="Add a note..."></textarea>
+      <div class="add-row"><button type="button" onclick="cmpAddNote('${esc(vendor)}')">Add note</button></div>`;
+    document.body.appendChild(pop);
+    const rect = (ev && ev.currentTarget && ev.currentTarget.getBoundingClientRect) ? ev.currentTarget.getBoundingClientRect() : { left: window.innerWidth/2, top: 100, right:0, bottom:0, width:0 };
+    pop.style.top  = (rect.bottom + window.scrollY + 6) + 'px';
+    pop.style.left = Math.max(12, Math.min(rect.right + window.scrollX - 300, window.innerWidth - 312)) + 'px';
+  };
+  window.cmpAddNote = function(vendor){
+    const ta = document.getElementById('cmpNewNote');
+    if (!ta || !ta.value.trim()) return;
+    const s = cmpComparisonState();
+    s.notes = s.notes || {};
+    s.notes[vendor] = s.notes[vendor] || [];
+    s.notes[vendor].push({ text: ta.value.trim(), author: 'Rajesh Kumar', timestamp: new Date().toLocaleString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' }) });
+    cmpSaveState(s);
+    _cmpOpenNotesFor = null;
+    document.querySelectorAll('.cmp-notes-pop').forEach(p => p.remove());
+    refreshComparisonTable();
+    showToast('Note added');
+  };
+  // Outside-click closes notes popover
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.cmp-notes-pop') && !e.target.closest('.notes-btn')){
+      document.querySelectorAll('.cmp-notes-pop').forEach(p => p.remove());
+      _cmpOpenNotesFor = null;
+    }
+  });
 
   // ===================== ACTIVITY TRAIL PANEL (formerly Audit Log) =====================
   let _uiAudit = { open:false, filter:'all' };
