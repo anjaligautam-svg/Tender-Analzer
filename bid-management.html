@@ -470,7 +470,9 @@
       negotiationSessions: [], negotiationOutcome:null, negotiatedAmount:null,
       stage4aComplete: false,
       recommendationNote: '',
-      preApprovalChecks: { c1:false, c2:false, c3:false, c4:false, c5:false, c6:false },
+      // Design-review unlock: checklist starts fully checked so the full Stage 4 flow is reachable.
+      // Officer can manually uncheck and re-check any item — this is just the default starting state.
+      preApprovalChecks: { c1:true, c2:true, c3:true, c4:true, c5:true, c6:true },
       approvalSent: false, approvalStatus: {},
       loaIssued: false, loaIssuedDate:null,
       loaAcknowledged: false, acknowledgementDate:null, acknowledgementBy:'',
@@ -628,12 +630,20 @@
     if (l1 > ec * 1.10) return 'C';
     return 'A';
   }
-  function negotiationVisible(){ return !!BM.negotiationTriggered; }
+  // True when the negotiation stage was actually triggered by Stage 1 / Stage 2 decisions.
+  // The Negotiation NODE is always visible in the progress bar (design-review unlock);
+  // this flag still controls the in-stage trigger banner so it only appears when relevant.
+  function negotiationTriggered(){ return !!BM.negotiationTriggered; }
+  // Kept for backwards compatibility — Negotiation is now always visible.
+  function negotiationVisible(){ return true; }
   function stageNodes(){
-    const arr = [{ key:1, label:'Reasonableness' }, { key:2, label:'Committee Review' }];
-    if (negotiationVisible()) arr.push({ key:3, label:'Negotiation' });
-    arr.push({ key:4, label:'Award & LoA' });
-    return arr;
+    // All four stages always shown — design-review unlock
+    return [
+      { key:1, label:'Reasonableness' },
+      { key:2, label:'Committee Review' },
+      { key:3, label:'Negotiation' },
+      { key:4, label:'Award & LoA' },
+    ];
   }
   function isStageComplete(key){
     if (key === 1) return BM.stage1Complete;
@@ -642,13 +652,9 @@
     if (key === 4) return BM.loaIssued;
     return false;
   }
-  function isStageLocked(key){
-    if (key === 1) return false;
-    if (key === 2) return !BM.stage1Complete;
-    if (key === 3) return !BM.stage2Complete || !negotiationVisible();
-    if (key === 4) return !BM.stage2Complete || (negotiationVisible() && !BM.stage3Complete);
-    return true;
-  }
+  // All stages unlocked for design-review purposes. Saved completion state (above) is still
+  // honoured visually (green checkmarks) — only the GATE is removed.
+  function isStageLocked(_key){ return false; }
   function renderWorkspace(){
     renderHeaderStatus();
     renderStageProgress();
@@ -977,13 +983,20 @@
     if (ta){ ta.focus(); ta.scrollIntoView({ behavior:'smooth', block:'center' }); }
   }
 
-  // ============ STAGE 3 — NEGOTIATION (conditional) ============
+  // ============ STAGE 3 — NEGOTIATION (always visible — design-review unlock) ============
   function stage3HTML(){
     const t = tenderInfo();
-    const ctx = `<div class="purple-box">
-      <div style="font-size:13px; font-weight:700; color:#3C3489;">Negotiation triggered</div>
-      <div style="font-size:12px; color:#534AB7; margin-top:2px;">Reason: ${esc(BM.negotiationReason || 'Negotiation requested during evaluation')}</div>
-    </div>`;
+    // Design-review info note — only when this stage was never triggered organically
+    const previewNote = !negotiationTriggered()
+      ? `<div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:10px 14px; margin-bottom:16px; font-size:12px; color:#0C447C; font-style:italic;">ℹ In production, this stage only appears when triggered by committee review or reasonableness check decision.</div>`
+      : '';
+    // Original trigger banner — still only shown when negotiation was actually triggered
+    const ctx = negotiationTriggered()
+      ? `<div class="purple-box">
+          <div style="font-size:13px; font-weight:700; color:#3C3489;">Negotiation triggered</div>
+          <div style="font-size:12px; color:#534AB7; margin-top:2px;">Reason: ${esc(BM.negotiationReason || 'Negotiation requested during evaluation')}</div>
+        </div>`
+      : '';
     const vendorRow = `<div style="background:#F9FAFB; border-radius:8px; padding:12px 14px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
       <span style="font-size:14px; font-weight:700; color:#111827;">${esc(t.l1Vendor)}</span>
       <span class="pill-green">L1 · ${fmtINR(t.l1Amount)}</span>
@@ -1032,7 +1045,7 @@
     }
     const footer = `<div class="stage-footer"><div class="text-[13px] text-ink-500">Stage 3 of ${stageNodes().length} — Negotiation</div><button class="btn-primary" ${BM.negotiationOutcome?'':'disabled'} onclick="advanceStage(3)">${BM.stage3Complete?'Negotiation complete ✓':'Complete Negotiation →'}</button></div>`;
     return `<div class="stage-header"><h2>Negotiation</h2><p>Document the negotiation process with the recommended vendor. All sessions must be recorded with line-item breakdown.</p></div>
-      ${ctx}${inviteBlock}${sessionsBlock}${outcome}${footer}`;
+      ${previewNote}${ctx}${inviteBlock}${sessionsBlock}${outcome}${footer}`;
   }
   function defaultSessionItems(){
     return [
@@ -1207,10 +1220,14 @@
         <button class="btn-success" onclick="completeStage4a()">Proceed to issue Letter of Acceptance →</button>
       </div>`;
     }
+    // Design-review unlock: LoA section is always rendered. In production it appears only
+    // after the recommendation is approved by all approvers — make that clear with an info note
+    // when the recommendation hasn't actually been approved yet.
     let loaBlock = '';
-    if (BM.stage4aComplete){
-      loaBlock = renderLoASection(t, amt);
-    }
+    const loaPreviewNote = !BM.stage4aComplete
+      ? `<div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:10px 14px; margin-bottom:16px; font-size:12px; color:#0C447C; font-style:italic;">ℹ In production, this section unlocks after the recommendation is approved by all approvers.</div>`
+      : '';
+    loaBlock = loaPreviewNote + renderLoASection(t, amt);
     return `<div class="stage-header"><h2>Award Recommendation</h2><p>Prepare the formal award recommendation note. This document goes up the approval chain before the Letter of Acceptance is issued.</p></div>
       ${summary}${editor}${attachments}${checklist}${apprSection}${approvalBanner}${loaBlock}`;
   }
