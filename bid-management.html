@@ -247,6 +247,21 @@
     .countdown-amber { color:#92400E; font-weight:700; }
     .countdown-red   { color:#991B1B; font-weight:700; animation: pulse-amber 1.6s ease-in-out infinite; border-radius:6px; padding:2px 6px; }
 
+    /* Global amount masking — same visual language as evaluation.html */
+    .amount-masked { background:#F3F4F6; color:#9CA3AF; border-radius:4px; padding:3px 10px; font-size:13px; letter-spacing:2px; display:inline-block; }
+    .amount-revealed { font-weight:600; color:#374151; font-size:13px; }
+    .eye-btn { width:28px; height:28px; border-radius:6px; border:1px solid #E5E7EB; background:white; color:#9CA3AF; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; margin-left:6px; vertical-align:middle; transition: all 150ms ease; padding:0; }
+    .eye-btn:hover { border-color:#0F5EE8; color:#0F5EE8; background:#EFF6FF; }
+    .eye-btn.pending-reveal { border-color:#F59E0B; color:#F59E0B; background:#FFFBEB; }
+    .eye-btn.revealed { border-color:#10B981; color:#10B981; background:#F0FDF4; cursor:default; pointer-events:none; }
+    /* Stage 1 amber-lock info banner */
+    .reason-locked { background:#FFFBEB; border:1px solid #FCD34D; border-radius:10px; padding:14px 18px; margin-top:12px; display:flex; align-items:center; gap:10px; font-size:13px; color:#92400E; }
+    .reason-locked .link { background:transparent; border:none; padding:0; color:#0F5EE8; font-size:12px; font-weight:600; cursor:pointer; text-decoration:none; }
+    /* Critical action toast notifications */
+    .critical-toast { background:#1a1a1a; border-radius:10px; padding:12px 16px; min-width:300px; max-width:400px; box-shadow:0 4px 16px rgba(0,0,0,0.25); display:flex; align-items:flex-start; gap:10px; transform:translateY(80px); opacity:0; animation: toastIn 250ms ease forwards; }
+    @keyframes toastIn { to { transform: translateY(0); opacity: 1; } }
+    .critical-toast button:hover { color:white !important; }
+
     @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
   </style>
 </head>
@@ -428,6 +443,143 @@
   function refreshIcons(){ if (window.lucide) lucide.createIcons(); }
   function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
   function fmtINR(n){ if (n == null) return '—'; return '₹'+Number(n).toLocaleString('en-IN'); }
+
+  // ===================== CRITICAL ACTION NOTIFICATIONS — same system as evaluation.html =====================
+  function getSessionId(){
+    try {
+      let s = sessionStorage.getItem('sessionId');
+      if (!s){ s = 'session-' + Math.random().toString(36).slice(2,11); sessionStorage.setItem('sessionId', s); }
+      return s;
+    } catch(e){ return 'session-anon'; }
+  }
+  function logCriticalAction(tenderId, data){
+    if (!tenderId) return;
+    const entry = Object.assign({
+      id: 'crit-' + Date.now() + '-' + Math.random().toString(36).slice(2,6),
+      officer: 'Rajesh Kumar', officerRole: 'Super Admin',
+      tenderId, timestamp: new Date().toISOString(),
+      sessionId: getSessionId(),
+    }, data || {});
+    const key = 'criticalLog_' + tenderId;
+    let log;
+    try { log = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e){ log = []; }
+    log.push(entry);
+    try { localStorage.setItem(key, JSON.stringify(log)); } catch(e){}
+    showCriticalToast(entry);
+    return entry;
+  }
+  const CRIT_ICONS  = { financial:'currency-rupee', evaluation:'clipboard-list', committee:'users', award:'trophy' };
+  const CRIT_COLORS = { financial:'#FCD34D',        evaluation:'#93C5FD',         committee:'#86EFAC', award:'#C4B5FD' };
+  function ensureCritToastContainer(){
+    let c = document.getElementById('critical-toast-container');
+    if (!c){
+      c = document.createElement('div');
+      c.id = 'critical-toast-container';
+      c.setAttribute('role', 'status');
+      c.setAttribute('aria-live', 'assertive');
+      c.style.cssText = 'position:fixed; bottom:24px; right:24px; z-index:1000; display:flex; flex-direction:column; gap:8px; align-items:flex-end; pointer-events:none;';
+      document.body.appendChild(c);
+    }
+    return c;
+  }
+  function dismissCriticalToast(toast){
+    if (!toast || !toast.parentElement) return;
+    toast.style.transition = 'transform 200ms ease, opacity 200ms ease';
+    toast.style.transform = 'translateY(80px)';
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 220);
+  }
+  function showCriticalToast(entry){
+    const container = ensureCritToastContainer();
+    const cat = entry.category || 'evaluation';
+    const ic  = CRIT_ICONS[cat]  || CRIT_ICONS.evaluation;
+    const col = CRIT_COLORS[cat] || CRIT_COLORS.evaluation;
+    const toast = document.createElement('div');
+    toast.className = 'critical-toast';
+    toast.setAttribute('aria-label', 'Critical action logged: ' + (entry.description || ''));
+    toast.style.pointerEvents = 'auto';
+    toast.innerHTML = `
+      <i data-lucide="${ic}" style="width:16px; height:16px; color:${col}; flex-shrink:0; margin-top:1px;"></i>
+      <div style="flex:1; min-width:0;">
+        <div style="font-size:13px; font-weight:500; color:white; line-height:1.4;">${esc(entry.description||'Critical action')}</div>
+        <div style="font-size:11px; color:rgba(255,255,255,0.55); margin-top:3px;">${esc(entry.officer||'Officer')} · just now</div>
+      </div>
+      <button type="button" class="crit-toast-close" style="background:transparent; border:none; color:rgba(255,255,255,0.5); cursor:pointer; font-size:14px; padding:0 2px; line-height:1; flex-shrink:0;" aria-label="Dismiss notification">×</button>`;
+    container.appendChild(toast);
+    if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
+    toast.querySelector('.crit-toast-close').addEventListener('click', () => dismissCriticalToast(toast));
+    const all = container.querySelectorAll('.critical-toast');
+    if (all.length > 3) dismissCriticalToast(all[0]);
+    let timer = setTimeout(() => dismissCriticalToast(toast), 5000);
+    toast.addEventListener('mouseenter', () => clearTimeout(timer));
+    toast.addEventListener('mouseleave', () => { timer = setTimeout(() => dismissCriticalToast(toast), 3000); });
+  }
+  // ===== Global amount masking — same rule used in /evaluation.html =====
+  // Reads the single source of truth: winnerReveal_<TND-ID>. The tender header,
+  // Stage 1 Reasonableness Check, Stage 4 Recommendation card, and Stage 4 LoA
+  // form all mask amounts until the winner has been revealed AND the per-vendor
+  // eye icon has been clicked.
+  function bmWinnerRevealKey(tnd){ return 'winnerReveal_' + (tnd || (typeof BM !== 'undefined' && BM ? BM.tnd : '')); }
+  function bmGetWinnerRevealState(tnd){
+    try {
+      const raw = localStorage.getItem(bmWinnerRevealKey(tnd));
+      if (raw){
+        const o = JSON.parse(raw);
+        if (o && typeof o === 'object') return Object.assign({ winnerRevealed:false, winnerRevealedAt:null, revealedVendors:[], method:null }, o);
+      }
+    } catch(e){}
+    return { winnerRevealed:false, winnerRevealedAt:null, revealedVendors:[], method:null };
+  }
+  function bmSetWinnerRevealState(tnd, patch){
+    const cur = bmGetWinnerRevealState(tnd);
+    const next = Object.assign({}, cur, patch);
+    try { localStorage.setItem(bmWinnerRevealKey(tnd), JSON.stringify(next)); } catch(e){}
+    return next;
+  }
+  function bmIsWinnerRevealed(tnd){ return !!bmGetWinnerRevealState(tnd).winnerRevealed; }
+  function bmIsAmountRevealedFor(tnd, vendor){
+    const s = bmGetWinnerRevealState(tnd);
+    return s.winnerRevealed && (s.revealedVendors || []).includes(vendor);
+  }
+  // Render a masked amount with the appropriate eye-icon state per the global rule
+  function bmMaskedAmount(tnd, vendor, amount){
+    if (bmIsAmountRevealedFor(tnd, vendor)) return `<span class="amount-revealed">${fmtINR(amount)}</span>`;
+    if (bmIsWinnerRevealed(tnd)){
+      return `<span class="amount-masked" aria-label="Quoted amount hidden — click eye icon to reveal">₹ ••••••</span><button class="eye-btn" type="button" onclick="bmRevealAmount('${esc(vendor)}')" aria-label="Reveal quoted amount for ${esc(vendor)}" title="Reveal quoted amount"><i data-lucide="eye" style="width:14px; height:14px;"></i></button>`;
+    }
+    return `<span class="amount-masked" aria-label="Quoted amount hidden — winner not yet revealed">₹ ••••••</span>`;
+  }
+  // Two-click reveal — global, single pending vendor at a time
+  let _bmPendingReveal = null;
+  let _bmPendingTimer = null;
+  function bmRevealAmount(vendor){
+    if (!BM || !BM.tnd) return;
+    if (bmIsAmountRevealedFor(BM.tnd, vendor)) return;
+    if (_bmPendingReveal && _bmPendingReveal !== vendor){
+      clearTimeout(_bmPendingTimer);
+      _bmPendingReveal = null;
+    }
+    if (_bmPendingReveal !== vendor){
+      _bmPendingReveal = vendor;
+      showToast('Click eye icon again to reveal ' + vendor);
+      _bmPendingTimer = setTimeout(() => { _bmPendingReveal = null; }, 3000);
+      return;
+    }
+    clearTimeout(_bmPendingTimer); _bmPendingTimer = null;
+    _bmPendingReveal = null;
+    const wr = bmGetWinnerRevealState(BM.tnd);
+    const list = (wr.revealedVendors || []).slice();
+    if (!list.includes(vendor)) list.push(vendor);
+    bmSetWinnerRevealState(BM.tnd, { revealedVendors: list });
+    // Touchpoint 2 — eye icon click reveals an amount (Bid Management page)
+    logCriticalAction(BM.tnd, {
+      touchpointId: 2, action: 'amount_revealed', category: 'financial',
+      description: "Viewed " + vendor + "'s financial bid amount",
+      page: 'bid-management', section: 'Bid Management',
+      vendorName: vendor,
+    });
+    renderWorkspace();
+  }
   function todayISO(){ try { return new Date().toISOString().slice(0,10); } catch(e){ return ''; } }
   function fmtDate(iso){ if (!iso) return '—'; try { return new Date(iso+(iso.length===10?'T00:00:00':'')).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); } catch(e){ return iso; } }
   function addDaysISO(iso, days){ const d = new Date((iso||todayISO())+'T00:00:00'); d.setDate(d.getDate()+days); return d.toISOString().slice(0,10); }
@@ -617,6 +769,14 @@
     closeLoaPanel(); closeConfirmModal();
     const t = BM_TENDERS.find(x => x.id === tnd) || BM_TENDERS[0];
     BM = loadBM(tnd) || (tnd === 'TND-2026-007' ? seedCompletedDemo(tnd) : freshBM(tnd));
+    // Listen for amount reveals happening in /evaluation.html (other tab) — re-render header/stage in real time
+    if (!window._bmStorageWired){
+      window._bmStorageWired = true;
+      window.addEventListener('storage', e => {
+        if (!BM || !BM.tnd || !e || !e.key) return;
+        if (e.key === 'winnerReveal_' + BM.tnd) renderWorkspace();
+      });
+    }
     if (BM.stage == null) BM.stage = 1;
     if (!BM.committeeMembers) BM.committeeMembers = JSON.parse(JSON.stringify(COMMITTEE_SEED));
     if (!BM.approvalStatus) BM.approvalStatus = {};
@@ -624,7 +784,19 @@
     document.getElementById('wsCrumb').textContent = t.id;
     document.getElementById('wsBadge').textContent = t.id;
     document.getElementById('wsName').textContent  = t.name;
-    document.getElementById('wsMeta').textContent  = `${t.dept} · ${t.sector} · Est. ${fmtINR(t.estimate)} · TS: ${fmtINR(t.ts)} · L1: ${fmtINR(t.l1Amount)} · Method: ${t.method}`;
+    // Tender header — L1 amount obeys the global masking rule. EC and TS remain visible.
+    const wsMeta = document.getElementById('wsMeta');
+    const baseMeta = `${t.dept} · ${t.sector} · Est. ${fmtINR(t.estimate)} · TS: ${fmtINR(t.ts)} · Method: ${t.method}`;
+    if (bmIsAmountRevealedFor(BM.tnd, t.l1Vendor)){
+      wsMeta.textContent = baseMeta;
+      // Append L1 amount as visible text
+      wsMeta.innerHTML = esc(baseMeta) + ` · L1: <span class="amount-revealed">${fmtINR(t.l1Amount)}</span>`;
+    } else if (bmIsWinnerRevealed(BM.tnd)){
+      wsMeta.innerHTML = esc(baseMeta) + ` · L1: ${bmMaskedAmount(BM.tnd, t.l1Vendor, t.l1Amount)}`;
+    } else {
+      wsMeta.innerHTML = esc(baseMeta) + ` · L1: <span class="amount-masked" aria-label="L1 amount hidden — winner not yet revealed">₹ ••••••</span>`;
+    }
+    refreshIcons();
     document.getElementById('screen-landing').classList.add('hidden');
     document.getElementById('screen-workspace').classList.remove('hidden');
     renderWorkspace();
@@ -721,22 +893,45 @@
   function stage1HTML(){
     const t = tenderInfo();
     const ec = t.estimate, ts = t.ts, l1 = t.l1Amount;
-    const vsEc = ((l1 - ec) / ec) * 100;
-    const vsTs = ts ? ((l1 - ts) / ts) * 100 : null;
-    const vsEcDiff = l1 - ec, vsTsDiff = ts ? l1 - ts : null;
-    const ecColor = vsEc < 0 ? '#065F46' : vsEc <= 10 ? '#374151' : vsEc <= 15 ? '#92400E' : '#991B1B';
+    // Global masking: amount must be revealed to run reasonableness math
+    const amountKnown = bmIsAmountRevealedFor(BM.tnd, t.l1Vendor);
+    const vsEc = amountKnown ? ((l1 - ec) / ec) * 100 : null;
+    const vsTs = (amountKnown && ts) ? ((l1 - ts) / ts) * 100 : null;
+    const vsEcDiff = amountKnown ? (l1 - ec) : null;
+    const vsTsDiff = (amountKnown && ts) ? (l1 - ts) : null;
+    const ecColor = vsEc == null ? '#9CA3AF' : vsEc < 0 ? '#065F46' : vsEc <= 10 ? '#374151' : vsEc <= 15 ? '#92400E' : '#991B1B';
     const tsColor = vsTs == null ? '#9CA3AF' : vsTs < 0 ? '#065F46' : vsTs <= 10 ? '#374151' : vsTs <= 15 ? '#92400E' : '#991B1B';
-    const caseKey = reasonablenessCase();
+    const caseKey = amountKnown ? reasonablenessCase() : null;
+    // L1 cell: respect masking rule
+    const l1Cell = amountKnown ? fmtINR(l1) : (bmIsWinnerRevealed(BM.tnd) ? bmMaskedAmount(BM.tnd, t.l1Vendor, l1) : `<span class="amount-masked" aria-label="L1 amount sealed">₹ ••••••</span>`);
+    const vsEcCell = amountKnown ? `<span style="color:${ecColor};">${vsEc>=0?'+':''}${vsEc.toFixed(1)}%</span>` : '<span style="color:#9CA3AF;">—</span>';
+    const vsEcNote = amountKnown ? (vsEcDiff<0?'₹'+Math.abs(vsEcDiff).toLocaleString('en-IN')+' below estimate':'₹'+Math.abs(vsEcDiff).toLocaleString('en-IN')+' above estimate') : '—';
+    const vsTsCell = (amountKnown && vsTs != null) ? `<span style="color:${tsColor};">${vsTs>=0?'+':''}${vsTs.toFixed(1)}%</span>` : '<span style="color:#9CA3AF;">—</span>';
+    const vsTsNote = (amountKnown && vsTsDiff != null) ? (vsTsDiff<0?'₹'+Math.abs(vsTsDiff).toLocaleString('en-IN')+' below TS value':'₹'+Math.abs(vsTsDiff).toLocaleString('en-IN')+' above TS value') : '—';
     const figureCard = `<div class="card">
       <div class="text-[14px] font-bold text-ink-900" style="margin-bottom:14px;">Financial comparison</div>
       <table class="fig-table">
         <tr><td class="lbl">Estimated Cost (EC)</td><td class="val">${fmtINR(ec)}</td><td class="note">Engineer's working estimate</td></tr>
         <tr><td class="lbl">Technical Sanction (TS)</td><td class="val">${fmtINR(ts)}</td><td class="note">Formally approved budget ceiling</td></tr>
-        <tr><td class="lbl">Recommended bid (L1)</td><td class="val">${fmtINR(l1)}</td><td class="note">${esc(t.l1Vendor)}</td></tr>
-        <tr><td class="lbl">L1 vs EC</td><td class="val" style="color:${ecColor};">${vsEc>=0?'+':''}${vsEc.toFixed(1)}%</td><td class="note">${vsEcDiff<0?'₹'+Math.abs(vsEcDiff).toLocaleString('en-IN')+' below estimate':'₹'+Math.abs(vsEcDiff).toLocaleString('en-IN')+' above estimate'}</td></tr>
-        ${ts != null ? `<tr><td class="lbl">L1 vs TS</td><td class="val" style="color:${tsColor};">${vsTs>=0?'+':''}${vsTs.toFixed(1)}%</td><td class="note">${vsTsDiff<0?'₹'+Math.abs(vsTsDiff).toLocaleString('en-IN')+' below TS value':'₹'+Math.abs(vsTsDiff).toLocaleString('en-IN')+' above TS value'}</td></tr>` : ''}
+        <tr><td class="lbl">Recommended bid (L1)</td><td class="val">${l1Cell}</td><td class="note">${esc(t.l1Vendor)}</td></tr>
+        <tr><td class="lbl">L1 vs EC</td><td class="val">${vsEcCell}</td><td class="note">${vsEcNote}</td></tr>
+        ${ts != null ? `<tr><td class="lbl">L1 vs TS</td><td class="val">${vsTsCell}</td><td class="note">${vsTsNote}</td></tr>` : ''}
       </table>
     </div>`;
+    // If amount not yet revealed, skip the result/decision banners and show the locked notice
+    if (!amountKnown){
+      return `<div class="stage-header"><h2>Reasonableness Check</h2><p>Before proceeding to committee review, verify that the recommended bid is financially reasonable compared to the estimated cost and Technical Sanction value.</p></div>
+        ${figureCard}
+        <div class="reason-locked" role="status">
+          <i data-lucide="lock" style="width:16px; height:16px; color:#F59E0B; flex-shrink:0;"></i>
+          <span>Reasonableness check unavailable — reveal winner in Bid Evaluation first to calculate L1 vs EC and L1 vs TS.</span>
+          <a class="link" href="evaluation.html?tender=${esc(t.id)}#financial">Go to Bid Evaluation →</a>
+        </div>
+        <div class="stage-footer">
+          <div class="text-[13px] text-ink-500">Stage 1 of ${stageNodes().length}</div>
+          <button class="btn-primary" disabled style="opacity:0.5; cursor:not-allowed;">Complete Reasonableness Check →</button>
+        </div>`;
+    }
     const rd = BM.reasonablenessDecision || (BM.reasonablenessDecision = { kind:null, note:'', authority:'', retenderReason:'', confirmed:false });
     let banner = '';
     if (caseKey === 'A'){
@@ -1143,18 +1338,27 @@
   function stage4HTML(){
     const t = tenderInfo();
     const amt = finalAmount();
-    const vsEc = ((amt - t.estimate) / t.estimate) * 100;
+    const amountKnown = bmIsAmountRevealedFor(BM.tnd, t.l1Vendor);
+    const vsEc = amountKnown ? ((amt - t.estimate) / t.estimate) * 100 : null;
     const negApproved = APPROVAL_CHAIN.every(a => (BM.approvalStatus[a.id]||{}).approved);
     const allApproved = BM.approvalSent && negApproved;
+    // Big recommended-amount block obeys masking rule
+    let amtBlockHTML;
+    if (amountKnown){
+      amtBlockHTML = `<div style="font-size:28px; font-weight:700; color:#0F5EE8; margin-top:12px;">${fmtINR(amt)}</div>
+        <div style="font-size:13px; color:${vsEc<0?'#065F46':'#92400E'}; margin-top:2px;">${vsEc>=0?'+':''}${vsEc.toFixed(1)}% ${vsEc<0?'below':'above'} estimated cost</div>
+        <div style="font-size:13px; color:${amt<=t.ts?'#065F46':'#991B1B'}; margin-top:2px;">${amt<=t.ts?'Within TS value of '+fmtINR(t.ts)+' ✓':'Above TS value of '+fmtINR(t.ts)+' ✗'}</div>`;
+    } else {
+      amtBlockHTML = `<div style="margin-top:12px;">${bmIsWinnerRevealed(BM.tnd) ? bmMaskedAmount(BM.tnd, t.l1Vendor, amt) : `<span class="amount-masked" style="font-size:24px; padding:6px 14px; letter-spacing:3px;" aria-label="Recommended amount sealed">₹ ••••••</span>`}</div>
+        <div style="font-size:12px; color:#9CA3AF; margin-top:6px; font-style:italic;">Recommended amount will appear here after the winner is revealed and the eye icon is clicked.</div>`;
+    }
     const summary = `<div class="card">
       <div style="display:grid; grid-template-columns:1.4fr 1fr; gap:24px;">
         <div>
           <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:#9CA3AF; font-weight:700;">Recommended Vendor</div>
           <div style="font-size:22px; font-weight:700; color:#111827; margin-top:4px;">${esc(t.l1Vendor)}</div>
           <div style="font-size:13px; color:#6B7280; margin-top:2px;">${esc(t.id)} — ${esc(t.name)}</div>
-          <div style="font-size:28px; font-weight:700; color:#0F5EE8; margin-top:12px;">${fmtINR(amt)}</div>
-          <div style="font-size:13px; color:${vsEc<0?'#065F46':'#92400E'}; margin-top:2px;">${vsEc>=0?'+':''}${vsEc.toFixed(1)}% ${vsEc<0?'below':'above'} estimated cost</div>
-          <div style="font-size:13px; color:${amt<=t.ts?'#065F46':'#991B1B'}; margin-top:2px;">${amt<=t.ts?'Within TS value of '+fmtINR(t.ts)+' ✓':'Above TS value of '+fmtINR(t.ts)+' ✗'}</div>
+          ${amtBlockHTML}
           <div style="margin-top:10px;"><span class="ai-pill">${esc(t.method)} — ${t.method==='L1'?'Lowest qualified bid':'Recommended by evaluation method'}</span></div>
         </div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; align-content:start;">
@@ -1273,6 +1477,15 @@
     BM.approvalStatus['officer'] = { approved:true, date: todayISO() };
     saveBM(); renderStageBody(); refreshIcons();
     showToast('Sent for approval');
+    // Touchpoint 25 — Award recommendation sent for approval
+    const _t = tenderInfo();
+    const _firstApprover = (APPROVAL_CHAIN[0] || { name:'Approval Officer' }).name;
+    logCriticalAction(BM.tnd, {
+      touchpointId: 25, action: 'award_recommendation_sent', category: 'award',
+      description: 'Award recommendation sent for approval',
+      page: 'bid-management', section: 'Award Recommendation',
+      detail: 'Sent to: ' + _firstApprover + ' · Recommended vendor: ' + (_t.l1Vendor || '—'),
+    });
   }
   function sendApprovalReminder(officerId, btn){
     if (btn){ btn.textContent = 'Reminder sent ✓'; btn.disabled = true; setTimeout(() => { btn.textContent = 'Send reminder'; btn.disabled = false; }, 2000); }
@@ -1297,7 +1510,7 @@
       <div class="form-grid-2">
         <div class="form-field"><label>Vendor name</label><input type="text" value="${esc(d.vendorName)}" oninput="updateLoaField('vendorName', this.value)" ${BM.loaIssued?'readonly':''}/></div>
         <div class="form-field"><label>Tender reference</label><input type="text" value="${esc(t.id)}/AMC/2026-27" readonly /></div>
-        <div class="form-field"><label>Accepted amount (₹)</label><input type="number" value="${d.acceptedAmount}" oninput="updateLoaField('acceptedAmount', parseFloat(this.value)||0)" ${BM.loaIssued?'readonly':''}/></div>
+        <div class="form-field"><label>Accepted amount (₹)</label>${bmIsAmountRevealedFor(BM.tnd, t.l1Vendor) ? `<input type="number" value="${d.acceptedAmount}" oninput="updateLoaField('acceptedAmount', parseFloat(this.value)||0)" ${BM.loaIssued?'readonly':''}/>` : `<div style="display:flex; align-items:center; gap:8px;"><input type="text" value="₹ ••••••" readonly style="background:#F3F4F6; color:#9CA3AF; cursor:not-allowed; letter-spacing:2px;" aria-label="Accepted amount sealed — reveal winner in Bid Evaluation" />${bmIsWinnerRevealed(BM.tnd) ? `<button class="eye-btn" type="button" onclick="bmRevealAmount('${esc(t.l1Vendor)}')" aria-label="Reveal accepted amount" title="Reveal accepted amount"><i data-lucide="eye" style="width:14px; height:14px;"></i></button>` : ''}</div><div style="font-size:11px; color:#92400E; margin-top:4px; font-style:italic;">Cannot issue LoA without revealing the accepted amount.</div>`}</div>
         <div class="form-field"><label>Date of LoA</label><input type="date" value="${esc(d.dateOfLoa)}" oninput="updateLoaField('dateOfLoa', this.value)" ${BM.loaIssued?'readonly':''}/></div>
         <div class="form-field"><label>Performance security (₹)</label><input type="number" value="${d.performanceSecurity}" oninput="updateLoaField('performanceSecurity', parseFloat(this.value)||0)" ${BM.loaIssued?'readonly':''}/><div style="font-size:11px; color:#9CA3AF; margin-top:4px;">Auto-calculated at 5% of ${fmtINR(d.acceptedAmount)} = ${fmtINR(Math.round(d.acceptedAmount*0.05))}. Edit if a different rate applies.</div></div>
         <div class="form-field"><label>Security submission deadline</label><input type="date" value="${esc(d.securityDeadline)}" oninput="updateLoaField('securityDeadline', this.value)" ${BM.loaIssued?'readonly':''}/></div>

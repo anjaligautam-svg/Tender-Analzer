@@ -246,6 +246,24 @@
     .ai-conf-popover.tier-low .ai-pop-tier { color:#991B1B; }
     /* Low-confidence banner above criteria table */
     .low-conf-banner { background:#FFFBEB; border:1px solid #FCD34D; border-radius:8px; padding:10px 14px; margin-bottom:12px; display:flex; align-items:center; gap:10px; font-size:13px; color:#92400E; }
+    /* ===== Critical action toast notifications ===== */
+    .critical-toast { background:#1a1a1a; border-radius:10px; padding:12px 16px; min-width:300px; max-width:400px; box-shadow:0 4px 16px rgba(0,0,0,0.25); display:flex; align-items:flex-start; gap:10px; transform:translateY(80px); opacity:0; animation: toastIn 250ms ease forwards; }
+    @keyframes toastIn { to { transform: translateY(0); opacity: 1; } }
+    .critical-toast button:hover { color:white !important; }
+    /* Critical Log tab inside Activity Trail panel */
+    .crit-tab-row { display:flex; gap:6px; padding:8px 18px 0; border-bottom:1px solid #F3F4F6; background:#F9FAFB; }
+    .crit-tab-row button { background:white; border:1px solid #E5E7EB; border-bottom:none; border-radius:6px 6px 0 0; padding:4px 10px; font-size:12px; color:#6B7280; cursor:pointer; font-weight:500; transition: all .15s ease; }
+    .crit-tab-row button.active { color:#0F5EE8; border-color:#0F5EE8; background:white; font-weight:700; }
+    .crit-tab-row .crit-badge { background:#FFFBEB; color:#92400E; border-radius:4px; padding:1px 5px; font-size:10px; font-weight:700; margin-left:4px; vertical-align:middle; }
+    .crit-log-entry { padding:10px 16px; border-bottom:1px solid #F3F4F6; }
+    .crit-log-entry.cat-financial  { border-left:3px solid #FCD34D; }
+    .crit-log-entry.cat-evaluation { border-left:3px solid #93C5FD; }
+    .crit-log-entry.cat-committee  { border-left:3px solid #86EFAC; }
+    .crit-log-entry.cat-award      { border-left:3px solid #C4B5FD; }
+    .crit-log-entry .desc { font-size:13px; font-weight:700; color:#111827; }
+    .crit-log-entry .meta { font-size:11px; color:#9CA3AF; margin-top:3px; }
+    .crit-log-entry .detail { font-size:11px; color:#6B7280; font-style:italic; margin-top:3px; }
+    .crit-log-empty { padding:32px 16px; text-align:center; font-size:13px; color:#9CA3AF; }
 
     /* ===== Bid Comparison tab (live, in-page) ===== */
     .cmp-freshness { background:#F0FDF4; border:1px solid #BBF7D0; border-radius:8px; padding:10px 16px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
@@ -1032,6 +1050,101 @@
 
 <script>
   function refreshIcons(){ if (window.lucide) lucide.createIcons(); }
+
+  // ===================== CRITICAL ACTION NOTIFICATIONS =====================
+  // 16 touchpoints across PQ/TQ/Financial/Committee/Award flows are logged here as
+  // an append-only audit-style record. Each call also pops a passive bottom-right toast.
+  // The Critical Log lives in `criticalLog_<TND-ID>` and is shown in a second tab inside
+  // the Activity Trail panel. See touchpoint comments in each handler for the exact action.
+  function getSessionId(){
+    try {
+      let s = sessionStorage.getItem('sessionId');
+      if (!s){ s = 'session-' + Math.random().toString(36).slice(2,11); sessionStorage.setItem('sessionId', s); }
+      return s;
+    } catch(e){ return 'session-anon'; }
+  }
+  function logCriticalAction(tenderId, data){
+    if (!tenderId) return;
+    const entry = Object.assign({
+      id: 'crit-' + Date.now() + '-' + Math.random().toString(36).slice(2,6),
+      officer: 'Rajesh Kumar',
+      officerRole: 'Super Admin',
+      tenderId,
+      timestamp: new Date().toISOString(),
+      sessionId: getSessionId(),
+    }, data || {});
+    const key = 'criticalLog_' + tenderId;
+    let log;
+    try { log = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e){ log = []; }
+    log.push(entry);
+    try { localStorage.setItem(key, JSON.stringify(log)); } catch(e){}
+    showCriticalToast(entry);
+    return entry;
+  }
+  const CRIT_ICONS  = { financial:'currency-rupee', evaluation:'clipboard-list', committee:'users', award:'trophy' };
+  const CRIT_COLORS = { financial:'#FCD34D',        evaluation:'#93C5FD',         committee:'#86EFAC', award:'#C4B5FD' };
+  function ensureCritToastContainer(){
+    let c = document.getElementById('critical-toast-container');
+    if (!c){
+      c = document.createElement('div');
+      c.id = 'critical-toast-container';
+      c.setAttribute('role', 'status');
+      c.setAttribute('aria-live', 'assertive');
+      c.style.cssText = 'position:fixed; bottom:24px; right:24px; z-index:1000; display:flex; flex-direction:column; gap:8px; align-items:flex-end; pointer-events:none;';
+      document.body.appendChild(c);
+    }
+    return c;
+  }
+  function dismissCriticalToast(toast){
+    if (!toast || !toast.parentElement) return;
+    toast.style.transition = 'transform 200ms ease, opacity 200ms ease';
+    toast.style.transform = 'translateY(80px)';
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 220);
+  }
+  function showCriticalToast(entry){
+    const container = ensureCritToastContainer();
+    const cat = entry.category || 'evaluation';
+    const ic  = CRIT_ICONS[cat]  || CRIT_ICONS.evaluation;
+    const col = CRIT_COLORS[cat] || CRIT_COLORS.evaluation;
+    const toast = document.createElement('div');
+    toast.className = 'critical-toast';
+    toast.setAttribute('aria-label', 'Critical action logged: ' + (entry.description || ''));
+    toast.style.pointerEvents = 'auto';
+    toast.innerHTML = `
+      <i data-lucide="${ic}" style="width:16px; height:16px; color:${col}; flex-shrink:0; margin-top:1px;"></i>
+      <div style="flex:1; min-width:0;">
+        <div style="font-size:13px; font-weight:500; color:white; line-height:1.4;">${esc(entry.description||'Critical action')}</div>
+        <div style="font-size:11px; color:rgba(255,255,255,0.55); margin-top:3px;">${esc(entry.officer||'Officer')} · just now</div>
+      </div>
+      <button type="button" class="crit-toast-close" style="background:transparent; border:none; color:rgba(255,255,255,0.5); cursor:pointer; font-size:14px; padding:0 2px; line-height:1; flex-shrink:0;" aria-label="Dismiss notification">×</button>`;
+    container.appendChild(toast);
+    if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
+    toast.querySelector('.crit-toast-close').addEventListener('click', () => dismissCriticalToast(toast));
+    // Enforce max-3 visible
+    const all = container.querySelectorAll('.critical-toast');
+    if (all.length > 3) dismissCriticalToast(all[0]);
+    // Auto-dismiss after 5s; pause on hover, reset on leave
+    let timer = setTimeout(() => dismissCriticalToast(toast), 5000);
+    toast.addEventListener('mouseenter', () => clearTimeout(timer));
+    toast.addEventListener('mouseleave', () => { timer = setTimeout(() => dismissCriticalToast(toast), 3000); });
+    // Bump the Critical Log badge in the Activity Trail panel
+    if (typeof updateCriticalLogBadge === 'function') updateCriticalLogBadge();
+  }
+  function formatRelativeTime(iso){
+    if (!iso) return '';
+    const t = new Date(iso).getTime();
+    if (isNaN(t)) return '';
+    const diff = Math.floor((Date.now() - t) / 1000);
+    if (diff < 5)    return 'just now';
+    if (diff < 60)   return diff + ' second' + (diff===1?'':'s') + ' ago';
+    const min = Math.floor(diff / 60);
+    if (min < 60)    return min + ' min ago';
+    const hr = Math.floor(min / 60);
+    if (hr < 24)     return hr + ' hour' + (hr===1?'':'s') + ' ago';
+    try { return new Date(iso).toLocaleString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' }); }
+    catch(e){ return ''; }
+  }
   let toastT = null;
   function showToast(msg){
     const t = document.getElementById('toast');
@@ -2116,6 +2229,23 @@
     back.classList.add('open');
     panel.classList.add('open');
     refreshIcons();
+    // Touchpoint 14 — Technical bid viewed; Touchpoint 15 — Financial bid viewed
+    if (kind === 'fin'){
+      logCriticalAction(EVAL.tnd, {
+        touchpointId: 15, action: 'financial_bid_viewed', category: 'financial',
+        description: 'Financial bid document viewed — ' + vendor,
+        page: 'evaluation', section: 'Financial Evaluation',
+        vendorName: vendor,
+      });
+    } else {
+      const _stageSec = EVAL.stageTab === 'financial' ? 'Financial Evaluation' : (EVAL.expanded === 's2' ? 'PQ & TQ Evaluation' : 'Technical Evaluation');
+      logCriticalAction(EVAL.tnd, {
+        touchpointId: 14, action: 'technical_bid_viewed', category: 'evaluation',
+        description: 'Technical bid document viewed — ' + vendor,
+        page: 'evaluation', section: _stageSec,
+        vendorName: vendor,
+      });
+    }
   }
   function closeBidDoc(){
     const panel = document.getElementById('bidDocPanel');
@@ -2896,6 +3026,13 @@
     back.classList.add('open');
     panel.classList.add('open');
     log('PQ Evaluation', 'evidence_viewed', `${crit.short} · ${vendor}`);
+    // Touchpoint 13 — Evidence document viewed
+    logCriticalAction(EVAL.tnd, {
+      touchpointId: 13, action: 'evidence_viewed', category: 'evaluation',
+      description: 'Evidence document viewed — ' + crit.short + ' for ' + vendor,
+      page: 'evaluation', section: 'PQ Evaluation',
+      vendorName: vendor, criterion: crit.short,
+    });
     refreshIcons();
   }
   function closeEvidencePanel(){
@@ -3212,6 +3349,16 @@
         previousVerdict: currentVerdict,
       };
       log('PQ Evaluation', 'verdict_changed', `${(PQ_CRITERIA.find(c=>c.id===critId)||{}).short || critId} · ${vendor} · ${currentVerdict} → ${sel} · "${changeCommentText.slice(0, 80)}${changeCommentText.length>80?'…':''}"`);
+      // Touchpoint 6 — PQ verdict changed (only fires when changing a deliberate prior verdict; needsChangeComment already enforces that)
+      const _critShort = (PQ_CRITERIA.find(c=>c.id===critId)||{}).short || critId;
+      logCriticalAction(EVAL.tnd, {
+        touchpointId: 6, action: 'pq_verdict_changed', category: 'evaluation',
+        description: 'PQ verdict changed: ' + _critShort + ' — ' + vendor,
+        page: 'evaluation', section: 'PQ Evaluation',
+        vendorName: vendor, criterion: _critShort,
+        oldValue: String(currentVerdict), newValue: String(sel),
+        detail: changeCommentText,
+      });
     }
     // C4 — synchronous autosave to localStorage
     pqAutosave();
@@ -3623,6 +3770,17 @@ Date: ${esc(fmtDateShort(today))}`;
     rec.status = 'sent';
     rec.sentAt = todayISO();
     log(rec.section==='TQ'?'TQ Evaluation':'PQ Evaluation', 'clarification_sent', `${rec.vendorId} · ${rec.criterionId} · ${rec.recipients.length} recipients`);
+    // Touchpoint 8 — clarification request sent
+    const _critList = rec.section==='TQ' ? TQ_CRITERIA : PQ_CRITERIA;
+    const _critShort = (_critList.find(c => c.id === rec.criterionId)||{}).short || rec.criterionId;
+    const _sec = rec.section==='TQ' ? 'TQ Evaluation' : 'PQ Evaluation';
+    logCriticalAction(EVAL.tnd, {
+      touchpointId: 8, action: 'clarification_sent', category: 'evaluation',
+      description: 'Clarification request sent — ' + _critShort + ' for ' + rec.vendorId,
+      page: 'evaluation', section: _sec,
+      vendorName: rec.vendorId, criterion: _critShort,
+      detail: 'Recipients: ' + rec.recipients.length + ' officer' + (rec.recipients.length===1?'':'s'),
+    });
     saveState(); renderTechnical(); closeClarPanel();
     showToast('Clarification request recorded as sent');
   }
@@ -3866,8 +4024,22 @@ Date: ${esc(fmtDateShort(today))}`;
     if (raw === ''){ flashInputError(inp); return; }
     const n = Number(raw);
     if (!Number.isFinite(n) || n < 0 || n > c.max){ flashInputError(inp); return; }
+    // Touchpoint 11 — fires only when editing a score that was already submitted (the pencil-edit flow only renders when value is set)
+    const _prev = ((EVAL.tqMemberScores||{})[vendor]||{})[critId]?.rk;
+    const _wasSubmitted = ((EVAL.tqMemberSubmitted||{})[vendor]||{}).rk;
     setMemberScore(vendor, critId, 'rk', String(n));   // existing fn handles clamp + log + matrix update
     delete _uiEditingScores[vendor+'|'+critId];
+    if (_wasSubmitted && _prev !== n){
+      const _critShort = (TQ_CRITERIA.find(x => x.id === critId)||{}).short || critId;
+      logCriticalAction(EVAL.tnd, {
+        touchpointId: 11, action: 'tq_score_edited', category: 'evaluation',
+        description: 'TQ score edited — ' + _critShort + ' for ' + vendor,
+        page: 'evaluation', section: 'TQ Evaluation',
+        vendorName: vendor, criterion: _critShort,
+        oldValue: String(_prev), newValue: String(n),
+        detail: 'Member: Rajesh Kumar',
+      });
+    }
     renderTechnical();
     refreshIcons();
   }
@@ -3992,6 +4164,15 @@ Date: ${esc(fmtDateShort(today))}`;
     EVAL.tqMemberSubmitted[vendor] = EVAL.tqMemberSubmitted[vendor] || {};
     EVAL.tqMemberSubmitted[vendor].rk = true;
     log('TQ Evaluation', 'score_submitted', `Rajesh Kumar submitted TQ scores for ${vendor}`);
+    // Touchpoint 10 — TQ scores submitted by committee member
+    const _total = typeof tqTotal === 'function' ? tqTotal(vendor) : null;
+    logCriticalAction(EVAL.tnd, {
+      touchpointId: 10, action: 'tq_score_submitted', category: 'evaluation',
+      description: 'TQ scores submitted for ' + vendor,
+      page: 'evaluation', section: 'TQ Evaluation',
+      vendorName: vendor,
+      detail: 'Member: Rajesh Kumar · Total: ' + (_total != null ? _total.toFixed(1) : '—') + '/100',
+    });
     saveState(); renderTechnical();
     showToast('Your TQ scores submitted for '+vendor);
   }
@@ -4097,6 +4278,26 @@ Date: ${esc(fmtDateShort(today))}`;
     modal.innerHTML = `<div class="video-modal"><button class="vm-close" onclick="closeVideoModal()" aria-label="Close">×</button>${media}</div>`;
     modal.classList.add('open');
     log('TQ Evaluation', 'video_viewed', `${vendor} · presentation video`);
+    // Touchpoint 16 — fires once per modal-open when the video element actually starts playing
+    const videoEl = modal.querySelector('video');
+    if (videoEl){
+      videoEl.addEventListener('play', function(){
+        logCriticalAction(EVAL.tnd, {
+          touchpointId: 16, action: 'presentation_played', category: 'evaluation',
+          description: 'Presentation video played — ' + vendor,
+          page: 'evaluation', section: 'TQ Evaluation',
+          vendorName: vendor,
+        });
+      }, { once: true });
+    } else if (modal.querySelector('iframe')){
+      // For embedded iframes (YouTube/Drive), we can't track play directly — log on open
+      logCriticalAction(EVAL.tnd, {
+        touchpointId: 16, action: 'presentation_played', category: 'evaluation',
+        description: 'Presentation video played — ' + vendor,
+        page: 'evaluation', section: 'TQ Evaluation',
+        vendorName: vendor, detail: 'Embedded video (iframe)',
+      });
+    }
   }
   function closeVideoModal(){
     const modal = document.getElementById('videoModal');
@@ -4487,6 +4688,14 @@ Date: ${esc(fmtDateShort(today))}`;
     EVAL.ntq[vendor] = { status:'sent', note:document.getElementById('ntqText-'+vendor).value };
     closeNtqEditor(vendor); saveState(); renderTechnical();
     showToast(vendor+' justification sent for signing');
+    // Touchpoint 7 — NTQ justification sent for signing
+    logCriticalAction(EVAL.tnd, {
+      touchpointId: 7, action: 'ntq_justification_sent', category: 'evaluation',
+      description: 'NTQ justification sent for signing — ' + vendor,
+      page: 'evaluation', section: 'Results & Actions',
+      vendorName: vendor,
+      detail: 'Sent to: Evaluation Committee Chair',
+    });
   }
   function signNtq(vendor){
     if (EVAL.ntq[vendor]){ EVAL.ntq[vendor].status = 'signed'; saveState(); renderTechnical(); showToast('Justification signed — rejection letter generated'); }
@@ -4811,6 +5020,34 @@ Date: ${esc(fmtDateShort(today))}`;
       ${view('FBS',  fbsViewBody(tName))}
       <div id="finAlbZone">${alb ? albDecisionHTML(alb) : ''}</div>`;
   }
+  // ===== Single source of truth for amount visibility — `winnerReveal_<TND>` =====
+  // All three pages (Financial Evaluation / Bid Comparison / Bid Management) read this key
+  // before rendering any quoted amount. No other key controls amount visibility.
+  function winnerRevealKey(tnd){ return 'winnerReveal_' + (tnd || (EVAL ? EVAL.tnd : '')); }
+  function getWinnerRevealState(tnd){
+    try {
+      const raw = localStorage.getItem(winnerRevealKey(tnd));
+      if (raw){
+        const o = JSON.parse(raw);
+        if (o && typeof o === 'object') return Object.assign({ winnerRevealed:false, winnerRevealedAt:null, revealedVendors:[], method:null }, o);
+      }
+    } catch(e){}
+    return { winnerRevealed:false, winnerRevealedAt:null, revealedVendors:[], method:null };
+  }
+  function setWinnerRevealState(tnd, patch){
+    const cur = getWinnerRevealState(tnd);
+    const next = Object.assign({}, cur, patch);
+    try { localStorage.setItem(winnerRevealKey(tnd), JSON.stringify(next)); } catch(e){}
+    // Live-update the Bid Comparison tab in same window
+    if (typeof refreshComparisonTable === 'function') refreshComparisonTable();
+    return next;
+  }
+  function isAmountRevealedFor(tnd, vendor){
+    const s = getWinnerRevealState(tnd);
+    return s.winnerRevealed && (s.revealedVendors || []).includes(vendor);
+  }
+  function isWinnerRevealed(tnd){ return !!getWinnerRevealState(tnd).winnerRevealed; }
+
   // ===== Per-method 3-phase state — stored under localStorage key `finEval_<TND>_<METHOD>` =====
   function finEvalKey(method){ return 'finEval_' + (EVAL ? EVAL.tnd : '') + '_' + method; }
   function getFinEval(method){
@@ -4965,6 +5202,13 @@ Date: ${esc(fmtDateShort(today))}`;
       EVAL.finRun = true; saveState();
       const bids = finBidsBase();
       log('Financial Evaluation', 'bids_evaluated', `${(METHOD_META[method]||{}).short||method} · ${bids.length} vendors`);
+      // Touchpoint 1 — "Evaluate Bids" clicked, Phase 2 begins
+      logCriticalAction(EVAL.tnd, {
+        touchpointId: 1, action: 'evaluate_bids', category: 'financial',
+        description: 'Financial bid evaluation started',
+        page: 'evaluation', section: 'Financial Evaluation',
+        detail: 'Method: ' + ((METHOD_META[method]||{}).short || method),
+      });
       renderFinancial();
       refreshIcons();
     }, 1200);
@@ -4975,29 +5219,35 @@ Date: ${esc(fmtDateShort(today))}`;
     const method = currentFinMethod();
     const st = getFinEval(method);
     if (st.phase !== 2) return;
-    const winner = currentFinWinner();
-    const bids = finBidsBase();
     // Log immediately (per spec: fires the moment the button is clicked, before animations)
-    log('Financial Evaluation', 'winner_revealed', `${(METHOD_META[method]||{}).short||method}${winner ? ' · '+winner.vendor+' · ₹'+(winner.quote||0).toLocaleString('en-IN') : ''}`);
-    // Determine which vendors are NOT yet revealed → they get the staggered animation
-    const unrevealed = bids.map(b => b.vendor).filter(v => !st.revealedVendors.includes(v));
-    // Commit phase=3 + revealedVendors=[all] immediately so re-render shows the final state
-    setFinEval(method, { phase:3, revealedVendors: bids.map(b => b.vendor), winnerRevealedAt: new Date().toISOString() });
+    log('Financial Evaluation', 'winner_revealed', `${(METHOD_META[method]||{}).short||method}`);
+    // Touchpoint 3 (a) — winner reveal initiated
+    logCriticalAction(EVAL.tnd, {
+      touchpointId: 3, action: 'winner_revealed', category: 'financial',
+      description: 'Winner reveal initiated',
+      page: 'evaluation', section: 'Financial Evaluation',
+      detail: 'Method: ' + ((METHOD_META[method]||{}).short || method),
+    });
+    // GLOBAL MASKING RULE — Reveal Winner advances phase but does NOT auto-reveal any amounts.
+    // All vendors (including the winner) stay masked with eye icons until clicked individually.
+    setFinEval(method, { phase:3, revealedVendors: [], winnerRevealedAt: new Date().toISOString() });
+    // Mirror to the shared winnerReveal_<TND> key — single source of truth across all pages
+    setWinnerRevealState(EVAL.tnd, { winnerRevealed:true, winnerRevealedAt: new Date().toISOString(), method, revealedVendors: [] });
     saveState();
-    // Re-render fully — table shows all revealed + ranks + winner card.
-    // Mark this re-render as a transition so the winner-card animates in (default behavior).
     _finJustRevealed = true;
     renderFinancial();
     refreshIcons();
-    // After render, apply staggered reveal animation to the newly-revealed cells (visual only)
-    setTimeout(() => {
-      unrevealed.forEach((vendor, i) => {
-        setTimeout(() => {
-          const cell = document.querySelector(`[data-revealed-amount="${vendor}"]`);
-          if (cell){ cell.classList.remove('reveal-anim'); /* re-trigger */ void cell.offsetWidth; cell.classList.add('reveal-anim'); }
-        }, i * 100);
+    // Touchpoint 3 (b) — winner identified (after Phase 3 state is committed)
+    const winner = currentFinWinner();
+    if (winner){
+      logCriticalAction(EVAL.tnd, {
+        touchpointId: 3, action: 'winner_identified', category: 'financial',
+        description: winner.vendor + ' identified as recommended vendor',
+        page: 'evaluation', section: 'Financial Evaluation',
+        vendorName: winner.vendor,
+        detail: ((METHOD_META[method]||{}).short || method) + ' — Rank 1',
       });
-    }, 0);
+    }
   }
   // Transient flag — true when the last renderFinancial was triggered by revealWinnerNow
   let _finJustRevealed = false;
@@ -5019,7 +5269,7 @@ Date: ${esc(fmtDateShort(today))}`;
   function revealVendor(vendor, btn){
     const method = currentFinMethod();
     const st = getFinEval(method);
-    if (st.phase !== 2) return;            // only in Phase 2
+    if (st.phase !== 2 && st.phase !== 3) return; // Phase 2 or Phase 3 (after Reveal Winner)
     if (st.revealedVendors.includes(vendor)) return;
     // First click — different vendor pending → cancel that pending first
     if (pendingRevealVendor && pendingRevealVendor !== vendor){
@@ -5042,14 +5292,32 @@ Date: ${esc(fmtDateShort(today))}`;
     next.revealedVendors = st.revealedVendors.slice();
     if (!next.revealedVendors.includes(vendor)) next.revealedVendors.push(vendor);
     setFinEval(method, { revealedVendors: next.revealedVendors });
+    // Mirror to the shared winnerReveal_<TND> key — both tabs and Bid Management read this
+    const wr = getWinnerRevealState(EVAL.tnd);
+    const wrList = (wr.revealedVendors || []).slice();
+    if (!wrList.includes(vendor)) wrList.push(vendor);
+    setWinnerRevealState(EVAL.tnd, { revealedVendors: wrList });
     const b = finBidsBase().find(x => x.vendor === vendor);
     log('Financial Evaluation', 'amount_revealed', `${vendor} · ${(METHOD_META[method]||{}).short||method}${b ? ' · ₹'+b.quote.toLocaleString('en-IN') : ''}`);
+    // Touchpoint 2 — eye icon click reveals an amount (Financial Evaluation tab)
+    // Only fires when the winner has been revealed (st.phase 3 already means winnerRevealed=true via revealWinnerNow).
+    if (isWinnerRevealed(EVAL.tnd)){
+      logCriticalAction(EVAL.tnd, {
+        touchpointId: 2, action: 'amount_revealed', category: 'financial',
+        description: 'Viewed ' + vendor + "'s financial bid amount",
+        page: 'evaluation', section: 'Financial Evaluation',
+        vendorName: vendor,
+      });
+    }
     // Inline DOM update — blur-reveal animation, eye → revealed state
     const cell = btn.parentElement;
     if (cell){
       const quote = b ? '₹'+b.quote.toLocaleString('en-IN') : '';
       cell.outerHTML = `<span class="reveal-anim" style="font-weight:600; color:#374151;" data-revealed-amount="${esc(vendor)}">${quote}</span>`;
     }
+    // Re-render so Phase 3 winner card amount + derived columns also update for this vendor
+    renderFinancial();
+    refreshIcons();
   }
 
   // ===== Phase header — banner + action button per phase =====
@@ -5974,15 +6242,20 @@ Date: ${esc(fmtDateShort(today))}`;
     return { score: t, members:submittedCount, provisional: submittedCount < 3 };
   }
   function cmpDeriveFin(vendor){
-    // Quoted amount + reveal phase + financial score (L1 = inverse of quote, normalized)
+    // Global masking rule — amounts are ONLY visible when
+    //   (a) winner has been revealed in Financial Evaluation, AND
+    //   (b) the eye icon for that specific vendor has been clicked.
+    // Read from the single source of truth: winnerReveal_<TND>.
     const m = (EVAL.evaluationMethod || EVAL.method || 'L1').toUpperCase();
+    const wr = getWinnerRevealState(EVAL.tnd);
+    const winnerRev = !!wr.winnerRevealed;
+    const revealedList = wr.revealedVendors || [];
+    const revealed = winnerRev && revealedList.includes(vendor);
+    const quote = (QUOTE_NUM || {})[vendor];
+    // Phase is still derived for the Stage strip / context-banner logic
     const fin = cmpReadJSON('finEval_' + EVAL.tnd + '_' + m);
     const phase = fin.phase || 1;
-    const revealedAll = phase === 3;
-    const revealedList = fin.revealedVendors || [];
-    const revealed = revealedAll || revealedList.includes(vendor);
-    const quote = (QUOTE_NUM || {})[vendor];
-    return { phase, revealed, quote, method:m };
+    return { phase, revealed, winnerRevealed: winnerRev, quote, method:m };
   }
   function cmpDeriveCombinedScore(vendor, tqScore, quote){
     // QCBS combined: T% × tqNorm + F% × finNorm
@@ -6106,31 +6379,40 @@ Date: ${esc(fmtDateShort(today))}`;
       const provBadge = row.tq.provisional ? ` <span class="tq-prov-badge">${row.tq.members}/3 PROV</span>` : '';
       tqCell = `<div class="tq-bar"><div class="tq-bar-num ${cls}">${row.tq.score.toFixed(1)}${provBadge}</div><div class="tq-bar-rail"><div class="tq-bar-fill" style="width:${pct}%;"></div></div></div>`;
     }
-    // Quote / Fin
+    // Quote / Fin — global masking rule
     let quoteCell, vsEstCell, vsTsCell;
+    const winnerRev = !!row.fin.winnerRevealed;
+    const ariaMasked = ' aria-label="Quoted amount hidden — click eye icon to reveal"';
     if (row.isNtq){
       quoteCell = '<span class="amount-ntq">NTQ — excluded</span>';
       vsEstCell = '<span class="amount-ntq">—</span>';
       vsTsCell  = '<span class="amount-ntq">—</span>';
-    } else if (row.fin.phase === 3 && row.quote){
-      quoteCell = `<span class="amount">${fmtINRn(row.quote)}</span>`;
+    } else if (winnerRev && row.fin.revealed && row.quote){
+      // Winner revealed AND eye icon already clicked for this vendor → show amount
+      quoteCell = `<span class="amount" aria-live="polite">${fmtINRn(row.quote)}</span>`;
       vsEstCell = row.vsEst != null ? `<span class="vs-cell ${row.vsEst >= 0 ? 'pos' : 'neg'}">${fmtPct(row.vsEst)}</span>` : '—';
       vsTsCell  = row.vsTs  != null ? `<span class="vs-cell ${row.vsTs  >= 0 ? 'pos' : 'neg'}">${fmtPct(row.vsTs)}</span>` : '—';
-    } else if (row.fin.phase === 2){
-      quoteCell = `<span class="amount-masked">••••••</span>`;
-      vsEstCell = '—';
-      vsTsCell  = '—';
+    } else if (winnerRev){
+      // Winner revealed but this vendor's eye icon not yet clicked → masked + eye icon
+      quoteCell = `<span class="amount-masked"${ariaMasked}>₹ ••••••</span><button class="eye-btn" type="button" onclick="cmpRevealAmount('${esc(row.vendor)}')" aria-label="Reveal quoted amount for ${esc(row.vendor)}" title="Reveal quoted amount"><i data-lucide="eye" style="width:14px; height:14px;"></i></button>`;
+      vsEstCell = `<span class="amount-masked"${ariaMasked}>••••</span>`;
+      vsTsCell  = `<span class="amount-masked"${ariaMasked}>••••</span>`;
     } else {
-      quoteCell = '<span class="amount-pending">Pending financial bid</span>';
-      vsEstCell = '—';
-      vsTsCell  = '—';
+      // Winner NOT revealed → fully masked, no eye icon
+      quoteCell = `<span class="amount-masked"${ariaMasked}>₹ ••••••</span>`;
+      vsEstCell = `<span class="amount-masked"${ariaMasked}>••••</span>`;
+      vsTsCell  = `<span class="amount-masked"${ariaMasked}>••••</span>`;
     }
-    // Combined
+    // Combined — masked too unless winner revealed AND this vendor revealed
     let combinedCell;
-    if (row.combined != null){
+    if (row.isNtq){
+      combinedCell = '<span style="color:#9CA3AF;">—</span>';
+    } else if (winnerRev && row.fin.revealed && row.combined != null){
       combinedCell = `<span class="amount">${row.combined.toFixed(1)}</span>`;
-    } else if (row.tq.score != null && row.fin.phase < 3){
-      combinedCell = `<span class="amount-pending">TQ: ${row.tq.score.toFixed(1)} · Fin: pending</span>`;
+    } else if (winnerRev){
+      combinedCell = `<span class="amount-masked"${ariaMasked}>••••</span>`;
+    } else if (row.tq.score != null){
+      combinedCell = `<span class="amount-pending">TQ: ${row.tq.score.toFixed(1)} · Fin: sealed</span>`;
     } else {
       combinedCell = '<span style="color:#9CA3AF;">—</span>';
     }
@@ -6184,22 +6466,23 @@ Date: ${esc(fmtDateShort(today))}`;
     const pqtq   = cmpStagePQTQ();
     const fin    = cmpStageFin();
     const finPhase = cmpFinPhaseForActive();
-    const finalReady = pqtq === 'done' && fin === 'done';
+    const winnerRev = isWinnerRevealed(EVAL.tnd);
     const hasNtq = buildComparisonData().some(r => r.isNtq);
     let banner;
-    if (finalReady){
+    if (winnerRev){
       banner = `<div class="cmp-ctx-banner ok" role="status">
-        <span>✓ All evaluation complete. This comparison is now ready to lock and proceed to Bid Management.</span>
+        <span>✓ Winner revealed. Click the eye icon on any vendor to reveal that vendor's quoted amount, then make your final selection.</span>
         <button class="link" type="button" style="background:#10B981; color:white; border-radius:6px; padding:6px 14px; font-size:12px; font-weight:700;" onclick="cmpLockAndProceed()">Lock &amp; Proceed to Bid Management →</button>
       </div>`;
     } else if (fin === 'partial' && finPhase < 3){
       banner = `<div class="cmp-ctx-banner warn" role="status">
-        <span>⏳ Financial bids uploaded but amounts not yet revealed. Go to Financial Evaluation to reveal bids.</span>
+        <span><i data-lucide="lock" style="width:13px; height:13px; display:inline-block; vertical-align:-1px; margin-right:4px;"></i> Financial bid amounts are sealed. Reveal the winner in Financial Evaluation to unlock the comparison.</span>
         <button class="link" type="button" onclick="setStageTab('financial')">Go to Financial Evaluation →</button>
       </div>`;
     } else if (pqtq !== 'none' && fin === 'none'){
       banner = `<div class="cmp-ctx-banner info" role="status">
-        <span>ℹ Technical evaluation data shown. Financial bid amounts will appear here once financial evaluation is complete.</span>
+        <span><i data-lucide="lock" style="width:13px; height:13px; display:inline-block; vertical-align:-1px; margin-right:4px;"></i> Financial bid amounts are sealed. Reveal the winner in Financial Evaluation to unlock the comparison.</span>
+        <button class="link" type="button" onclick="setStageTab('financial')">Go to Financial Evaluation →</button>
       </div>`;
     } else {
       banner = '';
@@ -6223,7 +6506,7 @@ Date: ${esc(fmtDateShort(today))}`;
     }
     const data = cmpRankRows(buildComparisonData());
     const state = cmpComparisonState();
-    const finalReady = cmpStagePQTQ() === 'done' && cmpStageFin() === 'done';
+    const finalReady = isWinnerRevealed(EVAL.tnd);
     const locked = !!state.locked;
     const rows = data.map(r => cmpRowHTML(r, locked, state.selectedVendor, finalReady)).join('');
 
@@ -6296,7 +6579,7 @@ Date: ${esc(fmtDateShort(today))}`;
     if (!tbody){ renderComparison(); return; }
     const data = cmpRankRows(buildComparisonData());
     const state = cmpComparisonState();
-    const finalReady = cmpStagePQTQ() === 'done' && cmpStageFin() === 'done';
+    const finalReady = isWinnerRevealed(EVAL.tnd);
     const locked = !!state.locked;
     // Build new rows; replace in place to keep refs but flash changed cells
     const existing = {};
@@ -6395,6 +6678,7 @@ Date: ${esc(fmtDateShort(today))}`;
         'finEval_' + tnd + '_LCS',
         'finEval_' + tnd + '_QBS',
         'finEval_' + tnd + '_FBS',
+        'winnerReveal_' + tnd,   // global masking-rule key — also triggers refresh
       ];
       if (relevant.includes(e.key)) refreshComparisonTable();
     };
@@ -6448,6 +6732,42 @@ Date: ${esc(fmtDateShort(today))}`;
   window.cmpProceedToBidMgmt = function(){
     location.href = 'bid-management.html?tender=' + encodeURIComponent(EVAL.tnd);
   };
+  // Bid Comparison side eye-icon reveal — same two-click pattern, but reuses the global pending state.
+  window.cmpRevealAmount = function(vendor){
+    const wr = getWinnerRevealState(EVAL.tnd);
+    if (!wr.winnerRevealed) return;
+    if ((wr.revealedVendors||[]).includes(vendor)) return;
+    if (pendingRevealVendor && pendingRevealVendor !== vendor){
+      try { resetPendingReveal(pendingRevealVendor); } catch(e){}
+    }
+    if (pendingRevealVendor !== vendor){
+      pendingRevealVendor = vendor;
+      showToast('Click eye icon again to reveal ' + vendor);
+      pendingRevealTimeout = setTimeout(() => { pendingRevealVendor = null; }, 3000);
+      return;
+    }
+    clearTimeout(pendingRevealTimeout);
+    pendingRevealTimeout = null;
+    pendingRevealVendor = null;
+    const list = (wr.revealedVendors || []).slice();
+    if (!list.includes(vendor)) list.push(vendor);
+    setWinnerRevealState(EVAL.tnd, { revealedVendors: list });
+    // Also keep finEval revealedVendors in sync so the Financial Evaluation tab agrees
+    const method = (EVAL.evaluationMethod || EVAL.method || 'L1').toUpperCase();
+    const fin = getFinEval(method);
+    const finList = (fin.revealedVendors || []).slice();
+    if (!finList.includes(vendor)) finList.push(vendor);
+    setFinEval(method, { revealedVendors: finList });
+    log('Bid Comparison', 'amount_revealed', vendor);
+    // Touchpoint 2 — eye icon click reveals an amount (Bid Comparison tab)
+    logCriticalAction(EVAL.tnd, {
+      touchpointId: 2, action: 'amount_revealed', category: 'financial',
+      description: 'Viewed ' + vendor + "'s financial bid amount",
+      page: 'evaluation', section: 'Bid Comparison',
+      vendorName: vendor,
+    });
+    refreshComparisonTable();
+  };
   window.cmpOpenNotes = function(vendor, ev){
     if (ev) ev.stopPropagation();
     // Close existing
@@ -6490,7 +6810,7 @@ Date: ${esc(fmtDateShort(today))}`;
   });
 
   // ===================== ACTIVITY TRAIL PANEL (formerly Audit Log) =====================
-  let _uiAudit = { open:false, filter:'all' };
+  let _uiAudit = { open:false, filter:'all', tab:'activity', lastSeenCritCount:0 };
   try { _uiAudit.open = sessionStorage.getItem('activityTrailOpen') === '1'; } catch(e){}
   // Presentations notes-column visibility (Fix 2) — hidden by default, restored from session
   let _uiPresNotes = false;
@@ -6553,28 +6873,77 @@ Date: ${esc(fmtDateShort(today))}`;
     const entries = list.length
       ? list.map(e => renderAuditRow(e)).join('')
       : '<div class="audit-empty">No audit entries yet. Actions will be recorded here as you work through the evaluation.</div>';
-    panel.innerHTML = `<div class="audit-panel-head">
-        <div class="ap-title">
-          <i data-lucide="clipboard-list" style="width:16px; height:16px; color:#0F5EE8;"></i>
-          <span class="ap-title-text">Activity Trail</span>
-          <span class="ap-count" aria-live="polite">(${list.length} ${list.length===1?'entry':'entries'})</span>
-        </div>
-        <button class="ap-close" onclick="closeAuditPanel()" aria-label="Close activity trail">×</button>
-      </div>
-      <div class="audit-panel-filter">
-        <select onchange="setAuditFilter(this.value)" aria-label="Filter activity trail by section">
-          <option value="all"                  ${_uiAudit.filter==='all'?'selected':''}>Section: All</option>
-          <option value="PQ Evaluation"        ${_uiAudit.filter==='PQ Evaluation'?'selected':''}>PQ Evaluation</option>
-          <option value="TQ Evaluation"        ${_uiAudit.filter==='TQ Evaluation'?'selected':''}>TQ Evaluation</option>
-          <option value="Financial Evaluation" ${_uiAudit.filter==='Financial Evaluation'?'selected':''}>Financial Evaluation</option>
-          <option value="Results & Actions"    ${_uiAudit.filter==='Results & Actions'?'selected':''}>Results &amp; Actions</option>
-          <option value="today"                ${_uiAudit.filter==='today'?'selected':''}>Today only</option>
-        </select>
-      </div>
-      <div class="audit-panel-list">${entries}</div>
-      <div class="audit-panel-export">
-        <button onclick="exportAuditLog()">Export as CSV</button>
+    // Critical Log entries (newest first)
+    let critLog;
+    try { critLog = JSON.parse(localStorage.getItem('criticalLog_' + EVAL.tnd) || '[]'); } catch(e){ critLog = []; }
+    const critList = critLog.slice().reverse();
+    const newCritCount = Math.max(0, critList.length - (_uiAudit.lastSeenCritCount || 0));
+    // Tab choice
+    const onActivity = _uiAudit.tab !== 'critical';
+    const tabsRow = `<div class="crit-tab-row" role="tablist" aria-label="Activity vs Critical">
+        <button role="tab" aria-selected="${onActivity?'true':'false'}" class="${onActivity?'active':''}" onclick="switchAuditTab('activity')">Activity Trail${(!onActivity || newCritCount===0) ? '' : ''}</button>
+        <button role="tab" aria-selected="${onActivity?'false':'true'}" class="${onActivity?'':'active'}" onclick="switchAuditTab('critical')">Critical Log${(onActivity && newCritCount>0) ? `<span class="crit-badge" aria-live="polite">⚠ ${newCritCount} new</span>` : ''}</button>
       </div>`;
+    if (onActivity){
+      panel.innerHTML = `<div class="audit-panel-head">
+          <div class="ap-title">
+            <i data-lucide="clipboard-list" style="width:16px; height:16px; color:#0F5EE8;"></i>
+            <span class="ap-title-text">Activity Trail</span>
+            <span class="ap-count" aria-live="polite">(${list.length} ${list.length===1?'entry':'entries'})</span>
+          </div>
+          <button class="ap-close" onclick="closeAuditPanel()" aria-label="Close activity trail">×</button>
+        </div>
+        ${tabsRow}
+        <div class="audit-panel-filter">
+          <select onchange="setAuditFilter(this.value)" aria-label="Filter activity trail by section">
+            <option value="all"                  ${_uiAudit.filter==='all'?'selected':''}>Section: All</option>
+            <option value="PQ Evaluation"        ${_uiAudit.filter==='PQ Evaluation'?'selected':''}>PQ Evaluation</option>
+            <option value="TQ Evaluation"        ${_uiAudit.filter==='TQ Evaluation'?'selected':''}>TQ Evaluation</option>
+            <option value="Financial Evaluation" ${_uiAudit.filter==='Financial Evaluation'?'selected':''}>Financial Evaluation</option>
+            <option value="Results & Actions"    ${_uiAudit.filter==='Results & Actions'?'selected':''}>Results &amp; Actions</option>
+            <option value="today"                ${_uiAudit.filter==='today'?'selected':''}>Today only</option>
+          </select>
+        </div>
+        <div class="audit-panel-list">${entries}</div>
+        <div class="audit-panel-export">
+          <button onclick="exportAuditLog()">Export as CSV</button>
+        </div>`;
+    } else {
+      // Critical Log tab
+      const critRows = critList.length
+        ? critList.map(e => {
+          const cat = e.category || 'evaluation';
+          const meta = esc(e.officer || 'Officer') + (e.section ? ' · ' + esc(e.section) : '') + ' · ' + esc(formatRelativeTime(e.timestamp));
+          const detailRow = e.detail ? `<div class="detail">${esc(e.detail)}</div>` : '';
+          return `<div class="crit-log-entry cat-${esc(cat)}"><div class="desc">${esc(e.description||e.action||'Critical action')}</div><div class="meta">${meta}</div>${detailRow}</div>`;
+        }).join('')
+        : '<div class="crit-log-empty">No critical actions recorded yet</div>';
+      panel.innerHTML = `<div class="audit-panel-head">
+          <div class="ap-title">
+            <i data-lucide="alert-octagon" style="width:16px; height:16px; color:#92400E;"></i>
+            <span class="ap-title-text">Critical Log</span>
+            <span class="ap-count" aria-live="polite">(${critList.length} ${critList.length===1?'entry':'entries'})</span>
+          </div>
+          <button class="ap-close" onclick="closeAuditPanel()" aria-label="Close panel">×</button>
+        </div>
+        ${tabsRow}
+        <div class="audit-panel-list">${critRows}</div>`;
+      // Mark all as seen when officer opens the Critical Log tab
+      _uiAudit.lastSeenCritCount = critList.length;
+    }
+  }
+  function switchAuditTab(tab){
+    _uiAudit.tab = tab;
+    renderAuditPanel();
+    refreshIcons();
+  }
+  function updateCriticalLogBadge(){
+    // Updates the Activity Trail trigger button's red dot count for new critical entries
+    if (_uiAudit && _uiAudit.open && _uiAudit.tab !== 'critical' && typeof renderAuditPanel === 'function'){
+      // Re-render to update the "X new" badge on the Critical Log tab button
+      renderAuditPanel();
+      refreshIcons();
+    }
   }
   function renderAuditRow(e){
     const cat = actionCategory(e.action);
@@ -6838,6 +7207,13 @@ Date: ${esc(fmtDateShort(today))}`;
     };
     EVAL.committeeMembers = (EVAL.committeeMembers || []).concat([newM]);
     log('Evaluation Committee', 'committee_member_added', `${name} · ${role}`);
+    // Touchpoint 17 — Committee member added
+    logCriticalAction(EVAL.tnd, {
+      touchpointId: 17, action: 'committee_member_added', category: 'committee',
+      description: 'Committee member added — ' + name,
+      page: 'evaluation', section: 'Evaluation Committee',
+      detail: 'Role: ' + role + (newM.designation ? ' · Designation: ' + newM.designation : ''),
+    });
     // Reset form
     _comAddForm = { name:'', designation:'', email:'', role:'', finEval:true };
     saveState();
@@ -6879,6 +7255,13 @@ Date: ${esc(fmtDateShort(today))}`;
         delete (EVAL.signoffs||{})[memberId];
         delete (EVAL.conflictDeclarations||{})[memberId];
         log('Evaluation Committee', 'committee_member_removed', m.name);
+        // Touchpoint 18 — Committee member removed
+        logCriticalAction(EVAL.tnd, {
+          touchpointId: 18, action: 'committee_member_removed', category: 'committee',
+          description: 'Committee member removed — ' + m.name,
+          page: 'evaluation', section: 'Evaluation Committee',
+          detail: 'Was: ' + (m.role || '—'),
+        });
         _comPendingRemove = null;
         saveState();
         renderCommittee();
@@ -7079,6 +7462,13 @@ Date: ${esc(fmtDateShort(today))}`;
       EVAL.signoffs[memberId].dateFin = today;
     }
     log('Evaluation Committee', 'signoff_completed', `${m.name} · ${type}`);
+    // Touchpoint 21 — Sign-off submitted
+    logCriticalAction(EVAL.tnd, {
+      touchpointId: 21, action: 'signoff_submitted', category: 'committee',
+      description: 'Evaluation sign-off submitted',
+      page: 'evaluation', section: 'Evaluation Committee',
+      detail: 'Type: ' + type + ' · Member: ' + m.name,
+    });
     _comSignoffConfirm = null;
     saveState();
     renderCommittee();
