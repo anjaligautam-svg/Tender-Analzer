@@ -77,6 +77,137 @@
     [contenteditable]:empty:before { content: attr(data-placeholder); color: #9CA3AF; }
     .dropdown-shadow { box-shadow: 0 12px 32px rgba(17,24,39,0.14), 0 2px 6px rgba(17,24,39,0.06); }
     @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+    /* === Additions: collapsible sub-sections, market enquiry, gem check, version history, AA/TS tracking, post-approval === */
+    .sub-section-head { display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-top:1px solid #F3F4F6; cursor:pointer; margin-top:20px; }
+    .sub-section-head .chev { transition: transform .2s ease; }
+    .sub-section-head.open .chev { transform: rotate(180deg); }
+    .sub-section-zone { overflow:hidden; max-height:0; transition: max-height 200ms ease; }
+    .sub-section-zone.open { max-height:5000px; }
+    .req-audit-badge { background:#FFFBEB; color:#92400E; border-radius:4px; padding:1px 6px; font-size:10px; font-weight:700; margin-left:8px; }
+    .pretty-radio { display:flex; align-items:flex-start; gap:8px; padding:12px 14px; border:1px solid #E5E7EB; border-radius:8px; cursor:pointer; background:white; transition: all .15s ease; min-height:64px; }
+    .pretty-radio:hover { border-color:#93C5FD; background:#F8FAFF; }
+    .pretty-radio.selected { border:1.5px solid #0F5EE8; background:#EFF6FF; padding:11.5px 13.5px; }
+    .pretty-radio .pr-icon { width:18px; height:18px; flex-shrink:0; margin-top:2px; }
+    .pretty-radio .pr-title { font-size:13px; font-weight:700; color:#111827; }
+    .pretty-radio .pr-sub   { font-size:11px; color:#6B7280; margin-top:2px; }
+    .pretty-radio.amber-on { border-color:#F59E0B; background:#FFFBEB; }
+    .pretty-radio.red-on { border-color:#EF4444; background:#FEF2F2; }
+    .me-table { width:100%; border-collapse:collapse; font-size:13px; }
+    .me-table th { background:#F9FAFB; font-size:11px; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; font-weight:600; padding:9px 12px; border-bottom:1px solid #E5E7EB; text-align:left; }
+    .me-table td { padding:10px 12px; border-bottom:1px solid #F3F4F6; color:#374151; vertical-align:middle; }
+    .me-table tr:last-child td { border-bottom:none; }
+    .me-table tbody tr:hover { background:#F9FAFB; }
+    .me-table tbody tr.fading { transition: opacity 150ms, max-height 150ms; opacity:0; max-height:0; }
+    .me-add-row { background:#F9FAFB; border-top:1px solid #E5E7EB; padding:10px 12px; display:grid; grid-template-columns: 120px 140px 110px 140px 1fr auto; gap:8px; align-items:center; }
+    .me-add-row input, .me-add-row select { border:1px solid #D1D5DB; border-radius:6px; padding:6px 8px; font-size:12.5px; background:white; }
+    .me-add-row input:focus, .me-add-row select:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 2px rgba(15,94,232,0.15); }
+    .me-add-btn { background:#0F5EE8; color:white; border:none; border-radius:6px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer; }
+    .me-add-btn:hover { background:#0B4BC4; }
+    .me-icon-btn { width:24px; height:24px; border-radius:5px; border:1px solid #E5E7EB; background:white; color:#9CA3AF; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; padding:0; }
+    .me-icon-btn:hover { border-color:#0F5EE8; color:#0F5EE8; background:#EFF6FF; }
+    .me-icon-btn.danger:hover { color:#EF4444; border-color:#EF4444; background:#FEF2F2; }
+    .me-edit-save { background:#10B981; color:white; border:none; border-radius:5px; width:24px; height:24px; cursor:pointer; }
+    .me-edit-save:hover { background:#059669; }
+    .me-edit-cancel { background:#F3F4F6; color:#6B7280; border:none; border-radius:5px; width:24px; height:24px; cursor:pointer; }
+    .me-edit-cancel:hover { background:#FEF2F2; color:#EF4444; }
+    .me-edit-input { border:1.5px solid #0F5EE8; border-radius:5px; padding:4px 6px; font-size:12.5px; width:100%; }
+    .upload-zone-sm { border:1.5px dashed #D1D5DB; border-radius:8px; padding:12px 16px; display:flex; gap:12px; align-items:center; background:#F9FAFB; }
+    .upload-chip { display:inline-flex; align-items:center; gap:6px; background:#EFF6FF; border:1px solid #BFDBFE; border-radius:6px; padding:4px 8px 4px 10px; font-size:12px; color:#0C447C; margin-right:6px; margin-top:6px; }
+    .upload-chip button { background:transparent; border:none; color:#0C447C; cursor:pointer; font-size:14px; padding:0 2px; }
+    .upload-chip button:hover { color:#EF4444; }
+    .ai-summary { background:#EFF6FF; border-radius:8px; padding:10px 14px; margin-top:12px; }
+    .ai-summary .lbl { font-size:12px; font-weight:700; color:#0C447C; }
+    .ai-summary .txt { font-size:12px; color:#1D4ED8; margin-top:2px; }
+    .competency-card { background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:12px 14px; margin-top:8px; display:flex; gap:12px; align-items:flex-start; }
+    .competency-card .lbl { font-size:12px; font-weight:700; color:#0C447C; }
+    .competency-card .name { font-size:14px; font-weight:700; color:#111827; margin-top:2px; }
+    .competency-card .sub  { font-size:12px; color:#1D4ED8; margin-top:4px; }
+    .competency-card .tat  { font-size:11px; color:#6B7280; font-style:italic; margin-top:6px; }
+    .photo-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top:10px; }
+    .photo-thumb { position:relative; border-radius:6px; overflow:hidden; background:#F3F4F6; aspect-ratio: 4/3; }
+    .photo-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+    .photo-thumb .rm { position:absolute; top:4px; right:4px; width:24px; height:24px; background:rgba(0,0,0,0.55); color:white; border:none; border-radius:6px; cursor:pointer; display:none; align-items:center; justify-content:center; padding:0; }
+    .photo-thumb:hover .rm { display:inline-flex; }
+    .photo-caption { font-size:11px; padding:6px 4px 0; }
+    .photo-caption input { width:100%; border:none; background:transparent; padding:2px 0; font-size:11px; color:#374151; }
+    .photo-caption input:focus { outline:none; border-bottom:1px solid #0F5EE8; }
+    /* GeM Check workflow */
+    .gem-section-title { font-size:13px; font-weight:700; color:#111827; margin-bottom:12px; }
+    .gem-amber-box { background:#FFFBEB; border:1px solid #FCD34D; border-radius:8px; padding:14px 16px; margin-top:10px; }
+    .gem-amber-box .lbl { font-size:13px; font-weight:700; color:#92400E; margin-bottom:10px; }
+    .gem-summary-box { background:#F0FDF4; border:1px solid #BBF7D0; border-radius:8px; padding:12px 14px; margin-top:16px; }
+    .gem-summary-box .lbl { font-size:13px; font-weight:700; color:#065F46; }
+    /* AA / TS Tracking */
+    .aa-section { border:1px solid #E5E7EB; border-radius:10px; padding:16px 18px; margin-bottom:14px; }
+    .aa-section .lbl { font-size:13px; font-weight:700; color:#111827; margin-bottom:10px; }
+    .aa-countdown { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; padding:5px 10px; border-radius:6px; margin-top:10px; }
+    .aa-countdown.green { background:#F0FDF4; color:#065F46; }
+    .aa-countdown.amber { background:#FFFBEB; color:#92400E; }
+    .aa-countdown.red   { background:#FEF2F2; color:#991B1B; }
+    .aa-query-card { background:#F9FAFB; border-radius:8px; padding:12px 14px; margin-bottom:10px; }
+    .aa-query-card .q-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+    .aa-query-card .q-num { font-size:13px; font-weight:700; color:#111827; }
+    .aa-query-card .q-date { font-size:11px; color:#9CA3AF; }
+    .aa-query-card textarea { width:100%; border:1px solid #D1D5DB; border-radius:6px; padding:6px 8px; font-size:12.5px; min-height:50px; resize:vertical; }
+    .aa-query-card textarea:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 2px rgba(15,94,232,0.15); }
+    .aa-final-section { background:#F0FDF4; border:1px solid #BBF7D0; border-radius:10px; padding:16px 18px; }
+    .aa-final-section .lbl { font-size:14px; font-weight:700; color:#065F46; margin-bottom:10px; }
+    .aa-rev-counter { font-size:12px; color:#374151; font-weight:600; }
+    .aa-rev-counter.high { color:#92400E; }
+    .pill-amber { background:#FFFBEB; color:#92400E; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:600; }
+    .pill-blue  { background:#EFF6FF; color:#0C447C; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:600; }
+    .pill-green { background:#F0FDF4; color:#065F46; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:600; }
+    /* Version History Panel */
+    .vh-panel { position:fixed; top:0; right:0; width:400px; max-width:100%; height:100vh; background:white; border-left:1px solid #E5E7EB; box-shadow:-4px 0 16px rgba(0,0,0,0.08); transform:translateX(100%); transition: transform 280ms cubic-bezier(0.4,0,0.2,1); z-index:200; display:flex; flex-direction:column; }
+    .vh-panel.open { transform: translateX(0); }
+    .vh-head { height:56px; background:#F9FAFB; border-bottom:1px solid #E5E7EB; padding:0 20px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+    .vh-head .title { font-size:14px; font-weight:700; color:#111827; }
+    .vh-head .id { font-size:11px; color:#9CA3AF; }
+    .vh-list { flex:1; overflow-y:auto; padding:0; }
+    .vh-entry { padding:14px 18px; border-bottom:1px solid #F3F4F6; }
+    .vh-entry:hover { background:#F9FAFB; }
+    .vh-row1 { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .vh-version { font-size:13px; font-weight:700; color:#111827; }
+    .vh-ts { font-size:11px; color:#9CA3AF; }
+    .vh-row2 { font-size:12px; color:#6B7280; margin-top:3px; }
+    .vh-changes { font-size:12px; color:#374151; margin-top:6px; }
+    .vh-changes ul { list-style:none; padding:0; margin:0; }
+    .vh-changes li { padding:2px 0; padding-left:12px; position:relative; }
+    .vh-changes li:before { content:'•'; position:absolute; left:0; color:#9CA3AF; }
+    .vh-actions { margin-top:8px; display:flex; gap:14px; }
+    .vh-actions a, .vh-actions button { font-size:12px; background:none; border:none; padding:0; cursor:pointer; }
+    .vh-actions .restore { color:#0F5EE8; }
+    .vh-actions .restore:hover { text-decoration:underline; }
+    .vh-actions .diff { color:#6B7280; }
+    .vh-actions .diff:hover { color:#111827; text-decoration:underline; }
+    .vh-restore-confirm { background:#FFFBEB; border:1px solid #FCD34D; border-radius:6px; padding:8px 12px; margin-top:8px; font-size:12px; color:#92400E; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .vh-restore-confirm .btn-y { background:#10B981; color:white; border:none; border-radius:5px; padding:4px 10px; font-size:12px; font-weight:600; cursor:pointer; }
+    .vh-restore-confirm .btn-n { background:transparent; border:none; color:#6B7280; font-size:12px; cursor:pointer; padding:4px 6px; }
+    /* Priority badges in list */
+    .prio-badge { display:inline-block; border-radius:4px; padding:2px 7px; font-size:10px; font-weight:700; vertical-align:middle; margin-left:6px; }
+    .prio-badge.priority  { background:#FFFBEB; color:#92400E; }
+    .prio-badge.emergency { background:#FEF2F2; color:#991B1B; }
+    .row-prio-emergency td:first-child { border-left:3px solid #EF4444; }
+    .row-prio-priority  td:first-child { border-left:3px solid #F59E0B; }
+    /* Post-approval expandable row */
+    .pa-panel { background:#F0FDF4; border-left:3px solid #10B981; padding:14px 20px; }
+    .pa-panel .pa-title { font-size:13px; font-weight:700; color:#065F46; margin-bottom:12px; }
+    .pa-grid { display:grid; grid-template-columns: repeat(4, 1fr); gap:16px; }
+    .pa-grid .pa-col .lbl { font-size:11px; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; font-weight:600; margin-bottom:3px; }
+    .pa-grid .pa-col .val { font-size:13px; font-weight:600; color:#111827; }
+    .pa-footer { margin-top:12px; padding-top:10px; border-top:1px solid #BBF7D0; font-size:12px; color:#6B7280; }
+    .pa-footer .ok { color:#065F46; font-weight:600; }
+    /* Clone selector */
+    .clone-card { border:1px solid #E5E7EB; border-radius:12px; padding:20px; cursor:pointer; background:white; transition: all .15s ease; }
+    .clone-card:hover { border-color:#8B5CF6; background:#EEEDFE; box-shadow:0 4px 12px rgba(0,0,0,0.08); transform: translateY(-1px); }
+    .clone-search { width:100%; border:1px solid #D1D5DB; border-radius:8px; padding:10px 14px 10px 38px; font-size:14px; background:white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat 12px center; }
+    .clone-search:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 2px rgba(15,94,232,0.15); }
+    .clone-result-row { padding:10px 14px; border-bottom:1px solid #F3F4F6; cursor:pointer; font-size:13px; }
+    .clone-result-row:hover { background:#F9FAFB; }
+    .clone-result-row:last-child { border-bottom:none; }
+    .clone-confirm-card { border:1px solid #E5E7EB; border-radius:10px; padding:16px 18px; margin-top:12px; background:white; }
+    .clone-banner { background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:10px 14px; margin-bottom:20px; font-size:13px; color:#0C447C; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
   </style>
 </head>
 <body class="min-h-screen">
@@ -317,7 +448,7 @@
           <p class="text-[14px] text-ink-500 mt-1">Choose how you'd like to create this Detailed Project Report.</p>
         </div>
 
-        <div class="max-w-[900px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="max-w-[1200px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <a href="#describe" class="start-card relative bg-white border border-line rounded-2xl p-7 block">
             <span class="absolute top-4 right-4 inline-flex items-center gap-1 bg-primary text-white text-[11px] font-semibold rounded-full px-2 py-0.5"><i data-lucide="sparkles" class="w-3 h-3"></i> Recommended</span>
             <div class="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center mb-4"><i data-lucide="message-square-text" class="w-5 h-5"></i></div>
@@ -344,6 +475,22 @@
             <div class="mt-4 text-[13px] font-bold text-primary inline-flex items-center gap-1">Get started <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></div>
             <div class="text-[11px] text-ink-400 mt-1.5">Fill form → Review → Submit</div>
           </a>
+          <!-- Addition 9 — Clone Past DPR -->
+          <button onclick="openCloneSelector()" class="clone-card text-left" style="margin:0;">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center mb-4" style="background:#EEEDFE; color:#8B5CF6;"><i data-lucide="copy" class="w-5 h-5"></i></div>
+            <h3 class="text-[15px] font-bold text-ink-900">Clone Past DPR</h3>
+            <p class="text-[13px] text-ink-500 mt-1.5 leading-relaxed">Start from a previous DPR and update for this year</p>
+            <div class="text-[11px] text-ink-400 mt-2.5">Save time on recurring projects</div>
+            <div class="mt-4 text-[13px] font-bold inline-flex items-center gap-1" style="color:#8B5CF6;">Get started <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></div>
+          </button>
+        </div>
+
+        <!-- Clone selector — hidden until "Clone Past DPR" card is clicked -->
+        <div id="cloneSelectorWrap" class="max-w-[900px] hidden">
+          <div class="mb-2 text-[13px] font-medium text-ink-900">Search past DPRs to clone from</div>
+          <input id="cloneSearchInput" type="text" class="clone-search" placeholder="Search past DPRs to clone from..." oninput="renderCloneResults(this.value)" />
+          <div id="cloneResults" class="bg-white border border-line rounded-lg mt-2 hidden"></div>
+          <div id="cloneConfirm" class="hidden"></div>
         </div>
 
         <div class="max-w-[900px]">
@@ -515,6 +662,9 @@
   <span id="toastMsg">Done</span>
 </div>
 
+<!-- Addition 3 — Version History slide-in panel -->
+<aside id="versionHistoryPanel" class="vh-panel" role="complementary" aria-label="Version history" aria-hidden="true"></aside>
+
 <!-- Confirm modal -->
 <div id="confirmModal" class="hidden fixed inset-0 z-[60] bg-ink-900/40 flex items-center justify-center p-4">
   <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-lift">
@@ -540,9 +690,9 @@
   const DPRS = [
     { id: 'DPR-2026-001', title: 'Road Resurfacing — Bandra West Zone 4', dept: 'Public Works', sector: 'Infrastructure', cost: 4500000, stage: 7, status: 'approved', aaNum: 'AA/2025-26/PWD/0892', tsNum: 'TS/CE/2025/4421', tsValue: 4500000, createdBy: 'Rajesh Kumar', createdOn: '28 Apr 2026' },
     { id: 'DPR-2026-002', title: 'Water Pipeline — Kalyan East Phase 3', dept: 'Water Supply', sector: 'Water & Sanitation', cost: 12000000, stage: 3, status: 'aa-pending', aaNum: '', tsNum: '', tsValue: 0, createdBy: 'Rajesh Kumar', createdOn: '28 Apr 2026', publishedOn: '1 May 2026' },
-    { id: 'DPR-2026-003', title: 'LED Street Light Retrofit — Zone 2', dept: 'Energy', sector: 'Energy', cost: 2850000, stage: 5, status: 'budget-pending', createdBy: 'Vikram Naik', createdOn: '24 Apr 2026' },
+    { id: 'DPR-2026-003', title: 'LED Street Light Retrofit — Zone 2', dept: 'Energy', sector: 'Energy', cost: 2850000, stage: 5, status: 'budget-pending', createdBy: 'Vikram Naik', createdOn: '24 Apr 2026', priority: 'priority' },
     { id: 'DPR-2026-004', title: 'AMC Office Renovation Phase 3', dept: 'Urban Development', sector: 'Urban Development', cost: 6200000, stage: 2, status: 'published', createdBy: 'Priya Shah', createdOn: '2 May 2026' },
-    { id: 'DPR-2026-005', title: 'Solid Waste Vehicle Procurement', dept: 'Sanitation', sector: 'Sanitation', cost: 9500000, stage: 1, status: 'draft', createdBy: 'Rajesh Kumar', createdOn: '5 May 2026' },
+    { id: 'DPR-2026-005', title: 'Solid Waste Vehicle Procurement', dept: 'Sanitation', sector: 'Sanitation', cost: 9500000, stage: 1, status: 'draft', createdBy: 'Rajesh Kumar', createdOn: '5 May 2026', priority: 'emergency' },
     { id: 'DPR-2026-006', title: 'Public Park Renovation — Riverfront', dept: 'Parks & Gardens', sector: 'Parks & Gardens', cost: 3300000, stage: 7, status: 'approved', aaNum: 'AA/2025-26/PARK/0145', tsNum: 'TS/CE/2025/4502', tsValue: 3300000, createdBy: 'Sunita Rao', createdOn: '15 Apr 2026' },
   ];
   const STAGE_LABELS = ['DPR Created','Published','AA Pending','TS Pending','Budget Pending','GeM Check','Approved'];
@@ -582,6 +732,12 @@
   function saveAndExit(){ showToast('DPR draft saved. Resume from DPR Creation.'); setTimeout(() => location.hash = '#list', 700); }
 
   // ===================== LIST RENDER =====================
+  // Addition 10 — track which Approved DPR's post-approval panel is expanded (id or null)
+  let _expandedPostApproval = null;
+  function togglePostApproval(id){
+    _expandedPostApproval = _expandedPostApproval === id ? null : id;
+    renderDprList(document.querySelector('.dpr-filter.bg-primary')?.dataset.filter || 'all');
+  }
   function renderDprList(filter='all'){
     const tbody = document.getElementById('dprRows');
     const filtered = filter === 'all' ? DPRS : DPRS.filter(d => d.status === filter);
@@ -590,8 +746,14 @@
       const pct = (d.stage / 7) * 100;
       const stageLabel = `Stage ${d.stage} — ${STAGE_LABELS[d.stage-1]}`;
       const actionHref = meta.actionHash === '#step1' ? '#step1' : meta.actionHash + d.id;
-      return `<tr class="hover:bg-surface transition cursor-pointer" onclick="if(!event.target.closest('button,a')){location.hash='#track-${d.id}'}">
-        <td class="px-5 py-3.5"><div class="font-medium text-ink-900">${d.title}</div><div class="text-[12px] text-ink-500 font-mono">${d.id}</div></td>
+      const dotCls = d.status==='approved'?'bg-success':d.status==='published'?'bg-primary':d.status==='draft'?'bg-ink-400':d.status==='gem-check'?'bg-purple-500':'bg-warning';
+      const isApproved = d.status === 'approved';
+      const prio = (d.priority || '').toLowerCase();
+      const prioBadge = prio === 'emergency' ? '<span class="prio-badge emergency">EMERGENCY</span>' : prio === 'priority' ? '<span class="prio-badge priority">PRIORITY</span>' : '';
+      const rowCls = prio === 'emergency' ? 'row-prio-emergency' : prio === 'priority' ? 'row-prio-priority' : '';
+      // Render the main row
+      const mainRow = `<tr class="${rowCls} hover:bg-surface transition cursor-pointer" onclick="if(!event.target.closest('button,a,[data-pa-toggle]')){location.hash='#track-${d.id}'}">
+        <td class="px-5 py-3.5"><div class="font-medium text-ink-900">${d.title}${prioBadge}</div><div class="text-[12px] text-ink-500 font-mono">${d.id}</div></td>
         <td class="px-5 py-3.5 text-ink-900">${d.dept}</td>
         <td class="px-5 py-3.5 text-ink-900">${d.sector}</td>
         <td class="px-5 py-3.5 text-right font-medium text-ink-900">₹${(d.cost/100000).toFixed(2)} L</td>
@@ -599,7 +761,10 @@
           <div class="h-1.5 bg-line rounded-full overflow-hidden"><div class="h-full bg-primary rounded-full" style="width: ${pct}%;"></div></div>
           <div class="text-[11px] text-ink-500 mt-1">${stageLabel}</div>
         </td>
-        <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full ${meta.pill} text-[11.5px] font-semibold"><span class="w-1.5 h-1.5 rounded-full ${d.status==='approved'?'bg-success':d.status==='published'?'bg-primary':d.status==='draft'?'bg-ink-400':d.status==='gem-check'?'bg-purple-500':'bg-warning'}"></span> ${meta.label}</span></td>
+        <td class="px-5 py-3.5">${isApproved
+          ? `<button type="button" data-pa-toggle class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full ${meta.pill} text-[11.5px] font-semibold cursor-pointer hover:brightness-95" onclick="event.stopPropagation(); togglePostApproval('${d.id}')" aria-expanded="${_expandedPostApproval===d.id?'true':'false'}"><span class="w-1.5 h-1.5 rounded-full ${dotCls}"></span> ${meta.label} <i data-lucide="chevron-${_expandedPostApproval===d.id?'up':'down'}" class="w-3 h-3 -mr-0.5"></i></button>`
+          : `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full ${meta.pill} text-[11.5px] font-semibold"><span class="w-1.5 h-1.5 rounded-full ${dotCls}"></span> ${meta.label}</span>`
+        }</td>
         <td class="px-5 py-3.5">
           <div class="flex items-center justify-end gap-2">
             <a href="${actionHref}" class="px-3 py-1.5 rounded-lg ${meta.actionCls} text-[12.5px] font-medium inline-flex items-center gap-1">${meta.action}</a>
@@ -608,6 +773,7 @@
               <div id="kebab-${d.id}" class="hidden absolute right-0 mt-1 w-44 bg-white border border-line rounded-xl dropdown-shadow z-20 p-1.5">
                 <a href="#step1" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-surface text-[13px] text-ink-900"><i data-lucide="pencil" class="w-3.5 h-3.5 text-ink-500"></i> Edit</a>
                 <a href="#new" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-surface text-[13px] text-ink-900"><i data-lucide="copy" class="w-3.5 h-3.5 text-ink-500"></i> Duplicate</a>
+                <button onclick="event.stopPropagation(); openVersionHistory('${d.id}')" class="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-surface text-[13px] text-ink-900"><i data-lucide="history" class="w-3.5 h-3.5 text-ink-500"></i> History</button>
                 <button onclick="event.stopPropagation(); showToast('DPR PDF downloaded')" class="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-surface text-[13px] text-ink-900"><i data-lucide="download" class="w-3.5 h-3.5 text-ink-500"></i> Download PDF</button>
                 <button onclick="event.stopPropagation(); showToast('DPR archived')" class="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-surface text-[13px] text-ink-900"><i data-lucide="archive" class="w-3.5 h-3.5 text-ink-500"></i> Archive</button>
                 <div class="border-t border-line my-1"></div>
@@ -617,8 +783,54 @@
           </div>
         </td>
       </tr>`;
+      // Addition 10 — Post-approval sub-row, expanded when status pill is clicked
+      const subRow = (isApproved && _expandedPostApproval === d.id)
+        ? `<tr><td colspan="7" style="padding:0;"><div class="pa-panel">${renderPostApprovalContent(d)}</div></td></tr>`
+        : '';
+      return mainRow + subRow;
     }).join('');
     refreshIcons();
+  }
+  // Addition 10 — Post-approval content (tender link, status, awarded amount, variance)
+  function renderPostApprovalContent(d){
+    // Use the existing tender mapping convention from evaluation.html: TND-2026-001 ↔ approved DPRs
+    // Hard-code the demo linkage: DPR-2026-001 → TND-2026-001 (Published, awarded 43,20,000)
+    //                              DPR-2026-006 → no tender yet
+    const linkage = {
+      'DPR-2026-001': { tender:'TND-2026-001', tenderStatus:'awarded', awardedAmount:4320000, daysToAward:47 },
+      'DPR-2026-006': { tender:null, tenderStatus:'not-created', awardedAmount:null, daysToAward:null },
+    };
+    const link = linkage[d.id] || { tender:null, tenderStatus:'not-created', awardedAmount:null, daysToAward:null };
+    const tenderCol = link.tender
+      ? `<div class="val text-success">Yes — <span class="font-mono">${link.tender}</span></div><a href="evaluation.html?tender=${link.tender}" class="text-[12px] text-primary hover:underline">View →</a>`
+      : `<div class="val text-ink-400">Not yet</div><a href="tender-creation.html?fromDpr=${d.id}" class="text-[12px] text-primary hover:underline">Create tender →</a>`;
+    const statusPills = { 'awarded':'pill-green', 'evaluation':'pill-amber', 'published':'pill-blue', 'not-created':'pill-amber' };
+    const statusText = { 'awarded':'Awarded', 'evaluation':'Under evaluation', 'published':'Published', 'not-created':'Not created' };
+    const statusCol = `<span class="${statusPills[link.tenderStatus]||'pill-amber'}">${statusText[link.tenderStatus]||link.tenderStatus}</span>`;
+    const amountCol = link.awardedAmount
+      ? `<div class="val">₹${link.awardedAmount.toLocaleString('en-IN')}</div>`
+      : `<div class="val text-ink-400">Pending</div>`;
+    let varianceCol = '<div class="val text-ink-400">—</div>';
+    let footerVariance = '';
+    if (link.awardedAmount){
+      const v = ((link.awardedAmount - d.cost) / d.cost) * 100;
+      const sign = v >= 0 ? '+' : '';
+      const cls = v < 0 ? 'text-success' : v <= 5 ? 'text-ink-900' : v <= 10 ? 'text-warning' : 'text-danger';
+      varianceCol = `<div class="val ${cls}">${sign}${v.toFixed(1)}%</div>`;
+      const verdict = v < 0 ? 'within acceptable range' : v <= 5 ? 'minor over-spend' : v <= 10 ? 'review required' : 'significant over-spend';
+      footerVariance = `<div>Estimated vs awarded variance: <span class="ok">${sign}${v.toFixed(1)}%</span> — ${esc(verdict)}</div>`;
+    }
+    return `<div class="pa-title">Post-Approval Tracking</div>
+      <div class="pa-grid">
+        <div class="pa-col"><div class="lbl">Tender created</div>${tenderCol}</div>
+        <div class="pa-col"><div class="lbl">Tender status</div>${statusCol}</div>
+        <div class="pa-col"><div class="lbl">Awarded amount</div>${amountCol}</div>
+        <div class="pa-col"><div class="lbl">Variance from estimate</div>${varianceCol}</div>
+      </div>
+      <div class="pa-footer">
+        ${link.daysToAward != null ? `<div>Time from DPR approval to tender award: <strong>${link.daysToAward} days</strong></div>` : ''}
+        ${footerVariance}
+      </div>`;
   }
   function toggleKebab(id){
     const open = document.getElementById('kebab-'+id);
@@ -669,34 +881,12 @@
       const lineCls = s.state==='done' ? 'pipeline-line done' : s.state==='active' ? 'pipeline-line active' : 'pipeline-line';
       const cardCls = s.state==='active' ? 'border-primary shadow-soft' : s.state==='upcoming' ? 'border-line opacity-60' : 'border-line';
 
-      // Stage 3 active expanded form
+      // Stage 3 / 4 / 6 active expanded forms
       let expanded = '';
-      if (s.state === 'active' && s.n === 3){
-        expanded = `
-          <div class="mt-4 pt-4 border-t border-line space-y-3">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-[13px]">
-              <div><div class="text-[11.5px] uppercase tracking-wider text-ink-500 font-semibold">Submitted to</div><div class="text-ink-900 mt-0.5">Municipal Commissioner</div><div class="text-[12px] text-ink-500">Sunil Mehta (IAS)</div></div>
-              <div><div class="text-[11.5px] uppercase tracking-wider text-ink-500 font-semibold">Submitted on</div><div class="text-ink-900 mt-0.5">2 May 2026</div></div>
-              <div><div class="text-[11.5px] uppercase tracking-wider text-ink-500 font-semibold">Expected by</div><div class="text-danger font-medium mt-0.5">${new Date()<new Date('2026-05-09')?'9 May 2026':'9 May 2026 — overdue'}</div></div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
-              <div>
-                <label class="block text-[12.5px] font-medium text-ink-900 mb-1.5">AA Number</label>
-                <input type="text" id="aaNumberInput" placeholder="Enter AA number once received" class="field" />
-              </div>
-              <div>
-                <label class="block text-[12.5px] font-medium text-ink-900 mb-1.5">Upload AA Order</label>
-                <div class="border border-dashed border-ink-400/40 rounded-lg px-3 py-2 hover:border-primary hover:bg-primary-light/30 transition cursor-pointer flex items-center gap-2 text-[12.5px]">
-                  <i data-lucide="upload" class="w-3.5 h-3.5 text-primary"></i>
-                  <span class="text-ink-500">Click to upload AA order PDF</span>
-                </div>
-              </div>
-            </div>
-            <div class="flex items-center justify-end gap-2 pt-2">
-              <button onclick="showToast('Reminder sent to Municipal Commissioner')" class="px-3 py-1.5 rounded-lg border border-warning text-warning text-[12.5px] font-medium hover:bg-warning/10 inline-flex items-center gap-1.5"><i data-lucide="bell" class="w-3.5 h-3.5"></i> Send Reminder</button>
-              <button onclick="markAaReceived('${d.id}')" class="px-3 py-1.5 rounded-lg bg-primary text-white text-[12.5px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5"><i data-lucide="check" class="w-3.5 h-3.5"></i> Mark as Received</button>
-            </div>
-          </div>`;
+      if ((s.state === 'active' || s.state === 'done') && (s.n === 3 || s.n === 4)){
+        expanded = renderApprovalTrackingPanel(d, s.n);
+      } else if ((s.state === 'active' || s.state === 'done') && s.n === 6){
+        expanded = renderGemCheckPanel(d);
       }
 
       const rightBadge = s.state==='done' ? `<span class="text-[11.5px] text-success font-medium inline-flex items-center gap-1"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Completed</span>`
@@ -780,6 +970,243 @@
     `;
     refreshIcons();
   }
+  // ===== Addition 4 — AA / TS Tracking panel (reusable) =====
+  function defaultApprovalTracking(kind){
+    return {
+      submission: { submittedTo:'', designation:'', submittedDate:'', mode:'', fileNo:'', responseTime:'2 weeks', saved:false },
+      queries: [],
+      finalApproval: { number:'', date:'', value:'', authorityName:'', file:'', saved:false },
+    };
+  }
+  function getApprovalTracking(dprId, kind){
+    const extras = getDprExtras(dprId);
+    if (kind === 'AA' && !extras.aaTracking) return defaultApprovalTracking('AA');
+    if (kind === 'TS' && !extras.tsTracking) return defaultApprovalTracking('TS');
+    return kind === 'AA' ? extras.aaTracking : extras.tsTracking;
+  }
+  function setApprovalTracking(dprId, kind, patch){
+    const extras = getDprExtras(dprId);
+    const key = kind === 'AA' ? 'aaTracking' : 'tsTracking';
+    extras[key] = Object.assign({}, extras[key] || defaultApprovalTracking(kind), patch);
+    setDprExtras(dprId, extras);
+  }
+  function renderApprovalTrackingPanel(d, stageNum){
+    const kind = stageNum === 3 ? 'AA' : 'TS';
+    const label = kind === 'AA' ? 'Administrative Approval (AA)' : 'Technical Sanction (TS)';
+    const t = getApprovalTracking(d.id, kind);
+    const sub = t.submission || {};
+    const final = t.finalApproval || {};
+    // Submitted-X-days-ago countdown
+    let countdownHTML = '';
+    if (sub.saved && sub.submittedDate){
+      const days = Math.floor((Date.now() - new Date(sub.submittedDate).getTime()) / 86400000);
+      const expectedDays = sub.responseTime === '1 week' ? 7 : sub.responseTime === '2 weeks' ? 14 : sub.responseTime === '1 month' ? 30 : null;
+      const remaining = expectedDays != null ? expectedDays - days : null;
+      const cls = remaining == null ? 'green' : remaining > 7 ? 'green' : remaining >= 0 ? 'amber' : 'red';
+      const remText = remaining == null ? 'Unknown timeline' : remaining < 0 ? `${Math.abs(remaining)} days overdue` : `${remaining} days remaining`;
+      countdownHTML = `<div class="aa-countdown ${cls}" aria-live="polite"><i data-lucide="clock" style="width:13px; height:13px;"></i> Submitted ${days} day${days===1?'':'s'} ago · Expected response: ${esc(sub.responseTime)} · ${remText}</div>`;
+    }
+    const queryCards = (t.queries || []).map((q, i) => `
+      <div class="aa-query-card">
+        <div class="q-head">
+          <div class="flex items-center gap-2">
+            <span class="q-num">Query ${i+1}</span>
+            <span class="${q.status==='received'?'pill-amber':q.status==='submitted'?'pill-blue':'pill-green'}">${q.status==='received'?'Query received':q.status==='submitted'?'Response submitted':'Resolved'}</span>
+          </div>
+          <span class="q-date">${esc(fmtFriendlyDate(q.date))}</span>
+        </div>
+        <label class="block text-[11.5px] text-ink-500 mb-1">Query</label>
+        <textarea oninput="updateApprovalQuery('${d.id}','${kind}',${i},'text',this.value)">${esc(q.text||'')}</textarea>
+        <label class="block text-[11.5px] text-ink-500 mt-2 mb-1">Response</label>
+        <textarea oninput="updateApprovalQuery('${d.id}','${kind}',${i},'response',this.value)">${esc(q.response||'')}</textarea>
+        <div class="flex items-center justify-between mt-2 gap-2 flex-wrap">
+          <button type="button" class="text-[12px] text-primary hover:underline" onclick="addApprovalQueryDocument('${d.id}','${kind}',${i})">+ Attach document</button>
+          ${q.status !== 'resolved' ? `<button type="button" onclick="resolveApprovalQuery('${d.id}','${kind}',${i})" class="px-3 py-1.5 rounded-lg text-[12px] font-bold text-white" style="background:#10B981;">Mark as resolved</button>` : '<span class="pill-green">Resolved</span>'}
+        </div>
+      </div>`).join('');
+    const revCount = (t.queries || []).length;
+    const revCountText = revCount > 0 ? `<span class="aa-rev-counter ${revCount>=2?'high':''}" aria-live="polite">${revCount} revision${revCount===1?'':'s'} so far</span>` : '';
+    return `<div class="mt-4 pt-4 border-t border-line">
+      <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+        <div>
+          <div class="text-[15px] font-bold text-ink-900">${label} Tracking</div>
+          <div class="text-[12px] text-ink-500">Track submission, queries, revisions, and final approval of the ${kind}.</div>
+        </div>
+        ${revCountText}
+      </div>
+      <div class="aa-section">
+        <div class="lbl">Submission details</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div><label class="block text-[12px] text-ink-500 mb-1">Submitted to</label><input type="text" class="field" placeholder="${kind==='AA'?'e.g. Commissioner, AMC':'e.g. Chief Engineer'}" value="${esc(sub.submittedTo)}" oninput="patchApprovalSubmission('${d.id}','${kind}','submittedTo',this.value)" /></div>
+          <div><label class="block text-[12px] text-ink-500 mb-1">Designation</label><input type="text" class="field" value="${esc(sub.designation)}" oninput="patchApprovalSubmission('${d.id}','${kind}','designation',this.value)" /></div>
+          <div><label class="block text-[12px] text-ink-500 mb-1">Date submitted</label><input type="date" class="field" value="${esc(sub.submittedDate)}" oninput="patchApprovalSubmission('${d.id}','${kind}','submittedDate',this.value)" /></div>
+          <div><label class="block text-[12px] text-ink-500 mb-1">Mode of submission</label><select class="field" onchange="patchApprovalSubmission('${d.id}','${kind}','mode',this.value)">
+            <option value="">Select…</option>
+            ${['Physical file','Email','Online portal','Both physical and digital'].map(m => `<option ${sub.mode===m?'selected':''}>${m}</option>`).join('')}
+          </select></div>
+          <div><label class="block text-[12px] text-ink-500 mb-1">File / reference number</label><input type="text" class="field" placeholder="Internal file tracking number" value="${esc(sub.fileNo)}" oninput="patchApprovalSubmission('${d.id}','${kind}','fileNo',this.value)" /></div>
+          <div><label class="block text-[12px] text-ink-500 mb-1">Estimated response time</label><select class="field" onchange="patchApprovalSubmission('${d.id}','${kind}','responseTime',this.value)">
+            ${['1 week','2 weeks','1 month','Unknown'].map(r => `<option ${sub.responseTime===r?'selected':''}>${r}</option>`).join('')}
+          </select></div>
+        </div>
+        <div class="mt-3 flex items-center justify-between gap-3 flex-wrap">
+          <button type="button" class="px-3 py-1.5 rounded-lg border border-primary text-primary text-[12.5px] font-medium hover:bg-primary-light" onclick="saveApprovalSubmission('${d.id}','${kind}')">${sub.saved?'Update submission record':'Save submission record'}</button>
+          ${countdownHTML}
+        </div>
+      </div>
+      <div class="aa-section">
+        <div class="flex items-center justify-between mb-2">
+          <div class="lbl">Queries &amp; revisions</div>
+          <button type="button" class="text-[12px] text-primary hover:underline" onclick="addApprovalQuery('${d.id}','${kind}')">+ Add entry</button>
+        </div>
+        ${queryCards || '<div class="text-[12px] text-ink-400">No queries logged yet.</div>'}
+      </div>
+      <div class="aa-final-section">
+        <div class="lbl">${kind} Obtained ✓</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div><label class="block text-[12px] text-ink-500 mb-1">${kind} Number <span class="text-danger">*</span></label><input type="text" class="field" placeholder="e.g. ${kind}/AMC/2026-27/001" value="${esc(final.number)}" oninput="patchApprovalFinal('${d.id}','${kind}','number',this.value)" /></div>
+          <div><label class="block text-[12px] text-ink-500 mb-1">${kind} Date</label><input type="date" class="field" value="${esc(final.date)}" oninput="patchApprovalFinal('${d.id}','${kind}','date',this.value)" /></div>
+          <div><label class="block text-[12px] text-ink-500 mb-1">${kind} Value (₹)</label><div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500 text-[13.5px]">₹</span><input type="number" class="field pl-7" value="${esc(final.value)}" oninput="patchApprovalFinal('${d.id}','${kind}','value',this.value)" /></div><div class="text-[11px] text-ink-500 mt-1">This sets the approved budget ceiling</div></div>
+          <div><label class="block text-[12px] text-ink-500 mb-1">${kind==='AA'?'Issuing authority':'Chief Engineer / approving authority'}</label><input type="text" class="field" value="${esc(final.authorityName)}" oninput="patchApprovalFinal('${d.id}','${kind}','authorityName',this.value)" /></div>
+        </div>
+        <div class="mt-3"><button type="button" class="px-4 py-2 rounded-lg text-white text-[13px] font-bold inline-flex items-center gap-1.5" style="background:#10B981;" onclick="saveApprovalFinal('${d.id}','${kind}')"><i data-lucide="check" class="w-3.5 h-3.5"></i> Save ${kind} record →</button></div>
+      </div>
+    </div>`;
+  }
+  function patchApprovalSubmission(id, kind, field, val){
+    const t = getApprovalTracking(id, kind);
+    t.submission = t.submission || {};
+    t.submission[field] = val;
+    setApprovalTracking(id, kind, t);
+  }
+  function patchApprovalFinal(id, kind, field, val){
+    const t = getApprovalTracking(id, kind);
+    t.finalApproval = t.finalApproval || {};
+    t.finalApproval[field] = val;
+    setApprovalTracking(id, kind, t);
+  }
+  function saveApprovalSubmission(id, kind){
+    const t = getApprovalTracking(id, kind);
+    t.submission.saved = true;
+    if (!t.submission.submittedDate) t.submission.submittedDate = new Date().toISOString().slice(0,10);
+    setApprovalTracking(id, kind, t);
+    renderTracker(id);
+    showToast(kind + ' submission record saved');
+  }
+  function addApprovalQuery(id, kind){
+    const t = getApprovalTracking(id, kind);
+    t.queries = t.queries || [];
+    t.queries.push({ text:'', response:'', date: new Date().toISOString().slice(0,10), status:'received' });
+    setApprovalTracking(id, kind, t);
+    renderTracker(id);
+  }
+  function updateApprovalQuery(id, kind, i, field, val){
+    const t = getApprovalTracking(id, kind);
+    if (!t.queries || !t.queries[i]) return;
+    t.queries[i][field] = val;
+    if (field === 'response' && (val||'').trim() && t.queries[i].status === 'received') t.queries[i].status = 'submitted';
+    setApprovalTracking(id, kind, t);
+  }
+  function resolveApprovalQuery(id, kind, i){
+    const t = getApprovalTracking(id, kind);
+    if (!t.queries || !t.queries[i]) return;
+    t.queries[i].status = 'resolved';
+    setApprovalTracking(id, kind, t);
+    renderTracker(id);
+    showToast('Query marked as resolved');
+  }
+  function addApprovalQueryDocument(id, kind, i){ showToast('Document attached (mock)'); }
+  function saveApprovalFinal(id, kind){
+    const t = getApprovalTracking(id, kind);
+    if (!t.finalApproval?.number){ showToast(kind+' number is required'); return; }
+    t.finalApproval.saved = true;
+    if (!t.finalApproval.date) t.finalApproval.date = new Date().toISOString().slice(0,10);
+    setApprovalTracking(id, kind, t);
+    const d = DPRS.find(x => x.id === id);
+    if (d){
+      if (kind === 'AA'){ d.aaNum = t.finalApproval.number; if (d.stage === 3){ d.stage = 4; d.status = 'ts-pending'; } }
+      else              { d.tsNum = t.finalApproval.number; d.tsValue = Number(t.finalApproval.value) || d.tsValue; if (d.stage === 4){ d.stage = 5; d.status = 'budget-pending'; } }
+    }
+    renderTracker(id);
+    showToast(kind + ' record saved — DPR advanced');
+  }
+
+  // ===== Addition 2 — GeM Check workflow =====
+  function defaultGemCheck(){ return { searchDate:'', searchedBy:'Rajesh Kumar', keywords:'', category:'', result:'', reason:'', otherReason:'', ackConfirmed:false, screenshotName:'', saved:false, savedAt:'' }; }
+  function getGemCheck(id){ return getDprExtras(id).gemCheck || defaultGemCheck(); }
+  function patchGemCheck(id, field, val){
+    const g = getGemCheck(id);
+    g[field] = val;
+    setDprExtras(id, { gemCheck: g });
+  }
+  function renderGemCheckPanel(d){
+    const g = getGemCheck(d.id);
+    const isAvailable = g.result === 'available' || g.result === 'partial';
+    const allFilled = g.searchDate && g.keywords && g.result && g.screenshotName && (!isAvailable || (g.reason && g.ackConfirmed && (g.reason !== 'Other' || g.otherReason)));
+    const radio = (v, t, s) => `<button type="button" class="pretty-radio ${g.result===v?'selected':''}" onclick="patchGemCheck('${d.id}','result','${v}'); renderTracker('${d.id}')">
+      <i data-lucide="${v==='available'?'check-circle-2':v==='partial'?'pie-chart':'x-circle'}" class="pr-icon text-primary"></i>
+      <div><div class="pr-title">${t}</div><div class="pr-sub">${s}</div></div>
+    </button>`;
+    return `<div class="mt-4 pt-4 border-t border-line">
+      <div class="text-[16px] font-bold text-ink-900">GeM Portal Check</div>
+      <div class="text-[13px] text-ink-500 mb-5">Under GFR Rule 149, procurement of goods and services available on GeM is mandatory. This check must be documented.</div>
+      <div class="gem-section-title">GeM search details</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+        <div><label class="block text-[12px] text-ink-500 mb-1">Date of GeM search <span class="text-danger">*</span></label><input type="date" class="field" value="${esc(g.searchDate)}" oninput="patchGemCheck('${d.id}','searchDate',this.value)" /></div>
+        <div><label class="block text-[12px] text-ink-500 mb-1">Searched by</label><input type="text" class="field" value="${esc(g.searchedBy)}" oninput="patchGemCheck('${d.id}','searchedBy',this.value)" /></div>
+        <div><label class="block text-[12px] text-ink-500 mb-1">Search keywords used <span class="text-danger">*</span></label><input type="text" class="field" placeholder="e.g. desktop computer, Core i5, 8GB RAM" value="${esc(g.keywords)}" oninput="patchGemCheck('${d.id}','keywords',this.value)" /></div>
+        <div><label class="block text-[12px] text-ink-500 mb-1">GeM product category</label><input type="text" class="field" placeholder="e.g. IT Hardware — Computers" value="${esc(g.category)}" oninput="patchGemCheck('${d.id}','category',this.value)" /></div>
+      </div>
+      <div class="mb-4">
+        <label class="block text-[12.5px] font-medium text-ink-900 mb-2">GeM search result</label>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+          ${radio('available', 'Available on GeM',     'Exact or equivalent product found')}
+          ${radio('partial',   'Partially available',  'Some items available, some not')}
+          ${radio('not',       'Not available',        'Product/service not listed on GeM')}
+        </div>
+      </div>
+      ${isAvailable ? `<div class="gem-amber-box">
+        <div class="lbl">If available on GeM, why is this tender being floated instead?</div>
+        <select class="field" onchange="patchGemCheck('${d.id}','reason',this.value); renderTracker('${d.id}')">
+          <option value="" ${!g.reason?'selected':''}>Select reason...</option>
+          ${['Quantity exceeds GeM seller capacity','Quality/specification not met by GeM sellers','GeM delivery timeline insufficient','Highly customised requirement','GeM technical support inadequate','Ministry/department exemption applicable','Other'].map(r => `<option ${g.reason===r?'selected':''}>${r}</option>`).join('')}
+        </select>
+        ${g.reason === 'Other' ? `<textarea class="field mt-2" style="min-height:60px;" placeholder="Specify reason (required for audit)" oninput="patchGemCheck('${d.id}','otherReason',this.value)">${esc(g.otherReason)}</textarea>` : ''}
+        <label class="flex items-start gap-2 mt-3 text-[12px] text-ink-900"><input type="checkbox" class="mt-0.5 accent-primary" ${g.ackConfirmed?'checked':''} onchange="patchGemCheck('${d.id}','ackConfirmed',this.checked); renderTracker('${d.id}')"> I confirm that the above reason has been approved by the competent authority and is being maintained on file.</label>
+      </div>` : ''}
+      <div class="mt-4">
+        <div class="text-[12.5px] font-bold text-ink-900 mb-1">Upload GeM search screenshot</div>
+        <div class="upload-zone-sm cursor-pointer" onclick="uploadGemScreenshot('${d.id}')">
+          <i data-lucide="upload-cloud" style="width:20px; height:20px; color:#0F5EE8;"></i>
+          <div class="text-[13px] text-ink-900">${g.screenshotName ? esc(g.screenshotName) : 'Drag files or browse'}</div>
+          <div class="text-[11px] text-ink-400">${g.screenshotName ? 'Uploaded' : 'PDF, JPG, PNG'}</div>
+          <button type="button" class="ml-auto px-3 py-1.5 rounded-lg border border-primary text-primary text-[12px] font-medium hover:bg-primary-light">Browse</button>
+        </div>
+        <div class="text-[11px] text-ink-400 mt-1">Take a screenshot of the GeM portal search results page and upload here.</div>
+      </div>
+      ${g.saved ? `<div class="gem-summary-box">
+        <div class="lbl">✓ GeM check complete and documented</div>
+        <div class="text-[12px] text-ink-500 mt-1">${esc(fmtFriendlyDate(g.savedAt))} · ${esc(g.searchedBy)}</div>
+      </div>` : ''}
+      <div class="mt-4"><button type="button" class="w-full px-4 py-2.5 rounded-lg text-white text-[13.5px] font-medium" style="background:${allFilled?'#0F5EE8':'#9CA3AF'}; ${allFilled?'':'cursor:not-allowed;'}" ${allFilled?'':'disabled'} onclick="saveGemCheck('${d.id}')">Save GeM Check Record →</button></div>
+    </div>`;
+  }
+  function uploadGemScreenshot(id){
+    patchGemCheck(id, 'screenshotName', 'gem_search_screenshot.png');
+    renderTracker(id);
+    showToast('Screenshot uploaded (mock)');
+  }
+  function saveGemCheck(id){
+    const g = getGemCheck(id);
+    g.saved = true;
+    g.savedAt = new Date().toISOString().slice(0,10);
+    setDprExtras(id, { gemCheck: g });
+    const d = DPRS.find(x => x.id === id);
+    if (d && d.stage === 6){ d.stage = 7; d.status = 'approved'; }
+    renderTracker(id);
+    showToast('GeM Check ✓ recorded — DPR moves to Approved');
+  }
+
   function markAaReceived(dprId){
     openConfirm({
       title: 'Mark Administrative Approval as Received',
@@ -919,7 +1346,108 @@
       { name:'soil_test_report.pdf',       size:'1.1 MB', type:'Soil Report' },
     ],
     reviewChecks: { scope:false, dsr:false, need:false, drawings:false, team:false },
+    // === Addition 8 — Priority/urgency flag ===
+    priorityFlag: 'routine',         // 'routine' | 'priority' | 'emergency'
+    priorityReason: '',               // dropdown selection
+    priorityReasonOther: '',          // free text when reason === 'Other'
+    // === Addition 7 — Funding source extras (existing `funding` field unchanged) ===
+    schemeYear: '',
+    grantOrderNo: '',
+    budgetAvailConfirmedBy: '',
+    budgetAvailConfirmedOn: '',
+    // === Addition 6 — Site Visit & Field Assessment (Step 2) ===
+    siteVisit: { open:false, date:'', officers:'', location:'', conditions:'', notes:'',
+      measurements:[ {item:'Road length', value:'1.2', unit:'km'}, {item:'Road width', value:'7.5', unit:'m'} ],
+      photos:[],    // [{name, caption}]
+      drawings:[],  // [{name, drawingNo, description, revision}]
+    },
+    // === Addition 1 — Market Enquiry & Cost Basis (Step 3) ===
+    marketEnquiry: { open:false, method:'market',
+      dsrEdition:'', dsrName:'',
+      poNumber:'', poDate:'', poDept:'',
+      enquiries:[
+        { vendor:'Vendor A — Techmart Solutions', date:'2026-05-10', mode:'Email',  rate:42000, remarks:'GeM listed vendor' },
+        { vendor:'Vendor B — CompuWorld',         date:'2026-05-10', mode:'Phone',  rate:44500, remarks:'Includes delivery' },
+        { vendor:'Vendor C — GeM Portal',         date:'2026-05-11', mode:'Online', rate:41800, remarks:'L1 on GeM' },
+      ],
+      evidence:[],
+    },
+    // === Addition 9 — Clone source (set when cloned) ===
+    clonedFrom: null,
   };
+
+  // === DPR_DATA — per-DPR persistence for new features (per-spec localStorage layout) ===
+  // Each DPR-id maps to { marketEnquiry, gemCheck, aaTracking, tsTracking, siteVisit, fundingSource, priority, postApproval }
+  const DPR_DATA_KEY = 'dpr_data_v1';
+  function loadDprData(){
+    try { return JSON.parse(localStorage.getItem(DPR_DATA_KEY) || '{}'); } catch(e){ return {}; }
+  }
+  function saveDprData(map){
+    try { localStorage.setItem(DPR_DATA_KEY, JSON.stringify(map)); }
+    catch(e){
+      // localStorage near full
+      showToast('Storage nearly full — consider exporting older DPRs');
+    }
+  }
+  function getDprExtras(dprId){
+    const all = loadDprData();
+    return all[dprId] || {};
+  }
+  function setDprExtras(dprId, patch){
+    const all = loadDprData();
+    all[dprId] = Object.assign({}, all[dprId] || {}, patch);
+    saveDprData(all);
+    // Storage threshold warning at 4MB
+    try { const size = (localStorage.getItem(DPR_DATA_KEY) || '').length; if (size > 4 * 1024 * 1024) showToast('Storage nearly full — consider exporting older DPRs'); } catch(e){}
+  }
+
+  // === Addition 3 — Version History storage ===
+  const MAX_VERSIONS = 20;
+  function loadVersions(dprId){
+    try { return JSON.parse(localStorage.getItem('dpr_versions_'+dprId) || '[]'); } catch(e){ return []; }
+  }
+  function saveVersions(dprId, arr){
+    while (arr.length > MAX_VERSIONS) arr.shift();
+    try { localStorage.setItem('dpr_versions_'+dprId, JSON.stringify(arr)); } catch(e){ showToast('Storage nearly full — consider exporting older DPRs'); }
+  }
+  function pushVersion(dprId, snapshot, summary){
+    const arr = loadVersions(dprId);
+    arr.push({
+      v: (arr[arr.length-1]?.v || 0) + 1,
+      ts: new Date().toISOString(),
+      user: 'Rajesh Kumar',
+      changes: summary || ['DPR updated'],
+      snapshot,
+    });
+    saveVersions(dprId, arr);
+  }
+  // Seed demo version history for the in-flight DPR + a list-row DPR
+  (function seedDemoVersions(){
+    if (!loadVersions('DPR-2026-010').length){
+      saveVersions('DPR-2026-010', [
+        { v:1, ts:'2026-05-10T14:30:00.000Z', user:'Rajesh Kumar', changes:['Initial draft created'] },
+        { v:2, ts:'2026-05-12T10:05:00.000Z', user:'Rajesh Kumar', changes:['Initial cost estimate revised after market enquiry', 'Estimated cost updated: ₹42,00,000 → ₹45,00,000'] },
+        { v:3, ts:'2026-05-15T15:17:00.000Z', user:'Rajesh Kumar', changes:['AA query response: scope reduced from 5 wards to 3 wards', 'Scope updated: 2 changes', 'BOQ: 3 items modified'] },
+        { v:4, ts:'2026-05-18T11:42:00.000Z', user:'Rajesh Kumar', changes:['BOQ quantities updated after site revisit'] },
+      ]);
+    }
+    if (!loadVersions('DPR-2026-002').length){
+      saveVersions('DPR-2026-002', [
+        { v:1, ts:'2026-04-28T09:30:00.000Z', user:'Rajesh Kumar', changes:['Initial draft created'] },
+        { v:2, ts:'2026-05-01T11:00:00.000Z', user:'Rajesh Kumar', changes:['Published — submitted for AA'] },
+      ]);
+    }
+  })();
+
+  // === Competency authority tier (Addition 5) ===
+  function competencyTier(cost){
+    const n = Number(cost) || 0;
+    if (n <= 500000)            return { name:'Head of Department (HOD)',                  sub:'Departmental level approval' };
+    if (n <= 2500000)           return { name:'Deputy Commissioner',                       sub:'Divisional level approval' };
+    if (n <= 5000000)           return { name:'Commissioner',                              sub:"Municipal Commissioner's office" };
+    if (n <= 50000000)          return { name:'State Government',                          sub:'State level approval required' };
+    return                            { name:'Central Government / High-level committee', sub:'Requires Cabinet/CCI approval' };
+  }
 
   function renderStepper(active){
     return `<div class="bg-white border-b border-line px-8 py-4">
@@ -972,11 +1500,50 @@
   }
 
   function renderStep1(){
+    const clonedBanner = FORM_STATE.clonedFrom
+      ? `<div class="clone-banner">
+          <div><i data-lucide="copy" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1.5"></i> Cloned from <span class="font-mono font-bold">${FORM_STATE.clonedFrom}</span> — review and update all fields for FY 2026-27</div>
+          <a href="#track-${FORM_STATE.clonedFrom}" class="text-[12px] font-bold text-primary hover:underline whitespace-nowrap">View original ↗</a>
+        </div>`
+      : '';
     return `<div class="px-6 lg:px-10 pt-8 pb-32"><div class="max-w-[860px] mx-auto">
+      ${clonedBanner}
       <div class="flex items-start justify-between gap-3 mb-6">
         <div><h1 class="text-[20px] font-bold text-ink-900">Step 1: Project Details</h1><p class="text-[14px] text-ink-500 mt-1">Basic classification and financial details for this project.</p></div>
-        <div class="text-[12px] text-ink-500 inline-flex items-center gap-1.5 mt-2"><i data-lucide="cloud-check" class="w-3.5 h-3.5"></i> Draft saved 1 min ago</div>
+        <div class="text-[12px] text-ink-500 inline-flex items-center gap-1.5 mt-2"><i data-lucide="cloud-check" class="w-3.5 h-3.5"></i> <span id="autosaveLabel">Draft saved 1 min ago</span> · <button type="button" class="text-primary hover:underline" onclick="openVersionHistory('DPR-2026-010')">View history</button></div>
       </div>
+
+      <!-- Addition 8 — Priority / urgency flag (top of Step 1) -->
+      <section class="mb-9" aria-labelledby="dpr-sec-prio">
+        <h2 id="dpr-sec-prio" class="block text-[13px] font-bold text-ink-900 mb-2">Project priority</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <button type="button" class="pretty-radio ${FORM_STATE.priorityFlag==='routine'?'selected':''}" onclick="setPriorityFlag('routine')">
+            <i data-lucide="clock" class="pr-icon text-ink-500"></i>
+            <div><div class="pr-title">Routine</div><div class="pr-sub">Normal procurement timeline</div></div>
+          </button>
+          <button type="button" class="pretty-radio ${FORM_STATE.priorityFlag==='priority'?'amber-on':''}" onclick="setPriorityFlag('priority')">
+            <i data-lucide="alert-triangle" class="pr-icon" style="color:#F59E0B;"></i>
+            <div><div class="pr-title" style="color:${FORM_STATE.priorityFlag==='priority'?'#92400E':'#111827'};">Priority</div><div class="pr-sub">Expedited handling required</div></div>
+          </button>
+          <button type="button" class="pretty-radio ${FORM_STATE.priorityFlag==='emergency'?'red-on':''}" onclick="setPriorityFlag('emergency')">
+            <i data-lucide="zap" class="pr-icon" style="color:#EF4444;"></i>
+            <div><div class="pr-title" style="color:${FORM_STATE.priorityFlag==='emergency'?'#991B1B':'#111827'};">Emergency</div><div class="pr-sub">Immediate action — breakdown or disaster</div></div>
+          </button>
+        </div>
+        ${FORM_STATE.priorityFlag !== 'routine' ? `<div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[13px] font-medium text-ink-900 mb-1.5">Reason for ${FORM_STATE.priorityFlag} <span class="text-danger">✱</span></label>
+            <select class="field" onchange="FORM_STATE.priorityReason = this.value; renderForm(1);">
+              <option value="" ${!FORM_STATE.priorityReason?'selected':''}>Select reason…</option>
+              ${['Equipment failure','Public safety risk','Court / government directive','Monsoon preparedness deadline','Scheme utilisation deadline','Disaster / flood damage','Other'].map(r => `<option ${FORM_STATE.priorityReason===r?'selected':''}>${r}</option>`).join('')}
+            </select>
+          </div>
+          ${FORM_STATE.priorityReason === 'Other' ? `<div>
+            <label class="block text-[13px] font-medium text-ink-900 mb-1.5">Describe the urgency</label>
+            <textarea rows="2" class="field" style="min-height:60px;" placeholder="Describe the urgency..." oninput="FORM_STATE.priorityReasonOther = this.value">${FORM_STATE.priorityReasonOther}</textarea>
+          </div>`:''}
+        </div>`:''}
+      </section>
 
       <section class="mb-9" aria-labelledby="dpr-sec-1a">
         <h2 id="dpr-sec-1a" class="text-[15px] font-bold text-ink-900 pb-2 border-b border-line mb-6">Project Classification</h2>
@@ -1021,33 +1588,58 @@
             <label class="block text-[13px] font-medium text-ink-900 mb-1.5">Financial Year <span class="text-danger" aria-hidden="true">✱</span></label>
             <select class="field" aria-required="true" onchange="FORM_STATE.fy = this.value"><option ${FORM_STATE.fy==='FY 2026-27'?'selected':''}>FY 2026-27</option><option ${FORM_STATE.fy==='FY 2027-28'?'selected':''}>FY 2027-28</option></select>
           </div>
-          <div>
-            <label class="block text-[13px] font-medium text-ink-900 mb-1.5">Priority Level</label>
-            <div class="grid grid-cols-3 gap-2">
-              ${['Routine','Priority','Emergency'].map(p => `<label class="radio-card text-[12.5px] ${FORM_STATE.priority===p?'selected':''}" onclick="FORM_STATE.priority='${p}'; renderForm(1)"><input type="radio" name="dprPrio" ${FORM_STATE.priority===p?'checked':''}> ${p}</label>`).join('')}
-            </div>
-          </div>
+          <!-- The old Priority Level radio has moved to the top of Step 1 as the new richer card row -->
         </div>
       </section>
 
       <section class="mb-6" aria-labelledby="dpr-sec-1b">
         <h2 id="dpr-sec-1b" class="text-[15px] font-bold text-ink-900 pb-2 border-b border-line mb-6">Financial Estimates</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div>
+          <div class="md:col-span-3">
             <label class="block text-[13px] font-medium text-ink-900 mb-1.5">Estimated Project Cost (₹) <span class="text-danger" aria-hidden="true">✱</span></label>
-            <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500 text-[13.5px]">₹</span><input id="dprEstCost" type="number" min="0" placeholder="0" value="${FORM_STATE.estCost}" class="field pl-7" aria-required="true" oninput="FORM_STATE.estCost = this.value; document.getElementById('dprCostTip').classList.toggle('hidden', !this.value)" /></div>
-            <div id="dprCostTip" class="hidden mt-1.5 text-[12px] italic text-primary inline-flex items-start gap-1"><i data-lucide="sparkles" class="w-3 h-3 mt-0.5"></i> Based on similar Infrastructure projects in Maharashtra, typical cost range for this scope is ₹38L–₹52L.</div>
+            <div class="relative max-w-[320px]"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500 text-[13.5px]">₹</span><input id="dprEstCost" type="number" min="0" placeholder="0" value="${FORM_STATE.estCost}" class="field pl-7" aria-required="true" oninput="onEstCostInput(this.value)" onblur="onEstCostBlur(this.value)" /></div>
+            <div id="dprCostTip" class="${FORM_STATE.estCost?'':'hidden '}mt-1.5 text-[12px] italic text-primary inline-flex items-start gap-1"><i data-lucide="sparkles" class="w-3 h-3 mt-0.5"></i> Based on similar Infrastructure projects in Maharashtra, typical cost range for this scope is ₹38L–₹52L.</div>
+            <!-- Addition 5 — Competent authority pre-check card -->
+            <div id="competencyCard" class="${FORM_STATE.estCost?'':'hidden '}competency-card" aria-live="polite" style="max-width:520px;">
+              <i data-lucide="user-check" style="width:18px; height:18px; color:#0C447C; flex-shrink:0; margin-top:2px;"></i>
+              <div>
+                <div class="lbl">Competent authority for this value</div>
+                <div class="name" id="competencyName">${FORM_STATE.estCost ? competencyTier(FORM_STATE.estCost).name : ''}</div>
+                <div class="sub"  id="competencySub">${FORM_STATE.estCost ? competencyTier(FORM_STATE.estCost).sub  : ''}</div>
+                <div class="sub" style="margin-top:6px;">Submit your DPR and AA application to this authority.</div>
+                <div class="tat">Typical turnaround: 2–4 weeks</div>
+              </div>
+            </div>
           </div>
           <div>
             <label class="block text-[13px] font-medium text-ink-900 mb-1.5">Funding Source <span class="text-danger" aria-hidden="true">✱</span></label>
             <select class="field" aria-required="true" onchange="FORM_STATE.funding = this.value">
-              <option value="">Select…</option>
-              ${['Municipal Budget','State Grant','Central Scheme','PPP','External Aid'].map(s => `<option ${FORM_STATE.funding===s?'selected':''}>${s}</option>`).join('')}
+              <option value="">Select funding source</option>
+              ${['State Finance Commission','AMRUT','Smart Cities Mission','PMAY','Jal Jeevan Mission','State Own Funds','Central Grant','14th / 15th Finance Commission','PPP / External Funding','Other'].map(s => `<option ${FORM_STATE.funding===s?'selected':''}>${s}</option>`).join('')}
             </select>
+          </div>
+          <div>
+            <label class="block text-[13px] font-medium text-ink-900 mb-1.5">Scheme year / phase</label>
+            <input type="text" placeholder="e.g. 2026-27 Phase 2" value="${FORM_STATE.schemeYear}" class="field" oninput="FORM_STATE.schemeYear = this.value" />
+          </div>
+          <div>
+            <label class="block text-[13px] font-medium text-ink-900 mb-1.5">Grant / sanction order number</label>
+            <input type="text" placeholder="If funds are from a sanctioned grant" value="${FORM_STATE.grantOrderNo}" class="field" oninput="FORM_STATE.grantOrderNo = this.value" />
           </div>
           <div>
             <label class="block text-[13px] font-medium text-ink-900 mb-1.5">Budget Head / Code</label>
             <input type="text" placeholder="e.g. 4215-01-102" value="${FORM_STATE.budgetCode}" class="field" oninput="FORM_STATE.budgetCode = this.value" />
+            <div class="mt-1 text-[11px] text-warning inline-flex items-center gap-1"><i data-lucide="alert-triangle" class="w-3 h-3"></i> Wrong budget head = finance rejection</div>
+          </div>
+          <div class="md:col-span-3 grid grid-cols-1 md:grid-cols-[1fr_180px] gap-3">
+            <div>
+              <label class="block text-[13px] font-medium text-ink-900 mb-1.5">Budget availability confirmed by</label>
+              <input type="text" placeholder="Finance officer who confirmed funds are available" value="${FORM_STATE.budgetAvailConfirmedBy}" class="field" oninput="FORM_STATE.budgetAvailConfirmedBy = this.value" />
+            </div>
+            <div>
+              <label class="block text-[13px] font-medium text-ink-900 mb-1.5">Date</label>
+              <input type="date" value="${FORM_STATE.budgetAvailConfirmedOn}" class="field" oninput="FORM_STATE.budgetAvailConfirmedOn = this.value" />
+            </div>
           </div>
           <div>
             <label class="block text-[13px] font-medium text-ink-900 mb-1.5">Expected Project Duration</label>
@@ -1063,6 +1655,35 @@
         </div>
       </section>
     </div></div>`;
+  }
+
+  // ===== Addition 8 — Priority flag helpers =====
+  function setPriorityFlag(p){
+    FORM_STATE.priorityFlag = p;
+    if (p === 'routine'){ FORM_STATE.priorityReason = ''; FORM_STATE.priorityReasonOther = ''; }
+    renderForm(1);
+  }
+  // ===== Addition 5 — Competency authority debounce =====
+  let _competencyTimer = null;
+  function onEstCostInput(v){
+    FORM_STATE.estCost = v;
+    const tip = document.getElementById('dprCostTip');
+    if (tip) tip.classList.toggle('hidden', !v);
+    if (_competencyTimer) clearTimeout(_competencyTimer);
+    _competencyTimer = setTimeout(() => updateCompetencyCard(v), 500);
+  }
+  function onEstCostBlur(v){
+    if (_competencyTimer){ clearTimeout(_competencyTimer); _competencyTimer = null; }
+    updateCompetencyCard(v);
+  }
+  function updateCompetencyCard(v){
+    const card = document.getElementById('competencyCard');
+    if (!card) return;
+    if (!v){ card.classList.add('hidden'); return; }
+    const t = competencyTier(v);
+    document.getElementById('competencyName').textContent = t.name;
+    document.getElementById('competencySub').textContent  = t.sub;
+    card.classList.remove('hidden');
   }
 
   function renderStep2(){
@@ -1124,8 +1745,112 @@
           <div class="mt-1 text-[11px] text-ink-500">Who benefits from this project — residents, businesses, departments?</div>
         </div>
       </section>
+
+      ${renderSiteVisitSection()}
     </div></div>`;
   }
+
+  // ===== Addition 6 — Site Visit & Field Assessment =====
+  function renderSiteVisitSection(){
+    const sv = FORM_STATE.siteVisit;
+    const open = !!sv.open;
+    const measurementRows = sv.measurements.map((m, i) => `
+      <div class="grid grid-cols-[1fr_140px_100px_30px] gap-2 mb-2 items-center">
+        <input type="text" placeholder="Item" value="${esc(m.item)}" class="field !py-1.5 !text-[12.5px]" oninput="FORM_STATE.siteVisit.measurements[${i}].item = this.value" />
+        <input type="text" placeholder="Value" value="${esc(m.value)}" class="field !py-1.5 !text-[12.5px]" oninput="FORM_STATE.siteVisit.measurements[${i}].value = this.value" />
+        <select class="field !py-1.5 !text-[12.5px]" onchange="FORM_STATE.siteVisit.measurements[${i}].unit = this.value">
+          ${['m','sqm','cum','no.','km','rmt'].map(u => `<option ${m.unit===u?'selected':''}>${u}</option>`).join('')}
+        </select>
+        <button type="button" class="me-icon-btn danger" onclick="removeMeasurement(${i})" aria-label="Remove measurement"><i data-lucide="x" style="width:12px; height:12px;"></i></button>
+      </div>`).join('');
+    const photoTiles = sv.photos.map((p, i) => `
+      <div>
+        <div class="photo-thumb">
+          ${p.dataUrl ? `<img src="${p.dataUrl}" alt="${esc(p.name||'site photo')}" />` : `<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#9CA3AF; font-size:11px;">${esc(p.name||'Photo')}</div>`}
+          <button type="button" class="rm" onclick="removeSitePhoto(${i})" aria-label="Remove photo"><i data-lucide="trash-2" style="width:13px; height:13px;"></i></button>
+        </div>
+        <div class="photo-caption"><input type="text" placeholder="Add caption..." value="${esc(p.caption||'')}" oninput="FORM_STATE.siteVisit.photos[${i}].caption = this.value" /></div>
+      </div>`).join('');
+    const drawingRows = sv.drawings.map((d, i) => `
+      <div class="border border-line rounded-lg px-3 py-2.5 mb-2">
+        <div class="flex items-center justify-between mb-2">
+          <div class="text-[13px] font-medium text-ink-900 inline-flex items-center gap-2"><i data-lucide="file-text" style="width:14px; height:14px; color:#0F5EE8;"></i> ${esc(d.name)}</div>
+          <button type="button" class="me-icon-btn danger" onclick="removeSiteDrawing(${i})" aria-label="Remove drawing"><i data-lucide="x" style="width:12px; height:12px;"></i></button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+          <input type="text" placeholder="Drawing number" value="${esc(d.drawingNo||'')}" class="field !py-1.5 !text-[12.5px]" oninput="FORM_STATE.siteVisit.drawings[${i}].drawingNo = this.value" />
+          <input type="text" placeholder="Description" value="${esc(d.description||'')}" class="field !py-1.5 !text-[12.5px]" oninput="FORM_STATE.siteVisit.drawings[${i}].description = this.value" />
+          <input type="text" placeholder="Revision" value="${esc(d.revision||'')}" class="field !py-1.5 !text-[12.5px]" oninput="FORM_STATE.siteVisit.drawings[${i}].revision = this.value" />
+        </div>
+      </div>`).join('');
+    return `<div class="sub-section-head ${open?'open':''}" onclick="toggleSiteVisit()" role="button" aria-expanded="${open?'true':'false'}">
+        <div class="flex items-center gap-2"><i data-lucide="map-pin" style="width:16px; height:16px; color:#0F5EE8;"></i><span class="text-[14px] font-bold text-ink-900">Site Visit &amp; Field Assessment</span><span class="text-[11px] text-ink-500 ml-1">For works tenders</span></div>
+        <i data-lucide="chevron-down" class="chev w-4 h-4 text-ink-500"></i>
+      </div>
+      <div class="text-[12px] text-ink-500 mb-3">Document the field visit conducted before cost estimation. Required for infrastructure and construction DPRs.</div>
+      <div class="sub-section-zone ${open?'open':''}">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+          <div><label class="block text-[12.5px] font-medium text-ink-900 mb-1">Date of site visit</label><input type="date" class="field" value="${esc(sv.date)}" oninput="FORM_STATE.siteVisit.date = this.value" /></div>
+          <div><label class="block text-[12.5px] font-medium text-ink-900 mb-1">Officers present</label><input type="text" class="field" placeholder="Names and designations" value="${esc(sv.officers)}" oninput="FORM_STATE.siteVisit.officers = this.value" /></div>
+          <div><label class="block text-[12.5px] font-medium text-ink-900 mb-1">Site location</label><input type="text" class="field" placeholder="Full address / GPS coordinates" value="${esc(sv.location)}" oninput="FORM_STATE.siteVisit.location = this.value" /></div>
+          <div>
+            <label class="block text-[12.5px] font-medium text-ink-900 mb-1">Weather / site conditions</label>
+            <select class="field" onchange="FORM_STATE.siteVisit.conditions = this.value">
+              <option value="">Select…</option>
+              ${['Clear','Rainy','Under use','Abandoned','Under construction'].map(c => `<option ${sv.conditions===c?'selected':''}>${c}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="mb-4">
+          <label class="block text-[12.5px] font-medium text-ink-900 mb-1">Site condition notes</label>
+          <textarea rows="3" class="field" style="min-height:80px;" placeholder="Describe current condition of the site, deficiencies observed, measurements taken, any hazards or access issues..." oninput="FORM_STATE.siteVisit.notes = this.value">${esc(sv.notes)}</textarea>
+        </div>
+        <div class="mb-4">
+          <div class="flex items-center justify-between mb-2">
+            <label class="block text-[12.5px] font-medium text-ink-900">Key measurements</label>
+            <button type="button" class="text-[12px] text-primary hover:underline" onclick="addMeasurement()">+ Add measurement</button>
+          </div>
+          ${measurementRows || '<div class="text-[12px] text-ink-400">No measurements yet.</div>'}
+        </div>
+        <div class="mb-4">
+          <label class="block text-[12.5px] font-medium text-ink-900 mb-1">Site photographs</label>
+          <div class="upload-zone-sm cursor-pointer" onclick="addDemoSitePhoto()">
+            <i data-lucide="upload-cloud" style="width:20px; height:20px; color:#0F5EE8;"></i>
+            <div class="text-[13px] text-ink-900">Upload photos</div>
+            <div class="text-[11px] text-ink-400">JPG, PNG, HEIC · multiple files allowed</div>
+            <button type="button" class="ml-auto px-3 py-1.5 rounded-lg border border-primary text-primary text-[12px] font-medium hover:bg-primary-light">Browse</button>
+          </div>
+          ${sv.photos.length ? `<div class="photo-grid">${photoTiles}</div>` : ''}
+        </div>
+        <div class="mb-2">
+          <label class="block text-[12.5px] font-medium text-ink-900 mb-1">Drawings &amp; maps</label>
+          <div class="upload-zone-sm cursor-pointer" onclick="addDemoSiteDrawing()">
+            <i data-lucide="upload-cloud" style="width:20px; height:20px; color:#0F5EE8;"></i>
+            <div class="text-[13px] text-ink-900">Upload drawings</div>
+            <div class="text-[11px] text-ink-400">PDF, DWG, DXF, JPG, PNG</div>
+            <button type="button" class="ml-auto px-3 py-1.5 rounded-lg border border-primary text-primary text-[12px] font-medium hover:bg-primary-light">Browse</button>
+          </div>
+          ${drawingRows ? `<div class="mt-3">${drawingRows}</div>` : ''}
+        </div>
+      </div>`;
+  }
+  function toggleSiteVisit(){ FORM_STATE.siteVisit.open = !FORM_STATE.siteVisit.open; renderForm(2); }
+  function addMeasurement(){ FORM_STATE.siteVisit.measurements.push({ item:'', value:'', unit:'m' }); renderForm(2); }
+  function removeMeasurement(i){ FORM_STATE.siteVisit.measurements.splice(i,1); renderForm(2); }
+  function addDemoSitePhoto(){
+    const n = FORM_STATE.siteVisit.photos.length + 1;
+    FORM_STATE.siteVisit.photos.push({ name:'site_photo_'+n+'.jpg', caption:'' });
+    renderForm(2); showToast('Photo added (mock)');
+  }
+  function removeSitePhoto(i){ FORM_STATE.siteVisit.photos.splice(i,1); renderForm(2); }
+  function addDemoSiteDrawing(){
+    const n = FORM_STATE.siteVisit.drawings.length + 1;
+    FORM_STATE.siteVisit.drawings.push({ name:'site_drawing_'+n+'.pdf', drawingNo:'', description:'', revision:'Rev 0' });
+    renderForm(2); showToast('Drawing added (mock)');
+  }
+  function removeSiteDrawing(i){ FORM_STATE.siteVisit.drawings.splice(i,1); renderForm(2); }
+  // Local esc helper (no XSS — defensive against quotes in user values)
+  function esc(s){ return (s == null ? '' : String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
   function renderStep3(){
     return `<div class="px-6 lg:px-10 pt-8 pb-32"><div class="max-w-[860px] mx-auto">
@@ -1165,8 +1890,174 @@
         <i data-lucide="alert-triangle" class="w-4 h-4 text-warning shrink-0 mt-0.5"></i>
         <span id="dprBoqMismatchText"></span>
       </div>
+
+      ${renderMarketEnquirySection()}
     </div></div>`;
   }
+
+  // ===== Addition 1 — Market Enquiry & Cost Basis =====
+  let _meEdit = null;   // index being edited inline
+  function renderMarketEnquirySection(){
+    const me = FORM_STATE.marketEnquiry;
+    const open = !!me.open;
+    // Methods row
+    const methodCard = (id, icon, title, sub) => `<button type="button" class="pretty-radio ${me.method===id?'selected':''}" onclick="setMeMethod('${id}')">
+      <i data-lucide="${icon}" class="pr-icon text-primary"></i>
+      <div><div class="pr-title">${title}</div><div class="pr-sub">${sub}</div></div>
+    </button>`;
+    let methodExtras = '';
+    if (me.method === 'dsr'){
+      methodExtras = `<div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+        <div><label class="block text-[12.5px] font-medium text-ink-900 mb-1">DSR edition / year used</label><input type="text" class="field" placeholder="e.g. DSR 2024" value="${esc(me.dsrEdition)}" oninput="FORM_STATE.marketEnquiry.dsrEdition = this.value" /></div>
+        <div><label class="block text-[12.5px] font-medium text-ink-900 mb-1">Applicable rate schedule name</label><input type="text" class="field" placeholder="e.g. PWD Schedule of Rates" value="${esc(me.dsrName)}" oninput="FORM_STATE.marketEnquiry.dsrName = this.value" /></div>
+      </div>`;
+    } else if (me.method === 'po'){
+      methodExtras = `<div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
+        <div><label class="block text-[12.5px] font-medium text-ink-900 mb-1">Previous PO number</label><input type="text" class="field" placeholder="PO-2025-…" value="${esc(me.poNumber)}" oninput="FORM_STATE.marketEnquiry.poNumber = this.value" /></div>
+        <div><label class="block text-[12.5px] font-medium text-ink-900 mb-1">Date of PO</label><input type="date" class="field" value="${esc(me.poDate)}" oninput="FORM_STATE.marketEnquiry.poDate = this.value" /></div>
+        <div><label class="block text-[12.5px] font-medium text-ink-900 mb-1">Issuing department</label><input type="text" class="field" placeholder="e.g. Public Works" value="${esc(me.poDept)}" oninput="FORM_STATE.marketEnquiry.poDept = this.value" /></div>
+      </div>`;
+    }
+    // Enquiry log rows (Market method only)
+    const rows = me.enquiries.map((r, i) => {
+      if (_meEdit === i){
+        return `<tr data-i="${i}">
+          <td>${i+1}</td>
+          <td><input class="me-edit-input" value="${esc(r.vendor)}" id="me-e-vendor" /></td>
+          <td><input class="me-edit-input" type="date" value="${esc(r.date)}" id="me-e-date" /></td>
+          <td><select class="me-edit-input" id="me-e-mode">${['Email','Phone','Portal','In person','Online'].map(m=>`<option ${r.mode===m?'selected':''}>${m}</option>`).join('')}</select></td>
+          <td><input class="me-edit-input" type="number" value="${esc(r.rate)}" id="me-e-rate" /></td>
+          <td><input class="me-edit-input" value="${esc(r.remarks||'')}" id="me-e-remarks" /></td>
+          <td><div class="flex items-center gap-1"><button class="me-edit-save" onclick="saveMeEdit(${i})" aria-label="Save">✓</button><button class="me-edit-cancel" onclick="cancelMeEdit()" aria-label="Cancel">✕</button></div></td>
+        </tr>`;
+      }
+      return `<tr data-i="${i}">
+        <td>${i+1}</td>
+        <td>${esc(r.vendor)}</td>
+        <td>${esc(fmtFriendlyDate(r.date))}</td>
+        <td>${esc(r.mode)}</td>
+        <td>₹${Number(r.rate||0).toLocaleString('en-IN')}/unit</td>
+        <td>${esc(r.remarks||'')}</td>
+        <td><div class="flex items-center gap-1"><button class="me-icon-btn" onclick="startMeEdit(${i})" aria-label="Edit"><i data-lucide="pencil" style="width:11px; height:11px;"></i></button><button class="me-icon-btn danger" onclick="deleteMeRow(${i})" aria-label="Delete"><i data-lucide="trash-2" style="width:11px; height:11px;"></i></button></div></td>
+      </tr>`;
+    }).join('');
+    // AI summary
+    const rates = me.enquiries.map(e => Number(e.rate)||0).filter(n => n > 0);
+    let summary = '';
+    if (rates.length){
+      const min = Math.min(...rates), max = Math.max(...rates);
+      summary = `Estimated cost of ₹${min.toLocaleString('en-IN')}/unit based on average of ${rates.length} market quote${rates.length===1?'':'s'} (range: ₹${min.toLocaleString('en-IN')}–₹${max.toLocaleString('en-IN')}). Lowest quote used as basis.`;
+    } else {
+      summary = 'Add at least one vendor enquiry to generate a cost basis summary.';
+    }
+    const evidenceChips = me.evidence.map((f,i) => `<span class="upload-chip">${esc(f.name)}<button type="button" onclick="removeMeEvidence(${i})" aria-label="Remove">×</button></span>`).join('');
+    const enquiryBody = me.method === 'market' ? `
+      <div style="border:1px solid #E5E7EB; border-radius:10px; overflow:hidden; margin-top:14px;">
+        <table class="me-table">
+          <thead><tr>
+            <th style="width:50px;">S.No</th>
+            <th>Vendor / Source</th>
+            <th style="width:120px;">Date Contacted</th>
+            <th style="width:90px;">Mode</th>
+            <th style="width:140px;">Quoted Rate (₹)</th>
+            <th>Remarks</th>
+            <th style="width:70px;"></th>
+          </tr></thead>
+          <tbody>${rows || '<tr><td colspan="7" style="text-align:center; padding:24px; color:#9CA3AF;">No enquiries logged yet.</td></tr>'}</tbody>
+        </table>
+        <div class="me-add-row">
+          <input type="text" id="meNewVendor" placeholder="Vendor name" />
+          <input type="date" id="meNewDate" />
+          <select id="meNewMode"><option>Email</option><option>Phone</option><option>Portal</option><option>In person</option></select>
+          <input type="number" id="meNewRate" placeholder="Rate (₹)" />
+          <input type="text" id="meNewRemarks" placeholder="Remarks" />
+          <button class="me-add-btn" type="button" onclick="addMeRow()">+ Add</button>
+        </div>
+      </div>
+      <div class="mt-3">
+        <div class="text-[12px] font-bold text-ink-900">Upload supporting evidence</div>
+        <div class="text-[11px] text-ink-400 mb-2">Attach screenshots, quotation emails, or GeM search results</div>
+        <div class="upload-zone-sm cursor-pointer" onclick="addDemoMeEvidence()">
+          <i data-lucide="upload-cloud" style="width:20px; height:20px; color:#0F5EE8;"></i>
+          <div class="text-[13px] text-ink-900">Drag files or browse</div>
+          <div class="text-[11px] text-ink-400">PDF, JPG, PNG</div>
+          <button type="button" class="ml-auto px-3 py-1.5 rounded-lg border border-primary text-primary text-[12px] font-medium hover:bg-primary-light">Browse</button>
+        </div>
+        <div>${evidenceChips}</div>
+      </div>
+      <div class="ai-summary" aria-live="polite">
+        <span class="lbl">✦ AI summary:</span>
+        <div class="txt" id="meAiSummary">${esc(summary)}</div>
+      </div>
+    ` : '';
+    return `<div class="sub-section-head ${open?'open':''}" onclick="toggleMarketEnquiry()" role="button" aria-expanded="${open?'true':'false'}">
+        <div class="flex items-center gap-2">
+          <i data-lucide="receipt" style="width:16px; height:16px; color:#0F5EE8;"></i>
+          <span class="text-[14px] font-bold text-ink-900">Market Enquiry &amp; Cost Basis</span>
+          <span class="req-audit-badge">Required for audit</span>
+        </div>
+        <div class="flex items-center gap-3"><button type="button" class="text-[12px] text-primary hover:underline" onclick="event.stopPropagation(); openMeForAdd()">Add enquiry +</button><i data-lucide="chevron-down" class="chev w-4 h-4 text-ink-500"></i></div>
+      </div>
+      <div class="text-[12px] text-ink-500 mb-3">Document how you arrived at the estimated cost. This protects you in audits — CAG and internal auditors routinely ask for cost basis evidence.</div>
+      <div class="sub-section-zone ${open?'open':''}">
+        <div class="text-[13px] font-bold text-ink-900 mb-2">How was the cost estimated?</div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+          ${methodCard('dsr', 'book', 'Schedule of Rates (DSR)', 'Standard government rate book')}
+          ${methodCard('market', 'search', 'Market Enquiry', 'Vendor quotes obtained')}
+          ${methodCard('po', 'history', 'Previous purchase order', 'Based on past similar work')}
+        </div>
+        ${methodExtras}
+        ${enquiryBody}
+      </div>`;
+  }
+  function fmtFriendlyDate(iso){
+    if (!iso) return '';
+    try { return new Date(iso + (iso.length===10?'T00:00:00':'')).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }); }
+    catch(e){ return iso; }
+  }
+  function toggleMarketEnquiry(){ FORM_STATE.marketEnquiry.open = !FORM_STATE.marketEnquiry.open; renderForm(3); }
+  function openMeForAdd(){ FORM_STATE.marketEnquiry.open = true; renderForm(3); setTimeout(() => { const v = document.getElementById('meNewVendor'); if (v) v.focus(); }, 50); }
+  function setMeMethod(m){ FORM_STATE.marketEnquiry.method = m; renderForm(3); }
+  function addMeRow(){
+    const vendor = document.getElementById('meNewVendor').value.trim();
+    if (!vendor){ showToast('Vendor name is required'); return; }
+    const date = document.getElementById('meNewDate').value || new Date().toISOString().slice(0,10);
+    const mode = document.getElementById('meNewMode').value;
+    const rate = parseFloat(document.getElementById('meNewRate').value) || 0;
+    const remarks = document.getElementById('meNewRemarks').value.trim();
+    FORM_STATE.marketEnquiry.enquiries.push({ vendor, date, mode, rate, remarks });
+    renderForm(3);
+  }
+  function startMeEdit(i){ _meEdit = i; renderForm(3); }
+  function cancelMeEdit(){ _meEdit = null; renderForm(3); }
+  function saveMeEdit(i){
+    const e = FORM_STATE.marketEnquiry.enquiries[i];
+    if (!e) return;
+    e.vendor  = document.getElementById('me-e-vendor').value;
+    e.date    = document.getElementById('me-e-date').value;
+    e.mode    = document.getElementById('me-e-mode').value;
+    e.rate    = parseFloat(document.getElementById('me-e-rate').value) || 0;
+    e.remarks = document.getElementById('me-e-remarks').value;
+    _meEdit = null;
+    renderForm(3);
+  }
+  function deleteMeRow(i){
+    const row = document.querySelector(`#dprBoqRows + .me-table, .me-table tr[data-i="${i}"]`);
+    // Fade then splice
+    const tr = document.querySelector(`.me-table tbody tr[data-i="${i}"]`);
+    if (tr){
+      tr.classList.add('fading');
+      setTimeout(() => { FORM_STATE.marketEnquiry.enquiries.splice(i,1); renderForm(3); }, 160);
+    } else {
+      FORM_STATE.marketEnquiry.enquiries.splice(i,1); renderForm(3);
+    }
+  }
+  function addDemoMeEvidence(){
+    const n = FORM_STATE.marketEnquiry.evidence.length + 1;
+    FORM_STATE.marketEnquiry.evidence.push({ name:'evidence_'+n+'.pdf' });
+    renderForm(3);
+  }
+  function removeMeEvidence(i){ FORM_STATE.marketEnquiry.evidence.splice(i,1); renderForm(3); }
 
   function recalcBoq(){
     const tbody = document.getElementById('dprBoqRows');
@@ -1279,7 +2170,7 @@
             ${summaryRow('Sector', FORM_STATE.sector)}
             ${summaryRow('Department', FORM_STATE.dept)}
             ${summaryRow('Financial Year', FORM_STATE.fy)}
-            ${summaryRow('Priority', FORM_STATE.priority)}
+            ${summaryRow('Priority', (FORM_STATE.priorityFlag||'routine').replace(/^./, c => c.toUpperCase()))}
             ${summaryRow('Estimated Cost', FORM_STATE.estCost ? '₹' + Number(FORM_STATE.estCost).toLocaleString('en-IN') : '')}
             ${summaryRow('Funding Source', FORM_STATE.funding)}
             ${summaryRow('Duration', FORM_STATE.duration)}
@@ -1332,6 +2223,155 @@
     });
   }
 
+  // ===================== ADDITION 3 — VERSION HISTORY PANEL =====================
+  let _vhCurrentDprId = null;
+  let _vhRestoreConfirm = null; // version number pending restore confirmation
+  function openVersionHistory(dprId){
+    _vhCurrentDprId = dprId;
+    _vhRestoreConfirm = null;
+    renderVersionHistoryPanel();
+    const p = document.getElementById('versionHistoryPanel');
+    p.classList.add('open');
+    p.setAttribute('aria-hidden','false');
+    refreshIcons();
+  }
+  function closeVersionHistory(){
+    const p = document.getElementById('versionHistoryPanel');
+    if (!p) return;
+    p.classList.remove('open');
+    p.setAttribute('aria-hidden','true');
+  }
+  function renderVersionHistoryPanel(){
+    if (!_vhCurrentDprId) return;
+    const arr = loadVersions(_vhCurrentDprId).slice().reverse(); // newest first
+    const panel = document.getElementById('versionHistoryPanel');
+    const entries = arr.length ? arr.map((e, idx) => {
+      const isCurrent = idx === 0; // newest first
+      const tsLabel = new Date(e.ts).toLocaleString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
+      const changes = (e.changes || []).slice(0, 3).map(c => `<li>${esc(c)}</li>`).join('');
+      const more = (e.changes || []).length > 3 ? `<li><button class="text-[12px] text-primary hover:underline" onclick="alert('Full diff coming soon')">+ ${(e.changes.length-3)} more changes</button></li>` : '';
+      const actions = isCurrent
+        ? `<button class="diff" onclick="showToast('Full diff (mock)')">View full diff</button>`
+        : `<button class="restore" onclick="confirmRestoreVersion(${e.v})">Restore this version</button><button class="diff" onclick="showToast('Full diff (mock)')">View full diff</button>`;
+      const restoreConfirm = _vhRestoreConfirm === e.v
+        ? `<div class="vh-restore-confirm">Restore version ${e.v}? Current changes will be saved as a new version first.<button class="btn-y" onclick="executeRestoreVersion(${e.v})">Confirm restore</button><button class="btn-n" onclick="cancelRestoreVersion()">Cancel</button></div>`
+        : '';
+      return `<div class="vh-entry" data-v="${e.v}">
+        <div class="vh-row1">
+          <div class="flex items-center gap-2"><span class="vh-version">Version ${e.v}</span>${isCurrent?'<span class="pill-blue">Current</span>':''}</div>
+          <span class="vh-ts">${esc(tsLabel)}</span>
+        </div>
+        <div class="vh-row2">Saved by ${esc(e.user)}</div>
+        <div class="vh-changes"><ul>${changes}${more}</ul></div>
+        <div class="vh-actions">${actions}</div>
+        ${restoreConfirm}
+      </div>`;
+    }).join('') : '<div style="padding:24px; text-align:center; font-size:13px; color:#9CA3AF;">No saved versions yet. Versions are recorded each time the DPR is saved.</div>';
+    panel.innerHTML = `<div class="vh-head">
+        <div class="flex items-center gap-2 min-w-0">
+          <i data-lucide="history" style="width:16px; height:16px; color:#0F5EE8;"></i>
+          <span class="title">Version History</span>
+          <span class="id font-mono">${esc(_vhCurrentDprId)}</span>
+        </div>
+        <button class="text-ink-500 hover:text-ink-900" style="background:transparent; border:none; font-size:20px; cursor:pointer;" onclick="closeVersionHistory()" aria-label="Close">×</button>
+      </div>
+      <div class="vh-list">${entries}</div>`;
+    refreshIcons();
+  }
+  function confirmRestoreVersion(v){ _vhRestoreConfirm = v; renderVersionHistoryPanel(); }
+  function cancelRestoreVersion(){ _vhRestoreConfirm = null; renderVersionHistoryPanel(); }
+  function executeRestoreVersion(v){
+    if (!_vhCurrentDprId) return;
+    const arr = loadVersions(_vhCurrentDprId);
+    const target = arr.find(e => e.v === v);
+    if (!target){ showToast('Version not found'); _vhRestoreConfirm = null; renderVersionHistoryPanel(); return; }
+    // Save current as a new version first (per spec)
+    pushVersion(_vhCurrentDprId, null, ['Auto-saved before restoring version ' + v]);
+    pushVersion(_vhCurrentDprId, target.snapshot || null, ['Restored from version ' + v]);
+    _vhRestoreConfirm = null;
+    renderVersionHistoryPanel();
+    showToast('Version ' + v + ' restored');
+  }
+  // Esc key closes panel
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeVersionHistory(); });
+
+  // ===================== ADDITION 9 — CLONE FROM PAST DPR =====================
+  let _cloneSelected = null;       // {id, title, sector, dept, fy, cost}
+  let _cloneChecks = { title:true, sector:true, scope:true, boq:true, eligibility:true, cost:false, team:false };
+  // Past DPRs to clone from — use the existing DPRS list (FY tagged from createdOn)
+  function pastDprPool(){
+    return DPRS.map(d => ({
+      id:d.id, title:d.title, sector:d.sector, dept:d.dept, fy:'FY 2025-26', cost:d.cost,
+    }));
+  }
+  function openCloneSelector(){
+    document.getElementById('cloneSelectorWrap').classList.remove('hidden');
+    document.getElementById('cloneSearchInput').focus();
+    renderCloneResults('');
+  }
+  function renderCloneResults(q){
+    const all = pastDprPool();
+    const filtered = !q ? all : all.filter(d => (d.title + ' ' + d.id + ' ' + d.sector + ' ' + d.dept).toLowerCase().includes(q.toLowerCase()));
+    const box = document.getElementById('cloneResults');
+    if (!q && document.activeElement !== document.getElementById('cloneSearchInput')){ box.classList.add('hidden'); return; }
+    box.classList.remove('hidden');
+    box.innerHTML = filtered.length
+      ? filtered.slice(0,8).map(d => `<button type="button" class="clone-result-row w-full text-left flex items-start justify-between gap-3" onclick="selectCloneSource('${d.id}')">
+          <div>
+            <div class="font-medium text-ink-900">${d.title}</div>
+            <div class="text-[11px] text-ink-500 mt-0.5"><span class="font-mono">${d.id}</span> · ${d.fy} · ${d.sector}</div>
+          </div>
+          <div class="text-[12.5px] text-ink-500 whitespace-nowrap pt-0.5">₹${(d.cost/100000).toFixed(1)} L</div>
+        </button>`).join('')
+      : '<div class="px-4 py-6 text-center text-[12.5px] text-ink-400">No matching DPRs found.</div>';
+  }
+  function selectCloneSource(id){
+    const src = pastDprPool().find(d => d.id === id);
+    if (!src) return;
+    _cloneSelected = src;
+    document.getElementById('cloneResults').classList.add('hidden');
+    document.getElementById('cloneSearchInput').value = src.title;
+    const c = _cloneChecks;
+    const wrap = document.getElementById('cloneConfirm');
+    wrap.classList.remove('hidden');
+    wrap.innerHTML = `<div class="clone-confirm-card">
+      <div class="text-[12px] text-ink-500">Cloning from:</div>
+      <div class="text-[14px] font-bold text-ink-900 mt-0.5">${src.title}</div>
+      <div class="text-[12px] text-ink-500"><span class="font-mono">${src.id}</span> · ${src.fy}</div>
+
+      <div class="text-[12px] font-bold text-ink-900 mt-4 mb-2">What will be copied:</div>
+      <div class="space-y-1.5">
+        <label class="flex items-center gap-2 text-[13px] text-ink-900"><input type="checkbox" ${c.title?'checked':''} onchange="_cloneChecks.title=this.checked" class="accent-primary"> Project title and description</label>
+        <label class="flex items-center gap-2 text-[13px] text-ink-900"><input type="checkbox" ${c.sector?'checked':''} onchange="_cloneChecks.sector=this.checked" class="accent-primary"> Sector and department</label>
+        <label class="flex items-center gap-2 text-[13px] text-ink-900"><input type="checkbox" ${c.scope?'checked':''} onchange="_cloneChecks.scope=this.checked" class="accent-primary"> Scope of work</label>
+        <label class="flex items-center gap-2 text-[13px] text-ink-900"><input type="checkbox" ${c.boq?'checked':''} onchange="_cloneChecks.boq=this.checked" class="accent-primary"> BOQ structure (quantities will be reset to 0 — enter new quantities)</label>
+        <label class="flex items-center gap-2 text-[13px] text-ink-900"><input type="checkbox" ${c.eligibility?'checked':''} onchange="_cloneChecks.eligibility=this.checked" class="accent-primary"> Eligibility and technical requirements</label>
+        <label class="flex items-center gap-2 text-[13px] text-ink-500"><input type="checkbox" ${c.cost?'checked':''} onchange="_cloneChecks.cost=this.checked" class="accent-primary"> Estimated cost (unchecked by default — costs change year to year)</label>
+        <label class="flex items-center gap-2 text-[13px] text-ink-500"><input type="checkbox" ${c.team?'checked':''} onchange="_cloneChecks.team=this.checked" class="accent-primary"> Team and key personnel (unchecked — personnel may have changed)</label>
+      </div>
+
+      <div class="text-[12px] text-ink-500 italic mt-4">What will NOT be copied: Approval records, AA/TS numbers, budget certificates, site visit photos — these are specific to the original DPR.</div>
+
+      <div class="mt-4">
+        <button onclick="createClone()" class="inline-flex items-center gap-1.5 text-white font-bold px-5 py-2.5 rounded-lg text-[13px]" style="background:#8B5CF6;"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Create clone →</button>
+      </div>
+    </div>`;
+    refreshIcons();
+  }
+  function createClone(){
+    const src = _cloneSelected;
+    if (!src) return;
+    // Reset FORM_STATE with selected fields copied
+    FORM_STATE.clonedFrom = src.id;
+    if (_cloneChecks.title)       FORM_STATE.title = src.title;
+    if (_cloneChecks.sector)      { FORM_STATE.sector = src.sector; FORM_STATE.dept = src.dept; }
+    if (_cloneChecks.scope)       FORM_STATE.scope = `<p>Scope cloned from ${src.id} — review and update for FY 2026-27.</p>`;
+    if (_cloneChecks.boq)         FORM_STATE.boq = FORM_STATE.boq.map(r => ({ ...r, qty: 0 }));
+    if (_cloneChecks.cost)        FORM_STATE.estCost = String(src.cost);
+    else                          FORM_STATE.estCost = '';
+    showToast(`Cloning from ${src.id} — review and update all fields`);
+    location.hash = '#step1';
+  }
   // ===================== ROUTER =====================
   function setView(name){
     document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
