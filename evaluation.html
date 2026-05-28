@@ -1739,7 +1739,8 @@
   function toggleSection(key){
     if (EVAL.readonly) return;
     const st = sectionStatus();
-    const locked = (key==='s2' && !st.s1done) || (key==='s3' && !st.s2done) || (key==='s4' && !st.s3done);
+    // Merged: s2 = PQ+TQ, s4 = Results
+    const locked = (key==='s2' && !st.s1done) || (key==='s4' && !(st.s2done && st.s3done));
     if (locked){ showToast('Complete previous section first'); return; }
     EVAL.expanded = (EVAL.expanded === key) ? '' : key;
     renderTechnical(); saveState();
@@ -1748,23 +1749,23 @@
   function renderTechnical(){
     const wrap = document.getElementById('stage-technical');
     const st = sectionStatus();
+    // Merged: Section 02 now combines PQ + TQ. Old Section 04 (Results & Actions) renumbers to 03 for display.
     wrap.innerHTML = [
       sectionCard('s1','01','Upload Technical Bids', st),
-      sectionCard('s2','02','PQ Evaluation', st),
-      sectionCard('s3','03','TQ Evaluation', st),
-      sectionCard('s4','04','Results & Actions', st),
+      sectionCard('s2','02','PQ & TQ Evaluation', st),
+      sectionCard('s4','03','Results & Actions', st),
     ].join('');
     refreshIcons();
     // Trigger the AI confidence bar width animation after the DOM is in place
     if (typeof animateAiConfBars === 'function') animateAiConfBars();
   }
   function sectionCard(key, num, title, st){
-    const locked = (key==='s2' && !st.s1done) || (key==='s3' && !st.s2done) || (key==='s4' && !st.s3done);
+    // Merged: s2 covers PQ+TQ. s4 (Results) requires both PQ and TQ done.
+    const locked = (key==='s2' && !st.s1done) || (key==='s4' && !(st.s2done && st.s3done));
     const expanded = EVAL.expanded === key && !locked;
-    // Change 2e: clarification count badge next to PQ/TQ section title
-    if (key === 's2' || key === 's3'){
-      const sec = key === 's2' ? 'PQ' : 'TQ';
-      const n = pendingClarsForSection(sec).length;
+    // Combined PQ + TQ clarification count badge for the merged section
+    if (key === 's2'){
+      const n = pendingClarsForSection('PQ').length + pendingClarsForSection('TQ').length;
       if (n > 0){
         title += ` <span class="clar-count-badge" aria-live="polite">${n} clarification${n===1?'':'s'} pending</span>`;
       }
@@ -1772,18 +1773,27 @@
     let statusPill;
     if (key==='s1') statusPill = EVAL.bids.length ? pill(EVAL.bids.length+' uploaded','#F0FDF4','#065F46') : pill('Pending','#F3F4F6','#6B7280');
     else if (key==='s2'){
-      const pqDone = EVAL.bids.length && EVAL.bids.every(b => PQ_CRITERIA.every(c => { const v = (EVAL.matrix[b.vendor]||{})[c.id]; return v != null && v !== 'clarif'; }));
-      const n = EVAL.bids.filter(b => PQ_CRITERIA.every(c => { const v = (EVAL.matrix[b.vendor]||{})[c.id]; return v != null && v !== 'clarif'; })).length;
-      statusPill = EVAL.pqConfirmed ? pill('Complete','#F0FDF4','#065F46') : (pqDone ? pill('Ready to confirm','#EFF6FF','#0C447C') : pill(n+' of '+EVAL.bids.length+' evaluated','#FFFBEB','#92400E'));
-    }
-    else if (key==='s3'){
-      const tqDone = EVAL.bids.length && EVAL.bids.every(b => TQ_CRITERIA.every(c => typeof (EVAL.matrix[b.vendor]||{})[c.id] === 'number'));
-      const n = EVAL.bids.filter(b => TQ_CRITERIA.every(c => typeof (EVAL.matrix[b.vendor]||{})[c.id] === 'number')).length;
-      statusPill = EVAL.tqConfirmed ? pill('Complete','#F0FDF4','#065F46') : (tqDone ? pill('Ready to confirm','#EFF6FF','#0C447C') : pill(n+' of '+EVAL.bids.length+' scored','#FFFBEB','#92400E'));
+      // Combined PQ + TQ status
+      if (!EVAL.bids.length){
+        statusPill = pill('Not started','#F3F4F6','#6B7280');
+      } else if (EVAL.pqConfirmed && EVAL.tqConfirmed){
+        statusPill = pill('Complete','#F0FDF4','#065F46');
+      } else {
+        // X of Y vendors with BOTH PQ pass-state + TQ scored
+        const bothDone = (vendor) => {
+          const pqOk = PQ_CRITERIA.every(c => { const v = (EVAL.matrix[vendor]||{})[c.id]; return v != null && v !== 'clarif'; });
+          const tqOk = TQ_CRITERIA.every(c => typeof (EVAL.matrix[vendor]||{})[c.id] === 'number');
+          return pqOk && tqOk;
+        };
+        const n = EVAL.bids.filter(b => bothDone(b.vendor)).length;
+        statusPill = pill(n + ' of ' + EVAL.bids.length + ' vendors evaluated', '#FFFBEB', '#92400E');
+      }
     }
     else statusPill = EVAL.techComplete ? pill('Complete','#F0FDF4','#065F46') : pill('Pending','#F3F4F6','#6B7280');
     const body = expanded ? `<div style="padding:0 18px 18px;">${sectionBody(key)}</div>` : '';
-    return `<div class="bg-white border border-line rounded-xl overflow-hidden">
+    // aria-label per spec for the combined header
+    const ariaLabel = key === 's2' ? ' aria-label="PQ and TQ Evaluation section, click to expand or collapse"' : '';
+    return `<div class="bg-white border border-line rounded-xl overflow-hidden" data-section="${key}"${ariaLabel}>
       ${sectionHeaderHTML(num,title,statusPill,key,expanded,locked)}
       ${body}
     </div>`;
@@ -1794,8 +1804,7 @@
 
   function sectionBody(key){
     if (key==='s1') return s1Body();
-    if (key==='s2') return s2PqBody();
-    if (key==='s3') return s3TqBody();
+    if (key==='s2') return s2CombinedBody();
     if (key==='s4') return s4Body();
     return '';
   }
@@ -2531,9 +2540,25 @@
     }
     return `<tr class="clar-subrow"><td colspan="${colspan}"><div class="csr"><div class="csr-left">${leftHTML}</div><div class="csr-right">${rightHTML}</div></div></td></tr>`;
   }
-  function s2PqBody(){
+  // ===== Combined PQ + TQ section body =====
+  // Top-level orchestrator. Builds:
+  //   shared vendor selector → shared instruction → PQ sub-section → divider → TQ sub-section
+  // The PQ and TQ tables themselves are untouched — only the chrome around them moves.
+  function s2CombinedBody(){
     if (!EVAL.bids.length) return '<div class="text-[13px] text-ink-500 italic">Upload technical bids first.</div>';
     const vendor = EVAL.activeVendor;
+    const sharedInstruction = `<div class="text-[13px] mb-5" style="color:#6B7280;">
+        Apply Pass / Fail to each criterion. <i data-lucide="hourglass" style="width:13px; height:13px; color:#F59E0B; display:inline-block; vertical-align:-1px; margin:0 2px;"></i> Pending is for clarifications still in flight.
+      </div>`;
+    return `${pqVendorSelectorHTML()}
+      ${sharedInstruction}
+      ${pqSubSectionHTML(vendor)}
+      <div style="border-top:1px solid #E5E7EB; margin:24px 0;"></div>
+      ${tqSubSectionHTML(vendor)}`;
+  }
+
+  // === PQ sub-section: sub-label + AI Pre-screen + low-conf banner + PQ table + Save CTA ===
+  function pqSubSectionHTML(vendor){
     const m = EVAL.matrix[vendor] || {};
     const rows = PQ_CRITERIA.map(c => {
       const val = m[c.id];
@@ -2542,7 +2567,6 @@
       const submittedCell = notFound
         ? `<div><span style="font-size:13px; color:#F59E0B; font-style:italic;">Not found</span> <a href="#" onclick="pqInlineEdit('${esc(vendor)}','${c.id}'); return false;" class="text-[12px] hover:underline" style="color:#0F5EE8;">Enter manually</a></div>`
         : `<div class="crit-sub">${esc(aiVal)}</div>`;
-      // C2 + C3 — wrap trigger with data-verdict for change-detection in popover
       const verdictAttr = esc(val == null ? '' : val);
       const trigger = `<span data-verdict="${verdictAttr}" onclick="openPqPopover(event,'${esc(vendor)}','${c.id}')">${verdictTriggerHTML(val)}</span>`;
       const commentHTML = pqCommentHTML(vendor, c.id);
@@ -2561,26 +2585,32 @@
       </tr>${clarSubRowHTML(vendor, c.id, 'PQ', 6)}`;
     }).join('');
 
-    // Overall PQ verdict for this vendor
+    // Overall PQ verdict for this vendor (shown in sub-label right side)
     const passCount = PQ_CRITERIA.filter(c => m[c.id] === 'pass').length;
     const failCount = PQ_CRITERIA.filter(c => m[c.id] === 'fail').length;
-    const clarCount = PQ_CRITERIA.filter(c => m[c.id] === 'clarif').length;
-    const overall = failCount ? `<span style="background:#FEF2F2; color:#991B1B; padding:6px 12px; border-radius:999px; font-size:13px; font-weight:600;">PQ Disqualified</span>`
-                  : passCount === PQ_CRITERIA.length ? `<span style="background:#F0FDF4; color:#065F46; padding:6px 12px; border-radius:999px; font-size:13px; font-weight:600;">PQ Qualified</span>`
-                  : `<span style="background:#FFFBEB; color:#92400E; padding:6px 12px; border-radius:999px; font-size:13px; font-weight:600;">In progress</span>`;
-    const allDone = EVAL.bids.every(b => PQ_CRITERIA.every(c => { const x = (EVAL.matrix[b.vendor]||{})[c.id]; return x != null && x !== 'clarif'; }));
-    // C4 — rename Confirm → Save
-    const confirmBtn = `<button onclick="confirmPQ()" class="px-4 py-2 rounded-lg ${allDone?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-medium" ${allDone?'':'disabled'}>Save PQ Evaluation</button>`;
+    const anySet = PQ_CRITERIA.some(c => m[c.id] != null);
+    let pqStatusHTML;
+    if (!anySet){
+      pqStatusHTML = `<span style="color:#9CA3AF; font-size:12px;">Not evaluated</span>`;
+    } else if (failCount){
+      pqStatusHTML = `<span style="color:#991B1B; font-size:12px; font-weight:600;">PQ Disqualified ✗</span>`;
+    } else if (passCount === PQ_CRITERIA.length){
+      pqStatusHTML = `<span style="color:#065F46; font-size:12px; font-weight:600;">PQ Qualified ✓</span>`;
+    } else {
+      pqStatusHTML = `<span style="color:#92400E; font-size:12px; font-weight:600;">Pending</span>`;
+    }
 
+    const allDone = EVAL.bids.every(b => PQ_CRITERIA.every(c => { const x = (EVAL.matrix[b.vendor]||{})[c.id]; return x != null && x !== 'clarif'; }));
+    const confirmBtn = `<button onclick="confirmPQ()" class="px-4 py-2 rounded-lg ${allDone?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-medium" ${allDone?'':'disabled'}>Save PQ Evaluation</button>`;
     const lowBanner = lowConfidenceBannerHTML('pq', vendor);
-    return `<div class="flex items-center justify-between gap-3 flex-wrap mb-2">
-        <div class="text-[12.5px] text-ink-500">Apply Pass / Fail to each criterion. ⏳ Pending is for clarifications still in flight.</div>
+
+    return `<div class="flex items-center justify-between gap-3 flex-wrap" style="margin-bottom:12px;">
+        <div class="flex items-center gap-2">
+          <span class="text-[14px] font-bold text-ink-900">Pre-Qualification Criteria</span>
+          <span id="pqSavedIndicator" class="pq-saved-indicator" aria-live="polite">Saved ✓</span>
+          ${pqStatusHTML}
+        </div>
         <button onclick="aiPrescreenPQ()" class="px-3 py-1.5 rounded-lg border border-primary text-primary text-[12px] font-medium hover:bg-primary-light inline-flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> ✦ AI Pre-screen PQ</button>
-      </div>
-      ${pqVendorSelectorHTML()}
-      <div class="flex items-center justify-between mb-2">
-        <div class="text-[13.5px] font-bold text-ink-900 inline-flex items-center gap-2">${esc(vendor)} <span id="pqSavedIndicator" class="pq-saved-indicator" aria-live="polite">Saved ✓</span></div>
-        <div>${overall}</div>
       </div>
       ${lowBanner}
       <div style="border:1px solid #E5E7EB; border-radius:12px; overflow:hidden;">
@@ -2591,6 +2621,96 @@
         </table>
       </div>
       <div class="flex justify-end mt-3">${confirmBtn}</div>`;
+  }
+
+  // === TQ sub-section: sub-label + AI Pre-score + committee bar + presentations + low-conf + TQ table + total + Submit/Confirm ===
+  function tqSubSectionHTML(vendor){
+    // TQ gating — until PQ is confirmed, show the amber gating message inside the TQ sub-section
+    const tqStatusForLabel = (() => {
+      const t = tqTotal(vendor);
+      if (t == null || isNaN(t)) return `<span style="color:#9CA3AF; font-size:12px;">Not scored</span>`;
+      return `<span style="color:#0F5EE8; font-size:12px; font-weight:600;">TQ Score: ${t.toFixed(1)} / 100</span>`;
+    })();
+    const tqHeader = `<div class="flex items-center justify-between gap-3 flex-wrap" style="margin-bottom:12px;">
+        <div class="flex items-center gap-2">
+          <span class="text-[14px] font-bold text-ink-900">Technical Qualification Criteria</span>
+          ${tqStatusForLabel}
+        </div>
+        <button onclick="aiPrescreenTQ()" class="px-3 py-1.5 rounded-lg border border-primary text-primary text-[12px] font-medium hover:bg-primary-light inline-flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> ✦ AI Pre-score TQ (your column)</button>
+      </div>`;
+    if (!EVAL.pqConfirmed){
+      return `${tqHeader}<div style="background:#FFFBEB; border:1px solid #FDE68A; color:#92400E; border-radius:10px; padding:14px 16px; font-size:13px;"><i data-lucide="alert-triangle" class="w-4 h-4 inline-block -mt-0.5 mr-1"></i> Complete PQ Evaluation for all vendors first</div>`;
+    }
+    return tqHeader + tqInnerForVendor(vendor);
+  }
+  // Inner TQ block — committee bar + presentations + low-conf + TQ table + running total + complete banner + Submit/Confirm CTAs
+  function tqInnerForVendor(vendor){
+    const memStatus = COMMITTEE_MEMBERS.map(mb => {
+      const submitted = ((EVAL.tqMemberSubmitted||{})[vendor]||{})[mb.id];
+      const cls = submitted ? 'done' : 'pending';
+      const icon = submitted ? '✓' : '⏳';
+      return `<span class="mem ${cls}">${esc(mb.name)} ${icon}</span>`;
+    }).join('');
+    const committeeBar = `<div class="ct-status-bar">
+        <div class="left">Committee scoring — minimum 3 members required</div>
+        <div class="right" aria-live="polite">${memStatus}</div>
+      </div>`;
+    const presOpen = !!EVAL.presOpen;
+    const presBlock = `<div class="pres-toggle ${presOpen?'open':''}" onclick="togglePresSection()" role="button" aria-expanded="${presOpen?'true':'false'}">
+        <div class="left"><i data-lucide="presentation" style="width:16px; height:16px; color:#8B5CF6;"></i><span style="font-size:14px; font-weight:700; color:#111827;">Vendor Presentations</span><span style="font-size:12px; color:#9CA3AF;">Optional — for tenders requiring demonstration</span></div>
+        <div style="display:flex; align-items:center; gap:8px;"><span style="font-size:12px; color:#0F5EE8;">Upload ▾</span><i data-lucide="chevron-down" class="chev w-3.5 h-3.5"></i></div>
+      </div>
+      <div class="pres-zone ${presOpen?'open':''}">
+        <div class="pres-info">ℹ Presentations are held during the technical evaluation phase for complex or high-value tenders. Record video evidence and scores here for audit purposes. GFR guidelines require all evaluation criteria and scores to be documented.</div>
+        <div style="border:1px solid #E5E7EB; border-radius:10px; overflow:hidden; margin-bottom:18px;">
+          <table class="pres-table">
+            <thead><tr><th style="width:24%;">Vendor</th><th style="width:22%;">Presentation</th><th style="width:22%;">Video / Demo</th><th class="pres-score-col" style="width:${_uiPresNotes?'18%':'32%'};">Score contribution</th>${_uiPresNotes?`<th style="width:14%;">Notes <button class="pres-notes-toggle" onclick="togglePresNotes()" type="button" aria-label="Hide notes column">Hide ▴</button></th>`:`<th style="width:0; padding:0;"><button class="pres-notes-toggle" onclick="togglePresNotes()" type="button" aria-label="Show notes column" style="margin-left:0;">Show notes ▾</button></th>`}</tr></thead>
+            <tbody>${EVAL.bids.map(b => renderPresRow(b.vendor)).join('')}</tbody>
+          </table>
+        </div>
+      </div>`;
+    const memHeader = mb => {
+      const sub = ((EVAL.tqMemberSubmitted||{})[vendor]||{})[mb.id];
+      return `<th><span class="mh" title="${esc(mb.name)} · ${esc(mb.designation)}">${esc(mb.name)}${mb.isYou?' (you)':''}</span><span class="ms ${sub?'done':'pending'}">${sub?'✓ Scored':'Pending'}</span></th>`;
+    };
+    const rows = TQ_CRITERIA.map(c => renderTqRow(c, vendor)).join('');
+    const meSubmitted = ((EVAL.tqMemberSubmitted||{})[vendor]||{}).rk;
+    const meAllScored = TQ_CRITERIA.every(c => typeof (((EVAL.tqMemberScores||{})[vendor]||{})[c.id]||{}).rk === 'number');
+    const submitBtn = meSubmitted
+      ? `<button class="px-4 py-2 rounded-lg bg-success-light text-success border border-success text-[13px] font-medium cursor-not-allowed" disabled>Submitted ✓ — ${esc(vendor)}</button>`
+      : `<button onclick="submitMyTqScores('${esc(vendor)}')" class="px-4 py-2 rounded-lg ${meAllScored?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-medium" ${meAllScored?'':'disabled'}>Submit my scores for ${esc(vendor)} →</button>`;
+    const allDoneEverywhere = EVAL.bids.every(b => COMMITTEE_MEMBERS.every(mb => ((EVAL.tqMemberSubmitted||{})[b.vendor]||{})[mb.id]));
+    const confirmBtn = `<button onclick="confirmTQ()" class="px-4 py-2 rounded-lg ${allDoneEverywhere?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-medium" ${allDoneEverywhere?'':'disabled'}>Confirm TQ Evaluation</button>`;
+    const allSubmittedForVendor = COMMITTEE_MEMBERS.every(mb => ((EVAL.tqMemberSubmitted||{})[vendor]||{})[mb.id]);
+    const completeBanner = allSubmittedForVendor
+      ? `<div style="background:#F0FDF4; border:1px solid #BBF7D0; color:#065F46; border-radius:8px; padding:10px 14px; font-size:13px; font-weight:600; margin-top:14px;">✓ TQ scoring complete for ${esc(vendor)} — committee average finalised</div>`
+      : '';
+    return `${committeeBar}
+      ${presBlock}
+      ${lowConfidenceBannerHTML('tq', vendor)}
+      <div style="border:1px solid #E5E7EB; border-radius:12px; overflow:hidden;">
+        <table class="tq-comm-table" style="table-layout:fixed;">
+          <colgroup><col style="width:18%"><col style="width:7%"><col style="width:11%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:16%"></colgroup>
+          <thead><tr><th>Criterion</th><th>Max marks</th><th title="AI confidence score — how certain the AI is about its assessment based on the uploaded document quality and completeness"><i data-lucide="sparkles" style="width:11px; height:11px; display:inline-block; vertical-align:-1px; margin-right:3px; color:#9CA3AF;"></i>AI Confidence</th>${COMMITTEE_MEMBERS.map(memHeader).join('')}<th>Average</th><th>Verdict</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        ${(function(){
+          const totalMax = TQ_CRITERIA.reduce((s,c) => s + c.max, 0);
+          let sum = 0, any = false;
+          TQ_CRITERIA.forEach(c => {
+            const { avg } = memberAvg(vendor, c.id);
+            if (avg != null){ sum += avg; any = true; }
+          });
+          const display = any ? sum.toFixed(1) : '—';
+          return `<div class="tq-total-row" data-tq-total="${esc(vendor)}" aria-live="polite">
+              <span class="tq-total-label">TQ Score:</span>
+              <span class="tq-total-value">${display}</span>
+              <span class="tq-total-max">/ ${totalMax}</span>
+            </div>`;
+        })()}
+      </div>
+      ${completeBanner}
+      <div class="flex justify-between items-center mt-4 flex-wrap gap-2">${submitBtn}${confirmBtn}</div>`;
   }
 
   // C3 — Render the comment below a verdict pill, with Read more / Read less toggle
@@ -3468,7 +3588,8 @@ Date: ${esc(fmtDateShort(today))}`;
     const allDone = EVAL.bids.every(b => PQ_CRITERIA.every(c => { const x = (EVAL.matrix[b.vendor]||{})[c.id]; return x != null && x !== 'clarif'; }));
     if (!allDone){ showToast('Resolve all pending PQ verdicts first'); return; }
     EVAL.pqConfirmed = true;
-    EVAL.expanded = 's3';
+    // Merged s2 stays expanded so the user sees the now-unlocked TQ sub-section right below
+    EVAL.expanded = 's2';
     log('PQ Evaluation', 'pq_confirmed', `${EVAL.bids.length} vendors`);
     pqAutosave(); // C4 — also snapshot to localStorage on confirm
     renderTechnical(); saveState();
