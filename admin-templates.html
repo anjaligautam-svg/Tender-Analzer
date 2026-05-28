@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tender Templates — TenderAI Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>
+    tailwind.config = { theme: { extend: {
+      fontFamily: { sans: ['"DM Sans"', 'system-ui', 'sans-serif'] },
+      colors: { primary:{DEFAULT:'#0F5EE8',light:'#EFF6FF',border:'#93C5FD'}, success:{DEFAULT:'#10B981',light:'#F0FDF4'}, warning:{DEFAULT:'#F59E0B',light:'#FFFBEB'}, danger:{DEFAULT:'#EF4444',light:'#FEF2F2'}, purple:{DEFAULT:'#8B5CF6',light:'#EEEDFE'}, ink:{900:'#111827',500:'#6B7280',400:'#9CA3AF'}, line:'#E5E7EB', surface:'#F9FAFB' },
+      boxShadow:{ soft:'0 1px 3px rgba(0,0,0,0.08)', lift:'0 4px 12px rgba(0,0,0,0.12)' }
+    }}};
+  </script>
+  <style>
+    html, body{ font-family:'DM Sans',system-ui,sans-serif; color:#111827; background:#F9FAFB; }
+    *:focus-visible{ outline:2px solid #0F5EE8; outline-offset:2px; border-radius:4px; }
+    ::-webkit-scrollbar{ width:10px; height:10px; } ::-webkit-scrollbar-thumb{ background:#E5E7EB; border-radius:8px; } ::-webkit-scrollbar-thumb:hover{ background:#D1D5DB; } ::-webkit-scrollbar-track{ background:transparent; }
+    .template-card{ transition:all .15s ease; }
+    .template-card:hover{ box-shadow:0 4px 12px rgba(0,0,0,0.08); transform:translateY(-1px); border-color:#93C5FD; }
+    .toast{ transform:translateY(80px); opacity:0; transition:transform .3s cubic-bezier(.2,.7,.2,1),opacity .25s ease; } .toast.show{ transform:translateY(0); opacity:1; }
+    .dropdown-shadow{ box-shadow:0 12px 32px rgba(17,24,39,0.14),0 2px 6px rgba(17,24,39,0.06); }
+    .side-panel{ transition:transform .28s ease; } .side-panel.closed{ transform:translateX(100%); }
+    .overlay-shade{ background:rgba(17,24,39,0.34); }
+    @media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important;} }
+  </style>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+
+  <aside class="w-[244px] shrink-0 bg-white border-r border-line flex flex-col">
+    <div class="px-5 pt-5 pb-4 border-b border-line">
+      <div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-[15px]">T</div><div><div class="text-[15px] font-semibold text-ink-900 leading-tight">TenderAI</div><div class="text-[11px] text-ink-500 leading-tight">Admin Panel</div></div></div>
+      <button class="mt-4 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-line bg-surface hover:bg-white hover:shadow-soft transition"><div class="w-7 h-7 rounded-md bg-primary-light text-primary flex items-center justify-center"><i data-lucide="building-2" class="w-4 h-4"></i></div><div class="text-left flex-1 min-w-0"><div class="text-[12.5px] font-medium text-ink-900 truncate">Ahmedabad</div><div class="text-[10.5px] text-ink-500 truncate">Municipal Corporation</div></div><i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+    </div>
+    <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">OVERVIEW</div><ul class="space-y-0.5"><li><a href="admin.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Admin Dashboard</a></li></ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">ACCESS &amp; ORG</div><ul class="space-y-0.5">
+        <li><a href="admin-users.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="users" class="w-4 h-4"></i> User Management <span class="ml-auto bg-primary-light text-primary text-[10px] font-semibold rounded-full px-1.5 py-0.5">24</span></a></li>
+        <li><a href="admin-org.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="network" class="w-4 h-4"></i> Department &amp; Org</a></li>
+      </ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">CATALOG</div><ul class="space-y-0.5">
+        <li><a href="admin-templates.html" aria-current="page" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] bg-primary-light text-primary font-medium"><i data-lucide="layout-template" class="w-4 h-4"></i> Tender Templates</a></li>
+        <li><a href="admin-budget.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="wallet" class="w-4 h-4"></i> Budget Heads</a></li>
+        <li><a href="admin-dsr.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="table-2" class="w-4 h-4"></i> DSR Rates</a></li>
+        <li><a href="admin-vendors.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="store" class="w-4 h-4"></i> Vendor Registry <span class="ml-auto bg-danger text-white text-[10px] font-semibold rounded-full px-1.5 py-0.5">3</span></a></li>
+      </ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">GOVERNANCE</div><ul class="space-y-0.5">
+        <li><a href="admin-compliance.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="shield-check" class="w-4 h-4"></i> Compliance &amp; Audit</a></li>
+        <li><a href="admin-reports.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Reports &amp; Analytics</a></li>
+      </ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">SYSTEM</div><ul class="space-y-0.5">
+        <li><a href="admin-notifications.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="bell-ring" class="w-4 h-4"></i> Notifications</a></li>
+        <li><a href="admin-settings.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="settings" class="w-4 h-4"></i> System Settings</a></li>
+      </ul></div>
+      <div class="pt-2 border-t border-line"><ul class="space-y-0.5"><li><a href="index.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="arrow-left" class="w-4 h-4"></i> Procurement Portal</a></li></ul></div>
+    </nav>
+    <div class="border-t border-line px-4 py-3 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div><div class="flex-1 min-w-0"><div class="text-[12.5px] font-medium text-ink-900 truncate">Rajesh Kumar</div><div class="text-[10.5px] text-ink-500 truncate">Super Admin</div></div><button onclick="sessionStorage.clear(); location.href='login.html'" class="text-ink-400 hover:text-ink-900"><i data-lucide="log-out" class="w-4 h-4"></i></button></div>
+  </aside>
+
+  <div class="flex-1 flex flex-col min-w-0">
+    <header class="h-16 bg-white border-b border-line px-6 flex items-center gap-4 sticky top-0 z-30">
+      <button class="text-ink-500 hover:text-ink-900"><i data-lucide="panel-left" class="w-5 h-5"></i></button>
+      <div class="flex-1 max-w-xl relative"><i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i><input id="search" oninput="renderTemplates()" type="search" placeholder="Search templates…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] placeholder:text-ink-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" /></div>
+      <button class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">FY 2026-27 <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+      <button class="relative w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500"><i data-lucide="bell" class="w-4 h-4"></i><span class="absolute -top-1 -right-1 bg-danger text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">5</span></button>
+      <div class="relative">
+        <button id="avatarBtn" class="flex items-center gap-2 pl-2 border-l border-line"><div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div><div class="hidden md:block text-left"><div class="text-[12.5px] font-medium text-ink-900 leading-tight">Rajesh Kumar</div><div class="text-[10.5px] text-ink-500 leading-tight">Super Admin</div></div><i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+        <div id="avatarMenu" class="hidden absolute right-0 mt-2 w-[240px] bg-white border border-line rounded-xl dropdown-shadow z-40 py-1.5">
+          <a href="#" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="user" class="w-4 h-4 text-ink-500"></i> My profile</a>
+          <a href="admin.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] bg-primary-light text-primary font-medium mx-1.5 rounded-md"><i data-lucide="shield" class="w-4 h-4"></i> Admin Panel</a>
+          <a href="index.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="layout-dashboard" class="w-4 h-4 text-ink-500"></i> Procurement Portal</a>
+          <a href="admin-settings.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="settings" class="w-4 h-4 text-ink-500"></i> System Settings</a>
+          <div class="my-1.5 border-t border-line"></div>
+          <a href="#" onclick="sessionStorage.clear(); location.href='login.html'; return false;" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-danger hover:bg-danger-light"><i data-lucide="log-out" class="w-4 h-4"></i> Sign out</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto px-8 py-6 space-y-7 min-w-0 relative">
+
+      <section class="flex items-start justify-between flex-wrap gap-3">
+        <div>
+          <div class="text-[13px] text-ink-500 mb-2"><a href="admin.html" class="hover:underline">Admin Panel</a> · Catalog</div>
+          <h1 class="text-[24px] font-bold text-ink-900 leading-tight">Tender Templates Library</h1>
+          <p class="text-[14px] text-ink-500 mt-1">Reusable templates grouped by sector with a default evaluation method (L1 / QCBS / LCS / QBS / FBS).</p>
+        </div>
+        <button onclick="openTplPanel()" class="px-3 py-2 rounded-lg bg-primary text-white text-[13px] font-medium inline-flex items-center gap-1.5 shadow-soft hover:bg-primary/90"><i data-lucide="plus" class="w-4 h-4"></i> New template</button>
+      </section>
+
+      <section id="sectors" class="space-y-7"></section>
+
+      <!-- Detail panel -->
+      <div id="panelShade" class="hidden absolute inset-0 overlay-shade z-30" onclick="closeTplPanel()"></div>
+      <aside id="tplPanel" class="side-panel closed absolute top-0 right-0 h-full w-[720px] max-w-full bg-white border-l border-line z-40 flex flex-col">
+        <div class="px-6 py-4 border-b border-line flex items-center justify-between shrink-0">
+          <div><div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold" id="tpMode">Template</div><h2 class="text-[18px] font-bold text-ink-900 mt-0.5" id="tpTitle">Template</h2></div>
+          <button onclick="closeTplPanel()" class="text-ink-400 hover:text-ink-900"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <div class="flex-1 overflow-y-auto px-6 py-5 space-y-5" id="tpBody"></div>
+        <div class="px-6 py-3 border-t border-line flex justify-between shrink-0">
+          <div id="tpLeftActions" class="flex gap-2"></div>
+          <div class="flex gap-2">
+            <button onclick="closeTplPanel()" class="px-3 py-2 rounded-lg border border-line text-[13px] hover:bg-surface">Close</button>
+            <button onclick="saveTpl()" class="px-3 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90">Save template</button>
+          </div>
+        </div>
+      </aside>
+
+    </main>
+  </div>
+</div>
+
+<div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-ink-900 text-white text-[13px] px-4 py-3 rounded-xl shadow-lift inline-flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-success"></i><span id="toastMsg">Done</span></div>
+
+<script>
+  function refreshIcons(){ if (window.lucide) lucide.createIcons(); }
+  let __toastTimer; function showToast(m){ const t=document.getElementById('toast'); document.getElementById('toastMsg').textContent=m; t.classList.add('show'); clearTimeout(__toastTimer); __toastTimer=setTimeout(()=>t.classList.remove('show'),2800); }
+  function bindDropdown(b,m){ const B=document.getElementById(b),M=document.getElementById(m); if(!B||!M)return; B.addEventListener('click',e=>{e.stopPropagation();M.classList.toggle('hidden');}); document.addEventListener('click',e=>{if(!M.contains(e.target)&&!B.contains(e.target))M.classList.add('hidden');}); }
+  function logAudit(a,t,m){ try{ const log=JSON.parse(localStorage.getItem('adminAuditLog')||'[]'); log.unshift({at:new Date().toISOString(),actor:'Rajesh Kumar',action:a,target:t,meta:m||null}); localStorage.setItem('adminAuditLog',JSON.stringify(log.slice(0,500))); }catch(e){} }
+  function seedOnce(k,v){ if(!localStorage.getItem(k)) localStorage.setItem(k,JSON.stringify(v)); }
+  bindDropdown('avatarBtn','avatarMenu');
+
+  const SECTORS = [
+    { id:'it',     label:'IT Goods',           icon:'monitor',     color:'primary' },
+    { id:'infra',  label:'Infrastructure Works',icon:'construction',color:'warning' },
+    { id:'water',  label:'Water Works',        icon:'droplet',     color:'primary' },
+    { id:'eng',    label:'Engineering Goods',  icon:'cog',         color:'purple' },
+    { id:'urban',  label:'Urban Dev Works',    icon:'landmark',    color:'success' },
+  ];
+  const SEED_TPL = [
+    { id:'TPL-IT-01',    sector:'it',    name:'Standard goods procurement (GeM-mandatory)', method:'L1',   versions:['v3.2 (current)','v3.1','v2.0'], usage:42, depts:['IT','Administration'] },
+    { id:'TPL-IT-02',    sector:'it',    name:'Software licensing & services',              method:'QCBS', versions:['v1.4 (current)','v1.3'],         usage:18, depts:['IT'] },
+    { id:'TPL-INF-01',   sector:'infra', name:'Road works (BOQ-based)',                     method:'L1',   versions:['v4.1 (current)','v4.0','v3.9'],   usage:67, depts:['Infrastructure'] },
+    { id:'TPL-INF-02',   sector:'infra', name:'Bridge construction (large-value)',          method:'QCBS', versions:['v2.0 (current)'],                  usage:9,  depts:['Infrastructure','Engineering'] },
+    { id:'TPL-WAT-01',   sector:'water', name:'Pipeline supply &amp; installation',         method:'L1',   versions:['v3.0 (current)','v2.5'],           usage:34, depts:['Water'] },
+    { id:'TPL-WAT-02',   sector:'water', name:'Treatment plant maintenance (services)',     method:'LCS',  versions:['v1.2 (current)'],                  usage:11, depts:['Water'] },
+    { id:'TPL-ENG-01',   sector:'eng',   name:'Heavy machinery procurement',                method:'QCBS', versions:['v2.3 (current)','v2.2'],           usage:21, depts:['Engineering','Sanitation'] },
+    { id:'TPL-ENG-02',   sector:'eng',   name:'LED &amp; lighting fixtures',                 method:'L1',   versions:['v1.8 (current)'],                  usage:27, depts:['Engineering'] },
+    { id:'TPL-URB-01',   sector:'urban', name:'Park / public realm renovation',             method:'QCBS', versions:['v2.0 (current)'],                  usage:14, depts:['Urban Dev','Parks'] },
+    { id:'TPL-URB-02',   sector:'urban', name:'Riverfront development packages',            method:'QBS',  versions:['v1.0 (current)'],                  usage:6,  depts:['Urban Dev'] },
+  ];
+  seedOnce('admin_templates', SEED_TPL);
+  function load(){ return JSON.parse(localStorage.getItem('admin_templates') || '[]'); }
+  function save(l){ localStorage.setItem('admin_templates', JSON.stringify(l)); }
+
+  function methodPill(m){
+    const c = { L1:'bg-primary-light text-primary', QCBS:'bg-purple-light text-purple', LCS:'bg-warning-light text-warning', QBS:'bg-success-light text-success', FBS:'bg-ink-400/15 text-ink-500' };
+    return `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold ${c[m]||c.L1}">${m}</span>`;
+  }
+  function renderTemplates(){
+    const q = (document.getElementById('search').value || '').toLowerCase();
+    const all = load();
+    document.getElementById('sectors').innerHTML = SECTORS.map(s => {
+      const list = all.filter(t => t.sector === s.id && (!q || (t.id+t.name+t.method+t.depts.join(' ')).toLowerCase().includes(q)));
+      if (!list.length) return '';
+      const colorMap = { primary:'bg-primary-light text-primary', purple:'bg-purple-light text-purple', success:'bg-success-light text-success', warning:'bg-warning-light text-warning' };
+      return `<div>
+        <div class="flex items-center gap-2 mb-3"><div class="w-8 h-8 rounded-lg ${colorMap[s.color]} flex items-center justify-center"><i data-lucide="${s.icon}" class="w-4 h-4"></i></div><h2 class="text-[16px] font-bold text-ink-900">${s.label}</h2><span class="text-[12px] text-ink-500">${list.length} templates</span></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+          ${list.map(t => {
+            const current = (t.versions[0]||'').match(/^v[\d.]+/)?.[0] || 'v1.0';
+            return `<div class="template-card bg-white border border-line rounded-xl p-4">
+              <div class="flex items-center justify-between"><div class="text-[11.5px] text-ink-500 font-mono">${t.id}</div>${methodPill(t.method)}</div>
+              <div class="text-[14px] font-bold text-ink-900 mt-1 leading-snug">${t.name}</div>
+              <div class="text-[12px] text-ink-500 mt-1">Default eval method · ${t.method}</div>
+              <div class="mt-3 flex items-center gap-3 text-[11.5px] text-ink-500"><span class="inline-flex items-center gap-1"><i data-lucide="git-commit" class="w-3.5 h-3.5"></i> ${current}</span><span class="inline-flex items-center gap-1"><i data-lucide="layers" class="w-3.5 h-3.5"></i> ${t.versions.length} versions</span><span class="inline-flex items-center gap-1"><i data-lucide="repeat" class="w-3.5 h-3.5"></i> ${t.usage} uses</span></div>
+              <!-- usage mini-chart -->
+              <div class="mt-3 flex items-end gap-0.5 h-8" aria-hidden="true">
+                ${Array.from({length:12}).map((_,i)=>`<div class="flex-1 bg-primary-light rounded-sm" style="height:${20 + ((t.usage*7 + i*13) % 60)}%"></div>`).join('')}
+              </div>
+              <div class="mt-3 flex items-center justify-between text-[12px]">
+                <div class="text-ink-500">${t.depts.slice(0,2).join(', ')}${t.depts.length>2?'…':''}</div>
+                <div class="flex gap-1">
+                  <button onclick="openTplPanel('${t.id}','preview')" class="px-2 py-1.5 rounded-md border border-line hover:bg-surface inline-flex items-center gap-1"><i data-lucide="eye" class="w-3.5 h-3.5"></i> Preview</button>
+                  <button onclick="cloneTpl('${t.id}')" class="px-2 py-1.5 rounded-md border border-line hover:bg-surface inline-flex items-center gap-1"><i data-lucide="copy-plus" class="w-3.5 h-3.5"></i> Clone</button>
+                  <button onclick="openTplPanel('${t.id}')" class="px-2 py-1.5 rounded-md border border-line hover:bg-surface">Edit</button>
+                </div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    }).join('');
+    refreshIcons();
+  }
+
+  let currentId = null;
+  function openTplPanel(id, mode){
+    currentId = id || null;
+    const t = id ? load().find(x => x.id === id) : { id:'', sector:'it', name:'', method:'L1', versions:['v1.0 (current)'], usage:0, depts:[] };
+    document.getElementById('tpMode').textContent = mode === 'preview' ? 'Preview' : (id ? 'Edit template' : 'New template');
+    document.getElementById('tpTitle').textContent = id ? t.name : 'New template';
+    const sectorOpts = SECTORS.map(s => `<option value="${s.id}" ${t.sector===s.id?'selected':''}>${s.label}</option>`).join('');
+    const methodOpts = ['L1','QCBS','LCS','QBS','FBS'].map(m => `<option ${t.method===m?'selected':''}>${m}</option>`).join('');
+    const allDepts = ['IT','Infrastructure','Water','Sanitation','Engineering','Urban Dev','Parks','Finance','Administration'];
+    document.getElementById('tpBody').innerHTML = `
+      <div class="grid grid-cols-2 gap-3">
+        <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">Template ID</span><input id="tf_id" value="${t.id||''}" placeholder="TPL-IT-03" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13.5px] font-mono" ${id?'readonly':''} /></label>
+        <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">Sector</span><select id="tf_sector" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13.5px]">${sectorOpts}</select></label>
+      </div>
+      <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">Template name</span><input id="tf_name" value="${t.name||''}" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13.5px]" /></label>
+      <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">Default evaluation method</span><select id="tf_method" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13.5px]">${methodOpts}</select><div class="text-[11.5px] text-ink-500 mt-1">L1 (Lowest), QCBS (Quality &amp; Cost), LCS, QBS, FBS — set the default for tenders started from this template.</div></label>
+      <div>
+        <div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold mb-2">Assigned to departments</div>
+        <div class="grid grid-cols-3 gap-2">${allDepts.map(d => `<label class="flex items-center gap-2 text-[12.5px] text-ink-900"><input type="checkbox" data-dept="${d}" ${t.depts.includes(d)?'checked':''} class="accent-primary"> ${d}</label>`).join('')}</div>
+      </div>
+      <div>
+        <div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold mb-2">Version history</div>
+        <ul class="border border-line rounded-xl divide-y divide-line text-[13px]">${t.versions.map((v,i) => `<li class="px-3 py-2.5 flex items-center justify-between"><span>${v}</span>${i===0?'<span class="text-[11px] text-success font-semibold">current</span>':'<span class="text-[11px] text-ink-400">history</span>'}</li>`).join('')}</ul>
+      </div>
+      <div class="border border-line rounded-xl p-4 bg-surface/40">
+        <div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold mb-2">Usage analytics · last 12 months</div>
+        <div class="flex items-end gap-1 h-16">${Array.from({length:12}).map((_,i)=>`<div class="flex-1 bg-primary rounded-sm" style="height:${20 + ((t.usage*7 + i*13) % 70)}%"></div>`).join('')}</div>
+        <div class="grid grid-cols-3 gap-3 mt-3 text-[12px]"><div><div class="text-ink-500">Total uses</div><div class="text-ink-900 font-bold">${t.usage}</div></div><div><div class="text-ink-500">Avg/month</div><div class="text-ink-900 font-bold">${(t.usage/12).toFixed(1)}</div></div><div><div class="text-ink-500">Versions</div><div class="text-ink-900 font-bold">${t.versions.length}</div></div></div>
+      </div>
+    `;
+    document.getElementById('tpLeftActions').innerHTML = id ? `<button onclick="cloneTpl('${id}', true)" class="px-3 py-2 rounded-lg border border-line text-[13px] hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="copy-plus" class="w-4 h-4"></i> Clone → new version</button>` : '';
+    document.getElementById('tplPanel').classList.remove('closed'); document.getElementById('panelShade').classList.remove('hidden');
+    refreshIcons();
+  }
+  function closeTplPanel(){ document.getElementById('tplPanel').classList.add('closed'); document.getElementById('panelShade').classList.add('hidden'); }
+  function saveTpl(){
+    const list = load();
+    const depts = [...document.querySelectorAll('#tpBody input[type=checkbox]:checked')].map(c => c.dataset.dept);
+    const data = { id: document.getElementById('tf_id').value.trim(), sector: document.getElementById('tf_sector').value, name: document.getElementById('tf_name').value.trim(), method: document.getElementById('tf_method').value, depts };
+    if (!data.id || !data.name){ showToast('ID and name are required'); return; }
+    if (currentId){
+      const i = list.findIndex(x => x.id === currentId); list[i] = { ...list[i], ...data };
+      logAudit('Updated', `Template ${data.id}`); showToast('Template saved');
+    } else {
+      if (list.find(x => x.id === data.id)){ showToast('Template ID already exists'); return; }
+      list.push({ ...data, versions:['v1.0 (current)'], usage:0 });
+      logAudit('Created', `Template ${data.id} (${data.name})`); showToast('Template created');
+    }
+    save(list); closeTplPanel(); renderTemplates();
+  }
+  function cloneTpl(id, asNewVersion){
+    const list = load(); const src = list.find(x => x.id === id); if (!src) return;
+    if (asNewVersion){
+      const m = (src.versions[0]||'v1.0').match(/v(\d+)\.(\d+)/); const nv = m ? `v${m[1]}.${parseInt(m[2])+1} (current)` : 'v2.0 (current)';
+      src.versions = [nv, ...src.versions.map(v => v.replace(' (current)',''))];
+      save(list); renderTemplates(); logAudit('Cloned', `Template ${id} → new version ${nv}`); showToast('New version created: ' + nv);
+    } else {
+      const copy = { ...src, id: src.id + '-COPY-' + String(Date.now()).slice(-3), name: src.name + ' (copy)', versions:['v1.0 (current)'], usage:0 };
+      list.push(copy); save(list); renderTemplates(); logAudit('Cloned', `Template ${id} → ${copy.id}`); showToast('Template cloned');
+    }
+  }
+
+  renderTemplates();
+  if (new URLSearchParams(location.search).get('new') === '1') openTplPanel();
+</script>
+</body>
+</html>

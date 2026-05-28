@@ -167,10 +167,20 @@
         <i data-lucide="bell" class="w-4 h-4"></i>
         <span class="absolute -top-1 -right-1 bg-danger text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">6</span>
       </button>
-      <div class="flex items-center gap-2 pl-2 border-l border-line">
-        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">U</div>
-        <div class="hidden md:block"><div class="text-[12.5px] font-medium text-ink-900 leading-tight">Admin User</div></div>
-        <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i>
+      <div class="relative">
+        <button id="avatarBtn" aria-label="Account menu" class="flex items-center gap-2 pl-2 border-l border-line">
+          <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div>
+          <div class="hidden md:block text-left"><div class="text-[12.5px] font-medium text-ink-900 leading-tight">Rajesh Kumar</div><div class="text-[10.5px] text-ink-500 leading-tight">Super Admin</div></div>
+          <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i>
+        </button>
+        <div id="avatarMenu" class="hidden absolute right-0 mt-2 w-[240px] bg-white border border-line rounded-xl shadow-lift z-40 py-1.5">
+          <a href="#" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="user" class="w-4 h-4 text-ink-500"></i> My profile</a>
+          <a href="admin.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] bg-primary-light text-primary font-medium mx-1.5 rounded-md"><i data-lucide="shield" class="w-4 h-4"></i> Admin Panel</a>
+          <a href="index.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="layout-dashboard" class="w-4 h-4 text-ink-500"></i> Procurement Portal</a>
+          <a href="admin-settings.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="settings" class="w-4 h-4 text-ink-500"></i> System Settings</a>
+          <div class="my-1.5 border-t border-line"></div>
+          <a href="#" onclick="sessionStorage.clear(); location.href='login.html'; return false;" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-danger hover:bg-danger-light"><i data-lucide="log-out" class="w-4 h-4"></i> Sign out</a>
+        </div>
       </div>
     </header>
 
@@ -4110,5 +4120,6 @@
     if (e.target.id === 'issueCorrigendumModal') closeIssueCorrigendumForm();
   });
 </script>
+<script>(function(){var b=document.getElementById("avatarBtn"),m=document.getElementById("avatarMenu");if(!b||!m)return;b.addEventListener("click",function(e){e.stopPropagation();m.classList.toggle("hidden");});document.addEventListener("click",function(e){if(!m.contains(e.target)&&!b.contains(e.target))m.classList.add("hidden");});if(window.lucide)lucide.createIcons();})();</script>
 </body>
 </html>

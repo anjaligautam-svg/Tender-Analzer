@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>System Settings — TenderAI Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>
+    tailwind.config = { theme: { extend: {
+      fontFamily: { sans: ['"DM Sans"', 'system-ui', 'sans-serif'] },
+      colors: { primary:{DEFAULT:'#0F5EE8',light:'#EFF6FF',border:'#93C5FD'}, success:{DEFAULT:'#10B981',light:'#F0FDF4'}, warning:{DEFAULT:'#F59E0B',light:'#FFFBEB'}, danger:{DEFAULT:'#EF4444',light:'#FEF2F2'}, purple:{DEFAULT:'#8B5CF6',light:'#EEEDFE'}, ink:{900:'#111827',500:'#6B7280',400:'#9CA3AF'}, line:'#E5E7EB', surface:'#F9FAFB' },
+      boxShadow:{ soft:'0 1px 3px rgba(0,0,0,0.08)', lift:'0 4px 12px rgba(0,0,0,0.12)' }
+    }}};
+  </script>
+  <style>
+    html, body{ font-family:'DM Sans',system-ui,sans-serif; color:#111827; background:#F9FAFB; }
+    *:focus-visible{ outline:2px solid #0F5EE8; outline-offset:2px; border-radius:4px; }
+    ::-webkit-scrollbar{ width:10px; height:10px; } ::-webkit-scrollbar-thumb{ background:#E5E7EB; border-radius:8px; } ::-webkit-scrollbar-thumb:hover{ background:#D1D5DB; } ::-webkit-scrollbar-track{ background:transparent; }
+    .toast{ transform:translateY(80px); opacity:0; transition:transform .3s cubic-bezier(.2,.7,.2,1),opacity .25s ease; } .toast.show{ transform:translateY(0); opacity:1; }
+    .dropdown-shadow{ box-shadow:0 12px 32px rgba(17,24,39,0.14),0 2px 6px rgba(17,24,39,0.06); }
+    .switch{ width:34px; height:20px; background:#E5E7EB; border-radius:999px; position:relative; cursor:pointer; transition:background .15s; }
+    .switch::after{ content:''; position:absolute; top:2px; left:2px; width:16px; height:16px; background:#fff; border-radius:50%; box-shadow:0 1px 3px rgba(0,0,0,.2); transition:transform .15s; }
+    .switch.on{ background:#0F5EE8; } .switch.on::after{ transform:translateX(14px); }
+    @media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important;} }
+  </style>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+
+  <aside class="w-[244px] shrink-0 bg-white border-r border-line flex flex-col">
+    <div class="px-5 pt-5 pb-4 border-b border-line">
+      <div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-[15px]">T</div><div><div class="text-[15px] font-semibold text-ink-900 leading-tight">TenderAI</div><div class="text-[11px] text-ink-500 leading-tight">Admin Panel</div></div></div>
+      <button class="mt-4 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-line bg-surface hover:bg-white hover:shadow-soft transition"><div class="w-7 h-7 rounded-md bg-primary-light text-primary flex items-center justify-center"><i data-lucide="building-2" class="w-4 h-4"></i></div><div class="text-left flex-1 min-w-0"><div class="text-[12.5px] font-medium text-ink-900 truncate">Ahmedabad</div><div class="text-[10.5px] text-ink-500 truncate">Municipal Corporation</div></div><i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+    </div>
+    <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">OVERVIEW</div><ul class="space-y-0.5"><li><a href="admin.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Admin Dashboard</a></li></ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">ACCESS &amp; ORG</div><ul class="space-y-0.5">
+        <li><a href="admin-users.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="users" class="w-4 h-4"></i> User Management <span class="ml-auto bg-primary-light text-primary text-[10px] font-semibold rounded-full px-1.5 py-0.5">24</span></a></li>
+        <li><a href="admin-org.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="network" class="w-4 h-4"></i> Department &amp; Org</a></li>
+      </ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">CATALOG</div><ul class="space-y-0.5">
+        <li><a href="admin-templates.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="layout-template" class="w-4 h-4"></i> Tender Templates</a></li>
+        <li><a href="admin-budget.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="wallet" class="w-4 h-4"></i> Budget Heads</a></li>
+        <li><a href="admin-dsr.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="table-2" class="w-4 h-4"></i> DSR Rates</a></li>
+        <li><a href="admin-vendors.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="store" class="w-4 h-4"></i> Vendor Registry <span class="ml-auto bg-danger text-white text-[10px] font-semibold rounded-full px-1.5 py-0.5">3</span></a></li>
+      </ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">GOVERNANCE</div><ul class="space-y-0.5">
+        <li><a href="admin-compliance.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="shield-check" class="w-4 h-4"></i> Compliance &amp; Audit</a></li>
+        <li><a href="admin-reports.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Reports &amp; Analytics</a></li>
+      </ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">SYSTEM</div><ul class="space-y-0.5">
+        <li><a href="admin-notifications.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="bell-ring" class="w-4 h-4"></i> Notifications</a></li>
+        <li><a href="admin-settings.html" aria-current="page" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] bg-primary-light text-primary font-medium"><i data-lucide="settings" class="w-4 h-4"></i> System Settings</a></li>
+      </ul></div>
+      <div class="pt-2 border-t border-line"><ul class="space-y-0.5"><li><a href="index.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="arrow-left" class="w-4 h-4"></i> Procurement Portal</a></li></ul></div>
+    </nav>
+    <div class="border-t border-line px-4 py-3 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div><div class="flex-1 min-w-0"><div class="text-[12.5px] font-medium text-ink-900 truncate">Rajesh Kumar</div><div class="text-[10.5px] text-ink-500 truncate">Super Admin</div></div><button onclick="sessionStorage.clear(); location.href='login.html'" class="text-ink-400 hover:text-ink-900"><i data-lucide="log-out" class="w-4 h-4"></i></button></div>
+  </aside>
+
+  <div class="flex-1 flex flex-col min-w-0">
+    <header class="h-16 bg-white border-b border-line px-6 flex items-center gap-4 sticky top-0 z-30">
+      <button class="text-ink-500 hover:text-ink-900"><i data-lucide="panel-left" class="w-5 h-5"></i></button>
+      <div class="flex-1 max-w-xl relative"><i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i><input type="search" placeholder="Search settings…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] placeholder:text-ink-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" /></div>
+      <button class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">FY 2026-27 <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+      <button class="relative w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500"><i data-lucide="bell" class="w-4 h-4"></i><span class="absolute -top-1 -right-1 bg-danger text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">5</span></button>
+      <div class="relative">
+        <button id="avatarBtn" class="flex items-center gap-2 pl-2 border-l border-line"><div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div><div class="hidden md:block text-left"><div class="text-[12.5px] font-medium text-ink-900 leading-tight">Rajesh Kumar</div><div class="text-[10.5px] text-ink-500 leading-tight">Super Admin</div></div><i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+        <div id="avatarMenu" class="hidden absolute right-0 mt-2 w-[240px] bg-white border border-line rounded-xl dropdown-shadow z-40 py-1.5">
+          <a href="#" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="user" class="w-4 h-4 text-ink-500"></i> My profile</a>
+          <a href="admin.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] bg-primary-light text-primary font-medium mx-1.5 rounded-md"><i data-lucide="shield" class="w-4 h-4"></i> Admin Panel</a>
+          <a href="index.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="layout-dashboard" class="w-4 h-4 text-ink-500"></i> Procurement Portal</a>
+          <a href="admin-settings.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="settings" class="w-4 h-4 text-ink-500"></i> System Settings</a>
+          <div class="my-1.5 border-t border-line"></div>
+          <a href="#" onclick="sessionStorage.clear(); location.href='login.html'; return false;" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-danger hover:bg-danger-light"><i data-lucide="log-out" class="w-4 h-4"></i> Sign out</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto px-8 py-6 space-y-7 min-w-0">
+
+      <section class="flex items-start justify-between flex-wrap gap-3">
+        <div>
+          <div class="text-[13px] text-ink-500 mb-2"><a href="admin.html" class="hover:underline">Admin Panel</a> · System</div>
+          <h1 class="text-[24px] font-bold text-ink-900 leading-tight">System Settings</h1>
+          <p class="text-[14px] text-ink-500 mt-1">Branding, security, session policy, FY calendar and audit-log retention. This is a no-backend prototype — uploads &amp; toggles persist to localStorage only.</p>
+        </div>
+        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-warning-light text-warning text-[12px] font-medium"><i data-lucide="flask-conical" class="w-3.5 h-3.5"></i> Mock controls — no real auth wiring</div>
+      </section>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+        <!-- Logo & seal library -->
+        <div class="bg-white border border-line rounded-xl p-5">
+          <div class="flex items-center justify-between mb-3"><h3 class="text-[15px] font-bold text-ink-900">Logo &amp; seal library</h3><button onclick="document.getElementById('logoFile').click()" class="text-[12.5px] text-primary font-medium hover:underline inline-flex items-center gap-1"><i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload</button><input id="logoFile" type="file" class="hidden" accept="image/*" onchange="onUploadLogo(this.files[0])" /></div>
+          <p class="text-[12px] text-ink-500 mb-3">Used in generated tender documents and report headers. Marked logos/seals are default.</p>
+          <ul id="logoList" class="grid grid-cols-2 gap-3 text-[12.5px]"></ul>
+        </div>
+
+        <!-- E-signature settings -->
+        <div class="bg-white border border-line rounded-xl p-5">
+          <h3 class="text-[15px] font-bold text-ink-900">E-signature settings</h3>
+          <p class="text-[12px] text-ink-500 mt-1 mb-3">Default style officers see when signing within the portal.</p>
+          <div class="grid grid-cols-3 gap-2 mb-4" id="sigStyles"></div>
+          <div class="grid grid-cols-3 gap-2">
+            <button class="border border-line rounded-lg py-3 text-[12.5px] inline-flex flex-col items-center gap-1 hover:bg-surface"><i data-lucide="pen-tool" class="w-4 h-4 text-primary"></i> Draw</button>
+            <button class="border border-line rounded-lg py-3 text-[12.5px] inline-flex flex-col items-center gap-1 hover:bg-surface"><i data-lucide="upload" class="w-4 h-4 text-primary"></i> Upload image</button>
+            <button class="border border-primary text-primary rounded-lg py-3 text-[12.5px] inline-flex flex-col items-center gap-1 bg-primary-light"><i data-lucide="type" class="w-4 h-4"></i> Typed (default)</button>
+          </div>
+        </div>
+
+        <!-- Portal branding -->
+        <div class="bg-white border border-line rounded-xl p-5">
+          <h3 class="text-[15px] font-bold text-ink-900">Portal branding</h3>
+          <p class="text-[12px] text-ink-500 mt-1 mb-4">Org-facing copy. Design tokens (colours, type) are fixed at this stage.</p>
+          <div class="space-y-3">
+            <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">Organisation name</span><input value="Ahmedabad Municipal Corporation" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13.5px]" /></label>
+            <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">Short name (shown in sidebar)</span><input value="Ahmedabad" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13.5px]" /></label>
+            <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">Public contact email</span><input value="procurement@amc.gov.in" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13.5px]" /></label>
+            <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">Helpline (procurement queries)</span><input value="+91 79 2659 1234" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13.5px]" /></label>
+            <div class="flex items-center justify-between border border-line rounded-lg px-3 py-2.5"><div><div class="text-[13px] text-ink-900 font-medium">Design tokens locked</div><div class="text-[11.5px] text-ink-500">Colour, type and spacing follow the TenderAI design system</div></div><div class="switch on" aria-disabled="true"></div></div>
+          </div>
+          <div class="mt-4 flex justify-end"><button onclick="showToast('Branding saved')" class="px-3 py-2 rounded-lg bg-primary text-white text-[13px] font-medium">Save branding</button></div>
+        </div>
+
+        <!-- Session & security -->
+        <div class="bg-white border border-line rounded-xl p-5">
+          <h3 class="text-[15px] font-bold text-ink-900">Session &amp; security</h3>
+          <div class="mt-4 space-y-3">
+            <div class="flex items-center justify-between border border-line rounded-lg px-3 py-2.5"><div><div class="text-[13px] text-ink-900 font-medium">Session timeout</div><div class="text-[11.5px] text-ink-500">Auto-logout after inactivity</div></div><select class="border border-line rounded-md px-2 py-1 text-[13px]"><option>15 min</option><option selected>30 min</option><option>60 min</option><option>2 hours</option></select></div>
+            <div class="flex items-center justify-between border border-line rounded-lg px-3 py-2.5"><div><div class="text-[13px] text-ink-900 font-medium">Password policy</div><div class="text-[11.5px] text-ink-500">Minimum length &amp; rotation</div></div><select class="border border-line rounded-md px-2 py-1 text-[13px]"><option>8 chars · 180d</option><option selected>10 chars + 1 symbol · 90d</option><option>12 chars + 2 symbols · 60d</option></select></div>
+            <div class="flex items-center justify-between border border-line rounded-lg px-3 py-2.5"><div><div class="text-[13px] text-ink-900 font-medium">Require 2FA for admins</div><div class="text-[11.5px] text-ink-500">TOTP authenticator app</div></div><div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="flex items-center justify-between border border-line rounded-lg px-3 py-2.5"><div><div class="text-[13px] text-ink-900 font-medium">Failed-login lockout</div><div class="text-[11.5px] text-ink-500">Block IP after N attempts</div></div><select class="border border-line rounded-md px-2 py-1 text-[13px]"><option>3 / 15 min</option><option selected>5 / 30 min</option><option>10 / 60 min</option></select></div>
+            <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">IP allowlist (admin-only)</span><textarea rows="3" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[12.5px] font-mono">10.0.0.0/24
+192.168.10.0/24
+49.36.0.0/16</textarea></label>
+          </div>
+          <div class="mt-4 flex justify-end"><button onclick="showToast('Security policy saved')" class="px-3 py-2 rounded-lg bg-primary text-white text-[13px] font-medium">Save security policy</button></div>
+        </div>
+
+        <!-- FY management -->
+        <div class="bg-white border border-line rounded-xl p-5">
+          <h3 class="text-[15px] font-bold text-ink-900">Financial Year management</h3>
+          <p class="text-[12px] text-ink-500 mt-1 mb-4">Switch the active FY for tender numbering, budgets and reports.</p>
+          <div class="space-y-2">
+            <label class="flex items-center justify-between border border-primary bg-primary-light rounded-lg px-3 py-2.5"><div><div class="text-[13px] text-primary font-bold">FY 2026-27 (current)</div><div class="text-[11.5px] text-ink-500">1 Apr 2026 → 31 Mar 2027</div></div><input type="radio" name="fy" checked class="accent-primary" /></label>
+            <label class="flex items-center justify-between border border-line rounded-lg px-3 py-2.5"><div><div class="text-[13px] text-ink-900">FY 2025-26 (closed)</div><div class="text-[11.5px] text-ink-500">1 Apr 2025 → 31 Mar 2026</div></div><input type="radio" name="fy" class="accent-primary" /></label>
+            <label class="flex items-center justify-between border border-line rounded-lg px-3 py-2.5"><div><div class="text-[13px] text-ink-900">FY 2027-28 (planning)</div><div class="text-[11.5px] text-ink-500">1 Apr 2027 → 31 Mar 2028</div></div><input type="radio" name="fy" class="accent-primary" /></label>
+          </div>
+          <div class="mt-4 flex justify-end"><button onclick="showToast('FY updated')" class="px-3 py-2 rounded-lg bg-primary text-white text-[13px] font-medium">Set active FY</button></div>
+        </div>
+
+        <!-- Audit log retention -->
+        <div class="bg-white border border-line rounded-xl p-5">
+          <h3 class="text-[15px] font-bold text-ink-900">Audit log retention</h3>
+          <p class="text-[12px] text-ink-500 mt-1 mb-4">Historical events visible in the Activity Trail and Compliance audit.</p>
+          <div class="space-y-3">
+            <div class="flex items-center justify-between border border-line rounded-lg px-3 py-2.5"><div><div class="text-[13px] text-ink-900 font-medium">Retention period</div><div class="text-[11.5px] text-ink-500">Older events are archived</div></div><select class="border border-line rounded-md px-2 py-1 text-[13px]"><option>1 year</option><option>3 years</option><option selected>7 years (CVC recommended)</option><option>Forever</option></select></div>
+            <div class="flex items-center justify-between border border-line rounded-lg px-3 py-2.5"><div><div class="text-[13px] text-ink-900 font-medium">Daily archive export</div><div class="text-[11.5px] text-ink-500">Push CSV to org-wide archive</div></div><div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="flex items-center justify-between border border-line rounded-lg px-3 py-2.5"><div><div class="text-[13px] text-ink-900 font-medium">Anonymise vendor PII in archives</div><div class="text-[11.5px] text-ink-500">GST/PAN partially masked</div></div><div class="switch" onclick="this.classList.toggle('on')"></div></div>
+          </div>
+          <div class="mt-4 flex gap-2 justify-end">
+            <button onclick="if (confirm('Clear local audit log? This cannot be undone.')) { localStorage.removeItem('adminAuditLog'); showToast('Local audit log cleared'); }" class="px-3 py-2 rounded-lg border border-danger text-danger text-[13px] font-medium hover:bg-danger-light">Clear local log</button>
+            <button onclick="showToast('Retention saved')" class="px-3 py-2 rounded-lg bg-primary text-white text-[13px] font-medium">Save</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-ink-900 text-white text-[13px] px-4 py-3 rounded-xl shadow-lift inline-flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-success"></i><span id="toastMsg">Done</span></div>
+
+<script>
+  function refreshIcons(){ if (window.lucide) lucide.createIcons(); }
+  let __toastTimer; function showToast(m){ const t=document.getElementById('toast'); document.getElementById('toastMsg').textContent=m; t.classList.add('show'); clearTimeout(__toastTimer); __toastTimer=setTimeout(()=>t.classList.remove('show'),2800); }
+  function bindDropdown(b,m){ const B=document.getElementById(b),M=document.getElementById(m); if(!B||!M)return; B.addEventListener('click',e=>{e.stopPropagation();M.classList.toggle('hidden');}); document.addEventListener('click',e=>{if(!M.contains(e.target)&&!B.contains(e.target))M.classList.add('hidden');}); }
+  function logAudit(a,t,m){ try{ const log=JSON.parse(localStorage.getItem('adminAuditLog')||'[]'); log.unshift({at:new Date().toISOString(),actor:'Rajesh Kumar',action:a,target:t,meta:m||null}); localStorage.setItem('adminAuditLog',JSON.stringify(log.slice(0,500))); }catch(e){} }
+  function seedOnce(k,v){ if(!localStorage.getItem(k)) localStorage.setItem(k,JSON.stringify(v)); }
+  bindDropdown('avatarBtn','avatarMenu');
+
+  /* Logo / seal library */
+  const SEED_LOGOS = [
+    { id:'L-1', name:'AMC primary logo', kind:'logo', isDefault:true,  uploaded:'2025-04-02' },
+    { id:'L-2', name:'AMC bilingual logo', kind:'logo', isDefault:false, uploaded:'2025-04-02' },
+    { id:'L-3', name:'Commissioner office seal', kind:'seal', isDefault:true,  uploaded:'2025-04-02' },
+    { id:'L-4', name:'Engineering dept seal',    kind:'seal', isDefault:false, uploaded:'2025-04-02' },
+  ];
+  seedOnce('admin_logos', SEED_LOGOS);
+  function loadL(){ return JSON.parse(localStorage.getItem('admin_logos') || '[]'); }
+  function saveL(l){ localStorage.setItem('admin_logos', JSON.stringify(l)); }
+
+  function renderLogos(){
+    document.getElementById('logoList').innerHTML = loadL().map(l => `
+      <li class="border border-line rounded-lg p-3">
+        <div class="aspect-[16/9] bg-surface rounded-md flex items-center justify-center text-ink-400"><i data-lucide="${l.kind==='logo'?'image':'stamp'}" class="w-6 h-6"></i></div>
+        <div class="mt-2 text-[12.5px] font-medium text-ink-900">${l.name}</div>
+        <div class="text-[11px] text-ink-500">${l.kind.toUpperCase()} · uploaded ${l.uploaded}</div>
+        <div class="mt-2 flex items-center justify-between">
+          ${l.isDefault ? '<span class="text-[11px] text-success font-semibold inline-flex items-center gap-1"><i data-lucide="check-circle-2" class="w-3 h-3"></i> Default</span>' : `<button onclick="setDefault('${l.id}')" class="text-[11.5px] text-primary font-medium hover:underline">Set default</button>`}
+          <button onclick="removeLogo('${l.id}')" class="text-[11.5px] text-ink-500 hover:text-danger">Remove</button>
+        </div>
+      </li>`).join('');
+    refreshIcons();
+  }
+  function onUploadLogo(file){
+    if (!file) return;
+    const list = loadL(); const id = 'L-' + Date.now();
+    list.unshift({ id, name: file.name, kind: file.name.toLowerCase().includes('seal')?'seal':'logo', isDefault:false, uploaded:new Date().toISOString().slice(0,10) });
+    saveL(list); renderLogos();
+    logAudit('Uploaded', `Logo/seal ${file.name}`); showToast('Asset uploaded to library');
+  }
+  function setDefault(id){
+    const list = loadL(); const tgt = list.find(x => x.id === id);
+    list.filter(x => x.kind === tgt.kind).forEach(x => x.isDefault = (x.id === id));
+    saveL(list); renderLogos();
+    logAudit('Set default', `${tgt.kind} ${tgt.name}`); showToast('Default updated');
+  }
+  function removeLogo(id){
+    const list = loadL(); const tgt = list.find(x => x.id === id);
+    if (tgt.isDefault){ showToast('Cannot remove the default — set another first'); return; }
+    saveL(list.filter(x => x.id !== id)); renderLogos();
+    logAudit('Removed', `Logo/seal ${tgt.name}`); showToast('Asset removed');
+  }
+
+  /* Signature styles preview */
+  const SIGS = ['Allison','Roboto Slab','Lavishly Yours'];
+  document.getElementById('sigStyles').innerHTML = SIGS.map((s,i) => `
+    <button class="border ${i===0?'border-primary bg-primary-light':'border-line'} rounded-lg py-2 px-2 text-center hover:bg-surface">
+      <div class="text-[15px] text-ink-900" style="font-family: 'Brush Script MT', cursive;">Rajesh Kumar</div>
+      <div class="text-[10.5px] text-ink-500 mt-1">${s}</div>
+    </button>`).join('');
+
+  renderLogos(); refreshIcons();
+</script>
+</body>
+</html>

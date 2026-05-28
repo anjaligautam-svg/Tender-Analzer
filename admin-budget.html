@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Budget Heads — TenderAI Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>
+    tailwind.config = { theme: { extend: {
+      fontFamily: { sans: ['"DM Sans"', 'system-ui', 'sans-serif'] },
+      colors: { primary:{DEFAULT:'#0F5EE8',light:'#EFF6FF',border:'#93C5FD'}, success:{DEFAULT:'#10B981',light:'#F0FDF4'}, warning:{DEFAULT:'#F59E0B',light:'#FFFBEB'}, danger:{DEFAULT:'#EF4444',light:'#FEF2F2'}, purple:{DEFAULT:'#8B5CF6',light:'#EEEDFE'}, ink:{900:'#111827',500:'#6B7280',400:'#9CA3AF'}, line:'#E5E7EB', surface:'#F9FAFB' },
+      boxShadow:{ soft:'0 1px 3px rgba(0,0,0,0.08)', lift:'0 4px 12px rgba(0,0,0,0.12)' }
+    }}};
+  </script>
+  <style>
+    html, body{ font-family:'DM Sans',system-ui,sans-serif; color:#111827; background:#F9FAFB; }
+    *:focus-visible{ outline:2px solid #0F5EE8; outline-offset:2px; border-radius:4px; }
+    ::-webkit-scrollbar{ width:10px; height:10px; } ::-webkit-scrollbar-thumb{ background:#E5E7EB; border-radius:8px; } ::-webkit-scrollbar-thumb:hover{ background:#D1D5DB; } ::-webkit-scrollbar-track{ background:transparent; }
+    .stat-card{ transition:all .15s ease; } .stat-card:hover{ box-shadow:0 4px 12px rgba(0,0,0,0.08); transform:translateY(-1px); }
+    .toast{ transform:translateY(80px); opacity:0; transition:transform .3s cubic-bezier(.2,.7,.2,1),opacity .25s ease; } .toast.show{ transform:translateY(0); opacity:1; }
+    .dropdown-shadow{ box-shadow:0 12px 32px rgba(17,24,39,0.14),0 2px 6px rgba(17,24,39,0.06); }
+    .side-panel{ transition:transform .28s ease; } .side-panel.closed{ transform:translateX(100%); }
+    .overlay-shade{ background:rgba(17,24,39,0.34); }
+    .tab.active{ color:#0F5EE8; border-color:#0F5EE8; }
+    @media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important;} }
+  </style>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+
+  <aside class="w-[244px] shrink-0 bg-white border-r border-line flex flex-col">
+    <div class="px-5 pt-5 pb-4 border-b border-line">
+      <div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-[15px]">T</div><div><div class="text-[15px] font-semibold text-ink-900 leading-tight">TenderAI</div><div class="text-[11px] text-ink-500 leading-tight">Admin Panel</div></div></div>
+      <button class="mt-4 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-line bg-surface hover:bg-white hover:shadow-soft transition"><div class="w-7 h-7 rounded-md bg-primary-light text-primary flex items-center justify-center"><i data-lucide="building-2" class="w-4 h-4"></i></div><div class="text-left flex-1 min-w-0"><div class="text-[12.5px] font-medium text-ink-900 truncate">Ahmedabad</div><div class="text-[10.5px] text-ink-500 truncate">Municipal Corporation</div></div><i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+    </div>
+    <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">OVERVIEW</div><ul class="space-y-0.5"><li><a href="admin.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Admin Dashboard</a></li></ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">ACCESS &amp; ORG</div><ul class="space-y-0.5">
+        <li><a href="admin-users.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="users" class="w-4 h-4"></i> User Management <span class="ml-auto bg-primary-light text-primary text-[10px] font-semibold rounded-full px-1.5 py-0.5">24</span></a></li>
+        <li><a href="admin-org.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="network" class="w-4 h-4"></i> Department &amp; Org</a></li>
+      </ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">CATALOG</div><ul class="space-y-0.5">
+        <li><a href="admin-templates.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="layout-template" class="w-4 h-4"></i> Tender Templates</a></li>
+        <li><a href="admin-budget.html" aria-current="page" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] bg-primary-light text-primary font-medium"><i data-lucide="wallet" class="w-4 h-4"></i> Budget Heads</a></li>
+        <li><a href="admin-dsr.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="table-2" class="w-4 h-4"></i> DSR Rates</a></li>
+        <li><a href="admin-vendors.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="store" class="w-4 h-4"></i> Vendor Registry <span class="ml-auto bg-danger text-white text-[10px] font-semibold rounded-full px-1.5 py-0.5">3</span></a></li>
+      </ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">GOVERNANCE</div><ul class="space-y-0.5">
+        <li><a href="admin-compliance.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="shield-check" class="w-4 h-4"></i> Compliance &amp; Audit</a></li>
+        <li><a href="admin-reports.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Reports &amp; Analytics</a></li>
+      </ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">SYSTEM</div><ul class="space-y-0.5">
+        <li><a href="admin-notifications.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="bell-ring" class="w-4 h-4"></i> Notifications</a></li>
+        <li><a href="admin-settings.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="settings" class="w-4 h-4"></i> System Settings</a></li>
+      </ul></div>
+      <div class="pt-2 border-t border-line"><ul class="space-y-0.5"><li><a href="index.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="arrow-left" class="w-4 h-4"></i> Procurement Portal</a></li></ul></div>
+    </nav>
+    <div class="border-t border-line px-4 py-3 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div><div class="flex-1 min-w-0"><div class="text-[12.5px] font-medium text-ink-900 truncate">Rajesh Kumar</div><div class="text-[10.5px] text-ink-500 truncate">Super Admin</div></div><button onclick="sessionStorage.clear(); location.href='login.html'" class="text-ink-400 hover:text-ink-900"><i data-lucide="log-out" class="w-4 h-4"></i></button></div>
+  </aside>
+
+  <div class="flex-1 flex flex-col min-w-0">
+    <header class="h-16 bg-white border-b border-line px-6 flex items-center gap-4 sticky top-0 z-30">
+      <button class="text-ink-500 hover:text-ink-900"><i data-lucide="panel-left" class="w-5 h-5"></i></button>
+      <div class="flex-1 max-w-xl relative"><i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i><input type="search" placeholder="Search budget heads, schemes…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] placeholder:text-ink-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" /></div>
+      <button class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">FY 2026-27 <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+      <button class="relative w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500"><i data-lucide="bell" class="w-4 h-4"></i><span class="absolute -top-1 -right-1 bg-danger text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">5</span></button>
+      <div class="relative">
+        <button id="avatarBtn" class="flex items-center gap-2 pl-2 border-l border-line"><div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div><div class="hidden md:block text-left"><div class="text-[12.5px] font-medium text-ink-900 leading-tight">Rajesh Kumar</div><div class="text-[10.5px] text-ink-500 leading-tight">Super Admin</div></div><i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+        <div id="avatarMenu" class="hidden absolute right-0 mt-2 w-[240px] bg-white border border-line rounded-xl dropdown-shadow z-40 py-1.5">
+          <a href="#" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="user" class="w-4 h-4 text-ink-500"></i> My profile</a>
+          <a href="admin.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] bg-primary-light text-primary font-medium mx-1.5 rounded-md"><i data-lucide="shield" class="w-4 h-4"></i> Admin Panel</a>
+          <a href="index.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="layout-dashboard" class="w-4 h-4 text-ink-500"></i> Procurement Portal</a>
+          <a href="admin-settings.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="settings" class="w-4 h-4 text-ink-500"></i> System Settings</a>
+          <div class="my-1.5 border-t border-line"></div>
+          <a href="#" onclick="sessionStorage.clear(); location.href='login.html'; return false;" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-danger hover:bg-danger-light"><i data-lucide="log-out" class="w-4 h-4"></i> Sign out</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto px-8 py-6 space-y-7 min-w-0 relative">
+
+      <section class="flex items-start justify-between flex-wrap gap-3">
+        <div>
+          <div class="text-[13px] text-ink-500 mb-2"><a href="admin.html" class="hover:underline">Admin Panel</a> · Catalog</div>
+          <h1 class="text-[24px] font-bold text-ink-900 leading-tight">Budget Head Management</h1>
+          <p class="text-[14px] text-ink-500 mt-1">Heads, scheme/grant references, department allocations and utilisation.</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="openSchemes()" class="px-3 py-2 rounded-lg border border-line text-[13px] hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="layers" class="w-4 h-4"></i> Schemes / grants</button>
+          <button onclick="openHeadPanel()" class="px-3 py-2 rounded-lg bg-primary text-white text-[13px] font-medium inline-flex items-center gap-1.5 shadow-soft hover:bg-primary/90"><i data-lucide="plus" class="w-4 h-4"></i> Add budget head</button>
+        </div>
+      </section>
+
+      <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="stat-card bg-white border border-line rounded-xl p-5"><div class="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center mb-2"><i data-lucide="wallet" class="w-4 h-4"></i></div><div class="text-[26px] font-bold text-ink-900 leading-none" id="kpiHeads">0</div><div class="text-[12px] text-ink-500 mt-1">Budget heads (FY 2026-27)</div></div>
+        <div class="stat-card bg-white border border-line rounded-xl p-5"><div class="w-9 h-9 rounded-lg bg-success-light text-success flex items-center justify-center mb-2"><i data-lucide="banknote" class="w-4 h-4"></i></div><div class="text-[26px] font-bold text-ink-900 leading-none" id="kpiAlloc">0</div><div class="text-[12px] text-ink-500 mt-1">Allocated (₹ Cr)</div></div>
+        <div class="stat-card bg-white border border-line rounded-xl p-5"><div class="w-9 h-9 rounded-lg bg-warning-light text-warning flex items-center justify-center mb-2"><i data-lucide="trending-up" class="w-4 h-4"></i></div><div class="text-[26px] font-bold text-ink-900 leading-none" id="kpiComm">0</div><div class="text-[12px] text-ink-500 mt-1">Committed (₹ Cr)</div></div>
+        <div class="stat-card bg-white border border-line rounded-xl p-5"><div class="w-9 h-9 rounded-lg bg-purple-light text-purple flex items-center justify-center mb-2"><i data-lucide="piggy-bank" class="w-4 h-4"></i></div><div class="text-[26px] font-bold text-ink-900 leading-none" id="kpiAvail">0</div><div class="text-[12px] text-ink-500 mt-1">Available (₹ Cr)</div></div>
+      </section>
+
+      <!-- Dept utilisation -->
+      <section class="bg-white border border-line rounded-xl p-5">
+        <div class="flex items-center justify-between mb-4"><h2 class="text-[16px] font-bold text-ink-900">Allocation &amp; utilisation by department · FY 2026-27</h2><span class="text-[11.5px] text-ink-500">Bars are consistent with the admin dashboard</span></div>
+        <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3" id="deptBars"></ul>
+      </section>
+
+      <!-- Heads table -->
+      <section class="space-y-3">
+        <div class="bg-white border border-line rounded-xl p-3 flex items-center gap-2 flex-wrap">
+          <div class="flex-1 min-w-[260px] relative"><i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i><input id="search" type="search" oninput="renderHeads()" placeholder="Search head code, name, scheme…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" /></div>
+          <select id="fDept" onchange="renderHeads()" class="px-3 py-2 rounded-lg border border-line bg-white text-[13px]"><option value="">All departments</option></select>
+          <select id="fFY" onchange="renderHeads()" class="px-3 py-2 rounded-lg border border-line bg-white text-[13px]"><option>FY 2026-27</option><option>FY 2025-26</option></select>
+        </div>
+        <div class="bg-white border border-line rounded-xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-[13.5px]">
+              <thead class="bg-surface border-b border-line"><tr class="text-[11.5px] uppercase tracking-wider text-ink-500 font-semibold">
+                <th class="text-left px-5 py-3">Head</th><th class="text-left px-5 py-3">Scheme / grant</th><th class="text-left px-5 py-3">Department</th>
+                <th class="text-left px-5 py-3">FY</th><th class="text-right px-5 py-3">Allocated</th><th class="text-right px-5 py-3">Committed</th>
+                <th class="text-right px-5 py-3">Available</th><th class="text-left px-5 py-3">Utilisation</th><th class="text-right px-5 py-3">Action</th>
+              </tr></thead>
+              <tbody id="headsBody" class="divide-y divide-line"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Add/Edit head panel -->
+      <div id="panelShade" class="hidden absolute inset-0 overlay-shade z-30" onclick="closeHeadPanel()"></div>
+      <aside id="headPanel" class="side-panel closed absolute top-0 right-0 h-full w-[720px] max-w-full bg-white border-l border-line z-40 flex flex-col">
+        <div class="px-6 py-4 border-b border-line flex items-center justify-between shrink-0"><div><div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold" id="hpMode">Add</div><h2 class="text-[18px] font-bold text-ink-900 mt-0.5" id="hpTitle">New budget head</h2></div><button onclick="closeHeadPanel()" class="text-ink-400 hover:text-ink-900"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+        <div class="flex-1 overflow-y-auto px-6 py-5 space-y-5" id="hpBody"></div>
+        <div class="px-6 py-3 border-t border-line flex justify-end gap-2 shrink-0"><button onclick="closeHeadPanel()" class="px-3 py-2 rounded-lg border border-line text-[13px] hover:bg-surface">Cancel</button><button onclick="saveHead()" class="px-3 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90">Save head</button></div>
+      </aside>
+
+      <!-- Drilldown panel: linked DPRs/tenders -->
+      <aside id="drillPanel" class="side-panel closed absolute top-0 right-0 h-full w-[720px] max-w-full bg-white border-l border-line z-40 flex flex-col">
+        <div class="px-6 py-4 border-b border-line flex items-center justify-between shrink-0"><div><div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold">Linked DPRs &amp; tenders</div><h2 class="text-[18px] font-bold text-ink-900 mt-0.5" id="drillTitle">Head</h2></div><button onclick="closeDrill()" class="text-ink-400 hover:text-ink-900"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+        <div class="flex-1 overflow-y-auto px-6 py-5" id="drillBody"></div>
+      </aside>
+
+      <!-- Schemes panel -->
+      <aside id="schemesPanel" class="side-panel closed absolute top-0 right-0 h-full w-[720px] max-w-full bg-white border-l border-line z-40 flex flex-col">
+        <div class="px-6 py-4 border-b border-line flex items-center justify-between shrink-0"><div><div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold">Registry</div><h2 class="text-[18px] font-bold text-ink-900 mt-0.5">Schemes &amp; grants</h2></div><button onclick="closeSchemes()" class="text-ink-400 hover:text-ink-900"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+        <div class="flex-1 overflow-y-auto px-6 py-5 space-y-3" id="schemesBody"></div>
+      </aside>
+
+    </main>
+  </div>
+</div>
+
+<div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-ink-900 text-white text-[13px] px-4 py-3 rounded-xl shadow-lift inline-flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-success"></i><span id="toastMsg">Done</span></div>
+
+<script>
+  function refreshIcons(){ if (window.lucide) lucide.createIcons(); }
+  let __toastTimer; function showToast(m){ const t=document.getElementById('toast'); document.getElementById('toastMsg').textContent=m; t.classList.add('show'); clearTimeout(__toastTimer); __toastTimer=setTimeout(()=>t.classList.remove('show'),2800); }
+  function bindDropdown(b,m){ const B=document.getElementById(b),M=document.getElementById(m); if(!B||!M)return; B.addEventListener('click',e=>{e.stopPropagation();M.classList.toggle('hidden');}); document.addEventListener('click',e=>{if(!M.contains(e.target)&&!B.contains(e.target))M.classList.add('hidden');}); }
+  function logAudit(a,t,m){ try{ const log=JSON.parse(localStorage.getItem('adminAuditLog')||'[]'); log.unshift({at:new Date().toISOString(),actor:'Rajesh Kumar',action:a,target:t,meta:m||null}); localStorage.setItem('adminAuditLog',JSON.stringify(log.slice(0,500))); }catch(e){} }
+  function seedOnce(k,v){ if(!localStorage.getItem(k)) localStorage.setItem(k,JSON.stringify(v)); }
+  bindDropdown('avatarBtn','avatarMenu');
+
+  const SCHEMES = [
+    { id:'SCH-AMRUT',     name:'AMRUT 2.0',                       sponsor:'MoHUA, GoI' },
+    { id:'SCH-SBM',       name:'Swachh Bharat Mission (Urban)',   sponsor:'MoHUA, GoI' },
+    { id:'SCH-PMGSY',     name:'PMGSY-IV',                        sponsor:'MoRD, GoI' },
+    { id:'SCH-15FC-GRANT',name:'15th FC Grant — Urban',           sponsor:'Finance Commission' },
+    { id:'SCH-AMC-OWN',   name:'AMC own revenue',                 sponsor:'Ahmedabad Municipal Corporation' },
+    { id:'SCH-IT-MOD',    name:'IT Modernisation Plan',           sponsor:'Gujarat State Govt' },
+  ];
+
+  const HEADS = [
+    { id:'BH-WAT-01', name:'Water Supply Pipeline Capex', scheme:'SCH-AMRUT',     dept:'Water',          fy:'FY 2026-27', alloc:6.5, comm:5.1, util:78 },
+    { id:'BH-WAT-02', name:'Water O&amp;M Annual',         scheme:'SCH-AMC-OWN',   dept:'Water',          fy:'FY 2026-27', alloc:7.7, comm:5.9, util:77 },
+    { id:'BH-INF-01', name:'Road Resurfacing FY27',        scheme:'SCH-PMGSY',     dept:'Infrastructure', fy:'FY 2026-27', alloc:14.0,comm:8.7, util:62 },
+    { id:'BH-INF-02', name:'Bridge Maintenance',           scheme:'SCH-15FC-GRANT',dept:'Infrastructure', fy:'FY 2026-27', alloc:8.8, comm:5.4, util:62 },
+    { id:'BH-IT-01',  name:'IT Hardware Refresh',          scheme:'SCH-IT-MOD',    dept:'IT',             fy:'FY 2026-27', alloc:4.2, comm:2.3, util:54 },
+    { id:'BH-IT-02',  name:'Cybersecurity Tools',          scheme:'SCH-IT-MOD',    dept:'IT',             fy:'FY 2026-27', alloc:2.2, comm:1.1, util:50 },
+    { id:'BH-SAN-01', name:'Solid Waste Equipment',        scheme:'SCH-SBM',       dept:'Sanitation',     fy:'FY 2026-27', alloc:9.1, comm:4.4, util:48 },
+    { id:'BH-ENG-01', name:'Street Lighting LED',          scheme:'SCH-AMC-OWN',   dept:'Engineering',    fy:'FY 2026-27', alloc:6.6, comm:2.7, util:41 },
+    { id:'BH-ENG-02', name:'Stormwater Drains',            scheme:'SCH-AMRUT',     dept:'Engineering',    fy:'FY 2026-27', alloc:5.0, comm:2.1, util:42 },
+    { id:'BH-URB-01', name:'Riverfront Redevelopment',     scheme:'SCH-15FC-GRANT',dept:'Urban Dev',      fy:'FY 2026-27', alloc:15.2,comm:4.7, util:31 },
+    { id:'BH-PRK-01', name:'Park Renovation',              scheme:'SCH-AMC-OWN',   dept:'Parks',          fy:'FY 2026-27', alloc:4.0, comm:0.9, util:22 },
+  ];
+  seedOnce('admin_budget', HEADS);
+  function load(){ return JSON.parse(localStorage.getItem('admin_budget') || '[]'); }
+  function save(l){ localStorage.setItem('admin_budget', JSON.stringify(l)); }
+
+  const DEPTS = ['Water','Infrastructure','IT','Sanitation','Engineering','Urban Dev','Parks'];
+  document.getElementById('fDept').innerHTML = '<option value="">All departments</option>' + DEPTS.map(d => `<option>${d}</option>`).join('');
+
+  function fmt(n){ return '₹' + n.toFixed(2).replace(/\.00$/, '') + ' Cr'; }
+
+  function renderKpis(){
+    const list = load().filter(h => h.fy === 'FY 2026-27');
+    const alloc = list.reduce((s,h) => s + h.alloc, 0), comm = list.reduce((s,h) => s + h.comm, 0);
+    document.getElementById('kpiHeads').textContent = list.length;
+    document.getElementById('kpiAlloc').textContent = alloc.toFixed(1);
+    document.getElementById('kpiComm').textContent  = comm.toFixed(1);
+    document.getElementById('kpiAvail').textContent = (alloc - comm).toFixed(1);
+  }
+  function renderDeptBars(){
+    const list = load().filter(h => h.fy === 'FY 2026-27');
+    const by = {}; list.forEach(h => { by[h.dept] = by[h.dept] || { alloc:0, comm:0 }; by[h.dept].alloc += h.alloc; by[h.dept].comm += h.comm; });
+    document.getElementById('deptBars').innerHTML = DEPTS.map(d => {
+      const r = by[d] || { alloc:0, comm:0 }; const pct = r.alloc ? Math.round(r.comm/r.alloc*100) : 0;
+      const cls = pct >= 75 ? 'bg-danger' : pct >= 55 ? 'bg-warning' : 'bg-primary';
+      return `<li>
+        <div class="flex items-center justify-between text-[12.5px]"><span class="text-ink-900 font-medium">${d}</span><span class="text-ink-500">${pct}% · ${fmt(r.comm)} of ${fmt(r.alloc)}</span></div>
+        <div class="mt-1.5 h-1.5 rounded-full bg-line overflow-hidden"><div class="h-full ${cls}" style="width:${pct}%"></div></div>
+      </li>`;
+    }).join('');
+  }
+  function renderHeads(){
+    const q = (document.getElementById('search').value || '').toLowerCase();
+    const fD = document.getElementById('fDept').value, fFy = document.getElementById('fFY').value;
+    const list = load().filter(h => (!q || (h.id+h.name+h.scheme).toLowerCase().includes(q)) && (!fD || h.dept === fD) && (!fFy || h.fy === fFy));
+    document.getElementById('headsBody').innerHTML = list.map(h => {
+      const cls = h.util >= 75 ? 'bg-danger' : h.util >= 55 ? 'bg-warning' : 'bg-primary';
+      const scheme = SCHEMES.find(s => s.id === h.scheme); const schemeName = scheme ? scheme.name : h.scheme;
+      const avail = (h.alloc - h.comm);
+      return `<tr class="hover:bg-surface transition">
+        <td class="px-5 py-3.5"><div class="font-medium text-ink-900">${h.name}</div><div class="text-[11.5px] text-ink-500 font-mono">${h.id}</div></td>
+        <td class="px-5 py-3.5 text-ink-900">${schemeName}</td>
+        <td class="px-5 py-3.5 text-ink-900">${h.dept}</td>
+        <td class="px-5 py-3.5 text-ink-500">${h.fy}</td>
+        <td class="px-5 py-3.5 text-right text-ink-900 font-medium">${fmt(h.alloc)}</td>
+        <td class="px-5 py-3.5 text-right text-ink-900">${fmt(h.comm)}</td>
+        <td class="px-5 py-3.5 text-right text-success font-medium">${fmt(avail)}</td>
+        <td class="px-5 py-3.5"><div class="w-32"><div class="text-[11.5px] text-ink-500">${h.util}%</div><div class="mt-1 h-1.5 rounded-full bg-line overflow-hidden"><div class="h-full ${cls}" style="width:${h.util}%"></div></div></div></td>
+        <td class="px-5 py-3.5 text-right"><div class="flex gap-1 justify-end"><button onclick="openDrill('${h.id}')" class="px-2 py-1.5 rounded-md border border-line text-[12px] hover:bg-surface inline-flex items-center gap-1"><i data-lucide="link-2" class="w-3.5 h-3.5"></i> Linked</button><button onclick="openHeadPanel('${h.id}')" class="px-2 py-1.5 rounded-md border border-line text-[12px] hover:bg-surface">Edit</button></div></td>
+      </tr>`;
+    }).join('') || `<tr><td colspan="9" class="px-5 py-10 text-center text-ink-500 text-[13px]">No budget heads match these filters.</td></tr>`;
+    refreshIcons();
+  }
+
+  /* Add/Edit head */
+  let currentId = null;
+  function openHeadPanel(id){
+    currentId = id || null;
+    const h = id ? load().find(x => x.id === id) : { id:'', name:'', scheme:SCHEMES[0].id, dept:'Water', fy:'FY 2026-27', alloc:0, comm:0, util:0 };
+    document.getElementById('hpMode').textContent = id ? 'Edit' : 'Add';
+    document.getElementById('hpTitle').textContent = id ? h.name : 'New budget head';
+    document.getElementById('hpBody').innerHTML = `
+      <div class="grid grid-cols-2 gap-3">
+        <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">Head code</span><input id="hf_id" value="${h.id||''}" placeholder="e.g. BH-WAT-03" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13.5px] font-mono" ${id?'readonly':''} /></label>
+        <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">FY</span><select id="hf_fy" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13.5px]"><option ${h.fy==='FY 2026-27'?'selected':''}>FY 2026-27</option><option ${h.fy==='FY 2025-26'?'selected':''}>FY 2025-26</option></select></label>
+      </div>
+      <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">Name</span><input id="hf_name" value="${h.name||''}" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13.5px]" /></label>
+      <div class="grid grid-cols-2 gap-3">
+        <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">Scheme / grant</span><select id="hf_scheme" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13.5px]">${SCHEMES.map(s => `<option value="${s.id}" ${h.scheme===s.id?'selected':''}>${s.name} · ${s.sponsor}</option>`).join('')}</select></label>
+        <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">Department</span><select id="hf_dept" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13.5px]">${DEPTS.map(d => `<option ${h.dept===d?'selected':''}>${d}</option>`).join('')}</select></label>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">Allocated (₹ Cr)</span><input id="hf_alloc" type="number" min="0" step="0.1" value="${h.alloc}" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13.5px]" /></label>
+        <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">Committed (₹ Cr)</span><input id="hf_comm" type="number" min="0" step="0.1" value="${h.comm}" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13.5px]" /></label>
+      </div>
+      <div class="bg-surface border border-line rounded-lg px-3 py-2 text-[12.5px] text-ink-500">Available = Allocated − Committed.</div>
+    `;
+    document.getElementById('headPanel').classList.remove('closed'); document.getElementById('panelShade').classList.remove('hidden');
+  }
+  function closeHeadPanel(){ document.getElementById('headPanel').classList.add('closed'); document.getElementById('panelShade').classList.add('hidden'); }
+  function saveHead(){
+    const list = load();
+    const data = { id: document.getElementById('hf_id').value.trim(), name: document.getElementById('hf_name').value.trim(), scheme: document.getElementById('hf_scheme').value, dept: document.getElementById('hf_dept').value, fy: document.getElementById('hf_fy').value, alloc: parseFloat(document.getElementById('hf_alloc').value||0), comm: parseFloat(document.getElementById('hf_comm').value||0) };
+    if (!data.id || !data.name){ showToast('Head code and name are required'); return; }
+    data.util = data.alloc ? Math.round(data.comm/data.alloc*100) : 0;
+    if (currentId){
+      const i = list.findIndex(x => x.id === currentId); list[i] = { ...list[i], ...data };
+      logAudit('Updated', `Budget head ${data.id}`);
+    } else {
+      if (list.find(x => x.id === data.id)){ showToast('Head code already exists'); return; }
+      list.push(data); logAudit('Created', `Budget head ${data.id} (${data.name})`);
+    }
+    save(list); closeHeadPanel(); renderKpis(); renderDeptBars(); renderHeads(); showToast('Head saved');
+  }
+
+  /* Drilldown */
+  function openDrill(id){
+    const h = load().find(x => x.id === id); if (!h) return;
+    document.getElementById('drillTitle').textContent = h.name + ' · ' + h.id;
+    const linked = [
+      { type:'DPR',    id:'DPR-2026-001', name:'Initial estimate', amount:0.6, status:'Approved' },
+      { type:'Tender', id:'TND-2026-001', name:'Tender package',   amount:1.8, status:'Published' },
+      { type:'Tender', id:'TND-2026-003', name:'Add-on works',     amount:2.2, status:'Under evaluation' },
+      { type:'PO',     id:'PO-2025-118',  name:'Spillover from FY25-26', amount:0.5, status:'Closed' },
+    ];
+    document.getElementById('drillBody').innerHTML = `
+      <div class="grid grid-cols-3 gap-3 mb-4">
+        <div class="border border-line rounded-lg p-3"><div class="text-[11.5px] text-ink-500">Allocated</div><div class="text-[18px] font-bold text-ink-900 mt-1">${fmt(h.alloc)}</div></div>
+        <div class="border border-line rounded-lg p-3"><div class="text-[11.5px] text-ink-500">Committed</div><div class="text-[18px] font-bold text-ink-900 mt-1">${fmt(h.comm)}</div></div>
+        <div class="border border-line rounded-lg p-3"><div class="text-[11.5px] text-ink-500">Available</div><div class="text-[18px] font-bold text-success mt-1">${fmt(h.alloc-h.comm)}</div></div>
+      </div>
+      <div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold mb-2">Linked DPRs &amp; tenders</div>
+      <table class="w-full text-[13px] border border-line rounded-xl overflow-hidden"><thead class="bg-surface border-b border-line"><tr class="text-[11.5px] uppercase tracking-wider text-ink-500"><th class="text-left px-3 py-2">Ref</th><th class="text-left px-3 py-2">Description</th><th class="text-right px-3 py-2">Amount</th><th class="text-left px-3 py-2">Status</th></tr></thead><tbody class="divide-y divide-line">
+        ${linked.map(l => `<tr><td class="px-3 py-2"><span class="font-mono text-[12px]">${l.id}</span> <span class="text-ink-500">· ${l.type}</span></td><td class="px-3 py-2 text-ink-900">${l.name}</td><td class="px-3 py-2 text-right text-ink-900">${fmt(l.amount)}</td><td class="px-3 py-2 text-ink-500">${l.status}</td></tr>`).join('')}
+      </tbody></table>
+    `;
+    document.getElementById('drillPanel').classList.remove('closed'); document.getElementById('panelShade').classList.remove('hidden');
+  }
+  function closeDrill(){ document.getElementById('drillPanel').classList.add('closed'); document.getElementById('panelShade').classList.add('hidden'); }
+
+  /* Schemes */
+  function openSchemes(){
+    document.getElementById('schemesBody').innerHTML = SCHEMES.map(s => `
+      <div class="border border-line rounded-xl p-4 flex items-start gap-3"><div class="w-9 h-9 rounded-lg bg-purple-light text-purple flex items-center justify-center"><i data-lucide="layers" class="w-4 h-4"></i></div><div class="flex-1"><div class="text-[14px] font-bold text-ink-900">${s.name}</div><div class="text-[12px] text-ink-500">${s.sponsor}</div><div class="text-[11.5px] text-ink-400 font-mono mt-1">${s.id}</div></div></div>`).join('');
+    document.getElementById('schemesPanel').classList.remove('closed'); document.getElementById('panelShade').classList.remove('hidden'); refreshIcons();
+  }
+  function closeSchemes(){ document.getElementById('schemesPanel').classList.add('closed'); document.getElementById('panelShade').classList.add('hidden'); }
+
+  renderKpis(); renderDeptBars(); renderHeads(); refreshIcons();
+</script>
+</body>
+</html>

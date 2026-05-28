@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vendor Registry — TenderAI Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>
+    tailwind.config = { theme: { extend: {
+      fontFamily: { sans: ['"DM Sans"', 'system-ui', 'sans-serif'] },
+      colors: { primary:{DEFAULT:'#0F5EE8',light:'#EFF6FF',border:'#93C5FD'}, success:{DEFAULT:'#10B981',light:'#F0FDF4'}, warning:{DEFAULT:'#F59E0B',light:'#FFFBEB'}, danger:{DEFAULT:'#EF4444',light:'#FEF2F2'}, purple:{DEFAULT:'#8B5CF6',light:'#EEEDFE'}, ink:{900:'#111827',500:'#6B7280',400:'#9CA3AF'}, line:'#E5E7EB', surface:'#F9FAFB' },
+      boxShadow:{ soft:'0 1px 3px rgba(0,0,0,0.08)', lift:'0 4px 12px rgba(0,0,0,0.12)' }
+    }}};
+  </script>
+  <style>
+    html, body{ font-family:'DM Sans',system-ui,sans-serif; color:#111827; background:#F9FAFB; }
+    *:focus-visible{ outline:2px solid #0F5EE8; outline-offset:2px; border-radius:4px; }
+    ::-webkit-scrollbar{ width:10px; height:10px; } ::-webkit-scrollbar-thumb{ background:#E5E7EB; border-radius:8px; } ::-webkit-scrollbar-thumb:hover{ background:#D1D5DB; } ::-webkit-scrollbar-track{ background:transparent; }
+    .stat-card{ transition:all .15s ease; } .stat-card:hover{ box-shadow:0 4px 12px rgba(0,0,0,0.08); transform:translateY(-1px); }
+    .toast{ transform:translateY(80px); opacity:0; transition:transform .3s cubic-bezier(.2,.7,.2,1),opacity .25s ease; } .toast.show{ transform:translateY(0); opacity:1; }
+    .dropdown-shadow{ box-shadow:0 12px 32px rgba(17,24,39,0.14),0 2px 6px rgba(17,24,39,0.06); }
+    .side-panel{ transition:transform .28s ease; } .side-panel.closed{ transform:translateX(100%); }
+    .overlay-shade{ background:rgba(17,24,39,0.34); }
+    .tab.active{ color:#0F5EE8; border-color:#0F5EE8; }
+    @media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important;} }
+  </style>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+
+  <aside class="w-[244px] shrink-0 bg-white border-r border-line flex flex-col">
+    <div class="px-5 pt-5 pb-4 border-b border-line">
+      <div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-[15px]">T</div><div><div class="text-[15px] font-semibold text-ink-900 leading-tight">TenderAI</div><div class="text-[11px] text-ink-500 leading-tight">Admin Panel</div></div></div>
+      <button class="mt-4 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-line bg-surface hover:bg-white hover:shadow-soft transition"><div class="w-7 h-7 rounded-md bg-primary-light text-primary flex items-center justify-center"><i data-lucide="building-2" class="w-4 h-4"></i></div><div class="text-left flex-1 min-w-0"><div class="text-[12.5px] font-medium text-ink-900 truncate">Ahmedabad</div><div class="text-[10.5px] text-ink-500 truncate">Municipal Corporation</div></div><i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+    </div>
+    <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">OVERVIEW</div><ul class="space-y-0.5"><li><a href="admin.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Admin Dashboard</a></li></ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">ACCESS &amp; ORG</div><ul class="space-y-0.5">
+        <li><a href="admin-users.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="users" class="w-4 h-4"></i> User Management <span class="ml-auto bg-primary-light text-primary text-[10px] font-semibold rounded-full px-1.5 py-0.5">24</span></a></li>
+        <li><a href="admin-org.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="network" class="w-4 h-4"></i> Department &amp; Org</a></li>
+      </ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">CATALOG</div><ul class="space-y-0.5">
+        <li><a href="admin-templates.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="layout-template" class="w-4 h-4"></i> Tender Templates</a></li>
+        <li><a href="admin-budget.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="wallet" class="w-4 h-4"></i> Budget Heads</a></li>
+        <li><a href="admin-dsr.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="table-2" class="w-4 h-4"></i> DSR Rates</a></li>
+        <li><a href="admin-vendors.html" aria-current="page" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] bg-primary-light text-primary font-medium"><i data-lucide="store" class="w-4 h-4"></i> Vendor Registry <span class="ml-auto bg-danger text-white text-[10px] font-semibold rounded-full px-1.5 py-0.5">3</span></a></li>
+      </ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">GOVERNANCE</div><ul class="space-y-0.5">
+        <li><a href="admin-compliance.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="shield-check" class="w-4 h-4"></i> Compliance &amp; Audit</a></li>
+        <li><a href="admin-reports.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Reports &amp; Analytics</a></li>
+      </ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">SYSTEM</div><ul class="space-y-0.5">
+        <li><a href="admin-notifications.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="bell-ring" class="w-4 h-4"></i> Notifications</a></li>
+        <li><a href="admin-settings.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="settings" class="w-4 h-4"></i> System Settings</a></li>
+      </ul></div>
+      <div class="pt-2 border-t border-line"><ul class="space-y-0.5"><li><a href="index.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="arrow-left" class="w-4 h-4"></i> Procurement Portal</a></li></ul></div>
+    </nav>
+    <div class="border-t border-line px-4 py-3 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div><div class="flex-1 min-w-0"><div class="text-[12.5px] font-medium text-ink-900 truncate">Rajesh Kumar</div><div class="text-[10.5px] text-ink-500 truncate">Super Admin</div></div><button onclick="sessionStorage.clear(); location.href='login.html'" class="text-ink-400 hover:text-ink-900"><i data-lucide="log-out" class="w-4 h-4"></i></button></div>
+  </aside>
+
+  <div class="flex-1 flex flex-col min-w-0">
+    <header class="h-16 bg-white border-b border-line px-6 flex items-center gap-4 sticky top-0 z-30">
+      <button class="text-ink-500 hover:text-ink-900"><i data-lucide="panel-left" class="w-5 h-5"></i></button>
+      <div class="flex-1 max-w-xl relative"><i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i><input type="search" placeholder="Search vendors…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] placeholder:text-ink-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" /></div>
+      <button class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">FY 2026-27 <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+      <button class="relative w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500"><i data-lucide="bell" class="w-4 h-4"></i><span class="absolute -top-1 -right-1 bg-danger text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">5</span></button>
+      <div class="relative">
+        <button id="avatarBtn" class="flex items-center gap-2 pl-2 border-l border-line"><div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div><div class="hidden md:block text-left"><div class="text-[12.5px] font-medium text-ink-900 leading-tight">Rajesh Kumar</div><div class="text-[10.5px] text-ink-500 leading-tight">Super Admin</div></div><i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+        <div id="avatarMenu" class="hidden absolute right-0 mt-2 w-[240px] bg-white border border-line rounded-xl dropdown-shadow z-40 py-1.5">
+          <a href="#" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="user" class="w-4 h-4 text-ink-500"></i> My profile</a>
+          <a href="admin.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] bg-primary-light text-primary font-medium mx-1.5 rounded-md"><i data-lucide="shield" class="w-4 h-4"></i> Admin Panel</a>
+          <a href="index.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="layout-dashboard" class="w-4 h-4 text-ink-500"></i> Procurement Portal</a>
+          <a href="admin-settings.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="settings" class="w-4 h-4 text-ink-500"></i> System Settings</a>
+          <div class="my-1.5 border-t border-line"></div>
+          <a href="#" onclick="sessionStorage.clear(); location.href='login.html'; return false;" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-danger hover:bg-danger-light"><i data-lucide="log-out" class="w-4 h-4"></i> Sign out</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto px-8 py-6 space-y-7 min-w-0 relative">
+
+      <section class="flex items-start justify-between flex-wrap gap-3">
+        <div>
+          <div class="text-[13px] text-ink-500 mb-2"><a href="admin.html" class="hover:underline">Admin Panel</a> · Catalog</div>
+          <h1 class="text-[24px] font-bold text-ink-900 leading-tight">Vendor Registry</h1>
+          <p class="text-[14px] text-ink-500 mt-1">Empanelled vendors, MSME status, performance and blacklist management.</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="exportCsv()" class="px-3 py-2 rounded-lg border border-line text-[13px] hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="download" class="w-4 h-4"></i> Export</button>
+          <button onclick="openVendorPanel()" class="px-3 py-2 rounded-lg bg-primary text-white text-[13px] font-medium inline-flex items-center gap-1.5 shadow-soft hover:bg-primary/90"><i data-lucide="plus" class="w-4 h-4"></i> Register vendor</button>
+        </div>
+      </section>
+
+      <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="stat-card bg-white border border-line rounded-xl p-5"><div class="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center mb-2"><i data-lucide="store" class="w-4 h-4"></i></div><div class="text-[26px] font-bold text-ink-900 leading-none" id="kpiTotal">0</div><div class="text-[12px] text-ink-500 mt-1">Total vendors</div></div>
+        <div class="stat-card bg-white border border-line rounded-xl p-5"><div class="w-9 h-9 rounded-lg bg-success-light text-success flex items-center justify-center mb-2"><i data-lucide="badge-check" class="w-4 h-4"></i></div><div class="text-[26px] font-bold text-ink-900 leading-none" id="kpiActive">0</div><div class="text-[12px] text-ink-500 mt-1">Active</div></div>
+        <div class="stat-card bg-white border border-line rounded-xl p-5"><div class="w-9 h-9 rounded-lg bg-purple-light text-purple flex items-center justify-center mb-2"><i data-lucide="leaf" class="w-4 h-4"></i></div><div class="text-[26px] font-bold text-ink-900 leading-none" id="kpiMSME">0</div><div class="text-[12px] text-ink-500 mt-1">MSME (EMD exempt)</div></div>
+        <div class="stat-card bg-white border border-line rounded-xl p-5"><div class="w-9 h-9 rounded-lg bg-danger-light text-danger flex items-center justify-center mb-2"><i data-lucide="shield-alert" class="w-4 h-4"></i></div><div class="text-[26px] font-bold text-danger leading-none" id="kpiBL">0</div><div class="text-[12px] text-ink-500 mt-1">Blacklisted · <span id="kpiPending" class="text-warning font-medium">0 pending</span></div></div>
+      </section>
+
+      <!-- Tabs -->
+      <section>
+        <div class="flex items-center gap-6 border-b border-line text-[13.5px]">
+          <button class="tab active py-2.5 border-b-2 -mb-px font-medium" data-tab="all">All vendors</button>
+          <button class="tab py-2.5 border-b-2 border-transparent text-ink-500 hover:text-ink-900" data-tab="msme">MSME</button>
+          <button class="tab py-2.5 border-b-2 border-transparent text-ink-500 hover:text-ink-900" data-tab="blacklist">Blacklist <span class="ml-1 inline-flex items-center justify-center bg-danger-light text-danger text-[10.5px] font-semibold rounded-full px-1.5">3</span></button>
+          <button class="tab py-2.5 border-b-2 border-transparent text-ink-500 hover:text-ink-900" data-tab="pending">Pending requests <span class="ml-1 inline-flex items-center justify-center bg-warning-light text-warning text-[10.5px] font-semibold rounded-full px-1.5">1</span></button>
+        </div>
+      </section>
+
+      <section class="bg-white border border-line rounded-xl p-3 flex items-center gap-2 flex-wrap">
+        <div class="flex-1 min-w-[260px] relative">
+          <i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+          <input id="search" type="search" oninput="render()" placeholder="Search by name, GST, PAN…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+        </div>
+        <select id="fType" onchange="render()" class="px-3 py-2 rounded-lg border border-line bg-white text-[13px]"><option value="">All types</option><option>Pvt Ltd</option><option>LLP</option><option>Partnership</option><option>Proprietorship</option></select>
+        <select id="fMsme" onchange="render()" class="px-3 py-2 rounded-lg border border-line bg-white text-[13px]"><option value="">MSME (any)</option><option>Micro</option><option>Small</option><option>Medium</option><option value="—">Non-MSME</option></select>
+      </section>
+
+      <section class="bg-white border border-line rounded-xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-[13.5px]">
+            <thead class="bg-surface border-b border-line"><tr class="text-[11.5px] uppercase tracking-wider text-ink-500 font-semibold">
+              <th class="text-left px-5 py-3">Vendor</th><th class="text-left px-5 py-3">Type</th><th class="text-left px-5 py-3">MSME</th>
+              <th class="text-left px-5 py-3">GST / PAN</th><th class="text-left px-5 py-3">Registered</th>
+              <th class="text-right px-5 py-3">Performance</th><th class="text-left px-5 py-3">Status</th><th class="text-right px-5 py-3">Action</th>
+            </tr></thead>
+            <tbody id="tbody" class="divide-y divide-line"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Vendor detail panel (720px) -->
+      <div id="panelShade" class="hidden absolute inset-0 overlay-shade z-30" onclick="closeVendorPanel()"></div>
+      <aside id="vendorPanel" class="side-panel closed absolute top-0 right-0 h-full w-[720px] max-w-full bg-white border-l border-line z-40 flex flex-col">
+        <div class="px-6 py-4 border-b border-line flex items-center justify-between shrink-0">
+          <div><div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold" id="vpMode">Vendor</div><h2 class="text-[18px] font-bold text-ink-900 mt-0.5" id="vpTitle">Vendor</h2><div class="text-[12px] text-ink-500 font-mono" id="vpId"></div></div>
+          <button onclick="closeVendorPanel()" class="text-ink-400 hover:text-ink-900"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <div class="flex-1 overflow-y-auto px-6 py-5 space-y-6" id="vpBody"></div>
+        <div class="px-6 py-3 border-t border-line flex items-center justify-between shrink-0 bg-white">
+          <div id="vpStatusActions" class="flex gap-2"></div>
+          <div class="flex gap-2">
+            <button onclick="closeVendorPanel()" class="px-3 py-2 rounded-lg border border-line text-[13px] hover:bg-surface">Close</button>
+            <button onclick="saveVendor()" class="px-3 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90">Save changes</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Blacklist confirm overlay -->
+      <div id="blacklistOverlay" class="hidden absolute inset-0 overlay-shade z-50 flex items-center justify-center p-6">
+        <div class="bg-white border border-line rounded-xl w-[520px] max-w-full p-5 shadow-lift">
+          <div class="flex items-start gap-3">
+            <div class="w-9 h-9 rounded-lg bg-danger-light text-danger flex items-center justify-center shrink-0"><i data-lucide="shield-alert" class="w-4 h-4"></i></div>
+            <div><h3 class="text-[15px] font-bold text-ink-900" id="blacklistTitle">Add to blacklist</h3><p class="text-[12.5px] text-ink-500 mt-1">Vendor history is preserved. Active bids from this vendor are flagged for re-evaluation.</p></div>
+          </div>
+          <label class="block mt-4"><span class="text-[12.5px] text-ink-900 font-medium">Reason (required)</span><textarea id="blReason" rows="3" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13px]" placeholder="e.g. material quality failed Q3 inspection · CIR ref CIR-2026-04"></textarea></label>
+          <div class="mt-4 grid grid-cols-2 gap-3">
+            <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">Effective date (required)</span><input id="blDate" type="date" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13px]" /></label>
+            <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">Supporting document</span><div class="mt-1 flex items-center gap-2 border border-dashed border-line rounded-lg px-3 py-2 text-[12.5px] text-ink-500"><i data-lucide="upload" class="w-3.5 h-3.5"></i> <span id="blFileName">No file selected</span><input id="blFile" type="file" class="hidden" onchange="document.getElementById('blFileName').textContent = this.files[0]?.name || 'No file selected'" /><button onclick="document.getElementById('blFile').click()" class="ml-auto text-primary font-medium">Choose</button></div></label>
+          </div>
+          <div class="mt-4 flex justify-end gap-2"><button onclick="closeBlacklist()" class="px-3 py-2 rounded-lg border border-line text-[13px] hover:bg-surface">Cancel</button><button onclick="confirmBlacklist()" class="px-3 py-2 rounded-lg bg-danger text-white text-[13px] font-medium hover:bg-danger/90">Add to blacklist</button></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-ink-900 text-white text-[13px] px-4 py-3 rounded-xl shadow-lift inline-flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-success"></i><span id="toastMsg">Done</span></div>
+
+<script>
+  function refreshIcons(){ if (window.lucide) lucide.createIcons(); }
+  let __toastTimer; function showToast(m){ const t=document.getElementById('toast'); document.getElementById('toastMsg').textContent=m; t.classList.add('show'); clearTimeout(__toastTimer); __toastTimer=setTimeout(()=>t.classList.remove('show'),2800); }
+  function bindDropdown(b,m){ const B=document.getElementById(b),M=document.getElementById(m); if(!B||!M)return; B.addEventListener('click',e=>{e.stopPropagation();M.classList.toggle('hidden');}); document.addEventListener('click',e=>{if(!M.contains(e.target)&&!B.contains(e.target))M.classList.add('hidden');}); }
+  function logAudit(a,t,m){ try{ const log=JSON.parse(localStorage.getItem('adminAuditLog')||'[]'); log.unshift({at:new Date().toISOString(),actor:'Rajesh Kumar',action:a,target:t,meta:m||null}); localStorage.setItem('adminAuditLog',JSON.stringify(log.slice(0,500))); }catch(e){} }
+  function seedOnce(k,v){ if(!localStorage.getItem(k)) localStorage.setItem(k,JSON.stringify(v)); }
+  bindDropdown('avatarBtn','avatarMenu');
+
+  const SEED_VENDORS = [
+    { id:'V-001', name:'Rajesh Constructions Pvt Ltd', type:'Pvt Ltd',     msme:'—',     gst:'24AABCR1234M1Z5', pan:'AABCR1234M', regDate:'2019-04-12', perf:4.6, awardedCr:18.4, status:'Active' },
+    { id:'V-002', name:'Maharashtra Roads Co.',         type:'Pvt Ltd',     msme:'Medium',gst:'27AAACM2345N1Z2', pan:'AAACM2345N', regDate:'2021-08-03', perf:4.1, awardedCr:9.6,  status:'Active' },
+    { id:'V-003', name:'BuildTech Solutions',           type:'LLP',         msme:'Small', gst:'24AABFB3456P1Z9', pan:'AABFB3456P', regDate:'2023-01-22', perf:3.4, awardedCr:2.1,  status:'Pending blacklist', pendingReason:'Material quality complaint, Q1 2026' },
+    { id:'V-004', name:'NCC Infrastructure Ltd',        type:'Pvt Ltd',     msme:'—',     gst:'36AAACN4567Q1Z6', pan:'AAACN4567Q', regDate:'2018-06-15', perf:4.8, awardedCr:34.0, status:'Active' },
+    { id:'V-005', name:'Patil & Associates',            type:'Partnership', msme:'Micro', gst:'24AAFCP5678R1Z3', pan:'AAFCP5678R', regDate:'2022-11-09', perf:4.3, awardedCr:1.4,  status:'Active' },
+    { id:'V-006', name:'Sigma Cement Traders',          type:'Proprietorship', msme:'Micro', gst:'24AABPS6789S1Z4', pan:'AABPS6789S', regDate:'2020-02-18', perf:2.1, awardedCr:0.9, status:'Blacklisted', blReason:'Repeated late delivery, FY2024-25', blDate:'2025-09-10' },
+    { id:'V-007', name:'Apex Steel Mart',               type:'Pvt Ltd',     msme:'—',     gst:'24AABCA7890T1Z2', pan:'AABCA7890T', regDate:'2017-12-01', perf:2.5, awardedCr:7.2, status:'Blacklisted', blReason:'Forged turnover certificate', blDate:'2024-11-22' },
+    { id:'V-008', name:'Green Earth Sanitation',        type:'LLP',         msme:'Small', gst:'24AABFG8901U1Z1', pan:'AABFG8901U', regDate:'2022-04-30', perf:1.8, awardedCr:0.4, status:'Blacklisted', blReason:'Misrepresentation of MSME status', blDate:'2025-03-14' },
+  ];
+  seedOnce('admin_vendors', SEED_VENDORS);
+  function load(){ return JSON.parse(localStorage.getItem('admin_vendors') || '[]'); }
+  function save(l){ localStorage.setItem('admin_vendors', JSON.stringify(l)); }
+
+  let currentTab = new URLSearchParams(location.search).get('tab') || 'all';
+  function setTab(t){ currentTab = t; document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === t)); render(); }
+  document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => setTab(b.dataset.tab)));
+
+  function render(){
+    const all = load();
+    const q = (document.getElementById('search').value || '').toLowerCase();
+    const fType = document.getElementById('fType').value, fMsme = document.getElementById('fMsme').value;
+    let list = all;
+    if (currentTab === 'msme')      list = list.filter(v => ['Micro','Small','Medium'].includes(v.msme));
+    if (currentTab === 'blacklist') list = list.filter(v => v.status === 'Blacklisted');
+    if (currentTab === 'pending')   list = list.filter(v => v.status === 'Pending blacklist');
+    list = list.filter(v => (!q || (v.name+v.gst+v.pan+v.type).toLowerCase().includes(q)) && (!fType || v.type === fType) && (!fMsme || v.msme === fMsme));
+
+    document.getElementById('kpiTotal').textContent  = all.length;
+    document.getElementById('kpiActive').textContent = all.filter(v => v.status === 'Active').length;
+    document.getElementById('kpiMSME').textContent   = all.filter(v => v.msme === 'Micro' || v.msme === 'Small').length;
+    document.getElementById('kpiBL').textContent     = all.filter(v => v.status === 'Blacklisted').length;
+    document.getElementById('kpiPending').textContent = all.filter(v => v.status === 'Pending blacklist').length + ' pending';
+
+    document.getElementById('tbody').innerHTML = list.map(v => {
+      const msmePill = ['Micro','Small'].includes(v.msme)
+        ? `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-purple-light text-purple text-[11px] font-semibold">${v.msme} · EMD exempt</span>`
+        : v.msme === 'Medium' ? `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-purple-light text-purple text-[11px] font-semibold">Medium</span>` : `<span class="text-ink-400 text-[11.5px]">—</span>`;
+      const statusPill = v.status === 'Active'
+        ? '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-success-light text-success text-[11.5px] font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-success"></span> Active</span>'
+        : v.status === 'Blacklisted'
+        ? '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-danger-light text-danger text-[11.5px] font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-danger"></span> Blacklisted</span>'
+        : '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-warning-light text-warning text-[11.5px] font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-warning"></span> Pending review</span>';
+      return `<tr class="hover:bg-surface transition">
+        <td class="px-5 py-3.5"><div class="font-medium text-ink-900">${v.name}</div><div class="text-[11.5px] text-ink-500 font-mono">${v.id}</div></td>
+        <td class="px-5 py-3.5 text-ink-900">${v.type}</td>
+        <td class="px-5 py-3.5">${msmePill}</td>
+        <td class="px-5 py-3.5"><div class="text-ink-900 font-mono text-[12px]">${v.gst}</div><div class="text-[11.5px] text-ink-500 font-mono">${v.pan}</div></td>
+        <td class="px-5 py-3.5 text-ink-500">${new Date(v.regDate).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</td>
+        <td class="px-5 py-3.5 text-right"><div class="inline-flex items-center gap-1 text-ink-900 font-medium">${v.perf.toFixed(1)} <i data-lucide="star" class="w-3.5 h-3.5 text-warning fill-warning"></i></div></td>
+        <td class="px-5 py-3.5">${statusPill}</td>
+        <td class="px-5 py-3.5 text-right"><button onclick="openVendorPanel('${v.id}')" class="px-3 py-1.5 rounded-lg border border-line text-[12.5px] hover:bg-surface">View</button></td>
+      </tr>`;
+    }).join('') || `<tr><td colspan="8" class="px-5 py-10 text-center text-ink-500 text-[13px]">No vendors match this view.</td></tr>`;
+    refreshIcons();
+  }
+
+  let currentId = null;
+  function openVendorPanel(id){
+    currentId = id || null;
+    const v = id ? load().find(x => x.id === id) : { name:'', type:'Pvt Ltd', msme:'—', gst:'', pan:'', regDate:new Date().toISOString().slice(0,10), perf:0, awardedCr:0, status:'Active' };
+    document.getElementById('vpMode').textContent  = id ? 'Vendor detail' : 'Register vendor';
+    document.getElementById('vpTitle').textContent = id ? v.name : 'New vendor';
+    document.getElementById('vpId').textContent    = id ? v.id : '';
+    document.getElementById('vpBody').innerHTML = `
+      <div>
+        <div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold mb-3">Identity</div>
+        <div class="grid grid-cols-2 gap-3">
+          <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">Name</span><input id="vf_name"  value="${v.name||''}" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13.5px]" /></label>
+          <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">Type</span>
+            <select id="vf_type" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13.5px]">${['Pvt Ltd','LLP','Partnership','Proprietorship'].map(o => `<option ${v.type===o?'selected':''}>${o}</option>`).join('')}</select>
+          </label>
+          <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">GSTIN</span><input id="vf_gst" value="${v.gst||''}" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13.5px] font-mono" /></label>
+          <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">PAN</span><input id="vf_pan" value="${v.pan||''}" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13.5px] font-mono" /></label>
+        </div>
+      </div>
+      <div>
+        <div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold mb-3">MSME</div>
+        <div class="grid grid-cols-2 gap-3">
+          <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">MSME status</span>
+            <select id="vf_msme" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13.5px]">${['—','Micro','Small','Medium'].map(o => `<option ${v.msme===o?'selected':''}>${o}</option>`).join('')}</select>
+          </label>
+          <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">CA UAN (turnover cert.)</span><input id="vf_uan" value="${v.uan||''}" placeholder="UAN required for turnover cert." class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13.5px] font-mono" /></label>
+        </div>
+        ${['Micro','Small'].includes(v.msme) ? '<div class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-light text-purple text-[12px] font-medium"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Micro &amp; Small → EMD exempt</div>' : ''}
+      </div>
+      <div>
+        <div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold mb-3">Performance &amp; awarded value</div>
+        <div class="grid grid-cols-3 gap-3">
+          <div class="border border-line rounded-lg p-3"><div class="text-[11.5px] text-ink-500">Performance score</div><div class="text-[20px] font-bold text-ink-900 mt-1">${v.perf.toFixed(1)} <span class="text-[11px] text-ink-500 font-normal">/ 5</span></div></div>
+          <div class="border border-line rounded-lg p-3"><div class="text-[11.5px] text-ink-500">Total awarded</div><div class="text-[20px] font-bold text-ink-900 mt-1">₹${v.awardedCr.toFixed(1)} <span class="text-[11px] text-ink-500 font-normal">Cr</span></div></div>
+          <div class="border border-line rounded-lg p-3"><div class="text-[11.5px] text-ink-500">Registered</div><div class="text-[15px] font-semibold text-ink-900 mt-1">${new Date(v.regDate).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold mb-3">Recent past tenders</div>
+        <ul class="border border-line rounded-xl divide-y divide-line text-[12.5px]">
+          <li class="px-3 py-2.5 flex items-center justify-between"><span>TND-2025-088 · Water pipeline Phase 1</span><span class="text-ink-500">₹4.2 Cr · Awarded</span></li>
+          <li class="px-3 py-2.5 flex items-center justify-between"><span>TND-2024-141 · Office furniture supply</span><span class="text-ink-500">₹0.6 Cr · Awarded</span></li>
+          <li class="px-3 py-2.5 flex items-center justify-between"><span>TND-2024-097 · Road resurfacing zone-B</span><span class="text-ink-500">₹2.8 Cr · L2 (not awarded)</span></li>
+        </ul>
+      </div>
+      <div>
+        <div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold mb-3">Documents</div>
+        <ul class="grid grid-cols-2 gap-2 text-[12.5px]">
+          ${['GST certificate','PAN copy','UAN MSME letter','Latest turnover cert.','ISO 9001:2015','Performance affidavit'].map(d => `<li class="border border-line rounded-lg px-3 py-2 flex items-center gap-2 text-ink-900"><i data-lucide="file-text" class="w-3.5 h-3.5 text-ink-500"></i> ${d}</li>`).join('')}
+        </ul>
+      </div>
+      ${v.status === 'Blacklisted' ? `<div class="border border-danger/30 bg-danger-light/40 rounded-xl p-4"><div class="flex items-center justify-between"><div><div class="text-[13px] font-bold text-danger">Currently blacklisted</div><div class="text-[12px] text-ink-500 mt-0.5">${v.blReason || ''} · effective ${v.blDate || ''}</div></div><button onclick="unblacklist('${v.id}')" class="px-3 py-2 rounded-lg border border-danger text-danger text-[12.5px] font-medium hover:bg-danger-light">Un-blacklist…</button></div></div>` : ''}
+      ${v.status === 'Pending blacklist' ? `<div class="border border-warning/30 bg-warning-light/60 rounded-xl p-4"><div class="text-[13px] font-bold text-warning">Blacklist request pending review</div><div class="text-[12px] text-ink-500 mt-0.5">Reason: ${v.pendingReason || '—'}</div><div class="mt-3 flex gap-2"><button onclick="openBlacklist('${v.id}', 'confirm')" class="px-3 py-1.5 rounded-lg bg-danger text-white text-[12.5px] font-medium">Confirm blacklist</button><button onclick="dismissPending('${v.id}')" class="px-3 py-1.5 rounded-lg border border-line text-[12.5px]">Dismiss request</button></div></div>` : ''}
+    `;
+    const actions = document.getElementById('vpStatusActions');
+    actions.innerHTML = id && v.status === 'Active' ? `<button onclick="openBlacklist('${v.id}')" class="px-3 py-2 rounded-lg border border-danger text-danger text-[12.5px] font-medium hover:bg-danger-light inline-flex items-center gap-1.5"><i data-lucide="shield-alert" class="w-4 h-4"></i> Add to blacklist</button>` : '';
+    document.getElementById('vendorPanel').classList.remove('closed');
+    document.getElementById('panelShade').classList.remove('hidden');
+    refreshIcons();
+  }
+  function closeVendorPanel(){ document.getElementById('vendorPanel').classList.add('closed'); document.getElementById('panelShade').classList.add('hidden'); }
+  function saveVendor(){
+    const list = load();
+    const data = {
+      name: document.getElementById('vf_name').value.trim(),
+      type: document.getElementById('vf_type').value,
+      gst:  document.getElementById('vf_gst').value.trim(),
+      pan:  document.getElementById('vf_pan').value.trim(),
+      msme: document.getElementById('vf_msme').value,
+      uan:  document.getElementById('vf_uan').value.trim(),
+    };
+    if (!data.name){ showToast('Vendor name is required'); return; }
+    if (currentId){
+      const i = list.findIndex(x => x.id === currentId); list[i] = { ...list[i], ...data };
+      logAudit('Updated', `Vendor ${data.name}`); showToast('Vendor updated');
+    } else {
+      list.push({ id:'V-' + String(Date.now()).slice(-3), regDate:new Date().toISOString().slice(0,10), perf:0, awardedCr:0, status:'Active', ...data });
+      logAudit('Registered', `Vendor ${data.name}`); showToast('Vendor registered');
+    }
+    save(list); closeVendorPanel(); render();
+  }
+
+  let blacklistTarget = null;
+  function openBlacklist(id){ blacklistTarget = id; document.getElementById('blDate').value = new Date().toISOString().slice(0,10); document.getElementById('blacklistOverlay').classList.remove('hidden'); refreshIcons(); }
+  function closeBlacklist(){ document.getElementById('blacklistOverlay').classList.add('hidden'); document.getElementById('blReason').value=''; document.getElementById('blFileName').textContent='No file selected'; }
+  function confirmBlacklist(){
+    const reason = document.getElementById('blReason').value.trim();
+    const date = document.getElementById('blDate').value;
+    const file = document.getElementById('blFile').files[0]?.name || '';
+    if (!reason){ showToast('Reason is required'); return; }
+    if (!date){ showToast('Effective date is required'); return; }
+    const list = load(); const v = list.find(x => x.id === blacklistTarget);
+    v.status = 'Blacklisted'; v.blReason = reason; v.blDate = date; v.blFile = file;
+    save(list); closeBlacklist(); closeVendorPanel(); render();
+    logAudit('Blacklisted', `Vendor ${v.name}`, { reason, date, file }); showToast('Vendor blacklisted — history preserved');
+  }
+  function unblacklist(id){
+    const reason = prompt('Reason for un-blacklisting:'); if (!reason) return;
+    const list = load(); const v = list.find(x => x.id === id);
+    v.status = 'Active'; v.blReason = ''; v.blDate = '';
+    save(list); closeVendorPanel(); render();
+    logAudit('Un-blacklisted', `Vendor ${v.name}`, { reason }); showToast('Vendor reactivated');
+  }
+  function dismissPending(id){
+    const list = load(); const v = list.find(x => x.id === id);
+    v.status = 'Active'; v.pendingReason = '';
+    save(list); closeVendorPanel(); render();
+    logAudit('Dismissed', `Blacklist request for ${v.name}`); showToast('Request dismissed');
+  }
+  function exportCsv(){
+    const rows = [['ID','Name','Type','MSME','GST','PAN','Registered','Performance','Status']];
+    load().forEach(v => rows.push([v.id,v.name,v.type,v.msme,v.gst,v.pan,v.regDate,v.perf,v.status]));
+    const csv = rows.map(r => r.map(c => `"${(''+c).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download = 'vendors.csv'; a.click();
+    logAudit('Exported','Vendor registry (CSV)'); showToast('Vendors exported');
+  }
+
+  setTab(currentTab);
+</script>
+</body>
+</html>

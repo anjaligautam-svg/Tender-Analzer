@@ -198,16 +198,97 @@
     .pa-grid .pa-col .val { font-size:13px; font-weight:600; color:#111827; }
     .pa-footer { margin-top:12px; padding-top:10px; border-top:1px solid #BBF7D0; font-size:12px; color:#6B7280; }
     .pa-footer .ok { color:#065F46; font-weight:600; }
-    /* Clone selector */
-    .clone-card { border:1px solid #E5E7EB; border-radius:12px; padding:20px; cursor:pointer; background:white; transition: all .15s ease; }
-    .clone-card:hover { border-color:#8B5CF6; background:#EEEDFE; box-shadow:0 4px 12px rgba(0,0,0,0.08); transform: translateY(-1px); }
-    .clone-search { width:100%; border:1px solid #D1D5DB; border-radius:8px; padding:10px 14px 10px 38px; font-size:14px; background:white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat 12px center; }
-    .clone-search:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 2px rgba(15,94,232,0.15); }
-    .clone-result-row { padding:10px 14px; border-bottom:1px solid #F3F4F6; cursor:pointer; font-size:13px; }
-    .clone-result-row:hover { background:#F9FAFB; }
-    .clone-result-row:last-child { border-bottom:none; }
-    .clone-confirm-card { border:1px solid #E5E7EB; border-radius:10px; padding:16px 18px; margin-top:12px; background:white; }
-    .clone-banner { background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:10px 14px; margin-bottom:20px; font-size:13px; color:#0C447C; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+
+    /* ===== Quick Setup wizard (rules-based questionnaire — no AI backend) ===== */
+    @keyframes wzMsgIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    .wz-msg { animation: wzMsgIn 200ms ease; margin-bottom: 8px; }
+    .wz-asst-label { font-size: 11px; color: #9CA3AF; margin-left: 36px; margin-bottom: 3px; display: block; }
+    .wz-asst-bubble { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 0 12px 12px 12px; padding: 12px 16px; font-size: 14px; color: #111827; max-width: 85%; line-height: 1.5; }
+    .wz-user-bubble { background: #0F5EE8; color: white; border-radius: 12px 0 12px 12px; padding: 10px 16px; font-size: 14px; max-width: 85%; margin-left: auto; }
+    .wz-assistant-row { display: flex; align-items: flex-start; gap: 10px; }
+    .wz-assistant-avatar { width: 26px; height: 26px; border-radius: 6px; background: #0F5EE8; color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+    .wz-options { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .wz-chip { border: 1.5px solid #E5E7EB; border-radius: 10px; padding: 12px 16px; font-size: 14px; font-weight: 500; color: #374151; background: white; cursor: pointer; transition: all 150ms ease; min-width: 0; flex: 0 1 auto; text-align: left; line-height: 1.4; }
+    .wz-chip .sub { display: block; font-size: 11px; color: #9CA3AF; font-weight: 400; margin-top: 2px; }
+    .wz-chip:hover { border-color: #0F5EE8; background: #EFF6FF; }
+    .wz-chip.selected { border-color: #0F5EE8; background: #EFF6FF; color: #0C447C; }
+    .wz-chip.gray { color: #9CA3AF; font-size: 12px; padding: 8px 12px; }
+    .wz-chip.gray:hover { color: #374151; background: #F9FAFB; border-color: #D1D5DB; }
+    .wz-chip[disabled] { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+    .wz-text-input { width: 100%; border: 1px solid #D1D5DB; border-radius: 8px; padding: 10px 14px; font-size: 14px; background: white; }
+    .wz-text-input:focus { outline: none; border-color: #0F5EE8; box-shadow: 0 0 0 3px rgba(15,94,232,0.1); }
+    .wz-typing { display: inline-flex; gap: 3px; padding: 12px 16px; background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 0 12px 12px 12px; }
+    .wz-typing span { width: 6px; height: 6px; border-radius: 50%; background: #9CA3AF; animation: wzTyping 1.2s infinite ease-in-out; }
+    .wz-typing span:nth-child(2) { animation-delay: .15s; }
+    .wz-typing span:nth-child(3) { animation-delay: .3s; }
+    @keyframes wzTyping { 0%,80%,100% { opacity: 0.3; transform: scale(0.7); } 40% { opacity: 1; transform: scale(1); } }
+    .wz-summary-card { background: white; border: 1px solid #E5E7EB; border-radius: 10px; padding: 14px 16px; margin-top: 8px; font-size: 13px; line-height: 1.7; }
+    .wz-summary-card .row { display: flex; gap: 10px; align-items: flex-start; padding: 3px 0; }
+    .wz-summary-card .row .ico { width: 18px; flex-shrink: 0; }
+    .wz-summary-card .row .lbl { color: #6B7280; min-width: 110px; }
+    .wz-summary-card .row .val { color: #111827; font-weight: 500; }
+    .wz-edit-menu { background: white; border: 1px solid #E5E7EB; border-radius: 10px; padding: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-top: 8px; max-width: 360px; }
+    .wz-edit-menu button { width: 100%; text-align: left; padding: 8px 12px; font-size: 13px; color: #111827; background: transparent; border: none; border-radius: 6px; cursor: pointer; }
+    .wz-edit-menu button:hover { background: #F9FAFB; }
+    .wz-confirm-row { margin-top: 10px; }
+
+    /* ===== DPR Draft Preview Panel (mirrors tender-creation Check Draft) ===== */
+    #dprDraftPanel { transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1); }
+    #dprDraftBackdrop { transition: opacity 280ms cubic-bezier(0.4, 0, 0.2, 1); }
+    .dpr-draft-doc-body { font-family: 'Times New Roman', Georgia, serif; font-size: 13.5px; line-height: 1.9; color: #1a1a1a; transition: background .15s ease; padding: 32px 40px; border-radius: 6px; }
+    .dpr-draft-doc-body h2 { font-size: 16px; font-weight: 700; color: #111827; text-align: center; font-family: 'DM Sans', system-ui, sans-serif; letter-spacing: 0.04em; margin: 4px 0; }
+    .dpr-draft-doc-body h3 { font-size: 13.5px; font-weight: 700; color: #111827; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #D1D5DB; padding-bottom: 6px; margin: 0 0 14px; font-family: 'DM Sans', system-ui, sans-serif; }
+    .dpr-draft-doc-body [data-field] { padding: 0 2px; border-radius: 3px; transition: background .3s ease, box-shadow .15s ease; }
+    .dpr-draft-doc-body.edit-mode { background: #FAFEF5; cursor: text; }
+    .dpr-draft-doc-body.edit-mode [data-field] { background: white; box-shadow: inset 0 0 0 1px transparent; }
+    .dpr-draft-doc-body.edit-mode [data-field]:hover { box-shadow: inset 0 0 0 1px #93C5FD; }
+    .dpr-draft-doc-body .field-flash { background: #D1FAE5 !important; transition: background .8s ease; }
+    .dpr-draft-doc-body .dpr-doc-section { margin-bottom: 28px; position: relative; }
+    .dpr-draft-doc-body .nit-subhead { font-size: 13px; font-weight: 700; color: #111827; margin: 0 0 10px; font-family: 'DM Sans', system-ui, sans-serif; }
+    .dpr-draft-doc-body .nit-subhead.spaced { margin-top: 18px; }
+    .dpr-draft-doc-body .doc-header { text-align: center; margin-bottom: 28px; }
+    .dpr-draft-doc-body .doc-seal { width: 48px; height: 48px; border-radius: 50%; border: 1.5px solid #9CA3AF; background: #F9FAFB; font-size: 8px; color: #9CA3AF; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-family: 'DM Sans', system-ui, sans-serif; letter-spacing: 0.1em; font-weight: 600; }
+    .dpr-draft-doc-body .doc-govt { font-size: 13.5px; font-weight: 700; color: #111827; letter-spacing: 0.04em; font-family: 'DM Sans', system-ui, sans-serif; line-height: 1.5; }
+    .dpr-draft-doc-body .doc-rule-double { border-top: 2px solid #111827; border-bottom: 1px solid #111827; padding: 3px 0; margin: 12px 0; }
+    .dpr-draft-doc-body .doc-nit-no { font-size: 12.5px; color: #374151; margin-top: 6px; font-family: 'DM Sans', system-ui, sans-serif; }
+    .dpr-draft-doc-body .info-table { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid #D1D5DB; }
+    .dpr-draft-doc-body .info-cell-k { font-weight: 600; background: #F9FAFB; padding: 8px 12px; border-bottom: 1px solid #E5E7EB; border-right: 1px solid #E5E7EB; font-size: 12.5px; font-family: 'DM Sans', system-ui, sans-serif; }
+    .dpr-draft-doc-body .info-cell-v { padding: 8px 12px; border-bottom: 1px solid #E5E7EB; font-size: 12.5px; }
+    .dpr-draft-doc-body .info-cell-v.empty { color: #9CA3AF; font-style: italic; }
+    .dpr-draft-doc-body .info-cell-v.amber-empty { background: #FFFBEB; color: #92400E; font-style: italic; font-size: 11px; font-family: 'DM Sans', system-ui, sans-serif; }
+    .dpr-draft-doc-body .info-table > .info-cell-k:nth-last-of-type(1),
+    .dpr-draft-doc-body .info-table > .info-cell-v:nth-last-of-type(1) { border-bottom: 0; }
+    .dpr-draft-doc-body ol.formal-list { margin: 6px 0 6px 22px; padding-left: 4px; }
+    .dpr-draft-doc-body ol.formal-list > li { margin-bottom: 10px; padding-left: 4px; text-align: justify; }
+    .dpr-draft-doc-body .nit-para { margin: 0 0 10px; text-align: justify; }
+    .dpr-draft-doc-body .boq-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 6px; }
+    .dpr-draft-doc-body .boq-table thead th { background: #F3F4F6; font-weight: 700; text-align: center; border: 1px solid #D1D5DB; padding: 7px 10px; font-family: 'DM Sans', system-ui, sans-serif; }
+    .dpr-draft-doc-body .boq-table tbody td { border: 1px solid #D1D5DB; padding: 7px 10px; }
+    .dpr-draft-doc-body .boq-table tbody tr:nth-child(even) td { background: #FAFAFA; }
+    .dpr-draft-doc-body .boq-table tfoot td { border: 1px solid #D1D5DB; padding: 8px 10px; font-weight: 700; background: #FAFAFA; }
+    .dpr-draft-doc-body .boq-table .tx-r { text-align: right; }
+    .dpr-draft-doc-body .boq-table .tx-c { text-align: center; }
+    .dpr-draft-doc-body .draft-placeholder-amber { background: #FFFBEB; border-left: 3px solid #FCD34D; border-radius: 0 6px 6px 0; padding: 12px 16px; color: #92400E; font-style: italic; font-size: 12px; font-family: 'DM Sans', system-ui, sans-serif; margin: 4px 0; }
+    .dpr-draft-doc-body .doc-footer { margin-top: 40px; border-top: 2px solid #111827; padding-top: 16px; display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; font-family: 'DM Sans', system-ui, sans-serif; }
+    .dpr-draft-doc-body .doc-footer-l, .dpr-draft-doc-body .doc-footer-r { font-size: 12px; line-height: 1.7; }
+    .dpr-draft-doc-body .doc-footer-l .desig, .dpr-draft-doc-body .doc-footer-r .desig { color: #6B7280; }
+    .dpr-draft-doc-body .doc-footer-r .seal-small { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid #9CA3AF; background: #F9FAFB; font-size: 7px; color: #9CA3AF; display: flex; align-items: center; justify-content: center; margin: 4px auto 0; letter-spacing: 0.1em; font-weight: 600; }
+    .dpr-draft-doc-body .doc-watermark { font-size: 11px; color: #9CA3AF; font-style: italic; text-align: center; margin-top: 16px; font-family: 'DM Sans', system-ui, sans-serif; }
+    .dpr-draft-doc-body .doc-logo-strip { display: flex; gap: 12px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap; }
+    .dpr-draft-doc-body .doc-logo { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: 'DM Sans', system-ui, sans-serif; }
+    /* Section-level edit (mirrors tender's nit-section behaviour) */
+    .dpr-draft-doc-body.edit-mode .dpr-doc-section { transition: all 150ms ease; border-radius: 8px; }
+    .dpr-draft-doc-body.edit-mode .dpr-doc-section:hover { box-shadow: 0 0 0 2px #0F5EE8; background: rgba(15,94,232,0.02); padding: 12px; }
+    .dpr-draft-doc-body.edit-mode .dpr-doc-section.section-active { box-shadow: 0 0 0 2px #0F5EE8; background: rgba(15,94,232,0.02); padding: 12px; position: relative; }
+    .dpr-draft-doc-body.edit-mode .dpr-doc-section.section-editing { box-shadow: 0 0 0 2px #10B981; background: rgba(16,185,129,0.02); padding: 12px; position: relative; }
+    .dpr-section-action-bar { position: absolute; top: -16px; left: 12px; background: #0F5EE8; color: white; border-radius: 6px; padding: 5px 10px; display: flex; gap: 8px; align-items: center; font-family: 'DM Sans', system-ui, sans-serif; z-index: 5; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+    .dpr-section-action-bar button { font-size: 12px; color: white; display: inline-flex; align-items: center; gap: 4px; padding: 2px 4px; border-radius: 3px; background: transparent; border: none; cursor: pointer; }
+    .dpr-section-action-bar button:hover { background: rgba(255,255,255,0.18); }
+    .dpr-section-mini-toolbar { position: absolute; top: 24px; left: 12px; background: white; border: 1px solid #E5E7EB; border-radius: 6px; padding: 4px; display: flex; gap: 2px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); z-index: 4; }
+    .dpr-section-mini-toolbar button { width: 26px; height: 26px; border-radius: 4px; color: #6B7280; display: inline-flex; align-items: center; justify-content: center; background: transparent; border: none; cursor: pointer; }
+    .dpr-section-mini-toolbar button:hover { background: #F3F4F6; color: #111827; }
+    .dpr-section-done-link { position: absolute; bottom: 8px; right: 12px; font-size: 12px; color: #10B981; font-weight: 600; cursor: pointer; z-index: 5; background: transparent; border: none; }
+    .dpr-section-done-link:hover { text-decoration: underline; }
   </style>
 </head>
 <body class="min-h-screen">
@@ -289,10 +370,20 @@
         <i data-lucide="bell" class="w-4 h-4"></i>
         <span class="absolute -top-1 -right-1 bg-danger text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">6</span>
       </button>
-      <div class="flex items-center gap-2 pl-2 border-l border-line">
-        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">U</div>
-        <div class="hidden md:block"><div class="text-[12.5px] font-medium text-ink-900 leading-tight">Admin User</div></div>
-        <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i>
+      <div class="relative">
+        <button id="avatarBtn" aria-label="Account menu" class="flex items-center gap-2 pl-2 border-l border-line">
+          <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div>
+          <div class="hidden md:block text-left"><div class="text-[12.5px] font-medium text-ink-900 leading-tight">Rajesh Kumar</div><div class="text-[10.5px] text-ink-500 leading-tight">Super Admin</div></div>
+          <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i>
+        </button>
+        <div id="avatarMenu" class="hidden absolute right-0 mt-2 w-[240px] bg-white border border-line rounded-xl shadow-lift z-40 py-1.5">
+          <a href="#" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="user" class="w-4 h-4 text-ink-500"></i> My profile</a>
+          <a href="admin.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] bg-primary-light text-primary font-medium mx-1.5 rounded-md"><i data-lucide="shield" class="w-4 h-4"></i> Admin Panel</a>
+          <a href="index.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="layout-dashboard" class="w-4 h-4 text-ink-500"></i> Procurement Portal</a>
+          <a href="admin-settings.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="settings" class="w-4 h-4 text-ink-500"></i> System Settings</a>
+          <div class="my-1.5 border-t border-line"></div>
+          <a href="#" onclick="sessionStorage.clear(); location.href='login.html'; return false;" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-danger hover:bg-danger-light"><i data-lucide="log-out" class="w-4 h-4"></i> Sign out</a>
+        </div>
       </div>
     </header>
 
@@ -303,6 +394,11 @@
         <span class="font-medium">New DPR</span>
       </div>
       <div class="flex items-center gap-2 text-[12px] text-white/80">
+        <button id="checkDprDraftBtn" onclick="openDprDraftPanel()" aria-label="Check DPR draft" class="inline-flex items-center gap-1.5 text-white font-medium" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 5px 14px; font-size: 12px; cursor: pointer; transition: background .15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">
+          <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+          Check DPR Draft <i data-lucide="arrow-right" class="w-3 h-3"></i>
+        </button>
+        <span class="h-4 w-px mx-1" style="background: rgba(255,255,255,0.2);"></span>
         <i data-lucide="cloud-check" class="w-3.5 h-3.5"></i>
         <span id="autosaveLabel">Draft auto-saved 1 min ago</span>
         <span class="mx-2 opacity-50">•</span>
@@ -448,52 +544,35 @@
           <p class="text-[14px] text-ink-500 mt-1">Choose how you'd like to create this Detailed Project Report.</p>
         </div>
 
-        <div class="max-w-[1200px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="max-w-[1100px] grid grid-cols-1 md:grid-cols-3 gap-6">
           <a href="#describe" class="start-card relative bg-white border border-line rounded-2xl p-7 block">
             <span class="absolute top-4 right-4 inline-flex items-center gap-1 bg-primary text-white text-[11px] font-semibold rounded-full px-2 py-0.5"><i data-lucide="sparkles" class="w-3 h-3"></i> Recommended</span>
             <div class="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center mb-4"><i data-lucide="message-square-text" class="w-5 h-5"></i></div>
-            <h3 class="text-[16px] font-bold text-ink-900">Describe Your Project</h3>
-            <p class="text-[13px] text-ink-500 mt-1.5 leading-relaxed">Tell our AI what you want to build or procure. It will structure the DPR for you.</p>
+            <h3 class="text-[16px] font-bold text-ink-900">Quick Setup</h3>
+            <p class="text-[13px] text-ink-500 mt-1.5 leading-relaxed">Answer 8 quick questions about your project. We'll pre-fill the DPR — you refine the rest.</p>
             <div class="text-[12px] italic text-ink-400 mt-2.5">~3 minutes</div>
             <div class="mt-4 text-[13px] font-bold text-primary inline-flex items-center gap-1">Get started <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></div>
-            <div class="text-[11px] text-ink-400 mt-1.5">Describe → AI structures → Review form</div>
+            <div class="text-[11px] text-ink-400 mt-1.5">Answer questions → Pre-fill form → Review</div>
           </a>
           <a href="#upload" class="start-card relative bg-white border border-line rounded-2xl p-7 block">
-            <span class="absolute top-4 right-4 inline-flex items-center gap-1 bg-primary text-white text-[11px] font-semibold rounded-full px-2 py-0.5"><i data-lucide="sparkles" class="w-3 h-3"></i> Recommended</span>
             <div class="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center mb-4"><i data-lucide="file-up" class="w-5 h-5"></i></div>
             <h3 class="text-[16px] font-bold text-ink-900">Upload an Existing DPR</h3>
-            <p class="text-[13px] text-ink-500 mt-1.5 leading-relaxed">Upload a PDF or Word doc of a DPR you already have. AI will extract and structure all the data.</p>
+            <p class="text-[13px] text-ink-500 mt-1.5 leading-relaxed">Upload your existing DPR document. We'll read the key details and help you fill in the form.</p>
             <div class="text-[12px] italic text-ink-400 mt-2.5">~4 minutes</div>
             <div class="mt-4 text-[13px] font-bold text-primary inline-flex items-center gap-1">Get started <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></div>
-            <div class="text-[11px] text-ink-400 mt-1.5">Upload → AI extracts → Review form</div>
+            <div class="text-[11px] text-ink-400 mt-1.5">Upload → Verify extracted fields → Submit</div>
           </a>
           <a href="#step1" class="start-card bg-white rounded-2xl p-7 block" style="border: 1px solid #F3F4F6;">
             <div class="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center mb-4"><i data-lucide="pencil-line" class="w-5 h-5"></i></div>
             <h3 class="text-[16px] font-bold text-ink-900/90">Fill Manually</h3>
             <p class="text-[13px] text-ink-400 mt-1.5 leading-relaxed">Enter all project details yourself. Best for experienced users with all information ready.</p>
+            <div class="text-[11px] text-ink-400 mt-1.5">Complete control — fill in every field yourself</div>
             <div class="text-[12px] italic text-ink-400 mt-2.5">~25 minutes</div>
             <div class="mt-4 text-[13px] font-bold text-primary inline-flex items-center gap-1">Get started <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></div>
-            <div class="text-[11px] text-ink-400 mt-1.5">Fill form → Review → Submit</div>
           </a>
-          <!-- Addition 9 — Clone Past DPR -->
-          <button onclick="openCloneSelector()" class="clone-card text-left" style="margin:0;">
-            <div class="w-9 h-9 rounded-lg flex items-center justify-center mb-4" style="background:#EEEDFE; color:#8B5CF6;"><i data-lucide="copy" class="w-5 h-5"></i></div>
-            <h3 class="text-[15px] font-bold text-ink-900">Clone Past DPR</h3>
-            <p class="text-[13px] text-ink-500 mt-1.5 leading-relaxed">Start from a previous DPR and update for this year</p>
-            <div class="text-[11px] text-ink-400 mt-2.5">Save time on recurring projects</div>
-            <div class="mt-4 text-[13px] font-bold inline-flex items-center gap-1" style="color:#8B5CF6;">Get started <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></div>
-          </button>
         </div>
 
-        <!-- Clone selector — hidden until "Clone Past DPR" card is clicked -->
-        <div id="cloneSelectorWrap" class="max-w-[900px] hidden">
-          <div class="mb-2 text-[13px] font-medium text-ink-900">Search past DPRs to clone from</div>
-          <input id="cloneSearchInput" type="text" class="clone-search" placeholder="Search past DPRs to clone from..." oninput="renderCloneResults(this.value)" />
-          <div id="cloneResults" class="bg-white border border-line rounded-lg mt-2 hidden"></div>
-          <div id="cloneConfirm" class="hidden"></div>
-        </div>
-
-        <div class="max-w-[900px]">
+        <div class="max-w-[1100px]">
           <div class="bg-primary-light border border-primary-border rounded-[10px] px-4 py-3 flex items-start gap-2.5">
             <i data-lucide="info" class="w-4 h-4 text-primary shrink-0 mt-0.5"></i>
             <p class="text-[13px] text-ink-900">A DPR must be fully approved (AA + TS + Budget) before a tender can be raised. The system will guide you through each approval stage.</p>
@@ -508,7 +587,7 @@
         <div class="px-8 py-6 border-b border-line bg-white">
           <div class="flex items-start justify-between gap-3 flex-wrap">
             <div>
-              <div class="text-[13px] text-ink-500 mb-1.5"><a href="index.html" class="hover:text-ink-900">Dashboard</a><span class="mx-1.5 text-ink-400">/</span><a href="#list" class="hover:text-ink-900">DPR Creation</a><span class="mx-1.5 text-ink-400">/</span><span class="text-ink-900">Describe</span></div>
+              <div class="text-[13px] text-ink-500 mb-1.5"><a href="index.html" class="hover:text-ink-900">Dashboard</a><span class="mx-1.5 text-ink-400">/</span><a href="#list" class="hover:text-ink-900">DPR Creation</a><span class="mx-1.5 text-ink-400">/</span><span class="text-ink-900">Quick Setup</span></div>
               <a href="#new" class="text-[13px] text-ink-500 hover:text-ink-900 inline-flex items-center gap-1.5"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back</a>
             </div>
             <button onclick="saveAndExit()" class="text-[13px] text-ink-500 hover:text-ink-900 inline-flex items-center gap-1.5"><i data-lucide="save" class="w-3.5 h-3.5"></i> Save &amp; Exit</button>
@@ -517,47 +596,30 @@
         <div class="grid grid-cols-1 lg:grid-cols-[55%_1fr] gap-0 min-h-[calc(100vh-64px-86px)]">
           <div class="border-r border-line flex flex-col">
             <div class="px-8 py-5 border-b border-line">
-              <h2 class="text-[18px] font-bold text-ink-900">Tell us about your project</h2>
-              <p class="text-[13px] text-ink-500 mt-0.5">Write in plain language. AI will structure it into a DPR.</p>
+              <h2 class="text-[18px] font-bold text-ink-900">Quick Setup</h2>
+              <p class="text-[13px] text-ink-500 mt-0.5">A few quick questions to pre-fill your DPR — answer what you know, refine the rest in the full form.</p>
+              <div id="dprWizardStepLabel" class="text-[11px] text-ink-400 mt-2 text-center">Step 1 of 8</div>
             </div>
-            <div id="dprChatScroll" class="flex-1 overflow-y-auto px-8 py-5 space-y-4">
-              <div class="msg max-w-[88%]">
-                <div class="flex items-start gap-2.5">
-                  <div class="w-7 h-7 rounded-lg bg-primary text-white flex items-center justify-center shrink-0"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i></div>
-                  <div class="bg-primary-light text-ink-900 text-[13.5px] leading-relaxed px-4 py-3 rounded-tr-xl rounded-br-xl rounded-bl-xl">
-                    Hello! I'll help you create a DPR. Tell me about your project — for example: <em>"We need to repair 12 km of roads in Bandra West"</em> or <em>"We need to install water pipelines in Kalyan East covering 3 wards."</em>
-                  </div>
-                </div>
-                <div class="ml-9 mt-3 flex flex-wrap gap-2">
-                  <button class="chip" onclick="dprChatStart('Repair 12 km of roads in Bandra West Zone 4')">Road resurfacing</button>
-                  <button class="chip" onclick="dprChatStart('Install water pipelines in Kalyan East covering 3 wards')">Water pipeline</button>
-                  <button class="chip" onclick="dprChatStart('LED street light retrofit across Zone 2')">LED street lights</button>
-                  <button class="chip" onclick="dprChatStart('Renovate AMC office building Phase 3')">Office renovation</button>
-                </div>
-              </div>
-            </div>
-            <div class="border-t border-line bg-white px-8 py-4">
-              <div class="relative">
-                <textarea id="dprChatInput" rows="2" placeholder="Describe your project in plain language…" class="w-full border border-line rounded-[10px] px-4 py-3 text-[13.5px] resize-none min-h-[72px] focus:outline-none focus:border-primary focus:ring-[3px] focus:ring-primary/10"></textarea>
-                <button onclick="dprChatSend()" aria-label="Send" class="absolute bottom-3 right-3 w-9 h-9 rounded-lg bg-primary text-white flex items-center justify-center hover:bg-primary/90 shadow-soft"><i data-lucide="arrow-up" class="w-4 h-4"></i></button>
-              </div>
-            </div>
+            <div id="dprChatScroll" class="flex-1 overflow-y-auto px-8 py-5 space-y-3" aria-live="polite" role="log"></div>
+            <div class="border-t border-line bg-white px-8 py-3 text-[11px] text-ink-400 italic text-center">No data is sent to any AI service — this is a guided form to help you fill in the DPR faster.</div>
           </div>
           <div class="bg-surface px-8 py-6 flex flex-col">
             <div class="flex items-center justify-between mb-4">
               <div class="text-[12.5px] font-bold text-ink-500 uppercase tracking-wide">DPR Form Preview</div>
-              <div id="dprFillStatus" class="text-[12px] text-ink-500 inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-ink-400"></span><span>Waiting…</span></div>
+              <div id="dprFillStatus" class="text-[12px] text-ink-500 inline-flex items-center gap-1.5" aria-live="polite"><span class="w-2 h-2 rounded-full bg-ink-400"></span><span>Waiting for your answers…</span></div>
             </div>
             <div class="bg-white border border-line rounded-2xl p-5 space-y-3.5 flex-1">
               <div class="dpr-pf-row" data-field="title"><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1.5">Project Title</label><div class="field flex items-center justify-between text-ink-400 text-[13.5px]"><span class="pf-val">—</span><i data-lucide="check" class="w-4 h-4 text-success opacity-0 pf-tick"></i></div></div>
               <div class="dpr-pf-row" data-field="type"><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1.5">Project Type</label><div class="field flex items-center justify-between text-ink-400 text-[13.5px]"><span class="pf-val">—</span><i data-lucide="check" class="w-4 h-4 text-success opacity-0 pf-tick"></i></div></div>
               <div class="dpr-pf-row" data-field="sector"><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1.5">Sector</label><div class="field flex items-center justify-between text-ink-400 text-[13.5px]"><span class="pf-val">—</span><i data-lucide="check" class="w-4 h-4 text-success opacity-0 pf-tick"></i></div></div>
               <div class="dpr-pf-row" data-field="dept"><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1.5">Department</label><div class="field flex items-center justify-between text-ink-400 text-[13.5px]"><span class="pf-val">—</span><i data-lucide="check" class="w-4 h-4 text-success opacity-0 pf-tick"></i></div></div>
-              <div class="dpr-pf-row" data-field="cost"><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1.5">Estimated Cost</label><div class="field flex items-center justify-between text-ink-400 text-[13.5px]"><span class="pf-val">—</span><i data-lucide="check" class="w-4 h-4 text-success opacity-0 pf-tick"></i></div></div>
               <div class="dpr-pf-row" data-field="scope"><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1.5">Scope</label><div class="field flex items-center justify-between text-ink-400 text-[13.5px]"><span class="pf-val">—</span><i data-lucide="check" class="w-4 h-4 text-success opacity-0 pf-tick"></i></div></div>
+              <div class="dpr-pf-row" data-field="location"><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1.5">Location</label><div class="field flex items-center justify-between text-ink-400 text-[13.5px]"><span class="pf-val">—</span><i data-lucide="check" class="w-4 h-4 text-success opacity-0 pf-tick"></i></div></div>
+              <div class="dpr-pf-row" data-field="cost"><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1.5">Estimated Cost</label><div class="field flex items-center justify-between text-ink-400 text-[13.5px]"><span class="pf-val">—</span><i data-lucide="check" class="w-4 h-4 text-success opacity-0 pf-tick"></i></div></div>
+              <div class="dpr-pf-row" data-field="priority"><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1.5">Priority</label><div class="field flex items-center justify-between text-ink-400 text-[13.5px]"><span class="pf-val">—</span><i data-lucide="check" class="w-4 h-4 text-success opacity-0 pf-tick"></i></div></div>
+              <div class="dpr-pf-row" data-field="funding"><label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1.5">Funding Source</label><div class="field flex items-center justify-between text-ink-400 text-[13.5px]"><span class="pf-val">—</span><i data-lucide="check" class="w-4 h-4 text-success opacity-0 pf-tick"></i></div></div>
             </div>
-            <div class="text-[12px] text-ink-400 italic mt-3">You can edit everything on the next screen.</div>
-            <a id="dprReviewBtn" href="#step1" class="hidden mt-4 w-full inline-flex items-center justify-center gap-1.5 px-4 py-3 rounded-lg bg-primary text-white text-[14px] font-medium hover:bg-primary/90 shadow-soft">Review &amp; Edit Full Form <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
+            <div class="text-[12px] text-ink-400 italic mt-3">You'll be able to edit every field on the next screen.</div>
           </div>
         </div>
       </section>
@@ -576,7 +638,7 @@
 
         <div class="max-w-[680px] mx-auto">
           <h1 class="text-[20px] font-bold text-ink-900">Upload Your Existing DPR</h1>
-          <p class="text-[14px] text-ink-500 mt-1">AI will extract project details, BOQ, scope and location automatically. Review and edit everything before proceeding.</p>
+          <p class="text-[14px] text-ink-500 mt-1">Upload your existing DPR document. We'll read the key details and help you fill in the form.</p>
 
           <div id="dprUpState1" class="mt-6 rounded-2xl border-2 border-dashed border-ink-400/40 px-10 py-14 text-center hover:border-primary hover:bg-primary-light/40 transition cursor-pointer" onclick="dprStartUpload()">
             <div class="w-12 h-12 rounded-xl bg-primary-light text-primary mx-auto flex items-center justify-center mb-3"><i data-lucide="upload-cloud" class="w-6 h-6"></i></div>
@@ -591,31 +653,32 @@
               <div class="flex-1"><div class="text-[14px] font-medium text-ink-900">Water_Pipeline_Kalyan_East_DPR.pdf</div><div class="text-[12px] text-ink-500">5.4 MB • Uploaded just now</div></div>
             </div>
             <div class="h-1.5 rounded-full bg-line overflow-hidden" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div id="dprUpProgress" class="h-full bg-primary rounded-full transition-[width] duration-300" style="width: 0%;"></div></div>
-            <div class="mt-3 text-[13px] text-ink-500 inline-flex items-center gap-2"><i data-lucide="loader-2" class="w-3.5 h-3.5 spin text-primary"></i> AI is reading your DPR<span>…</span></div>
+            <div class="mt-3 text-[13px] text-ink-500 inline-flex items-center gap-2"><i data-lucide="loader-2" class="w-3.5 h-3.5 spin text-primary"></i> Reading your document<span>…</span></div>
           </div>
 
           <div id="dprUpState3" class="hidden mt-6 bg-white border border-line rounded-2xl p-6">
             <div class="flex items-center gap-3 mb-1">
               <div class="w-10 h-10 rounded-lg bg-success-light text-success flex items-center justify-center"><i data-lucide="check-circle-2" class="w-5 h-5"></i></div>
-              <div class="flex-1"><h3 class="text-[15px] font-bold text-ink-900">Here's what AI found in your DPR</h3><div class="text-[12px] text-ink-500">Water_Pipeline_Kalyan_East_DPR.pdf — 5.4 MB</div></div>
+              <div class="flex-1"><h3 class="text-[15px] font-bold text-ink-900">Detected fields — please verify</h3><div class="text-[12px] text-ink-500">Water_Pipeline_Kalyan_East_DPR.pdf — 5.4 MB</div></div>
             </div>
+            <div class="mt-3 text-[12px] text-ink-500 italic">We've pulled what we could from the document text. Please verify each value before continuing.</div>
             <ul class="mt-4 space-y-2.5 text-[13.5px]">
-              <li class="flex items-center justify-between"><span class="inline-flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-success"></i> <strong>Project Title</strong></span><span class="text-ink-900">Water Pipeline Kalyan East</span></li>
-              <li class="flex items-center justify-between"><span class="inline-flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-success"></i> <strong>Sector</strong></span><span class="text-ink-900">Infrastructure</span></li>
-              <li class="flex items-center justify-between"><span class="inline-flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-success"></i> <strong>Estimated Cost</strong></span><span class="text-ink-900">₹1,20,00,000</span></li>
-              <li class="flex items-center justify-between"><span class="inline-flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-success"></i> <strong>BOQ line items</strong></span><span class="text-ink-900">18 items found</span></li>
-              <li class="flex items-center justify-between"><span class="inline-flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-success"></i> <strong>Scope of work</strong></span><span class="text-ink-900">840 words extracted</span></li>
-              <li class="flex items-center justify-between"><span class="inline-flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-success"></i> <strong>Location</strong></span><span class="text-ink-900">Kalyan East, Thane</span></li>
-              <li class="flex items-center justify-between"><span class="inline-flex items-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4 text-warning"></i> <strong>AA Number</strong></span><span class="text-warning">Not found — enter manually</span></li>
-              <li class="flex items-center justify-between"><span class="inline-flex items-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4 text-warning"></i> <strong>Drawings</strong></span><span class="text-warning">Not found — attach separately</span></li>
+              <li class="flex items-center justify-between"><span class="inline-flex items-center gap-2"><strong>Project Title</strong> <span class="text-[10px] font-bold rounded px-1.5 py-0.5" style="background:#FFFBEB; color:#92400E;">Please verify</span></span><span class="text-ink-900">Water Pipeline Kalyan East</span></li>
+              <li class="flex items-center justify-between"><span class="inline-flex items-center gap-2"><strong>Sector</strong> <span class="text-[10px] font-bold rounded px-1.5 py-0.5" style="background:#FFFBEB; color:#92400E;">Please verify</span></span><span class="text-ink-900">Infrastructure</span></li>
+              <li class="flex items-center justify-between"><span class="inline-flex items-center gap-2"><strong>Estimated Cost</strong> <span class="text-[10px] font-bold rounded px-1.5 py-0.5" style="background:#FFFBEB; color:#92400E;">Please verify</span></span><span class="text-ink-900">₹1,20,00,000</span></li>
+              <li class="flex items-center justify-between"><span class="inline-flex items-center gap-2"><strong>BOQ line items</strong> <span class="text-[10px] font-bold rounded px-1.5 py-0.5" style="background:#FFFBEB; color:#92400E;">Please verify</span></span><span class="text-ink-900">18 items detected</span></li>
+              <li class="flex items-center justify-between"><span class="inline-flex items-center gap-2"><strong>Scope of work</strong> <span class="text-[10px] font-bold rounded px-1.5 py-0.5" style="background:#FFFBEB; color:#92400E;">Please verify</span></span><span class="text-ink-900">840 words detected</span></li>
+              <li class="flex items-center justify-between"><span class="inline-flex items-center gap-2"><strong>Location</strong> <span class="text-[10px] font-bold rounded px-1.5 py-0.5" style="background:#FFFBEB; color:#92400E;">Please verify</span></span><span class="text-ink-900">Kalyan East, Thane</span></li>
+              <li class="flex items-center justify-between"><span class="inline-flex items-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4 text-warning"></i> <strong>AA Number</strong></span><span class="text-warning">Enter manually</span></li>
+              <li class="flex items-center justify-between"><span class="inline-flex items-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4 text-warning"></i> <strong>Drawings</strong></span><span class="text-warning">Enter manually</span></li>
             </ul>
             <div class="mt-5 pt-5 border-t border-line flex items-center justify-between flex-wrap gap-3">
               <div class="flex items-center gap-3 text-[12.5px]">
                 <button onclick="dprResetUpload()" class="text-ink-500 hover:text-ink-900 inline-flex items-center gap-1.5"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Re-upload</button>
                 <span class="text-ink-300">|</span>
-                <a href="#describe" class="text-ink-500 hover:text-ink-900 inline-flex items-center gap-1.5"><i data-lucide="message-square-text" class="w-3.5 h-3.5"></i> Describe instead</a>
+                <a href="#describe" class="text-ink-500 hover:text-ink-900 inline-flex items-center gap-1.5"><i data-lucide="message-square-text" class="w-3.5 h-3.5"></i> Try quick setup instead</a>
               </div>
-              <a href="#step1" class="px-4 py-2.5 rounded-lg bg-primary text-white text-[13.5px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5 shadow-soft">Review &amp; Edit Extracted Data <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
+              <a href="#step1" class="px-4 py-2.5 rounded-lg bg-primary text-white text-[13.5px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5 shadow-soft">Verify &amp; Continue <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
             </div>
           </div>
         </div>
@@ -664,6 +727,93 @@
 
 <!-- Addition 3 — Version History slide-in panel -->
 <aside id="versionHistoryPanel" class="vh-panel" role="complementary" aria-label="Version history" aria-hidden="true"></aside>
+
+<!-- DPR Draft Preview Panel — mirrors tender-creation Check Draft pattern -->
+<div id="dprDraftBackdrop" class="hidden fixed inset-y-0 right-0 bg-black/30 opacity-0" style="left: 244px; z-index: 400;" onclick="closeDprDraftPanel()"></div>
+<aside id="dprDraftPanel" role="dialog" aria-modal="true" aria-label="DPR Draft Preview" class="fixed top-0 bottom-0 bg-white flex flex-col" style="right: 0; width: 720px; max-width: 100vw; z-index: 500; transform: translateX(100%); box-shadow: -4px 0 24px rgba(0,0,0,0.12);">
+  <!-- Panel header -->
+  <header class="shrink-0 flex items-center justify-between px-5" style="height: 56px; background: #F9FAFB; border-bottom: 1px solid #E5E7EB;">
+    <div class="min-w-0">
+      <div class="flex items-center gap-1.5 text-[14px] font-bold text-ink-900"><i data-lucide="file-text" class="w-4 h-4" style="color:#0F5EE8;"></i> DPR Draft Preview</div>
+      <div class="text-[11px] text-ink-400 mt-0.5"><span class="font-mono">DPR-2026-001</span> · Last saved <span id="dprDraftLastSaved">2 min ago</span></div>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="relative">
+        <button id="dprPanelLangBtn" onclick="toggleDprPanelLangMenu(event)" aria-label="Switch document language" class="inline-flex items-center gap-1 text-[11px]" style="background:white; color:#6B7280; border:1px solid #E5E7EB; border-radius:20px; padding:4px 10px;">
+          <i data-lucide="globe" class="w-3 h-3"></i><span id="dprPanelLangLabel">English</span><i data-lucide="chevron-down" class="w-3 h-3"></i>
+        </button>
+        <div id="dprPanelLangMenu" class="hidden absolute right-0 mt-1.5 w-52 bg-white border border-line rounded-lg z-50" style="box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 4px;">
+          <button data-lang="en" onclick="switchDprPanelLanguage('en')" class="w-full text-left px-3 py-2 text-[13px] hover:bg-surface rounded-md flex items-center justify-between"><span>🇮🇳 English</span><span id="dprPanelLangCheck-en" class="text-primary">✓</span></button>
+          <button data-lang="hi" onclick="switchDprPanelLanguage('hi')" class="w-full text-left px-3 py-2 text-[13px] hover:bg-surface rounded-md flex items-center justify-between"><span>🇮🇳 हिन्दी (Hindi)</span><span id="dprPanelLangCheck-hi" class="text-primary hidden">✓</span></button>
+          <button data-lang="mr" onclick="switchDprPanelLanguage('mr')" class="w-full text-left px-3 py-2 text-[13px] hover:bg-surface rounded-md flex items-center justify-between"><span>🇮🇳 मराठी (Marathi)</span><span id="dprPanelLangCheck-mr" class="text-primary hidden">✓</span></button>
+        </div>
+      </div>
+      <button id="dprDraftEditBtn" onclick="setDprEditMode(!dprEditMode)" class="bg-primary text-white text-[13px] font-medium hover:bg-primary/90" style="border-radius: 6px; padding: 6px 14px;">Edit Document</button>
+      <button id="dprDraftCloseBtn" onclick="closeDprDraftPanel()" aria-label="Close DPR draft" class="w-7 h-7 rounded text-ink-500 hover:bg-ink-400/15 hover:text-ink-900 flex items-center justify-center"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+  </header>
+
+  <!-- Progress strip -->
+  <div style="background:#F9FAFB; border-bottom:1px solid #F3F4F6; padding:8px 20px;">
+    <div class="flex items-center justify-between">
+      <div class="text-[12px] text-ink-500" aria-live="polite">Document is <span id="dprDraftPct">0</span>% complete</div>
+      <div id="dprSyncIndicator" class="opacity-0 inline-flex items-center gap-1 text-[11px] text-ink-400 transition-opacity"><i data-lucide="refresh-cw" class="w-3 h-3"></i> Refreshed</div>
+    </div>
+    <div class="mt-1 h-[3px] rounded overflow-hidden" style="background:#E5E7EB;"><div id="dprDraftPctBar" class="h-full bg-primary" style="width:0%; transition: width 300ms ease;"></div></div>
+  </div>
+
+  <!-- Language switch banner -->
+  <div id="dprPanelLangBanner" role="status" aria-live="polite" class="hidden flex items-center gap-1.5" style="background: #FFFBEB; border-bottom: 1px solid #FCD34D; padding: 8px 20px; font-size: 12px; color: #92400E;">
+    <i data-lucide="info" class="w-3.5 h-3.5"></i>
+    <span id="dprPanelLangBannerText">Document shown in हिन्दी. Form inputs remain in English.</span>
+  </div>
+
+  <!-- Edit mode banner -->
+  <div id="dprEditBanner" role="status" class="hidden items-center justify-between gap-1.5" style="background: #FFFBEB; border-bottom: 1px solid #FCD34D; padding: 8px 20px; font-size: 12px; color: #92400E; display: none;">
+    <span><i data-lucide="pencil" class="w-3 h-3 inline-block -mt-0.5 mr-1"></i> ✎ Edit mode — select any section or highlight text to modify</span>
+    <button onclick="setDprEditMode(false)" class="inline-flex items-center gap-1 text-white text-[11px] font-medium" style="background:#10B981; border-radius:4px; padding:3px 10px;"><i data-lucide="check" class="w-3 h-3"></i> Done editing</button>
+  </div>
+
+  <!-- Body -->
+  <div id="dprDraftBody" class="flex-1 overflow-y-auto relative" style="padding: 24px 28px;">
+    <div id="dprDraftDoc" class="dpr-draft-doc-body"></div>
+  </div>
+
+  <!-- Selection dialogue (same shape as tender-creation) -->
+  <div id="dprSelDialogue" class="hidden absolute" style="z-index:600;" role="dialog" aria-label="Edit DPR selection">
+    <div class="bg-white border border-line" style="border-radius: 12px; width: 320px; box-shadow: 0 8px 24px rgba(0,0,0,0.12);">
+      <div class="flex items-center justify-between" style="padding: 12px 16px 10px; border-bottom: 1px solid #F3F4F6;">
+        <div class="text-[12px] font-bold text-ink-900">Editing selection</div>
+        <button onclick="closeDprSelectionDialogue()" aria-label="Close" class="text-ink-400 hover:text-ink-900"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <div style="padding: 8px 16px; background: #F9FAFB; border-bottom: 1px solid #F3F4F6;">
+        <div id="dprSelPreview" class="text-[12px] italic" style="color: #374151;">""</div>
+      </div>
+      <div class="flex items-center gap-0" style="border-bottom: 1px solid #F3F4F6;">
+        <button id="dprAiTabBtn" onclick="switchDprSelTab('ai')" class="font-medium" style="padding: 8px 16px; font-size: 12px; border-bottom: 2px solid #0F5EE8; color: #0F5EE8; background:transparent; border-top:none; border-left:none; border-right:none; cursor:pointer;"><i data-lucide="sparkles" class="w-3 h-3 inline-block -mt-0.5 mr-0.5"></i> AI Suggest</button>
+        <button id="dprManualTabBtn" onclick="switchDprSelTab('manual')" style="padding: 8px 16px; font-size: 12px; border-bottom: 2px solid transparent; color: #6B7280; background:transparent; border-top:none; border-left:none; border-right:none; cursor:pointer;"><i data-lucide="pencil" class="w-3 h-3 inline-block -mt-0.5 mr-0.5"></i> Edit Manually</button>
+      </div>
+      <div id="dprAiTab" style="padding: 14px 16px;">
+        <input id="dprAiPrompt" type="text" placeholder="What do you want to change?" class="w-full text-[13px]" style="border:1px solid #E5E7EB; border-radius:8px; padding:8px 12px;" onkeydown="if(event.key==='Enter'){event.preventDefault(); dprAiSuggest();}" />
+        <div class="mt-2 flex items-center justify-between gap-2 flex-wrap">
+          <div class="flex flex-wrap gap-1.5">
+            <button onclick="dprQuickPrompt('Make more formal')" class="text-[11px] text-ink-500 hover:text-ink-900" style="border:1px solid #E5E7EB; border-radius:20px; padding:4px 10px; background:white; cursor:pointer;">Make more formal</button>
+            <button onclick="dprQuickPrompt('Simplify')" class="text-[11px] text-ink-500 hover:text-ink-900" style="border:1px solid #E5E7EB; border-radius:20px; padding:4px 10px; background:white; cursor:pointer;">Simplify</button>
+            <button onclick="dprQuickPrompt('Expand with more detail')" class="text-[11px] text-ink-500 hover:text-ink-900" style="border:1px solid #E5E7EB; border-radius:20px; padding:4px 10px; background:white; cursor:pointer;">Expand</button>
+            <button onclick="dprQuickPrompt('Translate to Hindi')" class="text-[11px] text-ink-500 hover:text-ink-900" style="border:1px solid #E5E7EB; border-radius:20px; padding:4px 10px; background:white; cursor:pointer;">Translate to Hindi</button>
+          </div>
+          <button onclick="dprAiSuggest()" class="bg-primary text-white text-[12px] font-medium hover:bg-primary/90 inline-flex items-center gap-1" style="border-radius:6px; padding:6px 14px;"><i data-lucide="sparkles" class="w-3 h-3"></i> Suggest</button>
+        </div>
+        <div id="dprAiSuggestOut"></div>
+      </div>
+      <div id="dprManualTab" class="hidden" style="padding: 14px 16px;">
+        <label class="block text-[12px] text-ink-500 mb-1.5">Replace selected text with:</label>
+        <textarea id="dprManualEditArea" class="w-full text-[13px]" style="min-height:80px; border:1px solid #E5E7EB; border-radius:8px; padding:10px 12px; resize:vertical;"></textarea>
+        <button onclick="applyDprManualEdit()" class="w-full bg-primary text-white text-[13px] font-bold hover:bg-primary/90 mt-2.5" style="border-radius:8px; padding:8px;">Apply change</button>
+      </div>
+    </div>
+  </div>
+</aside>
 
 <!-- Confirm modal -->
 <div id="confirmModal" class="hidden fixed inset-0 z-[60] bg-ink-900/40 flex items-center justify-center p-4">
@@ -1227,79 +1377,515 @@
     });
   }
 
-  // ===================== DESCRIBE FLOW =====================
-  let dprChatStep = 0;
-  function dprAppendMsg(html, who){
+  // ===================== QUICK SETUP — STRUCTURED 8-QUESTION WIZARD =====================
+  // No AI backend, no fetch — pure rules-based JS. State persists to FORM_STATE when
+  // the officer clicks "Looks good — continue to full form →".
+  const dprWizardState = {
+    type: null,             // 'works'|'goods'|'services'|'it'
+    typeLabel: null,
+    dept: null,
+    deptOther: '',
+    sector: null,
+    scopeSentence: '',
+    title: '',
+    locationArea: '',
+    locationZone: '',
+    scale: null,            // for Works: range; Goods: qty; Services: duration; IT: scale
+    scaleLabel: null,
+    scaleUnit: null,        // Goods only
+    estRange: null,         // human display string for cost range
+    priority: null,         // 'routine'|'priority'|'emergency'
+    priorityLabel: null,
+    funding: null,
+    fundingLabel: null,
+    currentStep: 1,         // 1..8
+    completed: { 1:false, 2:false, 3:false, 4:false, 5:false, 6:false, 7:false },
+    locked: { 1:false, 2:false, 3:false, 4:false, 5:false, 6:false, 7:false }, // becomes true once moved past
+  };
+  const DEPT_SECTORS = {
+    'Public Works':              ['Infrastructure','Roads','Buildings'],
+    'Water Supply & Sanitation': ['Water & Sanitation','Pipelines'],
+    'Urban Development':         ['Urban Development','Town Planning'],
+    'IT & Digital Services':     ['IT / Software','Digital','Cybersecurity'],
+    'Health':                    ['Healthcare','Medical Equipment'],
+    'Education':                 ['Education','School Infrastructure'],
+    'Finance':                   ['General Administration'],
+    'Parks & Gardens':           ['Parks & Gardens','Urban Greens'],
+    'Sanitation':                ['Sanitation','Solid Waste'],
+    'Energy':                    ['Energy','Power'],
+    'Transport':                 ['Transport','Logistics'],
+    'Other':                     ['General','Other'],
+  };
+  const TYPE_LABELS = { works:'Works', goods:'Goods', services:'Services', it:'IT / Software' };
+  const TYPE_SECTORS = { works:'Infrastructure', goods:'Procurement', services:'Services', it:'IT / Software' };
+
+  // ---- helpers ----
+  function dprWizardScrollToEnd(){
+    const scroll = document.getElementById('dprChatScroll');
+    if (!scroll) return;
+    setTimeout(() => { scroll.scrollTo({ top: scroll.scrollHeight, behavior: 'smooth' }); }, 30);
+  }
+  function dprWizardClearScroll(){ const s = document.getElementById('dprChatScroll'); if (s) s.innerHTML = ''; }
+  function dprWizardAppendAssistant(html){
+    const s = document.getElementById('dprChatScroll'); if (!s) return null;
     const wrap = document.createElement('div');
-    wrap.className = 'msg max-w-[88%] ' + (who === 'user' ? 'ml-auto' : '');
-    wrap.innerHTML = html;
-    document.getElementById('dprChatScroll').appendChild(wrap);
-    document.getElementById('dprChatScroll').scrollTop = 9999;
+    wrap.className = 'wz-msg';
+    wrap.innerHTML = `<div class="wz-asst-label">TenderAI Assistant</div><div class="wz-assistant-row"><div class="wz-assistant-avatar"><i data-lucide="sparkles" style="width:13px; height:13px;"></i></div><div class="wz-asst-bubble">${html}</div></div>`;
+    s.appendChild(wrap);
     refreshIcons();
+    dprWizardScrollToEnd();
+    return wrap;
   }
-  function aiBubble(content){ return `<div class="flex items-start gap-2.5"><div class="w-7 h-7 rounded-lg bg-primary text-white flex items-center justify-center shrink-0"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i></div><div class="bg-primary-light text-ink-900 text-[13.5px] leading-relaxed px-4 py-3 rounded-tr-xl rounded-br-xl rounded-bl-xl">${content}</div></div>`; }
-  function userBubble(t){ return `<div class="flex items-start gap-2.5 justify-end"><div class="bg-ink-900 text-white text-[13.5px] leading-relaxed px-4 py-3 rounded-tl-xl rounded-bl-xl rounded-br-xl max-w-full">${t}</div><div class="w-7 h-7 rounded-lg bg-ink-900 text-white flex items-center justify-center shrink-0 text-[11px] font-semibold">RK</div></div>`; }
-  function dprTyping(){ const w = document.createElement('div'); w.className='msg'; w.id='dprTyping'; w.innerHTML = `<div class="flex items-start gap-2.5"><div class="w-7 h-7 rounded-lg bg-primary text-white flex items-center justify-center shrink-0"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i></div><div class="bg-primary-light px-4 py-3 rounded-tr-xl rounded-br-xl rounded-bl-xl"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div></div>`; document.getElementById('dprChatScroll').appendChild(w); refreshIcons(); }
-  function dprHideTyping(){ const t = document.getElementById('dprTyping'); if (t) t.remove(); }
-  function dprFillPreview(field, val){
-    const row = document.querySelector(`#view-describe .dpr-pf-row[data-field="${field}"]`); if (!row) return;
-    const fld = row.querySelector('.field'), v = row.querySelector('.pf-val'), tk = row.querySelector('.pf-tick');
-    v.textContent = val; v.classList.remove('text-ink-400'); v.classList.add('text-ink-900');
-    fld.classList.remove('field-flash'); void fld.offsetWidth; fld.classList.add('field-flash');
-    tk.classList.remove('opacity-0');
-    document.getElementById('dprFillStatus').innerHTML = '<span class="w-2 h-2 rounded-full bg-primary pulse-blue"></span><span>Filling automatically…</span>';
+  function dprWizardAppendUser(text){
+    const s = document.getElementById('dprChatScroll'); if (!s) return null;
+    const wrap = document.createElement('div');
+    wrap.className = 'wz-msg';
+    wrap.innerHTML = `<div class="wz-user-bubble">${esc(text)}</div>`;
+    s.appendChild(wrap);
+    dprWizardScrollToEnd();
+    return wrap;
   }
-  function dprChatStart(text){
-    if (dprChatStep !== 0) return;
-    dprAppendMsg(userBubble(text), 'user');
-    dprTyping();
-    setTimeout(() => {
-      dprHideTyping();
-      dprAppendMsg(aiBubble(`Got it! This looks like a <strong>Civil Works</strong> project under <strong>Infrastructure</strong>. Let me ask two quick things:`));
-      setTimeout(() => dprFillPreview('title', 'Road Resurfacing Bandra West Z4'), 200);
-      setTimeout(() => dprFillPreview('type', 'Civil Works — Road Repair'), 700);
-      setTimeout(() => dprFillPreview('sector', 'Infrastructure'), 1200);
-      setTimeout(() => {
-        dprAppendMsg(aiBubble(`<div class="font-medium mb-2">What is the approximate project cost?</div><div class="flex flex-wrap gap-2"><button class="chip" onclick="dprAnswerCost('Under ₹25L')">Under ₹25L</button><button class="chip" onclick="dprAnswerCost('₹25L–₹2Cr')">₹25L–₹2Cr</button><button class="chip" onclick="dprAnswerCost('₹2Cr–₹10Cr')">₹2Cr–₹10Cr</button><button class="chip" onclick="dprAnswerCost('Above ₹10Cr')">Above ₹10Cr</button></div>`));
-        dprChatStep = 1;
-      }, 1500);
-    }, 1500);
+  function dprWizardTyping(){
+    const s = document.getElementById('dprChatScroll'); if (!s) return null;
+    const wrap = document.createElement('div');
+    wrap.className = 'wz-msg';
+    wrap.id = 'dprWzTyping';
+    wrap.innerHTML = `<div class="wz-assistant-row"><div class="wz-assistant-avatar"><i data-lucide="sparkles" style="width:13px; height:13px;"></i></div><div class="wz-typing"><span></span><span></span><span></span></div></div>`;
+    s.appendChild(wrap);
+    refreshIcons();
+    dprWizardScrollToEnd();
+    return wrap;
   }
-  function dprChatSend(){ const v = document.getElementById('dprChatInput').value.trim(); if (!v) return; document.getElementById('dprChatInput').value=''; dprChatStart(v); }
-  function dprAnswerCost(label){
-    if (dprChatStep !== 1) return;
-    dprAppendMsg(userBubble(label), 'user'); dprTyping();
-    setTimeout(() => {
-      dprHideTyping();
-      dprFillPreview('cost', label);
-      dprAppendMsg(aiBubble(`<div class="font-medium mb-2">Which department will own this project?</div><div class="flex flex-wrap gap-2"><button class="chip" onclick="dprAnswerDept('Public Works')">Public Works</button><button class="chip" onclick="dprAnswerDept('Water Supply')">Water</button><button class="chip" onclick="dprAnswerDept('Energy')">Energy</button><button class="chip" onclick="dprAnswerDept('Sanitation')">Sanitation</button><button class="chip" onclick="dprAnswerDept('Other')">Other</button></div>`));
-      dprChatStep = 2;
-    }, 1300);
+  function dprWizardHideTyping(){ const t = document.getElementById('dprWzTyping'); if (t) t.remove(); }
+  function dprWizardUpdateStepLabel(){
+    const el = document.getElementById('dprWizardStepLabel');
+    if (el){
+      const step = Math.max(1, Math.min(8, dprWizardState.currentStep));
+      el.textContent = step >= 8 ? 'Summary' : `Step ${step} of 8`;
+    }
   }
-  function dprAnswerDept(label){
-    if (dprChatStep !== 2) return;
-    dprAppendMsg(userBubble(label), 'user'); dprTyping();
-    setTimeout(() => {
-      dprHideTyping();
-      dprFillPreview('dept', label);
-      setTimeout(() => dprFillPreview('scope', '12 km road resurfacing'), 400);
-      dprAppendMsg(aiBubble(`<div class="mb-2.5">Got it. Here's what I've understood:</div>
-        <div class="bg-white border border-line rounded-lg p-3 text-[13px] grid grid-cols-2 gap-y-1.5">
-          <span class="text-ink-500">Project Type</span><span class="text-ink-900 font-medium">Civil Works — Road Repair</span>
-          <span class="text-ink-500">Location</span><span class="text-ink-900 font-medium">Bandra West, Mumbai</span>
-          <span class="text-ink-500">Sector</span><span class="text-ink-900 font-medium">Infrastructure</span>
-          <span class="text-ink-500">Department</span><span class="text-ink-900 font-medium">${label}</span>
-          <span class="text-ink-500">Est. Cost</span><span class="text-ink-900 font-medium">₹45,00,000</span>
-          <span class="text-ink-500">Scope</span><span class="text-ink-900 font-medium">12 km road resurfacing</span>
+  function dprWizardUpdateStatus(text, kind){
+    const el = document.getElementById('dprFillStatus');
+    if (!el) return;
+    const cls = kind === 'done' ? 'bg-success' : kind === 'active' ? 'bg-primary pulse-blue' : 'bg-ink-400';
+    el.innerHTML = `<span class="w-2 h-2 rounded-full ${cls}"></span><span class="${kind==='done'?'text-success font-medium':''}">${esc(text)}</span>`;
+  }
+  function updatePreviewField(field, value){
+    const row = document.querySelector(`#view-describe .dpr-pf-row[data-field="${field}"]`);
+    if (!row) return;
+    const fld = row.querySelector('.field');
+    const v   = row.querySelector('.pf-val');
+    const tk  = row.querySelector('.pf-tick');
+    if (!v) return;
+    v.textContent = value || '—';
+    if (value){ v.classList.remove('text-ink-400'); v.classList.add('text-ink-900'); }
+    else { v.classList.add('text-ink-400'); v.classList.remove('text-ink-900'); }
+    if (fld){ fld.classList.remove('field-flash'); void fld.offsetWidth; fld.classList.add('field-flash'); }
+    if (tk) tk.classList.toggle('opacity-0', !value);
+  }
+  // Title-case helper — capitalises every significant word, appends sector context tag
+  function dprTitleCase(sentence, sector){
+    if (!sentence) return '';
+    const stops = new Set(['a','an','the','of','to','in','on','for','at','by','with','from','and','or']);
+    const words = sentence.trim().replace(/\s+/g,' ').split(' ');
+    const titled = words.map((w, i) => (i === 0 || !stops.has(w.toLowerCase())) ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : w.toLowerCase());
+    let title = titled.join(' ').replace(/\.$/,'');
+    // Append sector context if meaningful and not already in the title
+    if (sector && !new RegExp(sector, 'i').test(title)){
+      title = title + ' — ' + sector;
+    }
+    return title;
+  }
+
+  // ---- step orchestration ----
+  function dprWizardStart(){
+    dprWizardClearScroll();
+    Object.assign(dprWizardState, { currentStep: 1, completed: {}, locked: {} });
+    ['title','type','sector','dept','cost','scope','location','priority','funding'].forEach(f => updatePreviewField(f, ''));
+    dprWizardUpdateStepLabel();
+    dprWizardUpdateStatus('Waiting for your answers…', null);
+    dprAskQuestion(1);
+  }
+  function dprWizardAdvance(toStep){
+    dprWizardState.currentStep = toStep;
+    dprWizardUpdateStepLabel();
+    if (toStep === 8){ dprWizardShowSummary(); return; }
+    dprWizardTyping();
+    setTimeout(() => { dprWizardHideTyping(); dprAskQuestion(toStep); }, 600);
+  }
+  function dprAskQuestion(n){
+    if (n === 1) return dprAskQ1();
+    if (n === 2) return dprAskQ2();
+    if (n === 3) return dprAskQ3();
+    if (n === 4) return dprAskQ4();
+    if (n === 5) return dprAskQ5();
+    if (n === 6) return dprAskQ6();
+    if (n === 7) return dprAskQ7();
+    if (n === 8) return dprWizardShowSummary();
+  }
+
+  // ===== Q1 — Type of work =====
+  function dprAskQ1(){
+    const chips = [
+      ['works',    'Works',         'Roads, buildings, pipelines, infrastructure'],
+      ['goods',    'Goods',         'Computers, equipment, vehicles, materials'],
+      ['services', 'Services',      'Manpower, consultancy, maintenance, security'],
+      ['it',       'IT / Software', 'Software development, systems, digital services'],
+    ];
+    const optsHtml = `<div class="wz-options" data-q="1">${chips.map(([id, t, sub]) =>
+      `<button class="wz-chip" type="button" onclick="dprAnswerQ1('${id}')"><span><strong>${t}</strong><span class="sub">${sub}</span></span></button>`
+    ).join('')}</div>`;
+    dprWizardAppendAssistant('What kind of project is this?' + optsHtml);
+  }
+  window.dprAnswerQ1 = function(typeId){
+    if (dprWizardState.locked[1]) return;
+    const label = TYPE_LABELS[typeId];
+    dprWizardState.type = typeId; dprWizardState.typeLabel = label; dprWizardState.completed[1] = true; dprWizardState.locked[1] = true;
+    dprWizardMarkChipsSelected(1, typeId);
+    dprWizardAppendUser(label);
+    // Provisional sector + type previews
+    updatePreviewField('type', label);
+    updatePreviewField('sector', TYPE_SECTORS[typeId] || '');
+    dprWizardUpdateStatus('Filling in your DPR…', 'active');
+    dprWizardAdvance(2);
+  };
+
+  // ===== Q2 — Department + Sector =====
+  function dprAskQ2(){
+    const depts = Object.keys(DEPT_SECTORS);
+    const html = `
+      <div>Which department is this for, and what sector does it fall under?</div>
+      <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2" data-q="2">
+        <select id="wzDeptSel" class="wz-text-input" onchange="dprWizardOnDeptChange(this.value)">
+          <option value="">Select department…</option>
+          ${depts.map(d => `<option>${d}</option>`).join('')}
+        </select>
+        <select id="wzSectorSel" class="wz-text-input" onchange="dprWizardState.sector = this.value">
+          <option value="">Select sector…</option>
+        </select>
+      </div>
+      <input id="wzDeptOther" type="text" class="wz-text-input mt-2 hidden" placeholder="Type department name" oninput="dprWizardState.deptOther = this.value" />
+      <div class="wz-confirm-row" data-q="2-confirm">
+        <button class="wz-chip" type="button" id="wzQ2Confirm" disabled onclick="dprAnswerQ2Confirm()">Confirm →</button>
+      </div>`;
+    dprWizardAppendAssistant(html);
+  }
+  window.dprWizardOnDeptChange = function(dept){
+    dprWizardState.dept = dept;
+    const sel = document.getElementById('wzSectorSel');
+    const other = document.getElementById('wzDeptOther');
+    if (other) other.classList.toggle('hidden', dept !== 'Other');
+    if (sel){
+      const opts = (DEPT_SECTORS[dept] || []);
+      sel.innerHTML = `<option value="">Select sector…</option>` + opts.map(s => `<option>${s}</option>`).join('');
+      dprWizardState.sector = '';
+    }
+    dprWizardUpdateConfirmEnabled();
+  };
+  function dprWizardUpdateConfirmEnabled(){
+    const btn = document.getElementById('wzQ2Confirm');
+    if (!btn) return;
+    const sectorSel = document.getElementById('wzSectorSel');
+    const sectorVal = sectorSel ? sectorSel.value : '';
+    dprWizardState.sector = sectorVal;
+    const ok = !!(dprWizardState.dept && sectorVal);
+    btn.disabled = !ok;
+  }
+  // Re-wire confirm enable on sector change too
+  document.addEventListener('change', e => {
+    if (e.target && e.target.id === 'wzSectorSel') dprWizardUpdateConfirmEnabled();
+  });
+  window.dprAnswerQ2Confirm = function(){
+    if (dprWizardState.locked[2]) return;
+    let dept = dprWizardState.dept;
+    if (dept === 'Other' && dprWizardState.deptOther) dept = dprWizardState.deptOther;
+    const sector = dprWizardState.sector;
+    if (!dept || !sector) return;
+    dprWizardState.dept = dept;
+    dprWizardState.completed[2] = true; dprWizardState.locked[2] = true;
+    dprWizardAppendUser(dept + ' · ' + sector);
+    updatePreviewField('dept', dept);
+    updatePreviewField('sector', sector);
+    dprWizardAdvance(3);
+  };
+
+  // ===== Q3 — One-sentence description =====
+  function dprAskQ3(){
+    const placeholders = {
+      works:    'e.g. Repair 3.2 km of road surface in Ward 12',
+      goods:    'e.g. Supply 50 desktop computers for AMC offices',
+      services: 'e.g. Round-the-clock security services for the AMC head office',
+      it:       'e.g. Build a citizen grievance portal with Aadhaar login',
+    };
+    const ph = placeholders[dprWizardState.type] || 'e.g. Describe the work in one sentence';
+    const html = `
+      <div>Briefly describe what needs to be done. One sentence is enough.</div>
+      <div class="mt-3" data-q="3">
+        <textarea id="wzScopeInput" class="wz-text-input" rows="2" placeholder="${esc(ph)}" oninput="dprWizardOnScopeInput(this.value)"></textarea>
+        <div class="mt-2"><button id="wzQ3Next" class="wz-chip" type="button" disabled onclick="dprAnswerQ3()">Next →</button></div>
+      </div>`;
+    dprWizardAppendAssistant(html);
+    setTimeout(() => document.getElementById('wzScopeInput')?.focus(), 50);
+  }
+  window.dprWizardOnScopeInput = function(v){
+    dprWizardState.scopeSentence = v;
+    const btn = document.getElementById('wzQ3Next');
+    if (btn) btn.disabled = v.trim().length < 5;
+  };
+  window.dprAnswerQ3 = function(){
+    if (dprWizardState.locked[3]) return;
+    const v = (dprWizardState.scopeSentence || '').trim();
+    if (v.length < 5) return;
+    dprWizardState.locked[3] = true; dprWizardState.completed[3] = true;
+    dprWizardAppendUser(v);
+    const title = dprTitleCase(v, dprWizardState.sector);
+    dprWizardState.title = title;
+    updatePreviewField('title', title);
+    updatePreviewField('scope', v);
+    dprWizardAdvance(4);
+  };
+
+  // ===== Q4 — Location =====
+  function dprAskQ4(){
+    const html = `
+      <div>Where is this work located?</div>
+      <div class="mt-3 space-y-2" data-q="4">
+        <input id="wzAreaInput" type="text" class="wz-text-input" placeholder="Area / locality (e.g. Ward 12, Bandra West, Kalyan East)" oninput="dprWizardState.locationArea = this.value; dprWizardUpdateQ4Confirm();" />
+        <select id="wzZoneSel" class="wz-text-input" onchange="dprWizardState.locationZone = this.value; dprWizardUpdateQ4Confirm();">
+          <option value="">Zone / district…</option>
+          ${['Central Zone','East Zone','West Zone','North Zone','South Zone','AMC Headquarters','Multiple zones','Other'].map(z => `<option>${z}</option>`).join('')}
+        </select>
+      </div>
+      <div class="wz-confirm-row"><button id="wzQ4Confirm" class="wz-chip" type="button" disabled onclick="dprAnswerQ4()">Confirm location →</button></div>`;
+    dprWizardAppendAssistant(html);
+  }
+  window.dprWizardUpdateQ4Confirm = function(){
+    const btn = document.getElementById('wzQ4Confirm');
+    if (btn) btn.disabled = !(dprWizardState.locationArea && dprWizardState.locationZone);
+  };
+  window.dprAnswerQ4 = function(){
+    if (dprWizardState.locked[4]) return;
+    if (!(dprWizardState.locationArea && dprWizardState.locationZone)) return;
+    dprWizardState.locked[4] = true; dprWizardState.completed[4] = true;
+    const loc = dprWizardState.locationArea + ' · ' + dprWizardState.locationZone;
+    dprWizardAppendUser(loc);
+    updatePreviewField('location', loc);
+    dprWizardAdvance(5);
+  };
+
+  // ===== Q5 — Scale (branches by type) =====
+  function dprAskQ5(){
+    const t = dprWizardState.type;
+    let html;
+    if (t === 'works'){
+      html = `<div>What is the approximate scale of the work?</div><div class="wz-options" data-q="5">${[
+        ['small','Small — under ₹10L','Under ₹10,00,000'],
+        ['medium','Medium — ₹10L to ₹50L','₹10L – ₹50L'],
+        ['large','Large — ₹50L to ₹2Cr','₹50L – ₹2Cr'],
+        ['major','Major — above ₹2Cr','Above ₹2,00,00,000'],
+      ].map(([id, t2, r]) => `<button class="wz-chip" type="button" onclick="dprAnswerQ5Range('${id}','${t2.replace(/'/g, "\\'")}','${r.replace(/'/g, "\\'")}')"><span><strong>${t2}</strong><span class="sub">${r}</span></span></button>`).join('')}</div>`;
+    } else if (t === 'goods'){
+      html = `<div>How many units are required approximately?</div>
+        <div class="mt-3 grid grid-cols-[1fr_120px] gap-2" data-q="5">
+          <input id="wzQtyInput" type="number" min="1" class="wz-text-input" placeholder="Enter approximate quantity" oninput="dprWizardState.scale = this.value; dprWizardUpdateQ5Confirm();" />
+          <select id="wzQtyUnit" class="wz-text-input" onchange="dprWizardState.scaleUnit = this.value; dprWizardUpdateQ5Confirm();">
+            <option value="">Unit…</option>
+            ${['Units','Sets','Nos.','Kg','Metres','Litres'].map(u => `<option>${u}</option>`).join('')}
+          </select>
         </div>
-        <div class="mt-3 flex items-center gap-2"><a href="#step1" class="px-3 py-1.5 rounded-lg bg-primary text-white text-[12.5px] font-medium hover:bg-primary/90 inline-flex items-center gap-1">This looks right <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></a><button class="text-[12.5px] text-ink-500 hover:text-ink-900">Correct something</button></div>`));
-      document.getElementById('dprFillStatus').innerHTML = '<i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-success"></i><span class="text-success font-medium">All fields ready</span>';
-      document.getElementById('dprReviewBtn').classList.remove('hidden');
-      dprChatStep = 3;
-      refreshIcons();
-    }, 1300);
+        <div class="wz-confirm-row"><button id="wzQ5Confirm" class="wz-chip" type="button" disabled onclick="dprAnswerQ5Goods()">Confirm →</button></div>`;
+    } else if (t === 'services'){
+      html = `<div>What is the duration of the service?</div><div class="wz-options" data-q="5">${[
+        ['1-3','1–3 months'],['6mo','6 months'],['1y','1 year'],['2y','2 years'],['ongoing','Ongoing'],
+      ].map(([id, t2]) => `<button class="wz-chip" type="button" onclick="dprAnswerQ5Duration('${id}','${t2.replace(/'/g, "\\'")}')"><strong>${t2}</strong></button>`).join('')}</div>`;
+    } else { // it
+      html = `<div>What is the scale of this system?</div><div class="wz-options" data-q="5">${[
+        ['small','Small module','One feature or microservice'],
+        ['app','Full application','End-to-end web/mobile app'],
+        ['enterprise','Enterprise system','Multi-module ERP/portal'],
+        ['infra','Infrastructure upgrade','Servers, cloud, networking'],
+      ].map(([id, t2, sub]) => `<button class="wz-chip" type="button" onclick="dprAnswerQ5ItScale('${id}','${t2.replace(/'/g, "\\'")}')"><span><strong>${t2}</strong><span class="sub">${sub}</span></span></button>`).join('')}</div>`;
+    }
+    dprWizardAppendAssistant(html);
   }
-  document.getElementById('dprChatInput').addEventListener('keydown', e => { if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); dprChatSend(); }});
+  window.dprAnswerQ5Range = function(id, label, range){
+    if (dprWizardState.locked[5]) return;
+    dprWizardState.scale = id; dprWizardState.scaleLabel = label; dprWizardState.estRange = range;
+    dprWizardState.locked[5] = true; dprWizardState.completed[5] = true;
+    dprWizardAppendUser(label);
+    updatePreviewField('cost', range);
+    dprWizardAdvance(6);
+  };
+  window.dprWizardUpdateQ5Confirm = function(){
+    const btn = document.getElementById('wzQ5Confirm');
+    if (btn) btn.disabled = !(dprWizardState.scale && dprWizardState.scaleUnit);
+  };
+  window.dprAnswerQ5Goods = function(){
+    if (dprWizardState.locked[5]) return;
+    if (!(dprWizardState.scale && dprWizardState.scaleUnit)) return;
+    dprWizardState.locked[5] = true; dprWizardState.completed[5] = true;
+    const label = dprWizardState.scale + ' ' + dprWizardState.scaleUnit;
+    dprWizardState.scaleLabel = label;
+    // Rough cost band derived from quantity buckets
+    const q = parseFloat(dprWizardState.scale) || 0;
+    const range = q < 50 ? '₹1L – ₹10L' : q < 200 ? '₹10L – ₹50L' : q < 1000 ? '₹50L – ₹2Cr' : 'Above ₹2Cr';
+    dprWizardState.estRange = range;
+    dprWizardAppendUser(label);
+    updatePreviewField('cost', range);
+    dprWizardAdvance(6);
+  };
+  window.dprAnswerQ5Duration = function(id, label){
+    if (dprWizardState.locked[5]) return;
+    dprWizardState.scale = id; dprWizardState.scaleLabel = label;
+    dprWizardState.locked[5] = true; dprWizardState.completed[5] = true;
+    const range = id === '1-3' ? '₹5L – ₹25L' : id === '6mo' ? '₹10L – ₹50L' : id === '1y' ? '₹25L – ₹1Cr' : id === '2y' ? '₹50L – ₹2Cr' : '₹50L – ₹2Cr';
+    dprWizardState.estRange = range;
+    dprWizardAppendUser(label);
+    updatePreviewField('cost', range);
+    dprWizardAdvance(6);
+  };
+  window.dprAnswerQ5ItScale = function(id, label){
+    if (dprWizardState.locked[5]) return;
+    dprWizardState.scale = id; dprWizardState.scaleLabel = label;
+    dprWizardState.locked[5] = true; dprWizardState.completed[5] = true;
+    const range = id === 'small' ? '₹2L – ₹15L' : id === 'app' ? '₹15L – ₹75L' : id === 'enterprise' ? '₹75L – ₹5Cr' : '₹50L – ₹2Cr';
+    dprWizardState.estRange = range;
+    dprWizardAppendUser(label);
+    updatePreviewField('cost', range);
+    dprWizardAdvance(6);
+  };
+
+  // ===== Q6 — Urgency =====
+  function dprAskQ6(){
+    const chips = [
+      ['routine',  'Routine',   'Normal procurement timeline'],
+      ['priority', 'Priority',  'Needs expedited handling'],
+      ['emergency','Emergency', 'Immediate action required'],
+    ];
+    const html = `<div>How urgent is this requirement?</div><div class="wz-options" data-q="6">${chips.map(([id, t, sub]) => `<button class="wz-chip" type="button" onclick="dprAnswerQ6('${id}','${t}')"><span><strong>${t}</strong><span class="sub">${sub}</span></span></button>`).join('')}</div>`;
+    dprWizardAppendAssistant(html);
+  }
+  window.dprAnswerQ6 = function(id, label){
+    if (dprWizardState.locked[6]) return;
+    dprWizardState.priority = id; dprWizardState.priorityLabel = label;
+    dprWizardState.locked[6] = true; dprWizardState.completed[6] = true;
+    dprWizardAppendUser(label);
+    updatePreviewField('priority', label);
+    dprWizardAdvance(7);
+  };
+
+  // ===== Q7 — Funding source =====
+  function dprAskQ7(){
+    const chips = [
+      ['state',   'State own funds',          ''],
+      ['central', 'Central government scheme',''],
+      ['grant',   'Grant / external funding', ''],
+      ['unknown', 'Not sure yet',             ''],
+    ];
+    const html = `<div>Do you know the funding source for this project?</div><div class="wz-options" data-q="7">${chips.map(([id, t]) => `<button class="wz-chip" type="button" onclick="dprAnswerQ7('${id}','${t.replace(/'/g, "\\'")}')"><strong>${t}</strong></button>`).join('')}<button class="wz-chip gray" type="button" onclick="dprAnswerQ7('skip','')">Skip for now</button></div>`;
+    dprWizardAppendAssistant(html);
+  }
+  window.dprAnswerQ7 = function(id, label){
+    if (dprWizardState.locked[7]) return;
+    dprWizardState.funding = id; dprWizardState.fundingLabel = label || (id === 'unknown' ? 'Not sure yet' : id === 'skip' ? '' : label);
+    dprWizardState.locked[7] = true; dprWizardState.completed[7] = true;
+    dprWizardAppendUser(label || 'Skipped');
+    if (id !== 'skip') updatePreviewField('funding', dprWizardState.fundingLabel);
+    dprWizardAdvance(8);
+  };
+
+  // ===== Q8 — Summary =====
+  function dprWizardShowSummary(){
+    const w = dprWizardState;
+    const summaryRows = [
+      ['📋', 'Type',       (w.typeLabel || '—') + (w.sector ? ' — ' + w.sector : '')],
+      ['🏢', 'Department', w.dept || '—'],
+      ['📍', 'Location',   (w.locationArea || '—') + (w.locationZone ? ', ' + w.locationZone : '')],
+      ['📝', 'Scope',      w.title || w.scopeSentence || '—'],
+      ['📊', 'Scale',      (w.scaleLabel || '—') + (w.estRange ? ' (' + w.estRange + ')' : '')],
+      ['⚡', 'Priority',    w.priorityLabel || '—'],
+      ['💰', 'Funding',    w.fundingLabel || (w.funding === 'skip' ? 'Skipped' : '—')],
+    ];
+    const card = `<div class="wz-summary-card">
+      <div style="font-weight:600; margin-bottom:6px;">Here's what I've captured for your DPR:</div>
+      ${summaryRows.map(r => `<div class="row"><div class="ico">${r[0]}</div><div class="lbl">${esc(r[1])}</div><div class="val">${esc(r[2])}</div></div>`).join('')}
+    </div>
+    <div class="wz-options" style="margin-top:10px;">
+      <button class="wz-chip" type="button" onclick="dprWizardCommit()" style="background:#0F5EE8; border-color:#0F5EE8; color:white;"><strong>Looks good — continue to full form →</strong></button>
+      <button class="wz-chip gray" type="button" onclick="dprWizardOpenEditMenu()">Edit an answer</button>
+    </div>`;
+    dprWizardAppendAssistant(card);
+    dprWizardUpdateStatus('Ready to continue', 'done');
+  }
+  // Edit-an-answer menu
+  window.dprWizardOpenEditMenu = function(){
+    const labels = ['Q1 — Type of work', 'Q2 — Department & sector', 'Q3 — Scope sentence', 'Q4 — Location', 'Q5 — Scale', 'Q6 — Urgency', 'Q7 — Funding'];
+    const html = `<div class="wz-edit-menu">${labels.map((l, i) => `<button type="button" onclick="dprWizardEditQuestion(${i+1})">${l}</button>`).join('')}</div>`;
+    dprWizardAppendAssistant('Which answer would you like to edit?' + html);
+  };
+  window.dprWizardEditQuestion = function(n){
+    // Re-enable lock on that question and re-ask it
+    dprWizardState.locked[n] = false; dprWizardState.completed[n] = false;
+    dprWizardState.currentStep = n;
+    dprWizardUpdateStepLabel();
+    dprWizardTyping();
+    setTimeout(() => { dprWizardHideTyping(); dprAskQuestion(n); }, 600);
+  };
+  // Commit answers → write to FORM_STATE → navigate to Step 1
+  window.dprWizardCommit = function(){
+    const w = dprWizardState;
+    if (w.title) FORM_STATE.title = w.title;
+    if (w.type){
+      const map = { works:'Civil Works', goods:'Supply of Goods', services:'Services', it:'Services' };
+      FORM_STATE.type = map[w.type] || '';
+    }
+    if (w.sector) FORM_STATE.sector = w.sector;
+    if (w.dept)   FORM_STATE.dept   = w.dept;
+    if (w.scopeSentence) FORM_STATE.scope = '<p>' + w.scopeSentence + '</p>';
+    if (w.locationArea)  FORM_STATE.ward = w.locationArea;
+    if (w.locationZone)  FORM_STATE.taluka = w.locationZone;
+    if (w.estRange){
+      // Derive a midpoint estimate from the range for the form's number field
+      const m = w.estRange.match(/₹([\d.]+)([LCr]+)/i);
+      if (m){
+        const num = parseFloat(m[1]) || 0;
+        const mult = /Cr/i.test(m[2]) ? 10000000 : 100000;
+        FORM_STATE.estCost = String(Math.round(num * mult));
+      }
+    }
+    if (w.priority){
+      FORM_STATE.priorityFlag = w.priority;
+    }
+    if (w.funding){
+      const fMap = {
+        state:   'State Own Funds',
+        central: 'Central Grant',
+        grant:   'PPP / External Funding',
+        unknown: '',
+        skip:    '',
+      };
+      FORM_STATE.funding = fMap[w.funding] || '';
+    }
+    showToast('Quick setup complete — continue editing in the full form');
+    location.hash = '#step1';
+  };
+
+  // Mark chips as selected (visual feedback before next render)
+  function dprWizardMarkChipsSelected(qNum, valueId){
+    const container = document.querySelector(`[data-q="${qNum}"]`);
+    if (!container) return;
+    container.querySelectorAll('.wz-chip').forEach(btn => {
+      const onclick = btn.getAttribute('onclick') || '';
+      if (onclick.includes("'" + valueId + "'")) btn.classList.add('selected');
+      btn.setAttribute('disabled', 'true');
+    });
+  }
+
+  // Boot the wizard whenever the describe view is shown
+  function dprWizardBootIfFirstTime(){
+    const scroll = document.getElementById('dprChatScroll');
+    if (scroll && scroll.children.length === 0){ dprWizardStart(); }
+  }
 
   // ===================== UPLOAD =====================
   function dprStartUpload(){
@@ -1372,8 +1958,6 @@
       ],
       evidence:[],
     },
-    // === Addition 9 — Clone source (set when cloned) ===
-    clonedFrom: null,
   };
 
   // === DPR_DATA — per-DPR persistence for new features (per-spec localStorage layout) ===
@@ -1500,14 +2084,7 @@
   }
 
   function renderStep1(){
-    const clonedBanner = FORM_STATE.clonedFrom
-      ? `<div class="clone-banner">
-          <div><i data-lucide="copy" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1.5"></i> Cloned from <span class="font-mono font-bold">${FORM_STATE.clonedFrom}</span> — review and update all fields for FY 2026-27</div>
-          <a href="#track-${FORM_STATE.clonedFrom}" class="text-[12px] font-bold text-primary hover:underline whitespace-nowrap">View original ↗</a>
-        </div>`
-      : '';
     return `<div class="px-6 lg:px-10 pt-8 pb-32"><div class="max-w-[860px] mx-auto">
-      ${clonedBanner}
       <div class="flex items-start justify-between gap-3 mb-6">
         <div><h1 class="text-[20px] font-bold text-ink-900">Step 1: Project Details</h1><p class="text-[14px] text-ink-500 mt-1">Basic classification and financial details for this project.</p></div>
         <div class="text-[12px] text-ink-500 inline-flex items-center gap-1.5 mt-2"><i data-lucide="cloud-check" class="w-3.5 h-3.5"></i> <span id="autosaveLabel">Draft saved 1 min ago</span> · <button type="button" class="text-primary hover:underline" onclick="openVersionHistory('DPR-2026-010')">View history</button></div>
@@ -2223,7 +2800,864 @@
     });
   }
 
-  // ===================== ADDITION 3 — VERSION HISTORY PANEL =====================
+  // ===================== DPR DRAFT PREVIEW PANEL (mirrors tender-creation Check Draft) =====================
+  // Translation table — same shape as tender-creation's TRANSLATIONS object
+  const dprTranslations = {
+    en: {
+      'doc.govt':            'AHMEDABAD MUNICIPAL CORPORATION',
+      'doc.deptLine':        '',
+      'doc.dprTitle':        'DETAILED PROJECT REPORT (DPR)',
+      'doc.refLabel':        'DPR Reference No.:',
+      'doc.fyLabel':         'Financial Year:',
+      'doc.dateLabel':       'Date of Preparation:',
+      'sec.basic':           'Basic Information',
+      'sec.background':      'Project Background and Justification',
+      'sec.scope':           'Scope of Work',
+      'sec.boq':             'Bill of Quantities (BOQ)',
+      'sec.financial':       'Financial Details',
+      'sec.timeline':        'Implementation Timeline',
+      'sec.tech':            'Technical Specifications',
+      'sec.gem':             'GeM Compliance',
+      'sec.personnel':       'Key Personnel',
+      'sec.annexures':       'Annexures',
+      'sub.background':      '2.1 Background',
+      'sub.need':            '2.2 Need and Justification',
+      'sub.objectives':      '2.3 Objectives',
+      'sub.desc':            '3.1 Description of Work',
+      'sub.location':        '3.2 Location',
+      'sub.site':            '3.3 Site Condition',
+      'sub.measure':         '3.4 Key Measurements',
+      'sub.boq':             '4.1 Bill of Quantities',
+      'sub.basis':           '4.2 Cost Basis',
+      'sub.timeline':        '6.1 Proposed Timeline',
+      'fld.name':            'Name of Project',
+      'fld.ref':             'DPR Reference No.',
+      'fld.dept':            'Department',
+      'fld.sector':          'Sector',
+      'fld.type':            'Project Type',
+      'fld.priority':        'Priority',
+      'fld.fy':              'Financial Year',
+      'fld.preparedBy':      'Prepared by',
+      'fld.date':            'Date of Preparation',
+      'fld.cost':            'Estimated Cost',
+      'fld.funding':         'Funding Source',
+      'fld.budget':          'Budget Head',
+      'fld.totalCost':       'Total Estimated Cost',
+      'fld.contingency':     'Contingency',
+      'fld.aaValue':         'Administrative Approval Value',
+      'fld.tsValue':         'Technical Sanction Value',
+      'fld.scheme':          'Scheme / Grant',
+      'fld.budgetConf':      'Budget Availability Confirmed by',
+      'foot.prepared':       'Prepared by:',
+      'foot.approved':       'Approved by:',
+      'foot.watermark':      'This is a system-generated DPR draft. Subject to review and approval.',
+    },
+    hi: {
+      'doc.govt':            'महाराष्ट्र शासन<br/>अहमदाबाद महानगरपालिका',
+      'doc.deptLine':        '',
+      'doc.dprTitle':        'विस्तृत परियोजना रिपोर्ट (DPR)',
+      'doc.refLabel':        'DPR संदर्भ क्र.:',
+      'doc.fyLabel':         'वित्तीय वर्ष:',
+      'doc.dateLabel':       'तैयारी की तिथि:',
+      'sec.basic':           'मूल जानकारी',
+      'sec.background':      'परियोजना पृष्ठभूमि',
+      'sec.scope':           'कार्य का दायरा',
+      'sec.boq':             'मात्राओं का विवरण',
+      'sec.financial':       'वित्तीय विवरण',
+      'sec.timeline':        'कार्यान्वयन समयरेखा',
+      'sec.tech':            'तकनीकी विशिष्टताएं',
+      'sec.gem':             'जेम अनुपालन',
+      'sec.personnel':       'प्रमुख कार्मिक',
+      'sec.annexures':       'अनुलग्नक',
+      'sub.background':      '2.1 पृष्ठभूमि',
+      'sub.need':            '2.2 आवश्यकता एवं औचित्य',
+      'sub.objectives':      '2.3 उद्देश्य',
+      'sub.desc':            '3.1 कार्य का विवरण',
+      'sub.location':        '3.2 स्थान',
+      'sub.site':            '3.3 स्थल की स्थिति',
+      'sub.measure':         '3.4 मुख्य मापन',
+      'sub.boq':             '4.1 मात्राओं का विवरण',
+      'sub.basis':           '4.2 लागत का आधार',
+      'sub.timeline':        '6.1 प्रस्तावित समयरेखा',
+      'fld.name':            'परियोजना का नाम',
+      'fld.ref':             'DPR संदर्भ क्र.',
+      'fld.dept':            'विभाग',
+      'fld.sector':          'क्षेत्र',
+      'fld.type':            'परियोजना प्रकार',
+      'fld.priority':        'प्राथमिकता',
+      'fld.fy':              'वित्तीय वर्ष',
+      'fld.preparedBy':      'तैयारकर्ता',
+      'fld.date':            'तैयारी की तिथि',
+      'fld.cost':            'अनुमानित लागत',
+      'fld.funding':         'वित्त पोषण स्रोत',
+      'fld.budget':          'बजट मद',
+      'fld.totalCost':       'कुल अनुमानित लागत',
+      'fld.contingency':     'आकस्मिकता',
+      'fld.aaValue':         'प्रशासनिक अनुमोदन मूल्य',
+      'fld.tsValue':         'तकनीकी स्वीकृति मूल्य',
+      'fld.scheme':          'योजना / अनुदान',
+      'fld.budgetConf':      'बजट उपलब्धता पुष्टि की गई',
+      'foot.prepared':       'तैयारकर्ता:',
+      'foot.approved':       'अनुमोदित:',
+      'foot.watermark':      'यह एक सिस्टम-जनित DPR मसौदा है। समीक्षा एवं अनुमोदन के अधीन।',
+    },
+    mr: {
+      'doc.govt':            'महाराष्ट्र शासन<br/>अहमदाबाद महानगरपालिका',
+      'doc.deptLine':        '',
+      'doc.dprTitle':        'विस्तृत प्रकल्प अहवाल (DPR)',
+      'doc.refLabel':        'DPR संदर्भ क्र.:',
+      'doc.fyLabel':         'आर्थिक वर्ष:',
+      'doc.dateLabel':       'तयारीची तारीख:',
+      'sec.basic':           'मूलभूत माहिती',
+      'sec.background':      'प्रकल्प पार्श्वभूमी',
+      'sec.scope':           'कामाची व्याप्ती',
+      'sec.boq':             'प्रमाणांचा तक्ता',
+      'sec.financial':       'आर्थिक तपशील',
+      'sec.timeline':        'अंमलबजावणी वेळापत्रक',
+      'sec.tech':            'तांत्रिक वैशिष्ट्ये',
+      'sec.gem':             'जेम अनुपालन',
+      'sec.personnel':       'प्रमुख कर्मचारी',
+      'sec.annexures':       'परिशिष्ट',
+      'sub.background':      '2.1 पार्श्वभूमी',
+      'sub.need':            '2.2 गरज व औचित्य',
+      'sub.objectives':      '2.3 उद्दिष्टे',
+      'sub.desc':            '3.1 कामाचे वर्णन',
+      'sub.location':        '3.2 स्थान',
+      'sub.site':            '3.3 स्थळ स्थिती',
+      'sub.measure':         '3.4 मुख्य मोजमापे',
+      'sub.boq':             '4.1 प्रमाणांचा तक्ता',
+      'sub.basis':           '4.2 खर्चाचा आधार',
+      'sub.timeline':        '6.1 प्रस्तावित वेळापत्रक',
+      'fld.name':            'प्रकल्पाचे नाव',
+      'fld.ref':             'DPR संदर्भ क्र.',
+      'fld.dept':            'विभाग',
+      'fld.sector':          'क्षेत्र',
+      'fld.type':            'प्रकल्प प्रकार',
+      'fld.priority':        'प्राधान्य',
+      'fld.fy':              'आर्थिक वर्ष',
+      'fld.preparedBy':      'तयार केले',
+      'fld.date':            'तयारीची तारीख',
+      'fld.cost':            'अंदाजित खर्च',
+      'fld.funding':         'निधी स्रोत',
+      'fld.budget':          'अंदाजपत्रक शीर्ष',
+      'fld.totalCost':       'एकूण अंदाजित खर्च',
+      'fld.contingency':     'आकस्मिकता',
+      'fld.aaValue':         'प्रशासकीय मान्यता मूल्य',
+      'fld.tsValue':         'तांत्रिक मंजुरी मूल्य',
+      'fld.scheme':          'योजना / अनुदान',
+      'fld.budgetConf':      'अंदाजपत्रक उपलब्धता निश्चित केली',
+      'foot.prepared':       'तयार केले:',
+      'foot.approved':       'मंजूर:',
+      'foot.watermark':      'हा एक प्रणाली-जनित DPR मसुदा आहे. पुनरावलोकन व मंजुरीच्या अधीन.',
+    },
+  };
+  const DPR_LANG_NAMES = { en:'English', hi:'हिन्दी', mr:'मराठी' };
+  let dprPanelLang = sessionStorage.getItem('dprDraftPanelLang') || 'en';
+  let dprEditMode = false;
+  let dprSelectionInfo = null;
+  let dprLastTriggerBtn = null;
+  let dprActiveSection = null;
+
+  function tDpr(key, lang){ return (dprTranslations[lang || dprPanelLang] || {})[key] || dprTranslations.en[key] || key; }
+
+  function dprPlaceholder(stepNum, fieldName){
+    return `<span style="background:#FEF3C7; border-radius:3px; padding:0 4px; color:#92400E; font-style:italic; font-size:12px;">[Complete Step ${stepNum} — ${esc(fieldName)}]</span>`;
+  }
+
+  // Pull all DPR data into a single snapshot
+  function getDprDraftData(){
+    const subtotal = FORM_STATE.boq.reduce((a,r) => a + (r.qty||0)*(r.rate||0), 0);
+    const conAmt   = Math.round(subtotal * (FORM_STATE.contingency || 0) / 100);
+    const total    = subtotal + conAmt;
+    return {
+      title: FORM_STATE.title,
+      type: FORM_STATE.type,
+      sector: FORM_STATE.sector,
+      dept: FORM_STATE.dept,
+      subDept: FORM_STATE.subDept,
+      fy: FORM_STATE.fy,
+      priorityFlag: FORM_STATE.priorityFlag || 'routine',
+      estCost: FORM_STATE.estCost,
+      funding: FORM_STATE.funding,
+      schemeYear: FORM_STATE.schemeYear,
+      grantOrderNo: FORM_STATE.grantOrderNo,
+      budgetCode: FORM_STATE.budgetCode,
+      budgetAvailConfirmedBy: FORM_STATE.budgetAvailConfirmedBy,
+      budgetAvailConfirmedOn: FORM_STATE.budgetAvailConfirmedOn,
+      duration: FORM_STATE.duration,
+      startDate: FORM_STATE.startDate,
+      scope: FORM_STATE.scope,
+      need: FORM_STATE.need,
+      district: FORM_STATE.district,
+      taluka: FORM_STATE.taluka,
+      ward: FORM_STATE.ward,
+      gps: FORM_STATE.gps,
+      siteDesc: FORM_STATE.siteDesc,
+      beneficiary: FORM_STATE.beneficiary,
+      siteVisit: FORM_STATE.siteVisit,
+      marketEnquiry: FORM_STATE.marketEnquiry,
+      boq: FORM_STATE.boq,
+      contingency: FORM_STATE.contingency,
+      subtotal, conAmt, total,
+      team: FORM_STATE.team,
+      files: FORM_STATE.files,
+    };
+  }
+
+  function dprComputePct(d){
+    // Count filled "key" fields out of total
+    const keys = [
+      d.title, d.type, d.sector, d.dept, d.fy, d.estCost, d.funding, d.budgetCode,
+      d.duration, d.startDate,
+      d.scope && d.scope.replace(/<[^>]+>/g,'').trim(),
+      d.need, d.district, d.taluka, d.ward, d.beneficiary,
+      (d.boq||[]).length > 0 ? 'yes' : '',
+      (d.team||[]).filter(t => t.name).length > 0 ? 'yes' : '',
+      (d.files||[]).length > 0 ? 'yes' : '',
+      d.siteVisit && d.siteVisit.date ? 'yes' : '',
+      d.marketEnquiry && d.marketEnquiry.enquiries && d.marketEnquiry.enquiries.length ? 'yes' : '',
+    ];
+    const filled = keys.filter(v => v && String(v).trim()).length;
+    return Math.round((filled / keys.length) * 100);
+  }
+
+  function dprHasAnyData(){
+    const d = getDprDraftData();
+    return !!(d.title || (d.scope && d.scope.replace(/<[^>]+>/g,'').trim()) || d.estCost || d.need || d.taluka || d.ward);
+  }
+
+  function dprInfoRow(label, fieldId, value, opts){
+    opts = opts || {};
+    const isEmpty = value === undefined || value === null || value === '' || value === false;
+    if (isEmpty){
+      const txt = opts.amber ? '[Not yet filled — complete required step]' : '—';
+      const cls = opts.amber ? 'amber-empty' : 'empty';
+      return `<div class="info-cell-k">${esc(label)}</div><div class="info-cell-v ${cls}" data-field="${esc(fieldId)}">${esc(txt)}</div>`;
+    }
+    return `<div class="info-cell-k">${esc(label)}</div><div class="info-cell-v" data-field="${esc(fieldId)}">${esc(String(value))}</div>`;
+  }
+
+  function dprPhAmber(text){ return `<div class="draft-placeholder-amber">${esc(text)}</div>`; }
+  function dprFmtINR(n){ if (!n) return ''; const num = parseFloat(String(n).replace(/[,₹\s]/g,'')) || 0; return num ? '₹' + num.toLocaleString('en-IN') : ''; }
+  function dprToday(){ return new Date().toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }); }
+  function dprDate(iso){ if (!iso) return ''; try { return new Date(iso + (String(iso).length===10?'T00:00:00':'')).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }); } catch(e){ return iso; } }
+  function stripHtml(html){ if (!html) return ''; const tmp = document.createElement('div'); tmp.innerHTML = html; return (tmp.textContent || '').trim(); }
+
+  function renderDprDraftDoc(){
+    const d = getDprDraftData();
+    const lang = dprPanelLang;
+    const today = dprToday();
+    const gem = getDprExtras('DPR-2026-001').gemCheck || null;
+    const aa  = (getDprExtras('DPR-2026-001').aaTracking || {}).finalApproval || {};
+    const ts  = (getDprExtras('DPR-2026-001').tsTracking || {}).finalApproval || {};
+    // Header
+    const headerHTML = `<div class="doc-header">
+      <div id="dprDocLogoStripWrap"></div>
+      <div class="doc-seal" aria-hidden="true">SEAL</div>
+      <div class="doc-govt">${tDpr('doc.govt', lang)}</div>
+      ${d.dept ? `<div style="font-size:12.5px; color:#374151; margin-top:4px; font-family:'DM Sans',system-ui,sans-serif;" data-field="dprDept">${esc(d.dept)}</div>` : ''}
+      <div class="doc-rule-double"></div>
+      <h2>${tDpr('doc.dprTitle', lang)}</h2>
+      <div style="font-size:14px; color:#111827; margin-top:6px; font-family:'DM Sans',system-ui,sans-serif; font-weight:600;" data-field="dprTitle">${d.title ? esc(d.title) : dprPlaceholder(1,'Project Title')}</div>
+      <div class="doc-nit-no"><strong>${tDpr('doc.refLabel', lang)}</strong> DPR-2026-001/AMC/2026-27</div>
+      <div class="doc-nit-no" style="margin-top:2px;"><strong>${tDpr('doc.fyLabel', lang)}</strong> ${esc(d.fy || 'FY 2026-27')}</div>
+      <div class="doc-nit-no" style="margin-top:2px;"><strong>${tDpr('doc.dateLabel', lang)}</strong> ${esc(today)}</div>
+    </div>`;
+
+    // === SECTION 1 ===
+    const s1 = `<section class="dpr-doc-section">
+      <h3>1. ${tDpr('sec.basic', lang)}</h3>
+      <div class="info-table">
+        ${dprInfoRow(tDpr('fld.name', lang),       'dprTitle',  d.title)}
+        ${dprInfoRow(tDpr('fld.ref', lang),        '__dprRef',  'DPR-2026-001/AMC/2026-27')}
+        ${dprInfoRow(tDpr('fld.dept', lang),       'dprDept',   d.dept)}
+        ${dprInfoRow(tDpr('fld.sector', lang),     'dprSector', d.sector)}
+        ${dprInfoRow(tDpr('fld.type', lang),       'dprType',   d.type)}
+        ${dprInfoRow(tDpr('fld.priority', lang),   '__prio',    (d.priorityFlag||'routine').replace(/^./, c=>c.toUpperCase()))}
+        ${dprInfoRow(tDpr('fld.fy', lang),         '__fy',      d.fy || 'FY 2026-27')}
+        ${dprInfoRow(tDpr('fld.preparedBy', lang), '__by',      'Rajesh Kumar, Super Admin')}
+        ${dprInfoRow(tDpr('fld.date', lang),       '__date',    today)}
+        ${dprInfoRow(tDpr('fld.cost', lang),       'dprEstCost', d.estCost ? dprFmtINR(d.estCost) : '', { amber:true })}
+        ${dprInfoRow(tDpr('fld.funding', lang),    '__funding', d.funding, { amber:true })}
+        ${dprInfoRow(tDpr('fld.budget', lang),     '__bh',      d.budgetCode, { amber:true })}
+      </div>
+    </section>`;
+
+    // === SECTION 2 ===
+    const scopeText = stripHtml(d.scope);
+    const s2 = `<section class="dpr-doc-section">
+      <h3>2. ${tDpr('sec.background', lang)}</h3>
+      <div class="nit-subhead">${tDpr('sub.background', lang)}</div>
+      ${scopeText
+        ? `<div class="nit-para" data-field="dprScope">${esc(scopeText)}</div>`
+        : dprPhAmber('[Complete Step 1 — Project Details to populate background]')}
+      <div class="nit-subhead spaced">${tDpr('sub.need', lang)}</div>
+      ${d.need
+        ? `<p class="nit-para">The proposed project is necessitated by the following reasons:</p><div class="nit-para" data-field="dprNeed">${esc(d.need)}</div>`
+        : dprPhAmber('[Complete Step 2 — Need justification]')}
+      <div class="nit-subhead spaced">${tDpr('sub.objectives', lang)}</div>
+      ${scopeText
+        ? `<ol class="formal-list" data-field="dprScope">${scopeText.split(/(?:\.\s+|\n)/).filter(s => s.trim().length > 8).slice(0,4).map(s => `<li>${esc(s.trim())}</li>`).join('')}</ol>`
+        : dprPhAmber('[Complete Step 2 — Scope to derive objectives]')}
+    </section>`;
+
+    // === SECTION 3 ===
+    const sv = d.siteVisit || {};
+    const measureRows = (sv.measurements||[]).filter(m => m.item).map(m => `<tr><td>${esc(m.item)}</td><td class="tx-r">${esc(m.value)}</td><td class="tx-c">${esc(m.unit)}</td></tr>`).join('');
+    const s3 = `<section class="dpr-doc-section">
+      <h3>3. ${tDpr('sec.scope', lang)}</h3>
+      <div class="nit-subhead">${tDpr('sub.desc', lang)}</div>
+      ${scopeText
+        ? `<div class="nit-para" data-field="dprScope">${esc(scopeText)}</div>`
+        : dprPhAmber('[Complete Step 2 — Scope & Location]')}
+      <div class="nit-subhead spaced">${tDpr('sub.location', lang)}</div>
+      ${(d.district || d.taluka || d.ward || d.gps)
+        ? `<div class="info-table" data-field="dprLocation">
+            ${dprInfoRow('District', 'dprDistrict', d.district)}
+            ${dprInfoRow('Taluka / Zone', 'dprTaluka', d.taluka)}
+            ${dprInfoRow('Ward / Area', 'dprWard', d.ward)}
+            ${dprInfoRow('GPS', 'dprGps', d.gps)}
+          </div>`
+        : dprPhAmber('[Complete Step 2 — Location details]')}
+      <div class="nit-subhead spaced">${tDpr('sub.site', lang)}</div>
+      ${sv.notes
+        ? `<div class="nit-para" data-field="dprSiteNotes">${esc(sv.notes)}</div>`
+        : `<div class="nit-para" style="color:#9CA3AF; font-style:italic;">Site visit not yet conducted.</div>`}
+      <div class="nit-subhead spaced">${tDpr('sub.measure', lang)}</div>
+      ${measureRows
+        ? `<table class="boq-table"><thead><tr><th>Item</th><th style="width:90px;">Value</th><th style="width:60px;">Unit</th></tr></thead><tbody>${measureRows}</tbody></table>`
+        : `<div class="nit-para" style="color:#9CA3AF; font-style:italic;">No measurements recorded yet.</div>`}
+    </section>`;
+
+    // === SECTION 4 — BOQ ===
+    const boqRows = (d.boq||[]).map((r,i) => {
+      const amt = (r.qty||0)*(r.rate||0);
+      return `<tr><td class="tx-c">${i+1}</td><td>${esc(r.desc||'')}</td><td class="tx-c">${esc(r.unit||'')}</td><td class="tx-r">${(r.qty||0).toLocaleString('en-IN')}</td><td class="tx-r">${(r.rate||0).toLocaleString('en-IN')}</td><td class="tx-r">${amt.toLocaleString('en-IN')}</td></tr>`;
+    }).join('');
+    const me = d.marketEnquiry || {};
+    let costBasisHTML;
+    if (me.method === 'market' && (me.enquiries||[]).length){
+      const meRows = me.enquiries.map(e => `<tr><td>${esc(e.vendor)}</td><td>${esc(dprDate(e.date))}</td><td class="tx-r">₹${Number(e.rate||0).toLocaleString('en-IN')}</td><td class="tx-c">${esc(e.mode)}</td></tr>`).join('');
+      costBasisHTML = `<p class="nit-para">The above rates are based on market enquiry conducted on ${esc(dprDate(me.enquiries[0].date))} from ${me.enquiries.length} vendors. The lowest quoted rate has been adopted as the basis of estimation. Details are as follows:</p>
+        <table class="boq-table"><thead><tr><th>Vendor</th><th style="width:120px;">Date</th><th style="width:120px;">Quoted Rate</th><th style="width:80px;">Mode</th></tr></thead><tbody>${meRows}</tbody></table>`;
+    } else if (me.method === 'dsr' && me.dsrEdition){
+      costBasisHTML = `<p class="nit-para">Rates are as per the <strong>${esc(me.dsrEdition)}</strong> Schedule of Rates ${me.dsrName ? '— ' + esc(me.dsrName) : ''} applicable for ${esc(d.fy || 'FY 2026-27')}.</p>`;
+    } else if (me.method === 'po' && me.poNumber){
+      costBasisHTML = `<p class="nit-para">Rates are based on Previous Purchase Order No. <strong>${esc(me.poNumber)}</strong> dated ${esc(dprDate(me.poDate))} issued by ${esc(me.poDept || 'the concerned department')}.</p>`;
+    } else {
+      costBasisHTML = dprPhAmber('[Complete Step 3 — Market Enquiry & Cost Basis section]');
+    }
+    const s4 = `<section class="dpr-doc-section">
+      <h3>4. ${tDpr('sec.boq', lang)}</h3>
+      <div class="nit-subhead">${tDpr('sub.boq', lang)}</div>
+      ${boqRows
+        ? `<p class="nit-para">The following quantities and estimated rates form the basis of the project cost estimation:</p>
+           <table class="boq-table">
+            <thead><tr><th style="width:40px;">S.No</th><th>Description</th><th style="width:60px;">Unit</th><th style="width:70px;">Qty</th><th style="width:90px;">Rate (₹)</th><th style="width:110px;">Amount (₹)</th></tr></thead>
+            <tbody>${boqRows}</tbody>
+            <tfoot>
+              <tr><td colspan="5" class="tx-r">Subtotal</td><td class="tx-r">${d.subtotal.toLocaleString('en-IN')}</td></tr>
+              <tr><td colspan="5" class="tx-r">Contingency @ ${d.contingency}%</td><td class="tx-r">${d.conAmt.toLocaleString('en-IN')}</td></tr>
+              <tr><td colspan="5" class="tx-r">Grand Total</td><td class="tx-r">₹${d.total.toLocaleString('en-IN')}</td></tr>
+            </tfoot>
+          </table>`
+        : dprPhAmber('[Complete Step 3 — BOQ to populate the schedule of quantities]')}
+      <div class="nit-subhead spaced">${tDpr('sub.basis', lang)}</div>
+      ${costBasisHTML}
+    </section>`;
+
+    // === SECTION 5 — Financial Details ===
+    const s5 = `<section class="dpr-doc-section">
+      <h3>5. ${tDpr('sec.financial', lang)}</h3>
+      <div class="info-table">
+        ${dprInfoRow(tDpr('fld.totalCost', lang),  '__total', d.total ? '₹' + d.total.toLocaleString('en-IN') : '', { amber:true })}
+        ${dprInfoRow(tDpr('fld.contingency', lang),'__con', d.contingency ? d.contingency + '% (₹' + d.conAmt.toLocaleString('en-IN') + ')' : '', { amber:true })}
+        ${dprInfoRow(tDpr('fld.aaValue', lang),    '__aaVal', aa && aa.value ? dprFmtINR(aa.value) : '', { amber:true })}
+        ${dprInfoRow(tDpr('fld.tsValue', lang),    '__tsVal', ts && ts.value ? dprFmtINR(ts.value) : '', { amber:true })}
+        ${dprInfoRow(tDpr('fld.budget', lang),     '__bh2',   d.budgetCode, { amber:true })}
+        ${dprInfoRow(tDpr('fld.funding', lang),    '__fund2', d.funding, { amber:true })}
+        ${dprInfoRow(tDpr('fld.scheme', lang),     '__scheme',d.schemeYear || d.grantOrderNo, { amber:true })}
+        ${dprInfoRow(tDpr('fld.budgetConf', lang), '__bcb',   d.budgetAvailConfirmedBy ? d.budgetAvailConfirmedBy + (d.budgetAvailConfirmedOn ? ' (' + dprDate(d.budgetAvailConfirmedOn) + ')' : '') : '', { amber:true })}
+      </div>
+    </section>`;
+
+    // === SECTION 6 — Timeline ===
+    let timelineHTML;
+    if (d.startDate){
+      const start = new Date(d.startDate);
+      const ms = 86400000;
+      const fmt = (date) => new Date(date.getTime()).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
+      const completion = d.duration ? d.duration : 'TBD';
+      const rows = [
+        ['1. DPR Approval', dprToday(), '—'],
+        ['2. Tender Floated', fmt(new Date(start.getTime() + 14*ms)), '14 days from DPR approval'],
+        ['3. Bid Opening', fmt(new Date(start.getTime() + 35*ms)), '—'],
+        ['4. Work Order Issued', fmt(new Date(start.getTime() + 50*ms)), '—'],
+        ['5. Work Commencement', fmt(start), '—'],
+        ['6. Work Completion', '—', completion],
+      ];
+      timelineHTML = `<table class="boq-table"><thead><tr><th>Milestone</th><th style="width:140px;">Target Date</th><th style="width:180px;">Duration</th></tr></thead><tbody>${rows.map(r => `<tr><td>${esc(r[0])}</td><td class="tx-c">${esc(r[1])}</td><td class="tx-c">${esc(r[2])}</td></tr>`).join('')}</tbody></table>`;
+    } else {
+      timelineHTML = dprPhAmber('[Complete Step 1 — Expected Start Date and Duration to populate timeline]');
+    }
+    const s6 = `<section class="dpr-doc-section">
+      <h3>6. ${tDpr('sec.timeline', lang)}</h3>
+      <div class="nit-subhead">${tDpr('sub.timeline', lang)}</div>
+      ${timelineHTML}
+    </section>`;
+
+    // === SECTION 7 — Technical Specifications ===
+    const specs = scopeText
+      ? scopeText.split(/(?:\.\s+|\n|;)/).filter(s => s.trim().length > 10).slice(0, 5)
+      : [];
+    const s7 = `<section class="dpr-doc-section">
+      <h3>7. ${tDpr('sec.tech', lang)}</h3>
+      ${specs.length
+        ? `<p class="nit-para">The technical specifications for the proposed work are as follows:</p><ol class="formal-list" data-field="dprScope">${specs.map(s => `<li>${esc(s.trim())}</li>`).join('')}</ol>`
+        : dprPhAmber('[Complete Step 2 — Scope to derive technical specifications]')}
+    </section>`;
+
+    // === SECTION 8 — GeM Compliance ===
+    const s8 = `<section class="dpr-doc-section">
+      <h3>8. ${tDpr('sec.gem', lang)}</h3>
+      ${gem && gem.saved
+        ? `<p class="nit-para">GeM portal was checked on <strong>${esc(dprDate(gem.searchDate))}</strong>. Result: <strong>${esc(gem.result === 'available' ? 'Available on GeM' : gem.result === 'partial' ? 'Partially available' : 'Not available')}</strong>.${gem.reason ? ' Reason for not procuring from GeM: ' + esc(gem.reason) + '.' : ''}</p>`
+        : dprPhAmber('[Complete GeM Check in the approval pipeline to populate this section]')}
+    </section>`;
+
+    // === SECTION 9 — Key Personnel ===
+    const teamRows = (d.team||[]).filter(t => t.name).map(t => `<tr><td>${esc(t.role)}</td><td>${esc(t.name)}</td><td>${esc(t.desig||'—')}</td><td>${esc(t.contact||'—')}</td></tr>`).join('');
+    const s9 = `<section class="dpr-doc-section">
+      <h3>9. ${tDpr('sec.personnel', lang)}</h3>
+      ${teamRows
+        ? `<table class="boq-table"><thead><tr><th>Role</th><th>Name</th><th>Designation</th><th>Contact</th></tr></thead><tbody>${teamRows}</tbody></table>`
+        : dprPhAmber('[Complete Step 4 — Team details]')}
+    </section>`;
+
+    // === SECTION 10 — Annexures ===
+    const photos = (sv.photos||[]).length;
+    const drawings = (sv.drawings||[]).length;
+    const meEvidence = (me.evidence||[]).length;
+    const filesCount = (d.files||[]).length;
+    const ann = (label, present, note) => present
+      ? `<li>${esc(label)} <span style="color:#10B981; font-weight:600;">✓ Attached${note ? ' (' + note + ')' : ''}</span></li>`
+      : `<li>${esc(label)} <span style="color:#9CA3AF; font-style:italic;">Not attached</span></li>`;
+    const s10 = `<section class="dpr-doc-section">
+      <h3>10. ${tDpr('sec.annexures', lang)}</h3>
+      <ol class="formal-list">
+        ${ann('Annexure A — Site photographs', photos > 0, photos + ' photos')}
+        ${ann('Annexure B — Drawings and maps', drawings > 0 || filesCount > 0, (drawings + filesCount) + ' files')}
+        ${ann('Annexure C — Market enquiry evidence', meEvidence > 0, meEvidence + ' files')}
+        ${ann('Annexure D — GeM search screenshot', !!(gem && gem.screenshotName))}
+        ${ann('Annexure E — Previous project references', false)}
+      </ol>
+    </section>`;
+
+    // === FOOTER ===
+    const footer = `<div class="doc-footer">
+      <div class="doc-footer-l">
+        <div><strong>${tDpr('foot.prepared', lang)}</strong></div>
+        <div>Rajesh Kumar</div>
+        <div class="desig">Super Admin</div>
+        <div class="desig">${esc(d.dept || 'Ahmedabad Municipal Corporation')}</div>
+        <div>Date: ${esc(today)}</div>
+      </div>
+      <div class="doc-footer-r" style="text-align:left;">
+        <div><strong>${tDpr('foot.approved', lang)}</strong></div>
+        <div>${aa && aa.authorityName ? esc(aa.authorityName) : '[AA Authority — pending]'}</div>
+        <div class="desig">${aa && aa.authorityName ? 'Approving Authority' : 'Designation'}</div>
+        <div>Date: ${aa && aa.date ? esc(dprDate(aa.date)) : '___________'}</div>
+        <div class="seal-small" aria-hidden="true" style="margin-left:0;">SEAL</div>
+      </div>
+    </div>
+    <div class="doc-watermark">${tDpr('foot.watermark', lang)}</div>`;
+
+    document.getElementById('dprDraftDoc').innerHTML = headerHTML + s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + s9 + s10 + footer;
+    const pct = dprComputePct(d);
+    document.getElementById('dprDraftPct').textContent = pct;
+    document.getElementById('dprDraftPctBar').style.width = pct + '%';
+    wireDprSectionEditing();
+    refreshIcons();
+  }
+
+  // ===== Open / close panel =====
+  window.openDprDraftPanel = function(){
+    // Block opening when no data exists yet
+    if (!dprHasAnyData()){
+      showToast('Add project details first to preview the draft');
+      return;
+    }
+    // Close any other panel (Version History) — mutually exclusive
+    closeVersionHistory();
+    dprLastTriggerBtn = document.getElementById('checkDprDraftBtn');
+    // Initialize language label from session storage
+    document.getElementById('dprPanelLangLabel').textContent = DPR_LANG_NAMES[dprPanelLang] || 'English';
+    dprUpdateLangChecks(dprPanelLang);
+    renderDprDraftDoc();
+    const backdrop = document.getElementById('dprDraftBackdrop');
+    const panel = document.getElementById('dprDraftPanel');
+    backdrop.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      backdrop.classList.remove('opacity-0');
+      panel.style.transform = 'translateX(0)';
+    });
+    // Focus close button
+    setTimeout(() => { document.getElementById('dprDraftCloseBtn')?.focus(); }, 100);
+  };
+  window.closeDprDraftPanel = function(){
+    const backdrop = document.getElementById('dprDraftBackdrop');
+    const panel = document.getElementById('dprDraftPanel');
+    panel.style.transform = 'translateX(100%)';
+    backdrop.classList.add('opacity-0');
+    setTimeout(() => backdrop.classList.add('hidden'), 280);
+    closeDprSelectionDialogue();
+    setDprEditMode(false);
+    if (dprLastTriggerBtn) dprLastTriggerBtn.focus();
+  };
+
+  // ===== Edit mode =====
+  window.setDprEditMode = function(on){
+    dprEditMode = !!on;
+    const doc = document.getElementById('dprDraftDoc');
+    if (doc) doc.classList.toggle('edit-mode', dprEditMode);
+    const banner = document.getElementById('dprEditBanner');
+    if (banner){ banner.style.display = dprEditMode ? 'flex' : 'none'; }
+    const btn = document.getElementById('dprDraftEditBtn');
+    if (btn){
+      btn.textContent = dprEditMode ? 'Done editing' : 'Edit Document';
+      btn.classList.toggle('bg-primary', !dprEditMode);
+      btn.classList.toggle('bg-success', dprEditMode);
+    }
+    if (!dprEditMode){
+      // Deactivate any active section
+      if (dprActiveSection){ dprDeactivateSection(dprActiveSection); }
+      closeDprSelectionDialogue();
+      // Show "✓ DPR draft updated" green flash for 3s
+      const lbl = document.getElementById('dprDraftLastSaved');
+      if (lbl){ lbl.textContent = 'just now'; }
+    }
+  };
+
+  // ===== Language switching =====
+  window.toggleDprPanelLangMenu = function(ev){
+    if (ev) ev.stopPropagation();
+    document.getElementById('dprPanelLangMenu')?.classList.toggle('hidden');
+  };
+  document.addEventListener('click', e => {
+    const m = document.getElementById('dprPanelLangMenu');
+    const btn = document.getElementById('dprPanelLangBtn');
+    if (m && !m.classList.contains('hidden') && !m.contains(e.target) && (!btn || !btn.contains(e.target))) m.classList.add('hidden');
+  });
+  function dprUpdateLangChecks(lang){
+    ['en','hi','mr'].forEach(c => {
+      const el = document.getElementById('dprPanelLangCheck-' + c);
+      if (el) el.classList.toggle('hidden', c !== lang);
+    });
+  }
+  window.switchDprPanelLanguage = function(lang){
+    dprPanelLang = lang;
+    try { sessionStorage.setItem('dprDraftPanelLang', lang); } catch(e){}
+    document.getElementById('dprPanelLangLabel').textContent = DPR_LANG_NAMES[lang] || 'English';
+    document.getElementById('dprPanelLangMenu')?.classList.add('hidden');
+    dprUpdateLangChecks(lang);
+    // Re-render with fade
+    const doc = document.getElementById('dprDraftDoc');
+    if (doc){
+      doc.style.opacity = '0';
+      setTimeout(() => { renderDprDraftDoc(); doc.style.opacity = '1'; }, 150);
+    }
+    // Amber banner for non-English
+    const banner = document.getElementById('dprPanelLangBanner');
+    if (banner){
+      if (lang === 'en'){ banner.classList.add('hidden'); }
+      else {
+        banner.classList.remove('hidden');
+        document.getElementById('dprPanelLangBannerText').textContent = 'Document shown in ' + (DPR_LANG_NAMES[lang]) + '. Form inputs remain in English.';
+        clearTimeout(window._dprLangBannerTimer);
+        window._dprLangBannerTimer = setTimeout(() => banner.classList.add('hidden'), 4000);
+      }
+    }
+  };
+
+  // ===== Section-level editing =====
+  function wireDprSectionEditing(){
+    const doc = document.getElementById('dprDraftDoc');
+    if (!doc) return;
+    doc.querySelectorAll('.dpr-doc-section').forEach(sec => {
+      if (sec.dataset.wired === '1') return;
+      sec.dataset.wired = '1';
+      sec.addEventListener('click', e => {
+        if (!dprEditMode) return;
+        if (e.target.closest('.dpr-section-action-bar') || e.target.closest('.dpr-section-mini-toolbar') || e.target.closest('.dpr-section-done-link')) return;
+        const sel = window.getSelection();
+        if (sel && sel.toString().trim().length > 0) return;
+        if (sec.classList.contains('section-editing')) return;
+        dprActivateSection(sec);
+      });
+    });
+  }
+  function dprActivateSection(sec){
+    if (dprActiveSection && dprActiveSection !== sec) dprDeactivateSection(dprActiveSection);
+    dprActiveSection = sec;
+    sec.classList.add('section-active');
+    if (!sec.querySelector('.dpr-section-action-bar')){
+      const bar = document.createElement('div');
+      bar.className = 'dpr-section-action-bar';
+      bar.contentEditable = 'false';
+      bar.innerHTML = `
+        <button type="button" data-act="edit"><i data-lucide="pencil" class="w-3 h-3"></i> Edit section</button>
+        <button type="button" data-act="ai"><i data-lucide="sparkles" class="w-3 h-3"></i> AI rewrite</button>
+        <button type="button" data-act="move"><i data-lucide="arrow-up-down" class="w-3 h-3"></i> Move</button>
+        <button type="button" data-act="clear"><i data-lucide="trash-2" class="w-3 h-3"></i> Clear</button>`;
+      sec.appendChild(bar);
+      bar.querySelectorAll('button').forEach(b => b.addEventListener('click', ev => {
+        ev.stopPropagation();
+        const act = b.dataset.act;
+        if (act === 'edit') dprEnterSectionEditMode(sec);
+        else if (act === 'ai') dprAiRewriteSection(sec);
+        else if (act === 'move') dprStartSectionMove(sec);
+        else if (act === 'clear') dprClearSection(sec);
+      }));
+      refreshIcons();
+    }
+  }
+  function dprDeactivateSection(sec){
+    if (!sec) return;
+    sec.classList.remove('section-active', 'section-editing');
+    sec.removeAttribute('contenteditable');
+    sec.querySelector('.dpr-section-action-bar')?.remove();
+    sec.querySelector('.dpr-section-mini-toolbar')?.remove();
+    sec.querySelector('.dpr-section-done-link')?.remove();
+    if (dprActiveSection === sec) dprActiveSection = null;
+  }
+  function dprEnterSectionEditMode(sec){
+    sec.classList.add('section-editing');
+    sec.contentEditable = 'true';
+    if (!sec.querySelector('.dpr-section-mini-toolbar')){
+      const tb = document.createElement('div');
+      tb.className = 'dpr-section-mini-toolbar';
+      tb.contentEditable = 'false';
+      tb.innerHTML = `
+        <button type="button" onmousedown="event.preventDefault(); document.execCommand('bold')" aria-label="Bold"><i data-lucide="bold" class="w-3.5 h-3.5"></i></button>
+        <button type="button" onmousedown="event.preventDefault(); document.execCommand('italic')" aria-label="Italic"><i data-lucide="italic" class="w-3.5 h-3.5"></i></button>
+        <button type="button" onmousedown="event.preventDefault(); document.execCommand('insertUnorderedList')" aria-label="Bullet list"><i data-lucide="list" class="w-3.5 h-3.5"></i></button>`;
+      sec.appendChild(tb);
+    }
+    if (!sec.querySelector('.dpr-section-done-link')){
+      const done = document.createElement('button');
+      done.type = 'button';
+      done.className = 'dpr-section-done-link';
+      done.contentEditable = 'false';
+      done.textContent = 'Done editing section';
+      done.addEventListener('click', e => { e.stopPropagation(); dprSaveAndDeactivateSection(sec); });
+      sec.appendChild(done);
+    }
+    refreshIcons();
+    const range = document.createRange();
+    const target = sec.querySelector('.nit-para, ol.formal-list, .info-table, .draft-placeholder-amber') || sec;
+    range.selectNodeContents(target);
+    range.collapse(true);
+    const sel = window.getSelection();
+    sel.removeAllRanges(); sel.addRange(range);
+  }
+  function dprSaveAndDeactivateSection(sec){
+    if (!sec) return;
+    sec.classList.add('field-flash');
+    setTimeout(() => sec.classList.remove('field-flash'), 800);
+    // Sync any [data-field] children back to FORM_STATE
+    sec.querySelectorAll('[data-field]').forEach(node => syncDprFieldBack(node));
+    dprDeactivateSection(sec);
+    dprShowSyncIndicator();
+  }
+  function dprAiRewriteSection(sec){
+    showToast('AI rewriting section…');
+    setTimeout(() => {
+      sec.classList.add('field-flash');
+      setTimeout(() => sec.classList.remove('field-flash'), 800);
+      showToast('Section rewritten — review changes');
+    }, 1200);
+  }
+  function dprClearSection(sec){
+    if (!confirm('Clear this section? The heading stays but all content will be removed.')) return;
+    sec.querySelectorAll(':scope > *:not(h3):not(.dpr-section-action-bar):not(.dpr-section-mini-toolbar):not(.dpr-section-done-link)').forEach(n => n.remove());
+    const ph = document.createElement('div');
+    ph.className = 'draft-placeholder-amber';
+    ph.textContent = '[Section cleared — content will need to be regenerated]';
+    sec.appendChild(ph);
+    dprShowSyncIndicator();
+  }
+  function dprStartSectionMove(sec){
+    showToast('Drag section to reorder — drop on another section');
+    sec.draggable = true;
+    const onDragEnd = () => { sec.draggable = false; sec.style.opacity = ''; sec.removeEventListener('dragend', onDragEnd); };
+    sec.addEventListener('dragstart', e => { sec.style.opacity = '0.6'; e.dataTransfer.effectAllowed = 'move'; });
+    sec.addEventListener('dragend', onDragEnd);
+    document.getElementById('dprDraftDoc').querySelectorAll('.dpr-doc-section').forEach(other => {
+      if (other === sec) return;
+      other.addEventListener('dragover', e => e.preventDefault(), { once:true });
+      other.addEventListener('drop', e => {
+        e.preventDefault();
+        const rect = other.getBoundingClientRect();
+        const before = e.clientY < rect.top + rect.height / 2;
+        other.parentElement.insertBefore(sec, before ? other : other.nextSibling);
+      }, { once:true });
+    });
+  }
+  function dprShowSyncIndicator(){
+    const ind = document.getElementById('dprSyncIndicator');
+    if (!ind) return;
+    ind.classList.remove('opacity-0');
+    clearTimeout(window._dprSyncTimer);
+    window._dprSyncTimer = setTimeout(() => ind.classList.add('opacity-0'), 1500);
+  }
+
+  // ===== Sync edits back to FORM_STATE =====
+  function syncDprFieldBack(node){
+    const f = node.dataset.field;
+    if (!f || f.startsWith('__')) return;
+    const text = (node.textContent || '').trim();
+    switch(f){
+      case 'dprTitle':       FORM_STATE.title       = text; break;
+      case 'dprDept':        FORM_STATE.dept        = text; break;
+      case 'dprSector':      FORM_STATE.sector      = text; break;
+      case 'dprType':        FORM_STATE.type        = text; break;
+      case 'dprEstCost':     FORM_STATE.estCost     = (text.replace(/[₹,\s]/g,'')) || ''; break;
+      case 'dprScope':       FORM_STATE.scope       = '<p>' + text + '</p>'; break;
+      case 'dprNeed':        FORM_STATE.need        = text; break;
+      case 'dprDistrict':    FORM_STATE.district    = text; break;
+      case 'dprTaluka':      FORM_STATE.taluka      = text; break;
+      case 'dprWard':        FORM_STATE.ward        = text; break;
+      case 'dprGps':         FORM_STATE.gps         = text; break;
+      case 'dprSiteNotes':   FORM_STATE.siteVisit.notes = text; break;
+    }
+  }
+
+  // ===== Text selection AI dialogue =====
+  const dprDraftDocEl = () => document.getElementById('dprDraftDoc');
+  document.addEventListener('mouseup', e => {
+    if (!dprEditMode) return;
+    const doc = dprDraftDocEl();
+    if (!doc) return;
+    if (!doc.contains(e.target)) return;
+    handleDprSelection();
+  });
+  function handleDprSelection(){
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed || !sel.toString().trim()) return;
+    const range = sel.getRangeAt(0);
+    const doc = dprDraftDocEl();
+    if (!doc.contains(range.commonAncestorContainer)) return;
+    let node = range.commonAncestorContainer;
+    if (node.nodeType === 3) node = node.parentNode;
+    const fieldEl = node.closest('[data-field]');
+    if (!fieldEl) return;
+    showDprSelectionDialogue(sel, fieldEl, range);
+  }
+  function showDprSelectionDialogue(sel, fieldEl, range){
+    const text = sel.toString();
+    const preview = text.length > 60 ? '"' + text.slice(0,57) + '…"' : '"' + text + '"';
+    document.getElementById('dprSelPreview').textContent = preview;
+    document.getElementById('dprManualEditArea').value = text;
+    document.getElementById('dprAiPrompt').value = '';
+    document.getElementById('dprAiSuggestOut').innerHTML = '';
+    switchDprSelTab('ai');
+    const dlg = document.getElementById('dprSelDialogue');
+    dlg.classList.remove('hidden');
+    const panel = document.getElementById('dprDraftPanel');
+    const rect = range.getBoundingClientRect();
+    const panelRect = panel.getBoundingClientRect();
+    const dlgW = 320, dlgH = dlg.offsetHeight || 240;
+    let left = rect.left - panelRect.left + (rect.width / 2) - (dlgW / 2);
+    left = Math.max(12, Math.min(left, panelRect.width - dlgW - 12));
+    let top = rect.top - panelRect.top - dlgH - 12;
+    if (top < 60) top = rect.bottom - panelRect.top + 12;
+    dlg.style.left = left + 'px';
+    dlg.style.top  = top  + 'px';
+    dprSelectionInfo = { range: range.cloneRange(), fieldEl, text };
+    refreshIcons();
+  }
+  window.closeDprSelectionDialogue = function(){
+    document.getElementById('dprSelDialogue')?.classList.add('hidden');
+    dprSelectionInfo = null;
+  };
+  window.switchDprSelTab = function(which){
+    const ai = which === 'ai';
+    document.getElementById('dprAiTab').classList.toggle('hidden', !ai);
+    document.getElementById('dprManualTab').classList.toggle('hidden', ai);
+    document.getElementById('dprAiTabBtn').style.borderBottomColor = ai ? '#0F5EE8' : 'transparent';
+    document.getElementById('dprAiTabBtn').style.color = ai ? '#0F5EE8' : '#6B7280';
+    document.getElementById('dprManualTabBtn').style.borderBottomColor = !ai ? '#0F5EE8' : 'transparent';
+    document.getElementById('dprManualTabBtn').style.color = !ai ? '#0F5EE8' : '#6B7280';
+  };
+  window.dprQuickPrompt = function(p){ document.getElementById('dprAiPrompt').value = p; dprAiSuggest(); };
+  window.dprAiSuggest = function(){
+    if (!dprSelectionInfo) return;
+    const promptText = (document.getElementById('dprAiPrompt').value || '').trim();
+    const out = document.getElementById('dprAiSuggestOut');
+    out.innerHTML = `<div class="mt-3 text-[12px] text-ink-500 italic">Generating…</div>`;
+    setTimeout(() => {
+      let suggestion = dprSelectionInfo.text;
+      const p = promptText.toLowerCase();
+      if (p.includes('formal')){
+        suggestion = `Pursuant to the applicable provisions, ${suggestion.charAt(0).toLowerCase() + suggestion.slice(1)}`;
+      } else if (p.includes('simplif')){
+        suggestion = suggestion.split(/[,.;]/)[0].trim() + '.';
+      } else if (p.includes('expand') || p.includes('detail')){
+        suggestion = `${suggestion} — including all design, materials, labour, supervision, statutory compliances, and incidental works necessary for satisfactory completion in conformity with applicable specifications and codes.`;
+      } else if (p.includes('hindi') || p.includes('translate')){
+        suggestion = `[हिन्दी अनुवाद] ${suggestion}`;
+      } else {
+        suggestion = `Refined: ${suggestion}`;
+      }
+      out.innerHTML = `<div class="mt-3" style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:8px; padding:12px;">
+        <div class="text-[11px] font-bold uppercase tracking-wide mb-1" style="color:#065F46;">Suggested replacement</div>
+        <div class="text-[13px] text-ink-900" id="dprAiSuggestText">${esc(suggestion)}</div>
+        <div class="mt-3 flex items-center gap-2">
+          <button onclick="acceptDprSuggestion()" class="bg-success text-white text-[12px] font-medium hover:bg-success/90 inline-flex items-center gap-1" style="border-radius:6px; padding:4px 12px;"><i data-lucide="check" class="w-3 h-3"></i> Accept</button>
+          <button onclick="dprAiSuggest()" class="text-[12px] text-ink-500 hover:text-ink-900" style="border:1px solid #E5E7EB; border-radius:6px; padding:4px 12px; background:white; cursor:pointer;">Try again</button>
+          <button onclick="closeDprSelectionDialogue()" class="text-[12px] text-ink-500 hover:text-ink-900" style="background:transparent; border:none; cursor:pointer;">Cancel</button>
+        </div>
+      </div>`;
+      refreshIcons();
+    }, 800);
+  };
+  window.acceptDprSuggestion = function(){
+    const text = document.getElementById('dprAiSuggestText').textContent;
+    applyDprReplacement(text);
+  };
+  window.applyDprManualEdit = function(){
+    if (!dprSelectionInfo) return;
+    const text = document.getElementById('dprManualEditArea').value;
+    if (text === dprSelectionInfo.text){ closeDprSelectionDialogue(); return; }
+    applyDprReplacement(text);
+  };
+  function applyDprReplacement(newText){
+    if (!dprSelectionInfo) return;
+    const { fieldEl, text: oldText } = dprSelectionInfo;
+    const fullOld = fieldEl.textContent;
+    const fullNew = fullOld.replace(oldText, newText);
+    fieldEl.textContent = fullNew;
+    fieldEl.classList.add('field-flash');
+    setTimeout(() => fieldEl.classList.remove('field-flash'), 800);
+    syncDprFieldBack(fieldEl);
+    closeDprSelectionDialogue();
+    dprShowSyncIndicator();
+  }
+
+  // ===== Keyboard =====
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    const dlg = document.getElementById('dprSelDialogue');
+    const panel = document.getElementById('dprDraftPanel');
+    if (dlg && !dlg.classList.contains('hidden')){ closeDprSelectionDialogue(); e.preventDefault(); return; }
+    if (panel && panel.style.transform === 'translateX(0px)'){
+      if (dprEditMode){ setDprEditMode(false); }
+      else { closeDprDraftPanel(); }
+      e.preventDefault();
+    }
+  });
+
+  // ===== ADDITION 3 — VERSION HISTORY PANEL =====================
   let _vhCurrentDprId = null;
   let _vhRestoreConfirm = null; // version number pending restore confirmation
   function openVersionHistory(dprId){
@@ -2295,83 +3729,6 @@
   // Esc key closes panel
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeVersionHistory(); });
 
-  // ===================== ADDITION 9 — CLONE FROM PAST DPR =====================
-  let _cloneSelected = null;       // {id, title, sector, dept, fy, cost}
-  let _cloneChecks = { title:true, sector:true, scope:true, boq:true, eligibility:true, cost:false, team:false };
-  // Past DPRs to clone from — use the existing DPRS list (FY tagged from createdOn)
-  function pastDprPool(){
-    return DPRS.map(d => ({
-      id:d.id, title:d.title, sector:d.sector, dept:d.dept, fy:'FY 2025-26', cost:d.cost,
-    }));
-  }
-  function openCloneSelector(){
-    document.getElementById('cloneSelectorWrap').classList.remove('hidden');
-    document.getElementById('cloneSearchInput').focus();
-    renderCloneResults('');
-  }
-  function renderCloneResults(q){
-    const all = pastDprPool();
-    const filtered = !q ? all : all.filter(d => (d.title + ' ' + d.id + ' ' + d.sector + ' ' + d.dept).toLowerCase().includes(q.toLowerCase()));
-    const box = document.getElementById('cloneResults');
-    if (!q && document.activeElement !== document.getElementById('cloneSearchInput')){ box.classList.add('hidden'); return; }
-    box.classList.remove('hidden');
-    box.innerHTML = filtered.length
-      ? filtered.slice(0,8).map(d => `<button type="button" class="clone-result-row w-full text-left flex items-start justify-between gap-3" onclick="selectCloneSource('${d.id}')">
-          <div>
-            <div class="font-medium text-ink-900">${d.title}</div>
-            <div class="text-[11px] text-ink-500 mt-0.5"><span class="font-mono">${d.id}</span> · ${d.fy} · ${d.sector}</div>
-          </div>
-          <div class="text-[12.5px] text-ink-500 whitespace-nowrap pt-0.5">₹${(d.cost/100000).toFixed(1)} L</div>
-        </button>`).join('')
-      : '<div class="px-4 py-6 text-center text-[12.5px] text-ink-400">No matching DPRs found.</div>';
-  }
-  function selectCloneSource(id){
-    const src = pastDprPool().find(d => d.id === id);
-    if (!src) return;
-    _cloneSelected = src;
-    document.getElementById('cloneResults').classList.add('hidden');
-    document.getElementById('cloneSearchInput').value = src.title;
-    const c = _cloneChecks;
-    const wrap = document.getElementById('cloneConfirm');
-    wrap.classList.remove('hidden');
-    wrap.innerHTML = `<div class="clone-confirm-card">
-      <div class="text-[12px] text-ink-500">Cloning from:</div>
-      <div class="text-[14px] font-bold text-ink-900 mt-0.5">${src.title}</div>
-      <div class="text-[12px] text-ink-500"><span class="font-mono">${src.id}</span> · ${src.fy}</div>
-
-      <div class="text-[12px] font-bold text-ink-900 mt-4 mb-2">What will be copied:</div>
-      <div class="space-y-1.5">
-        <label class="flex items-center gap-2 text-[13px] text-ink-900"><input type="checkbox" ${c.title?'checked':''} onchange="_cloneChecks.title=this.checked" class="accent-primary"> Project title and description</label>
-        <label class="flex items-center gap-2 text-[13px] text-ink-900"><input type="checkbox" ${c.sector?'checked':''} onchange="_cloneChecks.sector=this.checked" class="accent-primary"> Sector and department</label>
-        <label class="flex items-center gap-2 text-[13px] text-ink-900"><input type="checkbox" ${c.scope?'checked':''} onchange="_cloneChecks.scope=this.checked" class="accent-primary"> Scope of work</label>
-        <label class="flex items-center gap-2 text-[13px] text-ink-900"><input type="checkbox" ${c.boq?'checked':''} onchange="_cloneChecks.boq=this.checked" class="accent-primary"> BOQ structure (quantities will be reset to 0 — enter new quantities)</label>
-        <label class="flex items-center gap-2 text-[13px] text-ink-900"><input type="checkbox" ${c.eligibility?'checked':''} onchange="_cloneChecks.eligibility=this.checked" class="accent-primary"> Eligibility and technical requirements</label>
-        <label class="flex items-center gap-2 text-[13px] text-ink-500"><input type="checkbox" ${c.cost?'checked':''} onchange="_cloneChecks.cost=this.checked" class="accent-primary"> Estimated cost (unchecked by default — costs change year to year)</label>
-        <label class="flex items-center gap-2 text-[13px] text-ink-500"><input type="checkbox" ${c.team?'checked':''} onchange="_cloneChecks.team=this.checked" class="accent-primary"> Team and key personnel (unchecked — personnel may have changed)</label>
-      </div>
-
-      <div class="text-[12px] text-ink-500 italic mt-4">What will NOT be copied: Approval records, AA/TS numbers, budget certificates, site visit photos — these are specific to the original DPR.</div>
-
-      <div class="mt-4">
-        <button onclick="createClone()" class="inline-flex items-center gap-1.5 text-white font-bold px-5 py-2.5 rounded-lg text-[13px]" style="background:#8B5CF6;"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Create clone →</button>
-      </div>
-    </div>`;
-    refreshIcons();
-  }
-  function createClone(){
-    const src = _cloneSelected;
-    if (!src) return;
-    // Reset FORM_STATE with selected fields copied
-    FORM_STATE.clonedFrom = src.id;
-    if (_cloneChecks.title)       FORM_STATE.title = src.title;
-    if (_cloneChecks.sector)      { FORM_STATE.sector = src.sector; FORM_STATE.dept = src.dept; }
-    if (_cloneChecks.scope)       FORM_STATE.scope = `<p>Scope cloned from ${src.id} — review and update for FY 2026-27.</p>`;
-    if (_cloneChecks.boq)         FORM_STATE.boq = FORM_STATE.boq.map(r => ({ ...r, qty: 0 }));
-    if (_cloneChecks.cost)        FORM_STATE.estCost = String(src.cost);
-    else                          FORM_STATE.estCost = '';
-    showToast(`Cloning from ${src.id} — review and update all fields`);
-    location.hash = '#step1';
-  }
   // ===================== ROUTER =====================
   function setView(name){
     document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
@@ -2394,6 +3751,7 @@
     const valid = ['list','new','describe','upload','step1','step2','step3','step4','step5','success'];
     setView(valid.includes(h) ? h : 'list');
     if (h === 'list') renderDprList('all');
+    if (h === 'describe' && typeof dprWizardBootIfFirstTime === 'function') dprWizardBootIfFirstTime();
     if (['step1','step2','step3','step4','step5'].includes(h) && typeof renderForm === 'function') renderForm(parseInt(h.replace('step',''),10));
   }
   window.addEventListener('hashchange', routeFromHash);
@@ -2406,5 +3764,6 @@
   routeFromHash();
   refreshIcons();
 </script>
+<script>(function(){var b=document.getElementById("avatarBtn"),m=document.getElementById("avatarMenu");if(!b||!m)return;b.addEventListener("click",function(e){e.stopPropagation();m.classList.toggle("hidden");});document.addEventListener("click",function(e){if(!m.contains(e.target)&&!b.contains(e.target))m.classList.add("hidden");});if(window.lucide)lucide.createIcons();})();</script>
 </body>
 </html>

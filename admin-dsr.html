@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DSR Rate Management — TenderAI Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>
+    tailwind.config = { theme: { extend: {
+      fontFamily: { sans: ['"DM Sans"', 'system-ui', 'sans-serif'] },
+      colors: { primary:{DEFAULT:'#0F5EE8',light:'#EFF6FF',border:'#93C5FD'}, success:{DEFAULT:'#10B981',light:'#F0FDF4'}, warning:{DEFAULT:'#F59E0B',light:'#FFFBEB'}, danger:{DEFAULT:'#EF4444',light:'#FEF2F2'}, purple:{DEFAULT:'#8B5CF6',light:'#EEEDFE'}, ink:{900:'#111827',500:'#6B7280',400:'#9CA3AF'}, line:'#E5E7EB', surface:'#F9FAFB' },
+      boxShadow:{ soft:'0 1px 3px rgba(0,0,0,0.08)', lift:'0 4px 12px rgba(0,0,0,0.12)' }
+    }}};
+  </script>
+  <style>
+    html, body{ font-family:'DM Sans',system-ui,sans-serif; color:#111827; background:#F9FAFB; }
+    *:focus-visible{ outline:2px solid #0F5EE8; outline-offset:2px; border-radius:4px; }
+    ::-webkit-scrollbar{ width:10px; height:10px; } ::-webkit-scrollbar-thumb{ background:#E5E7EB; border-radius:8px; } ::-webkit-scrollbar-thumb:hover{ background:#D1D5DB; } ::-webkit-scrollbar-track{ background:transparent; }
+    .toast{ transform:translateY(80px); opacity:0; transition:transform .3s cubic-bezier(.2,.7,.2,1),opacity .25s ease; } .toast.show{ transform:translateY(0); opacity:1; }
+    .dropdown-shadow{ box-shadow:0 12px 32px rgba(17,24,39,0.14),0 2px 6px rgba(17,24,39,0.06); }
+    .overlay-shade{ background:rgba(17,24,39,0.34); }
+    .version-card{ transition:all .15s ease; cursor:pointer; }
+    .version-card:hover{ border-color:#93C5FD; box-shadow:0 4px 12px rgba(0,0,0,0.06); }
+    .version-card.selected{ border-color:#0F5EE8; background:#EFF6FF; }
+    @media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important;} }
+  </style>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+
+  <aside class="w-[244px] shrink-0 bg-white border-r border-line flex flex-col">
+    <div class="px-5 pt-5 pb-4 border-b border-line">
+      <div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-[15px]">T</div><div><div class="text-[15px] font-semibold text-ink-900 leading-tight">TenderAI</div><div class="text-[11px] text-ink-500 leading-tight">Admin Panel</div></div></div>
+      <button class="mt-4 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-line bg-surface hover:bg-white hover:shadow-soft transition"><div class="w-7 h-7 rounded-md bg-primary-light text-primary flex items-center justify-center"><i data-lucide="building-2" class="w-4 h-4"></i></div><div class="text-left flex-1 min-w-0"><div class="text-[12.5px] font-medium text-ink-900 truncate">Ahmedabad</div><div class="text-[10.5px] text-ink-500 truncate">Municipal Corporation</div></div><i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+    </div>
+    <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">OVERVIEW</div><ul class="space-y-0.5"><li><a href="admin.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Admin Dashboard</a></li></ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">ACCESS &amp; ORG</div><ul class="space-y-0.5">
+        <li><a href="admin-users.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="users" class="w-4 h-4"></i> User Management <span class="ml-auto bg-primary-light text-primary text-[10px] font-semibold rounded-full px-1.5 py-0.5">24</span></a></li>
+        <li><a href="admin-org.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="network" class="w-4 h-4"></i> Department &amp; Org</a></li>
+      </ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">CATALOG</div><ul class="space-y-0.5">
+        <li><a href="admin-templates.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="layout-template" class="w-4 h-4"></i> Tender Templates</a></li>
+        <li><a href="admin-budget.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="wallet" class="w-4 h-4"></i> Budget Heads</a></li>
+        <li><a href="admin-dsr.html" aria-current="page" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] bg-primary-light text-primary font-medium"><i data-lucide="table-2" class="w-4 h-4"></i> DSR Rates</a></li>
+        <li><a href="admin-vendors.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="store" class="w-4 h-4"></i> Vendor Registry <span class="ml-auto bg-danger text-white text-[10px] font-semibold rounded-full px-1.5 py-0.5">3</span></a></li>
+      </ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">GOVERNANCE</div><ul class="space-y-0.5">
+        <li><a href="admin-compliance.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="shield-check" class="w-4 h-4"></i> Compliance &amp; Audit</a></li>
+        <li><a href="admin-reports.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Reports &amp; Analytics</a></li>
+      </ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">SYSTEM</div><ul class="space-y-0.5">
+        <li><a href="admin-notifications.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="bell-ring" class="w-4 h-4"></i> Notifications</a></li>
+        <li><a href="admin-settings.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="settings" class="w-4 h-4"></i> System Settings</a></li>
+      </ul></div>
+      <div class="pt-2 border-t border-line"><ul class="space-y-0.5"><li><a href="index.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="arrow-left" class="w-4 h-4"></i> Procurement Portal</a></li></ul></div>
+    </nav>
+    <div class="border-t border-line px-4 py-3 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div><div class="flex-1 min-w-0"><div class="text-[12.5px] font-medium text-ink-900 truncate">Rajesh Kumar</div><div class="text-[10.5px] text-ink-500 truncate">Super Admin</div></div><button onclick="sessionStorage.clear(); location.href='login.html'" class="text-ink-400 hover:text-ink-900"><i data-lucide="log-out" class="w-4 h-4"></i></button></div>
+  </aside>
+
+  <div class="flex-1 flex flex-col min-w-0">
+    <header class="h-16 bg-white border-b border-line px-6 flex items-center gap-4 sticky top-0 z-30">
+      <button class="text-ink-500 hover:text-ink-900"><i data-lucide="panel-left" class="w-5 h-5"></i></button>
+      <div class="flex-1 max-w-xl relative"><i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i><input type="search" placeholder="Search items, codes…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] placeholder:text-ink-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" /></div>
+      <button class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">FY 2026-27 <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+      <button class="relative w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500"><i data-lucide="bell" class="w-4 h-4"></i><span class="absolute -top-1 -right-1 bg-danger text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">5</span></button>
+      <div class="relative">
+        <button id="avatarBtn" class="flex items-center gap-2 pl-2 border-l border-line"><div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div><div class="hidden md:block text-left"><div class="text-[12.5px] font-medium text-ink-900 leading-tight">Rajesh Kumar</div><div class="text-[10.5px] text-ink-500 leading-tight">Super Admin</div></div><i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+        <div id="avatarMenu" class="hidden absolute right-0 mt-2 w-[240px] bg-white border border-line rounded-xl dropdown-shadow z-40 py-1.5">
+          <a href="#" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="user" class="w-4 h-4 text-ink-500"></i> My profile</a>
+          <a href="admin.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] bg-primary-light text-primary font-medium mx-1.5 rounded-md"><i data-lucide="shield" class="w-4 h-4"></i> Admin Panel</a>
+          <a href="index.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="layout-dashboard" class="w-4 h-4 text-ink-500"></i> Procurement Portal</a>
+          <a href="admin-settings.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="settings" class="w-4 h-4 text-ink-500"></i> System Settings</a>
+          <div class="my-1.5 border-t border-line"></div>
+          <a href="#" onclick="sessionStorage.clear(); location.href='login.html'; return false;" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-danger hover:bg-danger-light"><i data-lucide="log-out" class="w-4 h-4"></i> Sign out</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto px-8 py-6 space-y-7 min-w-0 relative">
+
+      <section class="flex items-start justify-between flex-wrap gap-3">
+        <div>
+          <div class="text-[13px] text-ink-500 mb-2"><a href="admin.html" class="hover:underline">Admin Panel</a> · Catalog</div>
+          <h1 class="text-[24px] font-bold text-ink-900 leading-tight">DSR Rate Management</h1>
+          <p class="text-[14px] text-ink-500 mt-1">Schedule of rates by version, region and sector. Active rates auto-populate the DPR BOQ.</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="document.getElementById('uploadFile').click()" class="px-3 py-2 rounded-lg border border-line text-[13px] hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="upload" class="w-4 h-4"></i> Upload rate book</button>
+          <input id="uploadFile" type="file" accept=".csv,.xlsx" class="hidden" onchange="onUpload(this.files[0])" />
+        </div>
+      </section>
+
+      <!-- Versions -->
+      <section>
+        <div class="flex items-center justify-between mb-3"><h2 class="text-[16px] font-bold text-ink-900">Rate books</h2><span class="text-[12px] text-ink-500">Click a version to view its line items</span></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3" id="versionsGrid"></div>
+      </section>
+
+      <!-- Active items -->
+      <section class="space-y-3">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div><h2 class="text-[16px] font-bold text-ink-900" id="itemsTitle">Rate items</h2><div class="text-[12px] text-ink-500" id="itemsSub">Showing the currently selected version</div></div>
+          <div class="flex gap-2">
+            <select id="fSector" onchange="renderItems()" class="px-3 py-2 rounded-lg border border-line bg-white text-[13px]"><option value="">All sectors</option><option>Civil works</option><option>Water works</option><option>Electrical</option><option>IT</option></select>
+            <select id="fRegion" onchange="renderItems()" class="px-3 py-2 rounded-lg border border-line bg-white text-[13px]"><option value="">All regions</option><option>Ahmedabad — All zones</option><option>Zone — East</option><option>Zone — West</option><option>Zone — North</option><option>Zone — South</option></select>
+          </div>
+        </div>
+        <div class="bg-white border border-line rounded-xl p-3">
+          <div class="relative"><i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i><input id="itemSearch" oninput="renderItems()" type="search" placeholder="Search by item code or description…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" /></div>
+        </div>
+        <div class="bg-white border border-line rounded-xl overflow-hidden">
+          <table class="w-full text-[13.5px]">
+            <thead class="bg-surface border-b border-line"><tr class="text-[11.5px] uppercase tracking-wider text-ink-500 font-semibold">
+              <th class="text-left px-5 py-3">Item code</th><th class="text-left px-5 py-3">Description</th><th class="text-left px-5 py-3">Sector</th>
+              <th class="text-left px-5 py-3">Unit</th><th class="text-right px-5 py-3">Rate (₹)</th><th class="text-left px-5 py-3">Effective from</th><th class="text-left px-5 py-3">Region</th>
+            </tr></thead>
+            <tbody id="itemsBody" class="divide-y divide-line"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Publish confirm overlay -->
+      <div id="publishOverlay" class="hidden absolute inset-0 overlay-shade z-50 flex items-center justify-center p-6">
+        <div class="bg-white border border-line rounded-xl w-[520px] max-w-full p-5 shadow-lift">
+          <div class="flex items-start gap-3"><div class="w-9 h-9 rounded-lg bg-warning-light text-warning flex items-center justify-center shrink-0"><i data-lucide="alert-triangle" class="w-4 h-4"></i></div>
+            <div><h3 class="text-[15px] font-bold text-ink-900">Publish <span id="publishTitle"></span>?</h3><p class="text-[12.5px] text-ink-500 mt-1">The currently live version will be moved to history. Active rates auto-populate the DPR BOQ on next save.</p></div>
+          </div>
+          <ul class="mt-4 space-y-1.5 text-[12.5px] text-ink-900">
+            <li class="flex items-start gap-2"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-success mt-0.5"></i> All existing DPRs continue to use the rate they were saved with.</li>
+            <li class="flex items-start gap-2"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-success mt-0.5"></i> Officers will see a "Rates updated" prompt on the next DPR open.</li>
+            <li class="flex items-start gap-2"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-success mt-0.5"></i> Activity trail captures publisher, time and version delta.</li>
+          </ul>
+          <div class="mt-4 flex justify-end gap-2"><button onclick="closePublish()" class="px-3 py-2 rounded-lg border border-line text-[13px] hover:bg-surface">Cancel</button><button onclick="confirmPublish()" class="px-3 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90">Publish &amp; activate</button></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-ink-900 text-white text-[13px] px-4 py-3 rounded-xl shadow-lift inline-flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-success"></i><span id="toastMsg">Done</span></div>
+
+<script>
+  function refreshIcons(){ if (window.lucide) lucide.createIcons(); }
+  let __toastTimer; function showToast(m){ const t=document.getElementById('toast'); document.getElementById('toastMsg').textContent=m; t.classList.add('show'); clearTimeout(__toastTimer); __toastTimer=setTimeout(()=>t.classList.remove('show'),2800); }
+  function bindDropdown(b,m){ const B=document.getElementById(b),M=document.getElementById(m); if(!B||!M)return; B.addEventListener('click',e=>{e.stopPropagation();M.classList.toggle('hidden');}); document.addEventListener('click',e=>{if(!M.contains(e.target)&&!B.contains(e.target))M.classList.add('hidden');}); }
+  function logAudit(a,t,m){ try{ const log=JSON.parse(localStorage.getItem('adminAuditLog')||'[]'); log.unshift({at:new Date().toISOString(),actor:'Rajesh Kumar',action:a,target:t,meta:m||null}); localStorage.setItem('adminAuditLog',JSON.stringify(log.slice(0,500))); }catch(e){} }
+  function seedOnce(k,v){ if(!localStorage.getItem(k)) localStorage.setItem(k,JSON.stringify(v)); }
+  bindDropdown('avatarBtn','avatarMenu');
+
+  const SEED_VERSIONS = [
+    { id:'v2026.2', label:'v2026.2', status:'Draft',    publishedAt:null,           items:1284, scope:'Ahmedabad — All zones', sector:'All sectors', note:'Ready to publish · revised cement/steel base rates' },
+    { id:'v2026.1', label:'v2026.1', status:'Live',     publishedAt:'2026-04-12',   items:1278, scope:'Ahmedabad — All zones', sector:'All sectors', note:'Currently active for all departments' },
+    { id:'v2025.4', label:'v2025.4', status:'Archived', publishedAt:'2025-11-30',   items:1244, scope:'Ahmedabad — All zones', sector:'All sectors', note:'Retired on activation of v2026.1' },
+    { id:'v2025.3', label:'v2025.3', status:'Archived', publishedAt:'2025-07-15',   items:1220, scope:'Ahmedabad — All zones', sector:'All sectors', note:'Quarterly revision' },
+  ];
+  seedOnce('admin_dsr_versions', SEED_VERSIONS);
+  function loadV(){ return JSON.parse(localStorage.getItem('admin_dsr_versions') || '[]'); }
+  function saveV(l){ localStorage.setItem('admin_dsr_versions', JSON.stringify(l)); }
+
+  const ITEMS_DEMO = [
+    { code:'C-01-001', desc:'PCC 1:4:8 in foundation',                   sector:'Civil works',  unit:'cum',  rate:6450,   eff:'2026-04-12', region:'Ahmedabad — All zones' },
+    { code:'C-01-005', desc:'RCC M-25 with formwork &amp; rebar',         sector:'Civil works',  unit:'cum',  rate:8950,   eff:'2026-04-12', region:'Ahmedabad — All zones' },
+    { code:'C-02-014', desc:'Brick masonry in CM 1:6 (1st class brick)', sector:'Civil works',  unit:'cum',  rate:5870,   eff:'2026-04-12', region:'Zone — East' },
+    { code:'W-03-002', desc:'GI pipe 100mm dia including specials',      sector:'Water works',  unit:'m',    rate:1820,   eff:'2026-04-12', region:'Ahmedabad — All zones' },
+    { code:'W-03-009', desc:'PVC pipe 110mm dia incl. excavation',       sector:'Water works',  unit:'m',    rate:1140,   eff:'2026-04-12', region:'Zone — West' },
+    { code:'W-04-021', desc:'Sluice valve 150mm dia',                    sector:'Water works',  unit:'no',   rate:18450,  eff:'2026-04-12', region:'Ahmedabad — All zones' },
+    { code:'E-05-007', desc:'LED street light 90W with arm and bracket', sector:'Electrical',   unit:'no',   rate:7800,   eff:'2026-04-12', region:'Ahmedabad — All zones' },
+    { code:'E-05-014', desc:'Distribution panel TP&amp;N 100A',          sector:'Electrical',   unit:'no',   rate:48500,  eff:'2026-04-12', region:'Ahmedabad — All zones' },
+    { code:'E-06-022', desc:'Underground cable 4C × 25 sq mm Al',        sector:'Electrical',   unit:'m',    rate:560,    eff:'2026-04-12', region:'Zone — North' },
+    { code:'I-09-001', desc:'Desktop PC i5/16GB/512SSD',                 sector:'IT',           unit:'no',   rate:62000,  eff:'2026-04-12', region:'Ahmedabad — All zones' },
+    { code:'I-09-005', desc:'24-port Layer-2 switch',                    sector:'IT',           unit:'no',   rate:34200,  eff:'2026-04-12', region:'Ahmedabad — All zones' },
+    { code:'I-09-011', desc:'A4 mono laser printer (network)',           sector:'IT',           unit:'no',   rate:18900,  eff:'2026-04-12', region:'Ahmedabad — All zones' },
+  ];
+
+  let selectedVersion = 'v2026.1';
+  function renderVersions(){
+    document.getElementById('versionsGrid').innerHTML = loadV().map(v => {
+      const isSel = v.id === selectedVersion;
+      const pill = v.status === 'Live'    ? '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-success-light text-success text-[11px] font-semibold">Live</span>'
+                  : v.status === 'Draft'  ? '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-warning-light text-warning text-[11px] font-semibold">Draft</span>'
+                  :                         '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-ink-400/15 text-ink-500 text-[11px] font-semibold">Archived</span>';
+      const cta = v.status === 'Draft' ? `<button onclick="event.stopPropagation(); openPublish('${v.id}')" class="px-3 py-1.5 rounded-md bg-primary text-white text-[12px] font-medium hover:bg-primary/90">Publish</button>` : '';
+      return `<div onclick="selectVersion('${v.id}')" class="version-card ${isSel?'selected':''} border border-line rounded-xl p-4 bg-white">
+        <div class="flex items-center justify-between"><div class="text-[14px] font-bold text-ink-900">${v.label}</div>${pill}</div>
+        <div class="text-[11.5px] text-ink-500 mt-1">${v.items.toLocaleString()} line items · ${v.scope}</div>
+        <div class="text-[11.5px] text-ink-500 mt-0.5">${v.publishedAt ? 'Published ' + new Date(v.publishedAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : 'Not yet published'}</div>
+        <div class="text-[11.5px] text-ink-900 mt-2">${v.note}</div>
+        <div class="mt-3 flex items-center justify-end gap-2">${cta}</div>
+      </div>`;
+    }).join('');
+  }
+  function selectVersion(id){ selectedVersion = id; renderVersions(); renderItems(); }
+
+  function renderItems(){
+    const v = loadV().find(x => x.id === selectedVersion);
+    document.getElementById('itemsTitle').textContent = `Rate items — ${v.label}`;
+    document.getElementById('itemsSub').textContent = `${v.status} · ${v.items.toLocaleString()} items in this book`;
+    const q = (document.getElementById('itemSearch').value || '').toLowerCase();
+    const sec = document.getElementById('fSector').value, reg = document.getElementById('fRegion').value;
+    const list = ITEMS_DEMO.filter(i => (!q || (i.code+i.desc).toLowerCase().includes(q)) && (!sec || i.sector === sec) && (!reg || i.region === reg));
+    document.getElementById('itemsBody').innerHTML = list.map(i => `
+      <tr class="hover:bg-surface transition">
+        <td class="px-5 py-3 font-mono text-[12.5px] text-ink-900">${i.code}</td>
+        <td class="px-5 py-3 text-ink-900">${i.desc}</td>
+        <td class="px-5 py-3 text-ink-500">${i.sector}</td>
+        <td class="px-5 py-3 text-ink-500">${i.unit}</td>
+        <td class="px-5 py-3 text-right text-ink-900 font-medium">₹ ${i.rate.toLocaleString('en-IN')}</td>
+        <td class="px-5 py-3 text-ink-500">${i.eff}</td>
+        <td class="px-5 py-3 text-ink-500">${i.region}</td>
+      </tr>`).join('') || `<tr><td colspan="7" class="px-5 py-10 text-center text-ink-500 text-[13px]">No items match your filters.</td></tr>`;
+  }
+
+  /* Publish */
+  let publishTarget = null;
+  function openPublish(id){ publishTarget = id; document.getElementById('publishTitle').textContent = id; document.getElementById('publishOverlay').classList.remove('hidden'); refreshIcons(); }
+  function closePublish(){ document.getElementById('publishOverlay').classList.add('hidden'); }
+  function confirmPublish(){
+    const list = loadV();
+    const current = list.find(x => x.status === 'Live'); if (current) current.status = 'Archived';
+    const target = list.find(x => x.id === publishTarget); target.status = 'Live'; target.publishedAt = new Date().toISOString().slice(0,10);
+    saveV(list); closePublish(); selectVersion(target.id); renderVersions();
+    logAudit('Published', `DSR ${target.id} marked live`); showToast('Rate book published — auto-populating DPR BOQ');
+  }
+
+  function onUpload(file){
+    if (!file) return;
+    const list = loadV();
+    const next = 'v' + new Date().getFullYear() + '.' + (list.length + 1);
+    list.unshift({ id: next, label: next, status:'Draft', publishedAt:null, items: 1284 + Math.floor(Math.random()*40), scope:'Ahmedabad — All zones', sector:'All sectors', note:'Imported from ' + file.name });
+    saveV(list); renderVersions();
+    logAudit('Uploaded', `DSR rate book ${next}`, { file: file.name }); showToast('Rate book uploaded as ' + next + ' (Draft)');
+  }
+
+  /* Init + dashboard quick-action ?publish=1 */
+  renderVersions(); renderItems(); refreshIcons();
+  if (new URLSearchParams(location.search).get('publish') === '1') {
+    const d = loadV().find(v => v.status === 'Draft'); if (d) openPublish(d.id);
+  }
+</script>
+</body>
+</html>

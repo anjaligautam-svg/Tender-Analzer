@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Management — TenderAI Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>
+    tailwind.config = { theme: { extend: {
+      fontFamily: { sans: ['"DM Sans"', 'system-ui', 'sans-serif'] },
+      colors: {
+        primary: { DEFAULT: '#0F5EE8', light: '#EFF6FF', border: '#93C5FD' },
+        success: { DEFAULT: '#10B981', light: '#F0FDF4' },
+        warning: { DEFAULT: '#F59E0B', light: '#FFFBEB' },
+        danger:  { DEFAULT: '#EF4444', light: '#FEF2F2' },
+        purple:  { DEFAULT: '#8B5CF6', light: '#EEEDFE' },
+        ink: { 900: '#111827', 500: '#6B7280', 400: '#9CA3AF' },
+        line: '#E5E7EB', surface: '#F9FAFB',
+      },
+      boxShadow: { soft: '0 1px 3px rgba(0,0,0,0.08)', lift: '0 4px 12px rgba(0,0,0,0.12)' },
+    }}};
+  </script>
+  <style>
+    html, body { font-family: 'DM Sans', system-ui, sans-serif; color: #111827; background: #F9FAFB; }
+    *:focus-visible { outline: 2px solid #0F5EE8; outline-offset: 2px; border-radius: 4px; }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 8px; }
+    ::-webkit-scrollbar-thumb:hover { background: #D1D5DB; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    .stat-card { transition: all .15s ease; }
+    .stat-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); transform: translateY(-1px); }
+    .toast { transform: translateY(80px); opacity: 0; transition: transform .3s cubic-bezier(.2,.7,.2,1), opacity .25s ease; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .dropdown-shadow { box-shadow: 0 12px 32px rgba(17,24,39,0.14), 0 2px 6px rgba(17,24,39,0.06); }
+    /* Right-side panels: 720px (form) and 320px (utility) */
+    .side-panel { transition: transform .28s ease; }
+    .side-panel.closed { transform: translateX(100%); }
+    /* In-flow overlay (not fixed) */
+    .overlay-shade { background: rgba(17,24,39,0.34); }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+  </style>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+
+  <!-- ============ ADMIN SIDEBAR ============ -->
+  <aside class="w-[244px] shrink-0 bg-white border-r border-line flex flex-col" aria-label="Primary">
+    <div class="px-5 pt-5 pb-4 border-b border-line">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-[15px]">T</div>
+        <div>
+          <div class="text-[15px] font-semibold text-ink-900 leading-tight">TenderAI</div>
+          <div class="text-[11px] text-ink-500 leading-tight">Admin Panel</div>
+        </div>
+      </div>
+      <button class="mt-4 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-line bg-surface hover:bg-white hover:shadow-soft transition">
+        <div class="w-7 h-7 rounded-md bg-primary-light text-primary flex items-center justify-center"><i data-lucide="building-2" class="w-4 h-4"></i></div>
+        <div class="text-left flex-1 min-w-0"><div class="text-[12.5px] font-medium text-ink-900 truncate">Ahmedabad</div><div class="text-[10.5px] text-ink-500 truncate">Municipal Corporation</div></div>
+        <i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 text-ink-400"></i>
+      </button>
+    </div>
+    <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+      <div>
+        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">OVERVIEW</div>
+        <ul class="space-y-0.5"><li><a href="admin.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Admin Dashboard</a></li></ul>
+      </div>
+      <div>
+        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">ACCESS &amp; ORG</div>
+        <ul class="space-y-0.5">
+          <li><a href="admin-users.html" aria-current="page" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] bg-primary-light text-primary font-medium"><i data-lucide="users" class="w-4 h-4"></i> User Management <span class="ml-auto bg-primary text-white text-[10px] font-semibold rounded-full px-1.5 py-0.5">24</span></a></li>
+          <li><a href="admin-org.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="network" class="w-4 h-4"></i> Department &amp; Org</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">CATALOG</div>
+        <ul class="space-y-0.5">
+          <li><a href="admin-templates.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="layout-template" class="w-4 h-4"></i> Tender Templates</a></li>
+          <li><a href="admin-budget.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="wallet" class="w-4 h-4"></i> Budget Heads</a></li>
+          <li><a href="admin-dsr.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="table-2" class="w-4 h-4"></i> DSR Rates</a></li>
+          <li><a href="admin-vendors.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="store" class="w-4 h-4"></i> Vendor Registry <span class="ml-auto bg-danger text-white text-[10px] font-semibold rounded-full px-1.5 py-0.5">3</span></a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">GOVERNANCE</div>
+        <ul class="space-y-0.5">
+          <li><a href="admin-compliance.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="shield-check" class="w-4 h-4"></i> Compliance &amp; Audit</a></li>
+          <li><a href="admin-reports.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Reports &amp; Analytics</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">SYSTEM</div>
+        <ul class="space-y-0.5">
+          <li><a href="admin-notifications.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="bell-ring" class="w-4 h-4"></i> Notifications</a></li>
+          <li><a href="admin-settings.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="settings" class="w-4 h-4"></i> System Settings</a></li>
+        </ul>
+      </div>
+      <div class="pt-2 border-t border-line">
+        <ul class="space-y-0.5"><li><a href="index.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="arrow-left" class="w-4 h-4"></i> Procurement Portal</a></li></ul>
+      </div>
+    </nav>
+    <div class="border-t border-line px-4 py-3 flex items-center gap-3">
+      <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div>
+      <div class="flex-1 min-w-0"><div class="text-[12.5px] font-medium text-ink-900 truncate">Rajesh Kumar</div><div class="text-[10.5px] text-ink-500 truncate">Super Admin</div></div>
+      <button onclick="sessionStorage.clear(); location.href='login.html'" class="text-ink-400 hover:text-ink-900"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN COLUMN ============ -->
+  <div class="flex-1 flex flex-col min-w-0">
+
+    <header class="h-16 bg-white border-b border-line px-6 flex items-center gap-4 sticky top-0 z-30">
+      <button aria-label="Toggle sidebar" class="text-ink-500 hover:text-ink-900"><i data-lucide="panel-left" class="w-5 h-5"></i></button>
+      <div class="flex-1 max-w-xl relative">
+        <i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+        <input id="globalSearch" type="search" placeholder="Search officers…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] placeholder:text-ink-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+      </div>
+      <button class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">FY 2026-27 <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+      <button id="bellBtn" aria-label="Notifications" class="relative w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500"><i data-lucide="bell" class="w-4 h-4"></i><span class="absolute -top-1 -right-1 bg-danger text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">5</span></button>
+      <div class="relative">
+        <button id="avatarBtn" aria-label="Account menu" class="flex items-center gap-2 pl-2 border-l border-line">
+          <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div>
+          <div class="hidden md:block text-left"><div class="text-[12.5px] font-medium text-ink-900 leading-tight">Rajesh Kumar</div><div class="text-[10.5px] text-ink-500 leading-tight">Super Admin</div></div>
+          <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i>
+        </button>
+        <div id="avatarMenu" class="hidden absolute right-0 mt-2 w-[240px] bg-white border border-line rounded-xl dropdown-shadow z-40 py-1.5">
+          <a href="#" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="user" class="w-4 h-4 text-ink-500"></i> My profile</a>
+          <a href="admin.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] bg-primary-light text-primary font-medium mx-1.5 rounded-md"><i data-lucide="shield" class="w-4 h-4"></i> Admin Panel</a>
+          <a href="index.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="layout-dashboard" class="w-4 h-4 text-ink-500"></i> Procurement Portal</a>
+          <a href="admin-settings.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="settings" class="w-4 h-4 text-ink-500"></i> System Settings</a>
+          <div class="my-1.5 border-t border-line"></div>
+          <a href="#" onclick="sessionStorage.clear(); location.href='login.html'; return false;" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-danger hover:bg-danger-light"><i data-lucide="log-out" class="w-4 h-4"></i> Sign out</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto px-8 py-6 space-y-7 min-w-0 relative">
+
+      <!-- Page header -->
+      <section class="flex items-start justify-between flex-wrap gap-3">
+        <div>
+          <div class="text-[13px] text-ink-500 mb-2"><a href="admin.html" class="hover:underline">Admin Panel</a> · Access &amp; Org</div>
+          <h1 class="text-[24px] font-bold text-ink-900 leading-tight">User Management</h1>
+          <p class="text-[14px] text-ink-500 mt-1">Officers, roles, departments and per-module access control.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="exportCsv()" class="px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="download" class="w-4 h-4"></i> Export</button>
+          <button onclick="openOfficerPanel()" class="px-3 py-2 rounded-lg bg-primary text-white text-[13px] font-medium inline-flex items-center gap-1.5 shadow-soft hover:bg-primary/90"><i data-lucide="user-plus" class="w-4 h-4"></i> Add officer</button>
+        </div>
+      </section>
+
+      <!-- Stat strip -->
+      <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="stat-card bg-white border border-line rounded-xl p-5"><div class="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center mb-2"><i data-lucide="users" class="w-4 h-4"></i></div><div class="text-[26px] font-bold text-ink-900 leading-none" id="kpiTotal">0</div><div class="text-[12px] text-ink-500 mt-1">Total officers</div></div>
+        <div class="stat-card bg-white border border-line rounded-xl p-5"><div class="w-9 h-9 rounded-lg bg-success-light text-success flex items-center justify-center mb-2"><i data-lucide="user-check" class="w-4 h-4"></i></div><div class="text-[26px] font-bold text-ink-900 leading-none" id="kpiActive">0</div><div class="text-[12px] text-ink-500 mt-1">Active</div></div>
+        <div class="stat-card bg-white border border-line rounded-xl p-5"><div class="w-9 h-9 rounded-lg bg-warning-light text-warning flex items-center justify-center mb-2"><i data-lucide="user-x" class="w-4 h-4"></i></div><div class="text-[26px] font-bold text-ink-900 leading-none" id="kpiInactive">0</div><div class="text-[12px] text-ink-500 mt-1">Inactive</div></div>
+        <div class="stat-card bg-white border border-line rounded-xl p-5"><div class="w-9 h-9 rounded-lg bg-purple-light text-purple flex items-center justify-center mb-2"><i data-lucide="shield" class="w-4 h-4"></i></div><div class="text-[26px] font-bold text-ink-900 leading-none" id="kpiAdmins">0</div><div class="text-[12px] text-ink-500 mt-1">Admin-tier roles</div></div>
+      </section>
+
+      <!-- Filters -->
+      <section class="bg-white border border-line rounded-xl p-3 flex items-center gap-2 flex-wrap">
+        <div class="flex-1 min-w-[260px] relative">
+          <i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+          <input id="search" type="search" oninput="render()" placeholder="Search by name, email, role…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+        </div>
+        <select id="fRole" onchange="render()" class="px-3 py-2 rounded-lg border border-line bg-white text-[13px] text-ink-900">
+          <option value="">All roles</option>
+          <option>Super Admin</option><option>Technical Officer</option><option>Finance Officer</option><option>Deputy Commissioner</option><option>Accounts Officer</option>
+        </select>
+        <select id="fDept" onchange="render()" class="px-3 py-2 rounded-lg border border-line bg-white text-[13px] text-ink-900">
+          <option value="">All departments</option>
+          <option>IT</option><option>Infrastructure</option><option>Water</option><option>Sanitation</option><option>Engineering</option><option>Urban Dev</option><option>Parks</option><option>Finance</option><option>Administration</option>
+        </select>
+        <select id="fStatus" onchange="render()" class="px-3 py-2 rounded-lg border border-line bg-white text-[13px] text-ink-900">
+          <option value="">All statuses</option><option>Active</option><option>Inactive</option>
+        </select>
+      </section>
+
+      <!-- Table -->
+      <section class="bg-white border border-line rounded-xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-[13.5px]">
+            <thead class="bg-surface border-b border-line">
+              <tr class="text-[11.5px] uppercase tracking-wider text-ink-500 font-semibold">
+                <th class="text-left px-5 py-3">Officer</th>
+                <th class="text-left px-5 py-3">Role</th>
+                <th class="text-left px-5 py-3">Department</th>
+                <th class="text-left px-5 py-3">Status</th>
+                <th class="text-left px-5 py-3">Last active</th>
+                <th class="text-right px-5 py-3">Active tenders</th>
+                <th class="text-right px-5 py-3">Action</th>
+              </tr>
+            </thead>
+            <tbody id="tbody" class="divide-y divide-line"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ OFFICER FORM PANEL (720px right) ============ -->
+      <div id="panelShade" class="hidden absolute inset-0 overlay-shade z-30" onclick="closeOfficerPanel()"></div>
+      <aside id="officerPanel" class="side-panel closed absolute top-0 right-0 h-full w-[720px] max-w-full bg-white border-l border-line z-40 flex flex-col">
+        <div class="px-6 py-4 border-b border-line flex items-center justify-between shrink-0">
+          <div>
+            <div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold" id="panelMode">Add officer</div>
+            <h2 class="text-[18px] font-bold text-ink-900 mt-0.5" id="panelTitle">New officer</h2>
+          </div>
+          <button onclick="closeOfficerPanel()" class="text-ink-400 hover:text-ink-900"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <div class="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+          <div>
+            <div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold mb-3">Profile</div>
+            <div class="grid grid-cols-2 gap-4">
+              <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">Full name</span><input id="fName" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13.5px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" /></label>
+              <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">Email</span><input id="fEmail" type="email" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13.5px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" placeholder="name@amc.gov.in" /></label>
+              <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">Role</span>
+                <select id="fRoleEdit" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13.5px]">
+                  <option>Super Admin</option><option>Technical Officer</option><option>Finance Officer</option><option>Deputy Commissioner</option><option>Accounts Officer</option><option>Custom…</option>
+                </select>
+              </label>
+              <label class="block"><span class="text-[12.5px] text-ink-900 font-medium">Department</span>
+                <select id="fDeptEdit" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13.5px]">
+                  <option>IT</option><option>Infrastructure</option><option>Water</option><option>Sanitation</option><option>Engineering</option><option>Urban Dev</option><option>Parks</option><option>Finance</option><option>Administration</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold mb-3">Module-access matrix</div>
+            <div class="border border-line rounded-xl overflow-hidden">
+              <table class="w-full text-[13px]">
+                <thead class="bg-surface border-b border-line">
+                  <tr class="text-[11px] uppercase tracking-wider text-ink-500 font-semibold">
+                    <th class="text-left px-4 py-2.5">Module</th>
+                    <th class="text-center px-3 py-2.5">View</th>
+                    <th class="text-center px-3 py-2.5">Edit</th>
+                    <th class="text-center px-3 py-2.5">Approve</th>
+                  </tr>
+                </thead>
+                <tbody id="accessBody" class="divide-y divide-line"></tbody>
+              </table>
+            </div>
+            <div class="text-[11.5px] text-ink-500 mt-2">View = read access · Edit = create/modify · Approve = sign off / publish.</div>
+          </div>
+
+          <div id="dangerZone" class="border border-danger/30 bg-danger-light/40 rounded-xl p-4 hidden">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-[13px] font-bold text-danger">Deactivate this officer</div>
+                <div class="text-[12px] text-ink-500 mt-0.5">Removes access without deleting their history.</div>
+              </div>
+              <button onclick="deactivateCurrent()" class="px-3 py-2 rounded-lg border border-danger text-danger text-[12.5px] font-medium hover:bg-danger-light">Deactivate…</button>
+            </div>
+          </div>
+        </div>
+        <div class="px-6 py-3 border-t border-line flex items-center justify-between shrink-0 bg-white">
+          <div class="text-[11.5px] text-ink-500" id="autosaveLabel">Changes save when you click Save officer.</div>
+          <div class="flex gap-2">
+            <button onclick="closeOfficerPanel()" class="px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">Cancel</button>
+            <button onclick="saveOfficer()" class="px-3 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90">Save officer</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ============ DEACTIVATE CONFIRM (in-flow overlay) ============ -->
+      <div id="deactivateOverlay" class="hidden absolute inset-0 overlay-shade z-50 flex items-center justify-center p-6">
+        <div class="bg-white border border-line rounded-xl w-[480px] max-w-full p-5 shadow-lift">
+          <div class="flex items-start gap-3">
+            <div class="w-9 h-9 rounded-lg bg-danger-light text-danger flex items-center justify-center shrink-0"><i data-lucide="user-x" class="w-4 h-4"></i></div>
+            <div class="flex-1">
+              <h3 class="text-[15px] font-bold text-ink-900">Deactivate officer?</h3>
+              <p class="text-[12.5px] text-ink-500 mt-1">Their account loses access immediately. History and audit trail are preserved — you can reactivate later.</p>
+            </div>
+          </div>
+          <label class="block mt-4"><span class="text-[12.5px] text-ink-900 font-medium">Reason (required)</span>
+            <textarea id="deactReason" rows="3" class="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[13px]" placeholder="e.g. transferred to AMC South zone"></textarea>
+          </label>
+          <div class="mt-4 flex justify-end gap-2">
+            <button onclick="closeDeactivate()" class="px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">Cancel</button>
+            <button onclick="confirmDeactivate()" class="px-3 py-2 rounded-lg bg-danger text-white text-[13px] font-medium hover:bg-danger/90">Deactivate</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ USER ACTIVITY (320px right) ============ -->
+      <aside id="userActivity" class="side-panel closed absolute top-0 right-0 h-full w-[320px] bg-white border-l border-line z-40 flex flex-col">
+        <div class="px-5 py-4 border-b border-line flex items-center justify-between shrink-0">
+          <div>
+            <div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold">Per-officer activity</div>
+            <h3 class="text-[15px] font-bold text-ink-900 mt-0.5" id="actUser">Officer</h3>
+          </div>
+          <button onclick="closeUserActivity()" class="text-ink-400 hover:text-ink-900"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+        <ul id="actList" class="flex-1 overflow-y-auto px-5 py-4 space-y-4 text-[12.5px]"></ul>
+      </aside>
+
+    </main>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-ink-900 text-white text-[13px] px-4 py-3 rounded-xl shadow-lift inline-flex items-center gap-2.5">
+  <i data-lucide="check-circle-2" class="w-4 h-4 text-success"></i>
+  <span id="toastMsg">Done</span>
+</div>
+
+<script>
+  /* ====== SHARED HELPERS (kept consistent across admin pages) ====== */
+  function refreshIcons(){ if (window.lucide) lucide.createIcons(); }
+  let __toastTimer;
+  function showToast(msg){ const t=document.getElementById('toast'); if(!t)return; document.getElementById('toastMsg').textContent=msg; t.classList.add('show'); clearTimeout(__toastTimer); __toastTimer=setTimeout(()=>t.classList.remove('show'),2800); }
+  function bindDropdown(b,m){ const B=document.getElementById(b),M=document.getElementById(m); if(!B||!M)return; B.addEventListener('click',e=>{e.stopPropagation();M.classList.toggle('hidden');}); document.addEventListener('click',e=>{if(!M.contains(e.target)&&!B.contains(e.target))M.classList.add('hidden');}); }
+  function logAudit(action,target,meta){ try{ const log=JSON.parse(localStorage.getItem('adminAuditLog')||'[]'); log.unshift({at:new Date().toISOString(),actor:'Rajesh Kumar',action,target,meta:meta||null}); localStorage.setItem('adminAuditLog',JSON.stringify(log.slice(0,500))); }catch(e){} }
+  function timeAgo(iso){ const d=(Date.now()-new Date(iso).getTime())/1000; if(d<60)return Math.floor(d)+'s ago'; if(d<3600)return Math.floor(d/60)+'m ago'; if(d<86400)return Math.floor(d/3600)+'h ago'; return Math.floor(d/86400)+'d ago'; }
+  function seedOnce(k,v){ if(!localStorage.getItem(k)) localStorage.setItem(k,JSON.stringify(v)); }
+  bindDropdown('avatarBtn','avatarMenu');
+
+  /* ====== SEED ====== */
+  const MODULES = ['Dashboard','DPR Creation','Tender Creation','Pre-Bid Queries','Bid Evaluation','Bid Comparison','Bid Management','Compliance & Audit','Reports & Analytics','User Management','Budget Heads','DSR Rates','Vendor Registry'];
+  const SEED_USERS = [
+    { id:'U-1', name:'Rajesh Kumar',  email:'rajesh.kumar@amc.gov.in',  role:'Super Admin',         dept:'Administration', status:'Active',   lastActive:new Date(Date.now()-1000*60*8).toISOString(),  activeTenders:11, access: defaultAccess('Super Admin') },
+    { id:'U-2', name:'Priya Shah',    email:'priya.shah@amc.gov.in',    role:'Technical Officer',   dept:'IT',             status:'Active',   lastActive:new Date(Date.now()-1000*60*45).toISOString(), activeTenders:9,  access: defaultAccess('Technical Officer') },
+    { id:'U-3', name:'Amit Patil',    email:'amit.patil@amc.gov.in',    role:'Finance Officer',     dept:'Finance',        status:'Active',   lastActive:new Date(Date.now()-1000*60*60*3).toISOString(),activeTenders:7, access: defaultAccess('Finance Officer') },
+    { id:'U-4', name:'Sunita Rao',    email:'sunita.rao@amc.gov.in',    role:'Deputy Commissioner', dept:'Administration', status:'Active',   lastActive:new Date(Date.now()-1000*60*60*7).toISOString(),activeTenders:6, access: defaultAccess('Deputy Commissioner') },
+    { id:'U-5', name:'Ravi Mehta',    email:'ravi.mehta@amc.gov.in',    role:'Accounts Officer',    dept:'Finance',        status:'Active',   lastActive:new Date(Date.now()-1000*60*60*26).toISOString(),activeTenders:4, access: defaultAccess('Accounts Officer') },
+    { id:'U-6', name:'Neha Joshi',    email:'neha.joshi@amc.gov.in',    role:'Technical Officer',   dept:'Water',          status:'Active',   lastActive:new Date(Date.now()-1000*60*60*30).toISOString(),activeTenders:3, access: defaultAccess('Technical Officer') },
+    { id:'U-7', name:'Kiran Desai',   email:'kiran.desai@amc.gov.in',   role:'Technical Officer',   dept:'Infrastructure', status:'Inactive', lastActive:new Date(Date.now()-1000*60*60*24*45).toISOString(),activeTenders:0, access: defaultAccess('Technical Officer'), inactiveReason:'On long leave' },
+  ];
+  function defaultAccess(role){
+    const a = {}; MODULES.forEach(m => a[m] = { view:true, edit:false, approve:false });
+    if (role === 'Super Admin') MODULES.forEach(m => a[m] = { view:true, edit:true, approve:true });
+    if (role === 'Deputy Commissioner') MODULES.forEach(m => a[m] = { view:true, edit:false, approve:true });
+    if (role === 'Technical Officer') ['DPR Creation','Tender Creation','Pre-Bid Queries','Bid Evaluation'].forEach(m => a[m] = { view:true, edit:true, approve:false });
+    if (role === 'Finance Officer') ['Budget Heads','Bid Evaluation','Bid Comparison','Reports & Analytics'].forEach(m => a[m] = { view:true, edit:true, approve:false });
+    if (role === 'Accounts Officer') ['Budget Heads','Reports & Analytics'].forEach(m => a[m] = { view:true, edit:true, approve:false });
+    return a;
+  }
+  seedOnce('admin_users', SEED_USERS);
+
+  /* ====== STATE + RENDER ====== */
+  function load(){ return JSON.parse(localStorage.getItem('admin_users') || '[]'); }
+  function save(list){ localStorage.setItem('admin_users', JSON.stringify(list)); }
+
+  function render(){
+    const list = load();
+    const q = (document.getElementById('search').value || '').toLowerCase();
+    const fRole = document.getElementById('fRole').value;
+    const fDept = document.getElementById('fDept').value;
+    const fStatus = document.getElementById('fStatus').value;
+    const filtered = list.filter(u =>
+      (!q || (u.name+u.email+u.role+u.dept).toLowerCase().includes(q)) &&
+      (!fRole || u.role === fRole) &&
+      (!fDept || u.dept === fDept) &&
+      (!fStatus || u.status === fStatus)
+    );
+    document.getElementById('kpiTotal').textContent    = list.length;
+    document.getElementById('kpiActive').textContent   = list.filter(u => u.status === 'Active').length;
+    document.getElementById('kpiInactive').textContent = list.filter(u => u.status === 'Inactive').length;
+    document.getElementById('kpiAdmins').textContent   = list.filter(u => u.role === 'Super Admin' || u.role === 'Deputy Commissioner').length;
+    document.getElementById('tbody').innerHTML = filtered.map(u => {
+      const initials = u.name.split(' ').map(s => s[0]).slice(0,2).join('');
+      const pill = u.status === 'Active'
+        ? '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-success-light text-success text-[11.5px] font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-success"></span> Active</span>'
+        : '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-ink-400/15 text-ink-500 text-[11.5px] font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-ink-400"></span> Inactive</span>';
+      return `<tr class="hover:bg-surface transition">
+        <td class="px-5 py-3.5"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-full bg-primary-light text-primary flex items-center justify-center text-[12px] font-semibold">${initials}</div><div><div class="font-medium text-ink-900">${u.name}</div><div class="text-[12px] text-ink-500">${u.email}</div></div></div></td>
+        <td class="px-5 py-3.5 text-ink-900">${u.role}</td>
+        <td class="px-5 py-3.5 text-ink-900">${u.dept}</td>
+        <td class="px-5 py-3.5">${pill}</td>
+        <td class="px-5 py-3.5 text-ink-500">${u.status === 'Active' ? timeAgo(u.lastActive) : new Date(u.lastActive).toLocaleDateString()}</td>
+        <td class="px-5 py-3.5 text-right text-ink-900 font-medium">${u.activeTenders}</td>
+        <td class="px-5 py-3.5 text-right">
+          <div class="flex items-center justify-end gap-1">
+            <button onclick="showUserActivity('${u.id}')" class="px-2 py-1.5 rounded-lg text-ink-500 hover:bg-line hover:text-ink-900" aria-label="View activity"><i data-lucide="activity" class="w-4 h-4"></i></button>
+            <button onclick="openOfficerPanel('${u.id}')" class="px-3 py-1.5 rounded-lg border border-line text-ink-900 text-[12.5px] font-medium hover:bg-surface">Edit</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('') || `<tr><td colspan="7" class="px-5 py-10 text-center text-ink-500 text-[13px]">No officers match the current filters.</td></tr>`;
+    refreshIcons();
+  }
+
+  /* ====== PANEL ====== */
+  let currentId = null;
+  function openOfficerPanel(id){
+    currentId = id || null;
+    const list = load();
+    const u = id ? list.find(x => x.id === id) : { name:'', email:'', role:'Technical Officer', dept:'IT', status:'Active', access: defaultAccess('Technical Officer') };
+    document.getElementById('panelMode').textContent = id ? 'Edit officer' : 'Add officer';
+    document.getElementById('panelTitle').textContent = id ? u.name : 'New officer';
+    document.getElementById('fName').value  = u.name;
+    document.getElementById('fEmail').value = u.email;
+    document.getElementById('fRoleEdit').value = u.role;
+    document.getElementById('fDeptEdit').value = u.dept;
+    document.getElementById('dangerZone').classList.toggle('hidden', !id || u.status === 'Inactive');
+    renderAccess(u.access);
+    document.getElementById('officerPanel').classList.remove('closed');
+    document.getElementById('panelShade').classList.remove('hidden');
+    refreshIcons();
+  }
+  function closeOfficerPanel(){
+    document.getElementById('officerPanel').classList.add('closed');
+    document.getElementById('panelShade').classList.add('hidden');
+  }
+  function renderAccess(access){
+    document.getElementById('accessBody').innerHTML = MODULES.map(m => {
+      const a = access[m] || { view:false, edit:false, approve:false };
+      return `<tr><td class="px-4 py-2 text-ink-900">${m}</td>
+        <td class="px-3 py-2 text-center"><input type="checkbox" data-mod="${m}" data-perm="view"    ${a.view?'checked':''} class="accent-primary"></td>
+        <td class="px-3 py-2 text-center"><input type="checkbox" data-mod="${m}" data-perm="edit"    ${a.edit?'checked':''} class="accent-primary"></td>
+        <td class="px-3 py-2 text-center"><input type="checkbox" data-mod="${m}" data-perm="approve" ${a.approve?'checked':''} class="accent-primary"></td>
+      </tr>`;
+    }).join('');
+  }
+  document.getElementById('fRoleEdit').addEventListener('change', e => {
+    if (e.target.value !== 'Custom…') renderAccess(defaultAccess(e.target.value));
+  });
+  function gatherAccess(){
+    const a = {};
+    MODULES.forEach(m => a[m] = { view:false, edit:false, approve:false });
+    document.querySelectorAll('#accessBody input[type=checkbox]').forEach(cb => {
+      a[cb.dataset.mod][cb.dataset.perm] = cb.checked;
+    });
+    return a;
+  }
+  function saveOfficer(){
+    const list = load();
+    const data = {
+      name:  document.getElementById('fName').value.trim(),
+      email: document.getElementById('fEmail').value.trim(),
+      role:  document.getElementById('fRoleEdit').value,
+      dept:  document.getElementById('fDeptEdit').value,
+      access: gatherAccess(),
+    };
+    if (!data.name || !data.email){ showToast('Name and email are required'); return; }
+    if (currentId){
+      const i = list.findIndex(x => x.id === currentId);
+      list[i] = { ...list[i], ...data };
+      logAudit('Updated', `Officer ${data.name}`);
+      showToast('Officer updated');
+    } else {
+      const id = 'U-' + Date.now();
+      list.push({ id, ...data, status:'Active', lastActive:new Date().toISOString(), activeTenders:0 });
+      logAudit('Created', `Officer ${data.name} (${data.role})`);
+      showToast('Officer added');
+    }
+    save(list); closeOfficerPanel(); render();
+  }
+
+  /* ====== DEACTIVATE ====== */
+  function deactivateCurrent(){ if(!currentId) return; document.getElementById('deactivateOverlay').classList.remove('hidden'); }
+  function closeDeactivate(){ document.getElementById('deactivateOverlay').classList.add('hidden'); }
+  function confirmDeactivate(){
+    const reason = document.getElementById('deactReason').value.trim();
+    if (!reason){ showToast('Reason is required'); return; }
+    const list = load();
+    const u = list.find(x => x.id === currentId);
+    u.status = 'Inactive'; u.inactiveReason = reason; u.lastActive = new Date().toISOString();
+    save(list);
+    logAudit('Deactivated', `Officer ${u.name}`, { reason });
+    document.getElementById('deactReason').value = '';
+    closeDeactivate(); closeOfficerPanel(); render();
+    showToast('Officer deactivated — history preserved');
+  }
+
+  /* ====== PER-USER ACTIVITY ====== */
+  function showUserActivity(id){
+    const u = load().find(x => x.id === id); if (!u) return;
+    document.getElementById('actUser').textContent = u.name;
+    const audit = JSON.parse(localStorage.getItem('adminAuditLog') || '[]');
+    const mine = audit.filter(e => (e.target||'').includes(u.name));
+    const seed = [
+      { at: new Date(Date.now()-1000*60*20).toISOString(),  action:'Signed in',  detail:'Web · Chrome on macOS' },
+      { at: new Date(Date.now()-1000*60*60*3).toISOString(),action:'Reviewed',   detail:'TND-2026-002 technical evaluation' },
+      { at: new Date(Date.now()-1000*60*60*9).toISOString(),action:'Edited',     detail:'DPR-2026-004 BOQ' },
+      { at: new Date(Date.now()-1000*60*60*48).toISOString(),action:'Approved',  detail:'AA for DPR-2026-001' },
+    ];
+    const items = mine.length ? mine.map(e => ({ at:e.at, action:e.action, detail:e.target })) : seed;
+    document.getElementById('actList').innerHTML = items.map(e => `
+      <li class="flex gap-2.5">
+        <div class="w-7 h-7 rounded-full bg-primary-light text-primary flex items-center justify-center shrink-0"><i data-lucide="activity" class="w-3.5 h-3.5"></i></div>
+        <div class="flex-1 min-w-0"><div class="text-ink-900"><strong>${e.action}</strong> <span class="text-ink-500">${e.detail}</span></div><div class="text-[11px] text-ink-400 mt-0.5">${timeAgo(e.at)}</div></div>
+      </li>`).join('');
+    document.getElementById('userActivity').classList.remove('closed');
+    document.getElementById('panelShade').classList.remove('hidden');
+    refreshIcons();
+  }
+  function closeUserActivity(){
+    document.getElementById('userActivity').classList.add('closed');
+    document.getElementById('panelShade').classList.add('hidden');
+  }
+
+  /* ====== EXPORT ====== */
+  function exportCsv(){
+    const rows = [['Name','Email','Role','Department','Status','Last active','Active tenders']];
+    load().forEach(u => rows.push([u.name,u.email,u.role,u.dept,u.status,new Date(u.lastActive).toISOString(),u.activeTenders]));
+    const csv = rows.map(r => r.map(c => `"${(''+c).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], {type:'text/csv'}); const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'officers.csv'; a.click();
+    URL.revokeObjectURL(url); logAudit('Exported','Officer list (CSV)'); showToast('Officers exported');
+  }
+
+  /* ====== INIT ====== */
+  render();
+  if (new URLSearchParams(location.search).get('new') === '1') openOfficerPanel();
+</script>
+</body>
+</html>

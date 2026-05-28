@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Compliance &amp; Audit — TenderAI Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>
+    tailwind.config = { theme: { extend: {
+      fontFamily: { sans: ['"DM Sans"', 'system-ui', 'sans-serif'] },
+      colors: { primary:{DEFAULT:'#0F5EE8',light:'#EFF6FF',border:'#93C5FD'}, success:{DEFAULT:'#10B981',light:'#F0FDF4'}, warning:{DEFAULT:'#F59E0B',light:'#FFFBEB'}, danger:{DEFAULT:'#EF4444',light:'#FEF2F2'}, purple:{DEFAULT:'#8B5CF6',light:'#EEEDFE'}, ink:{900:'#111827',500:'#6B7280',400:'#9CA3AF'}, line:'#E5E7EB', surface:'#F9FAFB' },
+      boxShadow:{ soft:'0 1px 3px rgba(0,0,0,0.08)', lift:'0 4px 12px rgba(0,0,0,0.12)' }
+    }}};
+  </script>
+  <style>
+    html, body{ font-family:'DM Sans',system-ui,sans-serif; color:#111827; background:#F9FAFB; }
+    *:focus-visible{ outline:2px solid #0F5EE8; outline-offset:2px; border-radius:4px; }
+    ::-webkit-scrollbar{ width:10px; height:10px; } ::-webkit-scrollbar-thumb{ background:#E5E7EB; border-radius:8px; } ::-webkit-scrollbar-thumb:hover{ background:#D1D5DB; } ::-webkit-scrollbar-track{ background:transparent; }
+    .stat-card{ transition:all .15s ease; } .stat-card:hover{ box-shadow:0 4px 12px rgba(0,0,0,0.08); transform:translateY(-1px); }
+    .toast{ transform:translateY(80px); opacity:0; transition:transform .3s cubic-bezier(.2,.7,.2,1),opacity .25s ease; } .toast.show{ transform:translateY(0); opacity:1; }
+    .dropdown-shadow{ box-shadow:0 12px 32px rgba(17,24,39,0.14),0 2px 6px rgba(17,24,39,0.06); }
+    .tab.active{ color:#0F5EE8; border-color:#0F5EE8; }
+    @media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important;} }
+  </style>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+
+  <aside class="w-[244px] shrink-0 bg-white border-r border-line flex flex-col">
+    <div class="px-5 pt-5 pb-4 border-b border-line">
+      <div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-[15px]">T</div><div><div class="text-[15px] font-semibold text-ink-900 leading-tight">TenderAI</div><div class="text-[11px] text-ink-500 leading-tight">Admin Panel</div></div></div>
+      <button class="mt-4 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-line bg-surface hover:bg-white hover:shadow-soft transition"><div class="w-7 h-7 rounded-md bg-primary-light text-primary flex items-center justify-center"><i data-lucide="building-2" class="w-4 h-4"></i></div><div class="text-left flex-1 min-w-0"><div class="text-[12.5px] font-medium text-ink-900 truncate">Ahmedabad</div><div class="text-[10.5px] text-ink-500 truncate">Municipal Corporation</div></div><i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+    </div>
+    <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">OVERVIEW</div><ul class="space-y-0.5"><li><a href="admin.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Admin Dashboard</a></li></ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">ACCESS &amp; ORG</div><ul class="space-y-0.5">
+        <li><a href="admin-users.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="users" class="w-4 h-4"></i> User Management <span class="ml-auto bg-primary-light text-primary text-[10px] font-semibold rounded-full px-1.5 py-0.5">24</span></a></li>
+        <li><a href="admin-org.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="network" class="w-4 h-4"></i> Department &amp; Org</a></li>
+      </ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">CATALOG</div><ul class="space-y-0.5">
+        <li><a href="admin-templates.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="layout-template" class="w-4 h-4"></i> Tender Templates</a></li>
+        <li><a href="admin-budget.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="wallet" class="w-4 h-4"></i> Budget Heads</a></li>
+        <li><a href="admin-dsr.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="table-2" class="w-4 h-4"></i> DSR Rates</a></li>
+        <li><a href="admin-vendors.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="store" class="w-4 h-4"></i> Vendor Registry <span class="ml-auto bg-danger text-white text-[10px] font-semibold rounded-full px-1.5 py-0.5">3</span></a></li>
+      </ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">GOVERNANCE</div><ul class="space-y-0.5">
+        <li><a href="admin-compliance.html" aria-current="page" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] bg-primary-light text-primary font-medium"><i data-lucide="shield-check" class="w-4 h-4"></i> Compliance &amp; Audit</a></li>
+        <li><a href="admin-reports.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Reports &amp; Analytics</a></li>
+      </ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">SYSTEM</div><ul class="space-y-0.5">
+        <li><a href="admin-notifications.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="bell-ring" class="w-4 h-4"></i> Notifications</a></li>
+        <li><a href="admin-settings.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="settings" class="w-4 h-4"></i> System Settings</a></li>
+      </ul></div>
+      <div class="pt-2 border-t border-line"><ul class="space-y-0.5"><li><a href="index.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="arrow-left" class="w-4 h-4"></i> Procurement Portal</a></li></ul></div>
+    </nav>
+    <div class="border-t border-line px-4 py-3 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div><div class="flex-1 min-w-0"><div class="text-[12.5px] font-medium text-ink-900 truncate">Rajesh Kumar</div><div class="text-[10.5px] text-ink-500 truncate">Super Admin</div></div><button onclick="sessionStorage.clear(); location.href='login.html'" class="text-ink-400 hover:text-ink-900"><i data-lucide="log-out" class="w-4 h-4"></i></button></div>
+  </aside>
+
+  <div class="flex-1 flex flex-col min-w-0">
+    <header class="h-16 bg-white border-b border-line px-6 flex items-center gap-4 sticky top-0 z-30">
+      <button class="text-ink-500 hover:text-ink-900"><i data-lucide="panel-left" class="w-5 h-5"></i></button>
+      <div class="flex-1 max-w-xl relative"><i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i><input type="search" placeholder="Search audit trail…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] placeholder:text-ink-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" /></div>
+      <button class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">FY 2026-27 <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+      <button class="relative w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500"><i data-lucide="bell" class="w-4 h-4"></i><span class="absolute -top-1 -right-1 bg-danger text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">5</span></button>
+      <div class="relative">
+        <button id="avatarBtn" class="flex items-center gap-2 pl-2 border-l border-line"><div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div><div class="hidden md:block text-left"><div class="text-[12.5px] font-medium text-ink-900 leading-tight">Rajesh Kumar</div><div class="text-[10.5px] text-ink-500 leading-tight">Super Admin</div></div><i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+        <div id="avatarMenu" class="hidden absolute right-0 mt-2 w-[240px] bg-white border border-line rounded-xl dropdown-shadow z-40 py-1.5">
+          <a href="#" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="user" class="w-4 h-4 text-ink-500"></i> My profile</a>
+          <a href="admin.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] bg-primary-light text-primary font-medium mx-1.5 rounded-md"><i data-lucide="shield" class="w-4 h-4"></i> Admin Panel</a>
+          <a href="index.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="layout-dashboard" class="w-4 h-4 text-ink-500"></i> Procurement Portal</a>
+          <a href="admin-settings.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="settings" class="w-4 h-4 text-ink-500"></i> System Settings</a>
+          <div class="my-1.5 border-t border-line"></div>
+          <a href="#" onclick="sessionStorage.clear(); location.href='login.html'; return false;" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-danger hover:bg-danger-light"><i data-lucide="log-out" class="w-4 h-4"></i> Sign out</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto px-8 py-6 space-y-7 min-w-0">
+
+      <section class="flex items-start justify-between flex-wrap gap-3">
+        <div>
+          <div class="text-[13px] text-ink-500 mb-2"><a href="admin.html" class="hover:underline">Admin Panel</a> · Governance</div>
+          <h1 class="text-[24px] font-bold text-ink-900 leading-tight">Compliance &amp; Audit</h1>
+          <p class="text-[14px] text-ink-500 mt-1">CVC compliance, approval tracking, and flagged items across all tenders.</p>
+        </div>
+        <button onclick="showToast('Compliance report — PDF queued')" class="px-3 py-2 rounded-lg border border-line text-[13px] hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="file-down" class="w-4 h-4"></i> Download report</button>
+      </section>
+
+      <!-- CVC score breakdown -->
+      <section class="bg-white border border-line rounded-xl p-5">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+          <div class="flex items-center gap-4">
+            <div class="relative w-[112px] h-[112px]">
+              <svg viewBox="0 0 80 80" class="w-full h-full -rotate-90"><circle cx="40" cy="40" r="34" fill="none" stroke="#E5E7EB" stroke-width="8" /><circle cx="40" cy="40" r="34" fill="none" stroke="#10B981" stroke-width="8" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="27.77" /></svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center"><div class="text-[28px] font-bold text-ink-900 leading-none">87</div><div class="text-[10px] uppercase tracking-wider text-ink-400 font-semibold">/100</div></div>
+            </div>
+            <div>
+              <div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold">CVC Compliance Health</div>
+              <div class="text-[18px] font-bold text-ink-900 mt-0.5">Good standing</div>
+              <div class="text-[12px] text-ink-500 mt-0.5">+2 from last quarter · target ≥ 85</div>
+            </div>
+          </div>
+          <div class="lg:col-span-2 space-y-3">
+            <div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold">Score breakdown</div>
+            <div id="breakdownList" class="space-y-2"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stat strip -->
+      <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="stat-card bg-white border border-line rounded-xl p-5"><div class="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center mb-2"><i data-lucide="clipboard-check" class="w-4 h-4"></i></div><div class="text-[26px] font-bold text-ink-900 leading-none">11</div><div class="text-[12px] text-ink-500 mt-1">Pending approvals</div><div class="text-[11.5px] text-danger mt-0.5 font-medium">3 overdue</div></div>
+        <div class="stat-card bg-white border border-line rounded-xl p-5"><div class="w-9 h-9 rounded-lg bg-danger-light text-danger flex items-center justify-center mb-2"><i data-lucide="trending-down" class="w-4 h-4"></i></div><div class="text-[26px] font-bold text-ink-900 leading-none">4</div><div class="text-[12px] text-ink-500 mt-1">ALB flags (&gt;15% below)</div></div>
+        <div class="stat-card bg-white border border-line rounded-xl p-5"><div class="w-9 h-9 rounded-lg bg-warning-light text-warning flex items-center justify-center mb-2"><i data-lucide="alert-octagon" class="w-4 h-4"></i></div><div class="text-[26px] font-bold text-ink-900 leading-none">2</div><div class="text-[12px] text-ink-500 mt-1">L1 above TS</div></div>
+        <div class="stat-card bg-white border border-line rounded-xl p-5"><div class="w-9 h-9 rounded-lg bg-purple-light text-purple flex items-center justify-center mb-2"><i data-lucide="user" class="w-4 h-4"></i></div><div class="text-[26px] font-bold text-ink-900 leading-none">3</div><div class="text-[12px] text-ink-500 mt-1">Single-bid negotiations</div></div>
+      </section>
+
+      <!-- Pending approvals expanded -->
+      <section class="bg-white border border-line rounded-xl overflow-hidden">
+        <div class="px-5 py-4 border-b border-line flex items-center justify-between flex-wrap gap-2">
+          <h2 class="text-[16px] font-bold text-ink-900">Pending approvals (value-tier routed)</h2>
+          <div class="flex gap-2 items-center text-[12px] text-ink-500"><i data-lucide="info" class="w-3.5 h-3.5"></i> Authority is derived from value: ≤₹5L HOD · ₹5–25L Dy. Commissioner · ₹25–50L Commissioner · &gt;₹50L State</div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-[13.5px]">
+            <thead class="bg-surface border-b border-line"><tr class="text-[11.5px] uppercase tracking-wider text-ink-500 font-semibold">
+              <th class="text-left px-5 py-3">Tender</th><th class="text-left px-5 py-3">Stage</th><th class="text-left px-5 py-3">Authority</th>
+              <th class="text-right px-5 py-3">Value</th><th class="text-left px-5 py-3">Status</th><th class="text-right px-5 py-3">Aging</th>
+            </tr></thead>
+            <tbody id="approvalsBody" class="divide-y divide-line"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Flagged items -->
+      <section>
+        <div class="flex items-center gap-6 border-b border-line text-[13.5px] mb-4">
+          <button class="tab active py-2.5 border-b-2 -mb-px font-medium" data-flag="all">All flags</button>
+          <button class="tab py-2.5 border-b-2 border-transparent text-ink-500 hover:text-ink-900" data-flag="alb">ALB &gt;15% below</button>
+          <button class="tab py-2.5 border-b-2 border-transparent text-ink-500 hover:text-ink-900" data-flag="single">Single-bid</button>
+          <button class="tab py-2.5 border-b-2 border-transparent text-ink-500 hover:text-ink-900" data-flag="l1ts">L1 above TS</button>
+          <button class="tab py-2.5 border-b-2 border-transparent text-ink-500 hover:text-ink-900" data-flag="docs">Doc gaps</button>
+          <button class="tab py-2.5 border-b-2 border-transparent text-ink-500 hover:text-ink-900" data-flag="fraud">Fraud flags</button>
+        </div>
+        <div id="flagsList" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+      </section>
+
+      <!-- Audit trail -->
+      <section class="bg-white border border-line rounded-xl overflow-hidden">
+        <div class="px-5 py-4 border-b border-line flex items-center justify-between flex-wrap gap-2">
+          <h2 class="text-[16px] font-bold text-ink-900">Cross-tender audit trail</h2>
+          <div class="flex gap-2 flex-wrap">
+            <select id="atOfficer" onchange="renderAudit()" class="px-3 py-2 rounded-lg border border-line bg-white text-[13px]"><option value="">All officers</option></select>
+            <select id="atAction" onchange="renderAudit()" class="px-3 py-2 rounded-lg border border-line bg-white text-[13px]"><option value="">All actions</option></select>
+            <input id="atFrom" type="date" onchange="renderAudit()" class="px-3 py-2 rounded-lg border border-line bg-white text-[13px]" />
+          </div>
+        </div>
+        <div class="max-h-[440px] overflow-y-auto">
+          <table class="w-full text-[13px]">
+            <thead class="bg-surface border-b border-line sticky top-0"><tr class="text-[11.5px] uppercase tracking-wider text-ink-500 font-semibold">
+              <th class="text-left px-5 py-3">When</th><th class="text-left px-5 py-3">Officer</th><th class="text-left px-5 py-3">Action</th><th class="text-left px-5 py-3">Target</th>
+            </tr></thead>
+            <tbody id="auditBody" class="divide-y divide-line"></tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-ink-900 text-white text-[13px] px-4 py-3 rounded-xl shadow-lift inline-flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-success"></i><span id="toastMsg">Done</span></div>
+
+<script>
+  function refreshIcons(){ if (window.lucide) lucide.createIcons(); }
+  let __toastTimer; function showToast(m){ const t=document.getElementById('toast'); document.getElementById('toastMsg').textContent=m; t.classList.add('show'); clearTimeout(__toastTimer); __toastTimer=setTimeout(()=>t.classList.remove('show'),2800); }
+  function bindDropdown(b,m){ const B=document.getElementById(b),M=document.getElementById(m); if(!B||!M)return; B.addEventListener('click',e=>{e.stopPropagation();M.classList.toggle('hidden');}); document.addEventListener('click',e=>{if(!M.contains(e.target)&&!B.contains(e.target))M.classList.add('hidden');}); }
+  function timeAgo(iso){ const d=(Date.now()-new Date(iso).getTime())/1000; if(d<60)return Math.floor(d)+'s ago'; if(d<3600)return Math.floor(d/60)+'m ago'; if(d<86400)return Math.floor(d/3600)+'h ago'; return Math.floor(d/86400)+'d ago'; }
+  bindDropdown('avatarBtn','avatarMenu');
+
+  /* CVC breakdown */
+  const BREAKDOWN = [
+    { label:'Timely approvals (within SLA)',    score:22, max:25, cls:'bg-success' },
+    { label:'Documentation completeness',       score:19, max:20, cls:'bg-success' },
+    { label:'MSME participation target met',    score:14, max:15, cls:'bg-success' },
+    { label:'ALB resolution (>15% below est.)', score:12, max:15, cls:'bg-warning' },
+    { label:'Single-bid / negotiation hygiene', score:10, max:15, cls:'bg-warning' },
+    { label:'Audit trail integrity',            score:10, max:10, cls:'bg-success' },
+  ];
+  function renderBreakdown(){
+    document.getElementById('breakdownList').innerHTML = BREAKDOWN.map(r => `
+      <div>
+        <div class="flex items-center justify-between text-[12.5px]"><span class="text-ink-900">${r.label}</span><span class="text-ink-500">${r.score}/${r.max}</span></div>
+        <div class="mt-1 h-1.5 rounded-full bg-line overflow-hidden"><div class="h-full ${r.cls}" style="width:${(r.score/r.max)*100}%"></div></div>
+      </div>`).join('');
+  }
+
+  /* Approvals (same source data + aging) */
+  const APPROVALS = [
+    { id:'TND-2026-001', name:'Desktop Computers — AMC Offices',   stage:'Administrative Approval', valueLakh:18,   age:4,  status:'pending' },
+    { id:'TND-2026-002', name:'Road Maintenance Phase 2',           stage:'Technical Sanction',     valueLakh:42,   age:9,  status:'overdue' },
+    { id:'TND-2026-003', name:'Water Supply Pipeline Installation', stage:'Award Approval',         valueLakh:64,   age:11, status:'overdue' },
+    { id:'TND-2026-004', name:'Street Lighting LED Retrofit',       stage:'Technical Sanction',     valueLakh:8,    age:2,  status:'pending' },
+    { id:'TND-2026-007', name:'AMC Office Renovation Phase 3',      stage:'Administrative Approval', valueLakh:27.5, age:6, status:'pending' },
+    { id:'TND-2026-009', name:'Solid Waste Management Equipment',   stage:'Award Approval',         valueLakh:3.4,  age:1,  status:'pending' },
+    { id:'TND-2026-010', name:'Riverfront Park — Phase B',          stage:'Administrative Approval', valueLakh:55,  age:12, status:'overdue' },
+    { id:'TND-2026-011', name:'Street furniture restoration',       stage:'Award Approval',         valueLakh:7.2,  age:3,  status:'pending' },
+    { id:'TND-2026-012', name:'CCTV deployment Zone 4',             stage:'Technical Sanction',     valueLakh:14,   age:2,  status:'pending' },
+    { id:'TND-2026-013', name:'Storm-water drain extension',        stage:'Administrative Approval', valueLakh:32,  age:5,  status:'pending' },
+    { id:'TND-2026-014', name:'Public toilet block · Zone B',       stage:'Award Approval',         valueLakh:4.5,  age:1,  status:'pending' },
+  ];
+  function authorityFor(v){ if(v<=5)return'HOD'; if(v<=25)return'Deputy Commissioner'; if(v<=50)return'Commissioner'; return'State Government'; }
+  function fmtINR(v){ return v>=100 ? '₹'+(v/100).toFixed(2).replace(/\.00$/, '')+' Cr' : '₹'+v.toFixed(2).replace(/\.00$/, '')+' L'; }
+  function renderApprovals(){
+    document.getElementById('approvalsBody').innerHTML = APPROVALS.map(a => {
+      const pill = a.status === 'overdue'
+        ? '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-danger-light text-danger text-[11.5px] font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-danger"></span> Overdue</span>'
+        : '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-warning-light text-warning text-[11.5px] font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-warning"></span> Pending</span>';
+      const ageCls = a.status === 'overdue' ? 'text-danger font-semibold' : 'text-ink-500';
+      return `<tr class="hover:bg-surface transition">
+        <td class="px-5 py-3.5"><div class="font-medium text-ink-900">${a.name}</div><div class="text-[12px] text-ink-500 font-mono">${a.id}</div></td>
+        <td class="px-5 py-3.5 text-ink-900">${a.stage}</td>
+        <td class="px-5 py-3.5"><div class="text-ink-900">${authorityFor(a.valueLakh)}</div><div class="text-[11.5px] text-ink-500">Auto-routed by value</div></td>
+        <td class="px-5 py-3.5 text-right text-ink-900 font-medium">${fmtINR(a.valueLakh)}</td>
+        <td class="px-5 py-3.5">${pill}</td>
+        <td class="px-5 py-3.5 text-right ${ageCls}">${a.age}d</td>
+      </tr>`;
+    }).join('');
+  }
+
+  /* Flags */
+  const FLAGS = [
+    { kind:'alb',   tender:'TND-2026-003', who:'Maharashtra Roads Co.', detail:'Quote 18.4% below estimate (₹64L)',  severity:'high' },
+    { kind:'alb',   tender:'TND-2026-007', who:'BuildTech Solutions',    detail:'Quote 22.1% below estimate (₹27.5L)', severity:'high' },
+    { kind:'alb',   tender:'TND-2026-011', who:'Sigma Cement Traders',   detail:'Quote 16.8% below estimate (₹7.2L)', severity:'medium' },
+    { kind:'alb',   tender:'TND-2026-013', who:'Patil &amp; Associates', detail:'Quote 15.3% below estimate (₹32L)',  severity:'medium' },
+    { kind:'single',tender:'TND-2026-002', who:'NCC Infrastructure Ltd', detail:'Single bid received — negotiation required', severity:'medium' },
+    { kind:'single',tender:'TND-2026-009', who:'Apex Steel Mart',        detail:'Single bid received — negotiation required', severity:'medium' },
+    { kind:'single',tender:'TND-2026-014', who:'Rajesh Constructions',   detail:'Single bid received — negotiation required', severity:'medium' },
+    { kind:'l1ts',  tender:'TND-2026-001', who:'Rajesh Constructions',   detail:'L1 (₹19.4L) above TS (₹18L) — fresh approval required', severity:'high' },
+    { kind:'l1ts',  tender:'TND-2026-012', who:'Maharashtra Roads Co.',  detail:'L1 (₹15.1L) above TS (₹14L) — fresh approval required', severity:'medium' },
+    { kind:'docs',  tender:'TND-2026-004', who:'—',                       detail:'EMD/turnover certificate missing from 2 bidders', severity:'low' },
+    { kind:'docs',  tender:'TND-2026-010', who:'—',                       detail:'CMMI certificate not attached for 1 bidder',     severity:'low' },
+    { kind:'fraud', tender:'TND-2025-088', who:'Sigma Cement Traders',    detail:'Duplicate signature on financial bid · CIR-2026-04', severity:'high' },
+  ];
+  let flagTab = 'all';
+  document.querySelectorAll('[data-flag]').forEach(b => b.addEventListener('click', () => {
+    flagTab = b.dataset.flag;
+    document.querySelectorAll('[data-flag]').forEach(x => x.classList.toggle('active', x === b));
+    renderFlags();
+  }));
+  function renderFlags(){
+    const sevCls = { high:'border-danger/40 bg-danger-light/40', medium:'border-warning/40 bg-warning-light/50', low:'border-line bg-surface/60' };
+    const sevPill = { high:'bg-danger-light text-danger', medium:'bg-warning-light text-warning', low:'bg-ink-400/15 text-ink-500' };
+    const icon = { alb:'trending-down', single:'user', l1ts:'alert-octagon', docs:'file-warning', fraud:'shield-alert' };
+    const label = { alb:'ALB · >15% below', single:'Single-bid', l1ts:'L1 above TS', docs:'Doc gap', fraud:'Fraud flag' };
+    const list = flagTab === 'all' ? FLAGS : FLAGS.filter(f => f.kind === flagTab);
+    document.getElementById('flagsList').innerHTML = list.map(f => `
+      <div class="border ${sevCls[f.severity]} rounded-xl p-4">
+        <div class="flex items-center justify-between"><div class="inline-flex items-center gap-2 text-[12.5px] font-semibold ${sevPill[f.severity]} rounded-full px-2 py-0.5"><i data-lucide="${icon[f.kind]}" class="w-3.5 h-3.5"></i> ${label[f.kind]}</div><div class="text-[11.5px] text-ink-500 font-mono">${f.tender}</div></div>
+        <div class="text-[13.5px] text-ink-900 mt-2 font-medium">${f.who}</div>
+        <div class="text-[12.5px] text-ink-500 mt-0.5">${f.detail}</div>
+        <div class="mt-3 flex gap-2"><button class="px-2.5 py-1.5 rounded-md border border-line text-[12px] hover:bg-white">Open tender</button><button class="px-2.5 py-1.5 rounded-md border border-line text-[12px] hover:bg-white">Acknowledge</button></div>
+      </div>`).join('');
+    refreshIcons();
+  }
+
+  /* Audit trail */
+  const SEED_AUDIT = [
+    { at:new Date(Date.now()-1000*60*8).toISOString(),   actor:'Rajesh Kumar', action:'Published',  target:'DSR rate book v2026.1 marked live' },
+    { at:new Date(Date.now()-1000*60*60).toISOString(),  actor:'Rajesh Kumar', action:'Updated',    target:'Approval threshold — Tier 3 set to ₹50L' },
+    { at:new Date(Date.now()-1000*60*60*4).toISOString(),actor:'Priya Shah',   action:'Onboarded',  target:'Officer Sunita Rao · Deputy Commissioner' },
+    { at:new Date(Date.now()-1000*60*60*22).toISOString(),actor:'Rajesh Kumar',action:'Flagged',    target:'Vendor BuildTech Solutions — blacklist requested' },
+    { at:new Date(Date.now()-1000*60*60*30).toISOString(),actor:'Amit Patil',  action:'Allocated',  target:'Budget head BH-IT-01 → IT dept FY 2026-27' },
+    { at:new Date(Date.now()-1000*60*60*52).toISOString(),actor:'Sunita Rao',  action:'Approved',   target:'AA on TND-2026-006' },
+    { at:new Date(Date.now()-1000*60*60*70).toISOString(),actor:'Neha Joshi',  action:'Reviewed',   target:'BOQ for DPR-2026-004' },
+    { at:new Date(Date.now()-1000*60*60*92).toISOString(),actor:'Ravi Mehta',  action:'Generated',  target:'Monthly compliance summary' },
+  ];
+  function loadAudit(){
+    const stored = JSON.parse(localStorage.getItem('adminAuditLog') || '[]');
+    return stored.concat(SEED_AUDIT).sort((a,b) => new Date(b.at) - new Date(a.at));
+  }
+  function populateAuditFilters(list){
+    const officers = [...new Set(list.map(l => l.actor))], actions = [...new Set(list.map(l => l.action))];
+    const o = document.getElementById('atOfficer'), a = document.getElementById('atAction');
+    o.innerHTML = '<option value="">All officers</option>' + officers.map(x => `<option>${x}</option>`).join('');
+    a.innerHTML = '<option value="">All actions</option>' + actions.map(x => `<option>${x}</option>`).join('');
+  }
+  function renderAudit(){
+    const all = loadAudit();
+    const fO = document.getElementById('atOfficer').value, fA = document.getElementById('atAction').value;
+    const fF = document.getElementById('atFrom').value;
+    const list = all.filter(e =>
+      (!fO || e.actor === fO) && (!fA || e.action === fA) &&
+      (!fF || new Date(e.at) >= new Date(fF))
+    );
+    document.getElementById('auditBody').innerHTML = list.map(e => `
+      <tr class="hover:bg-surface">
+        <td class="px-5 py-3 text-ink-500 whitespace-nowrap">${timeAgo(e.at)}</td>
+        <td class="px-5 py-3 text-ink-900">${e.actor}</td>
+        <td class="px-5 py-3"><span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary-light text-primary text-[11.5px] font-semibold">${e.action}</span></td>
+        <td class="px-5 py-3 text-ink-900">${e.target}</td>
+      </tr>`).join('') || `<tr><td colspan="4" class="px-5 py-10 text-center text-ink-500 text-[13px]">No matching events.</td></tr>`;
+  }
+
+  renderBreakdown();
+  renderApprovals();
+  renderFlags();
+  populateAuditFilters(loadAudit());
+  renderAudit();
+  refreshIcons();
+</script>
+</body>
+</html>

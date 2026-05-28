@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reports &amp; Analytics — TenderAI Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>
+    tailwind.config = { theme: { extend: {
+      fontFamily: { sans: ['"DM Sans"', 'system-ui', 'sans-serif'] },
+      colors: { primary:{DEFAULT:'#0F5EE8',light:'#EFF6FF',border:'#93C5FD'}, success:{DEFAULT:'#10B981',light:'#F0FDF4'}, warning:{DEFAULT:'#F59E0B',light:'#FFFBEB'}, danger:{DEFAULT:'#EF4444',light:'#FEF2F2'}, purple:{DEFAULT:'#8B5CF6',light:'#EEEDFE'}, ink:{900:'#111827',500:'#6B7280',400:'#9CA3AF'}, line:'#E5E7EB', surface:'#F9FAFB' },
+      boxShadow:{ soft:'0 1px 3px rgba(0,0,0,0.08)', lift:'0 4px 12px rgba(0,0,0,0.12)' }
+    }}};
+  </script>
+  <style>
+    html, body{ font-family:'DM Sans',system-ui,sans-serif; color:#111827; background:#F9FAFB; }
+    *:focus-visible{ outline:2px solid #0F5EE8; outline-offset:2px; border-radius:4px; }
+    ::-webkit-scrollbar{ width:10px; height:10px; } ::-webkit-scrollbar-thumb{ background:#E5E7EB; border-radius:8px; } ::-webkit-scrollbar-thumb:hover{ background:#D1D5DB; } ::-webkit-scrollbar-track{ background:transparent; }
+    .toast{ transform:translateY(80px); opacity:0; transition:transform .3s cubic-bezier(.2,.7,.2,1),opacity .25s ease; } .toast.show{ transform:translateY(0); opacity:1; }
+    .dropdown-shadow{ box-shadow:0 12px 32px rgba(17,24,39,0.14),0 2px 6px rgba(17,24,39,0.06); }
+    .report-card{ transition:all .15s ease; }
+    .report-card:hover{ box-shadow:0 4px 12px rgba(0,0,0,0.08); transform:translateY(-1px); }
+    @media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important;} }
+  </style>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+
+  <aside class="w-[244px] shrink-0 bg-white border-r border-line flex flex-col">
+    <div class="px-5 pt-5 pb-4 border-b border-line">
+      <div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-[15px]">T</div><div><div class="text-[15px] font-semibold text-ink-900 leading-tight">TenderAI</div><div class="text-[11px] text-ink-500 leading-tight">Admin Panel</div></div></div>
+      <button class="mt-4 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-line bg-surface hover:bg-white hover:shadow-soft transition"><div class="w-7 h-7 rounded-md bg-primary-light text-primary flex items-center justify-center"><i data-lucide="building-2" class="w-4 h-4"></i></div><div class="text-left flex-1 min-w-0"><div class="text-[12.5px] font-medium text-ink-900 truncate">Ahmedabad</div><div class="text-[10.5px] text-ink-500 truncate">Municipal Corporation</div></div><i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+    </div>
+    <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">OVERVIEW</div><ul class="space-y-0.5"><li><a href="admin.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Admin Dashboard</a></li></ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">ACCESS &amp; ORG</div><ul class="space-y-0.5">
+        <li><a href="admin-users.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="users" class="w-4 h-4"></i> User Management <span class="ml-auto bg-primary-light text-primary text-[10px] font-semibold rounded-full px-1.5 py-0.5">24</span></a></li>
+        <li><a href="admin-org.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="network" class="w-4 h-4"></i> Department &amp; Org</a></li>
+      </ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">CATALOG</div><ul class="space-y-0.5">
+        <li><a href="admin-templates.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="layout-template" class="w-4 h-4"></i> Tender Templates</a></li>
+        <li><a href="admin-budget.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="wallet" class="w-4 h-4"></i> Budget Heads</a></li>
+        <li><a href="admin-dsr.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="table-2" class="w-4 h-4"></i> DSR Rates</a></li>
+        <li><a href="admin-vendors.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="store" class="w-4 h-4"></i> Vendor Registry <span class="ml-auto bg-danger text-white text-[10px] font-semibold rounded-full px-1.5 py-0.5">3</span></a></li>
+      </ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">GOVERNANCE</div><ul class="space-y-0.5">
+        <li><a href="admin-compliance.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="shield-check" class="w-4 h-4"></i> Compliance &amp; Audit</a></li>
+        <li><a href="admin-reports.html" aria-current="page" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] bg-primary-light text-primary font-medium"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Reports &amp; Analytics</a></li>
+      </ul></div>
+      <div><div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">SYSTEM</div><ul class="space-y-0.5">
+        <li><a href="admin-notifications.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="bell-ring" class="w-4 h-4"></i> Notifications</a></li>
+        <li><a href="admin-settings.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="settings" class="w-4 h-4"></i> System Settings</a></li>
+      </ul></div>
+      <div class="pt-2 border-t border-line"><ul class="space-y-0.5"><li><a href="index.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="arrow-left" class="w-4 h-4"></i> Procurement Portal</a></li></ul></div>
+    </nav>
+    <div class="border-t border-line px-4 py-3 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div><div class="flex-1 min-w-0"><div class="text-[12.5px] font-medium text-ink-900 truncate">Rajesh Kumar</div><div class="text-[10.5px] text-ink-500 truncate">Super Admin</div></div><button onclick="sessionStorage.clear(); location.href='login.html'" class="text-ink-400 hover:text-ink-900"><i data-lucide="log-out" class="w-4 h-4"></i></button></div>
+  </aside>
+
+  <div class="flex-1 flex flex-col min-w-0">
+    <header class="h-16 bg-white border-b border-line px-6 flex items-center gap-4 sticky top-0 z-30">
+      <button class="text-ink-500 hover:text-ink-900"><i data-lucide="panel-left" class="w-5 h-5"></i></button>
+      <div class="flex-1 max-w-xl relative"><i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i><input type="search" placeholder="Search reports…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] placeholder:text-ink-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" /></div>
+      <button class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">FY 2026-27 <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+      <button class="relative w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500"><i data-lucide="bell" class="w-4 h-4"></i><span class="absolute -top-1 -right-1 bg-danger text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">5</span></button>
+      <div class="relative">
+        <button id="avatarBtn" class="flex items-center gap-2 pl-2 border-l border-line"><div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div><div class="hidden md:block text-left"><div class="text-[12.5px] font-medium text-ink-900 leading-tight">Rajesh Kumar</div><div class="text-[10.5px] text-ink-500 leading-tight">Super Admin</div></div><i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+        <div id="avatarMenu" class="hidden absolute right-0 mt-2 w-[240px] bg-white border border-line rounded-xl dropdown-shadow z-40 py-1.5">
+          <a href="#" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="user" class="w-4 h-4 text-ink-500"></i> My profile</a>
+          <a href="admin.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] bg-primary-light text-primary font-medium mx-1.5 rounded-md"><i data-lucide="shield" class="w-4 h-4"></i> Admin Panel</a>
+          <a href="index.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="layout-dashboard" class="w-4 h-4 text-ink-500"></i> Procurement Portal</a>
+          <a href="admin-settings.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="settings" class="w-4 h-4 text-ink-500"></i> System Settings</a>
+          <div class="my-1.5 border-t border-line"></div>
+          <a href="#" onclick="sessionStorage.clear(); location.href='login.html'; return false;" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-danger hover:bg-danger-light"><i data-lucide="log-out" class="w-4 h-4"></i> Sign out</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto px-8 py-6 space-y-7 min-w-0">
+
+      <section class="flex items-start justify-between flex-wrap gap-3">
+        <div>
+          <div class="text-[13px] text-ink-500 mb-2"><a href="admin.html" class="hover:underline">Admin Panel</a> · Governance</div>
+          <h1 class="text-[24px] font-bold text-ink-900 leading-tight">Reports &amp; Analytics</h1>
+          <p class="text-[14px] text-ink-500 mt-1">Spend, cycle time, savings, vendor concentration, officer workload and MSME participation.</p>
+        </div>
+        <button onclick="showToast('Workbook export queued')" class="px-3 py-2 rounded-lg border border-line text-[13px] hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="download" class="w-4 h-4"></i> Export workbook</button>
+      </section>
+
+      <!-- Filters -->
+      <section class="bg-white border border-line rounded-xl p-3 flex items-center gap-2 flex-wrap">
+        <span class="text-[11.5px] text-ink-500 font-semibold uppercase tracking-wide ml-1">Filters:</span>
+        <select class="px-3 py-2 rounded-lg border border-line bg-white text-[13px]"><option>FY 2026-27</option><option>FY 2025-26</option></select>
+        <select class="px-3 py-2 rounded-lg border border-line bg-white text-[13px]"><option>All departments</option><option>IT</option><option>Infrastructure</option><option>Water</option><option>Sanitation</option><option>Engineering</option><option>Urban Dev</option><option>Parks</option></select>
+        <select class="px-3 py-2 rounded-lg border border-line bg-white text-[13px]"><option>All sectors</option><option>Civil works</option><option>Water works</option><option>Electrical</option><option>IT</option></select>
+        <input type="date" class="px-3 py-2 rounded-lg border border-line bg-white text-[13px]" />
+        <span class="text-ink-400">→</span>
+        <input type="date" class="px-3 py-2 rounded-lg border border-line bg-white text-[13px]" />
+        <button class="ml-auto px-3 py-2 rounded-lg border border-line text-[13px] hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="bookmark-plus" class="w-4 h-4"></i> Save view</button>
+      </section>
+
+      <!-- Report cards -->
+      <section class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+        <!-- Spend by department -->
+        <div class="report-card bg-white border border-line rounded-xl p-5">
+          <div class="flex items-center justify-between mb-3"><div><h3 class="text-[15px] font-bold text-ink-900">Spend by department</h3><div class="text-[12px] text-ink-500">FY 2026-27 · ₹ Cr</div></div><button class="text-[12px] text-primary hover:underline">Export</button></div>
+          <div class="space-y-2.5" id="spendDept"></div>
+        </div>
+
+        <!-- Spend by sector -->
+        <div class="report-card bg-white border border-line rounded-xl p-5">
+          <div class="flex items-center justify-between mb-3"><div><h3 class="text-[15px] font-bold text-ink-900">Spend by sector</h3><div class="text-[12px] text-ink-500">FY 2026-27 · share</div></div><button class="text-[12px] text-primary hover:underline">Export</button></div>
+          <div id="sectorBar"></div>
+          <ul class="grid grid-cols-2 gap-y-1.5 mt-3 text-[12px]" id="sectorLegend"></ul>
+        </div>
+
+        <!-- Tender cycle time -->
+        <div class="report-card bg-white border border-line rounded-xl p-5">
+          <div class="flex items-center justify-between mb-3"><div><h3 class="text-[15px] font-bold text-ink-900">Tender cycle time</h3><div class="text-[12px] text-ink-500">Average days per stage · last 6 months</div></div><button class="text-[12px] text-primary hover:underline">Export</button></div>
+          <div class="space-y-2.5" id="cycleStages"></div>
+          <div class="mt-3 pt-3 border-t border-line text-[12.5px] text-ink-500">Average end-to-end · <span class="text-ink-900 font-semibold">68 days</span> (target ≤ 72)</div>
+        </div>
+
+        <!-- Savings vs estimate -->
+        <div class="report-card bg-white border border-line rounded-xl p-5">
+          <div class="flex items-center justify-between mb-3"><div><h3 class="text-[15px] font-bold text-ink-900">Savings vs estimate</h3><div class="text-[12px] text-ink-500">L1 vs estimated cost · monthly %</div></div><button class="text-[12px] text-primary hover:underline">Export</button></div>
+          <div class="flex items-end gap-1.5 h-32" id="savingsBars"></div>
+          <div class="mt-3 text-[12.5px]">YTD savings · <span class="text-ink-900 font-bold">₹3.42 Cr</span> · avg <span class="text-success font-semibold">6.4% below</span> estimate</div>
+        </div>
+
+        <!-- Vendor concentration -->
+        <div class="report-card bg-white border border-line rounded-xl p-5">
+          <div class="flex items-center justify-between mb-3"><div><h3 class="text-[15px] font-bold text-ink-900">Vendor concentration risk</h3><div class="text-[12px] text-ink-500">% of awarded value to top vendors</div></div><button class="text-[12px] text-primary hover:underline">Export</button></div>
+          <div class="space-y-2.5" id="vendorConc"></div>
+          <div class="mt-3 text-[12.5px]"><span class="text-warning font-semibold">Top 3 vendors hold 41%</span> · monitor for concentration.</div>
+        </div>
+
+        <!-- Officer workload -->
+        <div class="report-card bg-white border border-line rounded-xl p-5">
+          <div class="flex items-center justify-between mb-3"><div><h3 class="text-[15px] font-bold text-ink-900">Officer workload</h3><div class="text-[12px] text-ink-500">Active tenders per officer</div></div><button class="text-[12px] text-primary hover:underline">Export</button></div>
+          <div class="space-y-2.5" id="officerLoad"></div>
+        </div>
+
+        <!-- MSME participation -->
+        <div class="report-card bg-white border border-line rounded-xl p-5 lg:col-span-2">
+          <div class="flex items-center justify-between mb-3"><div><h3 class="text-[15px] font-bold text-ink-900">MSME participation</h3><div class="text-[12px] text-ink-500">Bidders &amp; awarded value · last 6 months</div></div><button class="text-[12px] text-primary hover:underline">Export</button></div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="border border-line rounded-lg p-3"><div class="text-[11.5px] text-ink-500">MSME bidders</div><div class="text-[24px] font-bold text-ink-900 mt-1">38%</div><div class="text-[11.5px] text-success mt-0.5">+4 pp QoQ</div></div>
+            <div class="border border-line rounded-lg p-3"><div class="text-[11.5px] text-ink-500">MSME awards (count)</div><div class="text-[24px] font-bold text-ink-900 mt-1">22%</div><div class="text-[11.5px] text-warning mt-0.5">target ≥ 25%</div></div>
+            <div class="border border-line rounded-lg p-3"><div class="text-[11.5px] text-ink-500">MSME awarded value</div><div class="text-[24px] font-bold text-ink-900 mt-1">₹1.84 Cr</div><div class="text-[11.5px] text-success mt-0.5">+18% YoY</div></div>
+          </div>
+          <div class="mt-4 flex items-end gap-1.5 h-24" id="msmeBars"></div>
+        </div>
+      </section>
+
+      <!-- Saved reports -->
+      <section class="bg-white border border-line rounded-xl p-5">
+        <h3 class="text-[15px] font-bold text-ink-900 mb-3">Saved reports</h3>
+        <ul class="divide-y divide-line">
+          <li class="py-3 flex items-center justify-between"><div><div class="text-[13.5px] font-medium text-ink-900">Quarterly compliance summary</div><div class="text-[12px] text-ink-500">Last run · 12 May 2026 · scheduled monthly</div></div><div class="flex gap-2"><button class="px-2.5 py-1.5 rounded-md border border-line text-[12px] hover:bg-surface">Run now</button><button class="px-2.5 py-1.5 rounded-md border border-line text-[12px] hover:bg-surface">Open</button></div></li>
+          <li class="py-3 flex items-center justify-between"><div><div class="text-[13.5px] font-medium text-ink-900">FY26 spend by department</div><div class="text-[12px] text-ink-500">Last run · 3 May 2026 · ad-hoc</div></div><div class="flex gap-2"><button class="px-2.5 py-1.5 rounded-md border border-line text-[12px] hover:bg-surface">Run now</button><button class="px-2.5 py-1.5 rounded-md border border-line text-[12px] hover:bg-surface">Open</button></div></li>
+          <li class="py-3 flex items-center justify-between"><div><div class="text-[13.5px] font-medium text-ink-900">MSME participation YoY</div><div class="text-[12px] text-ink-500">Last run · 21 Apr 2026 · scheduled quarterly</div></div><div class="flex gap-2"><button class="px-2.5 py-1.5 rounded-md border border-line text-[12px] hover:bg-surface">Run now</button><button class="px-2.5 py-1.5 rounded-md border border-line text-[12px] hover:bg-surface">Open</button></div></li>
+        </ul>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-ink-900 text-white text-[13px] px-4 py-3 rounded-xl shadow-lift inline-flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-success"></i><span id="toastMsg">Done</span></div>
+
+<script>
+  function refreshIcons(){ if (window.lucide) lucide.createIcons(); }
+  let __toastTimer; function showToast(m){ const t=document.getElementById('toast'); document.getElementById('toastMsg').textContent=m; t.classList.add('show'); clearTimeout(__toastTimer); __toastTimer=setTimeout(()=>t.classList.remove('show'),2800); }
+  function bindDropdown(b,m){ const B=document.getElementById(b),M=document.getElementById(m); if(!B||!M)return; B.addEventListener('click',e=>{e.stopPropagation();M.classList.toggle('hidden');}); document.addEventListener('click',e=>{if(!M.contains(e.target)&&!B.contains(e.target))M.classList.add('hidden');}); }
+  bindDropdown('avatarBtn','avatarMenu');
+
+  /* Charts */
+  const SPEND = [['Infrastructure',22.8],['Urban Dev',15.2],['Water',14.2],['Engineering',11.6],['Sanitation',9.1],['IT',6.4],['Parks',4.0]];
+  function renderSpend(){
+    const max = Math.max(...SPEND.map(s => s[1]));
+    document.getElementById('spendDept').innerHTML = SPEND.map(s => {
+      const w = Math.round(s[1]/max*100);
+      return `<div><div class="flex items-center justify-between text-[12.5px]"><span class="text-ink-900 font-medium">${s[0]}</span><span class="text-ink-500">₹${s[1]} Cr</span></div><div class="mt-1 h-2 rounded-full bg-line overflow-hidden"><div class="h-full bg-primary" style="width:${w}%"></div></div></div>`;
+    }).join('');
+  }
+
+  const SECTORS = [['Civil works',38,'#0F5EE8'],['Water works',22,'#10B981'],['Electrical',16,'#F59E0B'],['IT',12,'#8B5CF6'],['Sanitation',8,'#EF4444'],['Other',4,'#6B7280']];
+  function renderSector(){
+    document.getElementById('sectorBar').innerHTML = `<div class="flex h-3 rounded-full overflow-hidden border border-line">${SECTORS.map(s => `<div style="width:${s[1]}%; background:${s[2]}"></div>`).join('')}</div>`;
+    document.getElementById('sectorLegend').innerHTML = SECTORS.map(s => `<li class="flex items-center gap-2 text-ink-900"><span class="w-2 h-2 rounded-full" style="background:${s[2]}"></span>${s[0]} <span class="text-ink-500">· ${s[1]}%</span></li>`).join('');
+  }
+
+  const CYCLE = [['DPR drafting',12],['Administrative Approval',8],['Tender preparation',6],['Publication → submission',21],['Technical evaluation',9],['Financial + award',12]];
+  function renderCycle(){
+    const max = Math.max(...CYCLE.map(c => c[1]));
+    document.getElementById('cycleStages').innerHTML = CYCLE.map(c => {
+      const w = Math.round(c[1]/max*100);
+      return `<div><div class="flex items-center justify-between text-[12.5px]"><span class="text-ink-900 font-medium">${c[0]}</span><span class="text-ink-500">${c[1]} days avg</span></div><div class="mt-1 h-2 rounded-full bg-line overflow-hidden"><div class="h-full bg-warning" style="width:${w}%"></div></div></div>`;
+    }).join('');
+  }
+
+  const SAVE = [-2,-4,-5,-6,-3,-7,-8,-6,-9,-5,-7,-6];
+  function renderSavings(){
+    const max = Math.max(...SAVE.map(v => Math.abs(v)));
+    document.getElementById('savingsBars').innerHTML = SAVE.map((v,i) => {
+      const h = Math.round(Math.abs(v)/max*100);
+      return `<div class="flex-1 flex flex-col items-center gap-1"><div class="w-full bg-success rounded-t-sm" style="height:${h}%"></div><div class="text-[10px] text-ink-400">${i+1}</div></div>`;
+    }).join('');
+  }
+
+  const VENDORS = [['Rajesh Constructions Pvt Ltd',18],['NCC Infrastructure Ltd',14],['Maharashtra Roads Co.',9],['Patil &amp; Associates',6],['BuildTech Solutions',5],['Others',48]];
+  function renderVendors(){
+    document.getElementById('vendorConc').innerHTML = VENDORS.map(v => `<div><div class="flex items-center justify-between text-[12.5px]"><span class="text-ink-900 font-medium">${v[0]}</span><span class="text-ink-500">${v[1]}%</span></div><div class="mt-1 h-2 rounded-full bg-line overflow-hidden"><div class="h-full ${v[1]>=15?'bg-warning':v[1]>=10?'bg-primary':'bg-ink-400'}" style="width:${v[1]}%"></div></div></div>`).join('');
+  }
+
+  const LOAD = [['Rajesh Kumar',11],['Priya Shah',9],['Amit Patil',7],['Sunita Rao',6],['Ravi Mehta',4],['Neha Joshi',3]];
+  function renderLoad(){
+    const max = Math.max(...LOAD.map(l => l[1]));
+    document.getElementById('officerLoad').innerHTML = LOAD.map(l => `<div><div class="flex items-center justify-between text-[12.5px]"><span class="text-ink-900 font-medium">${l[0]}</span><span class="text-ink-500">${l[1]} active</span></div><div class="mt-1 h-2 rounded-full bg-line overflow-hidden"><div class="h-full bg-primary" style="width:${Math.round(l[1]/max*100)}%"></div></div></div>`).join('');
+  }
+
+  function renderMsme(){
+    document.getElementById('msmeBars').innerHTML = [28,32,30,34,36,38].map((v,i) => {
+      const pair = [30,28,29,26,30,22][i];
+      return `<div class="flex-1 flex items-end gap-0.5 h-full"><div class="flex-1 bg-purple rounded-t-sm" style="height:${v}%" title="Bidders ${v}%"></div><div class="flex-1 bg-purple-light border border-purple/50 rounded-t-sm" style="height:${pair}%" title="Awards ${pair}%"></div></div>`;
+    }).join('');
+  }
+
+  renderSpend(); renderSector(); renderCycle(); renderSavings(); renderVendors(); renderLoad(); renderMsme(); refreshIcons();
+</script>
+</body>
+</html>
