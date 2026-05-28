@@ -139,12 +139,113 @@
     .clar-count-badge { display:inline-flex; align-items:center; background:#FFFBEB; color:#92400E; border-radius:20px; padding:2px 8px; font-size:11px; font-weight:700; margin-left:8px; }
 
     /* === PQ verdict popover (Change 2a) === */
-    .verdict-trigger { display:inline-flex; align-items:center; gap:6px; border:1px solid transparent; border-radius:999px; padding:6px 12px; font-size:13px; font-weight:500; cursor:pointer; background:#F9FAFB; color:#6B7280; transition: filter .15s ease, border-color .15s ease; }
+    /* C2 — interactive verdict pill with always-visible pencil */
+    .verdict-trigger { display:inline-flex; align-items:center; gap:6px; border:1.5px solid #D1D5DB; border-radius:6px; padding:5px 10px; font-size:12px; font-weight:500; cursor:pointer; background:white; color:#6B7280; transition: background 150ms ease, border-color 150ms ease, box-shadow 150ms ease; }
     .verdict-trigger:hover { filter:brightness(0.97); }
-    .verdict-trigger.is-pass    { background:#F0FDF4; color:#065F46; border-color:#BBF7D0; }
-    .verdict-trigger.is-fail    { background:#FEF2F2; color:#991B1B; border-color:#FECACA; }
-    .verdict-trigger.is-pending { background:#FFFBEB; color:#92400E; border-color:#FDE68A; }
-    .verdict-trigger.is-clarif  { background:#FFFBEB; color:#92400E; border-color:#F59E0B; }
+    .verdict-trigger:focus-visible { outline:2px solid #0F5EE8; outline-offset:2px; }
+    .verdict-trigger .vt-pencil { color:#9CA3AF; margin-left:2px; }
+    .verdict-trigger.is-pass    { background:#F0FDF4; color:#065F46; border-color:#10B981; }
+    .verdict-trigger.is-pass:hover    { background:#ECFDF5; border-color:#059669; box-shadow:0 0 0 2px rgba(16,185,129,0.15); }
+    .verdict-trigger.is-fail    { background:#FEF2F2; color:#991B1B; border-color:#EF4444; }
+    .verdict-trigger.is-fail:hover    { background:#FEE2E2; border-color:#DC2626; box-shadow:0 0 0 2px rgba(239,68,68,0.15); }
+    .verdict-trigger.is-pending { background:#FFFBEB; color:#92400E; border-color:#F59E0B; }
+    .verdict-trigger.is-pending:hover { background:#FEF3C7; border-color:#D97706; box-shadow:0 0 0 2px rgba(245,158,11,0.15); }
+    .verdict-trigger.is-clarif  { background:#EFF6FF; color:#1D4ED8; border-color:#3B82F6; }
+    .verdict-trigger.is-clarif:hover  { background:#DBEAFE; border-color:#2563EB; box-shadow:0 0 0 2px rgba(59,130,246,0.15); }
+    .verdict-empty-chip { display:inline-flex; align-items:center; gap:4px; border:1.5px dashed #D1D5DB; border-radius:6px; padding:5px 10px; font-size:12px; color:#9CA3AF; background:transparent; cursor:pointer; transition: color 150ms ease, border-color 150ms ease, background 150ms ease; }
+    .verdict-empty-chip:hover { color:#0F5EE8; border-color:#0F5EE8; background:#EFF6FF; }
+    .verdict-empty-chip:focus-visible { outline:2px solid #0F5EE8; outline-offset:2px; }
+    /* Comment displayed under the verdict pill (C3) */
+    .verdict-comment { margin-top:6px; font-size:11px; color:#6B7280; font-style:italic; line-height:1.5; max-width:100%; }
+    .verdict-comment .vc-meta { font-style:normal; color:#9CA3AF; font-size:10px; margin-left:4px; }
+    .verdict-comment .vc-toggle { background:transparent; border:none; padding:0; color:#0F5EE8; font-size:11px; cursor:pointer; font-style:normal; margin-left:4px; }
+    .verdict-comment .vc-toggle:hover { text-decoration:underline; }
+    /* C3 — Change-comment box inside popover */
+    .pq-change-comment-box { background:#F9FAFB; border-radius:8px; padding:12px; margin-top:8px; max-height:0; overflow:hidden; opacity:0; transition: max-height 200ms ease, opacity 150ms ease, margin-top 200ms ease, padding 200ms ease; }
+    .pq-change-comment-box.open { max-height:240px; opacity:1; }
+    .pq-change-comment-box label { display:block; font-size:12px; font-weight:700; color:#374151; margin-bottom:6px; }
+    .pq-change-comment-box label .req { color:#EF4444; }
+    .pq-change-comment-box textarea { width:100%; min-height:60px; border:1px solid #D1D5DB; border-radius:6px; padding:8px 10px; font-size:13px; resize:vertical; font-family:inherit; }
+    .pq-change-comment-box textarea:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 2px rgba(15,94,232,0.15); }
+    .pq-change-comment-box .wc { font-size:10px; color:#9CA3AF; text-align:right; margin-top:4px; }
+    .pq-change-comment-box .wc.ok { color:#10B981; }
+    /* C1 — vendor dropdown selector */
+    .pq-vendor-selector { display:flex; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+    .pq-vendor-selector .vs-label { font-size:13px; font-weight:500; color:#374151; }
+    .pq-vendor-dd { position:relative; display:inline-block; }
+    .pq-vendor-dd-trigger { background:white; border:1px solid #D1D5DB; border-radius:8px; padding:9px 14px; font-size:14px; color:#111827; cursor:pointer; display:flex; align-items:center; gap:10px; min-width:260px; justify-content:space-between; transition: border-color 150ms ease, box-shadow 150ms ease; }
+    .pq-vendor-dd-trigger:hover { border-color:#9CA3AF; }
+    .pq-vendor-dd-trigger:focus, .pq-vendor-dd-trigger:focus-visible { outline:2px solid #0F5EE8; outline-offset:2px; border-color:#0F5EE8; box-shadow:0 0 0 3px rgba(15,94,232,0.1); }
+    .pq-vendor-dd .v-avatar { width:28px; height:28px; border-radius:50%; background:#EFF6FF; color:#0F5EE8; font-size:11px; font-weight:600; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .pq-vendor-dd .v-name-block { display:flex; flex-direction:column; min-width:0; line-height:1.2; }
+    .pq-vendor-dd .v-name { font-size:14px; font-weight:700; color:#111827; }
+    .pq-vendor-dd .v-company { font-size:12px; color:#9CA3AF; }
+    .pq-vendor-dd .v-status { display:inline-flex; align-items:center; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:600; white-space:nowrap; }
+    .pq-vendor-dd .v-status.s-qual    { background:#F0FDF4; color:#065F46; }
+    .pq-vendor-dd .v-status.s-pending { background:#FFFBEB; color:#92400E; }
+    .pq-vendor-dd .v-status.s-disq    { background:#FEF2F2; color:#991B1B; }
+    .pq-vendor-dd .v-status.s-none    { background:#F3F4F6; color:#6B7280; }
+    .pq-vendor-dd .v-chev { color:#9CA3AF; transition: transform 150ms ease; }
+    .pq-vendor-dd[data-open="true"] .v-chev { transform: rotate(180deg); }
+    .pq-vendor-dd-panel { position:absolute; top:calc(100% + 4px); left:0; z-index:50; background:white; border:1px solid #E5E7EB; border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.1); min-width:340px; padding:6px; }
+    .pq-vendor-dd-panel.hidden { display:none; }
+    .pq-vendor-dd-search { position:relative; margin:4px; }
+    .pq-vendor-dd-search input { width:100%; border:1px solid #E5E7EB; border-radius:6px; padding:7px 10px 7px 32px; font-size:13px; background:#F9FAFB; }
+    .pq-vendor-dd-search input:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 2px rgba(15,94,232,0.15); background:white; }
+    .pq-vendor-dd-search .ico { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#9CA3AF; }
+    .pq-vendor-dd-options { max-height:280px; overflow-y:auto; margin-top:4px; }
+    .pq-vendor-dd-options .pq-vendor-empty { padding:16px; text-align:center; font-size:13px; color:#9CA3AF; }
+    .pq-vendor-dd-option { padding:9px 10px; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:10px; transition: background 150ms ease; }
+    .pq-vendor-dd-option:hover { background:#F9FAFB; }
+    .pq-vendor-dd-option.selected { background:#EFF6FF; }
+    .pq-vendor-dd-option .v-name { font-size:13px; }
+    .pq-vendor-dd-option .v-progress { font-size:10px; color:#9CA3AF; margin-top:1px; }
+    /* C4 — auto-save indicator */
+    .pq-saved-indicator { font-size:11px; color:#10B981; opacity:0; transition: opacity 150ms ease; }
+    .pq-saved-indicator.show { opacity:1; }
+    /* ===== AI Confidence column ===== */
+    .ai-conf-cell { padding:10px 12px; display:flex; flex-direction:column; gap:4px; cursor:pointer; transition: background 150ms ease; min-width:0; }
+    .ai-conf-cell:hover { background:#F9FAFB; }
+    .ai-conf-cell:focus-visible { outline:2px solid #0F5EE8; outline-offset:2px; border-radius:4px; }
+    .ai-conf-cell .ai-conf-row1 { display:flex; align-items:center; gap:6px; }
+    .ai-conf-cell .ai-conf-score { font-size:13px; font-weight:600; }
+    .ai-conf-cell .ai-conf-label { font-size:10px; }
+    .ai-conf-cell.tier-high .ai-conf-score { color:#065F46; }
+    .ai-conf-cell.tier-high .ai-conf-label { color:#065F46; }
+    .ai-conf-cell.tier-high .ai-conf-bar-fill { background:#10B981; }
+    .ai-conf-cell.tier-medium .ai-conf-score { color:#92400E; }
+    .ai-conf-cell.tier-medium .ai-conf-label { color:#92400E; }
+    .ai-conf-cell.tier-medium .ai-conf-bar-fill { background:#F59E0B; }
+    .ai-conf-cell.tier-low .ai-conf-score { color:#991B1B; }
+    .ai-conf-cell.tier-low .ai-conf-label { color:#991B1B; }
+    .ai-conf-cell.tier-low .ai-conf-bar-fill { background:#EF4444; }
+    .ai-conf-bar { width:100%; height:4px; background:#E5E7EB; border-radius:2px; overflow:hidden; }
+    .ai-conf-bar-fill { height:100%; border-radius:2px; transition: width 400ms ease; }
+    .ai-conf-reason { font-size:10px; color:#9CA3AF; font-style:italic; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%; }
+    .ai-conf-empty { display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 0; }
+    .ai-conf-empty .dash { color:#9CA3AF; font-size:12px; }
+    .ai-conf-empty .runlink { background:transparent; border:none; padding:0; font-size:10px; color:#0F5EE8; cursor:pointer; }
+    .ai-conf-empty .runlink:hover { text-decoration:underline; }
+    /* AI confidence popover */
+    .ai-conf-popover { position:absolute; background:white; border:1px solid #E5E7EB; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.1); padding:12px 14px; width:240px; z-index:50; font-size:12px; }
+    .ai-conf-popover .ai-pop-title { font-size:12px; font-weight:700; color:#111827; margin-bottom:8px; }
+    .ai-conf-popover .ai-pop-score-big { font-size:18px; font-weight:700; }
+    .ai-conf-popover .ai-pop-tier { font-size:12px; margin-top:2px; }
+    .ai-conf-popover .ai-pop-divider { border-top:1px solid #F3F4F6; margin:10px 0; }
+    .ai-conf-popover .ai-pop-section-label { font-size:11px; font-weight:700; color:#6B7280; margin-bottom:4px; }
+    .ai-conf-popover .ai-pop-reason { font-size:12px; color:#374151; line-height:1.6; }
+    .ai-conf-popover .ai-pop-checks { list-style:none; padding:0; margin:0; }
+    .ai-conf-popover .ai-pop-checks li { font-size:11px; color:#6B7280; padding:2px 0; }
+    .ai-conf-popover .ai-pop-checks li .ok { color:#10B981; font-weight:700; }
+    .ai-conf-popover .ai-pop-checks li .no { color:#EF4444; font-weight:700; }
+    .ai-conf-popover.tier-high .ai-pop-score-big { color:#065F46; }
+    .ai-conf-popover.tier-high .ai-pop-tier { color:#065F46; }
+    .ai-conf-popover.tier-medium .ai-pop-score-big { color:#92400E; }
+    .ai-conf-popover.tier-medium .ai-pop-tier { color:#92400E; }
+    .ai-conf-popover.tier-low .ai-pop-score-big { color:#991B1B; }
+    .ai-conf-popover.tier-low .ai-pop-tier { color:#991B1B; }
+    /* Low-confidence banner above criteria table */
+    .low-conf-banner { background:#FFFBEB; border:1px solid #FCD34D; border-radius:8px; padding:10px 14px; margin-bottom:12px; display:flex; align-items:center; gap:10px; font-size:13px; color:#92400E; }
     .pq-popover { position:absolute; width:340px; background:white; border:1px solid #E5E7EB; border-radius:12px; box-shadow:0 12px 32px rgba(0,0,0,0.12); padding:14px; z-index:55; }
     .pq-popover .pq-card { display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border:1px solid #E5E7EB; border-radius:8px; cursor:pointer; transition: border-color .15s ease, background .15s ease; margin-bottom:6px; }
     .pq-popover .pq-card:hover { border-color:#D1D5DB; }
@@ -825,6 +926,8 @@
 
     <!-- PQ verdict popover (positioned absolutely on cell click) -->
     <div id="pqPopover" class="pq-popover hidden" role="dialog" aria-modal="false"></div>
+    <!-- AI confidence popover (mutually exclusive with verdict popover) -->
+    <div id="aiConfPopover" class="ai-conf-popover hidden" role="dialog" aria-modal="false" aria-label="AI confidence detail"></div>
   </div>
 </div>
 
@@ -916,6 +1019,90 @@
   ];
   const TQ_THRESHOLD = 50;
 
+  // ===== AI Confidence sample data (rules-based — no backend) =====
+  // Per-vendor PQ confidence: score (0-100), reason snippet, checks.
+  const AI_CONF_PQ_BASE = {
+    'Rajesh Constructions': {
+      incorp:    { score:94, reason:'Certificate of Incorporation clearly readable, CIN matches' },
+      pangst:    { score:91, reason:'PAN and GSTIN verified, active status confirmed' },
+      moa:       { score:88, reason:'MOA and AOA both present, company objects match scope' },
+      turnover:  { score:82, reason:'CA certified, UAN number present, 3 years average calculated' },
+      audit:     { score:76, reason:'Balance sheets for 3 years present, CA stamp visible' },
+      iso:       { score:67, reason:'ISO 9001 certificate found, validity date partially unclear' },
+      blacklist: { score:58, reason:'Declaration present but not on company letterhead' },
+      wo:        { score:43, reason:'2 of 3 work orders found, third document unreadable' },
+    },
+    'Patil & Associates': {
+      incorp:    { score:71, reason:'Partnership deed found but registration certificate missing' },
+      pangst:    { score:89, reason:'PAN card clearly visible' },
+      moa:       { score:12, reason:'Not applicable for partnership but no firm deed alternative found' },
+      turnover:  { score:34, reason:'CA certificate present but UAN number absent' },
+      audit:     { score:28, reason:'Only 1 year balance sheet found, 3 years required' },
+      iso:       { score:15, reason:'No ISO certificate found in submitted documents' },
+      blacklist: { score:81, reason:'Signed declaration on company letterhead' },
+      wo:        { score:22, reason:'Only 1 work order found, value insufficient for 80-60-40 rule' },
+    },
+    'Maharashtra Roads Co.': {
+      incorp:    { score:88, reason:'Certificate of incorporation clearly readable' },
+      pangst:    { score:84, reason:'PAN and GSTIN both verified' },
+      moa:       { score:79, reason:'MOA on record, AOA partially redacted' },
+      turnover:  { score:72, reason:'CA certificate found, three years averaged' },
+      audit:     { score:68, reason:'Balance sheets present, audit report attached' },
+      iso:       { score:74, reason:'ISO 9001 and ISO 14001 found' },
+      blacklist: { score:69, reason:'Declaration present, signed by authorised signatory' },
+      wo:        { score:62, reason:'2 work orders verified against issuing authorities' },
+    },
+    'BuildTech Solutions': {
+      incorp:    { score:80, reason:'Incorporation certificate visible, CIN cross-referenced' },
+      pangst:    { score:77, reason:'PAN clear; GST registration matches address' },
+      moa:       { score:71, reason:'MOA scanned and readable' },
+      turnover:  { score:65, reason:'CA-certified, marginal pass over EC threshold' },
+      audit:     { score:58, reason:'Only summary balance sheet, full audit report missing' },
+      iso:       { score:73, reason:'ISO 9001 valid through next year' },
+      blacklist: { score:67, reason:'Declaration present, format compliant' },
+      wo:        { score:55, reason:'1 work order matches, others marginal' },
+    },
+    'NCC Infrastructure': {
+      incorp:    { score:90, reason:'Public Limited — full corporate records present' },
+      pangst:    { score:86, reason:'PAN and GSTIN active' },
+      moa:       { score:83, reason:'MOA and AOA complete' },
+      turnover:  { score:88, reason:'Turnover comfortably exceeds EC, CA-certified' },
+      audit:     { score:81, reason:'Three years audited statements found' },
+      iso:       { score:85, reason:'Three ISO certificates — 9001, 14001, 45001' },
+      blacklist: { score:79, reason:'Signed by company secretary on letterhead' },
+      wo:        { score:78, reason:'4 work orders found, values pass 80-60-40 rule' },
+    },
+  };
+  // TQ confidence is about document quality (vendor-agnostic per spec) — same scores across all vendors
+  const AI_CONF_TQ_BASE = {
+    woscore:   { score:78, reason:'Work order values clearly stated, dates verifiable' },
+    isoscore:  { score:85, reason:'Certificate numbers and validity dates legible' },
+    cmmi:      { score:52, reason:'CMMI certificate found but level not clearly stated' },
+    turnscore: { score:81, reason:'Matches CA certificate, calculation verifiable' },
+    manpower:  { score:44, reason:'HR certificate present but headcount data ambiguous' },
+  };
+  function aiConfidenceChecksFromScore(score){
+    // Derive plausible checks from the score
+    return {
+      documentPresent:    score >= 25,
+      textLegible:        score >= 35,
+      keyValuesExtracted: score >= 45,
+      crossReferenceMatch: score >= 75,
+    };
+  }
+  function confidenceTier(score){
+    if (score == null) return null;
+    if (score >= 75) return 'high';
+    if (score >= 45) return 'medium';
+    return 'low';
+  }
+  function confidenceTierLabel(tier){
+    if (tier === 'high')   return 'High';
+    if (tier === 'medium') return 'Medium';
+    if (tier === 'low')    return 'Low';
+    return '';
+  }
+
   // AI suggestions per vendor (used by pre-screen + popover prefill)
   function aiPQ(vendor, critId){
     const p = PARSED_TECH[vendor] || {};
@@ -1000,6 +1187,11 @@
       committeeMembers: defaultCommitteeMembers(),
       signoffs: {},               // { memberId: { TQ:bool, financial:bool, dateTQ, dateFin } }
       conflictDeclarations: {},   // { memberId: { declared:bool, date } }
+      // === PQ verdict-change comments (C3) — pqComments[vendor][critId] = { text, author, date, previousVerdict } ===
+      pqComments: {},
+      // === AI confidence (Confidence column) — populated by AI Pre-screen ===
+      pqConfidence: {},   // pqConfidence[vendor][critId] = { score, reason, checks }
+      tqConfidence: {},   // tqConfidence[vendor][critId] = { score, reason, checks }
       _seedV:6,
     };
   }
@@ -1419,6 +1611,49 @@
     if (!Array.isArray(EVAL.committeeMembers) || !EVAL.committeeMembers.length) EVAL.committeeMembers = defaultCommitteeMembers();
     if (!EVAL.signoffs)              EVAL.signoffs = {};
     if (!EVAL.conflictDeclarations)  EVAL.conflictDeclarations = {};
+    if (!EVAL.pqComments)            EVAL.pqComments = {};
+    if (!EVAL.pqConfidence)          EVAL.pqConfidence = {};
+    if (!EVAL.tqConfidence)          EVAL.tqConfidence = {};
+    // C4 + Confidence — restore per-tender PQ auto-save snapshot (matrix + comments + confidence) if present
+    try {
+      const snap = localStorage.getItem('pqEval_' + tnd);
+      if (snap){
+        const parsed = JSON.parse(snap);
+        if (parsed && typeof parsed === 'object'){
+          Object.keys(parsed).forEach(vendor => {
+            EVAL.matrix[vendor] = EVAL.matrix[vendor] || {};
+            EVAL.pqComments[vendor] = EVAL.pqComments[vendor] || {};
+            EVAL.pqConfidence[vendor] = EVAL.pqConfidence[vendor] || {};
+            Object.keys(parsed[vendor]).forEach(critId => {
+              const entry = parsed[vendor][critId] || {};
+              if (entry.verdict !== undefined) EVAL.matrix[vendor][critId] = entry.verdict === 'clarification' ? 'clarif' : entry.verdict;
+              if (entry.comment){
+                EVAL.pqComments[vendor][critId] = { text: entry.comment, author: entry.commentAuthor || 'Rajesh Kumar', date: entry.commentDate || new Date().toISOString(), previousVerdict: entry.previousVerdict || null };
+              }
+              if (entry.confidence && typeof entry.confidence.score === 'number'){
+                EVAL.pqConfidence[vendor][critId] = entry.confidence;
+              }
+            });
+          });
+        }
+      }
+      // TQ confidence
+      const tqSnap = localStorage.getItem('tqEval_' + tnd);
+      if (tqSnap){
+        const parsed = JSON.parse(tqSnap);
+        if (parsed && typeof parsed === 'object'){
+          Object.keys(parsed).forEach(vendor => {
+            EVAL.tqConfidence[vendor] = EVAL.tqConfidence[vendor] || {};
+            Object.keys(parsed[vendor]).forEach(critId => {
+              const entry = parsed[vendor][critId] || {};
+              if (entry.confidence && typeof entry.confidence.score === 'number'){
+                EVAL.tqConfidence[vendor][critId] = entry.confidence;
+              }
+            });
+          });
+        }
+      }
+    } catch(e){}
     if (!EVAL.activeVendor && EVAL.bids.length) EVAL.activeVendor = EVAL.bids[0].vendor;
     activeView = null;   // reset F2 view toggle for each tender
     document.getElementById('wsCrumb').textContent = t.id;
@@ -1520,6 +1755,8 @@
       sectionCard('s4','04','Results & Actions', st),
     ].join('');
     refreshIcons();
+    // Trigger the AI confidence bar width animation after the DOM is in place
+    if (typeof animateAiConfBars === 'function') animateAiConfBars();
   }
   function sectionCard(key, num, title, st){
     const locked = (key==='s2' && !st.s1done) || (key==='s3' && !st.s2done) || (key==='s4' && !st.s3done);
@@ -2114,13 +2351,164 @@
   }
   function setActiveVendor(v){ EVAL.activeVendor = v; renderTechnical(); saveState(); }
 
+  // ===== C1 — PQ vendor dropdown helpers =====
+  function pqVendorInitials(name){
+    return (name||'').trim().split(/\s+/).slice(0,2).map(p => p[0]||'').join('').toUpperCase() || '·';
+  }
+  function pqVendorCompanyLine(name){
+    // Display "company" subtitle alongside the short name
+    if (/Ltd|Pvt|Co\.|Constructions|Solutions|Infrastructure|Roads|Associates/i.test(name)) {
+      // Already includes a suffix
+      return '';
+    }
+    return '';
+  }
+  function pqVendorVerdictStatus(vendor){
+    const m = EVAL.matrix[vendor] || {};
+    const pqVals = PQ_CRITERIA.map(c => m[c.id]);
+    if (pqVals.every(v => v == null)) return { cls:'s-none',    label:'Not started' };
+    if (pqVals.includes('fail'))      return { cls:'s-disq',    label:'PQ Disqualified' };
+    if (pqVals.every(v => v === 'pass')) return { cls:'s-qual', label:'PQ Qualified' };
+    return { cls:'s-pending', label:'Pending' };
+  }
+  function pqVendorEvaluatedCount(vendor){
+    const m = EVAL.matrix[vendor] || {};
+    return PQ_CRITERIA.filter(c => m[c.id] != null).length;
+  }
+  function pqVendorOptionsTotal(){ return PQ_CRITERIA.length; }
+  function pqVendorSelectorHTML(){
+    if (!EVAL.bids.length) return '';
+    if (!EVAL.activeVendor || !EVAL.bids.find(b => b.vendor === EVAL.activeVendor)) EVAL.activeVendor = EVAL.bids[0].vendor;
+    const vendor = EVAL.activeVendor;
+    const status = pqVendorVerdictStatus(vendor);
+    const open = !!_uiPqVendorDdOpen;
+    const total = pqVendorOptionsTotal();
+    const options = EVAL.bids.map(b => {
+      const st  = pqVendorVerdictStatus(b.vendor);
+      const ev  = pqVendorEvaluatedCount(b.vendor);
+      const sel = b.vendor === vendor;
+      return `<div class="pq-vendor-dd-option ${sel?'selected':''}" data-vname="${esc(b.vendor.toLowerCase())}" onclick="pickPqVendor('${esc(b.vendor)}')">
+        <div class="v-avatar">${esc(pqVendorInitials(b.vendor))}</div>
+        <div class="v-name-block" style="flex:1; min-width:0;">
+          <div class="v-name">${esc(b.vendor)}</div>
+          <div class="v-progress">${ev} of ${total} criteria evaluated</div>
+        </div>
+        <span class="v-status ${st.cls}">${st.label}</span>
+      </div>`;
+    }).join('');
+    const doneCount = EVAL.bids.filter(b => pqVendorComplete(b.vendor)).length;
+    const pct = EVAL.bids.length ? Math.round(doneCount * 100 / EVAL.bids.length) : 0;
+    return `<div class="pq-vendor-selector">
+        <span class="vs-label">Evaluating vendor:</span>
+        <div class="pq-vendor-dd" data-open="${open?'true':'false'}">
+          <button type="button" id="pqVendorDdTrigger" class="pq-vendor-dd-trigger" aria-expanded="${open?'true':'false'}" aria-haspopup="listbox" onclick="event.stopPropagation(); togglePqVendorDropdown();">
+            <div class="v-avatar">${esc(pqVendorInitials(vendor))}</div>
+            <div class="v-name-block" style="flex:1; min-width:0; text-align:left;">
+              <span class="v-name">${esc(vendor)}</span>
+              <span class="v-company">Pre-qualification evaluation</span>
+            </div>
+            <span class="v-status ${status.cls}">${status.label}</span>
+            <i data-lucide="chevron-down" class="v-chev" style="width:14px; height:14px;"></i>
+          </button>
+          <div id="pqVendorDdPanel" class="pq-vendor-dd-panel ${open?'':'hidden'}" role="listbox" aria-label="Select vendor">
+            <div class="pq-vendor-dd-search">
+              <i data-lucide="search" class="ico" style="width:14px; height:14px;"></i>
+              <input id="pqVendorDdSearch" type="text" placeholder="Search vendors..." aria-label="Search vendors" oninput="filterPqVendorOptions(this.value)" onclick="event.stopPropagation();" />
+            </div>
+            <div id="pqVendorDdOptions" class="pq-vendor-dd-options">${options}</div>
+          </div>
+        </div>
+        ${viewBidButtonHTML()}
+        <div class="flex items-center gap-3 flex-wrap" style="margin-left:auto;">
+          <div class="text-[13px]" style="color:#6B7280;" aria-live="polite">${doneCount} of ${EVAL.bids.length} vendors evaluated</div>
+          <div style="width:120px; height:5px; background:#F3F4F6; border-radius:3px; overflow:hidden;"><div style="height:100%; width:${pct}%; background:#0F5EE8; border-radius:3px; transition:width 200ms ease;"></div></div>
+        </div>
+      </div>`;
+  }
+  // C1 — dropdown behaviour
+  function togglePqVendorDropdown(){
+    _uiPqVendorDdOpen = !_uiPqVendorDdOpen;
+    const dd = document.querySelector('.pq-vendor-dd');
+    const panel = document.getElementById('pqVendorDdPanel');
+    const trigger = document.getElementById('pqVendorDdTrigger');
+    if (dd){ dd.setAttribute('data-open', _uiPqVendorDdOpen ? 'true':'false'); }
+    if (panel){ panel.classList.toggle('hidden', !_uiPqVendorDdOpen); }
+    if (trigger){ trigger.setAttribute('aria-expanded', _uiPqVendorDdOpen ? 'true':'false'); }
+    if (_uiPqVendorDdOpen){
+      setTimeout(() => { document.getElementById('pqVendorDdSearch')?.focus(); }, 30);
+    }
+    refreshIcons();
+  }
+  function closePqVendorDropdown(){
+    if (!_uiPqVendorDdOpen) return;
+    _uiPqVendorDdOpen = false;
+    const dd = document.querySelector('.pq-vendor-dd');
+    const panel = document.getElementById('pqVendorDdPanel');
+    const trigger = document.getElementById('pqVendorDdTrigger');
+    if (dd){ dd.setAttribute('data-open', 'false'); }
+    if (panel){ panel.classList.add('hidden'); }
+    if (trigger){ trigger.setAttribute('aria-expanded', 'false'); }
+  }
+  function pickPqVendor(name){
+    closePqVendorDropdown();
+    EVAL.activeVendor = name;
+    renderTechnical();
+    saveState();
+  }
+  function filterPqVendorOptions(query){
+    const q = (query||'').trim().toLowerCase();
+    const container = document.getElementById('pqVendorDdOptions');
+    if (!container) return;
+    let visible = 0;
+    container.querySelectorAll('.pq-vendor-dd-option').forEach(opt => {
+      const name = opt.getAttribute('data-vname') || '';
+      const match = !q || name.includes(q);
+      opt.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+    let empty = container.querySelector('.pq-vendor-empty');
+    if (visible === 0){
+      if (!empty){
+        empty = document.createElement('div');
+        empty.className = 'pq-vendor-empty';
+        empty.textContent = 'No vendors found';
+        container.appendChild(empty);
+      }
+    } else {
+      if (empty) empty.remove();
+    }
+  }
+
   // ----- Section 02 — PQ Evaluation -----
+  // C2 — verdict pill renders with always-visible pencil + bordered style + Set-verdict empty chip
   function verdictTriggerHTML(val){
-    if (val === 'pass')    return `<button class="verdict-trigger is-pass">✓ Pass</button>`;
-    if (val === 'fail')    return `<button class="verdict-trigger is-fail">✗ Fail</button>`;
-    if (val === 'clarif')  return `<button class="verdict-trigger is-clarif">⏳ Clarification</button>`;
-    if (val === 'pending') return `<button class="verdict-trigger is-pending">⏳ Pending</button>`;
-    return `<button class="verdict-trigger">Set verdict</button>`;
+    if (val === 'pass'){
+      return `<button type="button" class="verdict-trigger is-pass" title="Click to change verdict" aria-label="Pass — click to change">
+        <i data-lucide="check" style="width:12px; height:12px;"></i> Pass
+        <i data-lucide="pencil" class="vt-pencil" style="width:11px; height:11px;"></i>
+      </button>`;
+    }
+    if (val === 'fail'){
+      return `<button type="button" class="verdict-trigger is-fail" title="Click to change verdict" aria-label="Fail — click to change">
+        <i data-lucide="x" style="width:12px; height:12px;"></i> Fail
+        <i data-lucide="pencil" class="vt-pencil" style="width:11px; height:11px;"></i>
+      </button>`;
+    }
+    if (val === 'clarif'){
+      return `<button type="button" class="verdict-trigger is-clarif" title="Click to change verdict" aria-label="Clarification — click to change">
+        <i data-lucide="message-circle" style="width:12px; height:12px;"></i> Clarification
+        <i data-lucide="pencil" class="vt-pencil" style="width:11px; height:11px;"></i>
+      </button>`;
+    }
+    if (val === 'pending'){
+      return `<button type="button" class="verdict-trigger is-pending" title="Click to change verdict" aria-label="Pending — click to change">
+        <i data-lucide="hourglass" style="width:12px; height:12px;"></i> Pending
+        <i data-lucide="pencil" class="vt-pencil" style="width:11px; height:11px;"></i>
+      </button>`;
+    }
+    return `<button type="button" class="verdict-empty-chip" aria-label="Set verdict">
+      <i data-lucide="plus" style="width:12px; height:12px;"></i> Set verdict
+    </button>`;
   }
   function clarSubRowHTML(vendor, critId, section, colspan){
     const rec = findClarRecord(vendor, critId);
@@ -2154,18 +2542,23 @@
       const submittedCell = notFound
         ? `<div><span style="font-size:13px; color:#F59E0B; font-style:italic;">Not found</span> <a href="#" onclick="pqInlineEdit('${esc(vendor)}','${c.id}'); return false;" class="text-[12px] hover:underline" style="color:#0F5EE8;">Enter manually</a></div>`
         : `<div class="crit-sub">${esc(aiVal)}</div>`;
-      const trigger = `<span onclick="openPqPopover(event,'${esc(vendor)}','${c.id}')">${verdictTriggerHTML(val)}</span>`;
+      // C2 + C3 — wrap trigger with data-verdict for change-detection in popover
+      const verdictAttr = esc(val == null ? '' : val);
+      const trigger = `<span data-verdict="${verdictAttr}" onclick="openPqPopover(event,'${esc(vendor)}','${c.id}')">${verdictTriggerHTML(val)}</span>`;
+      const commentHTML = pqCommentHTML(vendor, c.id);
       const evDoc = evidenceDocFor(vendor, c.id);
       const evidenceCell = evDoc
         ? `<button class="ev-link" onclick="openEvidencePanel('${esc(vendor)}','${c.id}')" title="View source document"><i data-lucide="external-link" style="width:12px; height:12px;"></i> View doc</button>`
         : `<span style="color:#9CA3AF; font-size:12px;">—</span>`;
+      const aiConfCell = aiConfCellHTML('pq', vendor, c.id);
       return `<tr>
         <td><div class="crit-name">${esc(c.short)}</div><div class="crit-desc">${esc(c.full)}</div></td>
         <td><div class="crit-sub">${esc(pqRequirement(c.id))}</div></td>
         <td>${submittedCell}</td>
         <td>${evidenceCell}</td>
-        <td>${trigger}</td>
-      </tr>${clarSubRowHTML(vendor, c.id, 'PQ', 5)}`;
+        ${aiConfCell}
+        <td>${trigger}${commentHTML}</td>
+      </tr>${clarSubRowHTML(vendor, c.id, 'PQ', 6)}`;
     }).join('');
 
     // Overall PQ verdict for this vendor
@@ -2176,25 +2569,57 @@
                   : passCount === PQ_CRITERIA.length ? `<span style="background:#F0FDF4; color:#065F46; padding:6px 12px; border-radius:999px; font-size:13px; font-weight:600;">PQ Qualified</span>`
                   : `<span style="background:#FFFBEB; color:#92400E; padding:6px 12px; border-radius:999px; font-size:13px; font-weight:600;">In progress</span>`;
     const allDone = EVAL.bids.every(b => PQ_CRITERIA.every(c => { const x = (EVAL.matrix[b.vendor]||{})[c.id]; return x != null && x !== 'clarif'; }));
-    const confirmBtn = `<button onclick="confirmPQ()" class="px-4 py-2 rounded-lg ${allDone?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-medium" ${allDone?'':'disabled'}>Confirm PQ Evaluation</button>`;
+    // C4 — rename Confirm → Save
+    const confirmBtn = `<button onclick="confirmPQ()" class="px-4 py-2 rounded-lg ${allDone?'bg-primary text-white hover:bg-primary/90':'bg-ink-400/30 text-ink-500 cursor-not-allowed'} text-[13px] font-medium" ${allDone?'':'disabled'}>Save PQ Evaluation</button>`;
 
+    const lowBanner = lowConfidenceBannerHTML('pq', vendor);
     return `<div class="flex items-center justify-between gap-3 flex-wrap mb-2">
         <div class="text-[12.5px] text-ink-500">Apply Pass / Fail to each criterion. ⏳ Pending is for clarifications still in flight.</div>
         <button onclick="aiPrescreenPQ()" class="px-3 py-1.5 rounded-lg border border-primary text-primary text-[12px] font-medium hover:bg-primary-light inline-flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> ✦ AI Pre-screen PQ</button>
       </div>
-      ${vendorTabsHTML('pq')}
+      ${pqVendorSelectorHTML()}
       <div class="flex items-center justify-between mb-2">
-        <div class="text-[13.5px] font-bold text-ink-900">${esc(vendor)}</div>
+        <div class="text-[13.5px] font-bold text-ink-900 inline-flex items-center gap-2">${esc(vendor)} <span id="pqSavedIndicator" class="pq-saved-indicator" aria-live="polite">Saved ✓</span></div>
         <div>${overall}</div>
       </div>
+      ${lowBanner}
       <div style="border:1px solid #E5E7EB; border-radius:12px; overflow:hidden;">
         <table class="crit-table" style="table-layout:fixed;">
-          <colgroup><col style="width:24%"><col style="width:22%"><col style="width:24%"><col style="width:13%"><col style="width:17%"></colgroup>
-          <thead><tr><th>Criterion</th><th>Requirement</th><th>Submitted Value</th><th>Evidence</th><th>Verdict</th></tr></thead>
+          <colgroup><col style="width:22%"><col style="width:18%"><col style="width:22%"><col style="width:11%"><col style="width:12%"><col style="width:15%"></colgroup>
+          <thead><tr><th>Criterion</th><th>Requirement</th><th>Submitted Value</th><th>Evidence</th><th title="AI confidence score — how certain the AI is about its assessment based on the uploaded document quality and completeness"><i data-lucide="sparkles" style="width:11px; height:11px; display:inline-block; vertical-align:-1px; margin-right:3px; color:#9CA3AF;"></i>AI Confidence</th><th>Verdict</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       </div>
       <div class="flex justify-end mt-3">${confirmBtn}</div>`;
+  }
+
+  // C3 — Render the comment below a verdict pill, with Read more / Read less toggle
+  function pqCommentHTML(vendor, critId){
+    const c = (EVAL.pqComments && EVAL.pqComments[vendor] && EVAL.pqComments[vendor][critId]) || null;
+    if (!c || !c.text) return '';
+    const key = vendor + '|' + critId;
+    const expanded = _uiPqCommentsExpanded.has(key);
+    const fullText = c.text;
+    const truncated = fullText.length > 80 && !expanded;
+    const display = truncated ? fullText.slice(0, 80) + '...' : fullText;
+    const toggle = fullText.length > 80
+      ? `<button class="vc-toggle" type="button" onclick="event.stopPropagation(); togglePqComment('${esc(vendor)}','${critId}');">${expanded ? 'Read less' : 'Read more'}</button>`
+      : '';
+    const dateLabel = fmtCommentDate(c.date);
+    const prefix = c.previousVerdict ? `Changed from ${verdictLabel(c.previousVerdict)}: ` : '';
+    return `<div class="verdict-comment"><em>"${esc(prefix + display)}"</em>${toggle}<span class="vc-meta">— ${esc(c.author || 'Rajesh Kumar')} · ${esc(dateLabel)}</span></div>`;
+  }
+  function verdictLabel(v){ return v === 'pass' ? 'Pass' : v === 'fail' ? 'Fail' : v === 'clarif' ? 'Clarification' : v === 'pending' ? 'Pending' : v || ''; }
+  function fmtCommentDate(iso){
+    if (!iso) return '';
+    try { return new Date(iso).toLocaleDateString('en-US', { month:'short', day:'numeric' }); }
+    catch(e){ return ''; }
+  }
+  function togglePqComment(vendor, critId){
+    const key = vendor + '|' + critId;
+    if (_uiPqCommentsExpanded.has(key)) _uiPqCommentsExpanded.delete(key);
+    else _uiPqCommentsExpanded.add(key);
+    renderTechnical();
   }
   function pqRequirement(id){
     return { incorp:'Certificate of incorporation', pangst:'Valid PAN + GST', moa:'MOA / AOA on file', turnover:'Avg ≥ ₹22.5L over 3 yrs', audit:'Audited P&L + balance sheet', iso:'≥ 1 ISO cert', blacklist:'Non-blacklisting declaration', wo:'80-60-40 work-order rule' }[id] || '—';
@@ -2400,10 +2825,15 @@
     closeBidDoc();
     closeClarPanel();
     closeEvidencePanel();
-    const trigger = (e.target.closest && e.target.closest('.verdict-trigger')) || e.currentTarget;
+    closeAiConfPopover();   // mutual exclusion with the AI confidence popover
+    _uiCurrentOpenPopover = 'verdict';
+    const trigger = (e.target.closest && (e.target.closest('.verdict-trigger') || e.target.closest('.verdict-empty-chip'))) || e.currentTarget;
     const cur = (EVAL.matrix[vendor]||{})[critId];
     const existing = findClarRecord(vendor, critId);
+    // C3 — capture the prior verdict at the moment the popover opens (currentVerdict)
     EVAL._pqPop = { vendor, critId, sel: cur || 'pass',
+      currentVerdict: cur || null,    // null | 'pass' | 'fail' | 'clarif' | 'pending'
+      changeComment: '',              // textarea contents
       text: existing && existing.text || '',
       deadline: existing && existing.deadline || '',
       trigger: trigger,        // captured for focus-return on close
@@ -2454,8 +2884,24 @@
       <label style="margin-top:10px;">Response deadline</label>
       <input id="pqClarDeadline" type="date" value="${esc(st.deadline)}" onclick="event.stopPropagation();" />
     </div>`;
+    // C3 — Change-comment box: required when changing a deliberate (pass/fail/clarif) verdict to a *different* verdict.
+    // Pending → anything = no comment required (Pending was provisional)
+    // null    → anything = no comment required (first decision)
+    // Same verdict re-confirmation = no comment required
+    const needsChangeComment = !!(st.currentVerdict && st.currentVerdict !== 'pending' && st.currentVerdict !== st.sel);
+    const wordCount = (st.changeComment || '').trim().split(/\s+/).filter(w => w.length).length;
+    const wcClass = needsChangeComment && wordCount >= 3 ? 'wc ok' : 'wc';
+    const commentBox = `<div id="pqChangeCommentBox" class="pq-change-comment-box ${needsChangeComment?'open':''}" aria-hidden="${needsChangeComment?'false':'true'}">
+      <label for="pqChangeComment">Reason for changing verdict <span class="req">*</span></label>
+      <textarea id="pqChangeComment" aria-required="true" placeholder="Why are you changing this verdict? This will be recorded in the audit trail." oninput="onPqChangeCommentInput(this.value)" onclick="event.stopPropagation();">${esc(st.changeComment || '')}</textarea>
+      <div id="pqChangeCommentWc" class="${wcClass}">${wordCount} word${wordCount===1?'':'s'}${needsChangeComment ? ' · minimum 3' : ''}</div>
+    </div>`;
     const saveLabel = isClar ? 'Save & Create Clarification Draft' : 'Save';
     const saveBtnClass = isClar ? 'btn-save amber' : 'btn-save';
+    // Block Save when a comment is required but not yet 3 words
+    const blocked = needsChangeComment && wordCount < 3;
+    const saveStyle = blocked ? ' style="opacity:0.5; cursor:not-allowed;"' : '';
+    const saveAttr  = blocked ? ' aria-disabled="true"' : '';
     const pop = document.getElementById('pqPopover');
     pop.innerHTML = `<div class="flex items-center justify-between mb-2">
         <div class="text-[12.5px] font-bold text-ink-900">${esc(st.vendor)} — ${esc((PQ_CRITERIA.find(c=>c.id===st.critId)||{}).short||st.critId)}</div>
@@ -2466,23 +2912,52 @@
       ${card('pending','⏳ Pending','Not decided yet — revisit later','on-pending')}
       ${card('clarif','⏳ Clarification Required','Need supporting document or explanation from vendor','on-clarif')}
       ${formHTML}
+      ${commentBox}
       <div class="pq-popover-actions">
         <button class="btn-cancel" onclick="event.stopPropagation(); closePqPopover();">Cancel</button>
-        <button class="${saveBtnClass}" onclick="event.stopPropagation(); savePqVerdict();">${saveLabel}</button>
+        <button id="pqSaveBtn" class="${saveBtnClass}"${saveStyle}${saveAttr} onclick="event.stopPropagation(); savePqVerdict();">${saveLabel}</button>
       </div>`;
     refreshIcons();
   }
   function pickPqSel(val){
     if (!EVAL._pqPop) return;
-    // Preserve any text already typed in the clar form before re-render
+    // Preserve any text already typed before re-render
     const t = document.getElementById('pqClarText'); if (t) EVAL._pqPop.text = t.value;
     const d = document.getElementById('pqClarDeadline'); if (d) EVAL._pqPop.deadline = d.value;
+    const cc = document.getElementById('pqChangeComment'); if (cc) EVAL._pqPop.changeComment = cc.value;
     EVAL._pqPop.sel = val;
     renderPqPopover();
   }
+  // C3 — live word-count + save-button gating without full re-render
+  function onPqChangeCommentInput(val){
+    if (!EVAL._pqPop) return;
+    EVAL._pqPop.changeComment = val;
+    const wc = (val || '').trim().split(/\s+/).filter(w => w.length).length;
+    const st = EVAL._pqPop;
+    const needsChangeComment = !!(st.currentVerdict && st.currentVerdict !== 'pending' && st.currentVerdict !== st.sel);
+    const blocked = needsChangeComment && wc < 3;
+    const wcEl = document.getElementById('pqChangeCommentWc');
+    if (wcEl){
+      wcEl.textContent = wc + ' word' + (wc===1?'':'s') + (needsChangeComment ? ' · minimum 3' : '');
+      wcEl.className = needsChangeComment && wc >= 3 ? 'wc ok' : 'wc';
+    }
+    const btn = document.getElementById('pqSaveBtn');
+    if (btn){
+      btn.style.opacity = blocked ? '0.5' : '';
+      btn.style.cursor  = blocked ? 'not-allowed' : '';
+      btn.setAttribute('aria-disabled', blocked ? 'true' : 'false');
+    }
+  }
   function savePqVerdict(){
     const st = EVAL._pqPop; if (!st) return;
-    const { vendor, critId, sel } = st;
+    const { vendor, critId, sel, currentVerdict } = st;
+    // C3 — enforce change-comment when changing a deliberate verdict to a different one
+    const needsChangeComment = !!(currentVerdict && currentVerdict !== 'pending' && currentVerdict !== sel);
+    let changeCommentText = (st.changeComment || '').trim();
+    if (needsChangeComment){
+      const wc = changeCommentText.split(/\s+/).filter(w => w.length).length;
+      if (wc < 3){ showToast('Add a 3+ word reason for changing the verdict'); return; }
+    }
     EVAL.matrix[vendor] = EVAL.matrix[vendor] || {};
     if (sel === 'clarif'){
       const text = (document.getElementById('pqClarText')?.value || '').trim();
@@ -2509,8 +2984,231 @@
       // Drop any clar record on this cell
       EVAL.clarifications = (EVAL.clarifications||[]).filter(c => !(c.vendorId === vendor && c.criterionId === critId));
     }
+    // C3 — persist the change-comment when present
+    if (needsChangeComment && changeCommentText){
+      EVAL.pqComments = EVAL.pqComments || {};
+      EVAL.pqComments[vendor] = EVAL.pqComments[vendor] || {};
+      EVAL.pqComments[vendor][critId] = {
+        text: changeCommentText,
+        author: 'Rajesh Kumar',
+        date: new Date().toISOString(),
+        previousVerdict: currentVerdict,
+      };
+      log('PQ Evaluation', 'verdict_changed', `${(PQ_CRITERIA.find(c=>c.id===critId)||{}).short || critId} · ${vendor} · ${currentVerdict} → ${sel} · "${changeCommentText.slice(0, 80)}${changeCommentText.length>80?'…':''}"`);
+    }
+    // C4 — synchronous autosave to localStorage
+    pqAutosave();
+    pqShowSavedIndicator();
     closePqPopover();
     renderTechnical(); saveState();
+  }
+  // ===== AI CONFIDENCE COLUMN — shared helpers (PQ + TQ) =====
+  // Track the single currently-open popover (verdict or confidence) so they don't co-exist
+  let _uiCurrentOpenPopover = null;  // 'verdict' | 'confidence' | null
+
+  function getAiConfidence(scope, vendor, critId){
+    // scope = 'pq' | 'tq'
+    const store = scope === 'pq' ? (EVAL.pqConfidence || {}) : (EVAL.tqConfidence || {});
+    const rec = (store[vendor] || {})[critId];
+    return rec && typeof rec.score === 'number' ? rec : null;
+  }
+  function hasAnyConfidence(scope){
+    const store = scope === 'pq' ? (EVAL.pqConfidence || {}) : (EVAL.tqConfidence || {});
+    return Object.keys(store).some(v => Object.keys(store[v] || {}).length > 0);
+  }
+
+  function aiConfCellHTML(scope, vendor, critId){
+    const c = getAiConfidence(scope, vendor, critId);
+    const critName = (scope === 'pq' ? PQ_CRITERIA : TQ_CRITERIA).find(x => x.id === critId);
+    if (!c){
+      // Empty state — dash + Run AI pre-screen link
+      const runFn = scope === 'pq' ? 'aiPrescreenPQ()' : 'aiPrescreenTQ()';
+      return `<td class="ai-conf-empty-cell" style="padding:10px 12px; text-align:center;">
+        <div class="ai-conf-empty">
+          <span class="dash">—</span>
+          <button class="runlink" type="button" onclick="event.stopPropagation(); ${runFn};">Run AI pre-screen</button>
+        </div>
+      </td>`;
+    }
+    const tier = confidenceTier(c.score);
+    const tierLabel = confidenceTierLabel(tier);
+    const reason = c.reason || '';
+    return `<td class="ai-conf-cell tier-${tier}" tabindex="0" role="button"
+        aria-label="AI confidence score ${c.score}% ${tierLabel} for ${esc(critName?critName.short:critId)}"
+        title="${esc(reason)}"
+        onclick="event.stopPropagation(); openAiConfPopover(event, '${scope}', '${esc(vendor)}', '${critId}')">
+      <div class="ai-conf-row1">
+        <span class="ai-conf-score">${c.score}%</span>
+        <span class="ai-conf-label">${tierLabel}</span>
+      </div>
+      <div class="ai-conf-bar"><div class="ai-conf-bar-fill" data-target-width="${c.score}" style="width:0%;"></div></div>
+      <div class="ai-conf-reason">${esc(reason)}</div>
+    </td>`;
+  }
+
+  function lowConfidenceBannerHTML(scope, vendor){
+    const store = scope === 'pq' ? (EVAL.pqConfidence || {}) : (EVAL.tqConfidence || {});
+    const vendorScores = store[vendor] || {};
+    const lowCrits = Object.keys(vendorScores).filter(critId => {
+      const score = vendorScores[critId]?.score;
+      return typeof score === 'number' && score < 45;
+    });
+    if (lowCrits.length === 0) return '';
+    const label = lowCrits.length === 1 ? '1 criterion has' : `${lowCrits.length} criteria have`;
+    return `<div class="low-conf-banner" role="status" aria-live="polite">
+      <i data-lucide="alert-triangle" style="width:16px; height:16px; color:#F59E0B; flex-shrink:0;"></i>
+      <span>${label} low AI confidence for ${esc(vendor)}. Review these carefully before setting verdicts.</span>
+    </div>`;
+  }
+
+  // After render: animate the confidence bars from 0 → target width
+  function animateAiConfBars(){
+    requestAnimationFrame(() => {
+      const fills = document.querySelectorAll('.ai-conf-bar-fill[data-target-width]');
+      fills.forEach((el, i) => {
+        const target = parseFloat(el.getAttribute('data-target-width')) || 0;
+        setTimeout(() => { el.style.width = target + '%'; }, i * 50);
+      });
+    });
+  }
+
+  // Popover
+  function openAiConfPopover(e, scope, vendor, critId){
+    if (e && e.stopPropagation) e.stopPropagation();
+    // Close any other popover first (mutual exclusion)
+    closePqPopover();
+    closeAiConfPopover();
+    const c = getAiConfidence(scope, vendor, critId);
+    if (!c) return;
+    const crit = (scope === 'pq' ? PQ_CRITERIA : TQ_CRITERIA).find(x => x.id === critId);
+    const tier = confidenceTier(c.score);
+    const tierLabel = confidenceTierLabel(tier);
+    const checks = c.checks || aiConfidenceChecksFromScore(c.score);
+    const checkRow = (label, ok) => `<li>${esc(label)}: <span class="${ok?'ok':'no'}">${ok?'✓':'✗'}</span></li>`;
+    const pop = document.getElementById('aiConfPopover');
+    if (!pop) return;
+    pop.className = 'ai-conf-popover tier-' + tier;
+    pop.innerHTML = `<div class="ai-pop-title">AI Confidence — ${esc(crit ? crit.short : critId)}</div>
+      <div class="ai-pop-score-big">${c.score}%</div>
+      <div class="ai-pop-tier">${tierLabel} confidence</div>
+      <div class="ai-pop-divider"></div>
+      <div class="ai-pop-section-label">Why this score:</div>
+      <div class="ai-pop-reason">${esc(c.reason || '')}</div>
+      <div class="ai-pop-divider"></div>
+      <div class="ai-pop-section-label">Based on:</div>
+      <ul class="ai-pop-checks">
+        ${checkRow('Document present',     !!checks.documentPresent)}
+        ${checkRow('Text legible',         !!checks.textLegible)}
+        ${checkRow('Key values extracted', !!checks.keyValuesExtracted)}
+        ${checkRow('Cross-reference match',!!checks.crossReferenceMatch)}
+      </ul>`;
+    pop.classList.remove('hidden');
+    pop.onclick = ev => ev.stopPropagation();
+    // Position relative to clicked cell
+    const trigger = e && e.currentTarget;
+    const rect = (trigger && trigger.getBoundingClientRect) ? trigger.getBoundingClientRect() : null;
+    if (rect){
+      const sx = window.scrollX, sy = window.scrollY;
+      let left = rect.left + sx;
+      let top  = rect.bottom + sy + 6;
+      const w = 240;
+      if (left + w > sx + window.innerWidth - 16) left = sx + window.innerWidth - w - 16;
+      pop.style.left = left + 'px';
+      pop.style.top  = top + 'px';
+    }
+    _uiCurrentOpenPopover = 'confidence';
+    refreshIcons();
+  }
+  function closeAiConfPopover(){
+    const pop = document.getElementById('aiConfPopover');
+    if (pop) pop.classList.add('hidden');
+    if (_uiCurrentOpenPopover === 'confidence') _uiCurrentOpenPopover = null;
+  }
+
+  // Populate confidence stores from the sample data — called by AI pre-screen actions
+  function populatePqConfidence(){
+    EVAL.pqConfidence = EVAL.pqConfidence || {};
+    EVAL.bids.forEach(b => {
+      EVAL.pqConfidence[b.vendor] = EVAL.pqConfidence[b.vendor] || {};
+      PQ_CRITERIA.forEach(c => {
+        const base = (AI_CONF_PQ_BASE[b.vendor] || {})[c.id]
+          || { score: 60 + Math.floor((b.vendor.length + c.id.length * 7) % 30), reason: 'Document quality assessed by AI parser' };
+        EVAL.pqConfidence[b.vendor][c.id] = {
+          score: base.score,
+          reason: base.reason,
+          checks: aiConfidenceChecksFromScore(base.score),
+        };
+      });
+    });
+  }
+  function populateTqConfidence(){
+    EVAL.tqConfidence = EVAL.tqConfidence || {};
+    EVAL.bids.forEach(b => {
+      EVAL.tqConfidence[b.vendor] = EVAL.tqConfidence[b.vendor] || {};
+      TQ_CRITERIA.forEach(c => {
+        const base = AI_CONF_TQ_BASE[c.id] || { score:60, reason:'Document quality assessed by AI parser' };
+        EVAL.tqConfidence[b.vendor][c.id] = {
+          score: base.score,
+          reason: base.reason,
+          checks: aiConfidenceChecksFromScore(base.score),
+        };
+      });
+    });
+  }
+  // TQ autosave to localStorage tqEval_<TND> — includes verdict (numeric) and confidence per the spec'd shape
+  function tqAutosave(){
+    if (!EVAL || !EVAL.tnd) return;
+    const payload = {};
+    EVAL.bids.forEach(b => {
+      const vendor = b.vendor;
+      const m = EVAL.matrix[vendor] || {};
+      payload[vendor] = {};
+      TQ_CRITERIA.forEach(c => {
+        const v = m[c.id];
+        const verdict = typeof v === 'number' ? v : null;
+        const conf = (EVAL.tqConfidence[vendor] || {})[c.id] || null;
+        payload[vendor][c.id] = {
+          verdict,
+          confidence: conf ? { score: conf.score, tier: confidenceTier(conf.score), reason: conf.reason, checks: conf.checks } : null,
+        };
+      });
+    });
+    try { localStorage.setItem('tqEval_' + EVAL.tnd, JSON.stringify(payload)); } catch(e){}
+  }
+
+  // C4 — write PQ matrix + comments + confidence to localStorage in the spec'd shape
+  function pqAutosave(){
+    if (!EVAL || !EVAL.tnd) return;
+    const payload = {};
+    EVAL.bids.forEach(b => {
+      const vendor = b.vendor;
+      const m = EVAL.matrix[vendor] || {};
+      const cs = (EVAL.pqComments && EVAL.pqComments[vendor]) || {};
+      const confs = (EVAL.pqConfidence && EVAL.pqConfidence[vendor]) || {};
+      payload[vendor] = {};
+      PQ_CRITERIA.forEach(c => {
+        const v = m[c.id];
+        const verdict = v === 'clarif' ? 'clarification' : (v || null);
+        const cmt = cs[c.id] || null;
+        const conf = confs[c.id] || null;
+        payload[vendor][c.id] = {
+          verdict,
+          comment: cmt ? cmt.text : null,
+          commentAuthor: cmt ? cmt.author : null,
+          commentDate: cmt ? cmt.date : null,
+          previousVerdict: cmt ? cmt.previousVerdict : null,
+          confidence: conf ? { score: conf.score, tier: confidenceTier(conf.score), reason: conf.reason, checks: conf.checks } : null,
+        };
+      });
+    });
+    try { localStorage.setItem('pqEval_' + EVAL.tnd, JSON.stringify(payload)); } catch(e){}
+  }
+  function pqShowSavedIndicator(){
+    const el = document.getElementById('pqSavedIndicator');
+    if (!el) return;
+    el.classList.add('show');
+    if (_uiPqSavedTimer) clearTimeout(_uiPqSavedTimer);
+    _uiPqSavedTimer = setTimeout(() => { el.classList.remove('show'); }, 2000);
   }
 
   // ===================== CLARIFICATION DRAFT PANEL (Change 2d) =====================
@@ -2760,6 +3458,9 @@ Date: ${esc(fmtDateShort(today))}`;
       PQ_CRITERIA.forEach(c => { EVAL.matrix[b.vendor][c.id] = aiPQ(b.vendor, c.id); });
     });
     EVAL.prescreened = true;
+    // Populate AI confidence scores so the Confidence column lights up
+    populatePqConfidence();
+    pqAutosave();
     renderTechnical(); saveState();
     showToast('AI pre-screened PQ — review and confirm');
   }
@@ -2769,8 +3470,9 @@ Date: ${esc(fmtDateShort(today))}`;
     EVAL.pqConfirmed = true;
     EVAL.expanded = 's3';
     log('PQ Evaluation', 'pq_confirmed', `${EVAL.bids.length} vendors`);
+    pqAutosave(); // C4 — also snapshot to localStorage on confirm
     renderTechnical(); saveState();
-    showToast('PQ Evaluation confirmed — TQ unlocked');
+    showToast('PQ Evaluation saved'); // C4 — final save toast
   }
 
   // ----- Section 03 — TQ Evaluation -----
@@ -2841,10 +3543,11 @@ Date: ${esc(fmtDateShort(today))}`;
       ${vendorTabsHTML('tq')}
       ${presBlock}
       <div class="text-[13.5px] font-bold text-ink-900 mb-2">${esc(vendor)}</div>
+      ${lowConfidenceBannerHTML('tq', vendor)}
       <div style="border:1px solid #E5E7EB; border-radius:12px; overflow:hidden;">
         <table class="tq-comm-table" style="table-layout:fixed;">
-          <colgroup><col style="width:22%"><col style="width:9%"><col style="width:13%"><col style="width:13%"><col style="width:13%"><col style="width:13%"><col style="width:17%"></colgroup>
-          <thead><tr><th>Criterion</th><th>Max marks</th>${COMMITTEE_MEMBERS.map(memHeader).join('')}<th>Average</th><th>Verdict</th></tr></thead>
+          <colgroup><col style="width:18%"><col style="width:7%"><col style="width:11%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:16%"></colgroup>
+          <thead><tr><th>Criterion</th><th>Max marks</th><th title="AI confidence score — how certain the AI is about its assessment based on the uploaded document quality and completeness"><i data-lucide="sparkles" style="width:11px; height:11px; display:inline-block; vertical-align:-1px; margin-right:3px; color:#9CA3AF;"></i>AI Confidence</th>${COMMITTEE_MEMBERS.map(memHeader).join('')}<th>Average</th><th>Verdict</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
         ${(function(){
@@ -2999,9 +3702,11 @@ Date: ${esc(fmtDateShort(today))}`;
     const verdictCell = avg != null
       ? `<td class="tq-verdict" data-verdict-cell="${esc(vendor)}|${c.id}"><span class="pill ${verdictTier(avg, c.max)}">${avg.toFixed(1)}</span></td>`
       : `<td class="tq-verdict" data-verdict-cell="${esc(vendor)}|${c.id}"><span class="pill pending">Pending</span></td>`;
+    const aiConfCell = aiConfCellHTML('tq', vendor, c.id);
     return `<tr>
       <td><div style="font-weight:600; color:#111827; font-size:14px;">${esc(c.short)}</div><div style="font-size:12px; color:#6B7280; margin-top:2px;">${esc(c.full)}</div></td>
       <td><span style="font-size:13px; color:#374151;">${c.max}</span></td>
+      ${aiConfCell}
       ${COMMITTEE_MEMBERS.map(cellHTML).join('')}
       ${avgCell}
       ${verdictCell}
@@ -3197,6 +3902,9 @@ Date: ${esc(fmtDateShort(today))}`;
       EVAL.matrix[b.vendor] = EVAL.matrix[b.vendor] || {};
       TQ_CRITERIA.forEach(c => { EVAL.matrix[b.vendor][c.id] = aiTQ(b.vendor, c.id); });
     });
+    // Populate AI confidence scores for TQ
+    populateTqConfidence();
+    tqAutosave();
     renderTechnical(); saveState();
     showToast('AI pre-scored TQ — review and confirm');
   }
@@ -4976,6 +5684,12 @@ Date: ${esc(fmtDateShort(today))}`;
   try { _uiPresNotes = sessionStorage.getItem('presNotesVisible') === '1'; } catch(e){}
   // Transient per-cell edit state for Member 1 TQ scores (Fix 3). Keyed `${vendor}|${critId}`.
   let _uiEditingScores = {};
+  // C1 — PQ vendor dropdown open flag (transient — not persisted)
+  let _uiPqVendorDdOpen = false;
+  // C3 — expanded change-comment cells (per vendor|critId) — Read more / Read less per cell
+  let _uiPqCommentsExpanded = new Set();
+  // C4 — "Saved ✓" indicator timer
+  let _uiPqSavedTimer = null;
   function renderAuditBadge(){
     const b = document.getElementById('auditBadge');
     if (!b || !EVAL) return;
@@ -5569,14 +6283,19 @@ Date: ${esc(fmtDateShort(today))}`;
     const pop = document.getElementById('cellPopover');
     if (pop && !pop.classList.contains('hidden') && !pop.contains(e.target) && !e.target.closest('.matrix-cell')) closeCell();
     const pq = document.getElementById('pqPopover');
-    if (pq && !pq.classList.contains('hidden') && !pq.contains(e.target) && !e.target.closest('.verdict-trigger')) closePqPopover();
+    if (pq && !pq.classList.contains('hidden') && !pq.contains(e.target) && !e.target.closest('.verdict-trigger') && !e.target.closest('.verdict-empty-chip')) closePqPopover();
+    // AI confidence popover — close on outside-click
+    const ac = document.getElementById('aiConfPopover');
+    if (ac && !ac.classList.contains('hidden') && !ac.contains(e.target) && !e.target.closest('.ai-conf-cell')) closeAiConfPopover();
+    // C1 — Close PQ vendor dropdown on outside-click
+    if (_uiPqVendorDdOpen && !e.target.closest('.pq-vendor-dd')) closePqVendorDropdown();
     // Close any open committee role dropdown when clicking outside it
     if (_comOpenRoleDropdown && !e.target.closest('.com-role-dropdown') && !e.target.closest('.com-role-pill')){
       closeRoleDropdown();
     }
   });
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape'){ closeCell(); closeDrawer(); closeBidDoc(); closePqPopover(); closeClarPanel(); closeEvidencePanel(); closeVideoModal(); closeAuditPanel(); cancelMethodSwitch(); cancelReevalStrip(); closeRoleDropdown(); cancelRemoveMember(); cancelSignoffConfirm(); if (pendingRevealVendor) resetPendingReveal(pendingRevealVendor); }
+    if (e.key === 'Escape'){ closeCell(); closeDrawer(); closeBidDoc(); closePqPopover(); closeAiConfPopover(); closeClarPanel(); closeEvidencePanel(); closeVideoModal(); closeAuditPanel(); cancelMethodSwitch(); cancelReevalStrip(); closeRoleDropdown(); cancelRemoveMember(); cancelSignoffConfirm(); closePqVendorDropdown(); if (pendingRevealVendor) resetPendingReveal(pendingRevealVendor); }
   });
 
   (function boot(){
