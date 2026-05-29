@@ -289,6 +289,58 @@
     .dpr-section-mini-toolbar button:hover { background: #F3F4F6; color: #111827; }
     .dpr-section-done-link { position: absolute; bottom: 8px; right: 12px; font-size: 12px; color: #10B981; font-weight: 600; cursor: pointer; z-index: 5; background: transparent; border: none; }
     .dpr-section-done-link:hover { text-decoration: underline; }
+
+    /* ===== AI Suggestions ===== */
+    .ai-suggestion-strip { background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 8px; padding: 8px 12px; margin-top: 6px; display: flex; align-items: center; gap: 8px; font-size: 12px; color: #0C447C; transition: opacity 200ms ease, max-height 200ms ease, margin 200ms ease, padding 200ms ease; overflow: hidden; }
+    .ai-suggestion-strip.dismissing { opacity: 0; max-height: 0; margin-top: 0; padding-top: 0; padding-bottom: 0; }
+    .ai-suggestion-strip .suggestion-text { flex: 1; color: #1D4ED8; line-height: 1.4; }
+    .ai-suggestion-strip .ai-spark { width: 13px; height: 13px; color: #0F5EE8; flex-shrink: 0; }
+    .ai-suggestion-strip .btn-apply-suggestion { background: #0F5EE8; color: white; border: none; border-radius: 6px; padding: 3px 10px; font-size: 11px; cursor: pointer; transition: background .15s ease; white-space: nowrap; }
+    .ai-suggestion-strip .btn-apply-suggestion:hover { background: #0B4BC4; }
+    .ai-suggestion-strip .btn-dismiss-suggestion { background: none; border: none; color: #9CA3AF; font-size: 13px; cursor: pointer; padding: 0 4px; transition: color .15s ease; }
+    .ai-suggestion-strip .btn-dismiss-suggestion:hover { color: #6B7280; }
+    @keyframes aiFieldFlash { from { background: #FFFBEB; } to { background: white; } }
+    .ai-field-flash { animation: aiFieldFlash 600ms ease; }
+    .ai-genned-note { font-size: 11px; color: #92400E; font-style: italic; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+    .ai-sparkle-btn { background: white; border: 1px solid #BFDBFE; border-radius: 6px; padding: 5px 10px; font-size: 12px; color: #0F5EE8; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; transition: background .15s ease, border-color .15s ease; font-weight: 500; }
+    .ai-sparkle-btn:hover { background: #EFF6FF; border-color: #93C5FD; }
+    .ai-sparkle-btn:disabled { opacity: 0.6; cursor: wait; }
+    .ai-sparkle-btn .ai-spinner { width: 12px; height: 12px; border: 1.5px solid #BFDBFE; border-top-color: #0F5EE8; border-radius: 50%; animation: aiSpin 1s linear infinite; }
+    @keyframes aiSpin { to { transform: rotate(360deg); } }
+    /* BOQ standard items panel — absolutely positioned dropdown */
+    .boq-std-wrap { position: relative; display: inline-block; }
+    .boq-std-panel { position: absolute; top: calc(100% + 4px); right: 0; width: 360px; background: white; border: 1px solid #E5E7EB; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); z-index: 50; padding: 14px 16px; max-height: 420px; overflow-y: auto; }
+    .boq-std-panel h4 { font-size: 13px; font-weight: 700; color: #111827; margin-bottom: 10px; }
+    .boq-std-panel .row { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-bottom: 1px solid #F3F4F6; font-size: 12.5px; }
+    .boq-std-panel .row:last-child { border-bottom: none; }
+    .boq-std-panel .row input[type="checkbox"] { margin-top: 3px; accent-color: #0F5EE8; flex-shrink: 0; }
+    .boq-std-panel .row .desc { flex: 1; color: #111827; }
+    .boq-std-panel .row .meta { font-size: 11px; color: #9CA3AF; margin-top: 1px; }
+    .boq-std-panel .actions { display: flex; justify-content: flex-end; margin-top: 12px; gap: 6px; }
+    .boq-std-panel .btn-add { background: #0F5EE8; color: white; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .boq-std-panel .btn-add:hover { background: #0B4BC4; }
+    .boq-std-panel .btn-cancel { background: transparent; border: none; color: #6B7280; font-size: 12px; cursor: pointer; padding: 6px 10px; }
+    /* AI readiness check card (Step 5) */
+    .ai-readiness-card { background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; }
+    .ai-readiness-card h3 { font-size: 14px; font-weight: 700; color: #111827; display: flex; align-items: center; gap: 6px; }
+    .ai-readiness-card .sub { font-size: 13px; color: #6B7280; margin-top: 4px; }
+    .ai-readiness-card .items { margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .ai-readiness-card .check-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: 8px; font-size: 13px; }
+    .ai-readiness-card .check-item.ok { background: #F0FDF4; color: #065F46; }
+    .ai-readiness-card .check-item.warn { background: #FFFBEB; color: #92400E; }
+    .ai-readiness-card .check-item.info { background: #EFF6FF; color: #0C447C; }
+    .ai-readiness-card .check-item .ci-text { flex: 1; line-height: 1.5; }
+    .ai-readiness-card .check-item .ci-link { background: transparent; border: none; padding: 0; color: #0F5EE8; font-size: 12px; cursor: pointer; font-weight: 600; }
+    .ai-readiness-card .check-item .ci-link:hover { text-decoration: underline; }
+    .ai-readiness-card .dismiss-all { background: transparent; border: none; color: #9CA3AF; font-size: 12px; cursor: pointer; padding: 0; margin-top: 12px; }
+    .ai-readiness-card .dismiss-all:hover { color: #6B7280; }
+    /* DPR Summary generator */
+    .ai-summary-box { background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 16px 18px; margin-top: 16px; position: relative; }
+    .ai-summary-box .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .ai-summary-box .header h4 { font-size: 13px; font-weight: 700; color: #111827; }
+    .ai-summary-box .copy-btn { background: transparent; border: 1px solid #E5E7EB; color: #6B7280; border-radius: 6px; padding: 4px 10px; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+    .ai-summary-box .copy-btn:hover { color: #0F5EE8; border-color: #0F5EE8; }
+    .ai-summary-box textarea { width: 100%; min-height: 160px; border: 1px solid #D1D5DB; border-radius: 8px; padding: 10px 12px; font-size: 13px; font-family: inherit; line-height: 1.6; resize: vertical; }
   </style>
 </head>
 <body class="min-h-screen">
@@ -1908,6 +1960,485 @@
 
   // ===================== FORM (Steps 1-5) =====================
   const FORM_STEPS = ['Project Details','Scope & Location','BOQ & Estimates','Team & Drawings','Review & Submit'];
+  // ===================== AI SUGGESTIONS — rules-based, no backend =====================
+  // Session-level tracking of which suggestions have been applied or dismissed.
+  // Survives form re-renders within the session but resets on browser close.
+  function aiIsApplied(id){   try { return sessionStorage.getItem('dprAiApplied_' + id) === '1'; } catch(e){ return false; } }
+  function aiIsDismissed(id){ try { return sessionStorage.getItem('dprAiDismissed_' + id) === '1'; } catch(e){ return false; } }
+  function aiMarkApplied(id){ try { sessionStorage.setItem('dprAiApplied_' + id, '1'); } catch(e){} }
+  function aiMarkDismissed(id){ try { sessionStorage.setItem('dprAiDismissed_' + id, '1'); } catch(e){} }
+  // Generate the inline suggestion strip HTML. Returns '' when suppressed (applied/dismissed/no-data).
+  function aiSuggestionStripHTML(id, suggestionText, applyJs, fieldLabel){
+    if (!suggestionText) return '';
+    if (aiIsApplied(id) || aiIsDismissed(id)) return '';
+    const fl = fieldLabel || id;
+    return `<div id="ai-strip-${id}" class="ai-suggestion-strip" data-field="${id}" role="status" aria-live="polite">
+      <i data-lucide="sparkles" class="ai-spark" aria-hidden="true"></i>
+      <span class="suggestion-text">${suggestionText}</span>
+      <button type="button" class="btn-apply-suggestion" aria-label="Apply AI suggestion for ${esc(fl)}" onclick="aiApplyStrip('${id}', (function(){ ${applyJs} })())">Apply ✓</button>
+      <button type="button" class="btn-dismiss-suggestion" aria-label="Dismiss AI suggestion for ${esc(fl)}" onclick="aiDismissStrip('${id}')">✕</button>
+    </div>`;
+  }
+  // Wired onto Apply ✓ — receives a value (or true) from the apply expression, dispatches by field id.
+  function aiApplyStrip(id, value){
+    // Field-specific application logic — id names map to FORM_STATE keys or DOM ids
+    if (id === 'title'){
+      FORM_STATE.title = value;
+      const el = document.getElementById('dprTitle'); if (el){ el.value = value; el.classList.add('ai-field-flash'); el.focus(); setTimeout(() => el.classList.remove('ai-field-flash'), 700); }
+    } else if (id === 'estCost'){
+      FORM_STATE.estCost = String(value);
+      const el = document.getElementById('dprEstCost'); if (el){ el.value = value; el.classList.add('ai-field-flash'); el.focus(); setTimeout(() => el.classList.remove('ai-field-flash'), 700); }
+    } else if (id === 'duration'){
+      FORM_STATE.duration = value;
+    } else if (id === 'funding'){
+      FORM_STATE.funding = value;
+    } else if (id === 'contingency'){
+      FORM_STATE.contingency = Number(value) || 0;
+      const el = document.getElementById('dprBoqContingency'); if (el){ el.value = value; el.classList.add('ai-field-flash'); setTimeout(() => el.classList.remove('ai-field-flash'), 700); }
+      if (typeof recalcBoq === 'function') recalcBoq();
+    } else if (id === 'location-format'){
+      FORM_STATE.ward = value;
+    }
+    aiMarkApplied(id);
+    aiAnimateStripOut(id);
+    // Re-render current step to reflect applied state and sync downstream suggestions
+    const step = (location.hash || '').match(/step(\d)/);
+    if (step && typeof renderForm === 'function') setTimeout(() => renderForm(parseInt(step[1], 10)), 220);
+  }
+  function aiDismissStrip(id){ aiMarkDismissed(id); aiAnimateStripOut(id); }
+  function aiAnimateStripOut(id){
+    const el = document.getElementById('ai-strip-' + id);
+    if (el){ el.classList.add('dismissing'); setTimeout(() => el.remove(), 220); }
+  }
+
+  // ----- Sector classification helper -----
+  // Maps the rich Sector dropdown values to coarser AI-template buckets
+  function aiSectorBucket(){
+    const t = (FORM_STATE.type || '').toLowerCase();
+    const s = (FORM_STATE.sector || '').toLowerCase();
+    const sc = (stripHtml(FORM_STATE.scope || '') || FORM_STATE.title || '').toLowerCase();
+    if (/water/.test(s) || /pipeline|pipe|water/.test(sc)) return 'water';
+    if (/road|infrastructure/.test(s) && /road|resurfac|bitum|sdbc/.test(sc + t)) return 'road';
+    if (/infrastructure/.test(s) && /road|resurfac|repair/.test(sc + t)) return 'road';
+    if (/it|digital|software/.test(s) || /computer|desktop|laptop|software/.test(sc + t)) return 'it';
+    if (/supply of goods|goods/.test(t)) return 'goods';
+    if (/services/.test(t) || /manpower|maintenance|security/.test(sc + t)) return 'services';
+    if (/parks|gardens|urban|education|health/.test(s) && /building|renovation/.test(sc + t)) return 'building';
+    if (/road/.test(sc + t)) return 'road';
+    return 'works'; // generic civil works
+  }
+
+  // ----- Title templates -----
+  function aiSuggestedTitle(){
+    if (FORM_STATE.title) return '';
+    const bucket = aiSectorBucket();
+    const loc = FORM_STATE.ward || FORM_STATE.taluka || FORM_STATE.district || '';
+    if (!FORM_STATE.dept || !FORM_STATE.sector) return '';
+    if (bucket === 'road' && loc) return `Road Resurfacing and Repair — ${loc}, ${FORM_STATE.fy || 'FY 2026-27'}`;
+    if (bucket === 'water' && loc) return `Water Supply Pipeline Installation — ${loc}, ${FORM_STATE.fy || 'FY 2026-27'}`;
+    if (bucket === 'it')   return `Supply of IT Equipment for ${FORM_STATE.dept} Offices — ${FORM_STATE.fy || 'FY 2026-27'}`;
+    if (bucket === 'goods')return `Supply of Goods for ${FORM_STATE.dept} — ${FORM_STATE.fy || 'FY 2026-27'}`;
+    if (bucket === 'building' && loc) return `Building Renovation Works — ${loc}, ${FORM_STATE.fy || 'FY 2026-27'}`;
+    if (loc) return `Infrastructure Improvement Works — ${loc}, ${FORM_STATE.fy || 'FY 2026-27'}`;
+    return '';
+  }
+
+  // ----- Cost range templates -----
+  function aiSuggestedCostRange(){
+    if (FORM_STATE.estCost) return '';
+    if (!FORM_STATE.sector) return '';
+    const bucket = aiSectorBucket();
+    if (bucket === 'road')     return { range:'₹15L–₹25L per km', label:'Road resurfacing per km' };
+    if (bucket === 'water')    return { range:'₹8L–₹15L per km', label:'Water pipeline per km' };
+    if (bucket === 'it')       return { range:'₹40,000–₹44,000 per desktop', label:'IT equipment per unit' };
+    if (bucket === 'building') return { range:'₹800–₹1,200 per sqft', label:'Building renovation per sqft' };
+    if (bucket === 'goods')    return { range:'depends on item & quantity', label:'Supply of Goods' };
+    return { range:'₹10L–₹2Cr', label:'civil works of this scale' };
+  }
+
+  // ----- Duration templates -----
+  function aiSuggestedDuration(){
+    if (FORM_STATE.duration) return '';
+    if (!FORM_STATE.sector) return '';
+    const bucket = aiSectorBucket();
+    const p = FORM_STATE.priorityFlag || 'routine';
+    if (p === 'emergency') return '3 Months';
+    if (bucket === 'road')     return '6 Months';
+    if (bucket === 'water')    return '1 Year';
+    if (bucket === 'building') return '1 Year';
+    if (bucket === 'it' || bucket === 'goods') return '3 Months';
+    if (bucket === 'services') return '1 Year';
+    return '6 Months';
+  }
+
+  // ----- Funding source templates -----
+  function aiSuggestedFunding(){
+    if (FORM_STATE.funding) return '';
+    if (!FORM_STATE.dept || !FORM_STATE.sector) return '';
+    const bucket = aiSectorBucket();
+    if (bucket === 'water')    return 'Jal Jeevan Mission';
+    if (bucket === 'road')     return 'State Finance Commission';
+    if (bucket === 'it')       return 'Smart Cities Mission';
+    if (bucket === 'building') return 'AMRUT';
+    return 'State Own Funds';
+  }
+
+  // ----- Budget Head suggestions -----
+  function aiSuggestedBudgetHeads(){
+    const bucket = aiSectorBucket();
+    if (bucket === 'road') return [
+      { code:'3054', label:'Roads and Bridges' },
+      { code:'3054-00-101', label:'District Roads' },
+      { code:'3054-00-337', label:'Road Works Under AMRUT' },
+    ];
+    if (bucket === 'water') return [
+      { code:'4215', label:'Capital Outlay on Water Supply' },
+      { code:'2215', label:'Water Supply and Sanitation' },
+    ];
+    if (bucket === 'it' || bucket === 'goods') return [
+      { code:'2052', label:'Secretariat and General Administration' },
+      { code:'4216', label:'Capital Outlay on Housing' },
+      { code:'2070', label:'Other Admin Services' },
+    ];
+    if (bucket === 'building') return [
+      { code:'4059', label:'Capital Outlay on Public Works' },
+      { code:'2059', label:'Public Works' },
+    ];
+    return [
+      { code:'2059', label:'Public Works' },
+      { code:'4059', label:'Capital Outlay on Public Works' },
+    ];
+  }
+  // ----- Scope of work templates -----
+  function aiSuggestedScope(){
+    const bucket = aiSectorBucket();
+    const loc = FORM_STATE.ward || FORM_STATE.taluka || FORM_STATE.district || '[Location]';
+    if (bucket === 'road') return `<p>The scope of work includes resurfacing and repair of approximately <strong>[X] km</strong> of road in ${esc(loc)}. The work involves removal of damaged bituminous surface, preparation of sub-base, application of prime coat, laying of bituminous macadam (BM) course, and finishing with semi-dense bituminous concrete (SDBC). The work also includes repair of potholes, edge repairs, and any drainage work as directed by the Engineer-in-Charge.</p>`;
+    if (bucket === 'water')return `<p>The scope of work includes design, supply, and installation of <strong>[X] km</strong> of water supply pipeline of <strong>[diameter] mm</strong> dia. from <strong>[source]</strong> to <strong>[destination]</strong> in ${esc(loc)}. The work includes excavation, laying of pipes, jointing, testing and commissioning, restoration of road surface, and all allied civil and mechanical works.</p>`;
+    if (bucket === 'it')   return `<p>The scope of work includes supply, delivery, installation, and commissioning of <strong>[X] desktop computers</strong> with peripherals at <strong>${esc(FORM_STATE.dept || '[Department]')}</strong> offices across ${esc(loc)}. The work includes unpacking, installation of operating system and licensed software as specified, connectivity testing, user acceptance testing, and handover to departmental staff. On-site warranty support for <strong>3 years</strong> from date of acceptance.</p>`;
+    if (bucket === 'building') return `<p>The scope of work includes renovation and repair of <strong>[building name]</strong> at ${esc(loc)}. The work includes civil works (plastering, flooring, waterproofing), electrical works (wiring, fixtures, panels), plumbing works, painting, and carpentry as per the drawings and specifications.</p>`;
+    if (bucket === 'goods')return `<p>The scope of work includes supply, delivery, installation and commissioning of <strong>[X] units</strong> of <strong>[Item]</strong> at <strong>${esc(FORM_STATE.dept || '[Department]')}</strong> offices in ${esc(loc)}. The work includes warranty support, training of departmental staff, and handover documentation.</p>`;
+    if (bucket === 'services') return `<p>The scope of work includes provision of <strong>[Service description]</strong> for <strong>${esc(FORM_STATE.dept || '[Department]')}</strong> at ${esc(loc)} for the contract period. The scope covers all operational deliverables, supervisory staff, equipment, statutory compliances, and reporting requirements as detailed in the technical specifications.</p>`;
+    return `<p>The scope of work includes <strong>[describe work]</strong> at ${esc(loc)} as per the drawings, specifications and bill of quantities annexed to this Detailed Project Report.</p>`;
+  }
+
+  // ----- Need justification templates -----
+  function aiSuggestedJustification(){
+    const bucket = aiSectorBucket();
+    const loc = FORM_STATE.ward || FORM_STATE.taluka || FORM_STATE.district || '[Location]';
+    if (bucket === 'road')  return `The existing road surface in ${loc} has deteriorated significantly due to heavy traffic and monsoon damage. Potholes and surface cracks have rendered the road unsafe for commuters and are causing damage to vehicles. The proposed repair work is essential to ensure road safety, reduce vehicle operating costs, and improve connectivity for residents of ${loc}.`;
+    if (bucket === 'water') return `The existing water supply infrastructure in ${loc} is over a decade old and has been experiencing frequent leakages and contamination issues. The proposed pipeline installation will improve water supply reliability, reduce non-revenue water losses, and provide safe drinking water to approximately [X] households.`;
+    if (bucket === 'it')    return `The existing computers at ${FORM_STATE.dept || 'the department'} offices are over five years old and have become technically obsolete. They are unable to support current software requirements resulting in operational inefficiency. The procurement of new computers is essential to maintain office productivity and support digital governance initiatives.`;
+    if (bucket === 'building') return `The existing building requires renovation due to ageing infrastructure, water damage, and increased occupancy load. The proposed works are essential to maintain workspace safety, comply with statutory norms, and provide an environment conducive to citizen service delivery.`;
+    if (bucket === 'goods') return `The current equipment stock at ${FORM_STATE.dept || 'the department'} is insufficient to meet the operational demand of the financial year. The proposed procurement will close the gap, improve service delivery turn-around, and reduce reliance on outsourced support.`;
+    if (bucket === 'services') return `Provision of the proposed services is essential to ensure uninterrupted operational continuity for ${FORM_STATE.dept || 'the department'}. The current internal capacity is insufficient to meet the service-level requirements without external augmentation.`;
+    return `The proposed work is essential to address operational requirements that cannot be deferred to a subsequent financial year. Delay would compromise service delivery and increase long-term costs.`;
+  }
+
+  // ----- Standard BOQ items by sector -----
+  function aiStandardBoqItems(){
+    const bucket = aiSectorBucket();
+    if (bucket === 'road') return [
+      { desc:'Excavation in hard soil',      unit:'Cum', rate:185 },
+      { desc:'Sub-base course (WBM)',        unit:'Cum', rate:2800 },
+      { desc:'Prime coat with bitumen',      unit:'Sqm', rate:45 },
+      { desc:'Bituminous macadam (BM)',      unit:'MT',  rate:48000 },
+      { desc:'SDBC 25mm',                    unit:'MT',  rate:52000 },
+      { desc:'Concrete kerb',                unit:'RMT', rate:850 },
+      { desc:'Earth compaction',             unit:'Cum', rate:95 },
+    ];
+    if (bucket === 'it') return [
+      { desc:'Desktop Computer (Core i5, 8GB, 512GB SSD)', unit:'No.', rate:42000 },
+      { desc:'Monitor 21.5" FHD',                          unit:'No.', rate:8500 },
+      { desc:'Keyboard & Mouse (wireless)',                unit:'Set', rate:800 },
+      { desc:'UPS 600VA',                                  unit:'No.', rate:3200 },
+      { desc:'Installation & commissioning',               unit:'No.', rate:500 },
+      { desc:'3-year on-site warranty',                    unit:'No.', rate:4500 },
+    ];
+    if (bucket === 'water') return [
+      { desc:'Excavation in ordinary soil', unit:'Cum', rate:120 },
+      { desc:'PVC pipe 110mm dia',          unit:'RMT', rate:450 },
+      { desc:'PVC pipe 160mm dia',          unit:'RMT', rate:680 },
+      { desc:'Laying and jointing pipes',   unit:'RMT', rate:85 },
+      { desc:'Gate valve 100mm',            unit:'No.', rate:4500 },
+      { desc:'Road restoration',            unit:'Sqm', rate:220 },
+    ];
+    if (bucket === 'building') return [
+      { desc:'Cement plaster 12mm',         unit:'Sqm', rate:185 },
+      { desc:'Vitrified tile flooring',     unit:'Sqm', rate:850 },
+      { desc:'Internal painting (acrylic emulsion)', unit:'Sqm', rate:78 },
+      { desc:'Electrical wiring per point', unit:'No.', rate:1200 },
+      { desc:'Aluminium window with glazing',unit:'Sqm', rate:2400 },
+    ];
+    return [
+      { desc:'General civil works',         unit:'LS',  rate:0 },
+    ];
+  }
+
+  // ----- BOQ row rate detection (case-insensitive description matching) -----
+  function aiRateRangeFor(desc){
+    const d = (desc || '').toLowerCase();
+    if (!d) return null;
+    if (d.includes('bitum') || d.includes('macadam') || d.includes('sdbc') || (d.includes(' bm ') || d.startsWith('bm ') || d.endsWith(' bm')))
+      return { range:'₹48,000–₹52,000/MT', mid:50000, source:'Maharashtra PWD DSR 2025-26' };
+    if (d.includes('excavation'))
+      return { range:'₹120–₹185/Cum', mid:152, source:'Maharashtra PWD DSR 2025-26' };
+    if (d.includes('computer') || d.includes('desktop'))
+      return { range:'₹41,000–₹44,000/No.', mid:42500, source:'GeM benchmark FY 2025-26' };
+    if (d.includes('monitor'))
+      return { range:'₹7,500–₹9,000/No.', mid:8250, source:'GeM benchmark FY 2025-26' };
+    if (d.includes('pipe') && d.includes('110'))
+      return { range:'₹420–₹480/RMT', mid:450, source:'CPWD DSR 2025' };
+    if (d.includes('pipe') && d.includes('160'))
+      return { range:'₹650–₹720/RMT', mid:680, source:'CPWD DSR 2025' };
+    if (d.includes('concrete') && (d.includes('m20') || d.includes('m-20')))
+      return { range:'₹5,800–₹6,800/Cum', mid:6300, source:'Maharashtra PWD DSR 2025-26' };
+    if (d.includes('plaster'))
+      return { range:'₹170–₹200/Sqm', mid:185, source:'Maharashtra PWD DSR 2025-26' };
+    if (d.includes('paint'))
+      return { range:'₹70–₹90/Sqm', mid:80, source:'Maharashtra PWD DSR 2025-26' };
+    return null;
+  }
+  function aiSuggestedContingency(){
+    const bucket = aiSectorBucket();
+    if (bucket === 'goods') return 2;
+    if (bucket === 'services') return 3;
+    if (bucket === 'it') return 5;
+    return 5; // works default
+  }
+
+  // ----- Team templates -----
+  function aiSuggestedTeam(){
+    const bucket = aiSectorBucket();
+    if (bucket === 'water') return [
+      { role:'Project Manager',     name:'', desig:'B.Tech Civil/Mechanical · 5 yrs · Full-time', contact:'' },
+      { role:'Pipeline Engineer',   name:'', desig:'B.Tech Civil · 3 yrs · Full-time', contact:'' },
+      { role:'Plumbing Supervisor', name:'', desig:'ITI/Diploma · 2 yrs · Full-time', contact:'' },
+    ];
+    if (bucket === 'it' || bucket === 'goods') return [
+      { role:'Project Manager',            name:'', desig:'B.Tech Computer Science · 5 yrs · Full-time', contact:'' },
+      { role:'Technical Support Engineer', name:'', desig:'Diploma IT · 2 yrs · Full-time', contact:'' },
+      { role:'Delivery Coordinator',       name:'', desig:'Any graduate · 1 yr · As required', contact:'' },
+    ];
+    // default: works
+    return [
+      { role:'Project Manager',           name:'', desig:'B.Tech Civil · 5 yrs · Full-time', contact:'' },
+      { role:'Site Engineer',             name:'', desig:'Diploma or B.Tech Civil · 3 yrs · Full-time', contact:'' },
+      { role:'Quality Control Engineer',  name:'', desig:'Civil/Materials · 2 yrs · As required', contact:'' },
+      { role:'Safety Officer',            name:'', desig:'Safety Diploma · 2 yrs · Full-time', contact:'' },
+    ];
+  }
+  // ----- Drawings checklist by sector -----
+  function aiSuggestedDrawings(){
+    const bucket = aiSectorBucket();
+    if (bucket === 'road') return ['Site location map','Longitudinal section (L-section)','Cross-sectional drawing','Existing road condition photographs','Pavement design details'];
+    if (bucket === 'water')return ['Route map / alignment plan','Pipeline profile drawing','Typical cross-section','Valve chamber details','Existing infrastructure drawing'];
+    if (bucket === 'it' || bucket === 'goods') return ['Floor plan of office locations','Network layout diagram','Existing IT infrastructure map'];
+    if (bucket === 'building') return ['Floor plan','Elevation drawing','Cross-section','Electrical layout','Plumbing layout'];
+    return ['Site location map'];
+  }
+
+  // ===== Sparkle button helper (section-level AI fill) =====
+  function aiSparkleBtn(label, onclickJs, id){
+    const _id = id || 'spark-' + Math.random().toString(36).slice(2,8);
+    return `<button type="button" id="${_id}" class="ai-sparkle-btn" onclick="aiRunSparkle('${_id}', function(){ ${onclickJs} })"><i data-lucide="sparkles" style="width:12px; height:12px;"></i> ${esc(label)}</button>`;
+  }
+  function aiRunSparkle(btnId, fn){
+    const btn = document.getElementById(btnId);
+    if (!btn || btn.disabled) return;
+    const orig = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="ai-spinner" aria-hidden="true"></span> Generating...';
+    setTimeout(() => {
+      try { fn(); } finally {
+        // The fn typically re-renders the form, so btn may no longer exist
+        const btn2 = document.getElementById(btnId);
+        if (btn2){ btn2.disabled = false; btn2.innerHTML = orig; }
+      }
+    }, 800);
+  }
+
+  // ===== Section-level AI fillers (called from sparkle buttons) =====
+  function aiFillScope(){
+    const t = aiSuggestedScope();
+    FORM_STATE.scope = t;
+    renderForm(2);
+    showToast('Scope draft generated — review and edit');
+  }
+  function aiFillJustification(){
+    FORM_STATE.need = aiSuggestedJustification();
+    renderForm(2);
+    showToast('Justification draft generated — review and edit');
+  }
+  function aiFillTeam(){
+    const team = aiSuggestedTeam();
+    FORM_STATE.team = team;
+    renderForm(4);
+    showToast('Team roles suggested — review and edit');
+  }
+  let _aiDrawingsChecklistOpen = false;
+  function aiToggleDrawingsChecklist(){
+    _aiDrawingsChecklistOpen = !_aiDrawingsChecklistOpen;
+    renderForm(4);
+  }
+  function aiAddDrawingFromChecklist(label){
+    FORM_STATE.files.push({ name: label.replace(/\s+/g,'_').toLowerCase() + '.pdf', size:'—', type:'Site Drawing' });
+    renderForm(4);
+    showToast('"' + label + '" added to drawings — upload the file');
+  }
+
+  // ----- BOQ standard items panel (toggle dropdown) -----
+  let _aiBoqPanelOpen = false;
+  let _aiBoqPanelSelected = new Set();
+  function aiToggleBoqStdPanel(){
+    _aiBoqPanelOpen = !_aiBoqPanelOpen;
+    if (!_aiBoqPanelOpen) _aiBoqPanelSelected.clear();
+    renderForm(3);
+  }
+  function aiBoqStdToggleItem(idx){
+    if (_aiBoqPanelSelected.has(idx)) _aiBoqPanelSelected.delete(idx); else _aiBoqPanelSelected.add(idx);
+  }
+  function aiBoqStdAddSelected(){
+    const items = aiStandardBoqItems();
+    Array.from(_aiBoqPanelSelected).forEach(i => {
+      const it = items[i]; if (!it) return;
+      FORM_STATE.boq.push({ desc: it.desc, unit: it.unit, qty: 0, rate: it.rate, dsr: it.rate });
+    });
+    _aiBoqPanelOpen = false;
+    _aiBoqPanelSelected.clear();
+    renderForm(3);
+    showToast('Standard items added — fill in quantities');
+  }
+  // ===== Step 5 — AI readiness check (auto-runs on Step 5 load) =====
+  function aiRunReadinessCheck(){
+    const sub = document.getElementById('aiReadinessSub');
+    const wrap = document.getElementById('aiReadinessItems');
+    if (!wrap) return;
+    setTimeout(() => {
+      const checks = aiBuildReadinessChecks();
+      if (sub) sub.textContent = checks.filter(c => c.kind !== 'ok').length + ' suggestion' + (checks.filter(c => c.kind !== 'ok').length===1?'':'s') + ' to improve your DPR before submission';
+      wrap.innerHTML = checks.map(c => `<div class="check-item ${c.kind}">
+        <i data-lucide="${c.kind==='ok'?'check-circle-2':c.kind==='warn'?'alert-triangle':'sparkles'}" style="width:14px; height:14px; flex-shrink:0; margin-top:1px;"></i>
+        <div class="ci-text">${c.text}</div>
+        ${c.linkLabel ? `<button class="ci-link" onclick="${esc(c.linkAction || '')}">${esc(c.linkLabel)} →</button>` : ''}
+      </div>`).join('') + '<button class="dismiss-all" type="button" onclick="aiDismissReadinessAll()">Dismiss all suggestions</button>';
+      refreshIcons();
+    }, 1000);
+  }
+  function aiDismissReadinessAll(){
+    const card = document.getElementById('aiReadinessCard');
+    if (card) card.style.display = 'none';
+  }
+  function aiBuildReadinessChecks(){
+    const out = [];
+    const f = FORM_STATE;
+    // --- Completeness ---
+    const me = f.marketEnquiry || {};
+    if (me.method === 'market' && (!me.enquiries || me.enquiries.length < 2)){
+      out.push({ kind:'warn', text:'⚠ Market enquiry not documented — required for audit protection', linkLabel:'Complete now', linkAction:"location.hash='#step3'" });
+    }
+    if (!(f.team || []).some(t => t && t.name && t.name.trim())){
+      out.push({ kind:'warn', text:'⚠ No team members named — Project Manager and Site Engineer typically required', linkLabel:'Add team', linkAction:"location.hash='#step4'" });
+    }
+    if ((f.files || []).length === 0 && aiSectorBucket() !== 'services'){
+      out.push({ kind:'info', text:'✦ No drawings uploaded. Infrastructure works typically require at least a site location map.', linkLabel:'Upload', linkAction:"location.hash='#step4'" });
+    }
+    // --- Consistency ---
+    const subtotal = (f.boq || []).reduce((a,r) => a + (r.qty||0)*(r.rate||0), 0);
+    const total = subtotal + Math.round(subtotal * (f.contingency||0) / 100);
+    const est = parseFloat(f.estCost) || 0;
+    if (est > 0 && total > 0){
+      const diff = Math.abs(est - total) / est;
+      if (diff > 0.10){
+        out.push({ kind:'warn', text:'⚠ Estimated cost (₹' + (est/100000).toFixed(2) + 'L) differs from BOQ total (₹' + (total/100000).toFixed(2) + 'L). Consider updating the estimated cost field.', linkLabel:'Update', linkAction:"location.hash='#step1'" });
+      }
+    }
+    if (f.duration === '3 Months' && total > 2000000){
+      out.push({ kind:'warn', text:'⚠ 3-month completion for ₹' + (total/100000).toFixed(0) + 'L works may be ambitious. Typical is 6+ months.', linkLabel:'Review', linkAction:"location.hash='#step1'" });
+    }
+    // --- Quality ---
+    const scopeText = stripHtml(f.scope || '');
+    const words = scopeText.split(/\s+/).filter(Boolean).length;
+    if (scopeText && words < 60){
+      out.push({ kind:'info', text:'✦ Your scope of work is brief (' + words + ' words). Adding more detail improves tender quality and reduces pre-bid queries.', linkLabel:'Expand scope', linkAction:"location.hash='#step2'" });
+    }
+    // --- Positive checks ---
+    if (f.title && f.estCost && scopeText) out.push({ kind:'ok', text:'✓ Project title, estimated cost, and scope are all populated' });
+    if ((f.boq || []).length >= 4) out.push({ kind:'ok', text:'✓ BOQ has ' + f.boq.length + ' line items — well-defined' });
+    if (me.enquiries && me.enquiries.length >= 3) out.push({ kind:'ok', text:'✓ Market enquiry documented from ' + me.enquiries.length + ' vendors' });
+    return out;
+  }
+  function numberToWordsINR(n){
+    if (!n) return 'Zero';
+    const lakh = Math.floor(n / 100000);
+    const remainder = n % 100000;
+    const thousand = Math.floor(remainder / 1000);
+    const rest = remainder % 1000;
+    const parts = [];
+    if (lakh) parts.push(lakh + ' Lakh' + (lakh > 1 ? 's' : ''));
+    if (thousand) parts.push(thousand + ' Thousand');
+    if (rest) parts.push(rest);
+    return parts.join(' ');
+  }
+  function aiGenerateCoverLetter(){
+    const f = FORM_STATE;
+    const subtotal = (f.boq || []).reduce((a,r) => a + (r.qty||0)*(r.rate||0), 0);
+    const total = subtotal + Math.round(subtotal * (f.contingency||0) / 100);
+    const amt = total || parseFloat(f.estCost) || 0;
+    const basis = (f.marketEnquiry && f.marketEnquiry.method === 'dsr') ? 'the applicable DSR rates'
+                : (f.marketEnquiry && f.marketEnquiry.method === 'po') ? 'previous purchase order rates'
+                : 'market enquiry from vendors';
+    const text = `We submit herewith the Detailed Project Report for '${f.title || '[Project Title]'}' proposed to be taken up by ${f.dept || '[Department]'} during ${f.fy || 'FY 2026-27'}. The estimated cost of the work is ₹${(amt).toLocaleString('en-IN')} (Rupees ${numberToWordsINR(amt)} only) to be funded from ${f.funding || '[Funding Source]'}. The work is proposed to be completed within ${f.duration || '[X months]'} from the date of Administrative Approval. The cost estimate has been prepared on the basis of ${basis} and includes a contingency provision of ${f.contingency || 5}% as per standard norms. We request that Administrative Approval for the above work may kindly be accorded at the earliest.`;
+    const wrap = document.getElementById('aiCoverLetterBox');
+    if (!wrap) return;
+    wrap.innerHTML = `<div class="ai-summary-box">
+      <div class="header"><h4>✦ DPR Covering Letter — Draft</h4>
+        <button class="copy-btn" type="button" onclick="aiCopyCoverLetter()"><i data-lucide="copy" style="width:11px; height:11px;"></i> Copy to clipboard</button>
+      </div>
+      <textarea id="aiCoverLetterText">${esc(text)}</textarea>
+      <div class="ai-genned-note"><i data-lucide="sparkles" style="width:11px; height:11px;"></i> AI generated — review before use</div>
+    </div>`;
+    refreshIcons();
+  }
+  function aiCopyCoverLetter(){
+    const ta = document.getElementById('aiCoverLetterText');
+    if (!ta) return;
+    try { navigator.clipboard.writeText(ta.value); showToast('Covering letter copied to clipboard'); }
+    catch(e){ ta.select(); document.execCommand('copy'); showToast('Copied'); }
+  }
+
+  function aiShowBudgetHeadPanel(){
+    const wrap = document.getElementById('bhSuggestPanel');
+    if (!wrap) return;
+    const heads = aiSuggestedBudgetHeads();
+    if (!heads.length){ wrap.innerHTML = '<div class="text-[11px] text-ink-400 mt-1">Set Department + Sector to get budget head suggestions.</div>'; return; }
+    wrap.innerHTML = '<div class="mt-2 flex flex-wrap gap-1.5">' + heads.map(h => `<button type="button" class="px-2 py-1 rounded-md border border-[#BFDBFE] bg-[#EFF6FF] text-[12px] text-[#0C447C] hover:bg-[#DBEAFE]" onclick="aiPickBudgetHead('${esc(h.code)}','${esc(h.label)}')">${esc(h.code)} — ${esc(h.label)}</button>`).join('') + '</div>';
+  }
+  function aiPickBudgetHead(code, label){
+    FORM_STATE.budgetCode = code;
+    const inp = document.getElementById('dprBudgetCode');
+    if (inp){ inp.value = code; inp.classList.add('ai-field-flash'); inp.focus(); setTimeout(() => inp.classList.remove('ai-field-flash'), 700); }
+    const wrap = document.getElementById('bhSuggestPanel');
+    if (wrap) wrap.innerHTML = '';
+    showToast('Budget head set to ' + code + ' — ' + label);
+  }
+  function aiBoqStdPanelHTML(){
+    if (!_aiBoqPanelOpen) return '';
+    const items = aiStandardBoqItems();
+    const bucketLabel = ({ road:'Road Works', water:'Water Supply', it:'IT/Goods', goods:'Goods Supply', building:'Building Works', services:'Services', works:'Civil Works' })[aiSectorBucket()] || 'Procurement';
+    return `<div class="boq-std-panel" role="dialog" aria-label="Standard BOQ items">
+      <h4>Standard BOQ items for ${esc(bucketLabel)}</h4>
+      ${items.map((it, i) => `<label class="row">
+        <input type="checkbox" ${_aiBoqPanelSelected.has(i)?'checked':''} onclick="event.stopPropagation(); aiBoqStdToggleItem(${i})" />
+        <div><div class="desc">${esc(it.desc)}</div><div class="meta">${esc(it.unit)} · ₹${it.rate.toLocaleString('en-IN')}/${esc(it.unit)}</div></div>
+      </label>`).join('')}
+      <div class="actions">
+        <button type="button" class="btn-cancel" onclick="event.stopPropagation(); aiToggleBoqStdPanel()">Cancel</button>
+        <button type="button" class="btn-add" onclick="event.stopPropagation(); aiBoqStdAddSelected()">Add selected items</button>
+      </div>
+    </div>`;
+  }
+
   const FORM_STATE = {
     step: 1,
     completed: { 1:false, 2:false, 3:false, 4:false, 5:false },
@@ -2080,6 +2611,7 @@
     view.innerHTML = renderStepper(step) + body + renderStickyFooter(step);
     refreshIcons();
     if (step === 3) recalcBoq();
+    if (step === 5 && typeof aiRunReadinessCheck === 'function') aiRunReadinessCheck();
   }
 
   function renderStep1(){
@@ -2126,7 +2658,8 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
             <label for="dprTitle" class="block text-[13px] font-medium text-ink-900 mb-1.5">Project Title <span class="text-danger" aria-hidden="true">✱</span></label>
-            <input id="dprTitle" type="text" value="${FORM_STATE.title}" placeholder="e.g. Road Resurfacing — Bandra West Zone 4" class="field" aria-required="true" oninput="FORM_STATE.title = this.value" />
+            <input id="dprTitle" type="text" value="${FORM_STATE.title}" placeholder="e.g. Road Resurfacing — Bandra West Zone 4" class="field" aria-required="true" oninput="FORM_STATE.title = this.value" onblur="renderForm(1)" />
+            ${(function(){ const s = aiSuggestedTitle(); return s ? aiSuggestionStripHTML('title', '✦ Suggested title: <strong>' + esc(s) + '</strong>', 'return ' + JSON.stringify(s) + ';', 'Project Title') : ''; })()}
           </div>
           <div>
             <label class="block text-[13px] font-medium text-ink-900 mb-1.5">DPR Reference No.</label>
@@ -2175,6 +2708,7 @@
             <label class="block text-[13px] font-medium text-ink-900 mb-1.5">Estimated Project Cost (₹) <span class="text-danger" aria-hidden="true">✱</span></label>
             <div class="relative max-w-[320px]"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500 text-[13.5px]">₹</span><input id="dprEstCost" type="number" min="0" placeholder="0" value="${FORM_STATE.estCost}" class="field pl-7" aria-required="true" oninput="onEstCostInput(this.value)" onblur="onEstCostBlur(this.value)" /></div>
             <div id="dprCostTip" class="${FORM_STATE.estCost?'':'hidden '}mt-1.5 text-[12px] italic text-primary inline-flex items-start gap-1"><i data-lucide="sparkles" class="w-3 h-3 mt-0.5"></i> Based on similar Infrastructure projects in Maharashtra, typical cost range for this scope is ₹38L–₹52L.</div>
+            ${(function(){ const r = aiSuggestedCostRange(); return r ? aiSuggestionStripHTML('estCost-range', '✦ Suggested based on sector benchmarks — typical range for ' + esc(r.label) + ': <strong>' + esc(r.range) + '</strong>. You can refine in BOQ.', 'return null;', 'Estimated Cost').replace('class="btn-apply-suggestion"', 'class="btn-apply-suggestion" style="display:none;"') : ''; })()}
             <!-- Addition 5 — Competent authority pre-check card -->
             <div id="competencyCard" class="${FORM_STATE.estCost?'':'hidden '}competency-card" aria-live="polite" style="max-width:520px;">
               <i data-lucide="user-check" style="width:18px; height:18px; color:#0C447C; flex-shrink:0; margin-top:2px;"></i>
@@ -2189,10 +2723,11 @@
           </div>
           <div>
             <label class="block text-[13px] font-medium text-ink-900 mb-1.5">Funding Source <span class="text-danger" aria-hidden="true">✱</span></label>
-            <select class="field" aria-required="true" onchange="FORM_STATE.funding = this.value">
+            <select class="field" aria-required="true" onchange="FORM_STATE.funding = this.value; renderForm(1);">
               <option value="">Select funding source</option>
               ${['State Finance Commission','AMRUT','Smart Cities Mission','PMAY','Jal Jeevan Mission','State Own Funds','Central Grant','14th / 15th Finance Commission','PPP / External Funding','Other'].map(s => `<option ${FORM_STATE.funding===s?'selected':''}>${s}</option>`).join('')}
             </select>
+            ${(function(){ const f = aiSuggestedFunding(); return f ? aiSuggestionStripHTML('funding', '✦ Common funding source for ' + esc(FORM_STATE.dept) + ' ' + esc(FORM_STATE.sector) + ' projects: <strong>' + esc(f) + '</strong>', 'return ' + JSON.stringify(f) + ';', 'Funding Source') : ''; })()}
           </div>
           <div>
             <label class="block text-[13px] font-medium text-ink-900 mb-1.5">Scheme year / phase</label>
@@ -2203,9 +2738,13 @@
             <input type="text" placeholder="If funds are from a sanctioned grant" value="${FORM_STATE.grantOrderNo}" class="field" oninput="FORM_STATE.grantOrderNo = this.value" />
           </div>
           <div>
-            <label class="block text-[13px] font-medium text-ink-900 mb-1.5">Budget Head / Code</label>
-            <input type="text" placeholder="e.g. 4215-01-102" value="${FORM_STATE.budgetCode}" class="field" oninput="FORM_STATE.budgetCode = this.value" />
+            <div class="flex items-center justify-between mb-1.5">
+              <label class="block text-[13px] font-medium text-ink-900">Budget Head / Code</label>
+              ${aiSparkleBtn('Suggest budget head', 'aiShowBudgetHeadPanel();', 'bhSpark')}
+            </div>
+            <input id="dprBudgetCode" type="text" placeholder="e.g. 4215-01-102" value="${FORM_STATE.budgetCode}" class="field" oninput="FORM_STATE.budgetCode = this.value" />
             <div class="mt-1 text-[11px] text-warning inline-flex items-center gap-1"><i data-lucide="alert-triangle" class="w-3 h-3"></i> Wrong budget head = finance rejection</div>
+            <div id="bhSuggestPanel"></div>
           </div>
           <div class="md:col-span-3 grid grid-cols-1 md:grid-cols-[1fr_180px] gap-3">
             <div>
@@ -2219,10 +2758,11 @@
           </div>
           <div>
             <label class="block text-[13px] font-medium text-ink-900 mb-1.5">Expected Project Duration</label>
-            <select class="field" onchange="FORM_STATE.duration = this.value">
+            <select class="field" onchange="FORM_STATE.duration = this.value; renderForm(1);">
               <option value="">Select…</option>
               ${['3 Months','6 Months','1 Year','18 Months','2 Years','Custom'].map(d => `<option ${FORM_STATE.duration===d?'selected':''}>${d}</option>`).join('')}
             </select>
+            ${(function(){ const d = aiSuggestedDuration(); return d ? aiSuggestionStripHTML('duration', '✦ Typical completion period for ' + esc(FORM_STATE.sector) + ' at ' + esc(FORM_STATE.priorityFlag || 'routine') + ' priority: <strong>' + esc(d) + '</strong>', 'return ' + JSON.stringify(d) + ';', 'Project Duration') : ''; })()}
           </div>
           <div>
             <label class="block text-[13px] font-medium text-ink-900 mb-1.5">Expected Start Date</label>
@@ -2270,7 +2810,10 @@
       </div>
 
       <section class="mb-9" aria-labelledby="dpr-sec-2a">
-        <h2 id="dpr-sec-2a" class="text-[15px] font-bold text-ink-900 pb-2 border-b border-line mb-5">Scope of Work</h2>
+        <div class="flex items-center justify-between pb-2 border-b border-line mb-5">
+          <h2 id="dpr-sec-2a" class="text-[15px] font-bold text-ink-900">Scope of Work</h2>
+          ${aiSparkleBtn('Generate scope', 'aiFillScope();', 'scopeSpark')}
+        </div>
         <label class="block text-[13px] font-medium text-ink-900 mb-1.5">Project Scope <span class="text-danger" aria-hidden="true">✱</span></label>
         <div class="border border-line rounded-lg overflow-hidden">
           <div class="flex items-center gap-1 px-2 py-1.5 border-b border-line bg-surface">
@@ -2282,9 +2825,13 @@
           </div>
           <div id="dprScope" contenteditable="true" class="px-3 py-3 text-[14px] outline-none" style="min-height: 180px;" data-placeholder="Describe the complete scope of work — what needs to be done, where, why, and any specific technical requirements…" oninput="FORM_STATE.scope = this.innerHTML">${FORM_STATE.scope}</div>
         </div>
+        ${FORM_STATE.scope ? '<div class="ai-genned-note"><i data-lucide="sparkles" style="width:11px; height:11px;"></i> AI generated — review and edit to match your specific requirements</div>' : ''}
         <button onclick="aiDraftDprScope()" class="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary-border text-[12.5px] text-primary hover:bg-primary-light"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> AI Draft Scope</button>
 
-        <label class="block text-[13px] font-medium text-ink-900 mt-6 mb-1.5">Need Justification <span class="text-danger" aria-hidden="true">✱</span></label>
+        <div class="flex items-center justify-between mt-6 mb-1.5">
+          <label class="block text-[13px] font-medium text-ink-900">Need Justification <span class="text-danger" aria-hidden="true">✱</span></label>
+          ${aiSparkleBtn('Generate justification', 'aiFillJustification();', 'justSpark')}
+        </div>
         <textarea rows="4" class="field" aria-required="true" placeholder="Why is this project needed? Reference complaints, inspections, scheme requirements, or policy mandates…" oninput="FORM_STATE.need = this.value">${FORM_STATE.need}</textarea>
         <div class="mt-1 text-[11px] text-ink-500">This justification is reviewed during Administrative Approval. Be specific.</div>
       </section>
@@ -2437,10 +2984,12 @@
 
       <div class="flex items-center justify-between flex-wrap gap-3 pb-2 border-b border-line mb-5">
         <h2 class="text-[15px] font-bold text-ink-900">Bill of Quantities</h2>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 boq-std-wrap">
+          ${aiSparkleBtn('Suggest standard items', 'aiToggleBoqStdPanel();', 'boqStdSpark')}
           <button onclick="showToast('BOQ already parsed from your uploaded DPR (4 items)')" class="px-3 py-1.5 rounded-lg border border-primary-border text-[12.5px] text-primary hover:bg-primary-light inline-flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Parse from uploaded DPR</button>
           <button class="px-3 py-1.5 rounded-lg border border-line text-[12.5px] text-ink-900 hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload BOQ Excel</button>
           <a href="#" class="text-[12.5px] text-primary hover:underline">Download Template</a>
+          ${aiBoqStdPanelHTML()}
         </div>
       </div>
 
@@ -2457,7 +3006,7 @@
           <button onclick="addDprBoqRow()" class="text-[12.5px] text-primary hover:underline inline-flex items-center gap-1"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Item</button>
           <div class="flex items-center gap-6 text-[13px]">
             <div class="flex items-center gap-2"><span class="text-ink-500">Subtotal</span><span id="dprBoqSubtotal" class="font-semibold text-ink-900">0</span></div>
-            <div class="flex items-center gap-2"><span class="text-ink-500">Contingency</span><input id="dprBoqContingency" type="number" value="${FORM_STATE.contingency}" min="0" max="100" class="field !w-16 !py-1 !px-2 text-right" oninput="FORM_STATE.contingency = parseFloat(this.value)||0; recalcBoq()" /><span class="text-ink-500">%</span><span id="dprBoqContingencyAmt" class="font-medium text-ink-900">0</span></div>
+            <div class="flex items-center gap-2"><span class="text-ink-500">Contingency</span><input id="dprBoqContingency" type="number" value="${FORM_STATE.contingency}" min="0" max="100" class="field !w-16 !py-1 !px-2 text-right" oninput="FORM_STATE.contingency = parseFloat(this.value)||0; recalcBoq()" /><span class="text-ink-500">%</span><span id="dprBoqContingencyAmt" class="font-medium text-ink-900">0</span>${(function(){ const c = aiSuggestedContingency(); if (FORM_STATE.contingency === c || aiIsApplied('contingency') || aiIsDismissed('contingency') || !FORM_STATE.sector) return ''; return `<span style="font-size:11px; color:#0F5EE8; margin-left:6px;" title="Standard contingency for ${esc(aiSectorBucket())}"><i data-lucide="sparkles" style="width:11px; height:11px; display:inline-block; vertical-align:-1px; margin-right:2px;"></i>Suggest ${c}% <button type="button" onclick="aiApplyStrip('contingency', ${c})" style="background:transparent; border:none; padding:0; color:#0F5EE8; font-weight:700; cursor:pointer;">Apply</button></span>`; })()}</div>
             <div class="flex items-center gap-2"><span class="text-ink-500 font-medium">Total Estimated</span><span id="dprBoqTotal" class="text-[15px] font-bold text-ink-900">₹0</span></div>
           </div>
         </div>
@@ -2700,7 +3249,10 @@
       </div>
 
       <section class="mb-9">
-        <h2 class="text-[15px] font-bold text-ink-900 pb-2 border-b border-line mb-5">Project Team</h2>
+        <div class="flex items-center justify-between pb-2 border-b border-line mb-5">
+          <h2 class="text-[15px] font-bold text-ink-900">Project Team</h2>
+          ${aiSparkleBtn('Suggest team', 'aiFillTeam();', 'teamSpark')}
+        </div>
         <div class="bg-white border border-line rounded-[10px] overflow-hidden">
           <table class="w-full text-[13px]">
             <thead class="bg-surface text-[10.5px] uppercase tracking-wider text-ink-500 font-semibold">
@@ -2713,7 +3265,15 @@
       </section>
 
       <section class="mb-6">
-        <h2 class="text-[15px] font-bold text-ink-900 pb-2 border-b border-line mb-5">Drawings &amp; Attachments</h2>
+        <div class="flex items-center justify-between pb-2 border-b border-line mb-5">
+          <h2 class="text-[15px] font-bold text-ink-900">Drawings &amp; Attachments</h2>
+          ${aiSparkleBtn('Suggest required drawings', 'aiToggleDrawingsChecklist();', 'drawSpark')}
+        </div>
+        ${_aiDrawingsChecklistOpen ? `<div class="bg-[#EFF6FF] border border-[#BFDBFE] rounded-lg p-4 mb-4">
+          <div class="text-[13px] font-bold text-[#0C447C] mb-2">Standard drawings for ${esc(aiSectorBucket())}</div>
+          <div class="space-y-1.5">${aiSuggestedDrawings().map(d => `<label class="flex items-center gap-2 text-[13px] text-ink-900"><input type="checkbox" class="accent-primary" onchange="if(this.checked){ aiAddDrawingFromChecklist('${esc(d)}'); }" /> ${esc(d)}</label>`).join('')}</div>
+          <button type="button" class="mt-2 text-[11px] text-ink-500 hover:text-ink-900" onclick="aiToggleDrawingsChecklist()">Close ▴</button>
+        </div>` : ''}
         <div class="border border-dashed border-ink-400/40 rounded-[10px] px-6 py-5 flex items-center gap-4 hover:border-primary hover:bg-primary-light/30 transition cursor-pointer" onclick="FORM_STATE.files.push({name:'new_attachment_'+(FORM_STATE.files.length+1)+'.pdf', size:'1.0 MB', type:'Other'}); renderForm(4); showToast('File added (mock)')">
           <div class="w-10 h-10 rounded-lg bg-primary-light text-primary flex items-center justify-center"><i data-lucide="upload-cloud" class="w-5 h-5"></i></div>
           <div class="flex-1"><div class="text-[13.5px] text-ink-900">Upload project drawings, site photos, soil reports, feasibility studies</div><div class="text-[12px] text-ink-500">Drag files here or click to browse</div></div>
@@ -2734,6 +3294,13 @@
       <div class="flex items-start justify-between gap-3 mb-6">
         <div><h1 class="text-[20px] font-bold text-ink-900">Step 5: Review &amp; Submit DPR</h1><p class="text-[14px] text-ink-500 mt-1">Review all details before submitting for departmental publication.</p></div>
         <div class="text-[12px] text-ink-500 inline-flex items-center gap-1.5 mt-2"><i data-lucide="cloud-check" class="w-3.5 h-3.5"></i> Draft saved 1 min ago</div>
+      </div>
+
+      <!-- AI readiness check (Step 5 auto-runs) -->
+      <div id="aiReadinessCard" class="ai-readiness-card" aria-live="polite">
+        <h3><i data-lucide="sparkles" style="width:14px; height:14px; color:#0F5EE8;"></i> AI readiness check</h3>
+        <div class="sub" id="aiReadinessSub">Analysing your DPR...</div>
+        <div class="items" id="aiReadinessItems"></div>
       </div>
 
       <section class="mb-6 bg-white border border-line rounded-2xl p-6">
@@ -2782,6 +3349,12 @@
         </div>
         ${!allChecked ? `<div class="mt-3 text-[12px] text-warning inline-flex items-center gap-1.5"><i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> Cannot submit until all 5 items are confirmed.</div>` : `<div class="mt-3 text-[12px] text-success inline-flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> All items confirmed — ready to submit.</div>`}
       </section>
+
+      <!-- DPR summary generator (covering letter) -->
+      <div class="mb-6">
+        ${aiSparkleBtn('Generate DPR summary for submission covering letter', 'aiGenerateCoverLetter();', 'coverSpark')}
+        <div id="aiCoverLetterBox"></div>
+      </div>
     </div></div>`;
   }
 
@@ -3346,6 +3919,17 @@
     const m = document.getElementById('dprPanelLangMenu');
     const btn = document.getElementById('dprPanelLangBtn');
     if (m && !m.classList.contains('hidden') && !m.contains(e.target) && (!btn || !btn.contains(e.target))) m.classList.add('hidden');
+    // Close BOQ standard items panel on outside click
+    if (_aiBoqPanelOpen && !e.target.closest('.boq-std-panel') && !e.target.closest('#boqStdSpark')){
+      _aiBoqPanelOpen = false; _aiBoqPanelSelected.clear();
+      if ((location.hash || '').includes('step3')) renderForm(3);
+    }
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && _aiBoqPanelOpen){
+      _aiBoqPanelOpen = false; _aiBoqPanelSelected.clear();
+      if ((location.hash || '').includes('step3')) renderForm(3);
+    }
   });
   function dprUpdateLangChecks(lang){
     ['en','hi','mr'].forEach(c => {
