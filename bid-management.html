@@ -262,6 +262,37 @@
     @keyframes toastIn { to { transform: translateY(0); opacity: 1; } }
     .critical-toast button:hover { color:white !important; }
 
+    /* ============ SUPER ADMIN SURVEILLANCE LAYER ============ */
+    .surveillance-badge { position:absolute; top:-8px; right:-8px; background:#1a1a1a; color:white; border-radius:20px; padding:3px 8px; font-size:10px; font-weight:500; font-family:'DM Sans', sans-serif; display:inline-flex; align-items:center; gap:5px; white-space:nowrap; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.2); z-index:30; pointer-events:all; transition:transform 150ms ease; line-height:1; user-select:none; }
+    .surveillance-badge:hover { transform: scale(1.05); }
+    .surveillance-badge:focus { outline:2px solid #60A5FA; outline-offset:2px; }
+    .surveillance-badge.sv-inline { position:relative; top:auto; right:auto; margin-left:6px; vertical-align:middle; }
+    .surveillance-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+    .dot-live    { background:#EF4444; animation: pulse-dot 1.5s ease infinite; }
+    .dot-recent  { background:#F59E0B; }
+    .dot-today   { background:#10B981; }
+    .dot-old     { background:#6B7280; }
+    .dot-never   { background:#374151; }
+    @keyframes pulse-dot { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.5; transform:scale(0.7); } }
+    .surveillance-popover { position:fixed; background:white; border:1px solid #E5E7EB; border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.12); padding:14px 16px; width:280px; z-index:200; pointer-events:all; font-family:'DM Sans', sans-serif; }
+    .sv-pop-h-eyebrow { font-size:11px; font-weight:700; text-transform:uppercase; color:#6B7280; letter-spacing:0.04em; margin-bottom:4px; }
+    .sv-pop-h-title   { font-size:13px; font-weight:700; color:#111827; margin-bottom:8px; line-height:1.35; }
+    .sv-pop-list      { max-height:180px; overflow-y:auto; margin-top:4px; }
+    .sv-pop-row       { display:flex; gap:10px; align-items:flex-start; padding:7px 0; border-bottom:1px solid #F3F4F6; }
+    .sv-pop-row:last-child { border-bottom:none; }
+    .sv-pop-avatar    { width:28px; height:28px; border-radius:50%; background:#EFF6FF; color:#0F5EE8; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .sv-pop-mid       { flex:1; min-width:0; }
+    .sv-pop-officer   { font-size:12px; font-weight:600; color:#111827; line-height:1.4; }
+    .sv-pop-you       { font-size:10px; color:#6B7280; font-style:italic; font-weight:400; margin-left:2px; }
+    .sv-pop-desc      { font-size:11px; color:#6B7280; margin-top:2px; line-height:1.4; }
+    .sv-pop-detail    { font-size:10px; color:#9CA3AF; margin-top:2px; font-style:italic; }
+    .sv-pop-time      { font-size:10px; color:#9CA3AF; flex-shrink:0; }
+    .sv-pop-empty     { font-size:12px; color:#9CA3AF; font-style:italic; text-align:center; padding:16px 0; }
+    .sv-pop-footer    { margin-top:10px; padding-top:10px; border-top:1px solid #F3F4F6; display:flex; justify-content:space-between; align-items:center; font-size:10px; color:#9CA3AF; gap:8px; }
+    .sv-pop-foot-you  { font-style:italic; }
+    .sv-pop-foot-total{ font-weight:600; }
+    .surveillance-indicator { background:#1a1a1a; color:white; border-radius:20px; padding:4px 12px; font-size:11px; font-weight:500; display:inline-flex; align-items:center; gap:5px; flex-shrink:0; margin-right:4px; font-family:'DM Sans', sans-serif; }
+
     @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
   </style>
 </head>
@@ -1673,10 +1704,274 @@
     if (e.key === 'Escape'){ closeLoaPanel(); closeConfirmModal(); }
   });
 
+  // ===================== SUPER ADMIN SURVEILLANCE LAYER =====================
+  // Read-only overlay over the bid-management touchpoints (currently T25 — "Send for
+  // approval", plus T2 eye icons in Stage 4 if present). Mirrors evaluation.html.
+  (function(){
+    const SURVEILLANCE_USER = 'Rajesh Kumar';
+    let _svInitialized = false;
+    let _svObserver = null;
+    let _svRefreshTimer = null;
+    let _svScanScheduled = false;
+    let _svPopoverTimeout = null;
+
+    function isSuperAdmin(){
+      try { return sessionStorage.getItem('userRole') === 'Super Admin'; } catch(e){ return false; }
+    }
+    function currentTenderId(){
+      return (typeof BM !== 'undefined' && BM && BM.tnd) ? BM.tnd : null;
+    }
+    function svEsc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
+    function readCriticalLog(tenderId){
+      try { return JSON.parse(localStorage.getItem('criticalLog_'+tenderId) || '[]'); } catch(e){ return []; }
+    }
+    function getSurveillanceEntries(tenderId, touchpointId, filters){
+      filters = filters || {};
+      return readCriticalLog(tenderId).filter(entry => {
+        if (entry.touchpointId !== touchpointId) return false;
+        if (filters.vendorName && entry.vendorName !== filters.vendorName) return false;
+        if (filters.criterion  && entry.criterion  !== filters.criterion) return false;
+        return true;
+      }).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+    }
+    function getLastAccess(tenderId, touchpointId, filters){
+      const entries = getSurveillanceEntries(tenderId, touchpointId, filters);
+      return entries.length > 0 ? entries[0] : null;
+    }
+    function svFormatRel(iso){
+      if (!iso) return '';
+      const t = new Date(iso).getTime();
+      if (isNaN(t)) return '';
+      const diff = Date.now() - t;
+      const mins = Math.floor(diff / 60000);
+      const hours = Math.floor(diff / 3600000);
+      const days = Math.floor(diff / 86400000);
+      if (mins < 1) return 'just now';
+      if (mins < 60) return mins+'m ago';
+      if (hours < 24) return hours+'h ago';
+      return days+'d ago';
+    }
+    function svInitials(name){
+      if (!name) return '··';
+      return String(name).split(/\s+/).map(w => (w[0]||'')).join('').substring(0,2).toUpperCase();
+    }
+    function svDotClass(entry){
+      if (!entry) return 'dot-never';
+      const mins = (Date.now() - new Date(entry.timestamp).getTime()) / 60000;
+      if (mins < 5) return 'dot-live';
+      if (mins < 60) return 'dot-recent';
+      if (mins < 1440) return 'dot-today';
+      return 'dot-old';
+    }
+    function badgeAriaLabel(entry){
+      return entry
+        ? 'Last accessed by '+(entry.officer||'unknown')+' '+svFormatRel(entry.timestamp)+' — hover for full history'
+        : 'Not yet accessed — hover for full history';
+    }
+    function buildBadge(tenderId, touchpointId, filters, popoverTitle, inline){
+      const last = getLastAccess(tenderId, touchpointId, filters);
+      const dot  = svDotClass(last);
+      const text = last ? (svInitials(last.officer) + ' · ' + svFormatRel(last.timestamp)) : '—';
+      const badge = document.createElement('span');
+      badge.className = 'surveillance-badge' + (inline ? ' sv-inline' : '');
+      badge.dataset.surveillance = '1';
+      badge.dataset.touchpointId = String(touchpointId);
+      badge.dataset.filters = JSON.stringify(filters || {});
+      badge.dataset.popoverTitle = popoverTitle || '';
+      badge.setAttribute('role', 'button');
+      badge.setAttribute('tabindex', '0');
+      badge.setAttribute('aria-label', badgeAriaLabel(last));
+      badge.innerHTML = '<span class="surveillance-dot '+dot+'"></span><span class="surveillance-badge-text">'+svEsc(text)+'</span>';
+      badge.addEventListener('mouseenter', () => showPopover(badge));
+      badge.addEventListener('mouseleave', schedulePopoverClose);
+      badge.addEventListener('focus',     () => showPopover(badge));
+      badge.addEventListener('blur',      schedulePopoverClose);
+      return badge;
+    }
+    function refreshBadgeContent(badge){
+      const tenderId = currentTenderId();
+      if (!tenderId) return;
+      const touchpointId = parseInt(badge.dataset.touchpointId, 10);
+      let filters = {};
+      try { filters = JSON.parse(badge.dataset.filters || '{}'); } catch(e){}
+      const last = getLastAccess(tenderId, touchpointId, filters);
+      const dot  = svDotClass(last);
+      const text = last ? (svInitials(last.officer) + ' · ' + svFormatRel(last.timestamp)) : '—';
+      const dotEl  = badge.querySelector('.surveillance-dot');
+      const textEl = badge.querySelector('.surveillance-badge-text');
+      if (dotEl)  dotEl.className  = 'surveillance-dot ' + dot;
+      if (textEl) textEl.textContent = text;
+      badge.setAttribute('aria-label', badgeAriaLabel(last));
+    }
+    function refreshAllSurveillanceBadges(){
+      document.querySelectorAll('[data-surveillance="1"]').forEach(refreshBadgeContent);
+    }
+    function ensurePopoverContainer(){
+      let p = document.getElementById('surveillance-popover');
+      if (!p){
+        p = document.createElement('div');
+        p.id = 'surveillance-popover';
+        p.className = 'surveillance-popover';
+        p.style.display = 'none';
+        p.addEventListener('mouseenter', () => { if (_svPopoverTimeout){ clearTimeout(_svPopoverTimeout); _svPopoverTimeout = null; } });
+        p.addEventListener('mouseleave', schedulePopoverClose);
+        document.body.appendChild(p);
+      }
+      return p;
+    }
+    function buildPopoverHTML(title, entries){
+      const youCount = entries.filter(e => e.officer === SURVEILLANCE_USER).length;
+      const total    = entries.length;
+      const head =
+        '<div class="sv-pop-h-eyebrow">Access history</div>'+
+        '<div class="sv-pop-h-title">'+svEsc(title)+'</div>';
+      let list;
+      if (!entries.length){
+        list = '<div class="sv-pop-empty">Not yet accessed</div>';
+      } else {
+        list = '<div class="sv-pop-list">' + entries.slice(0, 50).map(e => {
+          const initials = svInitials(e.officer);
+          const desc     = e.description || String(e.action || '').replace(/_/g,' ');
+          const detail   = e.detail ? '<div class="sv-pop-detail">'+svEsc(e.detail)+'</div>' : '';
+          const youTag   = e.officer === SURVEILLANCE_USER ? '<span class="sv-pop-you">(you)</span>' : '';
+          return '<div class="sv-pop-row">'+
+                   '<div class="sv-pop-avatar">'+svEsc(initials)+'</div>'+
+                   '<div class="sv-pop-mid">'+
+                     '<div class="sv-pop-officer">'+svEsc(e.officer || 'Unknown')+' '+youTag+'</div>'+
+                     '<div class="sv-pop-desc">'+svEsc(desc)+'</div>'+
+                     detail+
+                   '</div>'+
+                   '<div class="sv-pop-time">'+svEsc(svFormatRel(e.timestamp))+'</div>'+
+                 '</div>';
+        }).join('') + '</div>';
+      }
+      const youLine = youCount ? '<span class="sv-pop-foot-you">'+svEsc(SURVEILLANCE_USER)+' (you): '+youCount+'</span>' : '<span></span>';
+      const foot = entries.length
+        ? '<div class="sv-pop-footer">'+youLine+'<span class="sv-pop-foot-total">Total accesses: '+total+'</span></div>'
+        : '';
+      return head + list + foot;
+    }
+    function showPopover(badge){
+      if (_svPopoverTimeout){ clearTimeout(_svPopoverTimeout); _svPopoverTimeout = null; }
+      const tenderId = currentTenderId();
+      if (!tenderId) return;
+      const touchpointId = parseInt(badge.dataset.touchpointId, 10);
+      let filters = {};
+      try { filters = JSON.parse(badge.dataset.filters || '{}'); } catch(e){}
+      const title = badge.dataset.popoverTitle || '';
+      const entries = getSurveillanceEntries(tenderId, touchpointId, filters);
+      const pop = ensurePopoverContainer();
+      pop.innerHTML = buildPopoverHTML(title, entries);
+      pop.style.display = 'block';
+      const rect = badge.getBoundingClientRect();
+      pop.style.left = '0px'; pop.style.top = '0px';
+      const pr = pop.getBoundingClientRect();
+      const margin = 10;
+      let left = rect.left + (rect.width / 2) - (pr.width / 2);
+      let top  = rect.top - pr.height - margin;
+      if (top < 8) top = rect.bottom + margin;
+      if (left < 8) left = 8;
+      if (left + pr.width > window.innerWidth - 8) left = window.innerWidth - pr.width - 8;
+      pop.style.left = Math.round(left) + 'px';
+      pop.style.top  = Math.round(top)  + 'px';
+    }
+    function schedulePopoverClose(){
+      if (_svPopoverTimeout) clearTimeout(_svPopoverTimeout);
+      _svPopoverTimeout = setTimeout(() => {
+        const p = document.getElementById('surveillance-popover');
+        if (p) p.style.display = 'none';
+        _svPopoverTimeout = null;
+      }, 300);
+    }
+    function attachBadge(el, tenderId, touchpointId, filters, popoverTitle, inlineHint){
+      if (!el) return;
+      if (el.dataset.surveillanceAttached === '1') return;
+      let parent = el.parentElement;
+      if (!parent) return;
+      const pStyle = getComputedStyle(parent);
+      const clipped = pStyle.overflow === 'hidden' || pStyle.overflowX === 'hidden' || pStyle.overflowY === 'hidden';
+      let badgeParent = parent;
+      let inline = !!inlineHint;
+      if (clipped && !inline){
+        const wrap = document.createElement('span');
+        wrap.className = 'sv-wrap';
+        wrap.style.position = 'relative';
+        wrap.style.display  = 'inline-block';
+        parent.insertBefore(wrap, el);
+        wrap.appendChild(el);
+        badgeParent = wrap;
+      } else if (pStyle.position === 'static'){
+        parent.style.position = 'relative';
+      }
+      el.dataset.surveillanceAttached = '1';
+      const badge = buildBadge(tenderId, touchpointId, filters || {}, popoverTitle || '', inline);
+      badgeParent.appendChild(badge);
+    }
+    function scanAndAttach(){
+      if (!isSuperAdmin()) return;
+      const tenderId = currentTenderId();
+      if (!tenderId) return;
+      // T25 — "Send for approval →" (Stage 4 Award Recommendation)
+      document.querySelectorAll('button[onclick*="sendForApproval"]').forEach(btn => {
+        attachBadge(btn, tenderId, 25, {}, 'Award recommendation sent');
+      });
+      // T2 — Eye icons inside bid-management (if any present, eg. reveal in Stage 4)
+      document.querySelectorAll('button.eye-btn[data-eye-btn]').forEach(btn => {
+        const v = btn.dataset.eyeBtn;
+        if (!v) return;
+        attachBadge(btn, tenderId, 2, { vendorName: v }, 'Financial amount — '+v);
+      });
+    }
+    function scheduleScan(){
+      if (_svScanScheduled) return;
+      _svScanScheduled = true;
+      requestAnimationFrame(() => {
+        _svScanScheduled = false;
+        try { scanAndAttach(); } catch(e){}
+      });
+    }
+    function showHeaderIndicator(){
+      if (document.getElementById('surveillance-indicator')) return;
+      const header = document.querySelector('header.sticky');
+      if (!header) return;
+      const bell = header.querySelector('button[aria-label="Notifications"]');
+      const indicator = document.createElement('div');
+      indicator.id = 'surveillance-indicator';
+      indicator.className = 'surveillance-indicator';
+      indicator.setAttribute('aria-live', 'polite');
+      indicator.title = 'Surveillance layer active — visible only to Super Admins';
+      indicator.innerHTML = '<i data-lucide="eye" style="width:12px; height:12px;"></i> Surveillance on';
+      if (bell && bell.parentNode === header){ header.insertBefore(indicator, bell); }
+      else                                    { header.appendChild(indicator); }
+      if (window.lucide) lucide.createIcons();
+    }
+    function initSurveillanceLayer(){
+      if (_svInitialized) return;
+      try { if (!sessionStorage.getItem('userRole')) sessionStorage.setItem('userRole', 'Super Admin'); } catch(e){}
+      if (!isSuperAdmin()) return;
+      _svInitialized = true;
+      showHeaderIndicator();
+      ensurePopoverContainer();
+      setTimeout(scanAndAttach, 250);
+      const root = document.querySelector('.main-col') || document.body;
+      _svObserver = new MutationObserver(scheduleScan);
+      _svObserver.observe(root, { childList:true, subtree:true });
+      window.addEventListener('storage', (e) => {
+        const tnd = currentTenderId();
+        if (tnd && e.key === 'criticalLog_'+tnd) refreshAllSurveillanceBadges();
+      });
+      _svRefreshTimer = setInterval(refreshAllSurveillanceBadges, 60000);
+    }
+    window.initSurveillanceLayer = initSurveillanceLayer;
+    window.refreshAllSurveillanceBadges = refreshAllSurveillanceBadges;
+    window.svScanSurveillance = scanAndAttach;
+  })();
+
   (function boot(){
     const tnd = new URLSearchParams(location.search).get('tender');
     if (tnd){ openWorkspace(tnd); } else { renderLanding(); }
     refreshIcons();
+    if (typeof initSurveillanceLayer === 'function') initSurveillanceLayer();
   })();
 </script>
 <script>(function(){var b=document.getElementById("avatarBtn"),m=document.getElementById("avatarMenu");if(!b||!m)return;b.addEventListener("click",function(e){e.stopPropagation();m.classList.toggle("hidden");});document.addEventListener("click",function(e){if(!m.contains(e.target)&&!b.contains(e.target))m.classList.add("hidden");});if(window.lucide)lucide.createIcons();})();</script>

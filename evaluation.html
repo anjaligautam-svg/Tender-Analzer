@@ -830,6 +830,93 @@
     .com-signoff-confirm .msg { font-size:12px; color:#374151; }
     .com-signoff-confirm .btn-confirm { background:#10B981; color:white; border:none; border-radius:6px; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer; }
     .com-signoff-confirm .btn-confirm:hover { background:#059669; }
+
+    /* ============ SUPER ADMIN SURVEILLANCE LAYER ============ */
+    /* Floating badge attached to each critical touchpoint element. Renders only when sessionStorage.userRole === 'Super Admin'. */
+    .surveillance-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #1a1a1a;
+      color: white;
+      border-radius: 20px;
+      padding: 3px 8px;
+      font-size: 10px;
+      font-weight: 500;
+      font-family: 'DM Sans', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      z-index: 30;
+      pointer-events: all;
+      transition: transform 150ms ease;
+      line-height: 1;
+      user-select: none;
+    }
+    .surveillance-badge:hover { transform: scale(1.05); }
+    .surveillance-badge:focus { outline: 2px solid #60A5FA; outline-offset: 2px; }
+    .surveillance-badge.sv-inline {
+      position: relative;
+      top: auto;
+      right: auto;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+    .surveillance-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+    .dot-live    { background:#EF4444; animation: pulse-dot 1.5s ease infinite; }
+    .dot-recent  { background:#F59E0B; }
+    .dot-today   { background:#10B981; }
+    .dot-old     { background:#6B7280; }
+    .dot-never   { background:#374151; }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.5; transform: scale(0.7); }
+    }
+    .surveillance-popover {
+      position: fixed;
+      background: white;
+      border: 1px solid #E5E7EB;
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      padding: 14px 16px;
+      width: 280px;
+      z-index: 200;
+      pointer-events: all;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .sv-pop-h-eyebrow { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6B7280; letter-spacing: 0.04em; margin-bottom: 4px; }
+    .sv-pop-h-title   { font-size: 13px; font-weight: 700; color: #111827; margin-bottom: 8px; line-height: 1.35; }
+    .sv-pop-list      { max-height: 180px; overflow-y: auto; margin-top: 4px; }
+    .sv-pop-row       { display: flex; gap: 10px; align-items: flex-start; padding: 7px 0; border-bottom: 1px solid #F3F4F6; }
+    .sv-pop-row:last-child { border-bottom: none; }
+    .sv-pop-avatar    { width: 28px; height: 28px; border-radius: 50%; background: #EFF6FF; color: #0F5EE8; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .sv-pop-mid       { flex: 1; min-width: 0; }
+    .sv-pop-officer   { font-size: 12px; font-weight: 600; color: #111827; line-height: 1.4; }
+    .sv-pop-you       { font-size: 10px; color: #6B7280; font-style: italic; font-weight: 400; margin-left: 2px; }
+    .sv-pop-desc      { font-size: 11px; color: #6B7280; margin-top: 2px; line-height: 1.4; }
+    .sv-pop-detail    { font-size: 10px; color: #9CA3AF; margin-top: 2px; font-style: italic; }
+    .sv-pop-time      { font-size: 10px; color: #9CA3AF; flex-shrink: 0; }
+    .sv-pop-empty     { font-size: 12px; color: #9CA3AF; font-style: italic; text-align: center; padding: 16px 0; }
+    .sv-pop-footer    { margin-top: 10px; padding-top: 10px; border-top: 1px solid #F3F4F6; display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: #9CA3AF; gap: 8px; }
+    .sv-pop-foot-you  { font-style: italic; }
+    .sv-pop-foot-total{ font-weight: 600; }
+    .surveillance-indicator {
+      background: #1a1a1a;
+      color: white;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 11px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+      margin-right: 4px;
+      font-family: 'DM Sans', sans-serif;
+    }
   </style>
 </head>
 <body class="min-h-screen">
@@ -7501,10 +7588,438 @@ Date: ${esc(fmtDateShort(today))}`;
     if (e.key === 'Escape'){ closeCell(); closeDrawer(); closeBidDoc(); closePqPopover(); closeAiConfPopover(); closeClarPanel(); closeEvidencePanel(); closeVideoModal(); closeAuditPanel(); cancelMethodSwitch(); cancelReevalStrip(); closeRoleDropdown(); cancelRemoveMember(); cancelSignoffConfirm(); closePqVendorDropdown(); if (pendingRevealVendor) resetPendingReveal(pendingRevealVendor); }
   });
 
+  // ===================== SUPER ADMIN SURVEILLANCE LAYER =====================
+  // Read-only overlay over the 16 critical touchpoints. Renders floating badges +
+  // hover popovers ONLY when sessionStorage.getItem('userRole') === 'Super Admin'.
+  // The layer reads from criticalLog_<TND-ID> (which is written by logCriticalAction
+  // — DO NOT change that). On other roles, zero badges render and zero observers run.
+  (function(){
+    const SURVEILLANCE_USER = 'Rajesh Kumar';
+    let _svInitialized = false;
+    let _svObserver = null;
+    let _svRefreshTimer = null;
+    let _svScanScheduled = false;
+    let _svPopoverTimeout = null;
+
+    function isSuperAdmin(){
+      try { return sessionStorage.getItem('userRole') === 'Super Admin'; } catch(e){ return false; }
+    }
+    function currentTenderId(){
+      return (typeof EVAL !== 'undefined' && EVAL && EVAL.tnd) ? EVAL.tnd : null;
+    }
+    function svEsc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
+    function readCriticalLog(tenderId){
+      try { return JSON.parse(localStorage.getItem('criticalLog_'+tenderId) || '[]'); } catch(e){ return []; }
+    }
+    function getSurveillanceEntries(tenderId, touchpointId, filters){
+      filters = filters || {};
+      return readCriticalLog(tenderId).filter(entry => {
+        if (entry.touchpointId !== touchpointId) return false;
+        if (filters.vendorName && entry.vendorName !== filters.vendorName) return false;
+        if (filters.criterion  && entry.criterion  !== filters.criterion) return false;
+        return true;
+      }).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+    }
+    function getLastAccess(tenderId, touchpointId, filters){
+      const entries = getSurveillanceEntries(tenderId, touchpointId, filters);
+      return entries.length > 0 ? entries[0] : null;
+    }
+    function svFormatRel(iso){
+      if (!iso) return '';
+      const t = new Date(iso).getTime();
+      if (isNaN(t)) return '';
+      const diff = Date.now() - t;
+      const mins = Math.floor(diff / 60000);
+      const hours = Math.floor(diff / 3600000);
+      const days = Math.floor(diff / 86400000);
+      if (mins < 1) return 'just now';
+      if (mins < 60) return mins+'m ago';
+      if (hours < 24) return hours+'h ago';
+      return days+'d ago';
+    }
+    function svInitials(name){
+      if (!name) return '··';
+      return String(name).split(/\s+/).map(w => (w[0]||'')).join('').substring(0,2).toUpperCase();
+    }
+    function svDotClass(entry){
+      if (!entry) return 'dot-never';
+      const mins = (Date.now() - new Date(entry.timestamp).getTime()) / 60000;
+      if (mins < 5) return 'dot-live';
+      if (mins < 60) return 'dot-recent';
+      if (mins < 1440) return 'dot-today';
+      return 'dot-old';
+    }
+    function badgeAriaLabel(entry){
+      return entry
+        ? 'Last accessed by '+(entry.officer||'unknown')+' '+svFormatRel(entry.timestamp)+' — hover for full history'
+        : 'Not yet accessed — hover for full history';
+    }
+    function buildBadge(tenderId, touchpointId, filters, popoverTitle, inline){
+      const last = getLastAccess(tenderId, touchpointId, filters);
+      const dot  = svDotClass(last);
+      const text = last ? (svInitials(last.officer) + ' · ' + svFormatRel(last.timestamp)) : '—';
+      const badge = document.createElement('span');
+      badge.className = 'surveillance-badge' + (inline ? ' sv-inline' : '');
+      badge.dataset.surveillance = '1';
+      badge.dataset.touchpointId = String(touchpointId);
+      badge.dataset.filters = JSON.stringify(filters || {});
+      badge.dataset.popoverTitle = popoverTitle || '';
+      badge.setAttribute('role', 'button');
+      badge.setAttribute('tabindex', '0');
+      badge.setAttribute('aria-label', badgeAriaLabel(last));
+      badge.innerHTML = '<span class="surveillance-dot '+dot+'"></span><span class="surveillance-badge-text">'+svEsc(text)+'</span>';
+      badge.addEventListener('mouseenter', () => showPopover(badge));
+      badge.addEventListener('mouseleave', schedulePopoverClose);
+      badge.addEventListener('focus',     () => showPopover(badge));
+      badge.addEventListener('blur',      schedulePopoverClose);
+      return badge;
+    }
+    function refreshBadgeContent(badge){
+      const tenderId = currentTenderId();
+      if (!tenderId) return;
+      const touchpointId = parseInt(badge.dataset.touchpointId, 10);
+      let filters = {};
+      try { filters = JSON.parse(badge.dataset.filters || '{}'); } catch(e){}
+      const last = getLastAccess(tenderId, touchpointId, filters);
+      const dot  = svDotClass(last);
+      const text = last ? (svInitials(last.officer) + ' · ' + svFormatRel(last.timestamp)) : '—';
+      const dotEl  = badge.querySelector('.surveillance-dot');
+      const textEl = badge.querySelector('.surveillance-badge-text');
+      if (dotEl)  dotEl.className  = 'surveillance-dot ' + dot;
+      if (textEl) textEl.textContent = text;
+      badge.setAttribute('aria-label', badgeAriaLabel(last));
+    }
+    function refreshAllSurveillanceBadges(){
+      document.querySelectorAll('[data-surveillance="1"]').forEach(refreshBadgeContent);
+    }
+
+    // Popover -----------------------------------------------------------------
+    function ensurePopoverContainer(){
+      let p = document.getElementById('surveillance-popover');
+      if (!p){
+        p = document.createElement('div');
+        p.id = 'surveillance-popover';
+        p.className = 'surveillance-popover';
+        p.style.display = 'none';
+        p.addEventListener('mouseenter', () => { if (_svPopoverTimeout){ clearTimeout(_svPopoverTimeout); _svPopoverTimeout = null; } });
+        p.addEventListener('mouseleave', schedulePopoverClose);
+        document.body.appendChild(p);
+      }
+      return p;
+    }
+    function buildPopoverHTML(title, entries){
+      const youCount = entries.filter(e => e.officer === SURVEILLANCE_USER).length;
+      const total    = entries.length;
+      const head =
+        '<div class="sv-pop-h-eyebrow">Access history</div>'+
+        '<div class="sv-pop-h-title">'+svEsc(title)+'</div>';
+      let list;
+      if (!entries.length){
+        list = '<div class="sv-pop-empty">Not yet accessed</div>';
+      } else {
+        list = '<div class="sv-pop-list">' + entries.slice(0, 50).map(e => {
+          const initials = svInitials(e.officer);
+          const desc     = e.description || String(e.action || '').replace(/_/g,' ');
+          const detail   = e.detail ? '<div class="sv-pop-detail">'+svEsc(e.detail)+'</div>' : '';
+          const youTag   = e.officer === SURVEILLANCE_USER ? '<span class="sv-pop-you">(you)</span>' : '';
+          return '<div class="sv-pop-row">'+
+                   '<div class="sv-pop-avatar">'+svEsc(initials)+'</div>'+
+                   '<div class="sv-pop-mid">'+
+                     '<div class="sv-pop-officer">'+svEsc(e.officer || 'Unknown')+' '+youTag+'</div>'+
+                     '<div class="sv-pop-desc">'+svEsc(desc)+'</div>'+
+                     detail+
+                   '</div>'+
+                   '<div class="sv-pop-time">'+svEsc(svFormatRel(e.timestamp))+'</div>'+
+                 '</div>';
+        }).join('') + '</div>';
+      }
+      const youLine = youCount ? '<span class="sv-pop-foot-you">'+svEsc(SURVEILLANCE_USER)+' (you): '+youCount+'</span>' : '<span></span>';
+      const foot = entries.length
+        ? '<div class="sv-pop-footer">'+youLine+'<span class="sv-pop-foot-total">Total accesses: '+total+'</span></div>'
+        : '';
+      return head + list + foot;
+    }
+    function showPopover(badge){
+      if (_svPopoverTimeout){ clearTimeout(_svPopoverTimeout); _svPopoverTimeout = null; }
+      const tenderId = currentTenderId();
+      if (!tenderId) return;
+      const touchpointId = parseInt(badge.dataset.touchpointId, 10);
+      let filters = {};
+      try { filters = JSON.parse(badge.dataset.filters || '{}'); } catch(e){}
+      const title = badge.dataset.popoverTitle || '';
+      const entries = getSurveillanceEntries(tenderId, touchpointId, filters);
+      const pop = ensurePopoverContainer();
+      pop.innerHTML = buildPopoverHTML(title, entries);
+      pop.style.display = 'block';
+      // Place near badge — prefer above; if no room, below
+      const rect = badge.getBoundingClientRect();
+      pop.style.left = '0px'; pop.style.top = '0px';
+      const pr = pop.getBoundingClientRect();
+      const margin = 10;
+      let left = rect.left + (rect.width / 2) - (pr.width / 2);
+      let top  = rect.top - pr.height - margin;
+      if (top < 8) top = rect.bottom + margin;
+      if (left < 8) left = 8;
+      if (left + pr.width > window.innerWidth - 8) left = window.innerWidth - pr.width - 8;
+      pop.style.left = Math.round(left) + 'px';
+      pop.style.top  = Math.round(top)  + 'px';
+    }
+    function schedulePopoverClose(){
+      if (_svPopoverTimeout) clearTimeout(_svPopoverTimeout);
+      _svPopoverTimeout = setTimeout(() => {
+        const p = document.getElementById('surveillance-popover');
+        if (p) p.style.display = 'none';
+        _svPopoverTimeout = null;
+      }, 300);
+    }
+
+    // Attach badge — wrap the parent if needed -------------------------------
+    function attachBadge(el, tenderId, touchpointId, filters, popoverTitle, inlineHint){
+      if (!el) return;
+      if (el.dataset.surveillanceAttached === '1') return;
+      let parent = el.parentElement;
+      if (!parent) return;
+      // If the parent is overflow:hidden, wrap the element in a relative span so the
+      // badge can hang off the corner without being clipped.
+      const pStyle = parent ? getComputedStyle(parent) : null;
+      const clipped = pStyle && (pStyle.overflow === 'hidden' || pStyle.overflowX === 'hidden' || pStyle.overflowY === 'hidden');
+      let badgeParent = parent;
+      let inline = !!inlineHint;
+      if (clipped && !inline){
+        // Wrap the element in a positioned span
+        const wrap = document.createElement('span');
+        wrap.className = 'sv-wrap';
+        wrap.style.position = 'relative';
+        wrap.style.display  = 'inline-block';
+        parent.insertBefore(wrap, el);
+        wrap.appendChild(el);
+        badgeParent = wrap;
+      } else {
+        if (pStyle && pStyle.position === 'static') parent.style.position = 'relative';
+      }
+      el.dataset.surveillanceAttached = '1';
+      const badge = buildBadge(tenderId, touchpointId, filters || {}, popoverTitle || '', inline);
+      badgeParent.appendChild(badge);
+    }
+
+    // Map criterion id → short label (uses existing PQ_CRITERIA / TQ_CRITERIA)
+    function critShortFromId(id){
+      if (typeof PQ_CRITERIA !== 'undefined'){
+        const c = PQ_CRITERIA.find(x => x.id === id); if (c) return c.short;
+      }
+      if (typeof TQ_CRITERIA !== 'undefined'){
+        const c = TQ_CRITERIA.find(x => x.id === id); if (c) return c.short;
+      }
+      return id;
+    }
+
+    // The big DOM scan ------------------------------------------------------
+    function scanAndAttach(){
+      if (!isSuperAdmin()) return;
+      const tenderId = currentTenderId();
+      if (!tenderId) return;
+
+      // T1 — Evaluate Bids button (single instance per Financial section)
+      const evalBtn = document.getElementById('evaluateBidsBtn');
+      if (evalBtn) attachBadge(evalBtn, tenderId, 1, {}, 'Evaluate Bids button');
+
+      // T3 — Reveal Winner button (single instance per Financial section)
+      const revealBtn = document.getElementById('revealWinnerBtn');
+      if (revealBtn) attachBadge(revealBtn, tenderId, 3, {}, 'Reveal Winner button');
+
+      // T2 — Eye icon on each vendor's quoted amount (Financial Evaluation)
+      document.querySelectorAll('button.eye-btn[data-eye-btn]').forEach(btn => {
+        const v = btn.dataset.eyeBtn;
+        if (!v) return;
+        attachBadge(btn, tenderId, 2, { vendorName: v }, 'Financial amount — '+v);
+      });
+
+      // T14 / T15 — View Technical / Financial Bid links (anchors with openBidDoc(...))
+      document.querySelectorAll('a[onclick*="openBidDoc"]').forEach(a => {
+        const oc = a.getAttribute('onclick') || '';
+        const m = oc.match(/openBidDoc\('([^']+)'(?:\s*,\s*'([^']*)')?\)/);
+        if (!m) return;
+        const vendor = m[1];
+        const kind   = m[2] || 'tech';
+        if (kind === 'fin'){
+          attachBadge(a, tenderId, 15, { vendorName: vendor }, 'Financial bid — '+vendor, true);
+        } else {
+          attachBadge(a, tenderId, 14, { vendorName: vendor }, 'Technical bid — '+vendor, true);
+        }
+      });
+
+      // T6 — PQ verdict cells (span[data-verdict] within onclick="openPqPopover(event,'V','c')")
+      document.querySelectorAll('span[data-verdict][onclick*="openPqPopover"]').forEach(span => {
+        const oc = span.getAttribute('onclick') || '';
+        const m = oc.match(/openPqPopover\(event\s*,\s*'([^']+)'\s*,\s*'([^']+)'\)/);
+        if (!m) return;
+        const vendor = m[1];
+        const cId    = m[2];
+        const cShort = critShortFromId(cId);
+        attachBadge(span, tenderId, 6, { vendorName: vendor, criterion: cShort }, 'PQ Verdict — '+cShort+' — '+vendor);
+      });
+
+      // T13 — Evidence document link per criterion (button.ev-link with openEvidencePanel)
+      document.querySelectorAll('button.ev-link[onclick*="openEvidencePanel"]').forEach(btn => {
+        const oc = btn.getAttribute('onclick') || '';
+        const m = oc.match(/openEvidencePanel\('([^']+)'\s*,\s*'([^']+)'\)/);
+        if (!m) return;
+        const vendor = m[1];
+        const cId    = m[2];
+        const cShort = critShortFromId(cId);
+        attachBadge(btn, tenderId, 13, { vendorName: vendor, criterion: cShort }, 'Evidence viewed — '+cShort+' — '+vendor);
+      });
+
+      // T10 — TQ "Submit my scores" per vendor
+      document.querySelectorAll('button[onclick*="submitMyTqScores"]').forEach(btn => {
+        const oc = btn.getAttribute('onclick') || '';
+        const m = oc.match(/submitMyTqScores\('([^']+)'\)/);
+        if (!m) return;
+        const vendor = m[1];
+        attachBadge(btn, tenderId, 10, { vendorName: vendor }, 'TQ Score Submission — '+vendor);
+      });
+
+      // T11 — TQ score edit pencil per cell
+      document.querySelectorAll('button.tq-pencil-btn[onclick*="startEditScore"]').forEach(btn => {
+        const oc = btn.getAttribute('onclick') || '';
+        const m = oc.match(/startEditScore\('([^']+)'\s*,\s*'([^']+)'\)/);
+        if (!m) return;
+        const vendor = m[1];
+        const cId    = m[2];
+        const cShort = critShortFromId(cId);
+        attachBadge(btn, tenderId, 11, { vendorName: vendor, criterion: cShort }, 'TQ Score Edit — '+cShort+' — '+vendor);
+      });
+
+      // T7 — NTQ "Send for Signing →" per vendor
+      document.querySelectorAll('button[onclick*="sendNtqSigning"]').forEach(btn => {
+        const oc = btn.getAttribute('onclick') || '';
+        const m = oc.match(/sendNtqSigning\('([^']+)'\)/);
+        if (!m) return;
+        const vendor = m[1];
+        attachBadge(btn, tenderId, 7, { vendorName: vendor }, 'NTQ Justification — '+vendor);
+      });
+
+      // T16 — Presentation video Play per vendor
+      document.querySelectorAll('button[onclick*="openVideoModal"]').forEach(btn => {
+        const oc = btn.getAttribute('onclick') || '';
+        const m = oc.match(/openVideoModal\('([^']+)'\)/);
+        if (!m) return;
+        const vendor = m[1];
+        attachBadge(btn, tenderId, 16, { vendorName: vendor }, 'Presentation played — '+vendor);
+      });
+
+      // T8 — Clarification "Confirm & Record as Sent" — vendor/criterion come from EVAL._clarPanel
+      document.querySelectorAll('button.clar-btn-confirm[onclick*="confirmClarSent"]').forEach(btn => {
+        if (typeof EVAL === 'undefined' || !EVAL || !EVAL._clarPanel) return;
+        const st  = EVAL._clarPanel;
+        const rec = (EVAL.clarifications || []).find(c => c.id === st.recordId);
+        if (!rec) return;
+        const vendor = rec.vendorId;
+        const cShort = critShortFromId(rec.criterionId);
+        attachBadge(btn, tenderId, 8, { vendorName: vendor, criterion: cShort }, 'Clarification request — '+cShort+' — '+vendor);
+      });
+
+      // T17 — "Add to committee" button (Evaluation Committee tab)
+      document.querySelectorAll('button.com-add-btn[onclick*="addCommitteeMember"]').forEach(btn => {
+        attachBadge(btn, tenderId, 17, {}, 'Committee member added');
+      });
+
+      // T18 — "Yes, remove" per member row (Evaluation Committee tab)
+      document.querySelectorAll('button.btn-yes[onclick*="confirmRemoveMember"]').forEach(btn => {
+        attachBadge(btn, tenderId, 18, {}, 'Committee member removed');
+      });
+
+      // T21 — Sign-off "Confirm" per member row (Evaluation Committee tab)
+      document.querySelectorAll('button.btn-confirm[onclick*="confirmSignoff"]').forEach(btn => {
+        attachBadge(btn, tenderId, 21, {}, 'Evaluation sign-off');
+      });
+    }
+
+    function scheduleScan(){
+      if (_svScanScheduled) return;
+      _svScanScheduled = true;
+      requestAnimationFrame(() => {
+        _svScanScheduled = false;
+        try { scanAndAttach(); } catch(e){ /* never let surveillance throw into user code */ }
+      });
+    }
+
+    // Seed demo data so badges have something to show in single-browser demos
+    function seedSurveillanceDemo(tenderId){
+      if (!tenderId) return;
+      try {
+        const raw = localStorage.getItem('criticalLog_'+tenderId);
+        if (raw){
+          const arr = JSON.parse(raw);
+          if (Array.isArray(arr) && arr.length > 0) return;
+        }
+      } catch(e){}
+      const now = Date.now();
+      const seeds = [
+        { touchpointId:14, action:'technical_bid_viewed', description:"Viewed Rajesh Constructions' technical bid",     officer:'Priya Shah',  officerRole:'Technical Officer', vendorName:'Rajesh Constructions',  category:'evaluation', page:'evaluation', section:'Technical Evaluation', timestamp:new Date(now - 25*60000).toISOString() },
+        { touchpointId:14, action:'technical_bid_viewed', description:"Viewed Maharashtra Roads' technical bid",        officer:'Amit Patil',  officerRole:'Finance Officer',   vendorName:'Maharashtra Roads Co.', category:'evaluation', page:'evaluation', section:'Technical Evaluation', timestamp:new Date(now - 47*60000).toISOString() },
+        { touchpointId:13, action:'evidence_viewed',      description:'Evidence viewed — Turnover — Rajesh Constructions', officer:'Priya Shah',  officerRole:'Technical Officer', vendorName:'Rajesh Constructions',  criterion:'Turnover',     category:'evaluation', page:'evaluation', section:'PQ Evaluation', timestamp:new Date(now - 18*60000).toISOString() },
+        { touchpointId:10, action:'tq_score_submitted',   description:'TQ scores submitted for Rajesh Constructions',   officer:'Priya Shah',  officerRole:'Technical Officer', vendorName:'Rajesh Constructions',  category:'evaluation', page:'evaluation', section:'TQ Evaluation', detail:'Member: Priya Shah · Total: 74/100', timestamp:new Date(now - 3*60000).toISOString() },
+        { touchpointId:6,  action:'pq_verdict_changed',   description:'PQ verdict changed — Non-Blacklist — Patil & Associates', officer:'Amit Patil', officerRole:'Finance Officer', vendorName:'Patil & Associates',     criterion:'Non-Blacklist', oldValue:'pending', newValue:'pass', category:'evaluation', page:'evaluation', section:'PQ Evaluation', timestamp:new Date(now - 92*60000).toISOString() },
+        { touchpointId:17, action:'committee_member_added', description:'Committee member added — Sunita Rao',            officer:'Rajesh Kumar',officerRole:'Super Admin',       category:'committee',  page:'evaluation', section:'Evaluation Committee', detail:'Role: Legal Advisor · Designation: Deputy Commissioner', timestamp:new Date(now - 4*3600000).toISOString() }
+      ];
+      const withIds = seeds.map((s, i) => Object.assign({
+        id: 'crit-seed-'+i+'-'+Math.random().toString(36).slice(2,6),
+        tenderId,
+        sessionId: 'session-demo-surv',
+      }, s));
+      try { localStorage.setItem('criticalLog_'+tenderId, JSON.stringify(withIds)); } catch(e){}
+    }
+
+    // Header indicator
+    function showHeaderIndicator(){
+      if (document.getElementById('surveillance-indicator')) return;
+      const header = document.querySelector('header.sticky');
+      if (!header) return;
+      const bell = header.querySelector('button[aria-label="Notifications"]');
+      const indicator = document.createElement('div');
+      indicator.id = 'surveillance-indicator';
+      indicator.className = 'surveillance-indicator';
+      indicator.setAttribute('aria-live', 'polite');
+      indicator.title = 'Surveillance layer active — visible only to Super Admins';
+      indicator.innerHTML = '<i data-lucide="eye" style="width:12px; height:12px;"></i> Surveillance on';
+      if (bell && bell.parentNode === header){ header.insertBefore(indicator, bell); }
+      else                                    { header.appendChild(indicator); }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function initSurveillanceLayer(){
+      if (_svInitialized) return;
+      // Default the demo persona to Super Admin (the existing UI already labels Rajesh
+      // Kumar as Super Admin). Anyone who sets userRole to something else will see no badges.
+      try { if (!sessionStorage.getItem('userRole')) sessionStorage.setItem('userRole', 'Super Admin'); } catch(e){}
+      if (!isSuperAdmin()) return;
+      _svInitialized = true;
+      const tenderId = currentTenderId();
+      if (tenderId) seedSurveillanceDemo(tenderId);
+      showHeaderIndicator();
+      ensurePopoverContainer();
+      setTimeout(scanAndAttach, 250);
+      const root = document.querySelector('.main-col') || document.body;
+      _svObserver = new MutationObserver(scheduleScan);
+      _svObserver.observe(root, { childList:true, subtree:true });
+      window.addEventListener('storage', (e) => {
+        const tnd = currentTenderId();
+        if (tnd && e.key === 'criticalLog_'+tnd) refreshAllSurveillanceBadges();
+      });
+      _svRefreshTimer = setInterval(refreshAllSurveillanceBadges, 60000);
+    }
+
+    window.initSurveillanceLayer = initSurveillanceLayer;
+    window.refreshAllSurveillanceBadges = refreshAllSurveillanceBadges;
+    window.svScanSurveillance = scanAndAttach;
+  })();
+
   (function boot(){
     const tnd = new URLSearchParams(location.search).get('tender');
     if (tnd){ openWorkspace(tnd); } else { renderEvalList(); }
     refreshIcons();
+    if (typeof initSurveillanceLayer === 'function') initSurveillanceLayer();
   })();
 </script>
 <script>(function(){var b=document.getElementById("avatarBtn"),m=document.getElementById("avatarMenu");if(!b||!m)return;b.addEventListener("click",function(e){e.stopPropagation();m.classList.toggle("hidden");});document.addEventListener("click",function(e){if(!m.contains(e.target)&&!b.contains(e.target))m.classList.add("hidden");});if(window.lucide)lucide.createIcons();})();</script>
