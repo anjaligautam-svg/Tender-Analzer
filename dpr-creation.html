@@ -341,6 +341,70 @@
     .ai-summary-box .copy-btn { background: transparent; border: 1px solid #E5E7EB; color: #6B7280; border-radius: 6px; padding: 4px 10px; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
     .ai-summary-box .copy-btn:hover { color: #0F5EE8; border-color: #0F5EE8; }
     .ai-summary-box textarea { width: 100%; min-height: 160px; border: 1px solid #D1D5DB; border-radius: 8px; padding: 10px 12px; font-size: 13px; font-family: inherit; line-height: 1.6; resize: vertical; }
+
+    /* ====== Document Language + Logo Manager ====== */
+    .ta-doc-card { background:white; border:1px solid #E5E7EB; border-radius:12px; padding:20px 24px; margin-bottom:24px; }
+    .ta-doc-card h3.ta-doc-h { font-size:15px; font-weight:700; color:#111827; margin-bottom:4px; font-family:'DM Sans', sans-serif; }
+    .ta-doc-card .ta-doc-sub { font-size:13px; color:#6B7280; margin-bottom:16px; }
+    .ta-lang-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+    .ta-lang-card { position:relative; border:2px solid #E5E7EB; border-radius:10px; padding:16px 18px; cursor:pointer; display:flex; align-items:center; gap:14px; transition:all 150ms ease; background:white; text-align:left; }
+    .ta-lang-card:hover { border-color:#0F5EE8; background:#F8FBFF; }
+    .ta-lang-card.selected { border-color:#0F5EE8; background:#EFF6FF; }
+    .ta-lang-card .ta-flag { width:40px; height:28px; border-radius:4px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .ta-flag-en { background:#012169; color:#FFFFFF; font-size:12px; font-weight:700; }
+    .ta-flag-hi { background:linear-gradient(to bottom, #FF9933 0%, #FF9933 33%, #FFFFFF 33%, #FFFFFF 66%, #138808 66%, #138808 100%); color:#000080; font-size:10px; font-weight:700; }
+    .ta-flag-mr { background:#FF6B35; color:#FFFFFF; font-size:14px; font-weight:700; }
+    .ta-lang-name { font-size:14px; font-weight:700; color:#111827; line-height:1.2; }
+    .ta-lang-desc { font-size:11px; color:#9CA3AF; margin-top:2px; }
+    .ta-check-badge { position:absolute; width:20px; height:20px; background:#0F5EE8; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; }
+    .ta-lang-card .ta-check-badge { top:-8px; right:-8px; }
+    .ta-lang-note { background:#FFFBEB; border-radius:6px; padding:8px 12px; margin-top:12px; font-size:12px; color:#92400E; display:flex; gap:6px; align-items:flex-start; }
+    .ta-section-label { font-size:12px; font-weight:700; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; }
+    .ta-logo-row { display:flex; gap:10px; overflow-x:auto; padding-bottom:6px; scrollbar-width:none; }
+    .ta-logo-row::-webkit-scrollbar { display:none; }
+    .ta-logo-card { position:relative; width:88px; flex-shrink:0; border:2px solid #E5E7EB; border-radius:10px; padding:10px 8px; background:white; cursor:pointer; text-align:center; transition:all 150ms ease; }
+    .ta-logo-card:hover { border-color:#0F5EE8; background:#F8FBFF; }
+    .ta-logo-card.selected { border-color:#0F5EE8; background:#EFF6FF; }
+    .ta-logo-card .ta-check-badge { top:-7px; right:-7px; }
+    .ta-logo-card.pulse-once { animation: taLogoPulse 600ms ease; }
+    @keyframes taLogoPulse { 0% { box-shadow:0 0 0 3px rgba(15,94,232,0.3); } 100% { box-shadow:0 0 0 0 rgba(15,94,232,0); } }
+    .ta-logo-area { width:56px; height:56px; border-radius:8px; margin:0 auto 8px; display:flex; align-items:center; justify-content:center; }
+    .ta-logo-shape { display:flex; align-items:center; justify-content:center; }
+    .ta-logo-name { font-size:10px; font-weight:700; color:#374151; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .ta-logo-tag  { font-size:10px; color:#9CA3AF; margin-top:1px; }
+    .ta-logo-remove { position:absolute; top:-7px; left:-7px; width:18px; height:18px; background:#EF4444; border-radius:50%; color:white; font-size:10px; font-weight:700; display:none; align-items:center; justify-content:center; cursor:pointer; border:none; line-height:1; }
+    .ta-logo-card.is-custom:hover .ta-logo-remove { display:flex; }
+    .ta-upload-zone { border:1.5px dashed #D1D5DB; border-radius:8px; padding:12px 16px; display:flex; align-items:center; gap:14px; background:#F9FAFB; cursor:pointer; transition:all 150ms ease; }
+    .ta-upload-zone:hover { border-color:#0F5EE8; background:#EFF6FF; }
+    .ta-upload-zone.dragover { border-color:#0F5EE8; background:#EFF6FF; }
+    .ta-upload-text-main { font-size:13px; font-weight:700; color:#374151; }
+    .ta-upload-text-sub  { font-size:11px; color:#9CA3AF; margin-top:2px; }
+    .ta-browse-btn { background:#0F5EE8; color:white; border:none; border-radius:6px; padding:6px 14px; font-size:12px; font-weight:600; cursor:pointer; flex-shrink:0; }
+    .ta-browse-btn:hover { background:#0B4FCA; }
+    .ta-selected-wrap { max-height:0; overflow:hidden; transition:max-height 200ms ease; }
+    .ta-selected-wrap.open { max-height:280px; }
+    .ta-chips-row { display:flex; flex-wrap:wrap; gap:8px; }
+    .ta-chip { background:white; border:1px solid #E5E7EB; border-radius:6px; padding:5px 10px; display:flex; align-items:center; gap:8px; font-size:12px; color:#374151; cursor:grab; transition:transform 200ms ease, border-color 150ms ease, background 150ms ease; }
+    .ta-chip:active { cursor:grabbing; }
+    .ta-chip.dragging { opacity:0.5; }
+    .ta-chip.drag-over { border-left:2px solid #0F5EE8; }
+    .ta-chip-handle { font-size:12px; color:#9CA3AF; user-select:none; }
+    .ta-chip-thumb  { width:20px; height:20px; border-radius:4px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-weight:700; }
+    .ta-chip-name { font-weight:700; }
+    .ta-chip-rm { background:transparent; border:none; padding:0 2px; font-size:12px; color:#9CA3AF; cursor:pointer; transition:color 150ms ease; }
+    .ta-chip-rm:hover { color:#EF4444; }
+    .ta-placement-row { display:flex; align-items:center; gap:16px; margin-top:10px; font-size:12px; color:#374151; flex-wrap:wrap; }
+    .ta-placement-row .ta-place-label { font-size:11px; color:#9CA3AF; }
+    .ta-placement-row label { display:inline-flex; align-items:center; gap:5px; cursor:pointer; }
+    .ta-placement-row label input { accent-color:#0F5EE8; }
+    .ta-ai-strip { background:#EFF6FF; border-radius:6px; padding:7px 12px; margin-top:8px; font-size:12px; color:#0C447C; display:flex; align-items:center; gap:10px; }
+    .ta-ai-strip .ta-ai-strip-text { flex:1; }
+    .ta-ai-strip .ta-ai-apply { background:#0F5EE8; color:white; border:none; border-radius:6px; padding:4px 10px; font-size:11px; font-weight:600; cursor:pointer; }
+    .ta-ai-strip .ta-ai-apply:hover { background:#0B4FCA; }
+    .ta-ai-strip .ta-ai-dismiss { background:transparent; border:none; color:#6B7280; font-size:11px; cursor:pointer; }
+    .ta-ai-strip .ta-ai-dismiss:hover { color:#374151; }
+    .ta-ai-sparkle { border:1px solid #BFDBFE; border-radius:6px; padding:3px 10px; font-size:11px; color:#0F5EE8; background:white; cursor:pointer; display:inline-flex; align-items:center; gap:4px; font-weight:600; }
+    .ta-ai-sparkle:hover { background:#EFF6FF; }
   </style>
 </head>
 <body class="min-h-screen">
@@ -2515,6 +2579,433 @@
     try { const size = (localStorage.getItem(DPR_DATA_KEY) || '').length; if (size > 4 * 1024 * 1024) showToast('Storage nearly full — consider exporting older DPRs'); } catch(e){}
   }
 
+  // ========================================================================
+  // === DOCUMENT LANGUAGE + LOGO MANAGER (additive — does not change any
+  // === existing logic, auto-save, validation, or Check Draft panel content)
+  // ========================================================================
+  const TA_LANG_NAMES   = { english:'English',   hindi:'हिन्दी', marathi:'मराठी' };
+  const TA_LANG_TO_EN   = { english:'en',        hindi:'hi',     marathi:'mr' };
+  const TA_EN_TO_LANG   = { en:'english',        hi:'hindi',     mr:'marathi' };
+  const TA_LANG_BLURB   = { english:'Standard government format', hindi:'Hindi — official language', marathi:'Marathi — Maharashtra state' };
+  const TA_LOGO_LIBRARY = [
+    { id:'goi', name:'Govt. of India', tag:'Central',    areaBg:'#F9FAFB', areaBorder:'1px solid #E5E7EB', shape:'circle',  shapeBg:'#002D62', text:'भारत', textColor:'#FFFFFF', textFs:9,  dots:true  },
+    { id:'mah', name:'Maharashtra',     tag:'State',      areaBg:'#FFF8F0', shape:'circle',  shapeBg:'#FF6B00', text:'महा',  textColor:'#FFFFFF', textFs:11 },
+    { id:'amc', name:'Ahmedabad MC',    tag:'Municipal',  areaBg:'#EFF6FF', shape:'rounded', shapeBg:'#0F5EE8', text:'AMC',  textColor:'#FFFFFF', textFs:11 },
+    { id:'pwd', name:'Dept. of PWD',    tag:'Department', areaBg:'#F0FDF4', shape:'rounded', shapeBg:'#065F46', text:'PWD',  textColor:'#FFFFFF', textFs:11 },
+    { id:'nic', name:'NIC',             tag:'Technology', areaBg:'#FFFBEB', shape:'rounded', shapeBg:'#92400E', text:'NIC',  textColor:'#FFFFFF', textFs:11 },
+    { id:'itd', name:'IT Dept.',        tag:'Department', areaBg:'#EEEDFE', shape:'rounded', shapeBg:'#3C3489', text:'IT',   textColor:'#FFFFFF', textFs:13 },
+  ];
+  const TA_PLACEMENTS = [
+    { id:'side-by-side', label:'Side by side' },
+    { id:'left-aligned', label:'Left-aligned' },
+    { id:'centered',     label:'Centered'     },
+  ];
+
+  // State — loaded from sessionStorage so a draft auto-save tick survives nav
+  let _taLogoState = (function(){
+    try {
+      const raw = sessionStorage.getItem('ta_doc_lang_logos');
+      if (raw){
+        const s = JSON.parse(raw);
+        if (s && typeof s === 'object') return Object.assign({
+          language: 'english', selected:[], custom:[], order:[], placement:'side-by-side',
+          aiStripActive:false, aiStripDismissed:false, aiSuggestedIds:[]
+        }, s);
+      }
+    } catch(e){}
+    return { language:'english', selected:[], custom:[], order:[], placement:'side-by-side',
+             aiStripActive:false, aiStripDismissed:false, aiSuggestedIds:[] };
+  })();
+  // Sync the language with the existing dprPanelLang session key on first read
+  try {
+    const en = sessionStorage.getItem('dprDraftPanelLang');
+    if (en && TA_EN_TO_LANG[en]) _taLogoState.language = TA_EN_TO_LANG[en];
+  } catch(e){}
+
+  // Expose on FORM_STATE so the Check DPR Draft data snapshot can pick it up later
+  if (typeof FORM_STATE !== 'undefined'){
+    FORM_STATE.documentLanguage = _taLogoState.language;
+    FORM_STATE.logoConfig = {
+      selected: _taLogoState.selected.slice(),
+      custom:   _taLogoState.custom.slice(),
+      order:    _taLogoState.order.slice(),
+      placement:_taLogoState.placement,
+    };
+  }
+
+  function taSaveLogoState(){
+    try { sessionStorage.setItem('ta_doc_lang_logos', JSON.stringify(_taLogoState)); } catch(e){}
+    if (typeof FORM_STATE !== 'undefined'){
+      FORM_STATE.documentLanguage = _taLogoState.language;
+      FORM_STATE.logoConfig = {
+        selected: _taLogoState.selected.slice(),
+        custom:   _taLogoState.custom.slice(),
+        order:    _taLogoState.order.slice(),
+        placement:_taLogoState.placement,
+      };
+    }
+  }
+
+  function taEsc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
+
+  // Render the small 36px logo shape (used in cards) + 20px (used in chips)
+  function taLogoShapeHTML(logo, size){
+    size = size || 36;
+    const isCircle = logo.shape === 'circle';
+    const radius   = isCircle ? '50%' : '8px';
+    const dots = logo.dots
+      ? `<div style="display:flex; gap:2px; justify-content:center; margin-top:3px;">
+           <span style="width:3px; height:3px; border-radius:50%; background:#FF9933;"></span>
+           <span style="width:3px; height:3px; border-radius:50%; background:#FF9933;"></span>
+           <span style="width:3px; height:3px; border-radius:50%; background:#138808;"></span>
+           <span style="width:3px; height:3px; border-radius:50%; background:#138808;"></span>
+         </div>`
+      : '';
+    // Custom logos use an <img> rather than a CSS shape
+    if (logo.dataURL){
+      return `<div style="width:${size}px; height:${size}px; border-radius:${radius}; overflow:hidden; display:flex; align-items:center; justify-content:center; background:#F3F4F6;"><img src="${taEsc(logo.dataURL)}" alt="${taEsc(logo.name)}" style="max-width:100%; max-height:100%; object-fit:contain;"/></div>`;
+    }
+    return `<div style="display:flex; flex-direction:column; align-items:center;">
+      <div style="width:${size}px; height:${size}px; border-radius:${radius}; background:${logo.shapeBg}; display:flex; align-items:center; justify-content:center; color:${logo.textColor}; font-size:${logo.textFs}px; font-weight:700; line-height:1;">${taEsc(logo.text || '')}</div>
+      ${dots}
+    </div>`;
+  }
+  function taFindLogo(id){
+    return TA_LOGO_LIBRARY.find(l => l.id === id) || _taLogoState.custom.find(l => l.id === id) || null;
+  }
+
+  // ========================= HTML BUILDERS ==================================
+  function taDocLangLogosHTML(){
+    return `<div id="ta-doc-lang-logos-root">${taLangSectionHTML()}${taLogoSectionHTML()}</div>`;
+  }
+
+  function taLangSectionHTML(){
+    const cur = _taLogoState.language;
+    const card = (code, flagCls, flagText, name) => {
+      const sel = cur === code;
+      return `<button type="button" class="ta-lang-card${sel?' selected':''}" data-lang="${code}" aria-pressed="${sel}" aria-label="Select ${taEsc(TA_LANG_NAMES[code])} as document language" onclick="taSelectLanguage('${code}')">
+        <span class="ta-flag ta-flag-${flagCls}" aria-hidden="true">${flagText}</span>
+        <span>
+          <div class="ta-lang-name">${taEsc(name)}</div>
+          <div class="ta-lang-desc">${taEsc(TA_LANG_BLURB[code])}</div>
+        </span>
+        ${sel?'<span class="ta-check-badge" aria-hidden="true"><i data-lucide="check" style="width:11px;height:11px;"></i></span>':''}
+      </button>`;
+    };
+    const noteHTML = cur === 'english' ? '' :
+      `<div class="ta-lang-note" role="status"><i data-lucide="info" style="width:14px;height:14px;flex-shrink:0;margin-top:1px;"></i>
+        <span>Section headings and standard text will be in ${taEsc(TA_LANG_NAMES[cur])}. You can fill form fields in English — they will be translated in the final document.</span>
+      </div>`;
+    return `<section class="ta-doc-card" aria-labelledby="ta-doc-lang-h">
+      <h3 id="ta-doc-lang-h" class="ta-doc-h">Document Language</h3>
+      <p class="ta-doc-sub">Select the language in which the tender document will be drafted and published.</p>
+      <div class="ta-lang-grid" role="radiogroup" aria-label="Document language">
+        ${card('english','en','EN','English')}
+        ${card('hindi','hi','हिं','हिन्दी')}
+        ${card('marathi','mr','म','मराठी')}
+      </div>
+      ${noteHTML}
+    </section>`;
+  }
+
+  function taLogoSectionHTML(){
+    const aiSuggestionIds = _taLogoState.aiSuggestedIds || [];
+    const cards = TA_LOGO_LIBRARY.map(l => {
+      const sel = _taLogoState.selected.indexOf(l.id) >= 0;
+      const pulse = aiSuggestionIds.indexOf(l.id) >= 0 ? ' pulse-once' : '';
+      return `<button type="button" class="ta-logo-card${sel?' selected':''}${pulse}" data-logo-id="${l.id}" aria-pressed="${sel}" aria-label="Select ${taEsc(l.name)} logo" onclick="taToggleLogo('${l.id}')">
+        <div class="ta-logo-area" style="background:${l.areaBg};${l.areaBorder?'border:'+l.areaBorder+';':''}">
+          ${taLogoShapeHTML(l, 36)}
+        </div>
+        <div class="ta-logo-name">${taEsc(l.name)}</div>
+        <div class="ta-logo-tag">${taEsc(l.tag)}</div>
+        ${sel?'<span class="ta-check-badge" aria-hidden="true"><i data-lucide="check" style="width:11px;height:11px;"></i></span>':''}
+      </button>`;
+    }).join('');
+    const customCards = _taLogoState.custom.map(c => {
+      const sel = _taLogoState.selected.indexOf(c.id) >= 0;
+      const pendingRemoval = c._pendingRemoval ? '<div style="position:absolute; inset:0; background:rgba(254,242,242,0.95); border-radius:10px; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:4px; font-size:10px; color:#991B1B; text-align:center; padding:6px;"><div style="font-weight:700;">Remove this custom logo?</div><div style="font-size:9px; color:#7F1D1D;">(click ×)</div></div>' : '';
+      return `<button type="button" class="ta-logo-card is-custom${sel?' selected':''}" data-logo-id="${c.id}" aria-pressed="${sel}" aria-label="Select ${taEsc(c.name)} logo" onclick="taToggleLogo('${c.id}')">
+        <button type="button" class="ta-logo-remove" aria-label="Remove ${taEsc(c.name)}" onclick="event.stopPropagation(); taRemoveCustomLogo('${c.id}')">×</button>
+        <div class="ta-logo-area" style="background:#F9FAFB;">${taLogoShapeHTML(c, 36)}</div>
+        <div class="ta-logo-name" title="${taEsc(c.name)}">${taEsc(c.name)}</div>
+        <div class="ta-logo-tag">Custom</div>
+        ${sel?'<span class="ta-check-badge" aria-hidden="true"><i data-lucide="check" style="width:11px;height:11px;"></i></span>':''}
+        ${pendingRemoval}
+      </button>`;
+    }).join('');
+
+    const aiStripHTML = (_taLogoState.aiStripActive && !_taLogoState.aiStripDismissed) ? (function(){
+      const names = _taLogoState.aiSuggestedIds.map(id => (taFindLogo(id) || {}).name).filter(Boolean).join(', ');
+      const dept = (typeof FORM_STATE !== 'undefined' && FORM_STATE.dept) ? FORM_STATE.dept : 'this project';
+      return `<div class="ta-ai-strip" role="status">
+        <span class="ta-ai-strip-text">✦ Suggested for ${taEsc(dept)}: ${taEsc(names)}</span>
+        <button type="button" class="ta-ai-apply" onclick="taApplyAiLogoSuggestion()">Apply all</button>
+        <button type="button" class="ta-ai-dismiss" onclick="taDismissAiLogoSuggestion()">Dismiss</button>
+      </div>`;
+    })() : '';
+
+    const haveSelected = _taLogoState.selected.length > 0;
+    const chipsHTML = _taLogoState.order.map((id, i) => {
+      const l = taFindLogo(id); if (!l) return '';
+      return `<div class="ta-chip" draggable="true" data-chip-index="${i}" data-chip-id="${id}" role="option" aria-grabbed="false"
+        ondragstart="taChipDragStart(event, ${i})" ondragover="taChipDragOver(event, ${i})" ondragleave="taChipDragLeave(event, ${i})" ondrop="taChipDrop(event, ${i})" ondragend="taChipDragEnd(event, ${i})">
+        <span class="ta-chip-handle" aria-hidden="true">⠿</span>
+        <span class="ta-chip-thumb">${taLogoShapeHTML(l, 20)}</span>
+        <span class="ta-chip-name">${taEsc(l.name)}</span>
+        <button type="button" class="ta-chip-rm" aria-label="Remove ${taEsc(l.name)} from selection" onclick="taChipRemove('${id}')">×</button>
+      </div>`;
+    }).join('');
+
+    const placementHTML = TA_PLACEMENTS.map(p =>
+      `<label><input type="radio" name="taPlacement" value="${p.id}" ${_taLogoState.placement===p.id?'checked':''} onchange="taSetPlacement('${p.id}')"/> ${taEsc(p.label)}</label>`
+    ).join('');
+
+    return `<section class="ta-doc-card" aria-labelledby="ta-doc-logos-h">
+      <h3 id="ta-doc-logos-h" class="ta-doc-h">Logos &amp; Government Seals</h3>
+      <p class="ta-doc-sub">Select logos that will appear in the document header. Drag to reorder.</p>
+      <div class="ta-section-label">
+        <span>Pre-loaded logos</span>
+        <button type="button" class="ta-ai-sparkle" id="taAiLogoBtn" onclick="taRunAiLogoSuggest()" aria-label="Suggest logos for this project">✦ AI suggests</button>
+      </div>
+      <div class="ta-logo-row" role="listbox" aria-label="Pre-loaded logo library">
+        ${cards}${customCards}
+      </div>
+      ${aiStripHTML}
+      <div class="ta-section-label" style="margin-top:16px;">Or add your own</div>
+      <div class="ta-upload-zone" id="taUploadZone" onclick="document.getElementById('taLogoFileInput').click()" ondragover="taFileDragOver(event)" ondragleave="taFileDragLeave(event)" ondrop="taFileDrop(event)" role="button" tabindex="0" aria-label="Upload custom logo">
+        <i data-lucide="upload" style="width:22px;height:22px;color:#0F5EE8;flex-shrink:0;"></i>
+        <div style="flex:1; min-width:0;">
+          <div class="ta-upload-text-main">Click to browse or drag and drop</div>
+          <div class="ta-upload-text-sub">PNG, JPG, SVG — transparent background recommended · max 2MB</div>
+        </div>
+        <button type="button" class="ta-browse-btn" onclick="event.stopPropagation(); document.getElementById('taLogoFileInput').click()">Browse files</button>
+        <input id="taLogoFileInput" type="file" accept=".png,.jpg,.jpeg,.svg" multiple style="display:none;" onchange="taOnLogoFileChosen(event)"/>
+      </div>
+      <div class="ta-selected-wrap ${haveSelected?'open':''}" id="taSelectedWrap" aria-hidden="${haveSelected?'false':'true'}">
+        <div class="ta-section-label" style="margin-top:16px; text-transform:none; letter-spacing:0; color:#374151; font-weight:700; font-size:12px;">Selected logos — drag to reorder</div>
+        <div class="ta-chips-row" role="listbox" aria-label="Selected logos in document order" id="taChipsRow">${chipsHTML}</div>
+        <div class="ta-placement-row" role="radiogroup" aria-label="Logo placement in document">
+          <span class="ta-place-label">Placement:</span>
+          ${placementHTML}
+        </div>
+      </div>
+    </section>`;
+  }
+
+  // ========================= EVENT HANDLERS =================================
+  // Each handler updates state, saves, dispatches a custom event, and triggers
+  // a re-render via taRerenderRoot() which is page-specific (see init block).
+  function taRerenderRoot(){
+    const root = document.getElementById('ta-doc-lang-logos-root');
+    if (!root) return;
+    root.innerHTML = taLangSectionHTML() + taLogoSectionHTML();
+    if (window.lucide) lucide.createIcons();
+  }
+  function taSelectLanguage(code){
+    if (!TA_LANG_NAMES[code]) return;
+    _taLogoState.language = code;
+    // Clear any "pulse" marker so re-renders elsewhere don't loop
+    _taLogoState.aiSuggestedIds = [];
+    taSaveLogoState();
+    // Sync the existing DPR Check Draft panel language toggle
+    try { sessionStorage.setItem('dprDraftPanelLang', TA_LANG_TO_EN[code]); } catch(e){}
+    if (typeof window.switchDprPanelLanguage === 'function'){
+      try { window.switchDprPanelLanguage(TA_LANG_TO_EN[code]); } catch(e){}
+    }
+    document.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: code } }));
+    taRerenderRoot();
+  }
+  function taToggleLogo(id){
+    const idx = _taLogoState.selected.indexOf(id);
+    if (idx >= 0){
+      _taLogoState.selected.splice(idx, 1);
+      const oi = _taLogoState.order.indexOf(id);
+      if (oi >= 0) _taLogoState.order.splice(oi, 1);
+    } else {
+      _taLogoState.selected.push(id);
+      if (_taLogoState.order.indexOf(id) < 0) _taLogoState.order.push(id);
+    }
+    // Clear AI pulse markers (one-shot)
+    _taLogoState.aiSuggestedIds = [];
+    taSaveLogoState();
+    document.dispatchEvent(new CustomEvent('logosChanged', { detail: { logoConfig: { selected:_taLogoState.selected.slice(), custom:_taLogoState.custom.slice(), order:_taLogoState.order.slice(), placement:_taLogoState.placement } } }));
+    taRerenderRoot();
+  }
+  function taChipRemove(id){
+    // Deselects — same as toggling off
+    const si = _taLogoState.selected.indexOf(id); if (si >= 0) _taLogoState.selected.splice(si, 1);
+    const oi = _taLogoState.order.indexOf(id);    if (oi >= 0) _taLogoState.order.splice(oi, 1);
+    taSaveLogoState();
+    document.dispatchEvent(new CustomEvent('logosChanged', { detail: { logoConfig: { selected:_taLogoState.selected.slice(), custom:_taLogoState.custom.slice(), order:_taLogoState.order.slice(), placement:_taLogoState.placement } } }));
+    taRerenderRoot();
+  }
+  let _taPendingRemovalTimer = null;
+  function taRemoveCustomLogo(id){
+    const l = _taLogoState.custom.find(c => c.id === id);
+    if (!l) return;
+    if (!l._pendingRemoval){
+      l._pendingRemoval = true;
+      taRerenderRoot();
+      clearTimeout(_taPendingRemovalTimer);
+      _taPendingRemovalTimer = setTimeout(() => {
+        const x = _taLogoState.custom.find(c => c.id === id); if (x){ delete x._pendingRemoval; taSaveLogoState(); taRerenderRoot(); }
+      }, 2000);
+      return;
+    }
+    // Second click within 2s → actually delete
+    clearTimeout(_taPendingRemovalTimer); _taPendingRemovalTimer = null;
+    _taLogoState.custom = _taLogoState.custom.filter(c => c.id !== id);
+    const si = _taLogoState.selected.indexOf(id); if (si >= 0) _taLogoState.selected.splice(si, 1);
+    const oi = _taLogoState.order.indexOf(id);    if (oi >= 0) _taLogoState.order.splice(oi, 1);
+    taSaveLogoState();
+    document.dispatchEvent(new CustomEvent('logosChanged', { detail: { logoConfig: { selected:_taLogoState.selected.slice(), custom:_taLogoState.custom.slice(), order:_taLogoState.order.slice(), placement:_taLogoState.placement } } }));
+    taRerenderRoot();
+  }
+  function taSetPlacement(p){
+    _taLogoState.placement = p;
+    taSaveLogoState();
+    document.dispatchEvent(new CustomEvent('logosChanged', { detail: { logoConfig: { selected:_taLogoState.selected.slice(), custom:_taLogoState.custom.slice(), order:_taLogoState.order.slice(), placement:_taLogoState.placement } } }));
+    taRerenderRoot();
+  }
+  // ===== File upload (custom logos) =====
+  function taFileDragOver(e){ e.preventDefault(); e.currentTarget.classList.add('dragover'); }
+  function taFileDragLeave(e){ e.currentTarget.classList.remove('dragover'); }
+  function taFileDrop(e){
+    e.preventDefault();
+    e.currentTarget.classList.remove('dragover');
+    const files = (e.dataTransfer && e.dataTransfer.files) ? Array.from(e.dataTransfer.files) : [];
+    taIngestFiles(files);
+  }
+  function taOnLogoFileChosen(e){
+    const files = Array.from(e.target.files || []);
+    taIngestFiles(files);
+    e.target.value = '';
+  }
+  function taIngestFiles(files){
+    files.forEach(file => {
+      if (file.size > 2 * 1024 * 1024){
+        if (typeof showToast === 'function') showToast('File too large — max 2MB');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function(ev){
+        const id = 'custom-' + Date.now() + '-' + Math.random().toString(36).slice(2,6);
+        const entry = { id, name: file.name, dataURL: String(ev.target.result || '') };
+        _taLogoState.custom.push(entry);
+        _taLogoState.selected.push(id);
+        if (_taLogoState.order.indexOf(id) < 0) _taLogoState.order.push(id);
+        taSaveLogoState();
+        document.dispatchEvent(new CustomEvent('logosChanged', { detail: { logoConfig: { selected:_taLogoState.selected.slice(), custom:_taLogoState.custom.slice(), order:_taLogoState.order.slice(), placement:_taLogoState.placement } } }));
+        taRerenderRoot();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+  // ===== Drag-reorder chips =====
+  let _taDragIndex = null;
+  function taChipDragStart(e, i){
+    _taDragIndex = i;
+    e.dataTransfer.setData('text/plain', String(i));
+    e.dataTransfer.effectAllowed = 'move';
+    e.currentTarget.classList.add('dragging');
+    e.currentTarget.setAttribute('aria-grabbed','true');
+  }
+  function taChipDragOver(e, i){
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    e.currentTarget.classList.add('drag-over');
+  }
+  function taChipDragLeave(e){
+    e.currentTarget.classList.remove('drag-over');
+  }
+  function taChipDrop(e, i){
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+    const src = parseInt(e.dataTransfer.getData('text/plain'), 10);
+    if (isNaN(src) || src === i) return;
+    const arr = _taLogoState.order.slice();
+    const [m] = arr.splice(src, 1);
+    arr.splice(i, 0, m);
+    _taLogoState.order = arr;
+    taSaveLogoState();
+    document.dispatchEvent(new CustomEvent('logosChanged', { detail: { logoConfig: { selected:_taLogoState.selected.slice(), custom:_taLogoState.custom.slice(), order:_taLogoState.order.slice(), placement:_taLogoState.placement } } }));
+    taRerenderRoot();
+  }
+  function taChipDragEnd(e){
+    e.currentTarget.classList.remove('dragging');
+    e.currentTarget.setAttribute('aria-grabbed','false');
+    document.querySelectorAll('.ta-chip.drag-over').forEach(c => c.classList.remove('drag-over'));
+    _taDragIndex = null;
+  }
+  // ===== AI suggestion =====
+  function taSectorBucketForLogo(){
+    const dept = String((typeof FORM_STATE !== 'undefined' ? FORM_STATE.dept : '') || '').toLowerCase();
+    const sect = String((typeof FORM_STATE !== 'undefined' ? FORM_STATE.sector : '') || '').toLowerCase();
+    if (dept.indexOf('public works') >= 0 || sect.indexOf('infrastructure') >= 0) return ['mah','amc','pwd'];
+    if (dept.indexOf('it') >= 0 || sect.indexOf('goods') >= 0)                   return ['amc','nic','itd'];
+    if (dept.indexOf('water') >= 0 || sect.indexOf('sanitation') >= 0)           return ['mah','amc'];
+    return ['amc','mah'];
+  }
+  function taRunAiLogoSuggest(){
+    const btn = document.getElementById('taAiLogoBtn');
+    if (btn){ btn.disabled = true; btn.textContent = 'Suggesting…'; }
+    setTimeout(() => {
+      const ids = taSectorBucketForLogo();
+      _taLogoState.aiSuggestedIds = ids;
+      _taLogoState.aiStripActive  = true;
+      _taLogoState.aiStripDismissed = false;
+      taSaveLogoState();
+      taRerenderRoot();
+    }, 800);
+  }
+  function taApplyAiLogoSuggestion(){
+    const ids = (_taLogoState.aiSuggestedIds || []).slice();
+    ids.forEach(id => {
+      if (_taLogoState.selected.indexOf(id) < 0) _taLogoState.selected.push(id);
+      if (_taLogoState.order.indexOf(id)    < 0) _taLogoState.order.push(id);
+    });
+    _taLogoState.aiStripActive = false;
+    _taLogoState.aiStripDismissed = true;
+    _taLogoState.aiSuggestedIds = [];
+    taSaveLogoState();
+    document.dispatchEvent(new CustomEvent('logosChanged', { detail: { logoConfig: { selected:_taLogoState.selected.slice(), custom:_taLogoState.custom.slice(), order:_taLogoState.order.slice(), placement:_taLogoState.placement } } }));
+    taRerenderRoot();
+  }
+  function taDismissAiLogoSuggestion(){
+    _taLogoState.aiStripActive = false;
+    _taLogoState.aiStripDismissed = true;
+    _taLogoState.aiSuggestedIds = [];
+    taSaveLogoState();
+    taRerenderRoot();
+  }
+  // Expose handlers on window for inline onclick
+  window.taSelectLanguage       = taSelectLanguage;
+  window.taToggleLogo           = taToggleLogo;
+  window.taChipRemove           = taChipRemove;
+  window.taRemoveCustomLogo     = taRemoveCustomLogo;
+  window.taSetPlacement         = taSetPlacement;
+  window.taFileDragOver         = taFileDragOver;
+  window.taFileDragLeave        = taFileDragLeave;
+  window.taFileDrop             = taFileDrop;
+  window.taOnLogoFileChosen     = taOnLogoFileChosen;
+  window.taChipDragStart        = taChipDragStart;
+  window.taChipDragOver         = taChipDragOver;
+  window.taChipDragLeave        = taChipDragLeave;
+  window.taChipDrop             = taChipDrop;
+  window.taChipDragEnd          = taChipDragEnd;
+  window.taRunAiLogoSuggest     = taRunAiLogoSuggest;
+  window.taApplyAiLogoSuggestion= taApplyAiLogoSuggestion;
+  window.taDismissAiLogoSuggestion = taDismissAiLogoSuggestion;
+  window.taRerenderRoot         = taRerenderRoot;
+  // Listen back — if the panel toggles language, our cards reflect it
+  document.addEventListener('languageChanged', (e) => {
+    const code = e && e.detail && e.detail.language;
+    if (code && TA_LANG_NAMES[code] && _taLogoState.language !== code){
+      _taLogoState.language = code; taSaveLogoState(); taRerenderRoot();
+    }
+  });
+
   // === Addition 3 — Version History storage ===
   const MAX_VERSIONS = 20;
   function loadVersions(dprId){
@@ -2620,6 +3111,8 @@
         <div><h1 class="text-[20px] font-bold text-ink-900">Step 1: Project Details</h1><p class="text-[14px] text-ink-500 mt-1">Basic classification and financial details for this project.</p></div>
         <div class="text-[12px] text-ink-500 inline-flex items-center gap-1.5 mt-2"><i data-lucide="cloud-check" class="w-3.5 h-3.5"></i> <span id="autosaveLabel">Draft saved 1 min ago</span> · <button type="button" class="text-primary hover:underline" onclick="openVersionHistory('DPR-2026-010')">View history</button></div>
       </div>
+
+      ${taDocLangLogosHTML()}
 
       <!-- Addition 8 — Priority / urgency flag (top of Step 1) -->
       <section class="mb-9" aria-labelledby="dpr-sec-prio">
