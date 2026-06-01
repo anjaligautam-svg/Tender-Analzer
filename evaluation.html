@@ -582,22 +582,48 @@
     .pres-zone.open { max-height:1200px; }
     .pres-info { background:#EFF6FF; border:1px solid #BFDBFE; color:#1D4ED8; border-radius:8px; padding:10px 14px; font-size:12px; margin-bottom:14px; line-height:1.5; }
     .pres-table { width:100%; border-collapse:collapse; font-size:13px; table-layout:fixed; }
-    .pres-table th { background:#F9FAFB; font-size:11px; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; font-weight:700; padding:8px 10px; border-bottom:1px solid #E5E7EB; text-align:left; }
+    .pres-table th { background:#F9FAFB; font-size:11px; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; font-weight:600; padding:8px 10px; border-bottom:1px solid #E5E7EB; text-align:left; }
     .pres-table td { padding:10px 10px; border-bottom:1px solid #F3F4F6; vertical-align:top; font-size:12.5px; }
     .pres-table tr:last-child td { border-bottom:none; }
-    .pres-table th.pres-score-col, .pres-table td.pres-score-col { min-width:160px; }
-    .pres-score-cell { display:flex; flex-direction:column; gap:6px; align-items:flex-start; }
-    .pres-score-cell .pres-toggle-label { font-size:12px; color:#6B7280; white-space:nowrap; }
-    .pres-score-cell .pres-marks-input { display:flex; align-items:center; gap:6px; }
-    .pres-notes-toggle { background:transparent; border:none; color:#0F5EE8; font-size:10px; cursor:pointer; padding:0; text-transform:none; letter-spacing:0; font-weight:500; margin-left:6px; }
-    .pres-notes-toggle:hover { text-decoration:underline; }
     .pres-chip { display:inline-block; background:#F9FAFB; border:1px solid #E5E7EB; border-radius:6px; padding:3px 8px; font-size:11.5px; color:#374151; margin-right:4px; }
     .pres-upload-btn { background:white; border:1px dashed #93C5FD; color:#0F5EE8; border-radius:6px; padding:4px 10px; font-size:11.5px; cursor:pointer; }
     .pres-upload-btn:hover { background:#EFF6FF; }
     .pres-play-btn { background:#EFF6FF; color:#0F5EE8; border:none; border-radius:6px; padding:4px 10px; font-size:11.5px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; }
     .pres-play-btn:hover { background:#DBEAFE; }
-    .pres-note-input { width:100%; border:1px solid #D1D5DB; border-radius:6px; padding:4px 8px; font-size:12px; }
-    .pres-note-input:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 2px rgba(15,94,232,0.15); }
+    /* === NOTES column === */
+    .pres-notes-cell { padding:8px 10px !important; }
+    .pres-note-chip  { background:#F9FAFB; border:1px solid #E5E7EB; border-radius:6px; padding:6px 10px; font-size:12px; margin-bottom:4px; animation: presNoteChipAppear 200ms ease both; }
+    @keyframes presNoteChipAppear { 0% { opacity:0; transform:translateY(-4px); } 100% { opacity:1; transform:translateY(0); } }
+    .pres-note-text  { color:#374151; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:180px; }
+    .pres-note-meta  { margin-top:4px; display:flex; align-items:center; justify-content:space-between; gap:6px; }
+    .pres-note-meta-left  { display:flex; align-items:center; gap:5px; min-width:0; }
+    .pres-note-meta-right { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+    .pres-note-avatar { width:20px; height:20px; border-radius:50%; background:#EFF6FF; color:#0F5EE8; font-size:9px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .pres-note-author { font-size:10px; font-weight:700; color:#374151; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:80px; }
+    .pres-note-dot    { font-size:10px; color:#9CA3AF; }
+    .pres-note-ts     { font-size:10px; color:#9CA3AF; white-space:nowrap; }
+    .pres-note-ts-edited { font-size:9px; color:#9CA3AF; margin-left:2px; font-style:italic; }
+    .pres-note-edit-link   { font-size:10px; color:#0F5EE8; background:transparent; border:none; padding:0; cursor:pointer; transition:color 150ms ease; }
+    .pres-note-edit-link:hover { text-decoration:underline; }
+    .pres-note-remove-btn  { font-size:11px; color:#9CA3AF; background:transparent; border:none; padding:0 2px; cursor:pointer; line-height:1; transition:color 150ms ease; }
+    .pres-note-remove-btn:hover { color:#EF4444; }
+    .pres-note-add-trigger { display:inline-flex; align-items:center; gap:5px; font-size:12px; color:#0F5EE8; background:transparent; border:none; padding:2px 0; cursor:pointer; transition:color 150ms ease; }
+    .pres-note-add-trigger:hover { text-decoration:underline; }
+    .pres-note-add-trigger.compact { font-size:11px; }
+    .pres-note-form-wrap { max-height:0; overflow:hidden; transition:max-height 200ms ease; }
+    .pres-note-form-wrap.open { max-height:240px; }
+    .pres-note-form { background:#F0F7FF; border:1px solid #BFDBFE; border-radius:8px; padding:10px 12px; margin-top:6px; }
+    .pres-note-form textarea { width:100%; min-height:56px; border:1px solid #BFDBFE; border-radius:6px; padding:7px 9px; font-size:12px; resize:none; background:white; font-family:inherit; color:#111827; box-sizing:border-box; line-height:1.4; transition:border-color 150ms ease; }
+    .pres-note-form textarea:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 2px rgba(15,94,232,0.15); }
+    .pres-note-form .form-foot { display:flex; align-items:center; justify-content:space-between; margin-top:8px; gap:8px; }
+    .pres-note-form .author-name { font-size:11px; color:#9CA3AF; }
+    .pres-note-form .form-actions { display:flex; align-items:center; gap:10px; }
+    .pres-note-form .btn-cancel-note { background:transparent; border:none; color:#6B7280; font-size:11px; cursor:pointer; padding:2px 4px; }
+    .pres-note-form .btn-cancel-note:hover { color:#374151; }
+    .pres-note-form .btn-save-note   { background:#0F5EE8; color:white; border:none; border-radius:5px; padding:4px 12px; font-size:11px; font-weight:700; cursor:pointer; transition:background 150ms ease; }
+    .pres-note-form .btn-save-note:hover { background:#0B4FCA; }
+    .pres-note-form .btn-save-note:disabled { background:#9CA3AF; cursor:not-allowed; }
+    .pres-notes-count-badge { display:inline-flex; align-items:center; background:#EFF6FF; color:#0C447C; border-radius:20px; padding:2px 8px; font-size:10px; font-weight:700; margin-left:8px; }
     .toggle-on { width:32px; height:18px; background:#0F5EE8; border-radius:9px; position:relative; cursor:pointer; transition: background .15s ease; }
     .toggle-on::after { content:''; position:absolute; top:2px; left:16px; width:14px; height:14px; background:white; border-radius:50%; transition: left .15s ease; }
     .toggle-off { width:32px; height:18px; background:#D1D5DB; border-radius:9px; position:relative; cursor:pointer; transition: background .15s ease; }
@@ -1893,6 +1919,9 @@
     if (!EVAL.tqMemberSubmitted) EVAL.tqMemberSubmitted = {};
     if (!EVAL.presentations)     EVAL.presentations = {};
     if (!EVAL.finRevealed)       EVAL.finRevealed = {};
+    // NOTES column — drop stale cache + seed demo notes if the localStorage key is empty
+    _presNotesCache = null;
+    if (typeof seedPresNotesIfEmpty === 'function') seedPresNotesIfEmpty();
     if (!Array.isArray(EVAL.auditLog)) EVAL.auditLog = [];
     if (!Array.isArray(EVAL.committeeMembers) || !EVAL.committeeMembers.length) EVAL.committeeMembers = defaultCommitteeMembers();
     if (!EVAL.signoffs)              EVAL.signoffs = {};
@@ -2971,14 +3000,14 @@
       </div>`;
     const presOpen = !!EVAL.presOpen;
     const presBlock = `<div class="pres-toggle ${presOpen?'open':''}" onclick="togglePresSection()" role="button" aria-expanded="${presOpen?'true':'false'}">
-        <div class="left"><i data-lucide="presentation" style="width:16px; height:16px; color:#8B5CF6;"></i><span style="font-size:14px; font-weight:700; color:#111827;">Vendor Presentations</span><span style="font-size:12px; color:#9CA3AF;">Optional — for tenders requiring demonstration</span></div>
+        <div class="left"><i data-lucide="presentation" style="width:16px; height:16px; color:#8B5CF6;"></i><span style="font-size:14px; font-weight:700; color:#111827;">Vendor Presentations</span>${presNotesCountBadgeHTML()}<span style="font-size:12px; color:#9CA3AF;">Optional — for tenders requiring demonstration</span></div>
         <div style="display:flex; align-items:center; gap:8px;"><span style="font-size:12px; color:#0F5EE8;">Upload ▾</span><i data-lucide="chevron-down" class="chev w-3.5 h-3.5"></i></div>
       </div>
       <div class="pres-zone ${presOpen?'open':''}">
-        <div class="pres-info">ℹ Presentations are held during the technical evaluation phase for complex or high-value tenders. Record video evidence and scores here for audit purposes. GFR guidelines require all evaluation criteria and scores to be documented.</div>
+        <div class="pres-info">ℹ Presentations are held during the technical evaluation phase for complex or high-value tenders. Record video evidence and notes here for audit purposes. GFR guidelines require all evaluation criteria and scores to be documented.</div>
         <div style="border:1px solid #E5E7EB; border-radius:10px; overflow:hidden; margin-bottom:18px;">
           <table class="pres-table">
-            <thead><tr><th style="width:24%;">Vendor</th><th style="width:22%;">Presentation</th><th style="width:22%;">Video / Demo</th><th class="pres-score-col" style="width:${_uiPresNotes?'18%':'32%'};">Score contribution</th>${_uiPresNotes?`<th style="width:14%;">Notes <button class="pres-notes-toggle" onclick="togglePresNotes()" type="button" aria-label="Hide notes column">Hide ▴</button></th>`:`<th style="width:0; padding:0;"><button class="pres-notes-toggle" onclick="togglePresNotes()" type="button" aria-label="Show notes column" style="margin-left:0;">Show notes ▾</button></th>`}</tr></thead>
+            <thead><tr><th style="width:26%;">Vendor</th><th style="width:24%;">Presentation</th><th style="width:24%;">Video / Demo</th><th style="width:26%;">Notes</th></tr></thead>
             <tbody>${EVAL.bids.map(b => renderPresRow(b.vendor)).join('')}</tbody>
           </table>
         </div>
@@ -3965,14 +3994,14 @@ Date: ${esc(fmtDateShort(today))}`;
     // === Vendor presentations sub-section (Change 3) — collapsed by default ===
     const presOpen = !!EVAL.presOpen;
     const presBlock = `<div class="pres-toggle ${presOpen?'open':''}" onclick="togglePresSection()" role="button" aria-expanded="${presOpen?'true':'false'}">
-        <div class="left"><i data-lucide="presentation" style="width:16px; height:16px; color:#8B5CF6;"></i><span style="font-size:14px; font-weight:700; color:#111827;">Vendor Presentations</span><span style="font-size:12px; color:#9CA3AF;">Optional — for tenders requiring demonstration</span></div>
+        <div class="left"><i data-lucide="presentation" style="width:16px; height:16px; color:#8B5CF6;"></i><span style="font-size:14px; font-weight:700; color:#111827;">Vendor Presentations</span>${presNotesCountBadgeHTML()}<span style="font-size:12px; color:#9CA3AF;">Optional — for tenders requiring demonstration</span></div>
         <div style="display:flex; align-items:center; gap:8px;"><span style="font-size:12px; color:#0F5EE8;">Upload ▾</span><i data-lucide="chevron-down" class="chev w-3.5 h-3.5"></i></div>
       </div>
       <div class="pres-zone ${presOpen?'open':''}">
-        <div class="pres-info">ℹ Presentations are held during the technical evaluation phase for complex or high-value tenders. Record video evidence and scores here for audit purposes. GFR guidelines require all evaluation criteria and scores to be documented.</div>
+        <div class="pres-info">ℹ Presentations are held during the technical evaluation phase for complex or high-value tenders. Record video evidence and notes here for audit purposes. GFR guidelines require all evaluation criteria and scores to be documented.</div>
         <div style="border:1px solid #E5E7EB; border-radius:10px; overflow:hidden; margin-bottom:18px;">
           <table class="pres-table">
-            <thead><tr><th style="width:24%;">Vendor</th><th style="width:22%;">Presentation</th><th style="width:22%;">Video / Demo</th><th class="pres-score-col" style="width:${_uiPresNotes?'18%':'32%'};">Score contribution</th>${_uiPresNotes?`<th style="width:14%;">Notes <button class="pres-notes-toggle" onclick="togglePresNotes()" type="button" aria-label="Hide notes column">Hide ▴</button></th>`:`<th style="width:0; padding:0;"><button class="pres-notes-toggle" onclick="togglePresNotes()" type="button" aria-label="Show notes column" style="margin-left:0;">Show notes ▾</button></th>`}</tr></thead>
+            <thead><tr><th style="width:26%;">Vendor</th><th style="width:24%;">Presentation</th><th style="width:24%;">Video / Demo</th><th style="width:26%;">Notes</th></tr></thead>
             <tbody>${EVAL.bids.map(b => renderPresRow(b.vendor)).join('')}</tbody>
           </table>
         </div>
@@ -4279,31 +4308,215 @@ Date: ${esc(fmtDateShort(today))}`;
     } else {
       videoCell = `<button class="pres-upload-btn" onclick="presUploadVideo('${esc(vendor)}')">+ Upload video</button> <button class="pres-upload-btn" onclick="presLinkVideo('${esc(vendor)}')">+ Paste link</button>`;
     }
-    const toggleHTML = p.includeInTq
-      ? `<div class="pres-score-cell">
-           <span class="toggle-on" onclick="togglePresInclude('${esc(vendor)}')" role="switch" aria-checked="true"></span>
-           <span class="pres-toggle-label">Include in TQ scoring</span>
-           <div class="pres-marks-input">
-             <input type="number" min="0" max="20" value="${p.marks||0}" oninput="setPresMarks('${esc(vendor)}', this.value)" style="width:55px; border:1px solid #D1D5DB; border-radius:6px; padding:4px 8px; font-size:12.5px; text-align:center;" />
-             <span style="font-size:11px; color:#6B7280;">/ 20</span>
-           </div>
-         </div>`
-      : `<div class="pres-score-cell">
-           <span class="toggle-off" onclick="togglePresInclude('${esc(vendor)}')" role="switch" aria-checked="false"></span>
-           <span class="pres-toggle-label">Include in TQ scoring</span>
-         </div>`;
-    const notesCell = _uiPresNotes
-      ? `<td><input class="pres-note-input" type="text" placeholder="Notes…" value="${esc(p.notes||'')}" oninput="setPresNotes('${esc(vendor)}', this.value)" /></td>`
-      : `<td style="padding:0;"></td>`;
-    return `<tr><td><strong>${esc(vendor)}</strong></td><td>${pptCell}</td><td>${videoCell}</td><td class="pres-score-col">${toggleHTML}</td>${notesCell}</tr>`;
+    return `<tr><td><strong>${esc(vendor)}</strong></td><td>${pptCell}</td><td>${videoCell}</td>${presNotesCellHTML(vendor)}</tr>`;
   }
-  // _uiPresNotes is the transient flag for hiding/showing the Notes column
-  function togglePresNotes(){
-    _uiPresNotes = !_uiPresNotes;
-    try { sessionStorage.setItem('presNotesVisible', _uiPresNotes ? '1' : '0'); } catch(e){}
+
+  // ===== Presentations: NOTES column (replaces former Score Contribution) =====
+  // Persisted in `presentations_notes_<TND-ID>` as { vendorName: [ { id, text, author, authorInitials, timestamp, edited } ] }.
+  const PRES_NOTES_AUTHOR   = 'Rajesh Kumar';
+  const PRES_NOTES_INITIALS = 'RK';
+  let _presNotesCache  = null;             // tnd-scoped — reloaded on init / external storage change
+  let _presNotesAdding = null;             // vendor currently in "+ Add note" form (only one at a time)
+  let _presNotesEditing = null;            // { vendor, noteId } currently being edited (only one at a time)
+  function presNotesKey(tnd){ return 'presentations_notes_' + (tnd || (EVAL && EVAL.tnd) || ''); }
+  function loadPresNotes(){
+    if (_presNotesCache) return _presNotesCache;
+    let obj;
+    try { obj = JSON.parse(localStorage.getItem(presNotesKey()) || '{}'); } catch(e){ obj = {}; }
+    _presNotesCache = (obj && typeof obj === 'object') ? obj : {};
+    return _presNotesCache;
+  }
+  function savePresNotes(){
+    if (!_presNotesCache) return;
+    try { localStorage.setItem(presNotesKey(), JSON.stringify(_presNotesCache)); } catch(e){}
+  }
+  function presNotesForVendor(vendor){
+    const all = loadPresNotes();
+    return (all[vendor] || []).slice();
+  }
+  function presNotesTotal(){
+    const all = loadPresNotes();
+    return Object.values(all).reduce((s, arr) => s + (Array.isArray(arr) ? arr.length : 0), 0);
+  }
+  function presNotesCountBadgeHTML(){
+    const n = presNotesTotal();
+    if (!n) return '<span id="presNotesCountBadge" aria-live="polite"></span>';
+    return `<span id="presNotesCountBadge" class="pres-notes-count-badge" aria-live="polite">${n} note${n===1?'':'s'}</span>`;
+  }
+  function presNotesFormatTs(iso){
+    if (!iso) return '';
+    // Accept the demo string verbatim, otherwise format MMM D, h:MM AM/PM
+    if (typeof iso === 'string' && !/^\d{4}-\d{2}-\d{2}T/.test(iso)) return iso;
+    try { return new Date(iso).toLocaleString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' }); }
+    catch(e){ return ''; }
+  }
+  function presNoteIsMine(note){ return note && note.author === PRES_NOTES_AUTHOR; }
+  function presNoteChipHTML(vendor, note){
+    if (_presNotesEditing && _presNotesEditing.vendor === vendor && _presNotesEditing.noteId === note.id){
+      // EDIT inline — replace the chip with a textarea + Cancel/Save
+      const initial = note.text || '';
+      return `<div class="pres-note-chip" data-note-edit="${esc(note.id)}">
+        <div class="pres-note-form" style="margin-top:0;">
+          <textarea id="presNoteEditTextarea-${esc(vendor)}" aria-label="Edit note">${esc(initial)}</textarea>
+          <div class="form-foot">
+            <span class="author-name">${esc(note.author)}</span>
+            <div class="form-actions">
+              <button type="button" class="btn-cancel-note" onclick="cancelPresNoteEdit()">Cancel</button>
+              <button type="button" class="btn-save-note" onclick="savePresNoteEdit('${esc(vendor)}','${esc(note.id)}')">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }
+    const isMine = presNoteIsMine(note);
+    const editedTag = note.edited ? '<span class="pres-note-ts-edited">edited</span>' : '';
+    const right = isMine
+      ? `<button type="button" class="pres-note-edit-link" aria-label="Edit your note" onclick="startPresNoteEdit('${esc(vendor)}','${esc(note.id)}')">Edit</button>
+         <button type="button" class="pres-note-remove-btn" aria-label="Remove your note" onclick="removePresNote('${esc(vendor)}','${esc(note.id)}')">×</button>`
+      : '';
+    return `<div class="pres-note-chip" data-note-id="${esc(note.id)}">
+      <div class="pres-note-text" title="${esc(note.text||'')}">${esc(note.text||'')}</div>
+      <div class="pres-note-meta">
+        <div class="pres-note-meta-left">
+          <span class="pres-note-avatar" aria-hidden="true">${esc(note.authorInitials || presNoteInitials(note.author))}</span>
+          <span class="pres-note-author" title="${esc(note.author||'')}">${esc(note.author||'')}</span>
+          <span class="pres-note-dot" aria-hidden="true">·</span>
+          <span class="pres-note-ts">${esc(presNotesFormatTs(note.timestamp))}</span>${editedTag}
+        </div>
+        <div class="pres-note-meta-right">${right}</div>
+      </div>
+    </div>`;
+  }
+  function presNoteInitials(name){
+    if (!name) return '··';
+    return String(name).split(/\s+/).map(w => (w[0]||'')).join('').substring(0,2).toUpperCase();
+  }
+  function presNoteFormHTML(vendor){
+    return `<div class="pres-note-form-wrap open" data-add-form-vendor="${esc(vendor)}">
+      <div class="pres-note-form">
+        <textarea id="presNoteAddTextarea-${esc(vendor)}" placeholder="Add your observation about this vendor's presentation..." aria-label="Note text"></textarea>
+        <div class="form-foot">
+          <span class="author-name">${esc(PRES_NOTES_AUTHOR)}</span>
+          <div class="form-actions">
+            <button type="button" class="btn-cancel-note" onclick="cancelPresNoteAdd()">Cancel</button>
+            <button type="button" class="btn-save-note" onclick="savePresNoteAdd('${esc(vendor)}')">Save note</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+  function presNotesCellHTML(vendor){
+    const notes = presNotesForVendor(vendor);
+    const adding = _presNotesAdding === vendor;
+    const chipsHTML = notes.map(n => presNoteChipHTML(vendor, n)).join('');
+    const addTrigger = adding
+      ? ''
+      : (notes.length === 0
+          ? `<button type="button" class="pres-note-add-trigger" aria-label="Add note for ${esc(vendor)} presentation" onclick="startPresNoteAdd('${esc(vendor)}')">
+               <i data-lucide="pencil" style="width:12px; height:12px;"></i> + Add note
+             </button>`
+          : `<button type="button" class="pres-note-add-trigger compact" aria-label="Add note for ${esc(vendor)} presentation" onclick="startPresNoteAdd('${esc(vendor)}')">+ Add note</button>`);
+    const formHTML = adding ? presNoteFormHTML(vendor) : '';
+    return `<td class="pres-notes-cell" data-pres-notes-vendor="${esc(vendor)}">${chipsHTML}${addTrigger}${formHTML}</td>`;
+  }
+  function startPresNoteAdd(vendor){
+    // Enforce single open form across the entire table
+    _presNotesAdding = vendor;
+    _presNotesEditing = null;
+    renderTechnical();
+    refreshIcons();
+    // Focus the new textarea
+    setTimeout(() => {
+      const ta = document.getElementById('presNoteAddTextarea-' + vendor);
+      if (ta) ta.focus();
+    }, 60);
+  }
+  function cancelPresNoteAdd(){ _presNotesAdding = null; renderTechnical(); refreshIcons(); }
+  function savePresNoteAdd(vendor){
+    const ta = document.getElementById('presNoteAddTextarea-' + vendor);
+    const text = ta ? String(ta.value || '').trim() : '';
+    if (!text){ if (ta) ta.focus(); return; }
+    const all = loadPresNotes();
+    all[vendor] = all[vendor] || [];
+    all[vendor].push({
+      id: 'note-' + Date.now() + '-' + Math.random().toString(36).slice(2,6),
+      text,
+      author: PRES_NOTES_AUTHOR,
+      authorInitials: PRES_NOTES_INITIALS,
+      timestamp: new Date().toISOString(),
+    });
+    _presNotesCache = all;
+    savePresNotes();
+    _presNotesAdding = null;
+    log('TQ Evaluation', 'presentation_note_added', `${vendor} · "${text.slice(0,40)}${text.length>40?'…':''}"`);
     renderTechnical();
     refreshIcons();
   }
+  function startPresNoteEdit(vendor, noteId){
+    _presNotesEditing = { vendor, noteId };
+    _presNotesAdding = null;
+    renderTechnical();
+    refreshIcons();
+    setTimeout(() => {
+      const ta = document.getElementById('presNoteEditTextarea-' + vendor);
+      if (ta){ ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
+    }, 60);
+  }
+  function cancelPresNoteEdit(){ _presNotesEditing = null; renderTechnical(); refreshIcons(); }
+  function savePresNoteEdit(vendor, noteId){
+    const ta = document.getElementById('presNoteEditTextarea-' + vendor);
+    const text = ta ? String(ta.value || '').trim() : '';
+    if (!text){ if (ta) ta.focus(); return; }
+    const all = loadPresNotes();
+    const list = all[vendor] || [];
+    const note = list.find(n => n.id === noteId);
+    if (!note){ _presNotesEditing = null; renderTechnical(); return; }
+    if (!presNoteIsMine(note)){ _presNotesEditing = null; renderTechnical(); return; }
+    note.text = text;
+    note.edited = true;
+    note.editedAt = new Date().toISOString();
+    _presNotesCache = all;
+    savePresNotes();
+    _presNotesEditing = null;
+    log('TQ Evaluation', 'presentation_note_edited', `${vendor} · "${text.slice(0,40)}${text.length>40?'…':''}"`);
+    renderTechnical();
+    refreshIcons();
+  }
+  function removePresNote(vendor, noteId){
+    const all = loadPresNotes();
+    const list = all[vendor] || [];
+    const note = list.find(n => n.id === noteId);
+    if (!note || !presNoteIsMine(note)) return;
+    all[vendor] = list.filter(n => n.id !== noteId);
+    _presNotesCache = all;
+    savePresNotes();
+    log('TQ Evaluation', 'presentation_note_removed', `${vendor}`);
+    renderTechnical();
+    refreshIcons();
+  }
+  function seedPresNotesIfEmpty(){
+    if (!EVAL || !EVAL.tnd) return;
+    const raw = localStorage.getItem(presNotesKey());
+    if (raw){
+      try { const o = JSON.parse(raw); if (o && typeof o === 'object' && Object.keys(o).length) { _presNotesCache = o; return; } } catch(e){}
+    }
+    // Seed one demo note for Rajesh Constructions
+    const seed = {
+      'Rajesh Constructions': [{
+        id: 'note-seed-ps-001',
+        text: 'Strong presentation — clear understanding of scope. BOQ breakdown was detailed. Recommended for TQ scoring consideration.',
+        author: 'Priya Shah',
+        authorInitials: 'PS',
+        timestamp: 'May 18, 10:42 AM',
+      }],
+    };
+    _presNotesCache = seed;
+    savePresNotes();
+  }
+  // Cross-tab storage sync — if another tab writes new notes, drop the cache so we re-read
+  window.addEventListener('storage', function(e){
+    if (e.key && e.key === presNotesKey()){ _presNotesCache = null; if (EVAL && EVAL.expanded === 's2') renderTechnical(); }
+  });
   function presUploadPpt(vendor){
     EVAL.presentations[vendor] = EVAL.presentations[vendor] || {};
     EVAL.presentations[vendor].ppt = 'pres_'+vendor.toLowerCase().replace(/[^a-z0-9]+/g,'_')+'.pdf';
@@ -4332,23 +4545,7 @@ Date: ${esc(fmtDateShort(today))}`;
     showToast('Opening '+((EVAL.presentations[vendor]||{}).pptName||'presentation'));
     log('TQ Evaluation', 'presentation_viewed', `${vendor} · PPT/PDF`);
   }
-  function togglePresInclude(vendor){
-    EVAL.presentations[vendor] = EVAL.presentations[vendor] || {};
-    EVAL.presentations[vendor].includeInTq = !EVAL.presentations[vendor].includeInTq;
-    if (EVAL.presentations[vendor].includeInTq && EVAL.presentations[vendor].marks == null) EVAL.presentations[vendor].marks = 10;
-    log('TQ Evaluation', 'presentation_include_toggled', `${vendor} · include=${EVAL.presentations[vendor].includeInTq}`);
-    saveState(); renderTechnical();
-  }
-  function setPresMarks(vendor, val){
-    EVAL.presentations[vendor] = EVAL.presentations[vendor] || {};
-    EVAL.presentations[vendor].marks = parseInt(val) || 0;
-    saveState();
-  }
-  function setPresNotes(vendor, val){
-    EVAL.presentations[vendor] = EVAL.presentations[vendor] || {};
-    EVAL.presentations[vendor].notes = val;
-    saveState();
-  }
+  // (Score-contribution toggle / marks / inline notes input removed — replaced by NOTES column above.)
   // === Video modal ===
   function openVideoModal(vendor){
     const p = EVAL.presentations[vendor] || {};
@@ -6899,9 +7096,7 @@ Date: ${esc(fmtDateShort(today))}`;
   // ===================== ACTIVITY TRAIL PANEL (formerly Audit Log) =====================
   let _uiAudit = { open:false, filter:'all', tab:'activity', lastSeenCritCount:0 };
   try { _uiAudit.open = sessionStorage.getItem('activityTrailOpen') === '1'; } catch(e){}
-  // Presentations notes-column visibility (Fix 2) — hidden by default, restored from session
-  let _uiPresNotes = false;
-  try { _uiPresNotes = sessionStorage.getItem('presNotesVisible') === '1'; } catch(e){}
+  // (Former `_uiPresNotes` flag removed — NOTES column is now permanent.)
   // Transient per-cell edit state for Member 1 TQ scores (Fix 3). Keyed `${vendor}|${critId}`.
   let _uiEditingScores = {};
   // C1 — PQ vendor dropdown open flag (transient — not persisted)
