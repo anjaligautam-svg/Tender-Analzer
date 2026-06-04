@@ -1,547 +1,1605 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Panel — TenderAI Hub</title>
-  <meta name="description" content="TenderAI admin panel for Ahmedabad Municipal Corporation — manage officers, departments, vendors, budgets, templates, DSR rates, compliance and system settings." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-  <script>
-    tailwind.config = { theme: { extend: {
-      fontFamily: { sans: ['"DM Sans"', 'system-ui', 'sans-serif'] },
-      colors: {
-        primary: { DEFAULT: '#0F5EE8', light: '#EFF6FF', border: '#93C5FD' },
-        success: { DEFAULT: '#10B981', light: '#F0FDF4' },
-        warning: { DEFAULT: '#F59E0B', light: '#FFFBEB' },
-        danger:  { DEFAULT: '#EF4444', light: '#FEF2F2' },
-        purple:  { DEFAULT: '#8B5CF6', light: '#EEEDFE' },
-        ink: { 900: '#111827', 500: '#6B7280', 400: '#9CA3AF' },
-        line: '#E5E7EB', surface: '#F9FAFB',
-      },
-      boxShadow: { soft: '0 1px 3px rgba(0,0,0,0.08)', lift: '0 4px 12px rgba(0,0,0,0.12)' },
-    }}};
-  </script>
-  <style>
-    html, body { font-family: 'DM Sans', system-ui, sans-serif; color: #111827; background: #F9FAFB; }
-    *:focus-visible { outline: 2px solid #0F5EE8; outline-offset: 2px; border-radius: 4px; }
-    ::-webkit-scrollbar { width: 10px; height: 10px; }
-    ::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 8px; }
-    ::-webkit-scrollbar-thumb:hover { background: #D1D5DB; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    .stat-card { transition: all .15s ease; }
-    .stat-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); transform: translateY(-1px); }
-    .module-card { transition: all .15s ease; }
-    .module-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); transform: translateY(-2px); border-color: #93C5FD; }
-    .quick-tile { transition: all .15s ease; cursor: pointer; }
-    .quick-tile:hover { background: #F0F7FF; border-color: #0F5EE8; transform: scale(1.02); }
-    .quick-tile:active { transform: scale(0.98); }
-    .toast { transform: translateY(80px); opacity: 0; transition: transform .3s cubic-bezier(.2,.7,.2,1), opacity .25s ease; }
-    .toast.show { transform: translateY(0); opacity: 1; }
-    .dropdown-shadow { box-shadow: 0 12px 32px rgba(17,24,39,0.14), 0 2px 6px rgba(17,24,39,0.06); }
-    /* Activity trail right-side panel */
-    #activityPanel { transition: transform .28s ease; }
-    #activityPanel.collapsed { transform: translateX(100%); }
-    @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Console — TenderAI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+tailwind.config = { theme: { extend: {
+  fontFamily: { sans: ['"DM Sans"','system-ui','sans-serif'], mono:['"JetBrains Mono"','monospace'] },
+  colors: {
+    primary:{DEFAULT:'#0F5EE8',light:'#EFF6FF',border:'#93C5FD'},
+    success:{DEFAULT:'#10B981',light:'#F0FDF4'},
+    warning:{DEFAULT:'#F59E0B',light:'#FFFBEB'},
+    danger:{DEFAULT:'#EF4444',light:'#FEF2F2'},
+    purple:{DEFAULT:'#8B5CF6',light:'#EEEDFE'},
+    ink:{900:'#111827',500:'#6B7280',400:'#9CA3AF'},
+    line:'#E5E7EB', surface:'#F9FAFB',
+  },
+  boxShadow:{ soft:'0 1px 3px rgba(0,0,0,0.08)', lift:'0 4px 12px rgba(0,0,0,0.12)' },
+}}};
+</script>
+<style>
+  html,body{font-family:'DM Sans',system-ui,sans-serif;color:#111827;background:#F9FAFB}
+  *:focus-visible{outline:2px solid #0F5EE8;outline-offset:2px;border-radius:4px}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:#E5E7EB;border-radius:8px}
+  ::-webkit-scrollbar-thumb:hover{background:#D1D5DB}
+  ::-webkit-scrollbar-track{background:transparent}
+  .no-scrollbar{scrollbar-width:none}.no-scrollbar::-webkit-scrollbar{display:none}
+  .dropdown-shadow{box-shadow:0 12px 32px rgba(17,24,39,0.14),0 2px 6px rgba(17,24,39,0.06)}
+  /* item rows */
+  .item-row{transition:background .12s ease,border-color .12s ease}
+  .item-row:hover{background:#FCFCFD}
+  .pri-Core{color:#EF4444;background:#FEF2F2}
+  .pri-Helpful{color:#0F5EE8;background:#EFF6FF}
+  .pri-Optional{color:#6B7280;background:#F3F4F6}
+  .chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:600;border:1px solid transparent}
+  .chip-input{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:9999px;font-size:12px;background:#F3F4F6;color:#111827;border:1px solid #E5E7EB}
+  .chip-input button{color:#9CA3AF}.chip-input button:hover{color:#EF4444}
+  /* toggle */
+  .toggle{position:relative;width:36px;height:20px;background:#E5E7EB;border-radius:9999px;cursor:pointer;transition:background .15s}
+  .toggle .dot{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:9999px;background:white;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:left .15s}
+  .toggle.on{background:#10B981}.toggle.on .dot{left:18px}
+  /* edit panel */
+  #editPanel{transform:translateX(100%);transition:transform 280ms ease}
+  #editPanel.open{transform:translateX(0)}
+  #backdrop{opacity:0;pointer-events:none;transition:opacity 280ms ease}
+  #backdrop.open{opacity:1;pointer-events:auto}
+  /* activity panel */
+  #activityPanel{transition:transform 280ms ease, width 280ms ease}
+  #activityPanel.collapsed{transform:translateX(100%);width:0}
+  /* tabs/scoped tag */
+  .tab-active{background:#0F5EE8;color:white;border-color:#0F5EE8}
+  /* toast */
+  .toast{transform:translateY(80px);opacity:0;transition:transform .3s cubic-bezier(.2,.7,.2,1),opacity .25s ease}
+  .toast.show{transform:translateY(0);opacity:1}
+  /* anchor offset for sticky topbar */
+  .sec-anchor{scroll-margin-top:80px}
+  /* small inputs */
+  .inp{background:white;border:1px solid #E5E7EB;border-radius:8px;padding:6px 10px;font-size:13px;color:#111827}
+  .inp:focus{outline:none;border-color:#0F5EE8;box-shadow:0 0 0 3px rgba(15,94,232,.15)}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;font-size:13px;border-radius:8px;border:1px solid #E5E7EB;background:white;color:#111827;cursor:pointer}
+  .btn:hover{background:#F9FAFB}
+  .btn-primary{background:#0F5EE8;color:white;border-color:#0F5EE8}
+  .btn-primary:hover{background:#0D4FC2}
+  .btn-danger{background:#FEF2F2;color:#EF4444;border-color:#FECACA}
+  .btn-danger:hover{background:#FECACA}
+</style>
 </head>
 <body class="min-h-screen">
 <div class="flex min-h-screen">
 
-  <!-- ============ ADMIN SIDEBAR ============ -->
-  <aside class="w-[244px] shrink-0 bg-white border-r border-line flex flex-col" aria-label="Primary">
+  <!-- =================== SIDEBAR =================== -->
+  <aside class="w-[244px] shrink-0 bg-white border-r border-line flex flex-col" aria-label="Admin navigation">
     <div class="px-5 pt-5 pb-4 border-b border-line">
       <div class="flex items-center gap-3">
         <div class="w-9 h-9 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-[15px]">T</div>
         <div>
           <div class="text-[15px] font-semibold text-ink-900 leading-tight">TenderAI</div>
-          <div class="text-[11px] text-ink-500 leading-tight">Admin Panel</div>
+          <div class="text-[11px] text-ink-500 leading-tight">Admin Console · v0</div>
         </div>
       </div>
-      <button class="mt-4 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-line bg-surface hover:bg-white hover:shadow-soft transition" aria-label="Switch organisation">
+      <div class="mt-4 flex items-center gap-3 px-3 py-2.5 rounded-lg border border-line bg-surface">
         <div class="w-7 h-7 rounded-md bg-primary-light text-primary flex items-center justify-center"><i data-lucide="building-2" class="w-4 h-4"></i></div>
         <div class="text-left flex-1 min-w-0">
           <div class="text-[12.5px] font-medium text-ink-900 truncate">Ahmedabad</div>
           <div class="text-[10.5px] text-ink-500 truncate">Municipal Corporation</div>
         </div>
-        <i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 text-ink-400"></i>
-      </button>
+      </div>
     </div>
-    <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
-      <div>
-        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">OVERVIEW</div>
-        <ul class="space-y-0.5">
-          <li><a href="admin.html" aria-current="page" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] bg-primary-light text-primary font-medium"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Admin Dashboard</a></li>
-        </ul>
-      </div>
-      <div>
-        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">ACCESS &amp; ORG</div>
-        <ul class="space-y-0.5">
-          <li><a href="admin-users.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="users" class="w-4 h-4"></i> User Management <span class="ml-auto bg-primary-light text-primary text-[10px] font-semibold rounded-full px-1.5 py-0.5">24</span></a></li>
-          <li><a href="admin-org.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="network" class="w-4 h-4"></i> Department &amp; Org</a></li>
-        </ul>
-      </div>
-      <div>
-        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">CATALOG</div>
-        <ul class="space-y-0.5">
-          <li><a href="admin-templates.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="layout-template" class="w-4 h-4"></i> Tender Templates</a></li>
-          <li><a href="admin-budget.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="wallet" class="w-4 h-4"></i> Budget Heads</a></li>
-          <li><a href="admin-dsr.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="table-2" class="w-4 h-4"></i> DSR Rates</a></li>
-          <li><a href="admin-vendors.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="store" class="w-4 h-4"></i> Vendor Registry <span class="ml-auto bg-danger text-white text-[10px] font-semibold rounded-full px-1.5 py-0.5">3</span></a></li>
-        </ul>
-      </div>
-      <div>
-        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">GOVERNANCE</div>
-        <ul class="space-y-0.5">
-          <li><a href="admin-compliance.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="shield-check" class="w-4 h-4"></i> Compliance &amp; Audit</a></li>
-          <li><a href="admin-reports.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Reports &amp; Analytics</a></li>
-        </ul>
-      </div>
-      <div>
-        <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">SYSTEM</div>
-        <ul class="space-y-0.5">
-          <li><a href="admin-notifications.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="bell-ring" class="w-4 h-4"></i> Notifications</a></li>
-          <li><a href="admin-settings.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="settings" class="w-4 h-4"></i> System Settings</a></li>
-        </ul>
-      </div>
-      <div class="pt-2 border-t border-line">
-        <ul class="space-y-0.5">
-          <li><a href="index.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="arrow-left" class="w-4 h-4"></i> Procurement Portal</a></li>
-        </ul>
-      </div>
-    </nav>
+    <nav id="sideNav" class="flex-1 px-3 py-4 space-y-5 overflow-y-auto no-scrollbar"></nav>
     <div class="border-t border-line px-4 py-3 flex items-center gap-3">
       <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div>
-      <div class="flex-1 min-w-0">
-        <div class="text-[12.5px] font-medium text-ink-900 truncate">Rajesh Kumar</div>
-        <div class="text-[10.5px] text-ink-500 truncate">Super Admin</div>
-      </div>
-      <button onclick="sessionStorage.clear(); location.href='login.html'" aria-label="Sign out" class="text-ink-400 hover:text-ink-900"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+      <div class="flex-1 min-w-0"><div class="text-[12.5px] font-medium text-ink-900 truncate">Rajesh Kumar</div><div class="text-[10.5px] text-ink-500 truncate">Super Admin</div></div>
+      <button onclick="location.href='login.html'" aria-label="Sign out" class="text-ink-400 hover:text-ink-900"><i data-lucide="log-out" class="w-4 h-4"></i></button>
     </div>
   </aside>
 
-  <!-- ============ MAIN COLUMN ============ -->
+  <!-- =================== MAIN COLUMN =================== -->
   <div class="flex-1 flex flex-col min-w-0">
 
-    <!-- Topnav -->
+    <!-- Topbar -->
     <header class="h-16 bg-white border-b border-line px-6 flex items-center gap-4 sticky top-0 z-30">
       <button aria-label="Toggle sidebar" class="text-ink-500 hover:text-ink-900"><i data-lucide="panel-left" class="w-5 h-5"></i></button>
       <div class="flex-1 max-w-xl relative">
         <i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-        <input type="search" placeholder="Search officers, departments, vendors…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] placeholder:text-ink-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+        <input id="searchInput" type="search" placeholder="Search 149 admin settings — try 'TQ rubric', 'corrigendum', 'value tier'…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] placeholder:text-ink-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
       </div>
       <button class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">FY 2026-27 <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
-      <button id="activityToggle" aria-label="Toggle activity trail" class="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-lg border border-line hover:bg-surface text-ink-500 hover:text-ink-900 text-[13px]"><i data-lucide="activity" class="w-4 h-4"></i> Activity</button>
-      <div class="relative">
-        <button id="bellBtn" aria-label="Notifications" class="relative w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500">
-          <i data-lucide="bell" class="w-4 h-4"></i>
-          <span class="absolute -top-1 -right-1 bg-danger text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">5</span>
-        </button>
-        <div id="bellMenu" class="hidden absolute right-0 mt-2 w-[360px] bg-white border border-line rounded-xl dropdown-shadow z-40">
-          <div class="px-4 py-3 border-b border-line flex items-center justify-between"><div class="text-[14px] font-semibold text-ink-900">Admin notifications</div><a href="#" class="text-[12px] text-primary hover:underline">Mark all read</a></div>
-          <ul class="max-h-[420px] overflow-y-auto divide-y divide-line">
-            <li class="px-4 py-3 hover:bg-surface"><div class="flex gap-2.5"><div class="w-8 h-8 rounded-full bg-danger-light text-danger flex items-center justify-center shrink-0"><i data-lucide="alert-octagon" class="w-4 h-4"></i></div><div class="flex-1 min-w-0"><div class="text-[13px] text-ink-900"><strong>1 vendor blacklist</strong> request awaiting your review.</div><div class="text-[11px] text-ink-500 mt-0.5">1h ago</div></div></div></li>
-            <li class="px-4 py-3 hover:bg-surface"><div class="flex gap-2.5"><div class="w-8 h-8 rounded-full bg-warning-light text-warning flex items-center justify-center shrink-0"><i data-lucide="alert-triangle" class="w-4 h-4"></i></div><div class="flex-1 min-w-0"><div class="text-[13px] text-ink-900">DSR rate book <strong>v2026.2</strong> is ready to publish.</div><div class="text-[11px] text-ink-500 mt-0.5">3h ago</div></div></div></li>
-            <li class="px-4 py-3 hover:bg-surface"><div class="flex gap-2.5"><div class="w-8 h-8 rounded-full bg-warning-light text-warning flex items-center justify-center shrink-0"><i data-lucide="clock" class="w-4 h-4"></i></div><div class="flex-1 min-w-0"><div class="text-[13px] text-ink-900"><strong>3 approvals</strong> are past SLA across departments.</div><div class="text-[11px] text-ink-500 mt-0.5">Today</div></div></div></li>
-            <li class="px-4 py-3 hover:bg-surface"><div class="flex gap-2.5"><div class="w-8 h-8 rounded-full bg-primary-light text-primary flex items-center justify-center shrink-0"><i data-lucide="user-plus" class="w-4 h-4"></i></div><div class="flex-1 min-w-0"><div class="text-[13px] text-ink-900">New officer onboarding requested by HOD, Water Dept.</div><div class="text-[11px] text-ink-500 mt-0.5">Yesterday</div></div></div></li>
-            <li class="px-4 py-3 hover:bg-surface"><div class="flex gap-2.5"><div class="w-8 h-8 rounded-full bg-success-light text-success flex items-center justify-center shrink-0"><i data-lucide="check-circle-2" class="w-4 h-4"></i></div><div class="flex-1 min-w-0"><div class="text-[13px] text-ink-900">Monthly compliance report generated.</div><div class="text-[11px] text-ink-500 mt-0.5">2 days ago</div></div></div></li>
-          </ul>
-          <a href="admin-compliance.html" class="block px-4 py-3 text-center text-[12.5px] text-primary hover:bg-surface border-t border-line">Open Compliance &amp; Audit →</a>
-        </div>
-      </div>
-
-      <!-- Avatar dropdown -->
-      <div class="relative">
-        <button id="avatarBtn" aria-label="Account menu" class="flex items-center gap-2 pl-2 border-l border-line">
-          <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div>
-          <div class="hidden md:block text-left"><div class="text-[12.5px] font-medium text-ink-900 leading-tight">Rajesh Kumar</div><div class="text-[10.5px] text-ink-500 leading-tight">Super Admin</div></div>
-          <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i>
-        </button>
-        <div id="avatarMenu" class="hidden absolute right-0 mt-2 w-[240px] bg-white border border-line rounded-xl dropdown-shadow z-40 py-1.5">
-          <a href="#" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="user" class="w-4 h-4 text-ink-500"></i> My profile</a>
-          <a href="admin.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] bg-primary-light text-primary font-medium mx-1.5 rounded-md"><i data-lucide="shield" class="w-4 h-4"></i> Admin Panel</a>
-          <a href="index.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="layout-dashboard" class="w-4 h-4 text-ink-500"></i> Procurement Portal</a>
-          <a href="admin-settings.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="settings" class="w-4 h-4 text-ink-500"></i> System Settings</a>
-          <div class="my-1.5 border-t border-line"></div>
-          <a href="#" onclick="sessionStorage.clear(); location.href='login.html'; return false;" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-danger hover:bg-danger-light"><i data-lucide="log-out" class="w-4 h-4"></i> Sign out</a>
-        </div>
+      <button id="activityToggle" aria-label="Toggle activity log" class="hidden md:flex w-9 h-9 items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500"><i data-lucide="history" class="w-4 h-4"></i></button>
+      <button aria-label="Notifications" class="relative w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500"><i data-lucide="bell" class="w-4 h-4"></i><span class="absolute -top-1 -right-1 bg-danger text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">4</span></button>
+      <div class="flex items-center gap-2 pl-2 border-l border-line h-9">
+        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div>
+        <div class="hidden md:block text-left"><div class="text-[12.5px] font-medium text-ink-900 leading-tight">Rajesh Kumar</div><div class="text-[10.5px] text-ink-500 leading-tight">Super Admin</div></div>
       </div>
     </header>
 
     <div class="flex-1 flex min-w-0">
+      <main id="content" class="flex-1 overflow-y-auto px-8 py-6 space-y-6 min-w-0"></main>
 
-      <!-- ============ MAIN ============ -->
-      <main class="flex-1 overflow-y-auto px-8 py-6 space-y-8 min-w-0">
-
-        <!-- Page header -->
-        <section class="flex items-start justify-between flex-wrap gap-3">
-          <div>
-            <div class="text-[13px] text-ink-500 mb-2">Admin Panel</div>
-            <h1 class="text-[24px] font-bold text-ink-900 leading-tight">System administration</h1>
-            <p class="text-[14px] text-ink-500 mt-1">Ahmedabad Municipal Corporation · FY 2026-27</p>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success-light text-success text-[12px] font-medium"><span class="w-1.5 h-1.5 rounded-full bg-success"></span> All systems operational</span>
-            <button onclick="showToast('Export queued — system summary CSV')" class="px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="download" class="w-4 h-4"></i> Export</button>
-          </div>
-        </section>
-
-        <!-- CVC compliance health banner -->
-        <section class="bg-white border border-line rounded-xl p-5">
-          <div class="flex items-center gap-6 flex-wrap">
-            <!-- Score gauge -->
-            <div class="flex items-center gap-4">
-              <div class="relative w-[88px] h-[88px]">
-                <svg viewBox="0 0 80 80" class="w-full h-full -rotate-90">
-                  <circle cx="40" cy="40" r="34" fill="none" stroke="#E5E7EB" stroke-width="8" />
-                  <circle cx="40" cy="40" r="34" fill="none" stroke="#10B981" stroke-width="8" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="27.77" />
-                </svg>
-                <div class="absolute inset-0 flex flex-col items-center justify-center">
-                  <div class="text-[20px] font-bold text-ink-900 leading-none">87</div>
-                  <div class="text-[9.5px] uppercase tracking-wider text-ink-400 font-semibold">/100</div>
-                </div>
-              </div>
-              <div>
-                <div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold">CVC Compliance Health</div>
-                <div class="text-[16px] font-bold text-ink-900 mt-0.5">Good standing</div>
-                <a href="admin-compliance.html" class="text-[12.5px] text-primary font-medium hover:underline inline-flex items-center gap-1 mt-1">Open compliance dashboard <i data-lucide="arrow-right" class="w-3 h-3"></i></a>
-              </div>
-            </div>
-            <div class="h-12 w-px bg-line hidden md:block"></div>
-            <div class="grid grid-cols-3 gap-6 flex-1 min-w-[280px]">
-              <div>
-                <div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold">Pending approvals</div>
-                <div class="text-[22px] font-bold text-ink-900 leading-none mt-1">11</div>
-                <div class="text-[11.5px] text-ink-500 mt-0.5">Across all tenders</div>
-              </div>
-              <div>
-                <div class="text-[11px] uppercase tracking-[0.06em] text-danger font-semibold">Overdue</div>
-                <div class="text-[22px] font-bold text-danger leading-none mt-1">3</div>
-                <div class="text-[11.5px] text-ink-500 mt-0.5">Past SLA</div>
-              </div>
-              <div>
-                <div class="text-[11px] uppercase tracking-[0.06em] text-purple font-semibold">Under evaluation</div>
-                <div class="text-[22px] font-bold text-ink-900 leading-none mt-1">5</div>
-                <div class="text-[11.5px] text-ink-500 mt-0.5">In committee</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- 4 stat cards -->
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <a href="admin-users.html" class="stat-card block bg-white border border-line rounded-xl p-5">
-            <div class="flex items-center justify-between mb-2"><div class="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center"><i data-lucide="users" class="w-4 h-4"></i></div><span class="text-[10.5px] uppercase tracking-wider text-success font-semibold">+3</span></div>
-            <div class="text-[26px] font-bold text-ink-900 leading-none">24</div>
-            <div class="text-[12px] text-ink-500 mt-1">Active Officers</div>
-            <div class="text-[12px] text-success mt-0.5 font-medium">+3 onboarded this month</div>
-          </a>
-          <a href="admin-org.html" class="stat-card block bg-white border border-line rounded-xl p-5">
-            <div class="flex items-center justify-between mb-2"><div class="w-9 h-9 rounded-lg bg-purple-light text-purple flex items-center justify-center"><i data-lucide="network" class="w-4 h-4"></i></div><span class="text-[10.5px] uppercase tracking-wider text-ink-400 font-semibold">Org</span></div>
-            <div class="text-[26px] font-bold text-ink-900 leading-none">9</div>
-            <div class="text-[12px] text-ink-500 mt-1">Departments Configured</div>
-            <div class="text-[12px] text-ink-500 mt-0.5">All HODs assigned</div>
-          </a>
-          <a href="admin-compliance.html" class="stat-card block bg-white border border-line rounded-xl p-5">
-            <div class="flex items-center justify-between mb-2"><div class="w-9 h-9 rounded-lg bg-warning-light text-warning flex items-center justify-center"><i data-lucide="clipboard-check" class="w-4 h-4"></i></div><span class="text-[10.5px] uppercase tracking-wider text-danger font-semibold">3 overdue</span></div>
-            <div class="text-[26px] font-bold text-ink-900 leading-none">11</div>
-            <div class="text-[12px] text-ink-500 mt-1">Pending Approvals</div>
-            <div class="text-[12px] text-warning mt-0.5 font-medium">Across all tenders</div>
-          </a>
-          <a href="admin-vendors.html" class="stat-card block bg-white border border-line rounded-xl p-5">
-            <div class="flex items-center justify-between mb-2"><div class="w-9 h-9 rounded-lg bg-success-light text-success flex items-center justify-center"><i data-lucide="store" class="w-4 h-4"></i></div><span class="text-[10.5px] uppercase tracking-wider text-danger font-semibold">3 BL</span></div>
-            <div class="text-[26px] font-bold text-ink-900 leading-none">142</div>
-            <div class="text-[12px] text-ink-500 mt-1">Registered Vendors</div>
-            <div class="text-[12px] text-danger mt-0.5 font-medium">3 blacklisted</div>
-          </a>
-        </section>
-
-        <!-- Module grid -->
-        <section>
-          <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
-            <h2 class="text-[20px] font-bold text-ink-900">Admin modules</h2>
-            <p class="text-[13px] text-ink-500">Configure access, organisation, catalog, governance and system behaviour</p>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4" id="moduleGrid"></div>
-        </section>
-
-        <!-- Pending approvals table -->
-        <section class="space-y-3">
-          <div class="flex items-center justify-between flex-wrap gap-2">
-            <h2 class="text-[20px] font-bold text-ink-900">Pending approvals across all tenders</h2>
-            <a href="admin-compliance.html" class="text-[13px] text-primary font-medium hover:underline inline-flex items-center gap-1">View all in Compliance &amp; Audit <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></a>
-          </div>
-          <div class="bg-white border border-line rounded-xl overflow-hidden">
-            <div class="overflow-x-auto">
-              <table class="w-full text-[13.5px]">
-                <thead class="bg-surface border-b border-line">
-                  <tr class="text-[11.5px] uppercase tracking-wider text-ink-500 font-semibold">
-                    <th class="text-left px-5 py-3">Tender</th>
-                    <th class="text-left px-5 py-3">Stage</th>
-                    <th class="text-left px-5 py-3">Authority</th>
-                    <th class="text-right px-5 py-3">Value</th>
-                    <th class="text-left px-5 py-3">Status</th>
-                    <th class="text-right px-5 py-3">Aging</th>
-                  </tr>
-                </thead>
-                <tbody id="approvalsBody" class="divide-y divide-line"></tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <!-- Quick actions -->
-        <section>
-          <div class="text-[11px] uppercase tracking-[0.06em] text-ink-500 font-semibold mb-3">Quick actions</div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <a href="admin-users.html?new=1" class="quick-tile bg-white border border-line rounded-xl px-4 py-6 text-center block">
-              <i data-lucide="user-plus" class="w-7 h-7 text-primary mx-auto"></i>
-              <div class="text-[14px] font-bold text-ink-900 mt-3">Add officer</div>
-              <div class="text-[12px] text-ink-500 mt-1">Onboard a new user</div>
-            </a>
-            <a href="admin-templates.html?new=1" class="quick-tile bg-white border border-line rounded-xl px-4 py-6 text-center block">
-              <i data-lucide="layout-template" class="w-7 h-7 text-primary mx-auto"></i>
-              <div class="text-[14px] font-bold text-ink-900 mt-3">New template</div>
-              <div class="text-[12px] text-ink-500 mt-1">Create tender template</div>
-            </a>
-            <a href="admin-dsr.html?publish=1" class="quick-tile bg-white border border-line rounded-xl px-4 py-6 text-center block">
-              <i data-lucide="table-2" class="w-7 h-7 text-primary mx-auto"></i>
-              <div class="text-[14px] font-bold text-ink-900 mt-3">Publish DSR rates</div>
-              <div class="text-[12px] text-ink-500 mt-1">v2026.2 draft ready</div>
-            </a>
-            <a href="admin-vendors.html?tab=blacklist" class="quick-tile bg-white border border-line rounded-xl px-4 py-6 text-center block">
-              <i data-lucide="shield-alert" class="w-7 h-7 text-primary mx-auto"></i>
-              <div class="text-[14px] font-bold text-ink-900 mt-3">Review blacklist</div>
-              <div class="text-[12px] text-ink-500 mt-1">1 pending request</div>
-            </a>
-          </div>
-        </section>
-
-        <!-- Two-up: budget utilisation + officer workload -->
-        <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div class="bg-white border border-line rounded-xl p-5">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-[15px] font-bold text-ink-900">Budget utilisation by department</h3>
-              <a href="admin-budget.html" class="text-[12.5px] text-primary hover:underline">Open module →</a>
-            </div>
-            <ul class="space-y-3" id="budgetBars"></ul>
-          </div>
-          <div class="bg-white border border-line rounded-xl p-5">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-[15px] font-bold text-ink-900">Officer workload</h3>
-              <a href="admin-users.html" class="text-[12.5px] text-primary hover:underline">Open module →</a>
-            </div>
-            <ul class="space-y-3" id="officerBars"></ul>
-          </div>
-        </section>
-
-        <div class="h-6"></div>
-      </main>
-
-      <!-- ============ ACTIVITY TRAIL PANEL ============ -->
-      <aside id="activityPanel" class="w-[320px] shrink-0 border-l border-line bg-white overflow-y-auto collapsed" aria-label="Activity trail">
-        <div class="px-5 pt-5 pb-4 border-b border-line flex items-center justify-between">
-          <div>
-            <h2 class="text-[15px] font-bold text-ink-900">Activity trail</h2>
-            <div class="text-[11.5px] text-ink-500">All admin actions, newest first</div>
-          </div>
-          <button onclick="toggleActivity()" aria-label="Close activity trail" class="text-ink-400 hover:text-ink-900"><i data-lucide="x" class="w-4 h-4"></i></button>
+      <!-- Activity panel -->
+      <aside id="activityPanel" class="w-[320px] shrink-0 border-l border-line bg-white overflow-y-auto">
+        <div class="px-4 py-3.5 border-b border-line flex items-center justify-between sticky top-0 bg-white z-10">
+          <div class="text-[14px] font-semibold text-ink-900 flex items-center gap-2"><i data-lucide="history" class="w-4 h-4 text-ink-500"></i> Activity trail</div>
+          <button onclick="document.getElementById('activityPanel').classList.add('collapsed')" class="text-ink-400 hover:text-ink-900"><i data-lucide="x" class="w-4 h-4"></i></button>
         </div>
-        <ul id="activityList" class="px-5 py-4 space-y-4 text-[12.5px]"></ul>
+        <ul id="activityFeed" class="px-4 py-3 space-y-3.5"></ul>
       </aside>
     </div>
   </div>
 </div>
 
+<!-- =================== EDIT PANEL (720px) =================== -->
+<div id="backdrop" class="fixed inset-0 bg-black/30 z-40"></div>
+<aside id="editPanel" class="fixed top-0 right-0 h-full w-[720px] max-w-full bg-white border-l border-line z-50 flex flex-col">
+  <div class="px-6 py-4 border-b border-line flex items-start justify-between gap-4 shrink-0">
+    <div class="min-w-0">
+      <div id="epSection" class="text-[12px] text-ink-500"></div>
+      <h2 id="epTitle" class="text-[18px] font-bold text-ink-900 leading-tight mt-1"></h2>
+      <p id="epWhy" class="text-[13px] text-ink-500 mt-1.5 leading-snug"></p>
+    </div>
+    <button onclick="closeEdit()" class="text-ink-500 hover:text-ink-900 shrink-0"><i data-lucide="x" class="w-5 h-5"></i></button>
+  </div>
+  <div id="epBody" class="flex-1 overflow-y-auto px-6 py-5"></div>
+  <div class="px-6 py-3 border-t border-line flex items-center justify-between gap-3 shrink-0 bg-surface">
+    <div class="text-[12px] text-ink-500">Changes auto-save to your admin policy</div>
+    <div class="flex items-center gap-2">
+      <button onclick="closeEdit()" class="btn">Close</button>
+      <button onclick="saveEdit()" class="btn btn-primary"><i data-lucide="check" class="w-3.5 h-3.5"></i> Save</button>
+    </div>
+  </div>
+</aside>
+
 <!-- Toast -->
-<div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-ink-900 text-white text-[13px] px-4 py-3 rounded-xl shadow-lift inline-flex items-center gap-2.5">
+<div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-ink-900 text-white text-[13px] px-4 py-3 rounded-xl shadow-lift inline-flex items-center gap-2.5">
   <i data-lucide="check-circle-2" class="w-4 h-4 text-success"></i>
-  <span id="toastMsg">Done</span>
+  <span id="toastMsg">Saved</span>
 </div>
 
 <script>
-  // ============ SHARED ADMIN HELPERS ============
-  function refreshIcons(){ if (window.lucide) lucide.createIcons(); }
-  let __toastTimer;
-  function showToast(msg){
-    const t = document.getElementById('toast'); if (!t) return;
-    document.getElementById('toastMsg').textContent = msg;
-    t.classList.add('show');
-    clearTimeout(__toastTimer); __toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
-  }
-  function bindDropdown(btnId, menuId){
-    const btn = document.getElementById(btnId), menu = document.getElementById(menuId);
-    if (!btn || !menu) return;
-    btn.addEventListener('click', e => { e.stopPropagation(); menu.classList.toggle('hidden'); });
-    document.addEventListener('click', e => { if (!menu.contains(e.target) && !btn.contains(e.target)) menu.classList.add('hidden'); });
-  }
-  function logAudit(action, target, meta){
-    try {
-      const log = JSON.parse(localStorage.getItem('adminAuditLog') || '[]');
-      log.unshift({ at: new Date().toISOString(), actor: 'Rajesh Kumar', action, target, meta: meta || null });
-      localStorage.setItem('adminAuditLog', JSON.stringify(log.slice(0, 500)));
-    } catch (e) {}
-  }
-  function timeAgo(iso){
-    const d = (Date.now() - new Date(iso).getTime()) / 1000;
-    if (d < 60) return Math.floor(d)+'s ago';
-    if (d < 3600) return Math.floor(d/60)+'m ago';
-    if (d < 86400) return Math.floor(d/3600)+'h ago';
-    return Math.floor(d/86400)+'d ago';
-  }
-  function seedOnce(key, value){
-    if (!localStorage.getItem(key)) localStorage.setItem(key, JSON.stringify(value));
-  }
+/* =========================================================
+   DATA — schema-driven. Delete an item here ⇒ it disappears.
+   ========================================================= */
 
-  // ============ AVATAR + BELL DROPDOWNS ============
-  bindDropdown('avatarBtn', 'avatarMenu');
-  bindDropdown('bellBtn', 'bellMenu');
+const SECTIONS = [
+  // group, key, title, icon, subtitle, intro
+  // OVERVIEW
+  { g:'OVERVIEW', k:'dashboard', t:'Dashboard',           i:'layout-dashboard', s:'149 settings · 16 sections', intro:'A single place to choose how every part of the procurement portal behaves. Tick what matters, leave the rest with sensible defaults.' },
 
-  // ============ ACTIVITY TRAIL ============
-  const activityToggle = document.getElementById('activityToggle');
-  const activityPanel = document.getElementById('activityPanel');
-  function toggleActivity(){ activityPanel.classList.toggle('collapsed'); renderActivity(); }
-  activityToggle.addEventListener('click', toggleActivity);
+  // MODULE POLICIES
+  { g:'MODULE POLICIES', k:'dpr',     t:'DPR Creation',         i:'file-text',   s:'15 settings · 3 groups',  intro:'Policies that govern Detailed Project Report creation, approval pipeline, and AA/TS lifecycle.' },
+  { g:'MODULE POLICIES', k:'tender',  t:'Tender Creation',      i:'file-edit',   s:'19 settings · 7 groups',  intro:'Defaults and rules for NIT creation, PQ/TQ libraries, pre-checks, and publish workflow.' },
+  { g:'MODULE POLICIES', k:'prebid',  t:'Pre-Bid Queries',      i:'message-square-quote', s:'15 settings · 1 group',  intro:'Query intake, AI behaviour, standard responses, corrigendum workflow.' },
+  { g:'MODULE POLICIES', k:'eval',    t:'Bid Evaluation',       i:'gavel',       s:'28 settings · 7 groups · most important',  intro:'The densest configuration surface in the portal — PQ verdicts, TQ scoring rubric, 5 evaluation methods, reasonableness check, committee rules, financial reveal flow.' },
+  { g:'MODULE POLICIES', k:'mgmt',    t:'Bid Management',       i:'briefcase',   s:'22 settings · 6 groups',  intro:'Stage gates, committee verdicts, negotiation triggers, award recommendation, LoA.' },
 
-  function renderActivity(){
-    const log = JSON.parse(localStorage.getItem('adminAuditLog') || '[]');
-    const seed = [
-      { at: new Date(Date.now()-1000*60*22).toISOString(),     actor:'Rajesh Kumar', action:'Published',  target:'DSR rate book v2026.1 marked live' },
-      { at: new Date(Date.now()-1000*60*60*2).toISOString(),   actor:'Rajesh Kumar', action:'Updated',    target:'Approval threshold — Tier 3 set to ₹50L' },
-      { at: new Date(Date.now()-1000*60*60*5).toISOString(),   actor:'Priya Shah',   action:'Onboarded',  target:'Officer Sunita Rao · Deputy Commissioner' },
-      { at: new Date(Date.now()-1000*60*60*26).toISOString(),  actor:'Rajesh Kumar', action:'Flagged',    target:'Vendor BuildTech Solutions — blacklist requested' },
-      { at: new Date(Date.now()-1000*60*60*30).toISOString(),  actor:'Amit Patil',   action:'Allocated',  target:'Budget head BH-IT-01 → IT dept FY 2026-27' },
-    ];
-    const all = log.concat(seed).slice(0, 25);
-    const list = document.getElementById('activityList');
-    list.innerHTML = all.map(e => `
-      <li class="flex gap-2.5">
-        <div class="w-7 h-7 rounded-full bg-primary-light text-primary flex items-center justify-center shrink-0"><i data-lucide="activity" class="w-3.5 h-3.5"></i></div>
-        <div class="flex-1 min-w-0">
-          <div class="text-ink-900"><strong>${e.actor}</strong> ${e.action.toLowerCase()} <span class="text-ink-500">${e.target}</span></div>
-          <div class="text-[11px] text-ink-400 mt-0.5">${timeAgo(e.at)}</div>
-        </div>
-      </li>`).join('');
-    refreshIcons();
-  }
+  // CROSS-CUTTING
+  { g:'CROSS-CUTTING',   k:'signatures', t:'Signatures & Letterheads', i:'pen-tool',   s:'3 libraries',   intro:'One library for every outgoing letter across all 5 modules — logos, seals, signatures, letterhead.' },
+  { g:'CROSS-CUTTING',   k:'ai',         t:'AI Configuration',         i:'sparkles',   s:'6 settings',    intro:'Master prompts, tone, model, and on/off matrix. Every AI surface in every module reads from here.' },
+  { g:'CROSS-CUTTING',   k:'tiers',      t:'Value-Tier Routing',       i:'layers',     s:'2 settings · used by all 5 modules', intro:'AMC approval thresholds and the per-flow chains they drive. Edit once, applies everywhere.' },
+  { g:'CROSS-CUTTING',   k:'templates',  t:'Document Templates',       i:'file-stack', s:'2 libraries',   intro:'NIT, Corrigendum, Response Sheet, NTQ letter, Clarification letter, Negotiation minutes, Award note, LoA — all here.' },
+  { g:'CROSS-CUTTING',   k:'vendors',    t:'Vendor Master',            i:'store',      s:'4 settings',    intro:'Vendor registry, blacklist, MSME exemption flag, performance score model.' },
+  { g:'CROSS-CUTTING',   k:'officers',   t:'Officers & Departments',   i:'users',      s:'3 settings',    intro:'Officer directory, departments, standing committees.' },
+  { g:'CROSS-CUTTING',   k:'permissions',t:'Permissions',              i:'shield-check', s:'3 settings',  intro:'Per-action permission matrix, scoping, allowlists for special actions.' },
+  { g:'CROSS-CUTTING',   k:'notifications', t:'Notifications',         i:'bell-ring',  s:'4 settings',    intro:'Triggers, channels, escalation rules, message templates.' },
+  { g:'CROSS-CUTTING',   k:'audit',      t:'Audit & Compliance',       i:'clipboard-check', s:'5 settings', intro:'Audit trail, anonymisation enforcement, retention, compliance health score formula, tender-class presets.' },
+  { g:'CROSS-CUTTING',   k:'system',     t:'System',                   i:'settings',   s:'5 settings',    intro:'Auto-save, version retention, working calendar, FY, activity-trail configuration.' },
+];
 
-  // ============ MODULE GRID ============
-  const MODULES = [
-    { href:'admin-users.html',         icon:'users',           color:'primary', title:'User Management',     desc:'Officers, roles, module access',         stat:'24 active officers' },
-    { href:'admin-org.html',           icon:'network',         color:'purple',  title:'Department & Org',    desc:'Hierarchy, HODs, approval tiers',         stat:'9 departments' },
-    { href:'admin-templates.html',     icon:'layout-template', color:'primary', title:'Tender Templates',    desc:'Reusable tender + eval templates',        stat:'18 templates' },
-    { href:'admin-budget.html',        icon:'wallet',          color:'success', title:'Budget Heads',        desc:'Heads, schemes, dept allocations',        stat:'42 budget heads' },
-    { href:'admin-dsr.html',           icon:'table-2',         color:'warning', title:'DSR Rates',           desc:'Schedule of rates by version',            stat:'v2026.2 draft' },
-    { href:'admin-vendors.html',       icon:'store',           color:'danger',  title:'Vendor Registry',     desc:'Empanelment, MSME, blacklist',            stat:'142 vendors · 3 BL' },
-    { href:'admin-compliance.html',    icon:'shield-check',    color:'success', title:'Compliance & Audit',  desc:'CVC score, audit trail, flags',           stat:'CVC 87 / 100' },
-    { href:'admin-reports.html',       icon:'bar-chart-3',     color:'primary', title:'Reports & Analytics', desc:'Spend, cycle time, savings, MSME',        stat:'12 reports' },
-    { href:'admin-notifications.html', icon:'bell-ring',       color:'warning', title:'Notifications',       desc:'Alerts, escalations, templates',          stat:'14 rules · 12 on' },
-    { href:'admin-settings.html',      icon:'settings',        color:'purple',  title:'System Settings',     desc:'Branding, security, FY, retention',       stat:'Mock prototype' },
-  ];
-  function renderModules(){
-    const colorMap = { primary:'bg-primary-light text-primary', purple:'bg-purple-light text-purple', success:'bg-success-light text-success', warning:'bg-warning-light text-warning', danger:'bg-danger-light text-danger' };
-    document.getElementById('moduleGrid').innerHTML = MODULES.map(m => `
-      <a href="${m.href}" class="module-card bg-white border border-line rounded-xl p-4 block">
-        <div class="flex items-start justify-between mb-3">
-          <div class="w-9 h-9 rounded-lg ${colorMap[m.color]} flex items-center justify-center"><i data-lucide="${m.icon}" class="w-4 h-4"></i></div>
-          <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-ink-400"></i>
-        </div>
-        <div class="text-[14px] font-bold text-ink-900 leading-tight">${m.title}</div>
-        <div class="text-[11.5px] text-ink-500 mt-1 leading-snug">${m.desc}</div>
-        <div class="text-[11.5px] text-ink-900 mt-3 font-medium">${m.stat}</div>
-      </a>`).join('');
-    refreshIcons();
-  }
+/* ITEMS schema — every checkbox from the doc. Types:
+   - toggle  : boolean
+   - number  : numeric { unit, min, max, step }
+   - percent : 0–100
+   - text    : single line
+   - select  : { options }
+   - list    : array of strings (chips, add/remove)
+   - kvlist  : array of {k,v} pairs
+   - lib     : structured records (custom UI per id)
+   - chain   : ordered list of authorities
+   - matrix  : rows × cols of checkboxes
+   - template: long text body
+   - rules   : list of {when, then} rules
+   - tiers   : value-tier table
+*/
+const ITEMS = [
+  /* ====== DPR CREATION ====== */
+  // 1A
+  {id:'dpr.pipeline-stages', m:'dpr', s:'1A · Approval pipeline & stage gates', p:'Core', t:'list',
+    title:'Pipeline stages master',
+    why:'Different sectors have different statutory paths. Hardcoding causes wrong routing.',
+    def:['DPR Created','Published','AA','TS','Budget','GeM Check','Approved']},
+  {id:'dpr.aa-ts-authority', m:'dpr', s:'1A · Approval pipeline & stage gates', p:'Core', t:'tiers',
+    title:'AA / TS competent-authority matrix',
+    why:'AA/TS is the heart of DPR compliance. One source of truth.',
+    def:[
+      {min:0,max:500000,auth:'HOD'},
+      {min:500000,max:2500000,auth:'Deputy Commissioner'},
+      {min:2500000,max:5000000,auth:'Commissioner'},
+      {min:5000000,max:null,auth:'State Government'},
+    ]},
+  {id:'dpr.revision-limits', m:'dpr', s:'1A · Approval pipeline & stage gates', p:'Core', t:'kvlist',
+    title:'AA/TS revision-cycle limits',
+    why:'Stops endless query loops; auditable.',
+    def:[{k:'Max revisions',v:'3'},{k:'Deadline per cycle (days)',v:'7'},{k:'Escalate after exceeding',v:'true'}]},
+  {id:'dpr.gem-workflow', m:'dpr', s:'1A · Approval pipeline & stage gates', p:'Core', t:'lib',
+    title:'GeM-check workflow rules',
+    why:'GeM is statutory; categories and evidence list must be central.',
+    def:{categories:['Office stationery','Standard IT goods','Standard furniture','Standard vehicles'], evidenceRequired:['GeM non-availability screenshot','Justification note signed by HOD']}},
+  {id:'dpr.funding-sources', m:'dpr', s:'1A · Approval pipeline & stage gates', p:'Core', t:'list',
+    title:'Funding-source registry',
+    why:'Otherwise officers free-type scheme names with no consistency.',
+    def:['AMRUT 2.0','15th Finance Commission','State Plan – Urban Dev','Smart Cities Mission','SBM-U 2.0','Municipal Own Revenue']},
+  {id:'dpr.priority-sla', m:'dpr', s:'1A · Approval pipeline & stage gates', p:'Helpful', t:'kvlist',
+    title:'Priority labels & SLAs',
+    why:'Emergency tag bypasses normal queues; abuse risk if anyone can set it.',
+    def:[{k:'Routine SLA (days)',v:'21'},{k:'Priority SLA (days)',v:'10'},{k:'Emergency SLA (days)',v:'3'},{k:'Emergency requires role',v:'Commissioner'}]},
+  // 1B
+  {id:'dpr.templates', m:'dpr', s:'1B · Templates, BOQ & libraries', p:'Core', t:'lib',
+    title:'DPR templates per sector',
+    why:'Quality + speed; one good template beats 50 hand-written DPRs.',
+    def:[{sector:'Water Works',template:'Water Pipeline DPR v2.1'},{sector:'Roads',template:'Road Maintenance DPR v3.0'},{sector:'IT Goods',template:'IT Procurement DPR v1.4'},{sector:'Engineering Goods',template:'Engineering Goods DPR v1.2'},{sector:'Urban Dev Works',template:'Urban Dev DPR v2.0'}]},
+  {id:'dpr.boq-library', m:'dpr', s:'1B · Templates, BOQ & libraries', p:'Core', t:'toggle',
+    title:'BOQ item library / DSR linkage',
+    why:'Cited as a DPR feature — rates auto-populate DPR BOQ.',
+    def:true},
+  {id:'dpr.docs-policy', m:'dpr', s:'1B · Templates, BOQ & libraries', p:'Helpful', t:'matrix',
+    title:'Drawings & attachments policy',
+    why:'Prevents incomplete DPRs reaching AA.',
+    def:{rows:['Water Works','Roads','IT Goods','Engineering Goods'], cols:['Site survey','Soil test','Env clearance','Drawings'], cells:{}}},
+  {id:'dpr.site-visit', m:'dpr', s:'1B · Templates, BOQ & libraries', p:'Helpful', t:'kvlist',
+    title:'Site-visit notes requirements',
+    why:'Audit baseline; officers can\'t guess.',
+    def:[{k:'Min photos – Works',v:'6'},{k:'Min photos – Goods',v:'2'},{k:'Mandatory measurements',v:'true'}]},
+  {id:'dpr.market-enquiry', m:'dpr', s:'1B · Templates, BOQ & libraries', p:'Core', t:'kvlist',
+    title:'Market enquiry log structure',
+    why:'Cost-basis audit; format must not drift.',
+    def:[{k:'Minimum quotes',v:'3'},{k:'Required columns',v:'vendor, quote, date, source'},{k:'Max age of quote (days)',v:'90'}]},
+  // 1C
+  {id:'dpr.version-limit', m:'dpr', s:'1C · Quality controls', p:'Optional', t:'number',
+    title:'Version-history limit',
+    why:'Storage + audit policy.',
+    def:20, unit:'versions'},
+  {id:'dpr.clone-scope', m:'dpr', s:'1C · Quality controls', p:'Helpful', t:'kvlist',
+    title:'Clone-past-DPR scope',
+    why:'Stops officers cloning stale or unapproved DPRs.',
+    def:[{k:'FY window (years back)',v:'3'},{k:'Status filter',v:'Approved only'},{k:'Require sector match',v:'true'}]},
+  {id:'dpr.ai-readiness', m:'dpr', s:'1C · Quality controls', p:'Helpful', t:'list',
+    title:'AI Readiness Check rules',
+    why:'AI is making a quality judgement; criteria must be policy.',
+    def:['Completeness ≥ 90%','BOQ matches scope','All approvals captured','Market enquiry present','Site visit logged']},
+  {id:'dpr.competency-precheck', m:'dpr', s:'1C · Quality controls', p:'Core', t:'toggle',
+    title:'Competency-authority pre-check enabled',
+    why:'Already org policy — wire it into the DPR form so it shows live.',
+    def:true},
 
-  // ============ AMC APPROVAL TIER ROUTING ============
-  // ≤ 5L → HOD; 5–25L → Deputy Commissioner; 25–50L → Commissioner; > 50L → State
-  function authorityFor(valueLakh){
-    if (valueLakh <= 5)  return 'HOD';
-    if (valueLakh <= 25) return 'Deputy Commissioner';
-    if (valueLakh <= 50) return 'Commissioner';
-    return 'State Government';
-  }
-  function fmtINR(lakh){
-    if (lakh >= 100) return '₹' + (lakh/100).toFixed(2).replace(/\.00$/, '') + ' Cr';
-    return '₹' + lakh.toFixed(2).replace(/\.00$/, '') + ' L';
-  }
+  /* ====== TENDER CREATION ====== */
+  // 2A
+  {id:'tender.precheck', m:'tender', s:'2A · Pre-check rules', p:'Core', t:'matrix',
+    title:'Mandatory pre-check items',
+    why:'"Quick Check — Before We Begin" is on the page; the checklist itself is policy.',
+    def:{rows:['Goods','Works','Services','Consultancy'], cols:['GeM check','Budget sanction','AA capture','TS capture','DPR ref'], cells:{}}},
+  {id:'tender.gem-mandatory', m:'tender', s:'2A · Pre-check rules', p:'Core', t:'list',
+    title:'GeM-mandatory categories',
+    why:'Statutory.',
+    def:['Office stationery','Computers and peripherals','Office furniture','Vehicles (standard)','Generic IT services']},
+  // 2B
+  {id:'tender.smart-start', m:'tender', s:'2B · Smart Start & templates', p:'Helpful', t:'matrix',
+    title:'Smart Start methods enabled',
+    why:'Org may want to discourage Manual for new officers or disable AI describe on sensitive tenders.',
+    def:{rows:['New officer','Standard officer','Sensitive tender'], cols:['AI describe','Upload','Template','Clone','Manual'], cells:{}}},
+  {id:'tender.template-library', m:'tender', s:'2B · Smart Start & templates', p:'Core', t:'lib',
+    title:'Tender template library',
+    why:'Single highest-leverage admin asset for tender creation.',
+    def:[
+      {sector:'IT Goods', method:'L1', tpl:'IT Goods NIT v3.0', uses:24},
+      {sector:'Infrastructure Works', method:'L1', tpl:'Works NIT v2.4', uses:18},
+      {sector:'Water Works', method:'QCBS 70:30', tpl:'Water Works QCBS v2.1', uses:11},
+      {sector:'Engineering Goods', method:'L1', tpl:'Engineering NIT v1.6', uses:9},
+    ]},
+  {id:'tender.clone-scope', m:'tender', s:'2B · Smart Start & templates', p:'Helpful', t:'kvlist',
+    title:'Clone-past-tender scope',
+    why:'Prevents cloning from withdrawn or cancelled tenders.',
+    def:[{k:'FY window (years back)',v:'2'},{k:'Allowed status',v:'Awarded, Completed'},{k:'Sector match required',v:'false'}]},
+  // 2C
+  {id:'tender.sector-method', m:'tender', s:'2C · Classification & evaluation', p:'Core', t:'kvlist',
+    title:'Sector → evaluation-method defaults',
+    why:'Most tenders should follow the default; deviation should require justification.',
+    def:[{k:'IT Goods',v:'L1'},{k:'Infrastructure Works',v:'L1'},{k:'Water Works',v:'QCBS 70:30'},{k:'Consultancy',v:'QCBS 80:20'},{k:'Engineering Goods',v:'L1'},{k:'Urban Dev Works',v:'L1'}]},
+  {id:'tender.types', m:'tender', s:'2C · Classification & evaluation', p:'Helpful', t:'list',
+    title:'Tender-type master list',
+    why:'Drives sector routing and reporting.',
+    def:['Goods','Works','Services','Consultancy','Engineering Goods','Mixed (Goods+Services)']},
+  {id:'tender.value-tiers', m:'tender', s:'2C · Classification & evaluation', p:'Core', t:'tiers',
+    title:'AMC value-tier definitions',
+    why:'Cross-cutting; one master record consumed by every module.',
+    def:[
+      {min:0,max:500000,auth:'HOD'},
+      {min:500000,max:2500000,auth:'Deputy Commissioner'},
+      {min:2500000,max:5000000,auth:'Commissioner'},
+      {min:5000000,max:null,auth:'State Government'},
+    ]},
+  {id:'tender.emd-policy', m:'tender', s:'2C · Classification & evaluation', p:'Core', t:'kvlist',
+    title:'EMD policy matrix',
+    why:'EMD rules are statutory and money-related; mistakes are expensive.',
+    def:[{k:'Default EMD %',v:'2'},{k:'Min EMD (₹)',v:'10000'},{k:'Max EMD (₹)',v:'2500000'},{k:'MSME Micro exempt',v:'true'},{k:'MSME Small exempt',v:'true'}]},
+  // 2D — the PQ/TQ heart
+  {id:'tender.806040', m:'tender', s:'2D · PQ & TQ libraries (80-60-40 / TQ marks)', p:'Core', t:'kvlist',
+    title:'80-60-40 PQ rule',
+    why:"It's a rule, not a constant.",
+    def:[{k:'Option A: # work orders × % of EC',v:'1 × 80%'},{k:'Option B',v:'2 × 60%'},{k:'Option C',v:'3 × 40%'}]},
+  {id:'tender.tq-rubric', m:'tender', s:'2D · PQ & TQ libraries (80-60-40 / TQ marks)', p:'Core', t:'lib',
+    title:'TQ marks rubric (/100)',
+    why:'This rubric drives every TQ scoring screen in Evaluation. Single source of truth or chaos.',
+    def:[
+      {criterion:'Work orders – similar (≥80% EC)', max:5},
+      {criterion:'Work orders – similar (≥60% EC)', max:5},
+      {criterion:'Work orders – sector experience', max:10},
+      {criterion:'ISO 9001', max:2},
+      {criterion:'ISO 14001 / 45001', max:5},
+      {criterion:'ISO additional', max:10},
+      {criterion:'CMMI Level 3', max:2},
+      {criterion:'CMMI Level 4', max:5},
+      {criterion:'CMMI Level 5', max:10},
+      {criterion:'Turnover (3 FY)', max:20},
+      {criterion:'Key personnel CVs', max:15},
+      {criterion:'Methodology & approach', max:11},
+    ]},
+  {id:'tender.pq-by-company', m:'tender', s:'2D · PQ & TQ libraries (80-60-40 / TQ marks)', p:'Core', t:'lib',
+    title:'PQ criterion library by company type',
+    why:'Officer-added criteria with no master list = inconsistency across tenders.',
+    def:[
+      {type:'Pvt Ltd', docs:['MoA & AoA','CoI','GST','PAN','Turnover certificate (CA UAN)','Bank statement','Power of Attorney']},
+      {type:'LLP', docs:['LLP Agreement','CoI','GST','PAN','Turnover certificate (CA UAN)','Power of Attorney']},
+      {type:'Partnership', docs:['Partnership Deed','GST','PAN','Turnover certificate (CA UAN)','Authority letter']},
+      {type:'Sole Proprietor', docs:['GST','PAN','ITR (3 FY)','Turnover certificate (CA UAN)']},
+      {type:'JV', docs:['JV Agreement','Lead partner docs','Each partner docs','Liability declaration']},
+    ]},
+  {id:'tender.pq-types-8', m:'tender', s:'2D · PQ & TQ libraries (80-60-40 / TQ marks)', p:'Core', t:'list',
+    title:'PQ criterion type library (8 types)',
+    why:'Officer-added criteria with no master list = inconsistency.',
+    def:['Turnover','Work experience','Technical capacity','Financial capability','Manpower','Equipment','Quality certifications','Past performance']},
+  {id:'tender.ai-compliance', m:'tender', s:'2D · PQ & TQ libraries (80-60-40 / TQ marks)', p:'Helpful', t:'list',
+    title:'AI Compliance Check rules',
+    why:'Compliance criteria are policy, not AI defaults.',
+    def:['CVC compliance present','GFR alignment','EMD matches policy','PQ not restrictive','TS sanction valid','GeM mandatory check']},
+  {id:'tender.ai-eligibility', m:'tender', s:'2D · PQ & TQ libraries (80-60-40 / TQ marks)', p:'Helpful', t:'list',
+    title:'AI Eligibility Risk Check rules',
+    why:'Anti-restrictive-tender control; admin defines red flags.',
+    def:['Vendor universe < 5 likely qualifiers','Single OEM specification','Turnover criterion > 3× EC','Sector experience too narrow']},
+  // 2E
+  {id:'tender.milestones', m:'tender', s:'2E · Timeline defaults', p:'Core', t:'kvlist',
+    title:'Minimum durations per milestone',
+    why:'Tenders below statutory minimum bid-window get challenged.',
+    def:[{k:'Publish → Pre-bid meeting (days)',v:'7'},{k:'Pre-bid → Bid open (days)',v:'14'},{k:'Bid open → Tech eval (days)',v:'10'},{k:'Tech eval → Financial open (days)',v:'7'}]},
+  {id:'tender.calendar', m:'tender', s:'2E · Timeline defaults', p:'Helpful', t:'toggle',
+    title:'Working-day / holiday calendar',
+    why:'Centralised; otherwise officers count weekends wrong.',
+    def:true},
+  // 2F
+  {id:'tender.nit-sections', m:'tender', s:'2F · Document generation & branding (NIT)', p:'Core', t:'list',
+    title:'NIT section structure (10 sections)',
+    why:'The published NIT is a legal document; structure should not vary.',
+    def:['Invitation','Scope of work','Eligibility (PQ)','Technical specs','Evaluation method','Bid security (EMD)','Submission instructions','Opening of bids','Award','General conditions']},
+  {id:'tender.languages', m:'tender', s:'2F · Document generation & branding (NIT)', p:'Helpful', t:'kvlist',
+    title:'Languages enabled',
+    why:'Multilingual = policy choice and translation budget.',
+    def:[{k:'English',v:'true'},{k:'Hindi',v:'true'},{k:'Marathi',v:'true'},{k:'Default',v:'English'}]},
+  {id:'tender.ai-section-prompts', m:'tender', s:'2F · Document generation & branding (NIT)', p:'Core', t:'template',
+    title:'AI section-edit prompts',
+    why:'Determines NIT voice; central.',
+    def:'You are drafting a section of an NIT for the Ahmedabad Municipal Corporation. Use formal third-person Indian government English. Cite GFR 2017 and CVC guidelines where relevant. Avoid passive over-use. Keep clauses numbered. No marketing language.'},
+  // 2G
+  {id:'tender.cvc-chain', m:'tender', s:'2G · Review & publish', p:'Core', t:'chain',
+    title:'CVC review committee chain',
+    why:'CVC sign-off is statutory; can\'t be ad-hoc.',
+    def:['Section Officer','Department Head','Finance Officer','Vigilance Officer','Commissioner']},
+  {id:'tender.publish-template', m:'tender', s:'2G · Review & publish', p:'Helpful', t:'template',
+    title:'Vendor-notification template on publish',
+    why:'Org-voice + statutory wording.',
+    def:'Dear {vendor},\n\nThe Ahmedabad Municipal Corporation has published tender {tender_id} — {title}. Estimated cost: {ec}. Bid submission closes on {bid_close}.\n\nDocuments are available at {portal_link}.\n\nRegards,\nProcurement Cell\nAhmedabad Municipal Corporation'},
+  {id:'tender.autosave', m:'tender', s:'2G · Review & publish', p:'Optional', t:'number',
+    title:'Auto-save interval',
+    why:'Trivial to change once, easy to forget per-page.',
+    def:60, unit:'seconds'},
 
-  // ============ PENDING APPROVALS ============
-  const APPROVALS = [
-    { id:'TND-2026-001', name:'Desktop Computers — AMC Offices',    stage:'Administrative Approval', valueLakh:18,   age:4,  status:'pending' },
-    { id:'TND-2026-002', name:'Road Maintenance Phase 2',            stage:'Technical Sanction',     valueLakh:42,   age:9,  status:'overdue' },
-    { id:'TND-2026-003', name:'Water Supply Pipeline Installation',  stage:'Award Approval',         valueLakh:64,   age:11, status:'overdue' },
-    { id:'TND-2026-004', name:'Street Lighting LED Retrofit',        stage:'Technical Sanction',     valueLakh:8,    age:2,  status:'pending' },
-    { id:'TND-2026-007', name:'AMC Office Renovation Phase 3',       stage:'Administrative Approval', valueLakh:27.5, age:6, status:'pending' },
-    { id:'TND-2026-009', name:'Solid Waste Management Equipment',    stage:'Award Approval',         valueLakh:3.4,  age:1,  status:'pending' },
-    { id:'TND-2026-010', name:'Riverfront Park — Phase B',           stage:'Administrative Approval', valueLakh:55,  age:12, status:'overdue' },
-  ];
-  function renderApprovals(){
-    document.getElementById('approvalsBody').innerHTML = APPROVALS.map(a => {
-      const auth = authorityFor(a.valueLakh);
-      const statusPill = a.status === 'overdue'
-        ? '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-danger-light text-danger text-[11.5px] font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-danger"></span> Overdue</span>'
-        : '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-warning-light text-warning text-[11.5px] font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-warning"></span> Pending</span>';
-      const ageCls = a.status === 'overdue' ? 'text-danger font-semibold' : 'text-ink-500';
-      return `<tr class="hover:bg-surface transition">
-        <td class="px-5 py-3.5"><div class="font-medium text-ink-900">${a.name}</div><div class="text-[12px] text-ink-500 font-mono">${a.id}</div></td>
-        <td class="px-5 py-3.5 text-ink-900">${a.stage}</td>
-        <td class="px-5 py-3.5"><div class="text-ink-900">${auth}</div><div class="text-[11.5px] text-ink-500">Auto-routed by value</div></td>
-        <td class="px-5 py-3.5 text-right text-ink-900 font-medium">${fmtINR(a.valueLakh)}</td>
-        <td class="px-5 py-3.5">${statusPill}</td>
-        <td class="px-5 py-3.5 text-right ${ageCls}">${a.age}d</td>
-      </tr>`;
-    }).join('');
-  }
+  /* ====== PRE-BID QUERIES ====== */
+  {id:'prebid.sections', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'list',
+    title:'Query categorisation sections',
+    why:'Drives AI grouping, charts, and exports.',
+    def:['PQ / TQ & Eligibility','BOQ & Quantities','Dates & Timeline','Scope of Work','Financial & EMD','Technical Specifications','General / Other']},
+  {id:'prebid.ai-threshold', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'percent',
+    title:'AI grouping similarity threshold',
+    why:'ML knob; not an officer setting.',
+    def:78},
+  {id:'prebid.ai-prompts', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'template',
+    title:'AI master prompts (extract / group / suggest / rewrite / amendment)',
+    why:'Single voice across the org. — managed in detail under Cross-cutting → AI Configuration.',
+    def:'See Cross-cutting → AI Configuration → Master prompts.'},
+  {id:'prebid.std-responses', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'lib',
+    title:'Standard responses library',
+    why:'Library exists on the page; officers currently can\'t curate.',
+    def:[
+      {category:'Eligibility', title:'Turnover certificate requirement', body:'The bidder shall furnish a turnover certificate from a practicing Chartered Accountant bearing the CA\'s UAN number for the last three completed financial years.'},
+      {category:'Technical', title:'Minimum technical specifications', body:'Bidders are advised to refer to Section IV of the tender document for detailed technical specifications. Deviations, if any, must be clearly highlighted.'},
+      {category:'Scope', title:'Scope boundary', body:'The scope of work is strictly limited to the items listed in the BOQ and the technical specifications. Any work beyond this scope shall be treated as extra and handled per the conditions of contract.'},
+      {category:'Timeline', title:'Bid submission deadline', body:'The bid submission deadline is firm and will not be extended. Bidders are advised to upload bids well in advance to avoid technical issues.'},
+      {category:'General', title:'Refer to tender document', body:'Please refer to the tender document for clarification. All terms and conditions stated therein shall prevail.'},
+    ]},
+  {id:'prebid.generic-presets', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'list',
+    title:'Generic-response presets',
+    why:'Words have legal weight.',
+    def:['Refer to document','Cannot disclose','No change required','Standard response']},
+  {id:'prebid.response-chain', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'chain',
+    title:'Response-register approval chain',
+    why:'Cross-cutting routing.',
+    def:['Drafting officer','Reviewer','Approver (by value tier)']},
+  {id:'prebid.corr-types', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'lib',
+    title:'Corrigendum types & mandatory fields',
+    why:'Compliance — incomplete corrigenda are a major audit finding.',
+    def:[
+      {type:'Technical', required:['Old spec','New spec','Impact']},
+      {type:'Financial', required:['Old value','New value','Impact statement']},
+      {type:'Timeline',  required:['New date(s)','Reason','Auto-extend?']},
+      {type:'Scope',     required:['Revised BOQ ref','Reason']},
+    ]},
+  {id:'prebid.corr-numbering', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'text',
+    title:'Corrigendum auto-numbering format',
+    why:'Integrity.',
+    def:'{TENDER}/COR-{##}'},
+  {id:'prebid.ai-amendment-push', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'list',
+    title:'AI Amendment Summary push policy',
+    why:'Some changes legally require a corrigendum.',
+    def:['BOQ quantity change → mandatory push','Bid-close date change → mandatory push','Technical specification change → mandatory push','Typo / formatting → dismissable']},
+  {id:'prebid.response-window', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'number',
+    title:'Default pre-bid response window',
+    why:'Drives the "Response window closes in —" countdown.',
+    def:10, unit:'days'},
+  {id:'prebid.consultants', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'lib',
+    title:'Approved external consultants registry',
+    why:'Data-exposure risk; restrict who can receive.',
+    def:[
+      {name:'Mehta & Associates', email:'partners@mehtassoc.in', scope:'Water Works only'},
+      {name:'PwC India', email:'amc-projects@pwc.com', scope:'IT & Consultancy'},
+    ]},
+  {id:'prebid.response-sheet', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'template',
+    title:'Pre-Bid Query Response Sheet template',
+    why:'Regulated output document.',
+    def:'PRE-BID QUERY RESPONSE SHEET\nTender: {tender_id} — {title}\nDate of Meeting: {meeting_date}\nQueries received: {count}\n[Anonymised — vendor identifiers are redacted per CVC anonymisation policy.]\n\n| # | Section | Query (anonymised) | AMC Response |\n|---|---|---|---|\n{rows}\n\nSigned for AMC: {officer_name}, {designation}'},
+  {id:'prebid.mom-template', m:'prebid', s:'3 · Pre-Bid Queries', p:'Helpful', t:'template',
+    title:'MoM template',
+    why:'Audit consistency.',
+    def:'MINUTES OF PRE-BID MEETING\nTender: {tender_id}\nDate / Time: {date} / {time}\nVenue: {venue}\n\nAttendees:\n- AMC: {amc_attendees}\n- Vendors: {vendor_attendees}\n\nDiscussion:\n{discussion}\n\nClarifications agreed:\n{clarifications}\n\nNext steps:\n{next_steps}'},
+  {id:'prebid.anonymisation', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'list',
+    title:'Anonymisation rules',
+    why:'Statutory anonymisation.',
+    def:['Strip vendor company name','Strip vendor representative name','Strip phone / email','Strip PAN / GST','Replace with V1, V2, V3…']},
+  {id:'prebid.permissions-link', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'toggle',
+    title:'Per-action permissions enforced',
+    why:'Segregation of duties — managed under Cross-cutting → Permissions.',
+    def:true},
 
-  // ============ BUDGET + OFFICER BARS ============
-  const BUDGET = [
-    { dept:'Water',          used:78, ofCr:14.2 },
-    { dept:'Infrastructure', used:62, ofCr:22.8 },
-    { dept:'IT',             used:54, ofCr:6.4  },
-    { dept:'Sanitation',     used:48, ofCr:9.1  },
-    { dept:'Engineering',    used:41, ofCr:11.6 },
-    { dept:'Urban Dev',      used:31, ofCr:15.2 },
-    { dept:'Parks',          used:22, ofCr:4.0  },
-  ];
-  function renderBudget(){
-    document.getElementById('budgetBars').innerHTML = BUDGET.map(b => {
-      const cls = b.used >= 75 ? 'bg-danger' : b.used >= 55 ? 'bg-warning' : 'bg-primary';
-      return `<li>
-        <div class="flex items-center justify-between text-[12.5px]"><span class="text-ink-900 font-medium">${b.dept}</span><span class="text-ink-500">${b.used}% of ₹${b.ofCr} Cr</span></div>
-        <div class="mt-1.5 h-1.5 rounded-full bg-line overflow-hidden"><div class="h-full ${cls}" style="width:${b.used}%"></div></div>
-      </li>`;
-    }).join('');
-  }
+  /* ====== BID EVALUATION ====== */
+  // 4A — PQ Evaluation
+  {id:'eval.pq-vocab', m:'eval', s:'4A · PQ Evaluation', p:'Core', t:'list',
+    title:'PQ verdict vocabulary',
+    why:'Used everywhere downstream; fixed dictionary.',
+    def:['Pass','Fail','Pending','Clarification']},
+  {id:'eval.pq-evidence', m:'eval', s:'4A · PQ Evaluation', p:'Core', t:'lib',
+    title:'Evidence requirements per PQ criterion',
+    why:'Statutory — turnover cert needs CA UAN. Enforce, don\'t trust.',
+    def:[
+      {criterion:'Turnover', docs:['CA-signed certificate'], rules:['CA UAN mandatory','Max age 2 FY']},
+      {criterion:'Work experience', docs:['Work order','Completion certificate'], rules:['Both required','Signed by client']},
+      {criterion:'ISO certifications', docs:['Valid certificate'], rules:['Not expired','From accredited body']},
+      {criterion:'Bank guarantee', docs:['BG document'], rules:['Verifiable issuing bank']},
+    ]},
+  {id:'eval.clarification-letter', m:'eval', s:'4A · PQ Evaluation', p:'Core', t:'template',
+    title:'Clarification Request Letter template',
+    why:'Outgoing legal letter; format must not drift.',
+    def:'CLARIFICATION REQUEST\nTender: {tender_id}\nTo: {vendor_name}\nDate: {date}\n\nThis is with reference to your bid submitted for the above tender. The Evaluation Committee requires clarification on the following point(s):\n\n{points}\n\nYou are requested to submit your response within {sla} days from the date of this letter. Failure to respond within the stipulated time may result in your bid being treated as non-responsive.\n\nFor and on behalf of AMC,\n{officer_name}\n{designation}'},
+  {id:'eval.clarification-sla', m:'eval', s:'4A · PQ Evaluation', p:'Helpful', t:'kvlist',
+    title:'Clarification SLA',
+    why:'Predictable rule, not officer choice.',
+    def:[{k:'Days vendor has to respond',v:'5'},{k:'On no-response',v:'Auto-fail PQ'},{k:'Send reminder before deadline (days)',v:'2'}]},
+  {id:'eval.tech-bid-sections', m:'eval', s:'4A · PQ Evaluation', p:'Helpful', t:'list',
+    title:'Technical bid section structure (8 sections)',
+    why:'Drives the View Technical Bid panel and AI parsing.',
+    def:['Covering Letter','Company Profile','Pre-Qualification Documents','Turnover & Financial Details','Work Order / Experience','Key Technical Personnel','ISO & Other Certifications','Declarations']},
+  {id:'eval.ai-confidence-pq', m:'eval', s:'4A · PQ Evaluation', p:'Helpful', t:'percent',
+    title:'AI confidence threshold (PQ)',
+    why:'Below this AI confidence, officer must manually verify.',
+    def:75},
+  // 4B — TQ (HEART)
+  {id:'eval.tq-rubric', m:'eval', s:'4B · TQ Evaluation (scoring rubric)', p:'Core', t:'lib',
+    title:'TQ scoring rubric (/100 total)',
+    why:'Inconsistent rubrics across tenders = failed audits.',
+    def:[{ref:'See Tender Creation → TQ marks rubric (linked record)'}]},
+  {id:'eval.tq-sector-overrides', m:'eval', s:'4B · TQ Evaluation (scoring rubric)', p:'Core', t:'lib',
+    title:'Sector-specific rubric overrides',
+    why:'Sensible variation but only with policy approval.',
+    def:[
+      {sector:'IT Goods', override:'CMMI Level 5 weight 15 (vs 10 default)'},
+      {sector:'Civil Works', override:'Work orders weight 25 (vs 20 default)'},
+      {sector:'Consultancy', override:'Methodology weight 20'},
+    ]},
+  {id:'eval.committee-comp', m:'eval', s:'4B · TQ Evaluation (scoring rubric)', p:'Core', t:'kvlist',
+    title:'Committee size & composition',
+    why:'Committee composition is statutory.',
+    def:[{k:'Default members',v:'3'},{k:'≥ ₹25L members',v:'5'},{k:'≥ ₹50L members',v:'7 + Chair'},{k:'Must include Finance Officer',v:'true'}]},
+  {id:'eval.score-aggregation', m:'eval', s:'4B · TQ Evaluation (scoring rubric)', p:'Core', t:'select',
+    title:'Score aggregation rule',
+    why:'Determines who effectively wins.',
+    def:'Average', options:['Average','Weighted (Chair 2×)','Consensus (all must agree)','Median']},
+  {id:'eval.inline-edit', m:'eval', s:'4B · TQ Evaluation (scoring rubric)', p:'Core', t:'select',
+    title:'Inline-edit permissions after submit',
+    why:'Audit risk if anyone can edit a submitted score.',
+    def:'Member can edit own with reason', options:['Locked after submit','Member can edit own with reason','Chair can edit any with reason','Admin only']},
+  {id:'eval.min-tq', m:'eval', s:'4B · TQ Evaluation (scoring rubric)', p:'Core', t:'number',
+    title:'Minimum TQ qualifying score',
+    why:'Defines the floor; cannot vary per tender on a whim.',
+    def:60, unit:'/100'},
+  {id:'eval.vendor-pres', m:'eval', s:'4B · TQ Evaluation (scoring rubric)', p:'Helpful', t:'kvlist',
+    title:'Vendor-presentation requirements',
+    why:'Page allows video upload; policy belongs here.',
+    def:[{k:'Mandatory for tenders ≥',v:'₹50L'},{k:'Max video size (MB)',v:'200'},{k:'Counts toward TQ /100',v:'10'},{k:'Recording retained for (days)',v:'1825'}]},
+  {id:'eval.coi', m:'eval', s:'4B · TQ Evaluation (scoring rubric)', p:'Core', t:'template',
+    title:'Conflict-of-interest declaration template',
+    why:'CVC compliance.',
+    def:'CONFLICT OF INTEREST DECLARATION\nTender: {tender_id}\nMember: {member_name}\n\nI hereby declare that:\n1. I have no financial or personal interest in any of the bidders.\n2. I have no relationship (familial or professional within the last 3 years) with any bidder representative.\n3. I shall recuse myself immediately if any such conflict arises during evaluation.\n\nSignature: ____________\nDate: ____________'},
+  // 4C
+  {id:'eval.ntq-letter', m:'eval', s:'4C · Results & Actions', p:'Core', t:'template',
+    title:'NTQ Justification Letter template',
+    why:'Outgoing letter; standardised.',
+    def:'NON-TECHNICALLY-QUALIFIED JUSTIFICATION\nTender: {tender_id}\nTo: {vendor_name}\nDate: {date}\n\nThis is to inform you that your bid has been declared Non-Technically-Qualified (NTQ) on the following grounds:\n\n{grounds}\n\nThis decision has been taken by the Evaluation Committee after careful review of the documents submitted by you. The grounds are based on the PQ/TQ criteria specified in the tender document.\n\nFor and on behalf of AMC,\n{officer_name}\n{designation}'},
+  {id:'eval.ntq-signing', m:'eval', s:'4C · Results & Actions', p:'Core', t:'chain',
+    title:'NTQ Justification signing chain',
+    why:'Statutory accountability.',
+    def:['Evaluation Committee Chair','Department HOD','Vigilance Officer']},
+  {id:'eval.tq-ready-gate', m:'eval', s:'4C · Results & Actions', p:'Helpful', t:'list',
+    title:'TQ-Ready gate criteria',
+    why:'Stops half-baked progression.',
+    def:['All PQ verdicts complete','All TQ scores submitted by all members','All clarifications closed','COI declarations on file','Vendor presentations recorded (if applicable)']},
+  // 4D — Methods
+  {id:'eval.l1', m:'eval', s:'4D · Financial Evaluation methods', p:'Core', t:'select',
+    title:'L1 — tie-breaking rule',
+    why:'Tie-breaks are a known dispute trigger.',
+    def:'Earliest submission', options:['Earliest submission','Random lottery','Higher TQ score','Smaller variance from EC']},
+  {id:'eval.qcbs-weights', m:'eval', s:'4D · Financial Evaluation methods', p:'Core', t:'kvlist',
+    title:'QCBS — Technical:Financial weightage by sector',
+    why:'Sector-default weightages are central; per-tender deviation requires approval.',
+    def:[{k:'Consultancy',v:'80:20'},{k:'Water Works',v:'70:30'},{k:'Engineering Services',v:'70:30'},{k:'IT Services',v:'75:25'}]},
+  {id:'eval.qcbs-warning', m:'eval', s:'4D · Financial Evaluation methods', p:'Helpful', t:'percent',
+    title:'QCBS winner-change warning threshold',
+    why:'Anti-gaming protection — warn when a weightage tweak would flip the winner.',
+    def:5},
+  {id:'eval.lcs-cutoff', m:'eval', s:'4D · Financial Evaluation methods', p:'Core', t:'percent',
+    title:'LCS — default technical cutoff',
+    why:'Cutoff determines the pool; central policy.',
+    def:70},
+  {id:'eval.qbs', m:'eval', s:'4D · Financial Evaluation methods', p:'Helpful', t:'kvlist',
+    title:'QBS — selection config',
+    why:'Rules vary by procurement regime.',
+    def:[{k:'Top-N technical to open financial',v:'1'},{k:'Sealed financial bid retained for',v:'180 days'},{k:'Auto-reject below cutoff',v:'true'}]},
+  {id:'eval.fbs', m:'eval', s:'4D · Financial Evaluation methods', p:'Core', t:'kvlist',
+    title:'FBS — budget gate config',
+    why:'Budget-gate is hard policy.',
+    def:[{k:'Behaviour if above budget',v:'Auto-reject'},{k:'Budget source',v:'TS-sanctioned amount'},{k:'Allow admin override',v:'false'}]},
+  {id:'eval.method-warning', m:'eval', s:'4D · Financial Evaluation methods', p:'Helpful', t:'toggle',
+    title:'"Specified in tender" badge & non-default warning',
+    why:'Anti-tampering guardrail.',
+    def:true},
+  {id:'eval.reveal-flow', m:'eval', s:'4D · Financial Evaluation methods', p:'Core', t:'kvlist',
+    title:'3-phase financial reveal flow',
+    why:'Most sensitive moment in the system. Lock it down centrally.',
+    def:[{k:'Phase 1 click required by',v:'Chair'},{k:'Phase 2 click required by',v:'Chair + Finance Officer'},{k:'Audit log every reveal',v:'true'},{k:'Reveal window (minutes)',v:'30'}]},
+  {id:'eval.winner-explanation', m:'eval', s:'4D · Financial Evaluation methods', p:'Helpful', t:'list',
+    title:'Winner-card explanation requirements',
+    why:'Audit explainability.',
+    def:['Final score & rank','How method was applied','Deviations from defaults','Reasonableness verdict','Any clarifications referenced']},
+  // 4E — Reasonableness
+  {id:'eval.alb-threshold', m:'eval', s:'4E · Reasonableness Check', p:'Core', t:'percent',
+    title:'ALB threshold (% below estimate)',
+    why:'A single number that drives major flows; must be central.',
+    def:15},
+  {id:'eval.ts-gate', m:'eval', s:'4E · Reasonableness Check', p:'Core', t:'kvlist',
+    title:'TS gate threshold',
+    why:'Determines whether award proceeds or escalates.',
+    def:[{k:'"Above" defined as',v:'L1 > 100% of TS'},{k:'Tolerance band',v:'± 2%'},{k:'Escalation on breach',v:'Fresh approval at next tier'}]},
+  {id:'eval.reasonableness-4cases', m:'eval', s:'4E · Reasonableness Check', p:'Core', t:'lib',
+    title:'Reasonableness Check 4-case definitions',
+    why:'Decision rules; uniform across tenders.',
+    def:[
+      {case:'Reasonable', trigger:'L1 within ±5% of EC', decision:'Proceed to committee'},
+      {case:'Above TS', trigger:'L1 > TS', decision:'Escalate per TS gate'},
+      {case:'Above estimate', trigger:'L1 > EC + 5% but ≤ TS', decision:'Negotiate or accept with justification'},
+      {case:'ALB', trigger:'L1 < EC × (1 − ALB%)', decision:'Mandatory negotiation + cost-build-up'},
+    ]},
+  {id:'eval.l1-ec-ts-config', m:'eval', s:'4E · Reasonableness Check', p:'Core', t:'kvlist',
+    title:'L1 vs EC vs TS comparison config',
+    why:'Math + policy bundle; central.',
+    def:[{k:'Display rounded to',v:'₹ thousands'},{k:'Tolerance band display',v:'± 5% from EC'},{k:'Auto-classify decision card',v:'true'}]},
+  // 4F — Committee
+  {id:'eval.quorum', m:'eval', s:'4F · Evaluation Committee', p:'Core', t:'kvlist',
+    title:'Quorum rules',
+    why:'Statutory.',
+    def:[{k:'Min members present (default 3)',v:'2'},{k:'Min members present (5)',v:'4'},{k:'Min members present (7)',v:'5'},{k:'Chair must be present',v:'true'}]},
+  {id:'eval.member-rights', m:'eval', s:'4F · Evaluation Committee', p:'Core', t:'matrix',
+    title:'Member roles & rights',
+    why:'Power asymmetry must be policy.',
+    def:{rows:['Chair','Finance Officer','Technical Member','Vigilance Observer'], cols:['Add member','Remove member','Override average','Sign off final','Veto NTQ'], cells:{}}},
+  {id:'eval.signoff-checklist', m:'eval', s:'4F · Evaluation Committee', p:'Helpful', t:'list',
+    title:'Evaluation sign-off checklist',
+    why:'Stops premature sign-off.',
+    def:['Rubric complete','Clarifications closed','COI declared by all','Presentations recorded (if applicable)','NTQ letters issued','Reasonableness verdict captured']},
+  // 4G — AI aids
+  {id:'eval.parser-rules', m:'eval', s:'4G · AI evaluation aids', p:'Helpful', t:'list',
+    title:'AI parser rules — what gets extracted',
+    why:'Determines what shows up auto-filled.',
+    def:['Turnover figures from CA cert','Work order values & years','ISO cert numbers & expiry','CMMI level','Personnel CV count','BG amount & issuer']},
+  {id:'eval.ai-suggest-on', m:'eval', s:'4G · AI evaluation aids', p:'Helpful', t:'toggle',
+    title:'AI suggestion on TQ scoring',
+    why:'Some procurement regimes prefer pure human scoring.',
+    def:true},
 
-  const OFFICERS = [
-    { name:'Rajesh Kumar',  role:'Super Admin',          load:11 },
-    { name:'Priya Shah',    role:'Technical Officer',    load:9  },
-    { name:'Amit Patil',    role:'Finance Officer',      load:7  },
-    { name:'Sunita Rao',    role:'Deputy Commissioner',  load:6  },
-    { name:'Ravi Mehta',    role:'Accounts Officer',     load:4  },
-    { name:'Neha Joshi',    role:'Technical Officer',    load:3  },
-  ];
-  function renderOfficers(){
-    const max = Math.max(...OFFICERS.map(o => o.load));
-    document.getElementById('officerBars').innerHTML = OFFICERS.map(o => {
-      const w = Math.round((o.load / max) * 100);
-      return `<li>
-        <div class="flex items-center justify-between text-[12.5px]"><span class="text-ink-900 font-medium">${o.name}</span><span class="text-ink-500">${o.load} active · ${o.role}</span></div>
-        <div class="mt-1.5 h-1.5 rounded-full bg-line overflow-hidden"><div class="h-full bg-primary" style="width:${w}%"></div></div>
-      </li>`;
-    }).join('');
-  }
+  /* ====== BID MANAGEMENT ====== */
+  // 5A
+  {id:'mgmt.stage-gates', m:'mgmt', s:'5A · Stage gates', p:'Core', t:'lib',
+    title:'Stage gate definitions',
+    why:'Page shows all 4 unlocked for "design review"; in production the gates are policy.',
+    def:[
+      {from:'Reasonableness', to:'Committee', requires:'Reasonableness verdict captured + all bids opened'},
+      {from:'Committee', to:'Negotiation', requires:'Verdict = Negotiation OR auto-trigger fires'},
+      {from:'Committee', to:'Award', requires:'Verdict = Approve OR Conditions resolved'},
+      {from:'Negotiation', to:'Award', requires:'Outcome = Accept'},
+    ]},
+  {id:'mgmt.stage-skip', m:'mgmt', s:'5A · Stage gates', p:'Core', t:'list',
+    title:'Stage skip rules',
+    why:'Skipping a statutory step without rule is a red flag.',
+    def:['Negotiation auto-skipped when committee = Approve and no triggers fire']},
+  // 5B
+  {id:'mgmt.reasonableness-shared', m:'mgmt', s:'5B · Reasonableness Check', p:'Core', t:'toggle',
+    title:'Share Reasonableness config with Bid Evaluation',
+    why:'Single record consumed both places.',
+    def:true},
+  // 5C
+  {id:'mgmt.verdict-vocab', m:'mgmt', s:'5C · Committee Review', p:'Core', t:'list',
+    title:'Committee verdict vocabulary',
+    why:'Decision vocabulary drives downstream routing.',
+    def:['Approve','Conditions','Concern','Negotiation']},
+  {id:'mgmt.conditions-flow', m:'mgmt', s:'5C · Committee Review', p:'Helpful', t:'list',
+    title:'Conditions resolution flow',
+    why:'Otherwise "Conditions" gets ignored.',
+    def:['Officer must capture each condition','Vendor must respond in writing','Re-vote required after response','Audit-logged']},
+  {id:'mgmt.committee-reminders', m:'mgmt', s:'5C · Committee Review', p:'Helpful', t:'kvlist',
+    title:'Committee reminder cadence',
+    why:'SLA enforcement.',
+    def:[{k:'First reminder after (hours)',v:'48'},{k:'Second reminder after (hours)',v:'24'},{k:'Escalation after (hours)',v:'72'}]},
+  // 5D
+  {id:'mgmt.negotiation-triggers', m:'mgmt', s:'5D · Negotiation', p:'Core', t:'list',
+    title:'Negotiation triggers',
+    why:'Statutory triggers; not officer-invented.',
+    def:['Single bid received','L1 above TS','All bids abnormally high','Committee verdict = Negotiation']},
+  {id:'mgmt.quote-movement', m:'mgmt', s:'5D · Negotiation', p:'Core', t:'kvlist',
+    title:'Quote-movement table requirements',
+    why:'Audit needs the movement log.',
+    def:[{k:'Capture per BOQ item',v:'true'},{k:'Min justification chars',v:'80'},{k:'Both old and new quote required',v:'true'}]},
+  {id:'mgmt.sustainability', m:'mgmt', s:'5D · Negotiation', p:'Helpful', t:'list',
+    title:'Sustainability check criteria',
+    why:'Audit defence.',
+    def:['Cost build-up provided','Peer benchmark compared','AMC rate-list referenced','Vendor financial health verified']},
+  {id:'mgmt.outcome-vocab', m:'mgmt', s:'5D · Negotiation', p:'Core', t:'list',
+    title:'Outcome vocabulary',
+    why:'Outcome decision is workflow-critical.',
+    def:['Accept','Reject','Re-tender']},
+  // 5E
+  {id:'mgmt.award-note', m:'mgmt', s:'5E · Award Recommendation', p:'Core', t:'template',
+    title:'Award Recommendation Note template',
+    why:'Outgoing recommendation; format and signers must be central.',
+    def:'AWARD RECOMMENDATION NOTE\nTender: {tender_id} — {title}\nEstimated cost: {ec}\nTS-sanctioned amount: {ts}\nWinning bidder: {vendor_name}\nAwarded value: {award_value}\nMethod: {method}\nReasonableness verdict: {reasonableness}\n\nJustification:\n{justification}\n\nRecommended for award by:\n{committee_signers}\n\nDate: {date}'},
+  {id:'mgmt.ai-award-prompt', m:'mgmt', s:'5E · Award Recommendation', p:'Core', t:'template',
+    title:'AI recommendation-note prompts',
+    why:'Single voice. — managed under Cross-cutting → AI Configuration.',
+    def:'You are drafting an Award Recommendation Note for AMC. Be factual, cite the evaluation method and reasonableness verdict, and avoid promotional language. State the awarded value in both ₹ and words.'},
+  {id:'mgmt.preapproval-checklist', m:'mgmt', s:'5E · Award Recommendation', p:'Core', t:'list',
+    title:'Pre-approval 6-item checklist',
+    why:'Page has the checklist; admin defines items per tender class.',
+    def:['Evaluation matrix signed','Reasonableness verdict captured','Vendor due-diligence complete','Documents attached','Budget head sufficient','GeM compliance (if applicable)']},
+  {id:'mgmt.routing-shared', m:'mgmt', s:'5E · Award Recommendation', p:'Core', t:'toggle',
+    title:'Approval routing chain follows value tiers',
+    why:'Cross-cutting routing.',
+    def:true},
+  {id:'mgmt.approval-reminders', m:'mgmt', s:'5E · Award Recommendation', p:'Helpful', t:'kvlist',
+    title:'Approval reminder cadence',
+    why:'SLA.',
+    def:[{k:'First reminder (hours)',v:'24'},{k:'Second reminder (hours)',v:'48'},{k:'Escalate to (level)',v:'+1 tier'}]},
+  {id:'mgmt.simulate-perm', m:'mgmt', s:'5E · Award Recommendation', p:'Core', t:'select',
+    title:'Simulate-approval permissions',
+    why:'Page exposes this for review; in production it must be off or admin-only.',
+    def:'Disabled in production', options:['Disabled in production','Super Admin only','Any admin','Available to all']},
+  // 5F
+  {id:'mgmt.loa-template', m:'mgmt', s:'5F · Letter of Acceptance (LoA)', p:'Core', t:'template',
+    title:'LoA letter template',
+    why:'Statutory outgoing document.',
+    def:'LETTER OF ACCEPTANCE\nNo: {loa_no}\nDate: {date}\nTo: {vendor_name}\n\nSub: Acceptance of your bid for {tender_id} — {title}\n\nWith reference to your bid dated {bid_date}, the Ahmedabad Municipal Corporation hereby accepts your offer for the awarded value of {award_value} (Rupees {award_words}).\n\nYou are required to:\n1. Furnish performance security of {perf_security} ({perf_pct}% of awarded value) within {perf_days} days.\n2. Sign the contract within {contract_days} days.\n3. Acknowledge this LoA in writing within {ack_days} days.\n\nFor and on behalf of AMC,\n{officer_name}\n{designation}'},
+  {id:'mgmt.perf-security', m:'mgmt', s:'5F · Letter of Acceptance (LoA)', p:'Core', t:'percent',
+    title:'Performance security %',
+    why:'Money-tied parameter.',
+    def:5},
+  {id:'mgmt.perf-methods', m:'mgmt', s:'5F · Letter of Acceptance (LoA)', p:'Helpful', t:'list',
+    title:'Performance security methods accepted',
+    why:'Acceptance policy.',
+    def:['Bank Guarantee','Fixed Deposit Receipt','Demand Draft']},
+  {id:'mgmt.loa-validity', m:'mgmt', s:'5F · Letter of Acceptance (LoA)', p:'Helpful', t:'number',
+    title:'LoA validity period',
+    why:'Standard term.',
+    def:60, unit:'days'},
+  {id:'mgmt.ack-window', m:'mgmt', s:'5F · Letter of Acceptance (LoA)', p:'Core', t:'number',
+    title:'Acknowledgement window',
+    why:'SLA driver.',
+    def:7, unit:'days'},
+  {id:'mgmt.ack-methods', m:'mgmt', s:'5F · Letter of Acceptance (LoA)', p:'Helpful', t:'list',
+    title:'Acknowledgement methods accepted',
+    why:'Procedural.',
+    def:['Digital signature','Email confirmation','Physical return']},
 
-  // ============ INIT ============
-  renderModules();
-  renderApprovals();
-  renderBudget();
-  renderOfficers();
+  /* ====== CROSS-CUTTING ====== */
+  // A. Signatures & letterheads
+  {id:'sig.logos', m:'signatures', s:'A · Signatures & letterheads', p:'Core', t:'lib',
+    title:'Logo & seal library',
+    why:'Used by NIT, Corrigendum, NTQ letter, Clarification letter, LoA, Award note.',
+    def:[
+      {name:'AMC Official Seal', use:'All letters', file:'amc-seal.png'},
+      {name:'AMC Logo Color', use:'NIT cover page', file:'amc-logo-color.png'},
+      {name:'AMC Logo BW', use:'B&W exports', file:'amc-logo-bw.png'},
+      {name:'Commissioner Seal', use:'Commissioner-signed letters', file:'commissioner-seal.png'},
+    ]},
+  {id:'sig.fonts', m:'signatures', s:'A · Signatures & letterheads', p:'Core', t:'lib',
+    title:'E-signature settings',
+    why:'6 font styles + draw + upload; per-officer defaults.',
+    def:[
+      {style:'Cursive', sample:'Rajesh Kumar'},
+      {style:'Italic',  sample:'Rajesh Kumar'},
+      {style:'Bold',    sample:'Rajesh Kumar'},
+      {style:'Stamp',   sample:'RK'},
+      {style:'Hand',    sample:'Rajesh Kumar'},
+      {style:'Print',   sample:'Rajesh Kumar'},
+    ]},
+  {id:'sig.letterhead', m:'signatures', s:'A · Signatures & letterheads', p:'Core', t:'template',
+    title:'Letterhead template',
+    why:'Header / footer / margins / designation lines reused across every outgoing letter.',
+    def:'┌─ HEADER ────────────────────────────┐\n│ Ahmedabad Municipal Corporation    │\n│ {office_address}                   │\n│ Phone: {phone} · Email: {email}    │\n└────────────────────────────────────┘\n\n[Body]\n\n┌─ FOOTER ────────────────────────────┐\n│ CIN: {cin} · GSTIN: {gst}          │\n│ www.amc.gov.in                     │\n└────────────────────────────────────┘'},
+  // B. AI
+  {id:'ai.prompts', m:'ai', s:'B · AI configuration', p:'Core', t:'lib',
+    title:'Master-prompt library',
+    why:'Single editable bank of prompts feeding every AI surface in every module.',
+    def:[
+      {key:'extract.queries', surface:'Pre-Bid → Extract queries', prompt:'Extract individual procurement-related questions from the uploaded document. For each, identify the section it pertains to (PQ, BOQ, Dates, Scope, Financial, Technical, General). Return as a structured list. Strip vendor names per anonymisation policy.'},
+      {key:'group.queries', surface:'Pre-Bid → Group queries', prompt:'Group similar queries together. Two queries are "similar" if they ask the same procurement question even with different wording.'},
+      {key:'draft.response', surface:'Pre-Bid → AI Suggest', prompt:'Draft a formal AMC response to this query. Use formal third-person Indian government English. Cite the relevant tender clause where applicable. Do not invent terms not in the tender.'},
+      {key:'rewrite.formal', surface:'Pre-Bid → Make more formal', prompt:'Rewrite the following response in more formal Indian government English. Preserve all factual content. Tighten where possible.'},
+      {key:'summary.amendment', surface:'Pre-Bid → AI Amendment Summary', prompt:'Compare the original tender document with the responses. Identify any change that materially affects the bid: BOQ quantities, technical specs, dates, financial terms. For each, classify as "must push corrigendum" or "optional".'},
+      {key:'parse.bid', surface:'Bid Evaluation → AI parser', prompt:'Parse the uploaded technical bid. Extract: turnover figures (from CA-signed certificate), work orders (value + year + client), ISO certifications (number + expiry), CMMI level, personnel CVs (count + roles).'},
+      {key:'draft.award', surface:'Bid Mgmt → AI draft recommendation', prompt:'Draft an Award Recommendation Note based on the evaluation matrix. Be factual. State the awarded value in both ₹ and words. Cite the evaluation method and reasonableness verdict.'},
+      {key:'edit.nit-section', surface:'Tender Creation → AI section edit', prompt:'Edit this NIT section. Use formal third-person Indian government English. Cite GFR 2017 and CVC guidelines where relevant. Keep clauses numbered.'},
+    ]},
+  {id:'ai.tone', m:'ai', s:'B · AI configuration', p:'Helpful', t:'select',
+    title:'Default tone preset',
+    why:'Drives Make more formal, AI Suggest, etc.',
+    def:'Formal', options:['Formal','Standard','Direct']},
+  {id:'ai.feature-matrix', m:'ai', s:'B · AI configuration', p:'Helpful', t:'matrix',
+    title:'AI on/off matrix per module/stage',
+    why:'Selectively disable AI where a procurement regime forbids it.',
+    def:{rows:['DPR','Tender Creation','Pre-Bid','Bid Evaluation','Bid Management'], cols:['Extract','Suggest','Summarise','Rewrite','Parse'], cells:{}}},
+  {id:'ai.confidence-global', m:'ai', s:'B · AI configuration', p:'Helpful', t:'percent',
+    title:'Global AI confidence threshold',
+    why:'Per-module override allowed.',
+    def:75},
+  {id:'ai.usage', m:'ai', s:'B · AI configuration', p:'Optional', t:'toggle',
+    title:'AI usage analytics enabled',
+    why:'Justifies the tool; feeds prompt-quality improvements.',
+    def:true},
+  {id:'ai.guardrails', m:'ai', s:'B · AI configuration', p:'Optional', t:'kvlist',
+    title:'Model & cost guardrails',
+    why:'Cost and security choice.',
+    def:[{k:'Model',v:'gpt-4-class'},{k:'Max tokens per call',v:'4000'},{k:'Monthly spend cap (₹)',v:'50000'},{k:'On failure',v:'Show manual draft'}]},
+  // C. Tiers
+  {id:'tiers.def', m:'tiers', s:'C · Value-tier routing', p:'Core', t:'tiers',
+    title:'AMC value-tier definitions',
+    why:'Drives every approval chain in every module. Edit once, applies everywhere.',
+    def:[
+      {min:0,max:500000,auth:'HOD'},
+      {min:500000,max:2500000,auth:'Deputy Commissioner'},
+      {min:2500000,max:5000000,auth:'Commissioner'},
+      {min:5000000,max:null,auth:'State Government'},
+    ]},
+  {id:'tiers.chains', m:'tiers', s:'C · Value-tier routing', p:'Core', t:'lib',
+    title:'Per-flow approval chains tied to tiers',
+    why:'Each flow may add its own extra signers (e.g. CVC for tender publish).',
+    def:[
+      {flow:'DPR · AA approval',      chain:'Officer → HOD → Tier authority'},
+      {flow:'DPR · TS approval',      chain:'Tier authority (TS authority same as AA per AMC)'},
+      {flow:'Tender · CVC review',    chain:'Section Officer → HOD → Finance → Vigilance → Commissioner'},
+      {flow:'Pre-Bid · Response register', chain:'Drafter → Reviewer → Tier authority'},
+      {flow:'Pre-Bid · Corrigendum',  chain:'Drafter → Reviewer → Tier authority → Vigilance'},
+      {flow:'Eval · NTQ Justification', chain:'Committee Chair → HOD → Vigilance'},
+      {flow:'Bid Mgmt · Award',       chain:'Committee → HOD → Tier authority'},
+      {flow:'Bid Mgmt · LoA',         chain:'Tier authority → Procurement Cell'},
+    ]},
+  // D. Templates
+  {id:'templates.registry', m:'templates', s:'D · Document templates', p:'Core', t:'lib',
+    title:'Outgoing-document template registry',
+    why:'NIT, Corrigendum, Response Sheet, NTQ letter, Clarification letter, Negotiation minutes, Award note, LoA — all here.',
+    def:[
+      {doc:'NIT',                version:'v3.2', updated:'2026-04-12'},
+      {doc:'Corrigendum',        version:'v1.4', updated:'2026-03-08'},
+      {doc:'Pre-Bid Response Sheet', version:'v2.0', updated:'2026-01-22'},
+      {doc:'NTQ Justification Letter', version:'v1.1', updated:'2025-11-05'},
+      {doc:'Clarification Request Letter', version:'v1.0', updated:'2025-09-14'},
+      {doc:'Negotiation Minutes', version:'v1.2', updated:'2026-02-19'},
+      {doc:'Award Recommendation Note', version:'v2.1', updated:'2026-04-02'},
+      {doc:'Letter of Acceptance (LoA)', version:'v3.0', updated:'2026-05-10'},
+    ]},
+  {id:'templates.versioning', m:'templates', s:'D · Document templates', p:'Helpful', t:'toggle',
+    title:'Template versioning & rollback',
+    why:'Drafts → publish; rollback supported.',
+    def:true},
+  // E. Vendors
+  {id:'vendors.registry', m:'vendors', s:'E · Vendor master', p:'Core', t:'lib',
+    title:'Vendor registry',
+    why:'Used by Tender publish, Evaluation, Bid Mgmt. Single source.',
+    def:[
+      {name:'Rajesh Constructions Pvt Ltd', type:'Pvt Ltd', msme:'—', status:'Active'},
+      {name:'Maharashtra Roads Co.',         type:'Pvt Ltd', msme:'—', status:'Active'},
+      {name:'BuildTech Solutions',           type:'LLP',     msme:'Small', status:'Active'},
+      {name:'NCC Infrastructure Ltd',        type:'Pvt Ltd', msme:'—', status:'Active'},
+      {name:'Patil & Associates',            type:'Partnership', msme:'Micro', status:'Blacklist pending'},
+    ]},
+  {id:'vendors.blacklist', m:'vendors', s:'E · Vendor master', p:'Core', t:'kvlist',
+    title:'Blacklist policy',
+    why:'Mandatory fields before a vendor can be blacklisted.',
+    def:[{k:'Reason mandatory',v:'true'},{k:'Supporting document mandatory',v:'true'},{k:'Approval to blacklist',v:'Commissioner'},{k:'Auto-block from tenders',v:'true'}]},
+  {id:'vendors.msme', m:'vendors', s:'E · Vendor master', p:'Core', t:'kvlist',
+    title:'MSME status & exemptions',
+    why:'Micro & Small auto-EMD-exempt; flag drives Tender Creation EMD calc.',
+    def:[{k:'Micro EMD exempt',v:'true'},{k:'Small EMD exempt',v:'true'},{k:'Medium EMD exempt',v:'false'},{k:'Validation via Udyam',v:'true'}]},
+  {id:'vendors.performance', m:'vendors', s:'E · Vendor master', p:'Helpful', t:'list',
+    title:'Performance-score model factors',
+    why:'Consumed by Evaluation and Bid Mgmt.',
+    def:['On-time completion %','Quality complaints','Cost variance from awarded value','Communication responsiveness','Past blacklist history']},
+  // F. Officers
+  {id:'officers.directory', m:'officers', s:'F · Officers & departments', p:'Core', t:'lib',
+    title:'Officer directory',
+    why:'Consumed by every approval chain.',
+    def:[
+      {name:'Rajesh Kumar', role:'Super Admin',         email:'rajesh.kumar@amc.gov.in', dept:'Procurement', status:'Active'},
+      {name:'Priya Shah',   role:'Technical Officer',   email:'priya.shah@amc.gov.in',   dept:'Engineering', status:'Active'},
+      {name:'Amit Patil',   role:'Finance Officer',     email:'amit.patil@amc.gov.in',   dept:'Finance',     status:'Active'},
+      {name:'Sunita Rao',   role:'Deputy Commissioner', email:'sunita.rao@amc.gov.in',   dept:'Commissioner Office', status:'Active'},
+      {name:'Ravi Mehta',   role:'Accounts Officer',    email:'ravi.mehta@amc.gov.in',   dept:'Accounts',    status:'Active'},
+    ]},
+  {id:'officers.depts', m:'officers', s:'F · Officers & departments', p:'Core', t:'list',
+    title:'Department & sector master',
+    why:'Drives sector defaults across modules.',
+    def:['Procurement Cell','Engineering','Water Works','Roads','IT & Goods','Urban Development','Finance','Accounts','Vigilance','Commissioner Office']},
+  {id:'officers.committees', m:'officers', s:'F · Officers & departments', p:'Core', t:'lib',
+    title:'Standing committee templates',
+    why:'Standard CVC / TQ / Bid Mgmt committees per dept and value tier.',
+    def:[
+      {committee:'CVC Review – default',       members:'Sec.Officer · HOD · Finance · Vigilance · Commissioner'},
+      {committee:'TQ Evaluation – 3-member',   members:'Technical (Chair) · Finance · Technical Expert'},
+      {committee:'TQ Evaluation – 5-member',   members:'Technical (Chair) · Finance · 2 Technical Experts · Vigilance'},
+      {committee:'Bid Mgmt – standard',        members:'HOD (Chair) · Finance · Technical · Vigilance'},
+    ]},
+  // G. Permissions
+  {id:'perm.matrix', m:'permissions', s:'G · Permissions', p:'Core', t:'matrix',
+    title:'Per-action permission matrix',
+    why:'Segregation of duties is CVC-mandated.',
+    def:{rows:['Super Admin','Technical Officer','Finance Officer','Deputy Commissioner','Accounts Officer'],
+         cols:['Create DPR','Approve DPR','Create Tender','CVC sign-off','Publish NIT','Upload queries','Approve responses','Issue corrigendum','Score TQ','Reveal financial bid','Approve award','Issue LoA'],
+         cells:{}}},
+  {id:'perm.scope', m:'permissions', s:'G · Permissions', p:'Helpful', t:'toggle',
+    title:'Department / sector scoping',
+    why:'Officers only see tenders in their domain.',
+    def:false},
+  {id:'perm.allowlists', m:'permissions', s:'G · Permissions', p:'Core', t:'kvlist',
+    title:'Special-action allowlists',
+    why:'Who may *Share with consultant*, *Simulate approval*, *Override default method*.',
+    def:[{k:'Share with consultant',v:'Super Admin, HOD'},{k:'Simulate approval',v:'Super Admin only'},{k:'Override default method',v:'Commissioner only'}]},
+  // H. Notifications
+  {id:'notif.triggers', m:'notifications', s:'H · Notifications', p:'Core', t:'lib',
+    title:'Notification triggers registry',
+    why:'Every notable event across modules.',
+    def:[
+      {event:'NIT published',      modules:'Tender → Vendors',  enabled:true},
+      {event:'Query received',     modules:'Pre-Bid → Officer', enabled:true},
+      {event:'Response published', modules:'Pre-Bid → Vendor',  enabled:true},
+      {event:'Corrigendum issued', modules:'Pre-Bid → Vendors', enabled:true},
+      {event:'Deadline T-24h',     modules:'All',               enabled:true},
+      {event:'Approval overdue',   modules:'All',               enabled:true},
+      {event:'LoA issued',         modules:'Bid Mgmt → Vendor', enabled:true},
+      {event:'LoA acknowledged',   modules:'Bid Mgmt → Officer',enabled:true},
+    ]},
+  {id:'notif.channels', m:'notifications', s:'H · Notifications', p:'Helpful', t:'matrix',
+    title:'Channel routing per trigger',
+    why:'Some events need SMS (deadline), others email is fine.',
+    def:{rows:['NIT published','Query received','Response published','Corrigendum issued','Deadline T-24h','Approval overdue','LoA issued'], cols:['Email','SMS','In-app'], cells:{}}},
+  {id:'notif.escalation', m:'notifications', s:'H · Notifications', p:'Core', t:'list',
+    title:'Escalation rules',
+    why:'Compliance + SLA enforcement.',
+    def:['Approval overdue 24h → reminder to approver','Overdue 48h → escalate to next tier','Overdue 72h → escalate to Commissioner','Overdue 7d → flag in compliance dashboard']},
+  {id:'notif.templates', m:'notifications', s:'H · Notifications', p:'Helpful', t:'toggle',
+    title:'Message-template library enabled',
+    why:'Per-trigger templates; org voice.',
+    def:true},
+  // I. Audit & compliance
+  {id:'audit.config', m:'audit', s:'I · Audit & compliance', p:'Core', t:'list',
+    title:'Audit-trail configuration — what gets logged',
+    why:'CVC reviews and RTI requests arrive years later.',
+    def:['Every send-for-approval','Every AI generation','Every regroup','Every share-with-consultant','Every publish','Every reveal of financial bid','Every score edit','Every blacklist action']},
+  {id:'audit.anonymisation', m:'audit', s:'I · Audit & compliance', p:'Core', t:'toggle',
+    title:'Anonymisation enforcement on exports',
+    why:'Statutory. Enforce by the system, don\'t trust the officer.',
+    def:true},
+  {id:'audit.retention', m:'audit', s:'I · Audit & compliance', p:'Optional', t:'kvlist',
+    title:'Document retention policy',
+    why:'Aligns with state record-retention rules.',
+    def:[{k:'DPR records (years)',v:'10'},{k:'Tender / NIT (years)',v:'10'},{k:'Bid documents (years)',v:'7'},{k:'Audit logs (years)',v:'15'}]},
+  {id:'audit.health-formula', m:'audit', s:'I · Audit & compliance', p:'Helpful', t:'list',
+    title:'Compliance health-score formula',
+    why:'What goes into the CVC compliance score on the admin dashboard.',
+    def:['Approvals on time (35%)','Corrigenda issued where required (25%)','Documents complete (15%)','COI declarations on file (10%)','No ALB unreviewed (10%)','GeM compliance (5%)']},
+  {id:'audit.class-presets', m:'audit', s:'I · Audit & compliance', p:'Helpful', t:'lib',
+    title:'Tender-class compliance presets',
+    why:'For high-value / sensitive tenders, force stricter rules.',
+    def:[
+      {class:'Routine (<₹25L)',       rules:'Standard chain · AI on · Single approver'},
+      {class:'High-value (₹25L–₹1Cr)', rules:'Dual approvers · AI on · COI mandatory'},
+      {class:'Sensitive (>₹1Cr)',     rules:'Dual approvers · AI off on drafting · Consultant whitelist enforced'},
+    ]},
+  // J. System
+  {id:'sys.autosave', m:'system', s:'J · System', p:'Optional', t:'number',
+    title:'Auto-save interval',
+    why:'Currently 60s.',
+    def:60, unit:'seconds'},
+  {id:'sys.version-retention', m:'system', s:'J · System', p:'Optional', t:'kvlist',
+    title:'Version-history retention',
+    why:'Per artefact type.',
+    def:[{k:'DPR (versions)',v:'20'},{k:'NIT (versions)',v:'15'},{k:'Evaluation matrix (versions)',v:'10'}]},
+  {id:'sys.calendar', m:'system', s:'J · System', p:'Helpful', t:'kvlist',
+    title:'Working-day & holiday calendar',
+    why:'Drives every deadline computation.',
+    def:[{k:'Working days',v:'Mon–Fri + alternate Sat'},{k:'Holidays from',v:'GoI + Maharashtra Govt list'},{k:'Half-day before holiday',v:'true'}]},
+  {id:'sys.fy', m:'system', s:'J · System', p:'Helpful', t:'kvlist',
+    title:'Financial-year management',
+    why:'Opening / closing / cutover.',
+    def:[{k:'Current FY',v:'2026-27'},{k:'FY starts',v:'April 1'},{k:'FY ends',v:'March 31'},{k:'Carry-forward window (days)',v:'30'}]},
+  {id:'sys.activity', m:'system', s:'J · System', p:'Optional', t:'list',
+    title:'Activity-Trail panel configuration',
+    why:'Which events appear in the right-side activity log.',
+    def:['Saves','Approvals','Publishes','AI generations','Reveals','Shares','Blacklist actions']},
+];
+
+/* =========================================================
+   STATE
+   ========================================================= */
+const STORE_KEY = 'admin_state_v1';
+const LOG_KEY   = 'admin_log_v1';
+
+function loadStore(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY)||'{}'); }catch(e){return{};} }
+function saveStore(s){ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }
+function getValue(id){ const s=loadStore(); if(id in s) return s[id]; return ITEMS.find(i=>i.id===id)?.def; }
+function setValue(id,v){ const s=loadStore(); s[id]=v; saveStore(s); logAction(id,v); refreshIcons(); }
+
+function loadLog(){ try{return JSON.parse(localStorage.getItem(LOG_KEY)||'[]');}catch(e){return[];} }
+function saveLog(l){ localStorage.setItem(LOG_KEY, JSON.stringify(l.slice(0,200))); }
+function logAction(id, v){
+  const item = ITEMS.find(i=>i.id===id);
+  const log = loadLog();
+  log.unshift({ id, title: item?.title||id, who:'Rajesh Kumar', when:Date.now(), preview: summarise(v) });
+  saveLog(log);
+  renderActivity();
+}
+function summarise(v){
+  if (v===true) return 'enabled';
+  if (v===false) return 'disabled';
+  if (Array.isArray(v)) return `${v.length} entries`;
+  if (typeof v==='object'&& v) return 'updated';
+  return String(v).slice(0,40);
+}
+
+/* =========================================================
+   ICONS + TOAST
+   ========================================================= */
+function refreshIcons(){ if(window.lucide) lucide.createIcons(); }
+let toastTimer;
+function toast(msg){
+  document.getElementById('toastMsg').textContent = msg;
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2400);
+}
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+function renderSidebar(){
+  const groups = {};
+  SECTIONS.forEach(s => { (groups[s.g] = groups[s.g]||[]).push(s); });
+  const cur = (location.hash||'#dashboard').slice(1);
+  const html = Object.entries(groups).map(([g, items]) => `
+    <div>
+      <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">${g}</div>
+      <ul class="space-y-0.5">
+        ${items.map(it => {
+          const active = it.k===cur;
+          const count = ITEMS.filter(i=>i.m===it.k).length;
+          const badge = count>0 ? `<span class="ml-auto text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${active?'bg-white/20 text-white':'bg-surface text-ink-500 border border-line'}">${count}</span>` : '';
+          return `<li><a href="#${it.k}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] ${active?'bg-primary text-white font-medium':'text-ink-500 hover:bg-surface hover:text-ink-900'}"><i data-lucide="${it.i}" class="w-4 h-4"></i> ${it.t} ${badge}</a></li>`;
+        }).join('')}
+      </ul>
+    </div>
+  `).join('');
+  document.getElementById('sideNav').innerHTML = html + `<div class="pt-1"><a href="index.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="arrow-left" class="w-4 h-4"></i> Procurement Portal</a></div>`;
   refreshIcons();
+}
+
+/* =========================================================
+   DASHBOARD
+   ========================================================= */
+function renderDashboard(){
+  const totals = SECTIONS.filter(s=>s.k!=='dashboard').map(s => ({s, count: ITEMS.filter(i=>i.m===s.k).length, core: ITEMS.filter(i=>i.m===s.k&&i.p==='Core').length}));
+  const totalItems = ITEMS.length;
+  const totalCore  = ITEMS.filter(i=>i.p==='Core').length;
+  const totalHelp  = ITEMS.filter(i=>i.p==='Helpful').length;
+  const totalOpt   = ITEMS.filter(i=>i.p==='Optional').length;
+  const customised = Object.keys(loadStore()).length;
+
+  document.getElementById('content').innerHTML = `
+    <div>
+      <div class="text-[13px] text-ink-500 mb-2">Admin Console</div>
+      <h1 class="text-[24px] font-bold text-ink-900 leading-tight">Procurement policy &amp; system settings</h1>
+      <p class="text-[14px] text-ink-500 mt-1">Ahmedabad Municipal Corporation · ${totalItems} settings across ${SECTIONS.length-1} sections.</p>
+    </div>
+
+    <section class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div class="bg-white border border-line rounded-xl p-5"><div class="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center mb-2"><i data-lucide="sliders-horizontal" class="w-4 h-4"></i></div><div class="text-[26px] font-bold leading-none">${totalItems}</div><div class="text-[12px] text-ink-500 mt-1">Total settings</div></div>
+      <div class="bg-white border border-line rounded-xl p-5"><div class="w-9 h-9 rounded-lg bg-danger-light text-danger flex items-center justify-center mb-2"><i data-lucide="alert-octagon" class="w-4 h-4"></i></div><div class="text-[26px] font-bold leading-none">${totalCore}</div><div class="text-[12px] text-ink-500 mt-1">Core (compliance)</div></div>
+      <div class="bg-white border border-line rounded-xl p-5"><div class="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center mb-2"><i data-lucide="zap" class="w-4 h-4"></i></div><div class="text-[26px] font-bold leading-none">${totalHelp}</div><div class="text-[12px] text-ink-500 mt-1">Helpful</div></div>
+      <div class="bg-white border border-line rounded-xl p-5"><div class="w-9 h-9 rounded-lg bg-purple-light text-purple flex items-center justify-center mb-2"><i data-lucide="check-square" class="w-4 h-4"></i></div><div class="text-[26px] font-bold leading-none">${customised}</div><div class="text-[12px] text-ink-500 mt-1">Customised</div></div>
+    </section>
+
+    <section>
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-[18px] font-bold text-ink-900">Module policies</h2>
+        <span class="text-[12px] text-ink-500">Click any module to start configuring</span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        ${totals.filter(x=>SECTIONS.find(s=>s.k===x.s.k).g==='MODULE POLICIES').map(x => `
+          <a href="#${x.s.k}" class="bg-white border border-line rounded-xl p-5 hover:shadow-soft hover:border-primary/30 transition block">
+            <div class="flex items-start justify-between mb-3">
+              <div class="w-10 h-10 rounded-lg bg-primary-light text-primary flex items-center justify-center"><i data-lucide="${x.s.i}" class="w-5 h-5"></i></div>
+              <i data-lucide="arrow-up-right" class="w-4 h-4 text-ink-400"></i>
+            </div>
+            <div class="text-[15px] font-semibold text-ink-900">${x.s.t}</div>
+            <p class="text-[12.5px] text-ink-500 mt-1 leading-snug">${x.s.intro}</p>
+            <div class="text-[12px] mt-3 pt-3 border-t border-line flex items-center gap-3">
+              <span class="text-ink-900 font-medium">${x.count} settings</span>
+              <span class="chip pri-Core">${x.core} Core</span>
+            </div>
+          </a>
+        `).join('')}
+      </div>
+    </section>
+
+    <section>
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-[18px] font-bold text-ink-900">Cross-cutting (used by all modules)</h2>
+        <span class="text-[12px] text-ink-500">Build these first; module policies select from them</span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+        ${totals.filter(x=>SECTIONS.find(s=>s.k===x.s.k).g==='CROSS-CUTTING').map(x => `
+          <a href="#${x.s.k}" class="bg-white border border-line rounded-xl p-4 hover:shadow-soft hover:border-primary/30 transition block">
+            <div class="w-9 h-9 rounded-lg bg-purple-light text-purple flex items-center justify-center mb-2"><i data-lucide="${x.s.i}" class="w-4 h-4"></i></div>
+            <div class="text-[13.5px] font-semibold text-ink-900">${x.s.t}</div>
+            <div class="text-[11.5px] text-ink-500 mt-0.5">${x.count} settings</div>
+          </a>
+        `).join('')}
+      </div>
+    </section>
+
+    <section class="bg-primary-light border border-primary/20 rounded-xl p-5">
+      <div class="flex gap-4">
+        <div class="w-10 h-10 rounded-lg bg-primary text-white flex items-center justify-center shrink-0"><i data-lucide="lightbulb" class="w-5 h-5"></i></div>
+        <div>
+          <div class="text-[14px] font-semibold text-ink-900">Suggested build order</div>
+          <p class="text-[13px] text-ink-500 mt-1 leading-snug">Start with <strong class="text-ink-900">Cross-cutting</strong> — Value-Tier Routing, AI Configuration, Signatures &amp; Letterheads, Officers &amp; Departments. Module policies then just <em>select from</em> those records, so you won't redo work.</p>
+        </div>
+      </div>
+    </section>
+  `;
+  refreshIcons();
+}
+
+/* =========================================================
+   SECTION RENDERER
+   ========================================================= */
+let currentFilter = 'All';
+let currentSearch = '';
+
+function renderSection(key){
+  if (key==='dashboard') return renderDashboard();
+  const sec = SECTIONS.find(s=>s.k===key);
+  if (!sec) return renderDashboard();
+  const all = ITEMS.filter(i=>i.m===key);
+  // group by subsection
+  const groups = {};
+  all.forEach(i=>{ (groups[i.s]=groups[i.s]||[]).push(i); });
+  const filtered = (items) => items.filter(i => {
+    if (currentFilter!=='All' && i.p!==currentFilter) return false;
+    if (currentSearch && !(i.title+' '+i.why).toLowerCase().includes(currentSearch)) return false;
+    return true;
+  });
+  const total = all.length;
+  const shown = all.filter(i => (currentFilter==='All'||i.p===currentFilter) && (!currentSearch || (i.title+' '+i.why).toLowerCase().includes(currentSearch))).length;
+
+  document.getElementById('content').innerHTML = `
+    <div>
+      <div class="text-[13px] text-ink-500 mb-2 flex items-center gap-2"><a href="#dashboard" class="hover:underline">Admin Console</a> · <span>${sec.g}</span></div>
+      <h1 class="text-[24px] font-bold text-ink-900 leading-tight flex items-center gap-2.5"><span class="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center"><i data-lucide="${sec.i}" class="w-5 h-5"></i></span> ${sec.t}</h1>
+      <p class="text-[14px] text-ink-500 mt-2 max-w-3xl">${sec.intro}</p>
+    </div>
+
+    <div class="bg-white border border-line rounded-xl p-3 flex items-center gap-2 flex-wrap">
+      <span class="text-[12px] text-ink-500 ml-1">Filter:</span>
+      ${['All','Core','Helpful','Optional'].map(p => `<button onclick="setFilter('${p}')" class="text-[12px] px-2.5 py-1 rounded-full border border-line ${currentFilter===p?'tab-active':'hover:bg-surface text-ink-500'}">${p}</button>`).join('')}
+      <span class="text-[12px] text-ink-400 ml-2">${shown} of ${total} shown</span>
+    </div>
+
+    ${Object.keys(groups).map(g => {
+      const items = filtered(groups[g]);
+      if (!items.length) return '';
+      return `
+        <section class="sec-anchor space-y-3">
+          <h3 class="text-[15px] font-semibold text-ink-900 mt-2">${g}</h3>
+          <div class="space-y-2">${items.map(renderItemRow).join('')}</div>
+        </section>
+      `;
+    }).join('')}
+  `;
+  refreshIcons();
+  bindItemHandlers();
+}
+
+function setFilter(p){ currentFilter = p; renderSection((location.hash||'#dashboard').slice(1)); }
+
+function renderItemRow(item){
+  const val = getValue(item.id);
+  const preview = renderPreview(item, val);
+  const editable = renderInlineControl(item, val);
+  return `
+    <div class="item-row bg-white border border-line rounded-xl p-4" data-id="${item.id}">
+      <div class="flex items-start justify-between gap-4">
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <div class="text-[14px] font-semibold text-ink-900">${item.title}</div>
+            <span class="chip pri-${item.p}">${item.p}</span>
+          </div>
+          <p class="text-[12.5px] text-ink-500 mt-1 leading-snug max-w-2xl">${item.why}</p>
+          ${preview ? `<div class="mt-2.5">${preview}</div>` : ''}
+        </div>
+        <div class="shrink-0 flex items-center gap-2">${editable}</div>
+      </div>
+    </div>
+  `;
+}
+
+/* preview shows current value summary */
+function renderPreview(item, val){
+  switch(item.t){
+    case 'list':
+      if (!Array.isArray(val)) return '';
+      return `<div class="flex flex-wrap gap-1.5">${val.slice(0,12).map(x=>`<span class="chip-input">${escapeHtml(String(x))}</span>`).join('')}${val.length>12?`<span class="text-[11px] text-ink-400">+${val.length-12} more</span>`:''}</div>`;
+    case 'kvlist':
+      if (!Array.isArray(val)) return '';
+      return `<div class="flex flex-wrap gap-1.5">${val.slice(0,6).map(p=>`<span class="chip-input"><b class="font-medium">${escapeHtml(p.k)}:</b>&nbsp;${escapeHtml(String(p.v))}</span>`).join('')}${val.length>6?`<span class="text-[11px] text-ink-400">+${val.length-6} more</span>`:''}</div>`;
+    case 'tiers':
+      return `<div class="flex flex-wrap gap-1.5">${val.map(t=>`<span class="chip-input">${fmtTier(t)} → ${escapeHtml(t.auth)}</span>`).join('')}</div>`;
+    case 'chain':
+      return `<div class="flex flex-wrap items-center gap-1">${val.map((x,i)=>`<span class="chip-input">${escapeHtml(x)}</span>${i<val.length-1?'<span class="text-ink-400 px-1">→</span>':''}`).join('')}</div>`;
+    case 'matrix':
+      if (!val||!val.rows) return '';
+      return `<div class="text-[12px] text-ink-500">${val.rows.length} rows × ${val.cols.length} cols matrix</div>`;
+    case 'lib':
+      if (!Array.isArray(val)) return '';
+      return `<div class="text-[12px] text-ink-500">${val.length} entries</div>`;
+    case 'template':
+      const sample = String(val||'').slice(0,140).replace(/\n/g,' ');
+      return `<div class="text-[12px] text-ink-500 font-mono">${escapeHtml(sample)}${(val||'').length>140?'…':''}</div>`;
+    case 'rules':
+      if (!Array.isArray(val)) return '';
+      return `<div class="text-[12px] text-ink-500">${val.length} rule(s)</div>`;
+    default: return '';
+  }
+}
+
+function fmtTier(t){
+  const lo = inrCompact(t.min);
+  const hi = t.max==null?'∞':inrCompact(t.max);
+  return `${lo}–${hi}`;
+}
+function inrCompact(n){
+  if (n==null) return '∞';
+  if (n>=10000000) return '₹'+(n/10000000).toFixed(n%10000000?1:0)+'Cr';
+  if (n>=100000)   return '₹'+(n/100000).toFixed(n%100000?1:0)+'L';
+  if (n>=1000)     return '₹'+(n/1000).toFixed(0)+'k';
+  return '₹'+n;
+}
+
+/* inline controls */
+function renderInlineControl(item, val){
+  switch(item.t){
+    case 'toggle':
+      return `<button class="toggle ${val?'on':''}" data-act="toggle" data-id="${item.id}" aria-pressed="${val?'true':'false'}"><span class="dot"></span></button>`;
+    case 'number':
+      return `<div class="flex items-center gap-2"><input class="inp w-24 text-right" type="number" value="${escapeHtml(String(val))}" data-act="number" data-id="${item.id}"><span class="text-[12px] text-ink-500">${escapeHtml(item.unit||'')}</span></div>`;
+    case 'percent':
+      return `<div class="flex items-center gap-2"><input class="inp w-20 text-right" type="number" min="0" max="100" value="${escapeHtml(String(val))}" data-act="number" data-id="${item.id}"><span class="text-[12px] text-ink-500">%</span></div>`;
+    case 'text':
+      return `<input class="inp w-72" type="text" value="${escapeHtml(String(val||''))}" data-act="text" data-id="${item.id}">`;
+    case 'select':
+      return `<select class="inp" data-act="select" data-id="${item.id}">${(item.options||[]).map(o=>`<option ${o===val?'selected':''}>${escapeHtml(o)}</option>`).join('')}</select>`;
+    default:
+      return `<button class="btn" data-act="open" data-id="${item.id}"><i data-lucide="settings-2" class="w-3.5 h-3.5"></i> Configure</button>`;
+  }
+}
+
+function bindItemHandlers(){
+  document.querySelectorAll('[data-act="toggle"]').forEach(el => {
+    el.onclick = () => {
+      const id = el.dataset.id; const next = !getValue(id);
+      setValue(id, next);
+      el.classList.toggle('on', next);
+      el.setAttribute('aria-pressed', String(next));
+      toast(`${ITEMS.find(i=>i.id===id).title}: ${next?'enabled':'disabled'}`);
+    };
+  });
+  document.querySelectorAll('[data-act="number"]').forEach(el => {
+    el.onchange = () => { setValue(el.dataset.id, Number(el.value)); toast('Saved'); };
+  });
+  document.querySelectorAll('[data-act="text"]').forEach(el => {
+    el.onchange = () => { setValue(el.dataset.id, el.value); toast('Saved'); };
+  });
+  document.querySelectorAll('[data-act="select"]').forEach(el => {
+    el.onchange = () => { setValue(el.dataset.id, el.value); toast('Saved'); };
+  });
+  document.querySelectorAll('[data-act="open"]').forEach(el => {
+    el.onclick = () => openEdit(el.dataset.id);
+  });
+}
+
+/* =========================================================
+   EDIT PANEL (complex types: list, kvlist, lib, chain, matrix, tiers, template)
+   ========================================================= */
+let editingId = null;
+let editingDraft = null;
+
+function openEdit(id){
+  editingId = id;
+  const item = ITEMS.find(i=>i.id===id);
+  editingDraft = JSON.parse(JSON.stringify(getValue(id)));
+  document.getElementById('epSection').textContent = item.s;
+  document.getElementById('epTitle').textContent = item.title;
+  document.getElementById('epWhy').textContent = item.why;
+  document.getElementById('epBody').innerHTML = renderEditor(item, editingDraft);
+  document.getElementById('editPanel').classList.add('open');
+  document.getElementById('backdrop').classList.add('open');
+  refreshIcons();
+  bindEditorHandlers();
+}
+function closeEdit(){
+  document.getElementById('editPanel').classList.remove('open');
+  document.getElementById('backdrop').classList.remove('open');
+  editingId = null;
+}
+function saveEdit(){
+  if (editingId==null) return;
+  setValue(editingId, editingDraft);
+  const item = ITEMS.find(i=>i.id===editingId);
+  toast(`${item.title} saved`);
+  closeEdit();
+  renderSection((location.hash||'#dashboard').slice(1));
+}
+document.getElementById('backdrop').addEventListener('click', closeEdit);
+
+function renderEditor(item, draft){
+  switch(item.t){
+    case 'list':    return editorList(draft);
+    case 'kvlist':  return editorKv(draft);
+    case 'lib':     return editorLib(draft);
+    case 'chain':   return editorChain(draft);
+    case 'matrix':  return editorMatrix(draft);
+    case 'tiers':   return editorTiers(draft);
+    case 'template':return editorTemplate(draft);
+    case 'rules':   return editorList(draft);
+    default: return `<pre class="text-[12px] text-ink-500">${escapeHtml(JSON.stringify(draft,null,2))}</pre>`;
+  }
+}
+
+function editorList(draft){
+  return `
+    <div class="space-y-2">
+      <div id="listRows" class="flex flex-wrap gap-2"></div>
+      <div class="flex items-center gap-2 pt-2">
+        <input id="newListItem" class="inp flex-1" placeholder="Add new entry and press Enter…">
+        <button class="btn btn-primary" onclick="addListEntry()"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add</button>
+      </div>
+    </div>
+  `;
+}
+function editorKv(){
+  return `
+    <div class="space-y-2">
+      <div id="kvRows" class="space-y-2"></div>
+      <button class="btn" onclick="addKvEntry()"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add pair</button>
+    </div>
+  `;
+}
+function editorChain(){
+  return `
+    <div class="space-y-2">
+      <div id="chainRows" class="space-y-2"></div>
+      <button class="btn" onclick="addChainStep()"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add step</button>
+    </div>
+  `;
+}
+function editorTiers(){
+  return `<div id="tiersRows" class="space-y-2"></div><button class="btn mt-3" onclick="addTier()"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add tier</button>`;
+}
+function editorTemplate(draft){
+  return `<textarea id="tplArea" class="w-full h-[440px] font-mono text-[12.5px] inp" placeholder="Template body — use {placeholders} as needed.">${escapeHtml(String(draft||''))}</textarea>`;
+}
+function editorMatrix(draft){
+  return `<div id="matrixWrap"></div>`;
+}
+function editorLib(draft){
+  // generic library editor: rows are key/value objects
+  return `
+    <div class="space-y-2">
+      <div id="libRows" class="space-y-2"></div>
+      <button class="btn" onclick="addLibRow()"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add entry</button>
+    </div>
+  `;
+}
+
+function bindEditorHandlers(){
+  const item = ITEMS.find(i=>i.id===editingId);
+  switch(item.t){
+    case 'list':    return renderListRows();
+    case 'rules':   return renderListRows();
+    case 'kvlist':  return renderKvRows();
+    case 'chain':   return renderChainRows();
+    case 'tiers':   return renderTiersRows();
+    case 'matrix':  return renderMatrix();
+    case 'lib':     return renderLibRows();
+    case 'template':
+      document.getElementById('tplArea').oninput = e => { editingDraft = e.target.value; };
+      break;
+  }
+}
+
+/* list editor */
+function renderListRows(){
+  const c = document.getElementById('listRows');
+  c.innerHTML = (editingDraft||[]).map((x,i)=>`<span class="chip-input">${escapeHtml(String(x))}<button data-i="${i}" class="rm-list"><i data-lucide="x" class="w-3 h-3"></i></button></span>`).join('');
+  c.querySelectorAll('.rm-list').forEach(b => b.onclick = () => { editingDraft.splice(+b.dataset.i,1); renderListRows(); });
+  const input = document.getElementById('newListItem');
+  input.onkeydown = e => { if (e.key==='Enter') { addListEntry(); e.preventDefault(); } };
+  refreshIcons();
+}
+function addListEntry(){
+  const i = document.getElementById('newListItem');
+  const v = i.value.trim(); if (!v) return;
+  editingDraft = editingDraft||[]; editingDraft.push(v); i.value=''; renderListRows();
+}
+
+/* kv editor */
+function renderKvRows(){
+  const c = document.getElementById('kvRows');
+  c.innerHTML = (editingDraft||[]).map((p,i)=>`
+    <div class="flex items-center gap-2">
+      <input class="inp flex-1" data-i="${i}" data-k="k" value="${escapeHtml(p.k||'')}" placeholder="Key">
+      <input class="inp flex-1" data-i="${i}" data-k="v" value="${escapeHtml(String(p.v||''))}" placeholder="Value">
+      <button class="btn btn-danger" data-i="${i}" aria-label="Remove"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+    </div>
+  `).join('');
+  c.querySelectorAll('input').forEach(inp => inp.onchange = e => { editingDraft[+e.target.dataset.i][e.target.dataset.k] = e.target.value; });
+  c.querySelectorAll('button[aria-label="Remove"]').forEach(b => b.onclick = () => { editingDraft.splice(+b.dataset.i,1); renderKvRows(); });
+  refreshIcons();
+}
+function addKvEntry(){ editingDraft = editingDraft||[]; editingDraft.push({k:'',v:''}); renderKvRows(); }
+
+/* chain editor */
+function renderChainRows(){
+  const c = document.getElementById('chainRows');
+  c.innerHTML = (editingDraft||[]).map((x,i)=>`
+    <div class="flex items-center gap-2">
+      <span class="w-7 h-7 rounded-full bg-primary-light text-primary text-[12px] font-semibold flex items-center justify-center">${i+1}</span>
+      <input class="inp flex-1" data-i="${i}" value="${escapeHtml(x)}">
+      <button class="btn" data-up="${i}" ${i===0?'disabled':''} aria-label="Up"><i data-lucide="chevron-up" class="w-3.5 h-3.5"></i></button>
+      <button class="btn" data-dn="${i}" ${i===editingDraft.length-1?'disabled':''} aria-label="Down"><i data-lucide="chevron-down" class="w-3.5 h-3.5"></i></button>
+      <button class="btn btn-danger" data-rm="${i}"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+    </div>
+  `).join('');
+  c.querySelectorAll('input').forEach(inp => inp.onchange = e => { editingDraft[+e.target.dataset.i] = e.target.value; });
+  c.querySelectorAll('button[data-up]').forEach(b => b.onclick = () => { const i=+b.dataset.up; if(i>0){[editingDraft[i-1],editingDraft[i]]=[editingDraft[i],editingDraft[i-1]];renderChainRows();}});
+  c.querySelectorAll('button[data-dn]').forEach(b => b.onclick = () => { const i=+b.dataset.dn; if(i<editingDraft.length-1){[editingDraft[i+1],editingDraft[i]]=[editingDraft[i],editingDraft[i+1]];renderChainRows();}});
+  c.querySelectorAll('button[data-rm]').forEach(b => b.onclick = () => { editingDraft.splice(+b.dataset.rm,1); renderChainRows(); });
+  refreshIcons();
+}
+function addChainStep(){ editingDraft = editingDraft||[]; editingDraft.push('New step'); renderChainRows(); }
+
+/* tiers editor */
+function renderTiersRows(){
+  const c = document.getElementById('tiersRows');
+  c.innerHTML = (editingDraft||[]).map((t,i)=>`
+    <div class="grid grid-cols-12 gap-2 items-center">
+      <div class="col-span-3"><input class="inp w-full" type="number" value="${t.min||0}" data-i="${i}" data-k="min" placeholder="Min ₹"></div>
+      <div class="col-span-3"><input class="inp w-full" type="number" value="${t.max==null?'':t.max}" data-i="${i}" data-k="max" placeholder="Max ₹ (blank = ∞)"></div>
+      <div class="col-span-5"><input class="inp w-full" value="${escapeHtml(t.auth)}" data-i="${i}" data-k="auth" placeholder="Authority"></div>
+      <div class="col-span-1"><button class="btn btn-danger w-full" data-rm="${i}"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></div>
+    </div>
+  `).join('');
+  c.querySelectorAll('input').forEach(inp => inp.onchange = e => {
+    const i = +e.target.dataset.i, k = e.target.dataset.k;
+    let v = e.target.value;
+    if (k==='min'||k==='max') v = v===''? (k==='max'?null:0) : Number(v);
+    editingDraft[i][k] = v;
+  });
+  c.querySelectorAll('button[data-rm]').forEach(b => b.onclick = () => { editingDraft.splice(+b.dataset.rm,1); renderTiersRows(); });
+  refreshIcons();
+}
+function addTier(){ editingDraft = editingDraft||[]; editingDraft.push({min:0,max:null,auth:'New authority'}); renderTiersRows(); }
+
+/* matrix editor */
+function renderMatrix(){
+  const m = editingDraft || {rows:[],cols:[],cells:{}};
+  m.cells = m.cells||{};
+  const html = `
+    <div class="overflow-x-auto">
+      <table class="text-[12.5px] w-full">
+        <thead><tr><th class="text-left text-ink-500 font-semibold p-2"></th>${m.cols.map(c=>`<th class="text-left text-ink-500 font-semibold p-2 whitespace-nowrap">${escapeHtml(c)}</th>`).join('')}</tr></thead>
+        <tbody>${m.rows.map((r,ri)=>`<tr class="border-t border-line"><td class="p-2 font-medium text-ink-900 whitespace-nowrap">${escapeHtml(r)}</td>${m.cols.map((c,ci)=>{
+          const key = ri+'_'+ci; const on = !!m.cells[key];
+          return `<td class="p-2"><button class="toggle ${on?'on':''}" data-cell="${key}" aria-pressed="${on}"><span class="dot"></span></button></td>`;
+        }).join('')}</tr>`).join('')}</tbody>
+      </table>
+    </div>
+  `;
+  document.getElementById('matrixWrap').innerHTML = html;
+  document.getElementById('matrixWrap').querySelectorAll('button[data-cell]').forEach(b => b.onclick = () => {
+    const k = b.dataset.cell;
+    m.cells[k] = !m.cells[k];
+    b.classList.toggle('on', m.cells[k]);
+    b.setAttribute('aria-pressed', String(m.cells[k]));
+  });
+}
+
+/* lib editor — generic key/value JSON */
+function renderLibRows(){
+  const c = document.getElementById('libRows');
+  c.innerHTML = (editingDraft||[]).map((row,i)=>{
+    if (typeof row !== 'object' || row===null) return '';
+    const keys = Object.keys(row);
+    return `
+      <div class="border border-line rounded-lg p-3 space-y-2">
+        <div class="flex items-center justify-between"><div class="text-[12px] text-ink-500">Entry ${i+1}</div><button class="btn btn-danger" data-rm="${i}"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></div>
+        ${keys.map(k=>`
+          <div class="grid grid-cols-12 gap-2 items-start">
+            <div class="col-span-3 text-[12px] text-ink-500 pt-2">${escapeHtml(k)}</div>
+            <div class="col-span-9"><${(typeof row[k]==='string'&&row[k].length>80)?'textarea':'input'} class="inp w-full" data-i="${i}" data-k="${escapeHtml(k)}" ${(typeof row[k]==='string'&&row[k].length>80)?'rows="3"':''}>${escapeHtml(typeof row[k]==='object'?JSON.stringify(row[k]):String(row[k]))}</${(typeof row[k]==='string'&&row[k].length>80)?'textarea':'input'}></div>
+          </div>
+        `).join('')}
+      </div>`;
+  }).join('');
+  c.querySelectorAll('input,textarea').forEach(inp => inp.onchange = e => {
+    const i = +e.target.dataset.i, k = e.target.dataset.k;
+    editingDraft[i][k] = e.target.value;
+  });
+  c.querySelectorAll('button[data-rm]').forEach(b => b.onclick = () => { editingDraft.splice(+b.dataset.rm,1); renderLibRows(); });
+  refreshIcons();
+}
+function addLibRow(){
+  if (!Array.isArray(editingDraft) || !editingDraft.length){ editingDraft = editingDraft||[]; editingDraft.push({}); renderLibRows(); return; }
+  const tmpl = {}; Object.keys(editingDraft[0]).forEach(k => tmpl[k]='');
+  editingDraft.push(tmpl); renderLibRows();
+}
+
+/* =========================================================
+   ACTIVITY FEED
+   ========================================================= */
+function renderActivity(){
+  const log = loadLog().slice(0,40);
+  if (!log.length){
+    document.getElementById('activityFeed').innerHTML = `<li class="text-[12.5px] text-ink-400">Your changes will appear here. Nothing yet — every save is auto-logged.</li>`;
+    return;
+  }
+  document.getElementById('activityFeed').innerHTML = log.map(a => `
+    <li class="flex gap-3">
+      <div class="w-7 h-7 rounded-full bg-primary-light text-primary flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></div>
+      <div class="min-w-0">
+        <div class="text-[12.5px] text-ink-900 leading-snug">Updated <strong>${escapeHtml(a.title)}</strong></div>
+        <div class="text-[11px] text-ink-500 mt-0.5">${escapeHtml(a.preview)} · ${escapeHtml(a.who)} · ${timeAgo(a.when)}</div>
+      </div>
+    </li>
+  `).join('');
+  refreshIcons();
+}
+function timeAgo(ts){
+  const s = Math.floor((Date.now()-ts)/1000);
+  if (s<60) return 'just now';
+  if (s<3600) return Math.floor(s/60)+'m ago';
+  if (s<86400) return Math.floor(s/3600)+'h ago';
+  return Math.floor(s/86400)+'d ago';
+}
+
+/* =========================================================
+   ROUTER / SEARCH
+   ========================================================= */
+function route(){
+  const key = (location.hash||'#dashboard').slice(1);
+  currentFilter = 'All'; currentSearch = '';
+  document.getElementById('searchInput').value = '';
+  renderSidebar();
+  renderSection(key);
+  window.scrollTo({top:0});
+}
+window.addEventListener('hashchange', route);
+
+document.getElementById('searchInput').addEventListener('input', e => {
+  currentSearch = e.target.value.trim().toLowerCase();
+  if (currentSearch && (location.hash==='#dashboard'||!location.hash)){
+    // search across all items: go to a special results page
+    renderSearch();
+  } else {
+    renderSection((location.hash||'#dashboard').slice(1));
+  }
+});
+
+function renderSearch(){
+  const q = currentSearch;
+  const matches = ITEMS.filter(i => (i.title+' '+i.why+' '+i.id).toLowerCase().includes(q));
+  document.getElementById('content').innerHTML = `
+    <div>
+      <h1 class="text-[22px] font-bold text-ink-900">Search results</h1>
+      <p class="text-[13px] text-ink-500 mt-1">${matches.length} setting${matches.length===1?'':'s'} matching "<span class="font-medium text-ink-900">${escapeHtml(q)}</span>"</p>
+    </div>
+    <div class="space-y-2">${matches.map(renderItemRow).join('')}</div>
+  `;
+  refreshIcons();
+  bindItemHandlers();
+}
+
+document.getElementById('activityToggle').addEventListener('click', () =>
+  document.getElementById('activityPanel').classList.toggle('collapsed'));
+
+/* =========================================================
+   UTIL
+   ========================================================= */
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* =========================================================
+   INIT
+   ========================================================= */
+renderActivity();
+route();
+refreshIcons();
 </script>
 </body>
 </html>

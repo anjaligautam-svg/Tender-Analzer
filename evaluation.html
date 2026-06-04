@@ -12,6 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Pinyon+Script&family=Pacifico&family=Great+Vibes&family=Sacramento&family=Kaushan+Script&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="admin-state.js"></script>
   <script>
     tailwind.config = { theme: { extend: {
       fontFamily: { sans: ['"DM Sans"', 'system-ui', 'sans-serif'] },
@@ -8514,6 +8515,6 @@ Date: ${esc(fmtDateShort(today))}`;
     if (typeof initSurveillanceLayer === 'function') initSurveillanceLayer();
   })();
 </script>
-<script>(function(){var b=document.getElementById("avatarBtn"),m=document.getElementById("avatarMenu");if(!b||!m)return;b.addEventListener("click",function(e){e.stopPropagation();m.classList.toggle("hidden");});document.addEventListener("click",function(e){if(!m.contains(e.target)&&!b.contains(e.target))m.classList.add("hidden");});if(window.lucide)lucide.createIcons();})();</script>
+<script>(function(){var b=document.getElementById("avatarBtn"),m=document.getElementById("avatarMenu");if(!b||!m)return;b.addEventListener("click",function(e){e.stopPropagation();m.classList.toggle("hidden");});document.addEventListener("click",function(e){if(!m.contains(e.target)&&!b.contains(e.target))m.classList.add("hidden");});document.addEventListener("keydown",function(e){if(e.key==="Escape")m.classList.add("hidden");});if(window.lucide)lucide.createIcons();})();</script>
 </body>
 </html>
