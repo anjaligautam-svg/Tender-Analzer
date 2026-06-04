@@ -15,8 +15,8 @@
     },
     {
       "name": "tender-analyzer",
-      "runtimeExecutable": "sh",
-      "runtimeArgs": ["-c", "cd /Users/Anjali/Documents/GitHub/Tender-Analzer && python3 -m http.server 4180"],
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["/Users/Anjali/Documents/GitHub/Tender-Analzer/.claude/static-server.js"],
       "port": 4180
     },
     {
@@ -24,6 +24,12 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "4200", "--directory", "/Users/Anjali/Documents/GitHub/Tender-Analzer"],
       "port": 4200
+    },
+    {
+      "name": "tender-node",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["/Users/Anjali/Documents/GitHub/Tender-Analzer/.claude/static-server.js"],
+      "port": 4180
     }
   ]
 }

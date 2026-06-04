@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+  <!-- E-signature cursive font families (Evaluation Committee → Sign-off dialog) -->
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Pinyon+Script&family=Pacifico&family=Great+Vibes&family=Sacramento&family=Kaushan+Script&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script>
@@ -316,6 +318,9 @@
     .cmp-table .tq-bar-fill { height:100%; background:#0F5EE8; border-radius:2px; }
     .cmp-table .tq-prov-badge { background:#FFFBEB; color:#92400E; font-size:9px; padding:1px 4px; border-radius:4px; font-weight:700; }
     .cmp-table .amount-masked { background:#F3F4F6; color:#9CA3AF; border-radius:4px; padding:3px 8px; font-size:12px; display:inline-block; }
+    /* Sealed quoted-amount pill — used in F1 opened-bids table (per spec; cmp-table keeps its scoped variant above) */
+    .amount-masked   { background:#F3F4F6; color:#9CA3AF; border-radius:4px; padding:4px 12px; font-size:13px; letter-spacing:2px; display:inline-block; }
+    .amount-revealed { font-weight:600; color:#111827; font-size:13px; }
     .cmp-table .amount { font-weight:700; color:#111827; font-size:13px; }
     .cmp-table .amount-pending { font-size:11px; color:#9CA3AF; font-style:italic; }
     .cmp-table .amount-ntq { font-size:11px; color:#EF4444; font-weight:600; }
@@ -856,6 +861,58 @@
     .com-signoff-confirm .msg { font-size:12px; color:#374151; }
     .com-signoff-confirm .btn-confirm { background:#10B981; color:white; border:none; border-radius:6px; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer; }
     .com-signoff-confirm .btn-confirm:hover { background:#059669; }
+
+    /* ============ E-SIGNATURE DIALOG (Evaluation Sign-off) ============ */
+    .com-esig-wrap { padding:0; }
+    .com-esig-dialog { background:white; border:1px solid #E5E7EB; border-radius:14px; padding:24px; margin-top:12px; box-shadow:0 4px 16px rgba(0,0,0,0.08); position:relative;
+      opacity:0; transform:translateY(-6px); transition: opacity 250ms ease, transform 250ms ease; }
+    .com-esig-dialog.shown { opacity:1; transform:translateY(0); }
+    .com-esig-dialog h3 { font-size:16px; font-weight:700; color:#111827; margin-bottom:4px; font-family:'DM Sans', sans-serif; }
+    .com-esig-dialog .esig-sub { font-size:13px; color:#6B7280; margin-bottom:20px; }
+    .com-esig-field { margin-bottom:16px; }
+    .com-esig-field label { display:block; font-size:13px; font-weight:500; color:#374151; margin-bottom:6px; }
+    .com-esig-field input[type="text"] { width:100%; border:1px solid #D1D5DB; border-radius:8px; padding:11px 14px; font-size:14px; color:#111827; outline:none; transition: border-color 150ms ease, box-shadow 150ms ease; font-family:'DM Sans', sans-serif; box-sizing:border-box; }
+    .com-esig-field input[type="text"]:focus { border-color:#0F5EE8; box-shadow:0 0 0 3px rgba(15,94,232,0.1); }
+    .com-esig-styles-label { display:block; font-size:13px; font-weight:500; color:#374151; margin-bottom:10px; }
+    .com-esig-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .com-esig-card { position:relative; border:2px solid #E5E7EB; border-radius:10px; padding:14px 16px; cursor:pointer; text-align:center; min-height:72px; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: all 150ms ease; background:white; }
+    .com-esig-card:hover { border-color:#0F5EE8; background:#F8FBFF; }
+    .com-esig-card.selected { border-color:#0F5EE8; background:#EFF6FF; }
+    .com-esig-card .esig-sig-preview { font-size:22px; font-weight:700; color:#1a1a1a; line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+    .com-esig-card .esig-style-label { font-size:10px; color:#9CA3AF; margin-top:6px; text-transform:none; letter-spacing:0; }
+    .com-esig-card .esig-check-badge { position:absolute; top:-8px; right:-8px; width:20px; height:20px; background:#0F5EE8; border-radius:50%; display:none; align-items:center; justify-content:center; color:white; }
+    .com-esig-card.selected .esig-check-badge { display:flex; }
+    /* The 6 cursive style families */
+    .esig-font-classic     { font-family:'Dancing Script', cursive !important; font-weight:700; font-size:22px; }
+    .esig-font-formal      { font-family:'Pinyon Script', cursive !important; font-weight:400; font-size:24px; }
+    .esig-font-modern      { font-family:'Pacifico', cursive !important; font-weight:400; font-size:18px; }
+    .esig-font-executive   { font-family:'Great Vibes', cursive !important; font-weight:400; font-size:24px; }
+    .esig-font-handwritten { font-family:'Sacramento', cursive !important; font-weight:400; font-size:22px; }
+    .esig-font-minimal     { font-family:'Kaushan Script', cursive !important; font-weight:400; font-size:18px; }
+    .com-esig-preview { background:#F9FAFB; border:1px solid #E5E7EB; border-radius:10px; padding:16px 20px; margin-top:14px; max-height:0; overflow:hidden; transition: max-height 200ms ease, padding 200ms ease; padding-top:0; padding-bottom:0; }
+    .com-esig-preview.shown { max-height:260px; padding-top:16px; padding-bottom:16px; }
+    .com-esig-preview .esig-prev-label { font-size:11px; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:12px; }
+    .com-esig-preview .esig-prev-grid { display:grid; grid-template-columns:1fr auto; gap:24px; align-items:flex-start; }
+    .com-esig-preview .esig-prev-col h6 { font-size:11px; color:#9CA3AF; margin:0 0 4px 0; font-weight:500; }
+    .com-esig-preview .esig-prev-signature { font-size:28px !important; color:#1a1a1a; margin:6px 0; line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+    .com-esig-preview .esig-prev-name { font-size:13px; font-weight:700; color:#111827; }
+    .com-esig-preview .esig-prev-desig, .com-esig-preview .esig-prev-date, .com-esig-preview .esig-prev-type { font-size:12px; color:#6B7280; }
+    .com-esig-preview .esig-seal { width:44px; height:44px; border:1.5px dashed #D1D5DB; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:8px; color:#9CA3AF; letter-spacing:1px; }
+    .com-esig-footer { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:20px; padding-top:16px; border-top:1px solid #F3F4F6; }
+    .com-esig-footer .esig-cancel { background:transparent; border:none; color:#6B7280; font-size:13px; cursor:pointer; padding:6px 8px; }
+    .com-esig-footer .esig-cancel:hover { color:#374151; text-decoration:underline; }
+    .com-esig-footer .esig-confirm { background:#0F5EE8; color:white; border:none; border-radius:8px; padding:10px 22px; font-size:13px; font-weight:700; cursor:pointer; transition: background 150ms ease; }
+    .com-esig-footer .esig-confirm:hover:not(:disabled) { background:#0B4FCA; }
+    .com-esig-footer .esig-confirm:disabled { background:#D1D5DB; color:white; cursor:not-allowed; }
+    .com-esig-footer .esig-confirm-wrap { display:flex; flex-direction:column; align-items:flex-end; gap:4px; }
+    .com-esig-footer .esig-helper { font-size:11px; color:#9CA3AF; }
+    /* Signature strip — appears below a signed row */
+    .com-sig-strip { background:#F9FAFB; border-radius:6px; padding:8px 12px; display:flex; align-items:center; gap:12px; margin-top:6px;
+      animation: comSigStripIn 250ms ease both; }
+    @keyframes comSigStripIn { 0% { opacity:0; transform:translateY(-4px); } 100% { opacity:1; transform:translateY(0); } }
+    .com-sig-strip .sig-rendered { font-size:18px; color:#1a1a1a; line-height:1.1; }
+    .com-sig-strip .sig-meta { font-size:11px; color:#6B7280; }
+    .com-sig-strip .sig-date { font-size:10px; color:#9CA3AF; margin-left:auto; }
 
     /* ============ SUPER ADMIN SURVEILLANCE LAYER ============ */
     /* Floating badge attached to each critical touchpoint element. Renders only when sessionStorage.userRole === 'Super Admin'. */
@@ -5029,6 +5086,10 @@ Date: ${esc(fmtDateShort(today))}`;
                    + finCard('f2','02','Financial Evaluation',   f2StatusPill(), f2exp, f2locked, f2locked ? '' : f2Body())
                    + (f3unlocked ? finCard('f3','03','Reasonableness Check', f3StatusPill(), f3exp, false, f3Body()) : '');
     refreshIcons();
+    // Reconcile the F1 sealed amounts against the current winnerReveal state on every render.
+    // Template already inlined the correct HTML, but this guards against any state change
+    // that happened between the template call and DOM commit.
+    if (typeof refreshUploadTableAmounts === 'function') refreshUploadTableAmounts();
   }
   function f3StatusPill(){
     return (EVAL.reasonableness && EVAL.reasonableness.confirmed)
@@ -5123,6 +5184,8 @@ Date: ${esc(fmtDateShort(today))}`;
       </div>`;
 
     // === Opened financial bids table — same layout as opened technical bids ===
+    // Quoted amounts here are SEALED. They mirror the unmasked state of the F2
+    // evaluation table via getF1DisplayAmountHTML(), which reads winnerReveal_<TND>.
     const finRows = EVAL.finBids.map(b => {
       const q = finQuote(b.vendor);
       const stPill = b.status==='parsed' ? '<span style="color:#10B981; font-size:12px;">Parsed ✓</span>'
@@ -5130,26 +5193,32 @@ Date: ${esc(fmtDateShort(today))}`;
       const action = b.status==='parsed'
         ? `<a href="#" onclick="openBidDoc('${esc(b.vendor)}','fin'); return false;" class="text-[12px] hover:underline" style="color:#0F5EE8;">View Financial Bid</a>`
         : '<span class="text-ink-400 text-[12px]">—</span>';
+      // Parsed rows show the sealed pill or the revealed amount per winnerReveal state.
+      // Pre-parse rows always show a dash (no amount to seal yet).
       const quoteCell = b.status==='parsed'
-        ? `<span onclick="editFinQuote(this,'${esc(b.vendor)}')" style="cursor:pointer; border-bottom:1px dashed #9CA3AF;" title="Click to edit">₹${q.toLocaleString('en-IN')}</span>`
+        ? getF1DisplayAmountHTML(EVAL.tnd, b.vendor, q)
         : '<span class="text-ink-400">—</span>';
-      return `<tr style="border-bottom:1px solid #F3F4F6;">
+      return `<tr style="border-bottom:1px solid #F3F4F6;" data-f1-row="${esc(b.vendor)}">
         <td style="padding:10px 12px; font-size:13px; color:#111827; font-weight:600;">${esc(b.vendor)}</td>
         <td style="padding:10px 12px; font-size:12px; color:#6B7280;" class="truncate">${esc(b.file)}</td>
         <td style="padding:10px 12px; font-size:11.5px; color:#9CA3AF;">May 19, 2026</td>
-        <td style="padding:10px 12px; font-size:13px; color:#111827;" data-fq="${esc(b.vendor)}">${quoteCell}</td>
+        <td style="padding:10px 12px; font-size:13px; color:#111827;" data-fq="${esc(b.vendor)}" data-amount="${q}">${quoteCell}</td>
         <td style="padding:10px 12px;">${stPill}</td>
         <td style="padding:10px 12px;">${action}</td>
       </tr>`;
     }).join('');
+    const sealedNote = isWinnerRevealed(EVAL.tnd)
+      ? ''
+      : '<div id="f1SealedNote" class="text-[12px] italic" style="display:flex; align-items:center; gap:6px; color:#9CA3AF; margin-top:10px;"><i data-lucide="lock" style="width:12px; height:12px; color:#9CA3AF;"></i> Quoted amounts are sealed. They will be revealed during financial evaluation.</div>';
     const opened = EVAL.finBids.length
       ? `<div class="text-[13px] font-bold text-ink-900 mb-2">Opened financial bids</div>
-         <div style="border:1px solid #E5E7EB; border-radius:10px; overflow:hidden; margin-bottom:14px;">
-           <table style="width:100%; table-layout:fixed; border-collapse:collapse;">
+         <div style="border:1px solid #E5E7EB; border-radius:10px; overflow:hidden; margin-bottom:4px;">
+           <table style="width:100%; table-layout:fixed; border-collapse:collapse;" data-f1-opened-table="${esc(EVAL.tnd||'')}">
              <thead><tr style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;">
-               <th style="${thS()} width:20%;">Vendor</th><th style="${thS()} width:22%;">File</th><th style="${thS()} width:14%;">Uploaded At</th><th style="${thS()} width:16%;">Quoted Amount (₹)</th><th style="${thS()} width:13%;">Status</th><th style="${thS()} width:15%;">Action</th>
+               <th style="${thS()} width:20%;">Vendor</th><th style="${thS()} width:22%;">File</th><th style="${thS()} width:14%;">Uploaded At</th><th style="${thS()} width:16%;" title="Amounts are sealed until financial evaluation is complete"><span style="display:inline-flex; align-items:center; gap:5px;"><i data-lucide="lock" style="width:11px; height:11px; color:#9CA3AF;"></i> Quoted Amount (₹)</span></th><th style="${thS()} width:13%;">Status</th><th style="${thS()} width:15%;">Action</th>
              </tr></thead><tbody>${finRows}</tbody></table>
-         </div>`
+         </div>
+         ${sealedNote}`
       : '<div class="text-[12.5px] text-ink-500 italic mb-3" style="padding:6px 0;">No financial bids uploaded yet.</div>';
 
     return `<div style="background:#F9FAFB; border:1px solid #E5E7EB; border-radius:8px; padding:12px 14px; margin-bottom:14px;">
@@ -5324,6 +5393,8 @@ Date: ${esc(fmtDateShort(today))}`;
     try { localStorage.setItem(winnerRevealKey(tnd), JSON.stringify(next)); } catch(e){}
     // Live-update the Bid Comparison tab in same window
     if (typeof refreshComparisonTable === 'function') refreshComparisonTable();
+    // Live-update the F1 opened-bids table without a full re-render
+    if (typeof refreshUploadTableAmounts === 'function') refreshUploadTableAmounts();
     return next;
   }
   function isAmountRevealedFor(tnd, vendor){
@@ -5331,6 +5402,40 @@ Date: ${esc(fmtDateShort(today))}`;
     return s.winnerRevealed && (s.revealedVendors || []).includes(vendor);
   }
   function isWinnerRevealed(tnd){ return !!getWinnerRevealState(tnd).winnerRevealed; }
+
+  // ===== F1 opened-bids table — sealed amount renderer =====
+  // The F1 upload register shows masked amounts permanently until the F2 evaluation
+  // flips winnerReveal_<TND>.winnerRevealed → true. After that, each vendor's amount
+  // unmasks individually as it appears in winnerReveal_<TND>.revealedVendors[].
+  function getF1DisplayAmountHTML(tnd, vendor, actualAmount){
+    const state = getWinnerRevealState(tnd);
+    if (state.winnerRevealed && Array.isArray(state.revealedVendors) && state.revealedVendors.indexOf(vendor) >= 0){
+      const n = Number(actualAmount) || 0;
+      return '<span class="amount-revealed">₹' + n.toLocaleString('en-IN') + '</span>';
+    }
+    return '<span class="amount-masked" aria-label="Quoted amount sealed">₹ ••••••</span>';
+  }
+  // Live-refresh hook: re-reads winnerReveal state and updates each F1 row's amount cell
+  // + the "sealed" info note's visibility. Called on the storage event (cross-window) and
+  // any time renderFinancial mutates the reveal state in-process.
+  function refreshUploadTableAmounts(){
+    const table = document.querySelector('[data-f1-opened-table]');
+    if (!table) return;
+    const tnd = table.getAttribute('data-f1-opened-table') || (EVAL ? EVAL.tnd : '');
+    table.querySelectorAll('td[data-fq][data-amount]').forEach(cell => {
+      const vendor = cell.getAttribute('data-fq');
+      const amount = parseFloat(cell.getAttribute('data-amount')) || 0;
+      cell.innerHTML = getF1DisplayAmountHTML(tnd, vendor, amount);
+    });
+    const note = document.getElementById('f1SealedNote');
+    if (note) note.style.display = isWinnerRevealed(tnd) ? 'none' : '';
+    if (window.lucide) lucide.createIcons();
+  }
+  // Cross-window live sync: another tab toggling reveal updates this table.
+  window.addEventListener('storage', function(e){
+    if (!EVAL || !EVAL.tnd) return;
+    if (e.key === winnerRevealKey(EVAL.tnd)) refreshUploadTableAmounts();
+  });
 
   // ===== Per-method 3-phase state — stored under localStorage key `finEval_<TND>_<METHOD>` =====
   function finEvalKey(method){ return 'finEval_' + (EVAL ? EVAL.tnd : '') + '_' + method; }
@@ -7678,34 +7783,32 @@ Date: ${esc(fmtDateShort(today))}`;
     const so = (EVAL.signoffs||{})[m.id] || {};
     const tqApplicable = m.role !== 'Observer';
     const finApplicable = m.role !== 'Observer' && m.finEval;
+    // TQ + Financial status cells get aria-live so screen readers announce when the row flips to Signed.
     const tqCell = !tqApplicable
-      ? `<span class="com-status-text gray">—</span>`
+      ? `<span class="com-status-text gray" aria-live="polite">—</span>`
       : so.TQ
-        ? `<span class="com-status-text green">Signed ✓</span><div class="com-status-sub">${esc(fmtCommitteeDate(so.dateTQ))}</div>`
-        : `<span class="com-status-text amber">Pending</span>`;
+        ? `<span class="com-status-text green" aria-live="polite">Signed ✓</span><div class="com-status-sub">${esc(fmtCommitteeDate(so.dateTQ))}</div>`
+        : `<span class="com-status-text amber" aria-live="polite">Pending</span>`;
     const finCell = !finApplicable
-      ? `<span class="com-status-text gray">—</span>`
+      ? `<span class="com-status-text gray" aria-live="polite">—</span>`
       : so.financial
-        ? `<span class="com-status-text green">Signed ✓</span><div class="com-status-sub">${esc(fmtCommitteeDate(so.dateFin))}</div>`
-        : `<span class="com-status-text amber">Pending</span>`;
+        ? `<span class="com-status-text green" aria-live="polite">Signed ✓</span><div class="com-status-sub">${esc(fmtCommitteeDate(so.dateFin))}</div>`
+        : `<span class="com-status-text amber" aria-live="polite">Pending</span>`;
     // CTA — only show if at least one pending
     let cta = '';
     const tqPending  = tqApplicable && !so.TQ;
     const finPending = finApplicable && !so.financial;
     if (tqPending || finPending){
-      // Logged-in user: inline confirm; others: send-request outlined
+      // Logged-in user: open e-signature dialog inline; others: send-request outlined
       if (m.isYou){
         const which = _comSignoffConfirm && _comSignoffConfirm.memberId === m.id ? _comSignoffConfirm.type : null;
-        if (which){
-          cta = `<div class="com-signoff-confirm">
-            <span class="msg">Confirm your sign-off on this evaluation?</span>
-            <button class="btn-confirm" type="button" onclick="confirmSignoff('${esc(m.id)}','${esc(which)}')">Confirm</button>
-            <button class="com-cta-link gray" type="button" onclick="cancelSignoffConfirm()">Cancel</button>
-          </div>`;
-        } else {
-          // Prefer TQ first if pending, else financial
+        if (!which){
           const type = tqPending ? 'TQ' : 'financial';
-          cta = `<button class="com-cta-primary" type="button" onclick="startSignoffConfirm('${esc(m.id)}','${esc(type)}')">Sign off</button>`;
+          cta = `<button id="esigOpenBtn-${esc(m.id)}-${esc(type)}" class="com-cta-primary" type="button" onclick="startSignoffConfirm('${esc(m.id)}','${esc(type)}')" aria-label="Open e-signature dialog">Sign off</button>`;
+        } else {
+          // While the dialog is open the row's action cell shows a small "dialog open" indicator;
+          // the dialog itself is rendered as a second <tr> below this row.
+          cta = `<span class="com-status-text blue" aria-live="polite">Signing…</span>`;
         }
       } else {
         cta = `<button class="com-cta-outlined" type="button" onclick="sendSignoffRequest('${esc(m.id)}')">Send request</button>`;
@@ -7713,24 +7816,213 @@ Date: ${esc(fmtDateShort(today))}`;
     } else if (!tqApplicable && !finApplicable){
       cta = `<span class="com-status-text gray">—</span>`;
     } else {
-      cta = `<span class="com-status-text green">All signed</span>`;
+      cta = `<span class="com-status-text green" aria-live="polite">All signed</span>`;
     }
-    return `<tr>
+    const mainRow = `<tr data-signoff-row="${esc(m.id)}">
       <td><div class="com-member-cell"><div class="com-avatar sm">${esc(memberInitials(m.name))}</div><div class="com-member-name" style="font-size:13px;">${esc(m.name)}${m.isYou ? '<span class="com-you-pill">(you)</span>' : ''}</div></div></td>
       <td>${tqCell}</td>
       <td>${finCell}</td>
       <td>${cta}</td>
     </tr>`;
+    // Signature strip below row, when the row has at least one signed type with stored signature
+    let stripHTML = '';
+    const signedTypes = [];
+    if (so.TQ && so.TQ_signature)               signedTypes.push({ type:'TQ', sig: so.TQ_signature, date: so.dateTQ });
+    if (so.financial && so.financial_signature) signedTypes.push({ type:'Financial', sig: so.financial_signature, date: so.dateFin });
+    if (signedTypes.length){
+      stripHTML = '<tr data-signoff-strip-row="' + esc(m.id) + '"><td colspan="4" style="padding-top:0; border-top:none;">' +
+        signedTypes.map(s => `<div class="com-sig-strip" aria-live="polite">
+          <span class="sig-rendered ${esc(comEsigFontClass(s.sig.signatureStyle))}">${esc(s.sig.name || m.name)}</span>
+          <span class="sig-meta">${esc(s.sig.name || m.name)} · ${esc(s.sig.designation || m.designation || '')} <span style="color:#9CA3AF;">(${esc(s.type)})</span></span>
+          <span class="sig-date">Signed ${esc(fmtCommitteeDate(s.date))}</span>
+        </div>`).join('') + '</td></tr>';
+    }
+    // Dialog row — appended right below the action row when the dialog is open for THIS member
+    let dialogHTML = '';
+    if (m.isYou && _comSignoffConfirm && _comSignoffConfirm.memberId === m.id){
+      dialogHTML = `<tr data-signoff-dialog-row="${esc(m.id)}"><td colspan="4" class="com-esig-wrap">${comEsigDialogHTML(m, _comSignoffConfirm.type)}</td></tr>`;
+    }
+    return mainRow + stripHTML + dialogHTML;
+  }
+  // ===== E-signature dialog helpers =====
+  const COM_ESIG_STYLES = [
+    { key:'Classic',     fontFamily:'Dancing Script', fontClass:'esig-font-classic' },
+    { key:'Formal',      fontFamily:'Pinyon Script',  fontClass:'esig-font-formal' },
+    { key:'Modern',      fontFamily:'Pacifico',       fontClass:'esig-font-modern' },
+    { key:'Executive',   fontFamily:'Great Vibes',    fontClass:'esig-font-executive' },
+    { key:'Handwritten', fontFamily:'Sacramento',     fontClass:'esig-font-handwritten' },
+    { key:'Minimal',     fontFamily:'Kaushan Script', fontClass:'esig-font-minimal' },
+  ];
+  function comEsigFontClass(styleKey){
+    const s = COM_ESIG_STYLES.find(x => x.key === styleKey);
+    return s ? s.fontClass : 'esig-font-classic';
+  }
+  function comEsigDialogHTML(m, type){
+    const draft = _comEsigDraft || {};
+    const name = draft.name != null ? draft.name : (m.name || 'Rajesh Kumar');
+    const designation = draft.designation != null ? draft.designation : (m.designation === 'Procurement Officer'
+      ? 'Super Admin, Ahmedabad Municipal Corporation'
+      : (m.designation ? (m.designation + (m.designation.indexOf('Ahmedabad') < 0 ? ', Ahmedabad Municipal Corporation' : '')) : 'Super Admin, Ahmedabad Municipal Corporation'));
+    const selectedStyle = draft.style || 'Classic';
+    const canConfirm = (name || '').trim().length >= 2;
+    const typeLabel = type === 'TQ' ? 'TQ Sign-off' : 'Financial Sign-off';
+    const todayStr = (function(){
+      try { return new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }); }
+      catch(e){ return new Date().toISOString().slice(0,10); }
+    })();
+    const cards = COM_ESIG_STYLES.map(s => {
+      const sel = s.key === selectedStyle;
+      return `<button type="button" class="com-esig-card ${sel?'selected':''}" data-esig-style="${esc(s.key)}" aria-pressed="${sel?'true':'false'}" aria-label="Select ${esc(s.key)} signature style" onclick="comEsigSelectStyle('${esc(s.key)}')">
+        <span class="esig-sig-preview ${esc(s.fontClass)}" data-esig-sig-preview>${esc(name)}</span>
+        <span class="esig-style-label">${esc(s.key)}</span>
+        ${sel?'<span class="esig-check-badge" aria-hidden="true"><i data-lucide="check" style="width:11px; height:11px;"></i></span>':''}
+      </button>`;
+    }).join('');
+    const previewClass = canConfirm ? 'shown' : '';
+    const selFontClass = comEsigFontClass(selectedStyle);
+    return `<div id="comEsigDialog" class="com-esig-dialog" role="dialog" aria-modal="true" aria-label="E-signature for evaluation sign-off">
+      <h3>Sign off — Evaluation Committee</h3>
+      <div class="esig-sub">Your e-signature will be recorded against this evaluation sign-off.</div>
+      <div class="com-esig-field">
+        <label for="comEsigName">Full name</label>
+        <input id="comEsigName" type="text" value="${esc(name)}" placeholder="Enter your full name as it should appear on the sign-off" oninput="comEsigOnNameInput(this.value)" />
+      </div>
+      <div class="com-esig-field">
+        <label for="comEsigDesignation">Designation</label>
+        <input id="comEsigDesignation" type="text" value="${esc(designation)}" oninput="comEsigOnDesignationInput(this.value)" />
+      </div>
+      <div class="com-esig-field">
+        <label class="com-esig-styles-label">Choose signature style</label>
+        <div class="com-esig-grid" role="radiogroup" aria-label="Signature style">${cards}</div>
+      </div>
+      <div id="comEsigPreview" class="com-esig-preview ${previewClass}" aria-live="polite">
+        <div class="esig-prev-label">Preview</div>
+        <div class="esig-prev-grid">
+          <div class="esig-prev-col">
+            <h6>Authorised Signatory</h6>
+            <div class="esig-prev-signature ${esc(selFontClass)}" data-esig-prev-sig>${esc(name)}</div>
+            <div class="esig-prev-name" data-esig-prev-name>${esc(name)}</div>
+            <div class="esig-prev-desig" data-esig-prev-desig>${esc(designation)}</div>
+            <div class="esig-prev-date">Date: ${esc(todayStr)}</div>
+            <div class="esig-prev-type">Type: ${esc(typeLabel)}</div>
+          </div>
+          <div class="esig-prev-col" style="text-align:center;">
+            <h6>Official Seal</h6>
+            <div class="esig-seal" aria-hidden="true">SEAL</div>
+          </div>
+        </div>
+      </div>
+      <div class="com-esig-footer">
+        <button type="button" class="esig-cancel" onclick="cancelSignoffConfirm()">Cancel</button>
+        <div class="esig-confirm-wrap">
+          <button type="button" id="comEsigConfirmBtn" class="esig-confirm" ${canConfirm?'':'disabled'} onclick="comEsigConfirm('${esc(m.id)}','${esc(type)}')">Confirm sign-off →</button>
+          ${canConfirm ? '' : '<span class="esig-helper">Enter your name to continue</span>'}
+        </div>
+      </div>
+    </div>`;
+  }
+  // Module-level e-sig draft state — shared between renders. Reset on cancel / open.
+  let _comEsigDraft = null;
+  // Live update: rewrite text in every card + the preview without re-rendering the whole row.
+  function comEsigOnNameInput(value){
+    if (!_comEsigDraft) _comEsigDraft = {};
+    _comEsigDraft.name = value;
+    document.querySelectorAll('[data-esig-sig-preview]').forEach(el => { el.textContent = value; });
+    const prev = document.querySelector('[data-esig-prev-sig]'); if (prev) prev.textContent = value;
+    const nm   = document.querySelector('[data-esig-prev-name]'); if (nm) nm.textContent = value;
+    const btn  = document.getElementById('comEsigConfirmBtn');
+    const ok = (value || '').trim().length >= 2;
+    if (btn){
+      btn.disabled = !ok;
+      const helper = btn.parentElement && btn.parentElement.querySelector('.esig-helper');
+      if (ok){ if (helper) helper.remove(); }
+      else if (!helper && btn.parentElement){
+        const h = document.createElement('span'); h.className = 'esig-helper'; h.textContent = 'Enter your name to continue'; btn.parentElement.appendChild(h);
+      }
+    }
+    const preview = document.getElementById('comEsigPreview');
+    if (preview) preview.classList.toggle('shown', ok);
+  }
+  function comEsigOnDesignationInput(value){
+    if (!_comEsigDraft) _comEsigDraft = {};
+    _comEsigDraft.designation = value;
+    const dg = document.querySelector('[data-esig-prev-desig]'); if (dg) dg.textContent = value;
+  }
+  function comEsigSelectStyle(styleKey){
+    if (!_comEsigDraft) _comEsigDraft = {};
+    _comEsigDraft.style = styleKey;
+    // Update cards' selected state + preview font without a full re-render
+    const fontCls = comEsigFontClass(styleKey);
+    document.querySelectorAll('.com-esig-card').forEach(card => {
+      const isSel = card.getAttribute('data-esig-style') === styleKey;
+      card.classList.toggle('selected', isSel);
+      card.setAttribute('aria-pressed', isSel ? 'true' : 'false');
+      let badge = card.querySelector('.esig-check-badge');
+      if (isSel && !badge){
+        const b = document.createElement('span'); b.className = 'esig-check-badge'; b.setAttribute('aria-hidden','true');
+        b.innerHTML = '<i data-lucide="check" style="width:11px; height:11px;"></i>';
+        card.appendChild(b);
+        if (window.lucide) lucide.createIcons();
+      } else if (!isSel && badge){
+        badge.remove();
+      }
+    });
+    const prev = document.querySelector('[data-esig-prev-sig]');
+    if (prev){
+      // Swap the font class — remove all esig-font-* classes then add the chosen one
+      prev.className = 'esig-prev-signature ' + fontCls;
+    }
+  }
+  function comEsigConfirm(memberId, type){
+    const nameInput = document.getElementById('comEsigName');
+    const desigInput = document.getElementById('comEsigDesignation');
+    const name = (nameInput ? nameInput.value : (_comEsigDraft && _comEsigDraft.name) || 'Rajesh Kumar').trim();
+    const designation = (desigInput ? desigInput.value : (_comEsigDraft && _comEsigDraft.designation) || '').trim();
+    if (name.length < 2){ showToast('Enter your full name'); return; }
+    const style = (_comEsigDraft && _comEsigDraft.style) || 'Classic';
+    const styleEntry = COM_ESIG_STYLES.find(s => s.key === style) || COM_ESIG_STYLES[0];
+    const signature = { name, designation, signatureStyle: style, signatureFontFamily: styleEntry.fontFamily, date: new Date().toISOString() };
+    // Smooth dialog dismissal — fade out, then commit.
+    const dialog = document.getElementById('comEsigDialog');
+    if (dialog) dialog.classList.remove('shown');
+    setTimeout(() => {
+      _comEsigDraft = null;
+      confirmSignoff(memberId, type, signature);
+    }, 200);
   }
   function startSignoffConfirm(memberId, type){
     _comSignoffConfirm = { memberId, type };
+    // Seed the draft with the member's identity so the cards show the right name immediately.
+    const m = (EVAL.committeeMembers || []).find(x => x.id === memberId) || {};
+    const defaultDesig = m.designation === 'Procurement Officer'
+      ? 'Super Admin, Ahmedabad Municipal Corporation'
+      : (m.designation && m.designation.indexOf('Ahmedabad') < 0 ? (m.designation + ', Ahmedabad Municipal Corporation') : (m.designation || 'Super Admin, Ahmedabad Municipal Corporation'));
+    _comEsigDraft = { name: m.name || 'Rajesh Kumar', designation: defaultDesig, style: 'Classic' };
     renderCommittee();
+    // Trigger the fade-in transition, focus the name input, and remember the original trigger
+    // button so Escape / Cancel can return focus to it.
+    setTimeout(() => {
+      const dialog = document.getElementById('comEsigDialog'); if (dialog) dialog.classList.add('shown');
+      const nameInput = document.getElementById('comEsigName');
+      if (nameInput){
+        nameInput.focus();
+        try { nameInput.setSelectionRange(nameInput.value.length, nameInput.value.length); } catch(e){}
+      }
+      if (window.lucide) lucide.createIcons();
+    }, 20);
+    // Remember the button id so cancel restores focus
+    _comSignoffConfirm._returnFocusId = 'esigOpenBtn-' + memberId + '-' + type;
   }
   function cancelSignoffConfirm(){
+    const returnFocusId = _comSignoffConfirm && _comSignoffConfirm._returnFocusId;
     _comSignoffConfirm = null;
+    _comEsigDraft = null;
     if (EVAL && EVAL.stageTab === 'committee') renderCommittee();
+    if (returnFocusId){
+      setTimeout(() => { const btn = document.getElementById(returnFocusId); if (btn) btn.focus(); }, 30);
+    }
   }
-  function confirmSignoff(memberId, type){
+  function confirmSignoff(memberId, type, signature){
     const m = (EVAL.committeeMembers||[]).find(x => x.id === memberId);
     if (!m) return;
     EVAL.signoffs = EVAL.signoffs || {};
@@ -7739,22 +8031,27 @@ Date: ${esc(fmtDateShort(today))}`;
     if (type === 'TQ'){
       EVAL.signoffs[memberId].TQ = true;
       EVAL.signoffs[memberId].dateTQ = today;
+      if (signature) EVAL.signoffs[memberId].TQ_signature = signature;
     } else {
       EVAL.signoffs[memberId].financial = true;
       EVAL.signoffs[memberId].dateFin = today;
+      if (signature) EVAL.signoffs[memberId].financial_signature = signature;
     }
-    log('Evaluation Committee', 'signoff_completed', `${m.name} · ${type}`);
-    // Touchpoint 21 — Sign-off submitted
+    const styleLabel = signature && signature.signatureStyle ? signature.signatureStyle : 'Classic';
+    log('Evaluation Committee', 'signoff_completed', `${m.name} · ${type} · ${styleLabel} signature`);
+    // Touchpoint 21 — Sign-off submitted (with signature style in detail)
     logCriticalAction(EVAL.tnd, {
       touchpointId: 21, action: 'signoff_submitted', category: 'committee',
       description: 'Evaluation sign-off submitted',
       page: 'evaluation', section: 'Evaluation Committee',
-      detail: 'Type: ' + type + ' · Member: ' + m.name,
+      detail: 'Type: ' + type + ' · Member: ' + m.name + ' · Style: ' + styleLabel,
+      member: m.name, signatureStyle: styleLabel, signoffType: type,
     });
     _comSignoffConfirm = null;
+    _comEsigDraft = null;
     saveState();
     renderCommittee();
-    showToast(type + ' sign-off recorded');
+    showToast('Sign-off recorded — ' + m.name);
   }
   function sendSignoffRequest(memberId){
     const m = (EVAL.committeeMembers||[]).find(x => x.id === memberId);

@@ -257,6 +257,38 @@
     /* Stage 1 amber-lock info banner */
     .reason-locked { background:#FFFBEB; border:1px solid #FCD34D; border-radius:10px; padding:14px 18px; margin-top:12px; display:flex; align-items:center; gap:10px; font-size:13px; color:#92400E; }
     .reason-locked .link { background:transparent; border:none; padding:0; color:#0F5EE8; font-size:12px; font-weight:600; cursor:pointer; text-decoration:none; }
+    /* === Method-aware additions (QBS flow + method pill) === */
+    .bm-method-pill { display:inline-flex; align-items:center; background:#EFF6FF; color:#0C447C; border-radius:20px; padding:3px 10px; font-size:12px; font-weight:700; }
+    .bm-landing-method-pill { display:inline-block; background:#F3F4F6; color:#374151; border-radius:4px; padding:2px 7px; font-size:11px; font-weight:700; letter-spacing:0.02em; }
+    .qbs-vendor-card { background:white; border:1px solid #E5E7EB; border-radius:12px; padding:20px 24px; margin-bottom:20px; }
+    .qbs-vendor-card .eyebrow { font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:#9CA3AF; font-weight:700; }
+    .qbs-vendor-card .vname { font-size:20px; font-weight:700; color:#111827; margin-top:6px; }
+    .qbs-vendor-card .vmeta { display:flex; align-items:center; gap:10px; margin-top:8px; flex-wrap:wrap; }
+    .qbs-amber-pill { display:inline-flex; align-items:center; background:#FFFBEB; color:#92400E; border:1px solid #FCD34D; border-radius:14px; padding:3px 10px; font-size:11px; font-weight:700; }
+    .qbs-tq-line { font-size:13px; color:#10B981; font-weight:600; }
+    .qbs-confirm-wrap { background:#F9FAFB; border:1px solid #E5E7EB; border-radius:10px; padding:14px 18px; margin-bottom:16px; }
+    .qbs-confirm-wrap label.consent { display:flex; gap:9px; align-items:flex-start; font-size:12px; color:#374151; line-height:1.6; }
+    .qbs-confirm-wrap input[type="checkbox"] { margin-top:3px; }
+    .qbs-confirm-wrap .date-row { display:flex; gap:14px; align-items:center; margin-top:12px; }
+    .qbs-confirm-wrap .date-row label { font-size:12px; color:#374151; font-weight:600; }
+    .qbs-confirm-wrap .date-row input[type="date"] { border:1px solid #D1D5DB; border-radius:6px; padding:6px 10px; font-size:13px; }
+    .qbs-success { background:#F0FDF4; border:1px solid #BBF7D0; border-radius:10px; padding:12px 16px; margin-bottom:14px; display:flex; align-items:center; gap:10px; font-size:13px; color:#065F46; }
+    .qbs-amount-block { background:white; border:1px solid #E5E7EB; border-radius:10px; padding:16px 18px; margin-bottom:14px; }
+    .qbs-amount-block label { font-size:12.5px; font-weight:600; color:#374151; display:block; margin-bottom:6px; }
+    .qbs-amount-block .helper { font-size:11px; color:#9CA3AF; margin-top:4px; }
+    .qbs-amount-block .input-wrap { position:relative; max-width:280px; }
+    .qbs-amount-block .input-wrap span.prefix { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#6B7280; font-size:13px; }
+    .qbs-amount-block .input-wrap input { width:100%; padding:8px 10px 8px 24px; border:1px solid #D1D5DB; border-radius:6px; font-size:13px; }
+    .qbs-info-banner { background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px; padding:14px 18px; margin-bottom:20px; display:flex; gap:12px; align-items:flex-start; }
+    .qbs-info-banner .body .title { font-size:13px; font-weight:700; color:#0C447C; margin-bottom:4px; }
+    .qbs-info-banner .body .desc  { font-size:12px; color:#1D4ED8; line-height:1.55; }
+    .qbs-anchor-card { background:#F9FAFB; border:1px solid #E5E7EB; border-radius:10px; padding:14px 18px; margin-bottom:16px; }
+    .qbs-anchor-card .row { display:flex; align-items:center; justify-content:space-between; padding:5px 0; font-size:13px; }
+    .qbs-anchor-card .row .lbl { color:#6B7280; }
+    .qbs-anchor-card .row .val { color:#111827; font-weight:700; }
+    .qbs-anchor-card .target { font-size:12px; color:#0F5EE8; font-style:italic; margin-top:10px; border-top:1px dashed #E5E7EB; padding-top:8px; }
+    .qbs-award-info { background:#EFF6FF; border-radius:8px; padding:10px 14px; font-size:12px; color:#0C447C; margin-top:14px; line-height:1.55; }
+
     /* Critical action toast notifications */
     .critical-toast { background:#1a1a1a; border-radius:10px; padding:12px 16px; min-width:300px; max-width:400px; box-shadow:0 4px 16px rgba(0,0,0,0.25); display:flex; align-items:flex-start; gap:10px; transform:translateY(80px); opacity:0; animation: toastIn 250ms ease forwards; }
     @keyframes toastIn { to { transform: translateY(0); opacity: 1; } }
@@ -442,7 +474,7 @@
         </div>
 
         <!-- Stage progress -->
-        <div id="stageProgress" class="stage-progress"></div>
+        <div id="stageProgress" class="stage-progress" aria-live="polite"></div>
 
         <!-- Stage tabs (jump to stage; gated) -->
         <div id="stageTabs" role="tablist" aria-label="Bid management stages" class="stage-tabs"></div>
@@ -634,6 +666,11 @@
     { id:'TND-2026-007', name:'LED Street Light Retrofit', dept:'Engineering', sector:'Goods', method:'L1',
       estimate:2850000, ts:2800000, l1Amount:2720000, l1Vendor:'LED Solutions Ltd',
       bidsReceived:3, tqCount:3, ntqCount:0 },
+    // QBS-method tender — exercises the negotiation-mandatory flow added for non-L1 methods.
+    { id:'TND-2026-012', name:'Hospital Information System — AMC Headquarters', dept:'IT', sector:'Services', method:'QBS',
+      estimate:2785350, ts:2700000, l1Amount:2895000, l1Vendor:'MedTech Software Solutions Pvt Ltd',
+      bidsReceived:4, tqCount:4, ntqCount:0,
+      qbsTqScore: 90, qbsTqMax: 100 },
   ];
   const COMMITTEE_SEED = [
     { id:'rk', name:'Rajesh Kumar',  designation:'Procurement Officer',  initials:'RK', isYou:true,  comment:'', verdict:'pending', date:null, conditions:'', concern:'' },
@@ -648,6 +685,26 @@
 
   // ===================== STATE =====================
   let BM = null;
+  // Method detection runs once per workspace open (when the user enters a tender).
+  // After detection the value is read-only — no mid-session re-detection.
+  let evaluationMethod = null;
+  function detectEvaluationMethod(tnd){
+    // Priority: shared winnerReveal.method → finEval_<TND>_<METHOD>.phase===3 → tender's declared method → 'L1'
+    try {
+      const w = JSON.parse(localStorage.getItem('winnerReveal_'+tnd) || '{}');
+      if (w && typeof w === 'object' && w.method) return w.method;
+    } catch(e){}
+    const methods = ['L1','QCBS','LCS','QBS','FBS'];
+    for (const m of methods){
+      try {
+        const s = JSON.parse(localStorage.getItem('finEval_'+tnd+'_'+m) || '{}');
+        if (s && s.phase === 3) return m;
+      } catch(e){}
+    }
+    const t = BM_TENDERS.find(x => x.id === tnd);
+    return (t && t.method) || 'L1';
+  }
+  function isQBS(){ return evaluationMethod === 'QBS'; }
   function freshBM(tnd){
     const t = BM_TENDERS.find(x => x.id === tnd) || BM_TENDERS[0];
     return {
@@ -668,6 +725,9 @@
       approvalSent: false, approvalStatus: {},
       loaIssued: false, loaIssuedDate:null,
       loaAcknowledged: false, acknowledgementDate:null, acknowledgementBy:'',
+      // QBS-only — Stage 1 (Open Financial Bid) state. Ignored when evaluationMethod !== 'QBS'.
+      qbsOpening: { confirmed:false, date:'', recordedBy:'', recordedAt:null },
+      qbsOpenedAmount: null,
       loaDetails: {
         vendorName: t.l1Vendor || '',
         acceptedAmount: t.l1Amount || 0,
@@ -750,7 +810,7 @@
       <span class="font-mono text-[11px] font-bold text-primary shrink-0" style="background:#EFF6FF; border-radius:4px; padding:2px 6px; width:108px; text-align:center;">${esc(t.id)}</span>
       <div class="flex-1 min-w-0">
         <div class="text-[14px] font-medium text-ink-900 truncate">${esc(t.name)}</div>
-        <div class="text-[12px] text-ink-400">${esc(t.dept)} · ${esc(t.sector)} · <span style="background:#F3F4F6; border-radius:20px; padding:1px 8px; font-size:11px;">${esc(t.method)}</span></div>
+        <div class="text-[12px] text-ink-400">${esc(t.dept)} · ${esc(t.sector)} · <span class="bm-landing-method-pill" aria-label="Evaluation method ${esc(t.method)}">${esc(t.method)}</span></div>
       </div>
       <div class="shrink-0 text-[12px]" style="color:${st.textCol}; width:220px; text-align:right;">${esc(st.text)}</div>
       <i data-lucide="chevron-right" class="w-4 h-4 text-ink-400 shrink-0"></i>
@@ -812,21 +872,36 @@
     if (!BM.committeeMembers) BM.committeeMembers = JSON.parse(JSON.stringify(COMMITTEE_SEED));
     if (!BM.approvalStatus) BM.approvalStatus = {};
     if (!BM.loaDetails) BM.loaDetails = freshBM(tnd).loaDetails;
+    // QBS backward-compat — fields added in this session, may be missing on older BM payloads
+    if (!BM.qbsOpening) BM.qbsOpening = { confirmed:false, date:'', recordedBy:'', recordedAt:null };
+    if (BM.qbsOpenedAmount === undefined) BM.qbsOpenedAmount = null;
+    // Read the evaluation method once per workspace open and pin it for the session.
+    evaluationMethod = detectEvaluationMethod(tnd);
     document.getElementById('wsCrumb').textContent = t.id;
     document.getElementById('wsBadge').textContent = t.id;
     document.getElementById('wsName').textContent  = t.name;
-    // Tender header — L1 amount obeys the global masking rule. EC and TS remain visible.
+    // Tender header — Method pill inline with Est. cost / TS. L1 amount still obeys masking.
     const wsMeta = document.getElementById('wsMeta');
-    const baseMeta = `${t.dept} · ${t.sector} · Est. ${fmtINR(t.estimate)} · TS: ${fmtINR(t.ts)} · Method: ${t.method}`;
-    if (bmIsAmountRevealedFor(BM.tnd, t.l1Vendor)){
-      wsMeta.textContent = baseMeta;
-      // Append L1 amount as visible text
-      wsMeta.innerHTML = esc(baseMeta) + ` · L1: <span class="amount-revealed">${fmtINR(t.l1Amount)}</span>`;
+    const baseMeta = `${t.dept} · ${t.sector} · Est. ${fmtINR(t.estimate)} · TS: ${fmtINR(t.ts)}`;
+    const methodPill = `<span class="bm-method-pill" aria-label="Evaluation method ${esc(evaluationMethod)}">Method: ${esc(evaluationMethod)}</span>`;
+    // For QBS, no competitively-determined L1 exists yet — show the opened amount when present, masked otherwise.
+    let tailHTML;
+    if (isQBS()){
+      if (BM.qbsOpenedAmount != null && bmIsAmountRevealedFor(BM.tnd, t.l1Vendor)){
+        tailHTML = ` · Quoted: <span class="amount-revealed">${fmtINR(BM.qbsOpenedAmount)}</span>`;
+      } else if (BM.qbsOpenedAmount != null){
+        tailHTML = ` · Quoted: <span class="amount-masked" aria-label="Quoted amount sealed">₹ ••••••</span>`;
+      } else {
+        tailHTML = ' · Quoted: <span style="color:#9CA3AF; font-style:italic;">not yet opened</span>';
+      }
+    } else if (bmIsAmountRevealedFor(BM.tnd, t.l1Vendor)){
+      tailHTML = ` · L1: <span class="amount-revealed">${fmtINR(t.l1Amount)}</span>`;
     } else if (bmIsWinnerRevealed(BM.tnd)){
-      wsMeta.innerHTML = esc(baseMeta) + ` · L1: ${bmMaskedAmount(BM.tnd, t.l1Vendor, t.l1Amount)}`;
+      tailHTML = ` · L1: ${bmMaskedAmount(BM.tnd, t.l1Vendor, t.l1Amount)}`;
     } else {
-      wsMeta.innerHTML = esc(baseMeta) + ` · L1: <span class="amount-masked" aria-label="L1 amount hidden — winner not yet revealed">₹ ••••••</span>`;
+      tailHTML = ' · L1: <span class="amount-masked" aria-label="L1 amount hidden — winner not yet revealed">₹ ••••••</span>';
     }
+    wsMeta.innerHTML = esc(baseMeta) + ' · ' + methodPill + tailHTML;
     refreshIcons();
     document.getElementById('screen-landing').classList.add('hidden');
     document.getElementById('screen-workspace').classList.remove('hidden');
@@ -849,7 +924,16 @@
   // Kept for backwards compatibility — Negotiation is now always visible.
   function negotiationVisible(){ return true; }
   function stageNodes(){
-    // All four stages always shown — design-review unlock
+    // QBS reshapes the entire post-selection flow because no competitive opening took place.
+    if (isQBS()){
+      return [
+        { key:1, label:'Open Financial Bid' },
+        { key:2, label:'Negotiation' },
+        { key:3, label:'Committee Review' },
+        { key:4, label:'Award & LoA' },
+      ];
+    }
+    // All four stages always shown — design-review unlock (L1 / QCBS / LCS / FBS)
     return [
       { key:1, label:'Reasonableness' },
       { key:2, label:'Committee Review' },
@@ -858,6 +942,14 @@
     ];
   }
   function isStageComplete(key){
+    if (isQBS()){
+      // QBS node mapping: 1=Open Bid, 2=Negotiation (uses stage3Complete), 3=Committee Review (uses stage2Complete), 4=Award & LoA
+      if (key === 1) return !!(BM.qbsOpening && BM.qbsOpening.confirmed && BM.qbsOpenedAmount != null);
+      if (key === 2) return BM.stage3Complete;
+      if (key === 3) return BM.stage2Complete;
+      if (key === 4) return BM.loaIssued;
+      return false;
+    }
     if (key === 1) return BM.stage1Complete;
     if (key === 2) return BM.stage2Complete;
     if (key === 3) return BM.stage3Complete;
@@ -914,6 +1006,15 @@
   }
   function renderStageBody(){
     const body = document.getElementById('stageBody');
+    if (isQBS()){
+      // QBS node order: 1=Open Bid → 2=Negotiation (mandatory) → 3=Committee Review → 4=Award & LoA.
+      // Reuses existing Stage 2 / Stage 3 / Stage 4 functions by passing opts; only Open Bid is new.
+      if (BM.stage === 1) body.innerHTML = qbsStage1HTML();
+      else if (BM.stage === 2) body.innerHTML = stage3HTML({ isQBSMandatory:true });
+      else if (BM.stage === 3) body.innerHTML = stage2HTML({ isQBSCommittee:true });
+      else if (BM.stage === 4) body.innerHTML = stage4HTML();
+      return;
+    }
     if (BM.stage === 1) body.innerHTML = stage1HTML();
     else if (BM.stage === 2) body.innerHTML = stage2HTML();
     else if (BM.stage === 3) body.innerHTML = stage3HTML();
@@ -939,14 +1040,25 @@
     const vsEcNote = amountKnown ? (vsEcDiff<0?'₹'+Math.abs(vsEcDiff).toLocaleString('en-IN')+' below estimate':'₹'+Math.abs(vsEcDiff).toLocaleString('en-IN')+' above estimate') : '—';
     const vsTsCell = (amountKnown && vsTs != null) ? `<span style="color:${tsColor};">${vsTs>=0?'+':''}${vsTs.toFixed(1)}%</span>` : '<span style="color:#9CA3AF;">—</span>';
     const vsTsNote = (amountKnown && vsTsDiff != null) ? (vsTsDiff<0?'₹'+Math.abs(vsTsDiff).toLocaleString('en-IN')+' below TS value':'₹'+Math.abs(vsTsDiff).toLocaleString('en-IN')+' above TS value') : '—';
+    // Method-specific label tweaks — see Change 4. Default labels are L1-specific.
+    const rcLabels = (() => {
+      if (evaluationMethod === 'QCBS') return { row:"Recommended bid (QCBS winner)", vsEc:"Recommended vendor's quote vs EC", vsTs:"Recommended vendor's quote vs TS", desc:"The QCBS winner's quoted amount is compared against estimated cost." };
+      if (evaluationMethod === 'LCS')  return { row:"Selected vendor's bid (LCS)",    vsEc:"Selected vendor's quote vs EC",    vsTs:"Selected vendor's quote vs TS",    desc:"The lowest cost vendor above the TQ cutoff is compared against estimated cost." };
+      if (evaluationMethod === 'FBS')  return { row:"Selected vendor's bid (FBS)",    vsEc:"Selected vendor's quote vs EC",    vsTs:"Selected vendor's quote vs TS",    desc:"The highest TQ score vendor within budget is compared against estimated cost." };
+      return                              { row:"Recommended bid (L1)",            vsEc:"L1 vs EC",                         vsTs:"L1 vs TS",                         desc:"" };
+    })();
+    const methodDesc = rcLabels.desc
+      ? `<div style="font-size:12px; color:#6B7280; font-style:italic; margin-bottom:10px;">${esc(rcLabels.desc)}</div>`
+      : '';
     const figureCard = `<div class="card">
       <div class="text-[14px] font-bold text-ink-900" style="margin-bottom:14px;">Financial comparison</div>
+      ${methodDesc}
       <table class="fig-table">
         <tr><td class="lbl">Estimated Cost (EC)</td><td class="val">${fmtINR(ec)}</td><td class="note">Engineer's working estimate</td></tr>
         <tr><td class="lbl">Technical Sanction (TS)</td><td class="val">${fmtINR(ts)}</td><td class="note">Formally approved budget ceiling</td></tr>
-        <tr><td class="lbl">Recommended bid (L1)</td><td class="val">${l1Cell}</td><td class="note">${esc(t.l1Vendor)}</td></tr>
-        <tr><td class="lbl">L1 vs EC</td><td class="val">${vsEcCell}</td><td class="note">${vsEcNote}</td></tr>
-        ${ts != null ? `<tr><td class="lbl">L1 vs TS</td><td class="val">${vsTsCell}</td><td class="note">${vsTsNote}</td></tr>` : ''}
+        <tr><td class="lbl">${esc(rcLabels.row)}</td><td class="val">${l1Cell}</td><td class="note">${esc(t.l1Vendor)}</td></tr>
+        <tr><td class="lbl">${esc(rcLabels.vsEc)}</td><td class="val">${vsEcCell}</td><td class="note">${vsEcNote}</td></tr>
+        ${ts != null ? `<tr><td class="lbl">${esc(rcLabels.vsTs)}</td><td class="val">${vsTsCell}</td><td class="note">${vsTsNote}</td></tr>` : ''}
       </table>
     </div>`;
     // If amount not yet revealed, skip the result/decision banners and show the locked notice
@@ -1065,6 +1177,9 @@
     showToast('Reasonableness check complete');
   }
   function advanceStage(currentStage){
+    // `currentStage` is the SEMANTIC stage (1=Reasonableness, 2=Committee, 3=Negotiation) — call sites
+    // pass these hardcoded values from the stage-body templates. BM.stage (the node number) is the
+    // visual position in stageNodes() and varies per method.
     if (currentStage === 1){
       if (!BM.stage1Complete){ showToast('Confirm a decision in the result banner first'); return; }
       BM.stage = 2; saveBM(); renderWorkspace(); return;
@@ -1081,19 +1196,128 @@
         BM.negotiationTriggered = true;
         BM.negotiationReason = `${negMember.name} (${negMember.designation}) requested negotiation — ${negMember.concern || 'L1 price should be tested'}`;
       }
-      BM.stage = negotiationVisible() ? 3 : 4;
+      // QBS: Committee Review is node 3 → next node is 4 (Award).
+      // Other methods: Committee Review is node 2 → next is Negotiation (3) if visible, else Award (4).
+      BM.stage = isQBS() ? 4 : (negotiationVisible() ? 3 : 4);
       saveBM(); renderWorkspace();
       return;
     }
     if (currentStage === 3){
       if (!BM.negotiationOutcome){ showToast('Record the negotiation outcome first'); return; }
       BM.stage3Complete = true;
-      BM.stage = 4; saveBM(); renderWorkspace(); return;
+      // QBS: Negotiation is node 2 → next is node 3 (Committee Review).
+      // Other methods: Negotiation is node 3 → next is node 4 (Award).
+      BM.stage = isQBS() ? 3 : 4; saveBM(); renderWorkspace(); return;
     }
   }
 
+  // ============ QBS STAGE 1 — OPEN FINANCIAL BID ============
+  // Only mounted when `evaluationMethod === 'QBS'`. Replaces the Reasonableness stage.
+  function qbsStage1HTML(){
+    const t = tenderInfo();
+    const opening = BM.qbsOpening || {};
+    const opened = !!opening.confirmed;
+    const tqScore = t.qbsTqScore || 90, tqMax = t.qbsTqMax || 100;
+    const vendorCard = `<div class="qbs-vendor-card">
+        <div class="eyebrow">Selected vendor — QBS</div>
+        <div class="vname">${esc(t.l1Vendor)}</div>
+        <div class="vmeta">
+          <span class="qbs-tq-line">Highest TQ score: ${tqScore}/${tqMax}</span>
+          ${opened
+            ? `<span class="qbs-amber-pill" style="background:#F0FDF4; color:#065F46; border-color:#BBF7D0;">Financial bid: Opened</span>`
+            : `<span class="qbs-amber-pill">Financial bid: Sealed</span>`}
+        </div>
+      </div>`;
+
+    if (!opened){
+      const consentDateStr = BM._qbsOpenDate ? fmtDate(BM._qbsOpenDate) : '[date]';
+      const canRecord = !!BM._qbsOpenAck && !!BM._qbsOpenDate;
+      const confirmBlock = `<div class="card">
+        <div class="text-[14px] font-bold text-ink-900" style="margin-bottom:12px;">Formally open financial bid</div>
+        <div class="qbs-confirm-wrap">
+          <label class="consent">
+            <input type="checkbox" ${BM._qbsOpenAck?'checked':''} onchange="setQbsOpenAck(this.checked)" />
+            <span>I confirm that the financial bid of <strong>${esc(t.l1Vendor)}</strong> is being opened in the presence of the evaluation committee on <strong>${esc(consentDateStr)}</strong>.</span>
+          </label>
+          <div class="date-row">
+            <label for="qbsOpenDate">Date of opening</label>
+            <input type="date" id="qbsOpenDate" value="${esc(BM._qbsOpenDate||'')}" oninput="setQbsOpenDate(this.value)" required />
+          </div>
+        </div>
+        <button class="btn-primary full" style="margin-top:14px;" ${canRecord?'':'disabled'} onclick="recordQbsOpening()">Record bid opening →</button>
+      </div>`;
+      const footer = `<div class="stage-footer">
+        <div class="text-[13px] text-ink-500">Stage 1 of ${stageNodes().length}</div>
+        <button class="btn-primary" disabled style="opacity:0.5; cursor:not-allowed;">Proceed to Negotiation →</button>
+      </div>`;
+      return `<div class="stage-header"><h2>Open Financial Bid</h2><p>The selected vendor's financial bid must now be formally opened. Under QBS, only the highest technically scoring vendor's financial bid is opened — all others remain sealed.</p></div>
+        ${vendorCard}${confirmBlock}${footer}`;
+    }
+
+    // POST-OPENING ─ success card + amount entry + proceed
+    const successCard = `<div class="qbs-success" role="status">
+      <i data-lucide="check-circle-2" style="width:18px; height:18px; color:#10B981; flex-shrink:0;"></i>
+      <span><strong>Financial bid opened</strong> · ${esc(fmtDate(opening.date))} · Recorded by ${esc(opening.recordedBy||'Rajesh Kumar')}</span>
+    </div>`;
+    const amtValAttr = BM.qbsOpenedAmount != null ? `value="${BM.qbsOpenedAmount}"` : '';
+    const amountBlock = `<div class="qbs-amount-block">
+      <label for="qbsQuotedAmount">Quoted amount (₹)</label>
+      <div class="input-wrap">
+        <span class="prefix">₹</span>
+        <input type="number" id="qbsQuotedAmount" min="0" placeholder="0" ${amtValAttr} oninput="setQbsOpenedAmount(this.value)" />
+      </div>
+      <div class="helper">Enter the amount from the opened financial bid</div>
+    </div>`;
+    const canProceed = BM.qbsOpenedAmount != null && BM.qbsOpenedAmount > 0;
+    const footer = `<div class="stage-footer">
+      <div class="text-[13px] text-ink-500">Stage 1 of ${stageNodes().length} · QBS — Open Financial Bid</div>
+      <button class="btn-primary" ${canProceed?'':'disabled'} onclick="qbsProceedToNegotiation()">Proceed to Negotiation →</button>
+    </div>`;
+    return `<div class="stage-header"><h2>Open Financial Bid</h2><p>The selected vendor's financial bid has been formally opened. Enter the quoted amount below to proceed.</p></div>
+      ${vendorCard}${successCard}${amountBlock}${footer}`;
+  }
+  function setQbsOpenAck(v){ BM._qbsOpenAck = !!v; saveBM(); renderStageBody(); refreshIcons(); }
+  function setQbsOpenDate(v){ BM._qbsOpenDate = v; saveBM(); renderStageBody(); refreshIcons(); }
+  function recordQbsOpening(){
+    if (!BM._qbsOpenAck){ showToast('Tick the confirmation checkbox first'); return; }
+    if (!BM._qbsOpenDate){ showToast('Pick the date of opening'); return; }
+    BM.qbsOpening = { confirmed:true, date: BM._qbsOpenDate, recordedBy:'Rajesh Kumar', recordedAt:new Date().toISOString() };
+    saveBM();
+    if (typeof logCriticalAction === 'function'){
+      logCriticalAction(BM.tnd, {
+        touchpointId: 25, action: 'qbs_bid_opened', category: 'award',
+        description: 'QBS financial bid formally opened — ' + (tenderInfo().l1Vendor||''),
+        page: 'bid-management', section: 'Open Financial Bid',
+        detail: 'Date: ' + fmtDate(BM.qbsOpening.date),
+      });
+    }
+    renderStageBody(); renderHeaderStatus(); refreshIcons();
+    showToast('Bid opening recorded');
+  }
+  function setQbsOpenedAmount(v){
+    const n = parseFloat(v); BM.qbsOpenedAmount = isNaN(n) ? null : n;
+    saveBM();
+    // Update the workspace header inline (no full re-render — preserves the input focus)
+    const wsMeta = document.getElementById('wsMeta');
+    if (wsMeta && typeof openWorkspace === 'function'){ /* will refresh on next renderWorkspace */ }
+  }
+  function qbsProceedToNegotiation(){
+    if (BM.qbsOpenedAmount == null || BM.qbsOpenedAmount <= 0){ showToast('Enter the quoted amount first'); return; }
+    // Mirror to the shared winnerReveal_<TND> key so the amount obeys the same masking rule downstream.
+    if (typeof bmSetWinnerRevealState === 'function'){
+      bmSetWinnerRevealState(BM.tnd, { winnerRevealed:true, winnerRevealedAt:new Date().toISOString(), method:'QBS', revealedVendors:[] });
+    } else {
+      try {
+        const k = 'winnerReveal_' + BM.tnd;
+        const cur = JSON.parse(localStorage.getItem(k) || '{}');
+        localStorage.setItem(k, JSON.stringify(Object.assign(cur, { winnerRevealed:true, method:'QBS', winnerRevealedAt:new Date().toISOString(), revealedVendors: cur.revealedVendors || [] })));
+      } catch(e){}
+    }
+    BM.stage = 2; saveBM(); renderWorkspace();
+  }
+
   // ============ STAGE 2 — COMMITTEE REVIEW ============
-  function stage2HTML(){
+  function stage2HTML(opts){
     const members = BM.committeeMembers;
     const approved = members.filter(m => m.verdict === 'approve' || m.verdict === 'cond').length;
     const concerns = members.filter(m => m.verdict === 'concern');
@@ -1170,7 +1394,11 @@
     const canComplete = pending === 0 && unresolvedCount === 0;
     const footerInfo = `${approved} of ${members.length} approved · ${pending} pending${negCount?' · '+negCount+' requested negotiation':''}`;
     const footer = `<div class="stage-footer"><div class="text-[13px] text-ink-500">${esc(footerInfo)}</div><button class="btn-primary" ${canComplete?'':'disabled'} onclick="advanceStage(2)">${BM.stage2Complete?'Committee review complete ✓':'Complete Committee Review →'}</button></div>`;
-    return `<div class="stage-header"><h2>Committee Review</h2><p>Evaluation committee members review the bid comparison and formally approve or raise concerns before the award recommendation is prepared.</p></div>
+    const isQbsCommittee = opts && opts.isQBSCommittee;
+    const subtitle = isQbsCommittee
+      ? 'Committee reviews the negotiated price and formally approves before the award recommendation is prepared.'
+      : 'Evaluation committee members review the bid comparison and formally approve or raise concerns before the award recommendation is prepared.';
+    return `<div class="stage-header"><h2>Committee Review</h2><p>${esc(subtitle)}</p></div>
       ${overview}${addBlock}${concernBlock}${footer}`;
   }
   function pickMyVerdict(k){
@@ -1219,19 +1447,45 @@
   }
 
   // ============ STAGE 3 — NEGOTIATION (always visible — design-review unlock) ============
-  function stage3HTML(){
+  function stage3HTML(opts){
     const t = tenderInfo();
-    // Design-review info note — only when this stage was never triggered organically
-    const previewNote = !negotiationTriggered()
-      ? `<div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:10px 14px; margin-bottom:16px; font-size:12px; color:#0C447C; font-style:italic;">ℹ In production, this stage only appears when triggered by committee review or reasonableness check decision.</div>`
-      : '';
-    // Original trigger banner — still only shown when negotiation was actually triggered
-    const ctx = negotiationTriggered()
-      ? `<div class="purple-box">
-          <div style="font-size:13px; font-weight:700; color:#3C3489;">Negotiation triggered</div>
-          <div style="font-size:12px; color:#534AB7; margin-top:2px;">Reason: ${esc(BM.negotiationReason || 'Negotiation requested during evaluation')}</div>
-        </div>`
-      : '';
+    const isMandatory = !!(opts && opts.isQBSMandatory);
+    // QBS context — replace the trigger banner with the mandatory-negotiation panel + anchor card
+    let previewNote = '';
+    let ctx = '';
+    let anchorBlock = '';
+    if (isMandatory){
+      ctx = `<div class="qbs-info-banner" role="status">
+          <i data-lucide="info" style="width:18px; height:18px; color:#0C447C; flex-shrink:0;"></i>
+          <div class="body">
+            <div class="title">QBS negotiation — mandatory</div>
+            <div class="desc">Under Quality Based Selection, negotiation with the selected vendor is mandatory. The financial bid was not competitively tendered — this negotiation establishes a fair and reasonable price.</div>
+          </div>
+        </div>`;
+      const openedAmt = BM.qbsOpenedAmount;
+      const revealed  = bmIsAmountRevealedFor(BM.tnd, t.l1Vendor);
+      const quotedRow = openedAmt == null
+        ? '<span style="color:#9CA3AF; font-style:italic;">Not yet entered</span>'
+        : (revealed ? `<span class="amount-revealed">${fmtINR(openedAmt)}</span>` : bmMaskedAmount(BM.tnd, t.l1Vendor, openedAmt));
+      anchorBlock = `<div class="qbs-anchor-card" aria-label="Reasonableness anchor">
+          <div class="row"><span class="lbl">Estimated Cost (EC):</span><span class="val">${fmtINR(t.estimate)}</span></div>
+          <div class="row"><span class="lbl">Technical Sanction (TS):</span><span class="val">${fmtINR(t.ts)}</span></div>
+          <div class="row"><span class="lbl">Vendor's opening quote:</span><span class="val">${quotedRow}</span></div>
+          <div class="target">✦ Target: negotiate to within TS value</div>
+        </div>`;
+    } else {
+      // Design-review info note — only when this stage was never triggered organically
+      previewNote = !negotiationTriggered()
+        ? `<div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:10px 14px; margin-bottom:16px; font-size:12px; color:#0C447C; font-style:italic;">ℹ In production, this stage only appears when triggered by committee review or reasonableness check decision.</div>`
+        : '';
+      // Original trigger banner — still only shown when negotiation was actually triggered
+      ctx = negotiationTriggered()
+        ? `<div class="purple-box">
+            <div style="font-size:13px; font-weight:700; color:#3C3489;">Negotiation triggered</div>
+            <div style="font-size:12px; color:#534AB7; margin-top:2px;">Reason: ${esc(BM.negotiationReason || 'Negotiation requested during evaluation')}</div>
+          </div>`
+        : '';
+    }
     const vendorRow = `<div style="background:#F9FAFB; border-radius:8px; padding:12px 14px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
       <span style="font-size:14px; font-weight:700; color:#111827;">${esc(t.l1Vendor)}</span>
       <span class="pill-green">L1 · ${fmtINR(t.l1Amount)}</span>
@@ -1280,7 +1534,7 @@
     }
     const footer = `<div class="stage-footer"><div class="text-[13px] text-ink-500">Stage 3 of ${stageNodes().length} — Negotiation</div><button class="btn-primary" ${BM.negotiationOutcome?'':'disabled'} onclick="advanceStage(3)">${BM.stage3Complete?'Negotiation complete ✓':'Complete Negotiation →'}</button></div>`;
     return `<div class="stage-header"><h2>Negotiation</h2><p>Document the negotiation process with the recommended vendor. All sessions must be recorded with line-item breakdown.</p></div>
-      ${previewNote}${ctx}${inviteBlock}${sessionsBlock}${outcome}${footer}`;
+      ${previewNote}${ctx}${anchorBlock}${inviteBlock}${sessionsBlock}${outcome}${footer}`;
   }
   function defaultSessionItems(){
     return [
@@ -1364,6 +1618,7 @@
   function finalAmount(){
     const t = tenderInfo();
     if (BM.negotiationOutcome === 'accept' && BM.negotiatedAmount) return BM.negotiatedAmount;
+    if (isQBS() && BM.qbsOpenedAmount != null) return BM.qbsOpenedAmount;
     return t.l1Amount;
   }
   function stage4HTML(){
@@ -1400,6 +1655,10 @@
         </div>
       </div>
     </div>`;
+    // QBS-only info banner — sits below the recommendation summary card
+    const qbsAwardInfo = isQBS()
+      ? `<div class="qbs-award-info" role="status">ℹ This award is based on QBS (Quality Based Selection). The vendor was selected on technical merit and price was established through negotiation — not competitive bidding. This must be explicitly stated in the recommendation note.</div>`
+      : '';
     if (!BM.recommendationNote) BM.recommendationNote = defaultRecommendationNote(t, amt, vsEc);
     const editor = `<div class="card">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
@@ -1473,9 +1732,16 @@
       : '';
     loaBlock = loaPreviewNote + renderLoASection(t, amt);
     return `<div class="stage-header"><h2>Award Recommendation</h2><p>Prepare the formal award recommendation note. This document goes up the approval chain before the Letter of Acceptance is issued.</p></div>
-      ${summary}${editor}${attachments}${checklist}${apprSection}${approvalBanner}${loaBlock}`;
+      ${summary}${qbsAwardInfo}${editor}${attachments}${checklist}${apprSection}${approvalBanner}${loaBlock}`;
   }
   function defaultRecommendationNote(t, amt, vsEc){
+    if (isQBS()){
+      // Quality-Based Selection — the vendor was picked on technical score; price came out of negotiation.
+      return `<p><em>In accordance with the procurement procedures and the evaluation conducted for ${esc(t.id)}, this office recommends the award of work for &quot;${esc(t.name)}&quot; to M/s ${esc(t.l1Vendor)}, who have been selected on the basis of highest technical score (QBS) and whose quoted price of ${fmtINR(amt)} (Rupees ${esc(numberToWordsINR(amt))} only) has been arrived at through negotiation.</em></p>
+<p><em>A total of ${t.bidsReceived} bids were received. After validity screening and technical evaluation, ${t.tqCount} bids were found Technically Qualified (TQ). Under QBS, the financial bid of the highest technically scoring vendor was formally opened in the presence of the evaluation committee — all other financial bids remain sealed.</em></p>
+<p><em>The negotiated price of ${fmtINR(amt)} is ${Math.abs(vsEc).toFixed(1)}% ${vsEc<0?'below':'above'} the estimated cost of ${fmtINR(t.estimate)} and is within the Technical Sanction value of ${fmtINR(t.ts)}. The Evaluation Committee reviewed the negotiated price and ${BM.committeeMembers.filter(m=>m.verdict==='approve'||m.verdict==='cond').length} of ${BM.committeeMembers.length} members have approved the recommendation.</em></p>
+<p><em>It is, therefore, recommended that the work be awarded to M/s ${esc(t.l1Vendor)} at the negotiated amount of ${fmtINR(amt)} subject to the standard terms and conditions of the tender document.</em></p>`;
+    }
     return `<p><em>In accordance with the procurement procedures and the evaluation conducted for ${esc(t.id)}, this office recommends the award of work for &quot;${esc(t.name)}&quot; to M/s ${esc(t.l1Vendor)}, who have submitted the lowest (L1) bid of ${fmtINR(amt)} (Rupees ${esc(numberToWordsINR(amt))} only).</em></p>
 <p><em>A total of ${t.bidsReceived} bids were received. After validity screening and technical evaluation, ${t.tqCount} bids were found Technically Qualified (TQ). The financial bids of TQ vendors were opened on May 17, 2026. The comparative statement was prepared and locked on May 18, 2026.</em></p>
 <p><em>The L1 quote of ${fmtINR(amt)} is ${Math.abs(vsEc).toFixed(1)}% ${vsEc<0?'below':'above'} the estimated cost of ${fmtINR(t.estimate)} and is within the Technical Sanction value of ${fmtINR(t.ts)}. The Evaluation Committee reviewed the comparison on May 18, 2026 and ${BM.committeeMembers.filter(m=>m.verdict==='approve'||m.verdict==='cond').length} of ${BM.committeeMembers.length} members have approved the recommendation.</em></p>
