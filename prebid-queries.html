@@ -1492,8 +1492,12 @@
       const raw = localStorage.getItem(PB_STDR_KEY);
       if (raw){ const arr = JSON.parse(raw); if (Array.isArray(arr)) return arr; }
     } catch(e){}
-    // Pre-populate on first read
-    const seed = [
+    // Pre-populate on first read — default library comes from the Admin Console
+    // (prebid.std-responses, shape {category,title,body}) when customised, else the built-in seed.
+    const seed = (window.AdminState && AdminState.has('prebid.std-responses')) ? AdminState.get('prebid.std-responses', []).map(function(r, i){
+      return { id: r.id || ('std-admin-'+(i+1)), category: r.category, title: r.title,
+               text: (r.body != null ? r.body : r.text) || '', usedCount: r.usedCount || 0, createdAt: r.createdAt || '2026-05-01' };
+    }) : [
       { id:'std-seed-1', category:'Eligibility', title:'Turnover certificate requirement',
         text:'The minimum turnover requirement is applicable for the last 3 financial years as per the tender document. Audited financial statements certified by a Chartered Accountant with UAN number are required as evidence.',
         usedCount:0, createdAt:'2026-05-01' },
@@ -2780,7 +2784,11 @@
   function clearSectionFilter(){ setSectionFilter(''); }
 
   // ============= AI SUMMARY =============
-  const SECTION_PALETTE = [
+  // Section taxonomy — overridden by the Admin Console (prebid.sections, array of strings)
+  // when customised; otherwise the built-in palette below is used.
+  const SECTION_PALETTE = (window.AdminState && AdminState.has('prebid.sections')) ? AdminState.get('prebid.sections', []).map(function(s, i){
+    return { key: s, label: s, color: ['#0F5EE8','#8B5CF6','#F59E0B','#10B981','#F97316','#6B7280','#EC4899'][i % 7] };
+  }) : [
     { key:'Technical Specifications', label:'Technical Spec', color:'#0F5EE8' },
     { key:'PQ / TQ & Eligibility',    label:'PQ/TQ',         color:'#8B5CF6' },
     { key:'BOQ & Quantities',         label:'BOQ',           color:'#F59E0B' },
@@ -2904,7 +2912,7 @@
         const diff = Math.ceil((new Date(r).getTime() - Date.now()) / 86400000);
         if (!isNaN(diff)) return Math.max(0, diff);
       }
-      return 17;
+      return AdminState.get('prebid.response-window', 17);
     })();
     const deadlineDate = (() => {
       const d = new Date(Date.now() + daysLeft * 86400000);

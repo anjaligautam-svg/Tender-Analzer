@@ -5053,7 +5053,7 @@ Date: ${esc(fmtDateShort(today))}`;
 
   // ===================== FINANCIAL TAB =====================
   function finQuote(vendor){ return (EVAL.finQuoteEdits && EVAL.finQuoteEdits[vendor]) || QUOTE_NUM[vendor] || 0; }
-  function isALB(quote){ return quote > 0 && quote < ESTIMATE * 0.85; }
+  function isALB(quote){ return quote > 0 && quote < ESTIMATE * (1 - AdminState.get('eval.alb-threshold', 15)/100); }
   function finComputed(){
     const bids = EVAL.finBids.map(b => {
       const q = finQuote(b.vendor);
@@ -6396,7 +6396,7 @@ Date: ${esc(fmtDateShort(today))}`;
     const quote = m === 'FBS' ? (EVAL.fbsBudget || ESTIMATE) : winner.quote;
     const ec = ESTIMATE;
     const ts = EVAL.ts;
-    if (quote < ec * 0.85) return 'D';
+    if (quote < ec * (1 - AdminState.get('eval.alb-threshold', 15)/100)) return 'D';
     if (ts != null && quote > ts) return 'B';
     if (quote > ec * 1.10) return 'C';
     return 'A';
@@ -6449,7 +6449,7 @@ Date: ${esc(fmtDateShort(today))}`;
       // ALB — handled in F2's ALB block; F3 just notes it
       banner = `<div class="reason-banner case-b" aria-live="polite">
         <div class="rb-head"><i data-lucide="alert-triangle" style="width:18px; height:18px;"></i> Abnormally low bid detected</div>
-        <div class="rb-body">${esc(winner.vendor)} quoted ₹${winner.quote.toLocaleString('en-IN')} — more than 15% below the estimate of ₹${ec.toLocaleString('en-IN')}. Record the ALB decision in Section 02 before proceeding with reasonableness.</div>
+        <div class="rb-body">${esc(winner.vendor)} quoted ₹${winner.quote.toLocaleString('en-IN')} — more than ${AdminState.get('eval.alb-threshold', 15)}% below the estimate of ₹${ec.toLocaleString('en-IN')}. Record the ALB decision in Section 02 before proceeding with reasonableness.</div>
       </div>`;
       proceedBtnDisabled = !EVAL.albDecision;
     } else if (caseKey === 'A'){
@@ -6677,7 +6677,7 @@ Date: ${esc(fmtDateShort(today))}`;
     if (lowPq) flags.push({ kind:'lowconf', label:'Low confidence' });
     if (pq.status === 'dq') flags.push({ kind:'ntq', label:'NTQ' });
     if (fin.revealed && fin.quote){
-      if (vsEst != null && vsEst <= -15) flags.push({ kind:'alb', label:'ALB' });
+      if (vsEst != null && vsEst <= -AdminState.get('eval.alb-threshold', 15)) flags.push({ kind:'alb', label:'ALB' });
       if (vsEst != null && vsEst >= 10)  flags.push({ kind:'high', label:'High quote' });
     }
     return flags;

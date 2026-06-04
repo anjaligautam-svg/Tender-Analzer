@@ -3048,6 +3048,12 @@
   // === Competency authority tier (Addition 5) ===
   function competencyTier(cost){
     const n = Number(cost) || 0;
+    // When the Admin Console customises the AMC value tiers (tiers.def), use the
+    // matched tier's approval authority; otherwise fall back to the built-in mapping.
+    if (window.AdminState && AdminState.has('tiers.def')){
+      const t = AdminState.tierFor(n);
+      if (t) return { name: t.auth, sub: 'Approval authority per admin value tiers' };
+    }
     if (n <= 500000)            return { name:'Head of Department (HOD)',                  sub:'Departmental level approval' };
     if (n <= 2500000)           return { name:'Deputy Commissioner',                       sub:'Divisional level approval' };
     if (n <= 5000000)           return { name:'Commissioner',                              sub:"Municipal Commissioner's office" };
