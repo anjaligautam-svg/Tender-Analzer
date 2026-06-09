@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = '/Users/Anjali/Documents/GitHub/Tender-Analzer';
-const PORT = parseInt(process.env.PORT || '4180', 10);
+const PORT = parseInt(process.argv[2] || process.env.PORT || '4180', 10);
 
 const TYPES = {
   '.html': 'text/html; charset=utf-8',

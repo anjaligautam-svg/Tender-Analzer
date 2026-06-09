@@ -112,7 +112,7 @@ tailwind.config = { theme: { extend: {
         <input id="searchInput" type="search" placeholder="Search 149 admin settings — try 'TQ rubric', 'corrigendum', 'value tier'…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] placeholder:text-ink-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
       </div>
       <button class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">FY 2026-27 <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
-      <button id="activityToggle" aria-label="Toggle activity log" class="hidden md:flex w-9 h-9 items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500"><i data-lucide="history" class="w-4 h-4"></i></button>
+      <button id="activityToggle" aria-label="Toggle activity trail" aria-expanded="false" class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="history" class="w-4 h-4 text-ink-500"></i> Activity trail</button>
       <button aria-label="Notifications" class="relative w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500"><i data-lucide="bell" class="w-4 h-4"></i><span class="absolute -top-1 -right-1 bg-danger text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">4</span></button>
       <div class="flex items-center gap-2 pl-2 border-l border-line h-9">
         <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div>
@@ -124,10 +124,10 @@ tailwind.config = { theme: { extend: {
       <main id="content" class="flex-1 overflow-y-auto px-8 py-6 space-y-6 min-w-0"></main>
 
       <!-- Activity panel -->
-      <aside id="activityPanel" class="w-[320px] shrink-0 border-l border-line bg-white overflow-y-auto">
+      <aside id="activityPanel" class="collapsed w-[320px] shrink-0 border-l border-line bg-white overflow-y-auto">
         <div class="px-4 py-3.5 border-b border-line flex items-center justify-between sticky top-0 bg-white z-10">
           <div class="text-[14px] font-semibold text-ink-900 flex items-center gap-2"><i data-lucide="history" class="w-4 h-4 text-ink-500"></i> Activity trail</div>
-          <button onclick="document.getElementById('activityPanel').classList.add('collapsed')" class="text-ink-400 hover:text-ink-900"><i data-lucide="x" class="w-4 h-4"></i></button>
+          <button onclick="document.getElementById('activityPanel').classList.add('collapsed');document.getElementById('activityToggle').setAttribute('aria-expanded','false')" class="text-ink-400 hover:text-ink-900"><i data-lucide="x" class="w-4 h-4"></i></button>
         </div>
         <ul id="activityFeed" class="px-4 py-3 space-y-3.5"></ul>
       </aside>
@@ -280,19 +280,15 @@ const ITEMS = [
 
   /* ====== TENDER CREATION ====== */
   // 2A
-  {id:'tender.precheck', m:'tender', s:'2A · Pre-check rules', p:'Core', t:'matrix',
-    title:'Mandatory pre-check items',
-    why:'"Quick Check — Before We Begin" is on the page; the checklist itself is policy.',
-    def:{rows:['Goods','Works','Services','Consultancy'], cols:['GeM check','Budget sanction','AA capture','TS capture','DPR ref'], cells:{}}},
-  {id:'tender.gem-mandatory', m:'tender', s:'2A · Pre-check rules', p:'Core', t:'list',
-    title:'GeM-mandatory categories',
-    why:'Statutory.',
-    def:['Office stationery','Computers and peripherals','Office furniture','Vehicles (standard)','Generic IT services']},
   // 2B
   {id:'tender.smart-start', m:'tender', s:'2B · Smart Start & templates', p:'Helpful', t:'matrix',
     title:'Smart Start methods enabled',
     why:'Org may want to discourage Manual for new officers or disable AI describe on sensitive tenders.',
     def:{rows:['New officer','Standard officer','Sensitive tender'], cols:['AI describe','Upload','Template','Clone','Manual'], cells:{}}},
+  {id:'tender.starter-chips', m:'tender', s:'2B · Smart Start & templates', p:'Helpful', t:'list',
+    title:'AI describe — quick-suggestion chips',
+    why:'5 chips shown on the AI describe screen prime officers with common AMC procurements. Org-specific — should reflect what AMC actually procures often. Edit to match your procurement patterns; the first 5 are shown on the screen, the rest rotate.',
+    def:['Supply of laptops','Road repair works','Water pipeline','Security services','Office housekeeping','Office furniture','Vehicle procurement','Garbage collection','Building maintenance works','Stationery supply']},
   {id:'tender.template-library', m:'tender', s:'2B · Smart Start & templates', p:'Core', t:'lib',
     title:'Tender template library',
     why:'Single highest-leverage admin asset for tender creation.',
@@ -315,14 +311,15 @@ const ITEMS = [
     title:'Tender-type master list',
     why:'Drives sector routing and reporting.',
     def:['Goods','Works','Services','Consultancy','Engineering Goods','Mixed (Goods+Services)']},
-  {id:'tender.value-tiers', m:'tender', s:'2C · Classification & evaluation', p:'Core', t:'tiers',
-    title:'AMC value-tier definitions',
-    why:'Cross-cutting; one master record consumed by every module.',
+  {id:'tender.subtypes', m:'tender', s:'2C · Classification & evaluation', p:'Helpful', t:'kvlist',
+    title:'Sub-types per tender type',
+    why:'The AI describe screen extracts a Sub-Type alongside the main type. Without a master list, sub-types drift across tenders and break reporting. Key = tender type, Value = comma-separated sub-types under that type.',
     def:[
-      {min:0,max:500000,auth:'HOD'},
-      {min:500000,max:2500000,auth:'Deputy Commissioner'},
-      {min:2500000,max:5000000,auth:'Commissioner'},
-      {min:5000000,max:null,auth:'State Government'},
+      {k:'Goods',v:'IT Goods, Office Goods, Vehicles, Furniture, Medical Goods, Stationery'},
+      {k:'Works',v:'Road Works, Water Works, Building Works, Maintenance Works, Drainage Works, Electrical Works'},
+      {k:'Services',v:'Housekeeping, Security, Catering, Transport, Garbage Collection'},
+      {k:'Consultancy',v:'Architectural, Engineering, Financial, Legal, IT Consultancy, Environmental'},
+      {k:'Engineering Goods',v:'Electrical Equipment, Mechanical Equipment, Pumps & Motors, Generators, Tools & Instruments'},
     ]},
   {id:'tender.emd-policy', m:'tender', s:'2C · Classification & evaluation', p:'Core', t:'kvlist',
     title:'EMD policy matrix',
@@ -409,36 +406,139 @@ const ITEMS = [
     def:60, unit:'seconds'},
 
   /* ====== PRE-BID QUERIES ====== */
+  {id:'prebid.dates', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'prebid-dates',
+    title:'Pre-Bid date management — policy & per-tender overrides',
+    why:'One place to set default windows (Release → Pre-bid → Window close → Response due), the lock policy that kicks in after publish, who can edit dates, and to make per-tender date overrides on live tenders.',
+    def:{
+      defaults:{
+        publishToPreBidDays: 7,
+        preBidToWindowCloseDays: 14,
+        windowCloseToResponseDueDays: 5,
+        notifyAdvanceDays: 2,
+      },
+      lockPolicy:{
+        lockAfterPublish: true,
+        autoCorrigendumOnDateChange: true,
+        notifyVendorsOnChange: true,
+        requireReasonForChange: true,
+      },
+      access:[
+        {label:'Super Admin', enabled:true},
+        {label:'Procurement Officer', enabled:true},
+        {label:'Department Head', enabled:false},
+        {label:'Finance Officer', enabled:false},
+        {label:'Pre-Bid Committee Chair', enabled:true},
+      ],
+      tenders:[
+        {id:'TND-2026-001', title:'Supply of 200 laptops for AMC offices', status:'Active',    dates:{publish:'2026-05-15', preBidMeeting:'2026-05-22', windowClose:'2026-06-05', responseDue:'2026-06-10'}},
+        {id:'TND-2026-002', title:'Road repair works — Bandra ward',        status:'Published', dates:{publish:'2026-04-10', preBidMeeting:'2026-04-17', windowClose:'2026-05-01', responseDue:'2026-05-06'}},
+        {id:'TND-2026-003', title:'Water pipeline — Andheri to Vile Parle', status:'Draft',     dates:{publish:'', preBidMeeting:'', windowClose:'', responseDue:''}},
+        {id:'TND-2026-004', title:'Security services for 12 municipal buildings', status:'Closed', dates:{publish:'2026-01-15', preBidMeeting:'2026-01-22', windowClose:'2026-02-05', responseDue:'2026-02-10'}},
+        {id:'TND-2026-005', title:'Office housekeeping — Worli depot',      status:'Active',    dates:{publish:'2026-05-20', preBidMeeting:'2026-05-27', windowClose:'2026-06-10', responseDue:'2026-06-15'}},
+      ],
+    }},
   {id:'prebid.sections', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'list',
     title:'Query categorisation sections',
     why:'Drives AI grouping, charts, and exports.',
     def:['PQ / TQ & Eligibility','BOQ & Quantities','Dates & Timeline','Scope of Work','Financial & EMD','Technical Specifications','General / Other']},
+  {id:'prebid.response-columns', m:'prebid', s:'3 · Pre-Bid Queries', p:'Helpful', t:'kvlist',
+    title:'Response register table — visible columns',
+    why:'Which columns appear in the response register table on the pre-bid page. Toggle to suit reporting needs and screen width.',
+    def:[
+      {k:'Query #',v:'true'},
+      {k:'Vendor (anonymised)',v:'true'},
+      {k:'Category',v:'true'},
+      {k:'Original query',v:'true'},
+      {k:'Draft response',v:'true'},
+      {k:'Final response',v:'true'},
+      {k:'Status',v:'true'},
+      {k:'Drafter',v:'true'},
+      {k:'Approver',v:'false'},
+      {k:'Date received',v:'false'},
+      {k:'Date published',v:'true'},
+      {k:'AI confidence',v:'false'},
+    ]},
   {id:'prebid.ai-threshold', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'percent',
     title:'AI grouping similarity threshold',
     why:'ML knob; not an officer setting.',
     def:78},
-  {id:'prebid.ai-prompts', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'template',
-    title:'AI master prompts (extract / group / suggest / rewrite / amendment)',
-    why:'Single voice across the org. — managed in detail under Cross-cutting → AI Configuration.',
-    def:'See Cross-cutting → AI Configuration → Master prompts.'},
-  {id:'prebid.std-responses', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'lib',
-    title:'Standard responses library',
-    why:'Library exists on the page; officers currently can\'t curate.',
+  {id:'prebid.summary-options', m:'prebid', s:'3 · Pre-Bid Queries', p:'Helpful', t:'kvlist',
+    title:'AI summary widgets — which to show on the screen',
+    why:'4 summary widgets appear on the pre-bid query screen. Admin can disable any that aren\'t useful for the org or that distract officers.',
     def:[
-      {category:'Eligibility', title:'Turnover certificate requirement', body:'The bidder shall furnish a turnover certificate from a practicing Chartered Accountant bearing the CA\'s UAN number for the last three completed financial years.'},
-      {category:'Technical', title:'Minimum technical specifications', body:'Bidders are advised to refer to Section IV of the tender document for detailed technical specifications. Deviations, if any, must be clearly highlighted.'},
-      {category:'Scope', title:'Scope boundary', body:'The scope of work is strictly limited to the items listed in the BOQ and the technical specifications. Any work beyond this scope shall be treated as extra and handled per the conditions of contract.'},
-      {category:'Timeline', title:'Bid submission deadline', body:'The bid submission deadline is firm and will not be extended. Bidders are advised to upload bids well in advance to avoid technical issues.'},
-      {category:'General', title:'Refer to tender document', body:'Please refer to the tender document for clarification. All terms and conditions stated therein shall prevail.'},
+      {k:'Response progress (X of Y answered)',v:'true'},
+      {k:'Primary concern (top category)',v:'true'},
+      {k:'Corrigendum risk (queries likely to need corrigendum)',v:'true'},
+      {k:'Response window (countdown)',v:'true'},
     ]},
-  {id:'prebid.generic-presets', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'list',
+  {id:'prebid.std-responses', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'std-responses-library',
+    title:'Standard responses library',
+    why:'Combined library + pending review queue. Officers in the portal can submit new responses → they appear here as Pending → admin approves to publish into the live library. CRUD on existing responses, search, category filters, and per-response usage counts all in one place.',
+    def:[
+      {status:'live', category:'Eligibility', title:'Access road clearance', body:'Yes. The access road can accommodate heavy goods vehicles up to 25 tonnes. Site visits are recommended to confirm conditions.', usedTimes:0},
+      {status:'live', category:'Eligibility', title:'Turnover certificate requirement', body:'The minimum turnover requirement is applicable for the last 3 financial years as per the tender document. Audited financial statements certified by a Chartered Accountant bearing UAN are mandatory.', usedTimes:0},
+      {status:'live', category:'Technical', title:'Minimum technical specifications', body:'The technical specifications mentioned in the tender document are the minimum requirements. Bidders may offer higher specifications subject to evaluation.', usedTimes:0},
+      {status:'live', category:'Scope', title:'Scope boundary', body:'The scope of work is as defined in Section 3 of the tender document. Any additional scope items will be treated as change requests and governed by the conditions of contract.', usedTimes:0},
+      {status:'live', category:'Timeline', title:'Bid submission deadline', body:'The bid submission deadline is firm and will not be extended. Bidders are advised to upload their bids well in advance to avoid technical issues.', usedTimes:0},
+      {status:'live', category:'General', title:'Refer to tender document', body:'Please refer to the tender document for clarification. All terms and conditions stated therein shall prevail.', usedTimes:0},
+      {status:'pending', category:'Eligibility', title:'EMD exemption clarification', body:'MSME bidders registered under Udyam and falling under Micro or Small enterprise category are exempt from EMD per GFR Rule 170(3). Bidders are required to upload a valid Udyam Registration Certificate dated within the last 90 days.', submittedBy:'Priya Shah', submittedAt:Date.now()-3*86400000},
+      {status:'pending', category:'BOQ', title:'BOQ quantity tolerance', body:'A tolerance of ±5% on BOQ quantities is admissible at the time of execution. Any variation beyond this requires prior written approval from the Engineer-in-Charge and shall be regularised through a variation order.', submittedBy:'Amit Patil', submittedAt:Date.now()-1*86400000},
+    ]},
+  {id:'prebid.generic-presets', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'generic-presets-combined',
     title:'Generic-response presets',
-    why:'Words have legal weight.',
-    def:['Refer to document','Cannot disclose','No change required','Standard response']},
+    why:'Short reusable phrases shown as quick picks when officers draft query replies. Manage the presets (with toggle for enable/disable) and which roles can add new ones from the portal, all in one place. The full permissions matrix overrides the access toggles if they conflict.',
+    def:{
+      presets:[
+        {label:'Refer to document', enabled:true},
+        {label:'Cannot disclose', enabled:true},
+        {label:'No change required', enabled:true},
+        {label:'Standard response', enabled:true},
+      ],
+      access:[
+        {label:'Super Admin', enabled:true},
+        {label:'Technical Officer', enabled:false},
+        {label:'Finance Officer', enabled:false},
+        {label:'Deputy Commissioner', enabled:true},
+        {label:'Accounts Officer', enabled:false},
+      ],
+    }},
   {id:'prebid.response-chain', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'chain',
     title:'Response-register approval chain',
     why:'Cross-cutting routing.',
     def:['Drafting officer','Reviewer','Approver (by value tier)']},
+  {id:'prebid.response-chain-mandatory', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'list',
+    title:'Response chain — mandatory steps',
+    why:'Steps listed here cannot be skipped during routing. Steps in prebid.response-chain that are not listed here are advisory and can be bypassed by the value-tier authority. Keep this list as a subset of prebid.response-chain.',
+    def:['Reviewer','Approver (by value tier)']},
+  {id:'prebid.committee', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'prebid-committee',
+    title:'Pre-Bid Committee — members, designations & permissions',
+    why:'Specific committee for pre-bid query handling. Designations are committee titles you can grant; Actions are the operations members can be permitted to do; Members is the table that pairs an officer with a designation and explicit permissions for each action. The portal reads this to decide what each member can do.',
+    def:{
+      designations:[
+        {label:'Chair', enabled:true},
+        {label:'Member', enabled:true},
+        {label:'Reviewer', enabled:true},
+        {label:'Drafter', enabled:true},
+        {label:'Vigilance Observer', enabled:true},
+      ],
+      actions:[
+        {label:'View queries', enabled:true},
+        {label:'Draft response', enabled:true},
+        {label:'Edit response', enabled:true},
+        {label:'Approve response', enabled:true},
+        {label:'Publish response', enabled:true},
+        {label:'Assign to others', enabled:true},
+        {label:'Upload MOM', enabled:true},
+        {label:'Issue corrigendum', enabled:true},
+        {label:'Add standard response', enabled:true},
+      ],
+      members:[
+        {officer:'Priya Shah',  designation:'Chair',    permissions:{'View queries':true,'Draft response':true,'Edit response':true,'Approve response':true,'Publish response':true,'Assign to others':true,'Upload MOM':true,'Issue corrigendum':true,'Add standard response':true}},
+        {officer:'Amit Patil',  designation:'Member',   permissions:{'View queries':true,'Draft response':true,'Edit response':true,'Approve response':false,'Publish response':false,'Assign to others':false,'Upload MOM':false,'Issue corrigendum':false,'Add standard response':false}},
+        {officer:'Sunita Rao',  designation:'Reviewer', permissions:{'View queries':true,'Draft response':false,'Edit response':true,'Approve response':true,'Publish response':false,'Assign to others':true,'Upload MOM':false,'Issue corrigendum':false,'Add standard response':false}},
+        {officer:'Rajesh Kumar',designation:'Drafter',  permissions:{'View queries':true,'Draft response':true,'Edit response':true,'Approve response':false,'Publish response':false,'Assign to others':false,'Upload MOM':true,'Issue corrigendum':false,'Add standard response':true}},
+      ],
+    }},
   {id:'prebid.corr-types', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'lib',
     title:'Corrigendum types & mandatory fields',
     why:'Compliance — incomplete corrigenda are a major audit finding.',
@@ -456,10 +556,6 @@ const ITEMS = [
     title:'AI Amendment Summary push policy',
     why:'Some changes legally require a corrigendum.',
     def:['BOQ quantity change → mandatory push','Bid-close date change → mandatory push','Technical specification change → mandatory push','Typo / formatting → dismissable']},
-  {id:'prebid.response-window', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'number',
-    title:'Default pre-bid response window',
-    why:'Drives the "Response window closes in —" countdown.',
-    def:10, unit:'days'},
   {id:'prebid.consultants', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'lib',
     title:'Approved external consultants registry',
     why:'Data-exposure risk; restrict who can receive.',
@@ -516,10 +612,6 @@ const ITEMS = [
     why:'Below this AI confidence, officer must manually verify.',
     def:75},
   // 4B — TQ (HEART)
-  {id:'eval.tq-rubric', m:'eval', s:'4B · TQ Evaluation (scoring rubric)', p:'Core', t:'lib',
-    title:'TQ scoring rubric (/100 total)',
-    why:'Inconsistent rubrics across tenders = failed audits.',
-    def:[{ref:'See Tender Creation → TQ marks rubric (linked record)'}]},
   {id:'eval.tq-sector-overrides', m:'eval', s:'4B · TQ Evaluation (scoring rubric)', p:'Core', t:'lib',
     title:'Sector-specific rubric overrides',
     why:'Sensible variation but only with policy approval.',
@@ -787,6 +879,7 @@ const ITEMS = [
       {key:'parse.bid', surface:'Bid Evaluation → AI parser', prompt:'Parse the uploaded technical bid. Extract: turnover figures (from CA-signed certificate), work orders (value + year + client), ISO certifications (number + expiry), CMMI level, personnel CVs (count + roles).'},
       {key:'draft.award', surface:'Bid Mgmt → AI draft recommendation', prompt:'Draft an Award Recommendation Note based on the evaluation matrix. Be factual. State the awarded value in both ₹ and words. Cite the evaluation method and reasonableness verdict.'},
       {key:'edit.nit-section', surface:'Tender Creation → AI section edit', prompt:'Edit this NIT section. Use formal third-person Indian government English. Cite GFR 2017 and CVC guidelines where relevant. Keep clauses numbered.'},
+      {key:'smart-start.describe', surface:'Tender Creation → AI describe (Smart Start)', prompt:'You are a procurement assistant for the Ahmedabad Municipal Corporation, helping an officer create a tender via natural language. Begin with a warm one-line greeting using their first name. Give two concrete example inputs drawn from common AMC procurement: one goods example and one works example (e.g. "I need 200 desktop computers for AMC offices" and "We need a contractor to repair roads in Bandra"). When the officer describes what they need, extract these fields and fill the form: Tender Type, Sub-Type, Sector, Suggested Evaluation Method, Estimated Value. If any field is ambiguous, ask one clarifying follow-up before filling it. Be especially careful with Estimated Value — if not stated, ask, do not guess. Use formal Indian government English with a helpful tone. Cite the AMC value tiers when discussing thresholds.'},
     ]},
   {id:'ai.tone', m:'ai', s:'B · AI configuration', p:'Helpful', t:'select',
     title:'Default tone preset',
@@ -849,6 +942,10 @@ const ITEMS = [
     title:'Template versioning & rollback',
     why:'Drafts → publish; rollback supported.',
     def:true},
+  {id:'templates.docbuilder', m:'templates', s:'D · Document templates', p:'Helpful', t:'docbuilder',
+    title:'Custom document templates (form builder)',
+    why:'Procurement spans many document types beyond letters — site inspection, completion certificate, MoM, work order, NOC, budget revision, etc. Admin can define each as a template once, and any portal page can render it.',
+    def:[]},
   // E. Vendors
   {id:'vendors.registry', m:'vendors', s:'E · Vendor master', p:'Core', t:'lib',
     title:'Vendor registry',
@@ -887,6 +984,10 @@ const ITEMS = [
     title:'Department & sector master',
     why:'Drives sector defaults across modules.',
     def:['Procurement Cell','Engineering','Water Works','Roads','IT & Goods','Urban Development','Finance','Accounts','Vigilance','Commissioner Office']},
+  {id:'officers.sectors', m:'officers', s:'F · Officers & departments', p:'Core', t:'list',
+    title:'Sectors master (canonical)',
+    why:'Sectors are currently mentioned across dpr.templates, tender.template-library, eval.tq-sector-overrides, tender.sector-method — each carries its own copy. This is the canonical sectors list. Future wire-up: existing sector-bearing items should read from this record rather than carry their own copies. Until then, edit here AND in each of those items to keep them in sync.',
+    def:['Water Works','Roads','IT Goods','Engineering Goods','Urban Dev Works','Consultancy','Electrical & Lighting','Drainage & Sewage','Solid Waste Management','Health & Sanitation']},
   {id:'officers.committees', m:'officers', s:'F · Officers & departments', p:'Core', t:'lib',
     title:'Standing committee templates',
     why:'Standard CVC / TQ / Bid Mgmt committees per dept and value tier.',
@@ -900,9 +1001,18 @@ const ITEMS = [
   {id:'perm.matrix', m:'permissions', s:'G · Permissions', p:'Core', t:'matrix',
     title:'Per-action permission matrix',
     why:'Segregation of duties is CVC-mandated.',
-    def:{rows:['Super Admin','Technical Officer','Finance Officer','Deputy Commissioner','Accounts Officer'],
-         cols:['Create DPR','Approve DPR','Create Tender','CVC sign-off','Publish NIT','Upload queries','Approve responses','Issue corrigendum','Score TQ','Reveal financial bid','Approve award','Issue LoA'],
-         cells:{}}},
+    def:{
+      rows:['Super Admin','Technical Officer','Finance Officer','Deputy Commissioner','Accounts Officer'],
+      cols:[
+        'DPR · Create','DPR · Approve',
+        'Tender · Create','Tender · CVC sign-off','Tender · Publish NIT',
+        'Pre-Bid · View','Pre-Bid · Draft','Pre-Bid · Edit','Pre-Bid · Approve','Pre-Bid · Publish','Pre-Bid · Manage',
+        'Corrigendum · View','Corrigendum · Draft','Corrigendum · Edit','Corrigendum · Approve','Corrigendum · Publish','Corrigendum · Manage',
+        'Eval · Score TQ','Eval · Reveal financial bid',
+        'Mgmt · Approve award','Mgmt · Issue LoA',
+      ],
+      cells:{}
+    }},
   {id:'perm.scope', m:'permissions', s:'G · Permissions', p:'Helpful', t:'toggle',
     title:'Department / sector scoping',
     why:'Officers only see tenders in their domain.',
@@ -1068,13 +1178,6 @@ function renderDashboard(){
       <p class="text-[14px] text-ink-500 mt-1">Ahmedabad Municipal Corporation · ${totalItems} settings across ${SECTIONS.length-1} sections.</p>
     </div>
 
-    <section class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-      <div class="bg-white border border-line rounded-xl p-5"><div class="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center mb-2"><i data-lucide="sliders-horizontal" class="w-4 h-4"></i></div><div class="text-[26px] font-bold leading-none">${totalItems}</div><div class="text-[12px] text-ink-500 mt-1">Total settings</div></div>
-      <div class="bg-white border border-line rounded-xl p-5"><div class="w-9 h-9 rounded-lg bg-danger-light text-danger flex items-center justify-center mb-2"><i data-lucide="alert-octagon" class="w-4 h-4"></i></div><div class="text-[26px] font-bold leading-none">${totalCore}</div><div class="text-[12px] text-ink-500 mt-1">Core (compliance)</div></div>
-      <div class="bg-white border border-line rounded-xl p-5"><div class="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center mb-2"><i data-lucide="zap" class="w-4 h-4"></i></div><div class="text-[26px] font-bold leading-none">${totalHelp}</div><div class="text-[12px] text-ink-500 mt-1">Helpful</div></div>
-      <div class="bg-white border border-line rounded-xl p-5"><div class="w-9 h-9 rounded-lg bg-purple-light text-purple flex items-center justify-center mb-2"><i data-lucide="check-square" class="w-4 h-4"></i></div><div class="text-[26px] font-bold leading-none">${customised}</div><div class="text-[12px] text-ink-500 mt-1">Customised</div></div>
-    </section>
-
     <section>
       <div class="flex items-center justify-between mb-3">
         <h2 class="text-[18px] font-bold text-ink-900">Module policies</h2>
@@ -1205,7 +1308,12 @@ function renderPreview(item, val){
   switch(item.t){
     case 'list':
       if (!Array.isArray(val)) return '';
-      return `<div class="flex flex-wrap gap-1.5">${val.slice(0,12).map(x=>`<span class="chip-input">${escapeHtml(String(x))}</span>`).join('')}${val.length>12?`<span class="text-[11px] text-ink-400">+${val.length-12} more</span>`:''}</div>`;
+      return `<div class="flex flex-wrap gap-1.5">${val.slice(0,12).map(x => {
+        const item = (typeof x === 'string') ? {label: x, enabled: true} : (x || {label:'', enabled:true});
+        const enabled = item.enabled !== false;
+        const cls = enabled ? '' : 'opacity-50 line-through';
+        return `<span class="chip-input ${cls}">${escapeHtml(item.label)}</span>`;
+      }).join('')}${val.length > 12 ? `<span class="text-[11px] text-ink-400">+${val.length-12} more</span>` : ''}</div>`;
     case 'kvlist':
       if (!Array.isArray(val)) return '';
       return `<div class="flex flex-wrap gap-1.5">${val.slice(0,6).map(p=>`<span class="chip-input"><b class="font-medium">${escapeHtml(p.k)}:</b>&nbsp;${escapeHtml(String(p.v))}</span>`).join('')}${val.length>6?`<span class="text-[11px] text-ink-400">+${val.length-6} more</span>`:''}</div>`;
@@ -1225,6 +1333,52 @@ function renderPreview(item, val){
     case 'rules':
       if (!Array.isArray(val)) return '';
       return `<div class="text-[12px] text-ink-500">${val.length} rule(s)</div>`;
+    case 'docbuilder':
+      if (!Array.isArray(val)) return '';
+      return `<div class="text-[12px] text-ink-500">${val.length} custom document${val.length===1?'':'s'}</div>`;
+    case 'std-responses-library':
+      if (!Array.isArray(val)) return '';
+      const _live = val.filter(r => (r.status||'live') === 'live').length;
+      const _pending = val.filter(r => r.status === 'pending').length;
+      return `<div class="flex items-center gap-3 text-[12px] text-ink-500">
+        <span><strong class="text-ink-900">${_live}</strong> in library</span>
+        ${_pending>0 ? `<span class="text-warning font-medium flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-warning"></span>${_pending} pending review</span>` : ''}
+      </div>`;
+    case 'generic-presets-combined':
+      if (!val || typeof val !== 'object') return '';
+      const _gpc_presets = Array.isArray(val.presets) ? val.presets : (Array.isArray(val) ? val : []);
+      const _gpc_access = Array.isArray(val.access) ? val.access : [];
+      const _gpc_pEnabled = _gpc_presets.filter(p => (typeof p === 'string') ? true : p.enabled !== false).length;
+      const _gpc_aEnabled = _gpc_access.filter(a => a.enabled !== false).length;
+      return `<div class="flex items-center gap-3 text-[12px] text-ink-500 flex-wrap">
+        <span><strong class="text-ink-900">${_gpc_pEnabled}</strong> preset${_gpc_pEnabled!==1?'s':''} active</span>
+        <span class="text-ink-300">•</span>
+        <span><strong class="text-ink-900">${_gpc_aEnabled}</strong> role${_gpc_aEnabled!==1?'s':''} can add</span>
+      </div>`;
+    case 'prebid-dates':
+      if (!val || typeof val !== 'object') return '';
+      const _pbd_t = Array.isArray(val.tenders) ? val.tenders : [];
+      const _pbd_active = _pbd_t.filter(t => t.status === 'Active').length;
+      const _pbd_locked = _pbd_t.filter(t => t.status === 'Published' || t.status === 'Closed').length;
+      return `<div class="flex items-center gap-3 text-[12px] text-ink-500 flex-wrap">
+        <span><strong class="text-ink-900">${_pbd_t.length}</strong> tenders</span>
+        <span class="text-ink-300">•</span>
+        <span class="text-success font-medium">${_pbd_active} active</span>
+        <span class="text-ink-300">•</span>
+        <span>${_pbd_locked} locked</span>
+      </div>`;
+    case 'prebid-committee':
+      if (!val || typeof val !== 'object') return '';
+      const _pbc_m = Array.isArray(val.members)      ? val.members.length : 0;
+      const _pbc_d = Array.isArray(val.designations) ? val.designations.filter(d=>d.enabled!==false).length : 0;
+      const _pbc_a = Array.isArray(val.actions)      ? val.actions.filter(a=>a.enabled!==false).length : 0;
+      return `<div class="flex items-center gap-3 text-[12px] text-ink-500 flex-wrap">
+        <span><strong class="text-ink-900">${_pbc_m}</strong> member${_pbc_m!==1?'s':''}</span>
+        <span class="text-ink-300">•</span>
+        <span><strong class="text-ink-900">${_pbc_d}</strong> designation${_pbc_d!==1?'s':''}</span>
+        <span class="text-ink-300">•</span>
+        <span><strong class="text-ink-900">${_pbc_a}</strong> action${_pbc_a!==1?'s':''}</span>
+      </div>`;
     default: return '';
   }
 }
@@ -1255,6 +1409,8 @@ function renderInlineControl(item, val){
       return `<input class="inp w-72" type="text" value="${escapeHtml(String(val||''))}" data-act="text" data-id="${item.id}">`;
     case 'select':
       return `<select class="inp" data-act="select" data-id="${item.id}">${(item.options||[]).map(o=>`<option ${o===val?'selected':''}>${escapeHtml(o)}</option>`).join('')}</select>`;
+    case 'docbuilder':
+      return `<button class="btn" data-act="docbuilder" data-id="${item.id}"><i data-lucide="settings-2" class="w-3.5 h-3.5"></i> Configure</button>`;
     default:
       return `<button class="btn" data-act="open" data-id="${item.id}"><i data-lucide="settings-2" class="w-3.5 h-3.5"></i> Configure</button>`;
   }
@@ -1281,6 +1437,9 @@ function bindItemHandlers(){
   });
   document.querySelectorAll('[data-act="open"]').forEach(el => {
     el.onclick = () => openEdit(el.dataset.id);
+  });
+  document.querySelectorAll('[data-act="docbuilder"]').forEach(el => {
+    el.onclick = () => openDocBuilder();
   });
 }
 
@@ -1328,6 +1487,10 @@ function renderEditor(item, draft){
     case 'tiers':   return editorTiers(draft);
     case 'template':return editorTemplate(draft);
     case 'rules':   return editorList(draft);
+    case 'std-responses-library': return editorStdResponsesLibrary(draft);
+    case 'generic-presets-combined': return editorGenericPresetsCombined(draft);
+    case 'prebid-dates': return editorPreBidDates(draft);
+    case 'prebid-committee': return editorPreBidCommittee(draft);
     default: return `<pre class="text-[12px] text-ink-500">${escapeHtml(JSON.stringify(draft,null,2))}</pre>`;
   }
 }
@@ -1335,8 +1498,8 @@ function renderEditor(item, draft){
 function editorList(draft){
   return `
     <div class="space-y-2">
-      <div id="listRows" class="flex flex-wrap gap-2"></div>
-      <div class="flex items-center gap-2 pt-2">
+      <div id="listRows" class="space-y-1.5"></div>
+      <div class="flex items-center gap-2 pt-3 mt-3 border-t border-line">
         <input id="newListItem" class="inp flex-1" placeholder="Add new entry and press Enter…">
         <button class="btn btn-primary" onclick="addListEntry()"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add</button>
       </div>
@@ -1388,6 +1551,10 @@ function bindEditorHandlers(){
     case 'tiers':   return renderTiersRows();
     case 'matrix':  return renderMatrix();
     case 'lib':     return renderLibRows();
+    case 'std-responses-library': return renderStdRespAll();
+    case 'generic-presets-combined': return renderGenericPresetsCombined();
+    case 'prebid-dates': return renderPreBidDatesAll();
+    case 'prebid-committee': return renderPreBidCommitteeAll();
     case 'template':
       document.getElementById('tplArea').oninput = e => { editingDraft = e.target.value; };
       break;
@@ -1397,29 +1564,72 @@ function bindEditorHandlers(){
 /* list editor */
 function renderListRows(){
   const c = document.getElementById('listRows');
-  c.innerHTML = (editingDraft||[]).map((x,i)=>`<span class="chip-input">${escapeHtml(String(x))}<button data-i="${i}" class="rm-list"><i data-lucide="x" class="w-3 h-3"></i></button></span>`).join('');
-  c.querySelectorAll('.rm-list').forEach(b => b.onclick = () => { editingDraft.splice(+b.dataset.i,1); renderListRows(); });
+  // Normalize editingDraft to {label, enabled} format (backward compatible)
+  editingDraft = (editingDraft||[]).map(normalizeListItem);
+
+  c.innerHTML = editingDraft.map((item, i) => `
+    <div class="flex items-center gap-3 px-3 py-2 border border-line rounded-lg ${!item.enabled ? 'bg-surface' : 'bg-white'}">
+      <button class="toggle ${item.enabled ? 'on' : ''}" data-toggle="${i}" aria-pressed="${item.enabled ? 'true' : 'false'}" aria-label="Enable or disable this entry"><span class="dot"></span></button>
+      <input type="text" class="flex-1 bg-transparent text-[13px] ${!item.enabled ? 'line-through text-ink-400' : 'text-ink-900'} focus:outline-none focus:ring-0 border-0 p-0" data-label="${i}" value="${escapeHtml(item.label)}" />
+      <button data-rm="${i}" class="text-ink-400 hover:text-danger transition" aria-label="Remove this entry"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+    </div>
+  `).join('');
+
+  c.querySelectorAll('button[data-toggle]').forEach(b => b.onclick = () => {
+    const i = +b.dataset.toggle;
+    editingDraft[i].enabled = !editingDraft[i].enabled;
+    renderListRows();
+  });
+  c.querySelectorAll('input[data-label]').forEach(inp => {
+    inp.oninput = e => { editingDraft[+e.target.dataset.label].label = e.target.value; };
+  });
+  c.querySelectorAll('button[data-rm]').forEach(b => b.onclick = () => {
+    editingDraft.splice(+b.dataset.rm, 1);
+    renderListRows();
+  });
+
   const input = document.getElementById('newListItem');
-  input.onkeydown = e => { if (e.key==='Enter') { addListEntry(); e.preventDefault(); } };
+  if (input) input.onkeydown = e => { if (e.key === 'Enter') { addListEntry(); e.preventDefault(); } };
   refreshIcons();
 }
 function addListEntry(){
   const i = document.getElementById('newListItem');
-  const v = i.value.trim(); if (!v) return;
-  editingDraft = editingDraft||[]; editingDraft.push(v); i.value=''; renderListRows();
+  const v = i.value.trim();
+  if (!v) return;
+  editingDraft = editingDraft || [];
+  editingDraft.push({label: v, enabled: true});
+  i.value = '';
+  renderListRows();
 }
 
 /* kv editor */
+// A kvlist value is boolean-ish when it reads true/false (string or real boolean).
+function kvIsBool(v){ return v===true || v===false || v==='true' || v==='false' || v==='True' || v==='False'; }
+function kvBoolVal(v){ return v===true || v==='true' || v==='True'; }
+
 function renderKvRows(){
   const c = document.getElementById('kvRows');
-  c.innerHTML = (editingDraft||[]).map((p,i)=>`
-    <div class="flex items-center gap-2">
+  c.innerHTML = (editingDraft||[]).map((p,i)=>{
+    const bool = kvIsBool(p.v);
+    const on = kvBoolVal(p.v);
+    const valControl = bool
+      ? `<button class="toggle ${on?'on':''}" data-toggle="${i}" aria-pressed="${on?'true':'false'}" aria-label="Toggle value"><span class="dot"></span></button>`
+      : `<input class="inp flex-1" data-i="${i}" data-k="v" value="${escapeHtml(String(p.v||''))}" placeholder="Value">`;
+    return `
+    <div class="flex items-center gap-2 ${bool && !on ? 'opacity-70' : ''}">
       <input class="inp flex-1" data-i="${i}" data-k="k" value="${escapeHtml(p.k||'')}" placeholder="Key">
-      <input class="inp flex-1" data-i="${i}" data-k="v" value="${escapeHtml(String(p.v||''))}" placeholder="Value">
+      ${valControl}
       <button class="btn btn-danger" data-i="${i}" aria-label="Remove"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
   c.querySelectorAll('input').forEach(inp => inp.onchange = e => { editingDraft[+e.target.dataset.i][e.target.dataset.k] = e.target.value; });
+  c.querySelectorAll('button[data-toggle]').forEach(b => b.onclick = () => {
+    const i = +b.dataset.toggle;
+    const cur = editingDraft[i].v;
+    const next = !kvBoolVal(cur);
+    editingDraft[i].v = (typeof cur === 'boolean') ? next : (next ? 'true' : 'false');
+    renderKvRows();
+  });
   c.querySelectorAll('button[aria-label="Remove"]').forEach(b => b.onclick = () => { editingDraft.splice(+b.dataset.i,1); renderKvRows(); });
   refreshIcons();
 }
@@ -1521,6 +1731,805 @@ function addLibRow(){
   editingDraft.push(tmpl); renderLibRows();
 }
 
+// State for the standard-responses editor
+let stdRespState = {search: '', filter: 'All', editing: null, adding: false};
+
+function editorStdResponsesLibrary(draft) {
+  return `
+    <div class="space-y-3" id="stdRespContainer">
+      <div class="flex items-center justify-between gap-3">
+        <div class="text-[13px] text-ink-500" id="stdRespCount"></div>
+        <button class="btn btn-primary" id="stdRespAddBtn">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add new
+        </button>
+      </div>
+
+      <div class="relative">
+        <i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+        <input id="stdRespSearch" class="inp w-full pl-9" placeholder="Search standard responses…">
+      </div>
+
+      <div id="stdRespFilters" class="flex flex-wrap gap-1.5"></div>
+
+      <div id="stdRespAddForm" class="hidden border border-primary/30 bg-primary-light/40 rounded-xl p-4 space-y-3">
+        <div>
+          <label class="text-[12px] text-ink-500 mb-1 block font-medium">Response title</label>
+          <input id="stdRespNewTitle" class="inp w-full" placeholder="e.g. EMD format clarification">
+        </div>
+        <div>
+          <label class="text-[12px] text-ink-500 mb-1 block font-medium">Category</label>
+          <select id="stdRespNewCategory" class="inp w-full"></select>
+        </div>
+        <div>
+          <label class="text-[12px] text-ink-500 mb-1 block font-medium">Response text</label>
+          <textarea id="stdRespNewBody" class="inp w-full" rows="4" placeholder="Type the standard response that can be reused…"></textarea>
+        </div>
+        <div class="flex justify-end gap-2">
+          <button class="btn" id="stdRespNewCancel">Cancel</button>
+          <button class="btn btn-primary" id="stdRespNewSave">Save to library</button>
+        </div>
+      </div>
+
+      <div id="stdRespList" class="space-y-2"></div>
+    </div>
+  `;
+}
+
+function renderStdRespAll() {
+  // Normalize entries (backward compatibility + defaults)
+  editingDraft = (editingDraft||[]).map(r => ({
+    status: r.status || 'live',
+    category: r.category || 'General',
+    title: r.title || '',
+    body: r.body || '',
+    usedTimes: r.usedTimes || 0,
+    submittedBy: r.submittedBy,
+    submittedAt: r.submittedAt,
+  }));
+
+  const total = editingDraft.length;
+  const countEl = document.getElementById('stdRespCount');
+  if (countEl) countEl.textContent = `${total} response${total!==1?'s':''}`;
+
+  // Filter chips
+  const cats = ['All', ...new Set(editingDraft.map(r => r.category))];
+  const filtersEl = document.getElementById('stdRespFilters');
+  if (filtersEl) {
+    filtersEl.innerHTML = cats.map(cat =>
+      `<button class="text-[12px] px-3 py-1 rounded-full border ${stdRespState.filter===cat?'bg-primary text-white border-primary':'border-line hover:bg-surface text-ink-700'}" data-filter="${escapeHtml(cat)}">${escapeHtml(cat)}</button>`
+    ).join('');
+    filtersEl.querySelectorAll('button[data-filter]').forEach(b => b.onclick = () => {
+      stdRespState.filter = b.dataset.filter;
+      renderStdRespAll();
+    });
+  }
+
+  // Filtered list
+  const filtered = editingDraft.filter(r => {
+    if (stdRespState.filter !== 'All' && r.category !== stdRespState.filter) return false;
+    if (stdRespState.search) {
+      const q = stdRespState.search.toLowerCase();
+      if (!((r.title+' '+r.body+' '+r.category).toLowerCase().includes(q))) return false;
+    }
+    return true;
+  });
+
+  const listEl = document.getElementById('stdRespList');
+  if (!listEl) return;
+
+  if (filtered.length === 0) {
+    listEl.innerHTML = `
+      <div class="text-center py-12 text-ink-500">
+        <i data-lucide="search-x" class="w-8 h-8 mx-auto mb-2 text-ink-400"></i>
+        <div class="text-[13px]">No responses match.</div>
+      </div>`;
+    refreshIcons();
+    bindStdRespControlHandlers();
+    return;
+  }
+
+  listEl.innerHTML = filtered.map((r) => {
+    const idx = editingDraft.indexOf(r);
+    const isPending = r.status === 'pending';
+    const isEditing = stdRespState.editing === idx;
+
+    if (isEditing) {
+      return `
+        <div class="bg-primary-light/40 border border-primary/30 rounded-xl p-4 space-y-3">
+          <input class="inp w-full" data-edit-field="title" data-idx="${idx}" value="${escapeHtml(r.title)}" placeholder="Response title">
+          <select class="inp w-full" data-edit-field="category" data-idx="${idx}">
+            ${[...new Set(['Eligibility','Technical','Financial','Scope','Timeline','BOQ','General',...editingDraft.map(x=>x.category)])].map(c => `<option ${c===r.category?'selected':''}>${escapeHtml(c)}</option>`).join('')}
+          </select>
+          <textarea class="inp w-full" rows="5" data-edit-field="body" data-idx="${idx}">${escapeHtml(r.body)}</textarea>
+          <div class="flex justify-end gap-2">
+            <button class="btn" data-edit-cancel>Cancel</button>
+            <button class="btn btn-primary" data-edit-done>Done</button>
+          </div>
+        </div>`;
+    }
+
+    return `
+      <div class="bg-white border ${isPending?'border-warning/40':'border-line'} rounded-xl p-4 space-y-2">
+        <div class="flex items-start justify-between gap-2">
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <span class="chip" style="background:#EFF6FF;color:#0F5EE8;text-transform:uppercase;letter-spacing:0.04em">${escapeHtml(r.category)}</span>
+            ${isPending ? `<span class="chip" style="background:#FFFBEB;color:#F59E0B">Pending review</span>` : ''}
+          </div>
+          <div class="text-[11px] text-ink-400 text-right shrink-0">
+            ${isPending ? `Submitted by ${escapeHtml(r.submittedBy||'?')}<br>${timeAgo(r.submittedAt||Date.now())}` : `Used ${r.usedTimes||0} times`}
+          </div>
+        </div>
+        ${r.title ? `<div class="text-[14px] font-semibold text-ink-900">${escapeHtml(r.title)}</div>` : ''}
+        <div class="text-[12.5px] text-ink-700 leading-relaxed">${escapeHtml(r.body)}</div>
+        <div class="flex items-center gap-2 pt-2 flex-wrap">
+          ${isPending ? `
+            <button class="btn btn-primary" data-approve-idx="${idx}"><i data-lucide="check" class="w-3.5 h-3.5"></i> Approve &amp; add</button>
+            <button class="btn btn-danger" data-reject-idx="${idx}"><i data-lucide="x" class="w-3.5 h-3.5"></i> Reject</button>
+          ` : ''}
+          <button class="btn" data-edit-idx="${idx}"><i data-lucide="pencil" class="w-3.5 h-3.5"></i> Edit</button>
+          <button class="text-ink-400 hover:text-danger ml-auto" data-delete-idx="${idx}" aria-label="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Inline-edit field listeners (write through to editingDraft as user types)
+  listEl.querySelectorAll('[data-edit-field]').forEach(inp => {
+    inp.oninput = e => {
+      const idx = +e.target.dataset.idx;
+      const field = e.target.dataset.editField;
+      editingDraft[idx][field] = e.target.value;
+    };
+  });
+
+  // Buttons
+  listEl.querySelectorAll('[data-edit-idx]').forEach(b => b.onclick = () => {
+    stdRespState.editing = +b.dataset.editIdx;
+    renderStdRespAll();
+  });
+  listEl.querySelectorAll('[data-edit-done]').forEach(b => b.onclick = () => {
+    stdRespState.editing = null;
+    renderStdRespAll();
+  });
+  listEl.querySelectorAll('[data-edit-cancel]').forEach(b => b.onclick = () => {
+    stdRespState.editing = null;
+    renderStdRespAll();
+  });
+  listEl.querySelectorAll('[data-delete-idx]').forEach(b => b.onclick = () => {
+    if (!confirm('Delete this response?')) return;
+    editingDraft.splice(+b.dataset.deleteIdx, 1);
+    renderStdRespAll();
+  });
+  listEl.querySelectorAll('[data-approve-idx]').forEach(b => b.onclick = () => {
+    const idx = +b.dataset.approveIdx;
+    editingDraft[idx].status = 'live';
+    editingDraft[idx].usedTimes = 0;
+    delete editingDraft[idx].submittedBy;
+    delete editingDraft[idx].submittedAt;
+    toast('Approved and added to library');
+    renderStdRespAll();
+  });
+  listEl.querySelectorAll('[data-reject-idx]').forEach(b => b.onclick = () => {
+    const reason = prompt('Reason for rejection (will be logged on Save):');
+    if (reason === null) return;
+    editingDraft.splice(+b.dataset.rejectIdx, 1);
+    toast('Rejected');
+    renderStdRespAll();
+  });
+
+  refreshIcons();
+  bindStdRespControlHandlers();
+}
+
+function bindStdRespControlHandlers() {
+  // Search
+  const search = document.getElementById('stdRespSearch');
+  if (search && !search.dataset.bound) {
+    search.dataset.bound = '1';
+    search.value = stdRespState.search;
+    search.oninput = e => {
+      stdRespState.search = e.target.value;
+      renderStdRespAll();
+    };
+  }
+
+  // Add new toggle
+  const addBtn = document.getElementById('stdRespAddBtn');
+  const addForm = document.getElementById('stdRespAddForm');
+  if (addBtn && !addBtn.dataset.bound) {
+    addBtn.dataset.bound = '1';
+    addBtn.onclick = () => {
+      addForm.classList.toggle('hidden');
+      if (!addForm.classList.contains('hidden')) {
+        const cats = [...new Set(['Eligibility','Technical','Financial','Scope','Timeline','BOQ','General',...editingDraft.map(r => r.category)])];
+        const sel = document.getElementById('stdRespNewCategory');
+        sel.innerHTML = cats.map(c => `<option>${escapeHtml(c)}</option>`).join('');
+      }
+    };
+  }
+
+  const cancelBtn = document.getElementById('stdRespNewCancel');
+  if (cancelBtn && !cancelBtn.dataset.bound) {
+    cancelBtn.dataset.bound = '1';
+    cancelBtn.onclick = () => {
+      addForm.classList.add('hidden');
+      document.getElementById('stdRespNewTitle').value = '';
+      document.getElementById('stdRespNewBody').value = '';
+    };
+  }
+
+  const saveNewBtn = document.getElementById('stdRespNewSave');
+  if (saveNewBtn && !saveNewBtn.dataset.bound) {
+    saveNewBtn.dataset.bound = '1';
+    saveNewBtn.onclick = () => {
+      const title = document.getElementById('stdRespNewTitle').value.trim();
+      const cat = document.getElementById('stdRespNewCategory').value;
+      const body = document.getElementById('stdRespNewBody').value.trim();
+      if (!body) { toast('Response text is required'); return; }
+      editingDraft.push({
+        status: 'live',
+        category: cat || 'General',
+        title,
+        body,
+        usedTimes: 0
+      });
+      document.getElementById('stdRespNewTitle').value = '';
+      document.getElementById('stdRespNewBody').value = '';
+      addForm.classList.add('hidden');
+      toast('Added to library');
+      renderStdRespAll();
+    };
+  }
+}
+
+/* generic-presets combined editor (presets list + access list) */
+function editorGenericPresetsCombined(draft) {
+  return `
+    <div class="space-y-6" id="gpcContainer">
+      <!-- Section 1: Presets list -->
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-[13px] font-semibold text-ink-900">Presets</h3>
+          <span class="text-[11px] text-ink-500" id="gpcPresetCount"></span>
+        </div>
+        <div id="gpcPresets" class="space-y-1.5"></div>
+        <div class="flex items-center gap-2 pt-3 mt-2 border-t border-line">
+          <input id="gpcNewPreset" class="inp flex-1" placeholder="Add new preset and press Enter…">
+          <button class="btn btn-primary" id="gpcAddPreset"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add</button>
+        </div>
+      </div>
+
+      <!-- Section 2: Access -->
+      <div class="pt-4 border-t border-line">
+        <h3 class="text-[13px] font-semibold text-ink-900 mb-1">Who can add new presets from the portal</h3>
+        <p class="text-[11.5px] text-ink-500 mb-3 leading-relaxed">Roles toggled on can submit new presets from the pre-bid page. The full permissions matrix (Cross-cutting → Permissions) is the source of truth and overrides if it conflicts.</p>
+        <div id="gpcAccess" class="space-y-1.5"></div>
+      </div>
+    </div>
+  `;
+}
+
+function renderGenericPresetsCombined() {
+  // Migrate old shapes if needed
+  if (Array.isArray(editingDraft)) {
+    // Old shape: array of strings or array of {label, enabled} from the old prebid.generic-presets
+    // Try to recover old access data from localStorage if it exists
+    const store = loadStore();
+    const oldAccess = store['prebid.generic-presets-access'];
+    editingDraft = {
+      presets: editingDraft,
+      access: Array.isArray(oldAccess) ? oldAccess : [
+        {label:'Super Admin', enabled:true},
+        {label:'Technical Officer', enabled:false},
+        {label:'Finance Officer', enabled:false},
+        {label:'Deputy Commissioner', enabled:true},
+        {label:'Accounts Officer', enabled:false},
+      ]
+    };
+  }
+  if (!editingDraft || typeof editingDraft !== 'object') {
+    editingDraft = {presets: [], access: []};
+  }
+  if (!Array.isArray(editingDraft.presets)) editingDraft.presets = [];
+  if (!Array.isArray(editingDraft.access)) editingDraft.access = [];
+  editingDraft.presets = editingDraft.presets.map(normalizeListItem);
+  editingDraft.access  = editingDraft.access.map(normalizeListItem);
+
+  const cnt = document.getElementById('gpcPresetCount');
+  if (cnt) cnt.textContent = `${editingDraft.presets.length} preset${editingDraft.presets.length!==1?'s':''}`;
+
+  const rowHtml = (item, i, scope, allowDelete) => `
+    <div class="flex items-center gap-3 px-3 py-2 border border-line rounded-lg ${!item.enabled ? 'bg-surface' : 'bg-white'}">
+      <button class="toggle ${item.enabled ? 'on' : ''}" data-gpc-toggle="${scope}|${i}" aria-pressed="${item.enabled ? 'true' : 'false'}" aria-label="Enable or disable"><span class="dot"></span></button>
+      <input type="text" class="flex-1 bg-transparent text-[13px] ${!item.enabled ? 'line-through text-ink-400' : 'text-ink-900'} focus:outline-none focus:ring-0 border-0 p-0" data-gpc-label="${scope}|${i}" value="${escapeHtml(item.label)}" />
+      ${allowDelete ? `<button data-gpc-rm="${scope}|${i}" class="text-ink-400 hover:text-danger transition" aria-label="Remove"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
+    </div>
+  `;
+
+  const presetsEl = document.getElementById('gpcPresets');
+  const accessEl  = document.getElementById('gpcAccess');
+  if (presetsEl) presetsEl.innerHTML = editingDraft.presets.map((it,i) => rowHtml(it,i,'presets',true)).join('');
+  if (accessEl)  accessEl.innerHTML  = editingDraft.access.map((it,i)  => rowHtml(it,i,'access',true)).join('');
+
+  // Toggle clicks
+  document.querySelectorAll('[data-gpc-toggle]').forEach(b => b.onclick = () => {
+    const [scope, iStr] = b.dataset.gpcToggle.split('|');
+    const i = +iStr;
+    editingDraft[scope][i].enabled = !editingDraft[scope][i].enabled;
+    renderGenericPresetsCombined();
+  });
+
+  // Label edits (live)
+  document.querySelectorAll('input[data-gpc-label]').forEach(inp => {
+    inp.oninput = e => {
+      const [scope, iStr] = e.target.dataset.gpcLabel.split('|');
+      const i = +iStr;
+      editingDraft[scope][i].label = e.target.value;
+    };
+  });
+
+  // Remove
+  document.querySelectorAll('button[data-gpc-rm]').forEach(b => b.onclick = () => {
+    const [scope, iStr] = b.dataset.gpcRm.split('|');
+    const i = +iStr;
+    editingDraft[scope].splice(i, 1);
+    renderGenericPresetsCombined();
+  });
+
+  // Add new preset
+  const addBtn   = document.getElementById('gpcAddPreset');
+  const newInput = document.getElementById('gpcNewPreset');
+  if (addBtn && !addBtn.dataset.bound) {
+    addBtn.dataset.bound = '1';
+    addBtn.onclick = () => {
+      const v = (newInput && newInput.value || '').trim();
+      if (!v) return;
+      editingDraft.presets.push({label: v, enabled: true});
+      newInput.value = '';
+      renderGenericPresetsCombined();
+    };
+  }
+  if (newInput && !newInput.dataset.bound) {
+    newInput.dataset.bound = '1';
+    newInput.onkeydown = e => {
+      if (e.key === 'Enter') { e.preventDefault(); addBtn.click(); }
+    };
+  }
+
+  refreshIcons();
+}
+
+/* pre-bid date management editor (defaults + lock policy + access + per-tender overrides) */
+let pbdState = {search: '', statusFilter: 'All', expandedTender: null};
+
+function editorPreBidDates(draft) {
+  return `
+    <div class="space-y-6" id="pbdContainer">
+      <!-- Section 1: Defaults -->
+      <div>
+        <h3 class="text-[13px] font-semibold text-ink-900 mb-1">Default date windows</h3>
+        <p class="text-[11.5px] text-ink-500 mb-3">Applied to every new pre-bid flow. Officers can override per tender below.</p>
+        <div class="space-y-2" id="pbdDefaults"></div>
+      </div>
+
+      <!-- Section 2: Lock policy -->
+      <div class="pt-4 border-t border-line">
+        <h3 class="text-[13px] font-semibold text-ink-900 mb-1">Lock policy</h3>
+        <p class="text-[11.5px] text-ink-500 mb-3">What happens when dates change after a tender is published.</p>
+        <div class="space-y-2" id="pbdLockPolicy"></div>
+      </div>
+
+      <!-- Section 3: Access -->
+      <div class="pt-4 border-t border-line">
+        <h3 class="text-[13px] font-semibold text-ink-900 mb-1">Who can edit dates</h3>
+        <p class="text-[11.5px] text-ink-500 mb-3">Roles toggled on can change tender dates from the portal.</p>
+        <div class="space-y-1.5" id="pbdAccess"></div>
+      </div>
+
+      <!-- Section 4: Per-tender overrides -->
+      <div class="pt-4 border-t border-line">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-[13px] font-semibold text-ink-900">Per-tender date overrides</h3>
+          <span class="text-[11px] text-ink-500" id="pbdTenderCount"></span>
+        </div>
+        <p class="text-[11.5px] text-ink-500 mb-3">Live tender list. Click any row to expand and edit dates. Published/Closed tenders are locked per your lock policy above.</p>
+        <div class="relative mb-3">
+          <i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+          <input id="pbdSearch" class="inp w-full pl-9" placeholder="Search by tender ID or title…">
+        </div>
+        <div id="pbdStatusFilters" class="flex flex-wrap gap-1.5 mb-3"></div>
+        <div id="pbdTenderList" class="space-y-2"></div>
+      </div>
+    </div>
+  `;
+}
+
+function renderPreBidDatesAll() {
+  if (!editingDraft || typeof editingDraft !== 'object' || Array.isArray(editingDraft)) {
+    editingDraft = JSON.parse(JSON.stringify(ITEMS.find(i => i.id === 'prebid.dates').def));
+  }
+  editingDraft.defaults   = editingDraft.defaults   || {};
+  editingDraft.lockPolicy = editingDraft.lockPolicy || {};
+  editingDraft.access     = editingDraft.access     || [];
+  editingDraft.tenders    = editingDraft.tenders    || [];
+
+  // --- Section 1: Defaults ---
+  const defaultsConfig = [
+    {key:'publishToPreBidDays',            label:'Tender release → Pre-bid meeting'},
+    {key:'preBidToWindowCloseDays',        label:'Pre-bid meeting → Window close'},
+    {key:'windowCloseToResponseDueDays',   label:'Window close → Response due'},
+    {key:'notifyAdvanceDays',              label:'Notify vendors this many days before deadline'},
+  ];
+  document.getElementById('pbdDefaults').innerHTML = defaultsConfig.map(c => `
+    <div class="flex items-center gap-3 px-3 py-2 border border-line rounded-lg bg-white">
+      <div class="flex-1 text-[13px] text-ink-900">${escapeHtml(c.label)}</div>
+      <input type="number" min="0" class="inp w-20 text-right" data-pbd-default="${c.key}" value="${editingDraft.defaults[c.key] || 0}">
+      <span class="text-[12px] text-ink-500 w-12">days</span>
+    </div>
+  `).join('');
+  document.querySelectorAll('[data-pbd-default]').forEach(inp => {
+    inp.onchange = e => { editingDraft.defaults[e.target.dataset.pbdDefault] = +e.target.value; };
+  });
+
+  // --- Section 2: Lock policy ---
+  const lockConfig = [
+    {key:'lockAfterPublish',             label:'Lock dates after publish (edits require corrigendum)'},
+    {key:'autoCorrigendumOnDateChange',  label:'Auto-generate a corrigendum on any date change post-publish'},
+    {key:'notifyVendorsOnChange',        label:'Notify all bidding vendors when dates change'},
+    {key:'requireReasonForChange',       label:'Require a written reason for every date change'},
+  ];
+  document.getElementById('pbdLockPolicy').innerHTML = lockConfig.map(c => {
+    const on = !!editingDraft.lockPolicy[c.key];
+    return `
+      <div class="flex items-center gap-3 px-3 py-2 border border-line rounded-lg ${on ? 'bg-white' : 'bg-surface'}">
+        <button class="toggle ${on ? 'on' : ''}" data-pbd-lock="${c.key}" aria-pressed="${on}"><span class="dot"></span></button>
+        <div class="flex-1 text-[13px] ${on ? 'text-ink-900' : 'text-ink-500'}">${escapeHtml(c.label)}</div>
+      </div>
+    `;
+  }).join('');
+  document.querySelectorAll('[data-pbd-lock]').forEach(b => b.onclick = () => {
+    editingDraft.lockPolicy[b.dataset.pbdLock] = !editingDraft.lockPolicy[b.dataset.pbdLock];
+    renderPreBidDatesAll();
+  });
+
+  // --- Section 3: Access ---
+  editingDraft.access = editingDraft.access.map(normalizeListItem);
+  document.getElementById('pbdAccess').innerHTML = editingDraft.access.map((it, i) => `
+    <div class="flex items-center gap-3 px-3 py-2 border border-line rounded-lg ${!it.enabled ? 'bg-surface' : 'bg-white'}">
+      <button class="toggle ${it.enabled ? 'on' : ''}" data-pbd-acc="${i}" aria-pressed="${!!it.enabled}"><span class="dot"></span></button>
+      <input type="text" class="flex-1 bg-transparent text-[13px] ${!it.enabled ? 'line-through text-ink-400' : 'text-ink-900'} focus:outline-none border-0 p-0" data-pbd-acc-label="${i}" value="${escapeHtml(it.label)}" />
+    </div>
+  `).join('');
+  document.querySelectorAll('[data-pbd-acc]').forEach(b => b.onclick = () => {
+    const i = +b.dataset.pbdAcc;
+    editingDraft.access[i].enabled = !editingDraft.access[i].enabled;
+    renderPreBidDatesAll();
+  });
+  document.querySelectorAll('[data-pbd-acc-label]').forEach(inp => {
+    inp.oninput = e => { editingDraft.access[+e.target.dataset.pbdAccLabel].label = e.target.value; };
+  });
+
+  // --- Section 4: Tender list ---
+  const allStatuses = ['All','Draft','Active','Published','Closed'];
+  document.getElementById('pbdStatusFilters').innerHTML = allStatuses.map(s => `
+    <button class="text-[12px] px-3 py-1 rounded-full border ${pbdState.statusFilter===s?'bg-primary text-white border-primary':'border-line hover:bg-surface text-ink-700'}" data-pbd-status="${s}">${escapeHtml(s)}</button>
+  `).join('');
+  document.querySelectorAll('[data-pbd-status]').forEach(b => b.onclick = () => {
+    pbdState.statusFilter = b.dataset.pbdStatus;
+    renderPreBidDatesAll();
+  });
+
+  const filtered = editingDraft.tenders.filter(t => {
+    if (pbdState.statusFilter !== 'All' && t.status !== pbdState.statusFilter) return false;
+    if (pbdState.search) {
+      const q = pbdState.search.toLowerCase();
+      if (!((t.id+' '+t.title).toLowerCase().includes(q))) return false;
+    }
+    return true;
+  });
+  document.getElementById('pbdTenderCount').textContent = `${filtered.length} of ${editingDraft.tenders.length} tenders`;
+
+  const statusColor = { Draft:'#6B7280', Active:'#10B981', Published:'#0F5EE8', Closed:'#9CA3AF' };
+  const labelFor    = { publish:'Tender release', preBidMeeting:'Pre-bid meeting', windowClose:'Window close', responseDue:'Response due' };
+
+  document.getElementById('pbdTenderList').innerHTML = filtered.length === 0
+    ? `<div class="text-center py-8 text-ink-500 text-[13px]">No tenders match.</div>`
+    : filtered.map(t => {
+        const tIdx     = editingDraft.tenders.indexOf(t);
+        const expanded = pbdState.expandedTender === tIdx;
+        const locked   = (t.status === 'Published' || t.status === 'Closed') && editingDraft.lockPolicy.lockAfterPublish;
+        const c        = statusColor[t.status] || '#6B7280';
+        const dates    = t.dates || {};
+
+        const summaryGrid = `
+          <div class="grid grid-cols-4 gap-2 mt-2 text-[11.5px]">
+            ${['publish','preBidMeeting','windowClose','responseDue'].map(f => `
+              <div><span class="text-ink-500 block">${escapeHtml(labelFor[f])}</span><span class="text-ink-900">${escapeHtml(dates[f]||'—')}</span></div>
+            `).join('')}
+          </div>`;
+
+        const editGrid = `
+          <div class="mt-3 pt-3 border-t border-line space-y-2">
+            ${['publish','preBidMeeting','windowClose','responseDue'].map(f => `
+              <div class="flex items-center gap-3">
+                <div class="text-[12.5px] text-ink-500 w-36">${escapeHtml(labelFor[f])}</div>
+                <input type="date" class="inp flex-1" data-pbd-date="${tIdx}|${f}" value="${escapeHtml(dates[f]||'')}" ${locked ? 'disabled' : ''}>
+              </div>
+            `).join('')}
+            ${locked ? `<div class="text-[11.5px] text-warning bg-warning-light border border-warning/20 rounded-lg p-2.5 mt-2 flex items-start gap-2"><i data-lucide="lock" class="w-3.5 h-3.5 shrink-0 mt-0.5"></i><span>This tender is locked. Changing dates requires a corrigendum (per your lock policy above).</span></div>` : ''}
+          </div>`;
+
+        return `
+          <div class="bg-white border border-line rounded-xl p-4">
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2 mb-1 flex-wrap">
+                  <span class="font-mono text-[12px] text-ink-500">${escapeHtml(t.id)}</span>
+                  <span class="chip" style="background:${c}1a;color:${c}">${escapeHtml(t.status)}</span>
+                  ${locked ? `<span class="chip" style="background:#FEF3C7;color:#92400E"><i data-lucide="lock" class="w-3 h-3 inline -mt-0.5"></i> Locked</span>` : ''}
+                </div>
+                <div class="text-[14px] font-semibold text-ink-900">${escapeHtml(t.title)}</div>
+              </div>
+              <button class="btn" data-pbd-toggle-tender="${tIdx}">${expanded ? 'Collapse' : (locked ? 'View' : 'Edit dates')}</button>
+            </div>
+            ${expanded ? editGrid : summaryGrid}
+          </div>`;
+      }).join('');
+
+  document.querySelectorAll('[data-pbd-toggle-tender]').forEach(b => b.onclick = () => {
+    const i = +b.dataset.pbdToggleTender;
+    pbdState.expandedTender = pbdState.expandedTender === i ? null : i;
+    renderPreBidDatesAll();
+  });
+  document.querySelectorAll('[data-pbd-date]').forEach(inp => {
+    inp.onchange = e => {
+      const [iStr, field] = e.target.dataset.pbdDate.split('|');
+      const i = +iStr;
+      editingDraft.tenders[i].dates = editingDraft.tenders[i].dates || {};
+      editingDraft.tenders[i].dates[field] = e.target.value;
+    };
+  });
+
+  // Search binding (bind once)
+  const searchEl = document.getElementById('pbdSearch');
+  if (searchEl && !searchEl.dataset.bound) {
+    searchEl.dataset.bound = '1';
+    searchEl.value = pbdState.search;
+    searchEl.oninput = e => { pbdState.search = e.target.value; renderPreBidDatesAll(); };
+  }
+
+  refreshIcons();
+}
+
+/* pre-bid committee editor (designations + actions + member permission matrix) */
+function editorPreBidCommittee(draft) {
+  return `
+    <div class="space-y-6" id="pbcContainer">
+      <!-- Section 1: Designations -->
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-[13px] font-semibold text-ink-900">Designations</h3>
+          <span class="text-[11px] text-ink-500" id="pbcDesigCount"></span>
+        </div>
+        <p class="text-[11.5px] text-ink-500 mb-3">Committee titles you can assign to members. Toggle off to keep but hide; trash icon to delete.</p>
+        <div id="pbcDesignations" class="space-y-1.5"></div>
+        <div class="flex items-center gap-2 pt-3 mt-2 border-t border-line">
+          <input id="pbcNewDesig" class="inp flex-1" placeholder="Add designation and press Enter…">
+          <button class="btn btn-primary" id="pbcAddDesig"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add</button>
+        </div>
+      </div>
+
+      <!-- Section 2: Actions / permissions -->
+      <div class="pt-4 border-t border-line">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-[13px] font-semibold text-ink-900">Actions / permissions</h3>
+          <span class="text-[11px] text-ink-500" id="pbcActionCount"></span>
+        </div>
+        <p class="text-[11.5px] text-ink-500 mb-3">Actions you can grant or restrict per member below. Toggling an action off here removes its column from the matrix.</p>
+        <div id="pbcActions" class="space-y-1.5"></div>
+        <div class="flex items-center gap-2 pt-3 mt-2 border-t border-line">
+          <input id="pbcNewAction" class="inp flex-1" placeholder="Add action and press Enter…">
+          <button class="btn btn-primary" id="pbcAddAction"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add</button>
+        </div>
+      </div>
+
+      <!-- Section 3: Members matrix -->
+      <div class="pt-4 border-t border-line">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-[13px] font-semibold text-ink-900">Committee members &amp; permissions</h3>
+          <span class="text-[11px] text-ink-500" id="pbcMemberCount"></span>
+        </div>
+        <p class="text-[11.5px] text-ink-500 mb-3">Each row is a committee member. Column headers are abbreviated — hover for the full action name. Toggle a cell to grant or revoke that action.</p>
+        <div id="pbcMembersWrap" class="overflow-x-auto -mx-1 px-1"></div>
+        <button class="btn btn-primary mt-3" id="pbcAddMember"><i data-lucide="user-plus" class="w-3.5 h-3.5"></i> Add member</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderPreBidCommitteeAll() {
+  if (!editingDraft || typeof editingDraft !== 'object' || Array.isArray(editingDraft)) {
+    editingDraft = JSON.parse(JSON.stringify(ITEMS.find(i => i.id === 'prebid.committee').def));
+  }
+  editingDraft.designations = (editingDraft.designations || []).map(normalizeListItem);
+  editingDraft.actions      = (editingDraft.actions || []).map(normalizeListItem);
+  editingDraft.members      = editingDraft.members || [];
+
+  const abbr = label => {
+    if (!label) return '';
+    if (label.length <= 4) return label;
+    const words = label.split(/\s+/);
+    if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
+    return label.substring(0, 3);
+  };
+
+  // --- Section 1: Designations ---
+  const desigsEl = document.getElementById('pbcDesignations');
+  desigsEl.innerHTML = editingDraft.designations.map((d, i) => `
+    <div class="flex items-center gap-3 px-3 py-2 border border-line rounded-lg ${!d.enabled ? 'bg-surface' : 'bg-white'}">
+      <button class="toggle ${d.enabled ? 'on' : ''}" data-pbc-desig-toggle="${i}" aria-pressed="${!!d.enabled}"><span class="dot"></span></button>
+      <input type="text" class="flex-1 bg-transparent text-[13px] ${!d.enabled ? 'line-through text-ink-400' : 'text-ink-900'} focus:outline-none border-0 p-0" data-pbc-desig-label="${i}" value="${escapeHtml(d.label)}" />
+      <button data-pbc-desig-rm="${i}" class="text-ink-400 hover:text-danger transition" aria-label="Remove"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+    </div>
+  `).join('');
+  document.getElementById('pbcDesigCount').textContent = `${editingDraft.designations.filter(d=>d.enabled).length} enabled`;
+
+  desigsEl.querySelectorAll('[data-pbc-desig-toggle]').forEach(b => b.onclick = () => {
+    const i = +b.dataset.pbcDesigToggle;
+    editingDraft.designations[i].enabled = !editingDraft.designations[i].enabled;
+    renderPreBidCommitteeAll();
+  });
+  desigsEl.querySelectorAll('[data-pbc-desig-label]').forEach(inp => {
+    inp.oninput = e => { editingDraft.designations[+e.target.dataset.pbcDesigLabel].label = e.target.value; };
+  });
+  desigsEl.querySelectorAll('[data-pbc-desig-rm]').forEach(b => b.onclick = () => {
+    editingDraft.designations.splice(+b.dataset.pbcDesigRm, 1);
+    renderPreBidCommitteeAll();
+  });
+
+  const newDesigBtn = document.getElementById('pbcAddDesig');
+  const newDesigInp = document.getElementById('pbcNewDesig');
+  if (newDesigBtn && !newDesigBtn.dataset.bound) {
+    newDesigBtn.dataset.bound = '1';
+    newDesigBtn.onclick = () => {
+      const v = (newDesigInp.value || '').trim();
+      if (!v) return;
+      editingDraft.designations.push({label: v, enabled: true});
+      newDesigInp.value = '';
+      renderPreBidCommitteeAll();
+    };
+  }
+  if (newDesigInp && !newDesigInp.dataset.bound) {
+    newDesigInp.dataset.bound = '1';
+    newDesigInp.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); newDesigBtn.click(); } };
+  }
+
+  // --- Section 2: Actions ---
+  const actionsEl = document.getElementById('pbcActions');
+  actionsEl.innerHTML = editingDraft.actions.map((a, i) => `
+    <div class="flex items-center gap-3 px-3 py-2 border border-line rounded-lg ${!a.enabled ? 'bg-surface' : 'bg-white'}">
+      <button class="toggle ${a.enabled ? 'on' : ''}" data-pbc-action-toggle="${i}" aria-pressed="${!!a.enabled}"><span class="dot"></span></button>
+      <input type="text" class="flex-1 bg-transparent text-[13px] ${!a.enabled ? 'line-through text-ink-400' : 'text-ink-900'} focus:outline-none border-0 p-0" data-pbc-action-label="${i}" value="${escapeHtml(a.label)}" />
+      <button data-pbc-action-rm="${i}" class="text-ink-400 hover:text-danger transition" aria-label="Remove"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+    </div>
+  `).join('');
+  document.getElementById('pbcActionCount').textContent = `${editingDraft.actions.filter(a=>a.enabled).length} enabled`;
+
+  actionsEl.querySelectorAll('[data-pbc-action-toggle]').forEach(b => b.onclick = () => {
+    const i = +b.dataset.pbcActionToggle;
+    editingDraft.actions[i].enabled = !editingDraft.actions[i].enabled;
+    renderPreBidCommitteeAll();
+  });
+  actionsEl.querySelectorAll('[data-pbc-action-label]').forEach(inp => {
+    inp.oninput = e => { editingDraft.actions[+e.target.dataset.pbcActionLabel].label = e.target.value; };
+  });
+  actionsEl.querySelectorAll('[data-pbc-action-rm]').forEach(b => b.onclick = () => {
+    editingDraft.actions.splice(+b.dataset.pbcActionRm, 1);
+    renderPreBidCommitteeAll();
+  });
+
+  const newActionBtn = document.getElementById('pbcAddAction');
+  const newActionInp = document.getElementById('pbcNewAction');
+  if (newActionBtn && !newActionBtn.dataset.bound) {
+    newActionBtn.dataset.bound = '1';
+    newActionBtn.onclick = () => {
+      const v = (newActionInp.value || '').trim();
+      if (!v) return;
+      editingDraft.actions.push({label: v, enabled: true});
+      newActionInp.value = '';
+      renderPreBidCommitteeAll();
+    };
+  }
+  if (newActionInp && !newActionInp.dataset.bound) {
+    newActionInp.dataset.bound = '1';
+    newActionInp.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); newActionBtn.click(); } };
+  }
+
+  // --- Section 3: Members matrix ---
+  const enabledActions = editingDraft.actions.filter(a => a.enabled);
+  const enabledDesigs  = editingDraft.designations.filter(d => d.enabled);
+  const store = loadStore();
+  const officerDir = store['officers.directory'] || (ITEMS.find(i => i.id === 'officers.directory') || {def:[]}).def;
+  const allOfficers = (officerDir || []).map(o => o.name || o.label || '').filter(Boolean);
+
+  document.getElementById('pbcMemberCount').textContent = `${editingDraft.members.length} member${editingDraft.members.length!==1?'s':''}`;
+
+  const tableHtml = editingDraft.members.length === 0
+    ? `<div class="text-center py-8 text-ink-500 text-[13px] border border-dashed border-line rounded-xl">No members yet. Click "Add member" below to start building the committee.</div>`
+    : `<table class="text-[12.5px]" style="min-width:100%;border-collapse:collapse">
+        <thead>
+          <tr class="border-b border-line">
+            <th class="text-left p-2 font-semibold text-ink-500 whitespace-nowrap" style="min-width:160px">Officer</th>
+            <th class="text-left p-2 font-semibold text-ink-500 whitespace-nowrap" style="min-width:140px">Designation</th>
+            ${enabledActions.map(a => `<th class="text-center p-2 font-semibold text-ink-500" style="min-width:54px"><span title="${escapeHtml(a.label)}" class="cursor-help">${escapeHtml(abbr(a.label))}</span></th>`).join('')}
+            <th class="w-8"></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${editingDraft.members.map((m, i) => `
+            <tr class="border-b border-line">
+              <td class="p-2">
+                <select class="inp w-full" data-pbc-mem-officer="${i}">
+                  ${allOfficers.map(name => `<option ${name === m.officer ? 'selected' : ''}>${escapeHtml(name)}</option>`).join('')}
+                  ${(!allOfficers.includes(m.officer) && m.officer) ? `<option selected>${escapeHtml(m.officer)}</option>` : ''}
+                </select>
+              </td>
+              <td class="p-2">
+                <select class="inp w-full" data-pbc-mem-desig="${i}">
+                  ${enabledDesigs.map(d => `<option ${d.label === m.designation ? 'selected' : ''}>${escapeHtml(d.label)}</option>`).join('')}
+                  ${(m.designation && !enabledDesigs.find(d => d.label === m.designation)) ? `<option selected>${escapeHtml(m.designation)}</option>` : ''}
+                </select>
+              </td>
+              ${enabledActions.map(a => {
+                const granted = !!(m.permissions && m.permissions[a.label]);
+                return `<td class="p-2 text-center">
+                  <button class="toggle ${granted ? 'on' : ''}" data-pbc-perm="${i}|${escapeHtml(a.label)}" aria-pressed="${granted}" title="${escapeHtml(a.label)}"><span class="dot"></span></button>
+                </td>`;
+              }).join('')}
+              <td class="p-2 text-center">
+                <button data-pbc-mem-rm="${i}" class="text-ink-400 hover:text-danger" aria-label="Remove"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>`;
+
+  const memWrap = document.getElementById('pbcMembersWrap');
+  memWrap.innerHTML = tableHtml;
+
+  memWrap.querySelectorAll('[data-pbc-mem-officer]').forEach(sel => {
+    sel.onchange = e => { editingDraft.members[+e.target.dataset.pbcMemOfficer].officer = e.target.value; };
+  });
+  memWrap.querySelectorAll('[data-pbc-mem-desig]').forEach(sel => {
+    sel.onchange = e => { editingDraft.members[+e.target.dataset.pbcMemDesig].designation = e.target.value; };
+  });
+  memWrap.querySelectorAll('[data-pbc-perm]').forEach(b => b.onclick = () => {
+    const [iStr, actionLabel] = b.dataset.pbcPerm.split('|');
+    const i = +iStr;
+    if (!editingDraft.members[i].permissions) editingDraft.members[i].permissions = {};
+    editingDraft.members[i].permissions[actionLabel] = !editingDraft.members[i].permissions[actionLabel];
+    renderPreBidCommitteeAll();
+  });
+  memWrap.querySelectorAll('[data-pbc-mem-rm]').forEach(b => b.onclick = () => {
+    editingDraft.members.splice(+b.dataset.pbcMemRm, 1);
+    renderPreBidCommitteeAll();
+  });
+
+  const addMemBtn = document.getElementById('pbcAddMember');
+  if (addMemBtn && !addMemBtn.dataset.bound) {
+    addMemBtn.dataset.bound = '1';
+    addMemBtn.onclick = () => {
+      const defaultOfficer = allOfficers[0] || '';
+      const defaultDesig = enabledDesigs[0] ? enabledDesigs[0].label : '';
+      const permissions = {};
+      enabledActions.forEach(a => permissions[a.label] = false);
+      editingDraft.members.push({officer: defaultOfficer, designation: defaultDesig, permissions});
+      renderPreBidCommitteeAll();
+    };
+  }
+
+  refreshIcons();
+}
+
 /* =========================================================
    ACTIVITY FEED
    ========================================================= */
@@ -1547,6 +2556,490 @@ function timeAgo(ts){
   if (s<3600) return Math.floor(s/60)+'m ago';
   if (s<86400) return Math.floor(s/3600)+'h ago';
   return Math.floor(s/86400)+'d ago';
+}
+
+/* =========================================================
+   DOCUMENT FORM BUILDER  (schema item: templates.docbuilder)
+   Custom full-section view — does NOT use the 720px edit panel.
+   ========================================================= */
+
+// --- Mocked AI knowledge base (keyword-driven; swap mockSuggest for a real call later) ---
+const DOC_KNOWLEDGE = {
+  'site-inspection': {
+    keywords:['site','inspection','visit','field','survey','walkthrough','progress'],
+    label:'Site inspection',
+    fields:[
+      {label:'Site / Project name', type:'text', required:true},
+      {label:'Date of visit', type:'date', required:true},
+      {label:'Time of visit', type:'time'},
+      {label:'GPS coordinates', type:'text', helpText:'Latitude, Longitude'},
+      {label:'Inspecting officer', type:'dropdown', source:'officers.directory'},
+      {label:'Photographs (min 6)', type:'file', required:true},
+      {label:'Key measurements', type:'textarea'},
+      {label:'Observations', type:'textarea', required:true},
+      {label:'Anomalies / issues', type:'textarea'},
+      {label:'Action items', type:'textarea'},
+      {label:'Officer signature', type:'signature', required:true},
+    ]
+  },
+  'completion-certificate': {
+    keywords:['completion','complete','closure','handover','close-out','final'],
+    label:'Completion certificate',
+    fields:[
+      {label:'Project / Tender ID', type:'text', required:true},
+      {label:'Vendor', type:'dropdown', source:'vendors.registry'},
+      {label:'Original completion date', type:'date'},
+      {label:'Actual completion date', type:'date', required:true},
+      {label:'Delay in days', type:'number'},
+      {label:'Reason for delay', type:'textarea'},
+      {label:'Awarded value', type:'currency'},
+      {label:'Actual cost', type:'currency', required:true},
+      {label:'Cost variance %', type:'percent'},
+      {label:'Quality status', type:'dropdown', options:['Satisfactory','Above expectations','Below expectations']},
+      {label:'Defects identified', type:'textarea'},
+      {label:'Defect liability period (months)', type:'number', defaultValue:12},
+      {label:'Performance security release', type:'toggle'},
+      {label:'Final payment recommendation', type:'dropdown', options:['Recommend','Hold','Do not recommend']},
+      {label:'Signing authority', type:'dropdown', source:'officers.directory'},
+      {label:'Authority signature', type:'signature', required:true},
+    ]
+  },
+  'mom': {
+    keywords:['mom','minutes','meeting','discussion','pre-bid meeting','review meeting'],
+    label:'Minutes of Meeting',
+    fields:[
+      {label:'Meeting type', type:'dropdown', options:['Pre-bid','Review','Negotiation','Coordination','Other']},
+      {label:'Date & time', type:'datetime'},
+      {label:'Venue', type:'text'},
+      {label:'Chairperson', type:'dropdown', source:'officers.directory'},
+      {label:'AMC attendees', type:'multiselect', source:'officers.directory'},
+      {label:'External attendees', type:'textarea'},
+      {label:'Agenda', type:'textarea', required:true},
+      {label:'Discussion summary', type:'textarea', required:true},
+      {label:'Decisions taken', type:'textarea'},
+      {label:'Action items', type:'table', columns:['Action','Owner','Deadline']},
+      {label:'Next meeting date', type:'date'},
+    ]
+  },
+  'work-order': {
+    keywords:['work order','wo','assignment','task order','release order'],
+    label:'Work order',
+    fields:[
+      {label:'Work Order number', type:'text', required:true},
+      {label:'Tender reference', type:'text'},
+      {label:'Vendor', type:'dropdown', source:'vendors.registry'},
+      {label:'Scope of work', type:'textarea', required:true},
+      {label:'BOQ items', type:'table', columns:['Item','Quantity','Unit','Rate','Amount']},
+      {label:'Total value', type:'currency', required:true},
+      {label:'Performance security %', type:'percent', defaultValue:5},
+      {label:'Commencement date', type:'date'},
+      {label:'Completion date', type:'date'},
+      {label:'Penalty clause', type:'textarea'},
+      {label:'Signing authority', type:'dropdown', source:'officers.directory'},
+    ]
+  },
+  'budget-revision': {
+    keywords:['budget','revision','revised','additional fund','supplementary','overrun'],
+    label:'Budget revision',
+    fields:[
+      {label:'Original tender / DPR ID', type:'text', required:true},
+      {label:'Original budget', type:'currency'},
+      {label:'Revised budget', type:'currency', required:true},
+      {label:'Variance amount', type:'currency'},
+      {label:'Variance %', type:'percent'},
+      {label:'Reason category', type:'dropdown', options:['Scope change','Material price rise','Quantity variation','Site conditions','Statutory change','Other']},
+      {label:'Detailed justification', type:'textarea', required:true},
+      {label:'Supporting documents', type:'file'},
+      {label:'Approving authority required', type:'dropdown', source:'tiers.def'},
+      {label:'CVC notification required', type:'toggle'},
+    ]
+  },
+  'noc': {
+    keywords:['noc','no objection','clearance','permit','permission'],
+    label:'No Objection Certificate',
+    fields:[
+      {label:'NOC type', type:'dropdown', options:['Environmental','Fire','Traffic','Heritage','Utility','Other']},
+      {label:'Issuing department', type:'text'},
+      {label:'Subject', type:'text', required:true},
+      {label:'Conditions / limitations', type:'textarea'},
+      {label:'Valid from', type:'date'},
+      {label:'Valid until', type:'date'},
+      {label:'Signing authority', type:'dropdown', source:'officers.directory'},
+      {label:'Signature', type:'signature'},
+    ]
+  },
+  'quality-audit': {
+    keywords:['quality','audit','qa','qc','testing','verify','third party'],
+    label:'Quality audit report',
+    fields:[
+      {label:'Audit date', type:'date', required:true},
+      {label:'Auditor', type:'text'},
+      {label:'Project / Tender', type:'text'},
+      {label:'Parameters checked', type:'checklist'},
+      {label:'Observations', type:'textarea', required:true},
+      {label:'Rating', type:'dropdown', options:['Pass','Conditional pass','Fail']},
+      {label:'Corrective actions required', type:'textarea'},
+      {label:'Deadline for compliance', type:'date'},
+      {label:'Auditor signature', type:'signature', required:true},
+    ]
+  },
+};
+
+const GENERIC_FIELDS = [
+  {label:'Document title', type:'text', required:true},
+  {label:'Reference number', type:'text'},
+  {label:'Date', type:'date', required:true},
+  {label:'Prepared by', type:'dropdown', source:'officers.directory'},
+  {label:'Department', type:'text'},
+  {label:'Subject / Purpose', type:'textarea'},
+  {label:'Content / details', type:'textarea', required:true},
+  {label:'Attachments', type:'file'},
+  {label:'Signing authority', type:'dropdown', source:'officers.directory'},
+  {label:'Signature', type:'signature'},
+];
+
+// Signature identical to spec: (description, opts) -> array of field objects.
+// opts.exclude = labels to skip; opts.expand = broaden the pool (used by "Ask for more").
+function mockSuggest(description, opts){
+  const desc = (description||'').toLowerCase();
+  const matches = [];
+  for (const [key, doc] of Object.entries(DOC_KNOWLEDGE)) {
+    // whole-word / phrase match so short keys (e.g. 'wo') don't match inside 'works'
+    const hits = doc.keywords.reduce((n,k) => {
+      const re = new RegExp('\\b'+k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','i');
+      return n + (re.test(desc) ? 1 : 0);
+    }, 0);
+    if (hits > 0) matches.push({key, hits, doc});
+  }
+  matches.sort((a,b) => b.hits - a.hits);
+  let pool = matches.length ? matches.flatMap(m => m.doc.fields) : GENERIC_FIELDS.slice();
+  if (opts && opts.expand) {
+    // broaden: pull in generic fields and any other known fields for distinct extras
+    pool = pool.concat(GENERIC_FIELDS).concat(Object.values(DOC_KNOWLEDGE).flatMap(d => d.fields));
+  }
+  const seen = new Set((opts && opts.exclude) || []);
+  pool = pool.filter(f => {
+    if (seen.has(f.label)) return false;
+    seen.add(f.label);
+    return true;
+  });
+  return pool.map(f => ({...f, aiGenerated:true}));
+}
+
+// --- Builder state (module-scoped; inline handlers call functions, never these vars directly) ---
+let dbEditing = null;        // working copy of the document being built/edited
+let dbSuggestions = [];      // current AI suggestion checklist
+let dbExpandedField = null;  // field id whose inline detail editor is open
+let dbAiText = '';           // AI assist textarea contents
+const DB_FIELD_TYPES = ['text','textarea','number','currency','percent','date','time','datetime','toggle','dropdown','multiselect','checklist','file','signature','seal','table','section','richtext'];
+const DB_SOURCE_KEYS = ['officers.directory','officers.depts','vendors.registry','tiers.def','sig.fonts','sig.logos'];
+
+function dbUid(p){ return p+'_'+Date.now().toString(36)+Math.floor(Math.random()*46656).toString(36); }
+function dbDocs(){ const v = getValue('templates.docbuilder'); return Array.isArray(v) ? v : []; }
+function dbField(id){ return (dbEditing && dbEditing.fields || []).find(f=>f.id===id); }
+function dbSectorsList(){ const v = getValue('officers.depts'); return Array.isArray(v) ? v : []; }
+function dbSourceExists(key){ return ITEMS.some(i=>i.id===key); }
+function dbSourceValues(key){
+  const v = getValue(key);
+  if (!Array.isArray(v)) return [];
+  return v.map(x => typeof x==='string' ? x : (x.name||x.vendor||x.label||x.auth||x.doc||x.font||x.title||JSON.stringify(x))).slice(0,20);
+}
+function dbStatusBadge(s){
+  const map = {Draft:'background:#F9FAFB;color:#6B7280;border:1px solid #E5E7EB', Active:'background:#F0FDF4;color:#10B981', Archived:'background:#F3F4F6;color:#9CA3AF'};
+  return `<span class="chip" style="${map[s]||map.Draft}">${escapeHtml(s||'Draft')}</span>`;
+}
+function dbWhyField(s){ return (s.required?'Often mandatory. ':'')+'Suggested “'+s.type+'” field for this kind of document.'+(s.source?' Bound to '+s.source+'.':''); }
+
+/* ---------- entry + library view ---------- */
+function openDocBuilder(){ dbEditing=null; dbSuggestions=[]; dbExpandedField=null; dbAiText=''; dbRenderLibrary(); }
+function dbBackToLibrary(){ dbEditing=null; dbSuggestions=[]; dbExpandedField=null; dbRenderLibrary(); }
+
+function dbRenderLibrary(){
+  const docs = dbDocs();
+  const cards = docs.length ? docs.map(dbDocCard).join('') : dbEmptyState();
+  document.getElementById('content').innerHTML = `
+    <div class="text-[13px] text-ink-500 mb-2"><a href="#templates" onclick="renderSection('templates');return false;" class="hover:underline">← Back to Document Templates</a></div>
+    <div class="flex items-start justify-between gap-4 flex-wrap">
+      <div>
+        <h1 class="text-[24px] font-bold text-ink-900 leading-tight flex items-center gap-2.5"><span class="w-9 h-9 rounded-lg bg-purple-light text-purple flex items-center justify-center"><i data-lucide="file-plus-2" class="w-5 h-5"></i></span> Custom document templates</h1>
+        <p class="text-[14px] text-ink-500 mt-2 max-w-2xl">Define any government document as a reusable template — site inspections, completion certificates, MoM, work orders, NOCs and more. Describe the document and let AI suggest the fields, then refine.</p>
+      </div>
+      <button class="btn btn-primary" onclick="dbNewDoc()"><i data-lucide="plus" class="w-4 h-4"></i> Create new document</button>
+    </div>
+    <div class="${docs.length?'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4':''}">${cards}</div>
+  `;
+  refreshIcons();
+}
+function dbEmptyState(){
+  return `<div class="bg-white border border-dashed border-line rounded-xl p-10 text-center">
+    <div class="w-12 h-12 rounded-xl bg-purple-light text-purple flex items-center justify-center mx-auto mb-3"><i data-lucide="file-plus-2" class="w-6 h-6"></i></div>
+    <div class="text-[15px] font-semibold text-ink-900">No custom documents yet</div>
+    <p class="text-[13px] text-ink-500 mt-1 max-w-md mx-auto">Create your first template — describe the document and AI will suggest the fields. You can always edit it later.</p>
+    <button class="btn btn-primary mt-4" style="margin-left:auto;margin-right:auto" onclick="dbNewDoc()"><i data-lucide="plus" class="w-4 h-4"></i> Create new document</button>
+  </div>`;
+}
+function dbDocCard(d){
+  const tags = (d.sectors||[]).map(s=>`<span class="chip-input" style="padding:2px 8px;font-size:11px">${escapeHtml(s)}</span>`).join(' ');
+  const fcount = (d.fields||[]).length;
+  return `
+  <div class="bg-white border border-line rounded-xl p-4 flex flex-col gap-3" style="box-shadow:0 1px 3px rgba(0,0,0,0.08)">
+    <div class="flex items-start justify-between gap-2">
+      <div class="min-w-0">
+        <div class="text-[14px] font-semibold text-ink-900 truncate">${escapeHtml(d.name||'Untitled document')}</div>
+        <div class="text-[12px] text-ink-500 mt-0.5">${escapeHtml(d.description||'')}</div>
+      </div>
+      ${dbStatusBadge(d.status)}
+    </div>
+    ${tags?`<div class="flex flex-wrap gap-1.5">${tags}</div>`:''}
+    <div class="text-[12px] text-ink-400 flex items-center gap-3">
+      <span class="inline-flex items-center gap-1"><i data-lucide="list" class="w-3.5 h-3.5"></i> ${fcount} field${fcount===1?'':'s'}</span>
+      <span class="inline-flex items-center gap-1"><i data-lucide="clock" class="w-3.5 h-3.5"></i> ${d.updatedAt?timeAgo(d.updatedAt):'—'}</span>
+    </div>
+    <div class="flex items-center gap-2 pt-2 border-t border-line">
+      <button class="btn" onclick="dbEditDoc('${d.id}')"><i data-lucide="pencil" class="w-3.5 h-3.5"></i> Edit</button>
+      <button class="btn" onclick="dbCloneDoc('${d.id}')"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Clone</button>
+      <button class="btn" onclick="dbArchiveDoc('${d.id}')"><i data-lucide="${d.status==='Archived'?'archive-restore':'archive'}" class="w-3.5 h-3.5"></i> ${d.status==='Archived'?'Restore':'Archive'}</button>
+    </div>
+  </div>`;
+}
+
+/* ---------- create / edit / clone / archive ---------- */
+function dbNewDoc(){ dbEditing = {id:dbUid('doc'), name:'', description:'', sectors:[], status:'Draft', createdAt:Date.now(), updatedAt:Date.now(), fields:[]}; dbSuggestions=[]; dbExpandedField=null; dbAiText=''; dbRenderBuilder(); }
+function dbEditDoc(id){ const d = dbDocs().find(x=>x.id===id); if(!d){ toast('Document not found'); return; } dbEditing = JSON.parse(JSON.stringify(d)); if(!Array.isArray(dbEditing.fields)) dbEditing.fields=[]; dbSuggestions=[]; dbExpandedField=null; dbAiText = dbEditing.description||''; dbRenderBuilder(); }
+function dbCloneDoc(id){ const d = dbDocs().find(x=>x.id===id); if(!d) return; const c = JSON.parse(JSON.stringify(d)); c.id=dbUid('doc'); c.name=(d.name||'Untitled')+' (copy)'; c.status='Draft'; c.createdAt=Date.now(); c.updatedAt=Date.now(); c.fields=(c.fields||[]).map(f=>({...f,id:dbUid('f')})); const arr=dbDocs(); arr.push(c); setValue('templates.docbuilder', arr); toast('Document cloned'); dbRenderLibrary(); }
+function dbArchiveDoc(id){ const arr=dbDocs(); const d=arr.find(x=>x.id===id); if(!d) return; d.status = d.status==='Archived'?'Draft':'Archived'; d.updatedAt=Date.now(); setValue('templates.docbuilder', arr); toast(d.status==='Archived'?'Document archived':'Document restored'); dbRenderLibrary(); }
+
+/* ---------- builder view ---------- */
+function dbRenderBuilder(){
+  const d = dbEditing;
+  document.getElementById('content').innerHTML = `
+    <div class="text-[13px] text-ink-500 mb-2"><a href="#" onclick="dbBackToLibrary();return false;" class="hover:underline">← Back to documents</a></div>
+    <div class="flex gap-6 items-start">
+      <div class="w-[420px] shrink-0 space-y-4 sticky top-2">${dbLeftColumn(d)}</div>
+      <div class="flex-1 min-w-0">${dbRightColumn(d)}</div>
+    </div>
+    ${dbFooter(d)}
+  `;
+  refreshIcons();
+}
+function dbLeftColumn(d){
+  const sectors = dbSectorsList();
+  return `
+  <div class="bg-white border border-line rounded-xl p-4 space-y-3">
+    <div class="text-[13px] font-semibold text-ink-900">Document details</div>
+    <label class="block"><span class="text-[12px] text-ink-500">Name</span>
+      <input id="dbName" class="inp w-full mt-1" value="${escapeHtml(d.name||'')}" placeholder="e.g. Site Inspection Report"></label>
+    <label class="block"><span class="text-[12px] text-ink-500">Description</span>
+      <textarea id="dbDesc" class="inp w-full mt-1" rows="3" placeholder="What is this document for? This also feeds the AI.">${escapeHtml(d.description||'')}</textarea></label>
+    <div><span class="text-[12px] text-ink-500">Sector tags</span>
+      <div class="flex flex-wrap gap-1.5 mt-1.5">
+        ${sectors.length?sectors.map((s,i)=>{const on=(d.sectors||[]).includes(s);return `<button type="button" onclick="dbToggleSector(${i})" class="chip-input" style="cursor:pointer;${on?'background:#EFF6FF;border-color:#93C5FD;color:#0F5EE8':''}">${escapeHtml(s)}</button>`;}).join(''):'<span class="text-[12px] text-ink-400">No sectors defined in Officers &amp; departments</span>'}
+      </div></div>
+    <label class="block"><span class="text-[12px] text-ink-500">Status</span>
+      <select id="dbStatus" class="inp w-full mt-1">${['Draft','Active','Archived'].map(s=>`<option ${d.status===s?'selected':''}>${s}</option>`).join('')}</select></label>
+  </div>
+  <div class="rounded-xl p-4 space-y-3" style="background:#EEEDFE;border:1px solid #DDD9FB">
+    <div class="flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-purple"></i><span class="text-[13px] font-semibold" style="color:#5B21B6">AI suggestions</span></div>
+    <textarea id="dbAiText" class="inp w-full" rows="3" placeholder="Describe the document so AI can suggest fields…">${escapeHtml(dbAiText)}</textarea>
+    <div class="flex items-center gap-2">
+      <button class="btn btn-primary" style="background:#8B5CF6;border-color:#8B5CF6" onclick="dbSuggest()"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Suggest fields</button>
+      ${dbSuggestions.length?`<button class="btn" onclick="dbSuggestMore()"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Ask for more</button>`:''}
+    </div>
+    ${dbSuggestionsHtml()}
+    <p class="text-[11px]" style="color:#7C6FD6">AI suggestions are starting points. Always review for compliance.</p>
+  </div>`;
+}
+function dbSuggestionsHtml(){
+  if(!dbSuggestions.length) return '';
+  return `
+  <div class="space-y-1 bg-white rounded-lg p-2 border border-line" style="max-height:320px;overflow-y:auto">
+    ${dbSuggestions.map((s,i)=>`
+      <label class="flex items-start gap-2 p-1.5 rounded-md hover:bg-surface cursor-pointer">
+        <input type="checkbox" class="mt-0.5" style="accent-color:#8B5CF6" ${s._checked?'checked':''} onchange="dbToggleSuggestion(${i},this.checked)">
+        <span class="flex-1 min-w-0">
+          <span class="flex items-center gap-1.5 flex-wrap">
+            ${s.aiGenerated?'<span style="display:inline-block;width:6px;height:6px;border-radius:9999px;background:#8B5CF6" title="AI-generated"></span>':''}
+            <span class="text-[12.5px] text-ink-900">${escapeHtml(s.label)}</span>
+            <span class="chip-input" style="padding:0 6px;font-size:10px">${escapeHtml(s.type)}</span>
+          </span>
+          ${s.source?`<span class="text-[10.5px] text-purple">↗ ${escapeHtml(s.source)}</span>`:''}
+        </span>
+        <span title="${escapeHtml(dbWhyField(s))}"><i data-lucide="info" class="w-3.5 h-3.5 text-ink-400"></i></span>
+      </label>`).join('')}
+    <button class="btn btn-primary w-full mt-1" onclick="dbAddSelected()"><i data-lucide="check" class="w-3.5 h-3.5"></i> Add selected</button>
+  </div>`;
+}
+function dbRightColumn(d){
+  const n = (d.fields||[]).length;
+  return `
+  <div class="bg-white border border-line rounded-xl p-4">
+    <div class="flex items-center justify-between mb-3">
+      <div class="text-[14px] font-semibold text-ink-900">Fields (${n})</div>
+      <button class="btn btn-primary" onclick="dbAddField()"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add field</button>
+    </div>
+    ${n?`<div class="space-y-2">${d.fields.map((f,i)=>dbFieldRow(f,i,n)).join('')}</div>`:`<div class="text-[13px] text-ink-400 text-center py-8 border border-dashed border-line rounded-lg">No fields yet. Use “Suggest fields” or “Add field”.</div>`}
+  </div>`;
+}
+function dbReorder(id,i,total){
+  return `<span class="flex flex-col items-center text-ink-400 shrink-0" title="Reorder">
+    <button onclick="dbMoveField('${id}',-1)" ${i===0?'disabled style="opacity:.25"':'class="hover:text-ink-900"'}><i data-lucide="chevron-up" class="w-3.5 h-3.5"></i></button>
+    <button onclick="dbMoveField('${id}',1)" ${i===total-1?'disabled style="opacity:.25"':'class="hover:text-ink-900"'}><i data-lucide="chevron-down" class="w-3.5 h-3.5"></i></button>
+  </span>`;
+}
+function dbFieldRow(f,i,total){
+  if(f.type==='section'){
+    return `<div class="flex items-center gap-2 py-1" data-fid="${f.id}">
+      ${dbReorder(f.id,i,total)}
+      <span class="h-px flex-1 bg-line"></span>
+      <input id="dbflabel_${f.id}" class="inp text-[12px] font-semibold text-center" style="min-width:160px" value="${escapeHtml(f.label||'')}" placeholder="Section heading">
+      <select class="inp text-[12px]" onchange="dbSetFieldType('${f.id}',this.value)">${DB_FIELD_TYPES.map(t=>`<option ${f.type===t?'selected':''}>${t}</option>`).join('')}</select>
+      <span class="h-px flex-1 bg-line"></span>
+      <button class="btn btn-danger" style="padding:4px 8px" onclick="dbDeleteField('${f.id}')" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+    </div>`;
+  }
+  const expanded = dbExpandedField===f.id;
+  return `<div class="border border-line rounded-lg" data-fid="${f.id}">
+    <div class="flex items-center gap-2 p-2">
+      ${dbReorder(f.id,i,total)}
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-1.5">
+          ${f.aiGenerated?'<i data-lucide="sparkles" class="w-3.5 h-3.5 text-purple shrink-0" title="AI-generated"></i>':''}
+          <input id="dbflabel_${f.id}" class="inp flex-1 text-[13px]" value="${escapeHtml(f.label||'')}" placeholder="Field label">
+        </div>
+        ${f.source?`<div class="text-[10.5px] text-purple mt-0.5 ml-0.5">↗ ${escapeHtml(f.source)}</div>`:''}
+      </div>
+      <select class="inp text-[12px]" onchange="dbSetFieldType('${f.id}',this.value)">${DB_FIELD_TYPES.map(t=>`<option ${f.type===t?'selected':''}>${t}</option>`).join('')}</select>
+      <button class="toggle ${f.required?'on':''}" title="Required" onclick="dbToggleRequired('${f.id}')"><span class="dot"></span></button>
+      <button class="btn" style="padding:4px 8px" onclick="dbExpandField('${f.id}')" title="Edit details"><i data-lucide="${expanded?'chevron-up':'sliders-horizontal'}" class="w-3.5 h-3.5"></i></button>
+      <button class="btn" style="padding:4px 8px" onclick="dbDuplicateField('${f.id}')" title="Duplicate"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
+      <button class="btn btn-danger" style="padding:4px 8px" onclick="dbDeleteField('${f.id}')" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+    </div>
+    ${expanded?dbFieldDetail(f):''}
+  </div>`;
+}
+function dbFieldDetail(f){
+  const optTypes = ['dropdown','multiselect','checklist'];
+  let extra = '';
+  if(optTypes.includes(f.type)){
+    extra += `<div>
+      <div class="text-[12px] text-ink-500 mb-1">Source binding</div>
+      <select class="inp w-full" onchange="dbSetSource('${f.id}',this.value)">
+        <option value="">— None (use custom options) —</option>
+        ${DB_SOURCE_KEYS.map(k=>`<option ${f.source===k?'selected':''}>${k}</option>`).join('')}
+      </select>
+      ${f.source?`<div class="text-[11px] text-purple mt-1">↗ Populated from ${escapeHtml(f.source)}${dbSourceExists(f.source)?'':' (not defined yet)'}</div>`:dbOptionsEditor(f)}
+    </div>`;
+  }
+  if(f.type==='table'){ extra += dbColumnsEditor(f); }
+  if(['number','currency','percent'].includes(f.type)){
+    extra += `<div class="flex gap-2">
+      <label class="flex-1"><span class="text-[12px] text-ink-500">Min</span><input id="dbfmin_${f.id}" class="inp w-full mt-1" type="number" value="${f.min!=null?f.min:''}" onchange="dbSetFieldNum('${f.id}','min',this.value)"></label>
+      <label class="flex-1"><span class="text-[12px] text-ink-500">Max</span><input id="dbfmax_${f.id}" class="inp w-full mt-1" type="number" value="${f.max!=null?f.max:''}" onchange="dbSetFieldNum('${f.id}','max',this.value)"></label>
+    </div>`;
+  }
+  return `<div class="border-t border-line p-3 space-y-3 bg-surface">
+    <label class="block"><span class="text-[12px] text-ink-500">Help text</span><input id="dbfhelp_${f.id}" class="inp w-full mt-1" value="${escapeHtml(f.helpText||'')}" onchange="dbSetFieldProp('${f.id}','helpText',this.value)"></label>
+    <label class="block"><span class="text-[12px] text-ink-500">Default value</span><input id="dbfdefault_${f.id}" class="inp w-full mt-1" value="${escapeHtml(f.defaultValue!=null?String(f.defaultValue):'')}" onchange="dbSetFieldProp('${f.id}','defaultValue',this.value)"></label>
+    ${extra}
+    <div><div class="text-[12px] text-ink-500 mb-1">Preview</div>${dbFieldPreview(f)}</div>
+  </div>`;
+}
+function dbOptionsEditor(f){
+  const opts = f.options||[];
+  return `<div class="mt-2">
+    <div class="text-[12px] text-ink-500 mb-1">Options</div>
+    <div class="flex flex-wrap gap-1.5 mb-1.5">${opts.length?opts.map((o,i)=>`<span class="chip-input">${escapeHtml(o)} <button onclick="dbRemoveOption('${f.id}',${i})">✕</button></span>`).join(''):'<span class="text-[11px] text-ink-400">No options</span>'}</div>
+    <div class="flex gap-2"><input class="inp flex-1" placeholder="Add option…" onkeydown="if(event.key==='Enter'){event.preventDefault();dbAddOption('${f.id}',this.value);}"><button class="btn" onclick="dbAddOption('${f.id}',this.previousElementSibling.value)">Add</button></div>
+  </div>`;
+}
+function dbColumnsEditor(f){
+  const cols = f.columns||[];
+  return `<div>
+    <div class="text-[12px] text-ink-500 mb-1">Table columns</div>
+    <div class="flex flex-wrap gap-1.5 mb-1.5">${cols.length?cols.map((c,i)=>`<span class="chip-input">${escapeHtml(c)} <button onclick="dbRemoveColumn('${f.id}',${i})">✕</button></span>`).join(''):'<span class="text-[11px] text-ink-400">No columns</span>'}</div>
+    <div class="flex gap-2"><input class="inp flex-1" placeholder="Add column…" onkeydown="if(event.key==='Enter'){event.preventDefault();dbAddColumn('${f.id}',this.value);}"><button class="btn" onclick="dbAddColumn('${f.id}',this.previousElementSibling.value)">Add</button></div>
+  </div>`;
+}
+function dbFieldPreview(f){
+  const lbl = escapeHtml(f.label||'Field');
+  switch(f.type){
+    case 'textarea': case 'richtext': return `<textarea class="inp w-full" rows="2" disabled placeholder="${lbl}"></textarea>`;
+    case 'number': return `<input class="inp w-full" disabled type="number" placeholder="0">`;
+    case 'currency': return `<input class="inp w-full" disabled value="₹ 0">`;
+    case 'percent': return `<input class="inp w-full" disabled value="0 %">`;
+    case 'date': return `<input class="inp" disabled type="date">`;
+    case 'time': return `<input class="inp" disabled type="time">`;
+    case 'datetime': return `<input class="inp" disabled type="datetime-local">`;
+    case 'toggle': return `<span class="toggle"><span class="dot"></span></span>`;
+    case 'dropdown': case 'multiselect': { const src = f.source?dbSourceValues(f.source):(f.options||[]); const opts = (src.length?src:['Option 1','Option 2']).slice(0,6); return `<select class="inp w-full" disabled ${f.type==='multiselect'?'multiple':''}>${opts.map(o=>`<option>${escapeHtml(String(o))}</option>`).join('')}</select>${f.source?`<div class="text-[10.5px] text-purple mt-1">↗ ${escapeHtml(f.source)}</div>`:''}`; }
+    case 'checklist': { const opts = f.options&&f.options.length?f.options:['Item 1','Item 2']; return `<div class="space-y-1">${opts.map(o=>`<label class="flex items-center gap-2 text-[12px]"><span class="toggle"><span class="dot"></span></span> ${escapeHtml(o)}</label>`).join('')}</div>`; }
+    case 'file': return `<div class="inp w-full text-ink-400 text-[12px]">⬆ Upload file…</div>`;
+    case 'signature': { const fonts = dbSourceValues('sig.fonts'); return `<div class="inp w-full text-ink-400" style="font-family:cursive">${fonts.length?escapeHtml(String(fonts[0])):'Signature'} ✎ <span class="text-[10.5px]">(sig.fonts)</span></div>`; }
+    case 'seal': { const logos = dbSourceValues('sig.logos'); return `<div class="inp text-ink-400 text-[12px]">◯ Seal ${logos.length?'· '+escapeHtml(String(logos[0])):''} <span class="text-[10.5px]">(sig.logos)</span></div>`; }
+    case 'table': { const cols = f.columns&&f.columns.length?f.columns:['Column 1','Column 2']; return `<table class="w-full text-[12px]" style="border-collapse:collapse"><thead><tr>${cols.map(c=>`<th style="border:1px solid #E5E7EB;background:#F9FAFB;color:#6B7280;padding:4px 8px">${escapeHtml(c)}</th>`).join('')}</tr></thead><tbody><tr>${cols.map(()=>`<td style="border:1px solid #E5E7EB;color:#9CA3AF;padding:4px 8px">—</td>`).join('')}</tr></tbody></table>`; }
+    case 'section': return `<div class="text-[12px] font-semibold text-ink-700 text-center">— ${lbl} —</div>`;
+    default: return `<input class="inp w-full" disabled placeholder="${lbl}">`;
+  }
+}
+function dbFooter(d){
+  const n = (d.fields||[]).length;
+  return `<div class="sticky bottom-0 -mx-8 px-8 py-3 bg-white border-t border-line flex items-center justify-end gap-2 z-30" style="box-shadow:0 -1px 3px rgba(0,0,0,0.06)">
+    <span class="text-[12px] text-ink-400 mr-auto">${n} field${n===1?'':'s'} · ${escapeHtml(d.name||'Untitled')}</span>
+    <button class="btn" onclick="dbBackToLibrary()">Cancel</button>
+    <button class="btn" onclick="dbSave('Draft')"><i data-lucide="save" class="w-3.5 h-3.5"></i> Save draft</button>
+    <button class="btn btn-primary" onclick="dbSave('Active')"><i data-lucide="check" class="w-3.5 h-3.5"></i> Publish</button>
+  </div>`;
+}
+
+/* ---------- builder mutations (sync DOM → state before any re-render) ---------- */
+function dbSyncMeta(){
+  if(!dbEditing) return;
+  const n=document.getElementById('dbName'); if(n) dbEditing.name=n.value;
+  const de=document.getElementById('dbDesc'); if(de) dbEditing.description=de.value;
+  const st=document.getElementById('dbStatus'); if(st) dbEditing.status=st.value;
+  const ai=document.getElementById('dbAiText'); if(ai) dbAiText=ai.value;
+  (dbEditing.fields||[]).forEach(f=>{
+    const l=document.getElementById('dbflabel_'+f.id); if(l) f.label=l.value;
+    const h=document.getElementById('dbfhelp_'+f.id); if(h) f.helpText=h.value;
+    const dv=document.getElementById('dbfdefault_'+f.id); if(dv) f.defaultValue=dv.value;
+    const mn=document.getElementById('dbfmin_'+f.id); if(mn) f.min = mn.value===''?null:Number(mn.value);
+    const mx=document.getElementById('dbfmax_'+f.id); if(mx) f.max = mx.value===''?null:Number(mx.value);
+  });
+}
+function dbToggleSector(i){ dbSyncMeta(); const s=dbSectorsList()[i]; if(s==null) return; dbEditing.sectors=dbEditing.sectors||[]; const k=dbEditing.sectors.indexOf(s); if(k>=0) dbEditing.sectors.splice(k,1); else dbEditing.sectors.push(s); dbRenderBuilder(); }
+function dbAddField(){ dbSyncMeta(); dbEditing.fields=dbEditing.fields||[]; const id=dbUid('f'); dbEditing.fields.push({id,label:'Untitled field',type:'text',required:false}); dbExpandedField=id; dbRenderBuilder(); }
+function dbMoveField(id,dir){ dbSyncMeta(); const a=dbEditing.fields||[]; const i=a.findIndex(f=>f.id===id); const j=i+dir; if(i<0||j<0||j>=a.length) return; const t=a[i]; a[i]=a[j]; a[j]=t; dbRenderBuilder(); }
+function dbDeleteField(id){ dbSyncMeta(); dbEditing.fields=(dbEditing.fields||[]).filter(f=>f.id!==id); if(dbExpandedField===id) dbExpandedField=null; dbRenderBuilder(); }
+function dbDuplicateField(id){ dbSyncMeta(); const a=dbEditing.fields||[]; const i=a.findIndex(f=>f.id===id); if(i<0) return; const c=JSON.parse(JSON.stringify(a[i])); c.id=dbUid('f'); c.label=(c.label||'Field')+' (copy)'; a.splice(i+1,0,c); dbRenderBuilder(); }
+function dbExpandField(id){ dbSyncMeta(); dbExpandedField = dbExpandedField===id?null:id; dbRenderBuilder(); }
+function dbSetFieldType(id,type){ dbSyncMeta(); const f=dbField(id); if(f){ f.type=type; if(type==='section'){ f.required=false; } } dbRenderBuilder(); }
+function dbToggleRequired(id){ dbSyncMeta(); const f=dbField(id); if(f) f.required=!f.required; dbRenderBuilder(); }
+function dbSetFieldProp(id,prop,val){ const f=dbField(id); if(f) f[prop]=val; }
+function dbSetFieldNum(id,prop,val){ const f=dbField(id); if(f) f[prop] = val===''?null:Number(val); }
+function dbSetSource(id,key){ dbSyncMeta(); const f=dbField(id); if(f){ if(key){ f.source=key; delete f.options; } else { delete f.source; } } dbRenderBuilder(); }
+function dbAddOption(id,val){ val=(val||'').trim(); if(!val) return; dbSyncMeta(); const f=dbField(id); if(f){ f.options=f.options||[]; f.options.push(val); } dbRenderBuilder(); }
+function dbRemoveOption(id,i){ dbSyncMeta(); const f=dbField(id); if(f&&f.options) f.options.splice(i,1); dbRenderBuilder(); }
+function dbAddColumn(id,val){ val=(val||'').trim(); if(!val) return; dbSyncMeta(); const f=dbField(id); if(f){ f.columns=f.columns||[]; f.columns.push(val); } dbRenderBuilder(); }
+function dbRemoveColumn(id,i){ dbSyncMeta(); const f=dbField(id); if(f&&f.columns) f.columns.splice(i,1); dbRenderBuilder(); }
+
+/* ---------- AI assist ---------- */
+function dbSuggest(){ dbSyncMeta(); const text=dbAiText||dbEditing.description||''; const have=new Set((dbEditing.fields||[]).map(f=>f.label)); dbSuggestions = mockSuggest(text,{exclude:[...have]}).map(s=>({...s,_checked:false})); dbRenderBuilder(); }
+function dbSuggestMore(){ dbSyncMeta(); const text=dbAiText||dbEditing.description||''; const have=new Set((dbEditing.fields||[]).map(f=>f.label)); dbSuggestions.forEach(s=>have.add(s.label)); const more=mockSuggest(text,{exclude:[...have],expand:true}).map(s=>({...s,_checked:false})); dbSuggestions=dbSuggestions.concat(more); if(!more.length) toast('No further suggestions'); dbRenderBuilder(); }
+function dbToggleSuggestion(i,checked){ if(dbSuggestions[i]) dbSuggestions[i]._checked=checked; }
+function dbAddSelected(){ dbSyncMeta(); const picked=dbSuggestions.filter(s=>s._checked); if(!picked.length){ toast('Select at least one suggestion'); return; } dbEditing.fields=dbEditing.fields||[]; picked.forEach(s=>{ const {_checked, ...rest}=s; dbEditing.fields.push({...rest, id:dbUid('f'), aiGenerated:true}); }); dbSuggestions=dbSuggestions.filter(s=>!s._checked); toast(picked.length+' field'+(picked.length===1?'':'s')+' added'); dbRenderBuilder(); }
+
+/* ---------- save ---------- */
+function dbSave(status){
+  dbSyncMeta();
+  if(!dbEditing.name || !dbEditing.name.trim()){ toast('Please name the document'); const n=document.getElementById('dbName'); if(n) n.focus(); return; }
+  dbEditing.status = status;
+  dbEditing.updatedAt = Date.now();
+  const arr = dbDocs();
+  const i = arr.findIndex(d=>d.id===dbEditing.id);
+  if(i>=0) arr[i]=dbEditing; else arr.push(dbEditing);
+  setValue('templates.docbuilder', arr);   // persists + logs to Activity Trail
+  toast('“'+dbEditing.name+'” '+(status==='Active'?'published':'saved as draft'));
+  dbBackToLibrary();
 }
 
 /* =========================================================
@@ -1586,13 +3079,21 @@ function renderSearch(){
   bindItemHandlers();
 }
 
-document.getElementById('activityToggle').addEventListener('click', () =>
-  document.getElementById('activityPanel').classList.toggle('collapsed'));
+document.getElementById('activityToggle').addEventListener('click', () => {
+  const open = document.getElementById('activityPanel').classList.toggle('collapsed') === false;
+  document.getElementById('activityToggle').setAttribute('aria-expanded', String(open));
+});
 
 /* =========================================================
    UTIL
    ========================================================= */
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function normalizeListItem(x) {
+  if (typeof x === 'string') return {label: x, enabled: true};
+  if (x && typeof x === 'object') return {label: x.label || '', enabled: x.enabled !== false};
+  return {label: String(x), enabled: true};
+}
 
 /* =========================================================
    INIT

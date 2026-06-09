@@ -2,6 +2,12 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "tender-node-4321",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["/Users/Anjali/Documents/GitHub/Tender-Analzer/.claude/static-server.js", "4321"],
+      "port": 4321
+    },
+    {
       "name": "stratzi-dev",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev", "--prefix", "/Users/Anjali/Desktop/stratzi-website"],

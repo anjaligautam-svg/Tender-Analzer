@@ -387,7 +387,9 @@
     .corrig-pc-link:hover { text-decoration:underline; }
 
     /* === Responses tab — Send-for-approval register flow (reuses .corrig-step / .corrig-summary-card / pills / spinner) === */
-    .approval-send-btn { display:inline-flex; align-items:center; gap:6px; background:#0F5EE8; color:white; border:none; border-radius:8px; padding:9px 18px; font-size:13px; font-weight:700; cursor:pointer; transition: background 150ms ease, opacity 150ms ease; }
+    .approval-send-btn { display:inline-flex; align-items:center; gap:7px; background:white; color:#0F5EE8; border:1.5px solid #0F5EE8; border-radius:8px; padding:8px 18px; font-size:13px; font-weight:500; cursor:pointer; transition: background 150ms ease, opacity 150ms ease; }
+    .approval-send-btn:hover { background:#EFF6FF; }
+    .approval-send-btn.disabled { border-color:#E5E7EB; color:#9CA3AF; cursor:not-allowed; pointer-events:none; background:white; }
     .approval-send-btn:hover { background:#0B4FCA; }
     .approval-send-btn.disabled { opacity:0.5; cursor:not-allowed; }
     .approval-send-btn.disabled:hover { background:#0F5EE8; }
@@ -452,6 +454,221 @@
     .approval-publish-cta .pc-sub { font-size:12px; color:#6B7280; margin-top:2px; }
     .approval-publish-btn { background:#10B981; color:white; border:none; border-radius:8px; padding:10px 22px; font-size:14px; font-weight:700; cursor:pointer; transition: background 150ms ease; flex-shrink:0; }
     .approval-publish-btn:hover { background:#059669; }
+
+    /* === C1: Landing sort/filter/search bar === */
+    .land-bar { display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+    .land-sort-sel { border:1px solid #E5E7EB; border-radius:7px; padding:7px 12px; font-size:13px; color:#374151; background:white; cursor:pointer; }
+    .land-chip { border:1px solid #E5E7EB; border-radius:20px; padding:5px 12px; font-size:12px; color:#374151; background:white; cursor:pointer; transition: background 150ms ease, color 150ms ease, border-color 150ms ease; }
+    .land-chip.active { background:#0F5EE8; color:white; border-color:#0F5EE8; }
+    .land-search-wrap { position:relative; display:inline-flex; align-items:center; }
+    .land-search-wrap i, .land-search-wrap svg { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#9CA3AF; pointer-events:none; }
+    .land-search { border:1px solid #E5E7EB; border-radius:8px; padding:8px 14px 8px 34px; font-size:13px; width:240px; outline:none; }
+    .land-search:focus { border-color:#0F5EE8; }
+    .land-count { font-size:12px; color:#9CA3AF; }
+    #activeList { transition: opacity 200ms ease; }
+
+    /* === C2: AI summary toggle row + placeholder === */
+    .ut-ai-row { display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-top:1px solid #F3F4F6; margin-top:12px; gap:12px; }
+    .ut-ai-row .lbl { font-size:13px; font-weight:700; color:#111827; }
+    .ut-ai-row .sub { font-size:12px; color:#6B7280; margin-top:2px; }
+    .ai-toggle { position:relative; width:42px; height:24px; flex-shrink:0; cursor:pointer; }
+    .ai-toggle input { opacity:0; width:0; height:0; }
+    .ai-toggle .track { position:absolute; inset:0; background:#D1D5DB; border-radius:999px; transition: background 150ms ease; }
+    .ai-toggle .thumb { position:absolute; top:3px; left:3px; width:18px; height:18px; background:white; border-radius:50%; transition: transform 150ms ease; box-shadow:0 1px 2px rgba(0,0,0,0.2); }
+    .ai-toggle input:checked + .track { background:#0F5EE8; }
+    .ai-toggle input:checked + .track + .thumb { transform: translateX(18px); }
+    .qis-off-placeholder { background:#F9FAFB; border:1px solid #E5E7EB; border-radius:10px; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
+    .qis-off-placeholder .left { display:flex; align-items:center; gap:8px; }
+    .qis-off-placeholder .msg { font-size:13px; color:#6B7280; }
+    .qis-off-placeholder .on-link { background:transparent; border:none; color:#0F5EE8; font-size:12px; cursor:pointer; }
+    .qis-off-placeholder .on-link:hover { text-decoration:underline; }
+
+    /* === AI Query Summary — opt-in prompt / skip-recovery gate === */
+    .qis-prompt-card { background:#F9FAFB; border:1px solid #E5E7EB; border-radius:10px; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; overflow:hidden; transition: max-height 200ms ease, opacity 200ms ease, padding 200ms ease, margin 200ms ease; }
+    .qis-prompt-card .left { display:flex; align-items:flex-start; gap:10px; min-width:0; }
+    .qis-prompt-card .left > i { flex-shrink:0; margin-top:1px; }
+    .qis-prompt-card .ttl { font-size:13px; font-weight:700; color:#374151; }
+    .qis-prompt-card .sub { font-size:12px; color:#6B7280; margin-top:2px; }
+    .qis-prompt-card .right { display:flex; align-items:center; flex-shrink:0; }
+    .qis-gen-btn { background:#0F5EE8; color:white; border:none; border-radius:7px; padding:7px 14px; font-size:13px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition: background 150ms ease; }
+    .qis-gen-btn:hover { background:#0B4FCA; }
+    .qis-gen-btn:disabled { opacity:0.85; cursor:wait; }
+    .qis-skip-link { background:transparent; border:none; color:#9CA3AF; font-size:12px; cursor:pointer; margin-left:12px; }
+    .qis-skip-link:hover { color:#6B7280; text-decoration:underline; }
+    .qis-recovery-line { display:flex; align-items:center; gap:5px; font-size:12px; margin-bottom:16px; }
+    .qis-recovery-line i { flex-shrink:0; }
+    .qis-gen-now { background:transparent; border:none; color:#0F5EE8; font-size:12px; cursor:pointer; padding:0; }
+    .qis-gen-now:hover { text-decoration:underline; }
+
+    /* === AI groups: ungroup + undo + re-group === */
+    .ung-btn { display:inline-flex; align-items:center; gap:5px; border:1px solid #E5E7EB; border-radius:6px; padding:4px 10px; font-size:11px; color:#6B7280; background:white; cursor:pointer; transition: border-color 150ms ease, color 150ms ease, background 150ms ease; }
+    .ung-btn:hover { border-color:#EF4444; color:#EF4444; background:#FEF2F2; }
+    .ung-confirm { display:flex; align-items:center; gap:8px; opacity:0; animation: ung-fade-in 150ms ease forwards; }
+    @keyframes ung-fade-in { to { opacity:1; } }
+    .ung-confirm .q { font-size:11px; color:#374151; }
+    .ung-yes { background:#EF4444; color:white; border:none; border-radius:5px; padding:3px 10px; font-size:11px; cursor:pointer; }
+    .ung-yes:hover { background:#DC2626; }
+    .ung-cancel { background:transparent; border:none; color:#9CA3AF; font-size:11px; cursor:pointer; }
+    .ung-cancel:hover { color:#6B7280; text-decoration:underline; }
+    .ung-origin { display:inline-flex; align-items:center; gap:4px; background:#F3F4F6; color:#6B7280; border-radius:4px; padding:2px 7px; font-size:10px; }
+    /* group card collapse/expand animation hooks */
+    .grp-card { transition: max-height 250ms ease, opacity 250ms ease, margin 250ms ease, border-color 600ms ease; overflow:hidden; }
+    /* individual card entrance (staggered via inline animation-delay) */
+    @keyframes qcard-enter { from { opacity:0; transform: translateY(-4px); } to { opacity:1; transform: translateY(0); } }
+    .qcard-enter { animation: qcard-enter 200ms ease both; }
+    /* undo toast stack (inline, bottom of AI groups section) */
+    #groupUndoToasts { display:flex; flex-direction:column; gap:8px; margin-top:10px; }
+    .ung-toast { background:#1a1a1a; color:white; border-radius:8px; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; gap:12px; transition: opacity 200ms ease; }
+    .ung-toast .left { display:flex; align-items:center; gap:8px; min-width:0; }
+    .ung-toast .msg { font-size:13px; color:white; }
+    .ung-toast .right { display:flex; align-items:center; flex-shrink:0; }
+    .ung-toast .undo { background:white; color:#1a1a1a; border:none; border-radius:5px; padding:4px 12px; font-size:12px; font-weight:700; cursor:pointer; }
+    .ung-toast .dismiss { background:transparent; border:none; color:rgba(255,255,255,0.5); font-size:16px; line-height:1; cursor:pointer; margin-left:10px; }
+    .ung-toast .dismiss:hover { color:white; }
+    /* re-group floating bar */
+    #regroupBar { margin-top:12px; }
+    .regroup-bar { background:#0F5EE8; color:white; border-radius:8px; padding:10px 16px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    .regroup-bar .cnt { font-size:13px; color:white; }
+    .regroup-these { background:transparent; color:white; border:1px solid rgba(255,255,255,0.4); border-radius:6px; padding:5px 12px; font-size:12px; cursor:pointer; }
+    .regroup-these:hover { background:rgba(255,255,255,0.12); }
+    .regroup-prompt { display:flex; align-items:center; gap:8px; flex-wrap:wrap; background:rgba(255,255,255,0.12); border-radius:6px; padding:6px 10px; }
+    .regroup-prompt label { font-size:12px; color:white; }
+    .regroup-prompt input { border:1px solid rgba(255,255,255,0.4); border-radius:5px; padding:5px 8px; font-size:12px; background:white; color:#111827; }
+    .regroup-create { background:white; color:#0F5EE8; border:none; border-radius:5px; padding:5px 12px; font-size:12px; font-weight:700; cursor:pointer; }
+    .regroup-cancel { background:transparent; border:none; color:rgba(255,255,255,0.8); font-size:12px; cursor:pointer; }
+    .ind-select-cb { accent-color:#0F5EE8; width:15px; height:15px; cursor:pointer; flex-shrink:0; }
+
+    /* === People selection modal (in-flow overlay) === */
+    #docMainContent { position:relative; }
+    .apm-overlay { position:absolute; top:0; left:0; width:100%; min-height:100%; background:rgba(0,0,0,0.35); z-index:100; display:flex; align-items:flex-start; justify-content:center; padding-top:40px; padding-bottom:40px; }
+    .apm-card { background:white; border-radius:14px; width:560px; max-width:95%; box-shadow:0 8px 32px rgba(0,0,0,0.12); opacity:0; transform:translateY(-10px); transition: opacity 250ms ease, transform 250ms ease; }
+    .apm-card.in { opacity:1; transform:translateY(0); }
+    .apm-head { padding:20px 24px; border-bottom:1px solid #E5E7EB; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+    .apm-head .t { font-size:17px; font-weight:700; color:#111827; }
+    .apm-head .s { font-size:13px; color:#6B7280; margin-top:4px; }
+    .apm-x { font-size:20px; color:#6B7280; cursor:pointer; background:transparent; border:none; line-height:1; }
+    .apm-x:hover { color:#111827; }
+    .apm-body { padding:20px 24px; }
+    .apm-summary { background:#F9FAFB; border-radius:8px; padding:10px 14px; margin-bottom:20px; display:flex; gap:20px; flex-wrap:wrap; }
+    .apm-summary .cell .k { font-size:11px; color:#6B7280; }
+    .apm-summary .cell .v { font-size:14px; font-weight:700; }
+    .apm-lbl { font-size:13px; font-weight:700; color:#374151; margin-bottom:4px; }
+    .apm-sub { font-size:12px; color:#6B7280; margin-bottom:14px; }
+    .apm-list { max-height:280px; overflow-y:auto; }
+    .apm-row { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:8px; cursor:pointer; margin-bottom:4px; transition: background 150ms ease; }
+    .apm-row:hover { background:#F9FAFB; }
+    .apm-row.req { cursor:default; }
+    .apm-cb { width:18px; height:18px; border-radius:4px; border:1.5px solid #D1D5DB; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:white; transition: background 150ms ease, border-color 150ms ease; }
+    .apm-cb.on { background:#0F5EE8; border-color:#0F5EE8; }
+    .apm-cb.dis { opacity:0.6; cursor:not-allowed; }
+    .apm-cb i { color:white; }
+    .apm-av { width:36px; height:36px; border-radius:50%; background:#EFF6FF; color:#0F5EE8; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .apm-name { font-size:14px; font-weight:700; color:#111827; display:flex; align-items:center; gap:6px; }
+    .apm-desig { font-size:12px; color:#6B7280; }
+    .apm-reqbadge { background:#FEF2F2; color:#991B1B; border-radius:4px; padding:1px 6px; font-size:10px; font-weight:700; }
+    .apm-rolepill { border-radius:20px; padding:2px 8px; font-size:11px; font-weight:600; white-space:nowrap; }
+    .apm-role-Technical { background:#EFF6FF; color:#1D4ED8; }
+    .apm-role-Finance { background:#F0FDF4; color:#065F46; }
+    .apm-role-Legal { background:#F5F3FF; color:#6D28D9; }
+    .apm-role-HOD { background:#FFFBEB; color:#92400E; }
+    .apm-role-Custom, .apm-role-Other { background:#F3F4F6; color:#6B7280; }
+    .apm-addsec { margin-top:12px; border-top:1px solid #F3F4F6; padding-top:12px; }
+    .apm-addlink { display:inline-flex; align-items:center; gap:6px; background:transparent; border:none; color:#0F5EE8; font-size:13px; cursor:pointer; padding:0; }
+    .apm-addlink:hover { text-decoration:underline; }
+    .apm-addform-wrap { max-height:0; overflow:hidden; transition: max-height 200ms ease; }
+    .apm-addform-wrap.open { max-height:220px; }
+    .apm-addform { background:#F9FAFB; border-radius:8px; padding:12px 14px; margin-top:10px; }
+    .apm-addform .grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+    .apm-addform input, .apm-addform select { border:1px solid #D1D5DB; border-radius:6px; padding:6px 9px; font-size:12px; outline:none; background:white; }
+    .apm-addform input:focus, .apm-addform select:focus { border-color:#0F5EE8; }
+    .apm-addform .row2 { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:8px; }
+    .apm-addform select.role { width:140px; }
+    .apm-add-btn { background:#0F5EE8; color:white; border:none; border-radius:6px; padding:6px 14px; font-size:12px; font-weight:600; cursor:pointer; }
+    .apm-add-cancel { background:transparent; border:none; color:#9CA3AF; font-size:12px; cursor:pointer; }
+    .apm-order { margin-top:16px; border-top:1px solid #F3F4F6; padding-top:14px; }
+    .apm-order .t { font-size:13px; font-weight:700; color:#374151; margin-bottom:8px; }
+    .apm-order .s { font-size:11px; color:#9CA3AF; margin-bottom:10px; }
+    .apm-chips { display:flex; gap:8px; flex-wrap:wrap; }
+    .apm-chip { background:white; border:1px solid #E5E7EB; border-radius:6px; padding:5px 10px; display:flex; align-items:center; gap:7px; font-size:12px; color:#374151; cursor:grab; }
+    .apm-chip:active { cursor:grabbing; }
+    .apm-chip .h { font-size:11px; color:#C4C9D4; }
+    .apm-chip .num { background:#0F5EE8; color:white; border-radius:50%; width:16px; height:16px; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; }
+    .apm-chip .rm { font-size:12px; color:#9CA3AF; cursor:pointer; }
+    .apm-chip .rm:hover { color:#EF4444; }
+    .apm-foot { padding:16px 24px; border-top:1px solid #E5E7EB; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .apm-foot .cnt { font-size:12px; color:#6B7280; }
+    .apm-foot .right { display:flex; align-items:center; gap:14px; }
+    .apm-cancel { background:transparent; border:none; color:#6B7280; font-size:13px; cursor:pointer; }
+    .apm-cancel:hover { color:#374151; }
+    .apm-send { background:#0F5EE8; color:white; border:none; border-radius:8px; padding:9px 20px; font-size:13px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+    .apm-send:disabled { opacity:0.5; cursor:not-allowed; }
+    /* Track-approval per-step simulate + reminder */
+    .ap-sim-row { margin-top:6px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .ap-sim-link { background:transparent; border:none; color:#C4C9D4; font-size:11px; cursor:pointer; padding:0; }
+    .ap-sim-link:hover { color:#9CA3AF; text-decoration:underline; }
+    .ap-sim-sep { color:#E5E7EB; font-size:11px; }
+    .ap-role-inline { border-radius:20px; padding:1px 7px; font-size:10px; font-weight:600; margin-left:6px; }
+    .ap-sb-prompt { display:flex; align-items:center; gap:8px; margin-top:6px; flex-wrap:wrap; }
+    .ap-sb-prompt input { border:1px solid #D1D5DB; border-radius:6px; padding:5px 9px; font-size:12px; width:240px; outline:none; }
+    .ap-sb-yes { background:#EF4444; color:white; border:none; border-radius:6px; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer; }
+    .ap-sb-cancel { background:transparent; border:none; color:#9CA3AF; font-size:12px; cursor:pointer; }
+
+    /* === Approved / Published ribbon (Responses register) === */
+    @keyframes pulse-once { 0% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); } 100% { box-shadow: 0 0 0 12px rgba(16,185,129,0); } }
+    .approval-ribbon-wrap { max-height:0; opacity:0; overflow:hidden; transition: max-height 300ms ease, opacity 300ms ease; }
+    .approval-ribbon-wrap.open { max-height:420px; opacity:1; }
+    .approval-ribbon { background:#F0FDF4; border:1px solid #BBF7D0; border-radius:12px; padding:16px 20px; margin-bottom:16px; }
+    .approval-ribbon .rb-head { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+    .approval-ribbon .rb-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#10B981; }
+    .approval-ribbon .rb-title { font-size:15px; font-weight:700; color:#111827; margin-bottom:4px; }
+    .approval-ribbon .rb-sub { font-size:13px; color:#6B7280; }
+    .approval-ribbon .rb-body { font-size:13px; color:#374151; margin-top:8px; }
+    .approval-ribbon .rb-pdf { display:inline-flex; align-items:center; gap:6px; border:1px solid #E5E7EB; border-radius:6px; padding:5px 12px; font-size:12px; color:#374151; background:white; cursor:pointer; flex-shrink:0; transition: background 150ms ease; }
+    .approval-ribbon .rb-pdf:hover { background:#F9FAFB; }
+    /* toolbar approved / published button states */
+    .approval-approved-btn { display:inline-flex; align-items:center; gap:7px; background:white; color:#10B981; border:1.5px solid #10B981; border-radius:8px; padding:8px 18px; font-size:13px; font-weight:500; cursor:default; }
+    .approval-published-btn { display:inline-flex; align-items:center; gap:7px; background:#10B981; color:white; border:1.5px solid #10B981; border-radius:8px; padding:8px 18px; font-size:13px; font-weight:600; cursor:default; }
+    .approval-pub-pulse { animation: pulse-once 600ms ease forwards; }
+
+    /* === C3: smart response pills === */
+    .smart-pill { background:#EFF6FF; color:#0C447C; border:1px solid #BFDBFE; border-radius:20px; padding:5px 12px; font-size:12px; cursor:pointer; transition: background 150ms ease, border-color 150ms ease; }
+    .smart-pill:hover { background:#DBEAFE; border-color:#93C5FD; }
+
+    /* === C4: regenerate highlights link === */
+    .corrig-regen-hl { display:inline-flex; align-items:center; gap:4px; background:transparent; border:none; color:#9CA3AF; font-size:10px; cursor:pointer; margin-top:6px; padding:0; }
+    .corrig-regen-hl:hover { color:#6B7280; text-decoration:underline; }
+
+    /* === C5: multi-person approver selector === */
+    .ap-sel-title { font-size:13px; font-weight:700; color:#374151; margin-bottom:10px; }
+    .ap-approver-list { margin-bottom:6px; }
+    .ap-approver-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #F9FAFB; }
+    .ap-cb { width:16px; height:16px; accent-color:#0F5EE8; cursor:pointer; flex-shrink:0; transition: opacity 150ms ease; }
+    .ap-cb.req { opacity:0.7; cursor:not-allowed; }
+    .ap-avatar { width:28px; height:28px; border-radius:50%; background:#0F5EE8; color:white; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .ap-add-link { display:inline-flex; align-items:center; gap:5px; background:transparent; border:none; color:#0F5EE8; font-size:12px; cursor:pointer; padding:6px 0; }
+    .ap-add-link:hover { text-decoration:underline; }
+    .ap-add-form { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; padding:8px 0; align-items:center; }
+    .ap-add-form input { border:1px solid #D1D5DB; border-radius:6px; padding:6px 10px; font-size:12px; outline:none; }
+    .ap-add-form input:focus { border-color:#0F5EE8; }
+    .ap-add-btn { grid-column:1 / -1; justify-self:end; background:#0F5EE8; color:white; border:none; border-radius:6px; padding:6px 16px; font-size:12px; font-weight:600; cursor:pointer; }
+    .ap-order-wrap { margin-top:12px; }
+    .ap-order-label { font-size:12px; color:#6B7280; margin-bottom:6px; }
+    .ap-order-chips { display:flex; gap:8px; flex-wrap:wrap; }
+    .ap-order-chip { display:inline-flex; align-items:center; gap:6px; background:#F3F4F6; border-radius:6px; padding:4px 10px; font-size:12px; color:#374151; cursor:grab; }
+    .ap-order-chip:active { cursor:grabbing; }
+    .ap-chip-handle { color:#9CA3AF; cursor:grab; }
+    .ap-chip-num { background:#0F5EE8; color:white; border-radius:50%; width:16px; height:16px; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; }
+    .ap-chip-x { color:#9CA3AF; cursor:pointer; font-size:14px; line-height:1; }
+    .ap-chip-x:hover { color:#EF4444; }
+    /* sent-back stepper state + revision banner */
+    .corrig-step .node.sentback { background:#EF4444; }
+    .corrig-step .node.sentback i { color:white; }
+    .corrig-step .s-title.ap-sentback-title { color:#991B1B; }
+    .ap-sentback-box { background:#FEF2F2; border-radius:6px; padding:8px 10px; margin-top:6px; font-size:12px; color:#374151; font-style:italic; }
+    .ap-revision-banner { background:#FFFBEB; border:1px solid #FCD34D; border-radius:10px; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+    .ap-revision-banner .msg { font-size:13px; color:#92400E; font-weight:600; }
+    .ap-rev-edit { background:#F59E0B; color:white; border:none; border-radius:8px; padding:8px 16px; font-size:13px; font-weight:700; cursor:pointer; }
+    .ap-rev-withdraw { background:transparent; border:none; color:#9CA3AF; font-size:12px; cursor:pointer; }
 
     /* === QIS collapsed view + QUERY DATE column === */
     /* Card body uses max-height transition only — never display:none. */
@@ -685,9 +902,29 @@
         <!-- ACTIVE -->
         <section>
           <div class="text-[11px] uppercase tracking-[0.08em] text-ink-500 font-semibold mb-2">Active</div>
-          <div class="relative mb-3">
-            <i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-            <input id="landingSearch" oninput="renderActiveList(this.value)" placeholder="Search tenders…" class="w-full bg-white border border-line rounded-lg pl-9 pr-3 py-2.5 text-[13px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+          <!-- C1: sort / filter / search bar -->
+          <div class="land-bar">
+            <span style="font-size:12px; color:#6B7280;">Sort by:</span>
+            <select id="landSort" class="land-sort-sel" onchange="landSetSort(this.value)" aria-label="Sort tenders">
+              <option value="newest">Date added — Newest first</option>
+              <option value="oldest">Date added — Oldest first</option>
+              <option value="closeSoon">Window closing — Soonest first</option>
+              <option value="closeLate">Window closing — Latest first</option>
+              <option value="queriesMost">Queries — Most first</option>
+              <option value="nameAZ">Tender name — A to Z</option>
+            </select>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;" role="group" aria-label="Filter tenders">
+              <button type="button" class="land-chip active" data-filter="all" onclick="landSetFilter('all')">All</button>
+              <button type="button" class="land-chip" data-filter="open" onclick="landSetFilter('open')">Window open</button>
+              <button type="button" class="land-chip" data-filter="closed" onclick="landSetFilter('closed')">Window closed</button>
+              <button type="button" class="land-chip" data-filter="due" onclick="landSetFilter('due')">Responses due</button>
+              <button type="button" class="land-chip" data-filter="completed" onclick="landSetFilter('completed')">Completed</button>
+            </div>
+            <div class="land-search-wrap" style="margin-left:auto;">
+              <i data-lucide="search" style="width:14px; height:14px;"></i>
+              <input id="landingSearch" class="land-search" oninput="landSetSearch(this.value)" placeholder="Search tenders..." aria-label="Search tenders" />
+            </div>
+            <span class="land-count" id="landCount">0 tenders</span>
           </div>
           <div id="activeList" class="bg-white border border-line rounded-xl overflow-hidden"></div>
         </section>
@@ -909,7 +1146,7 @@
             <div class="flex items-center justify-between gap-2 mb-3">
               <div class="inline-flex items-center gap-1.5 text-[13px] font-bold" style="color:#1D4ED8;">
                 <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> AI Grouped Queries
-                <span class="text-[12px] font-normal ml-1" style="color:#6B7280;">· <span id="aiGroupCount">9</span> queries in <span id="aiGroupNumGroups">3</span> groups</span>
+                <span class="text-[12px] font-normal ml-1" style="color:#6B7280;" aria-live="polite">· <span id="aiGroupCount">9</span> queries in <span id="aiGroupNumGroups">3</span> groups</span>
               </div>
               <button onclick="regroupWithAI()" class="text-[12px] hover:underline inline-flex items-center gap-1" style="color:#0F5EE8;"><i data-lucide="sparkles" class="w-3 h-3"></i> Regroup with AI</button>
             </div>
@@ -967,6 +1204,8 @@
             </div>
 
             <div id="groupsList"></div>
+            <!-- Undo toasts (session-only, stacked, inline at bottom of AI groups) -->
+            <div id="groupUndoToasts" aria-live="polite"></div>
           </div>
 
           <!-- SECTION 4 — INDIVIDUAL QUERIES -->
@@ -976,6 +1215,8 @@
               <span class="text-[11px] font-medium" style="background:#F3F4F6; color:#6B7280; border-radius:14px; padding:2px 8px;"><span id="individualCount">15</span> queries</span>
             </div>
             <div id="queryList" role="region" aria-live="polite"></div>
+            <!-- Re-group floating action bar (appears when 2+ individual queries are selected) -->
+            <div id="regroupBar"></div>
           </div>
 
           <!-- SECTION 5 — STICKY GENERIC RESPONSE CTA -->
@@ -1182,6 +1423,8 @@
 
           <!-- DEFAULT CONTENT -->
           <div id="docMainContent">
+            <!-- People-selection modal renders here (in-flow absolute overlay) -->
+            <div id="apModalHost"></div>
             <!-- Register -->
             <section>
               <div class="flex items-start justify-between gap-3 flex-wrap mb-3">
@@ -1192,12 +1435,14 @@
                 <div class="flex items-center gap-2">
                   <button class="px-3 py-2 rounded-lg border border-line text-[12.5px] text-ink-900 hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Download Register (PDF)</button>
                   <button id="approvalSendBtn" onclick="approvalStartConfirm()" class="approval-send-btn"><i data-lucide="send" class="w-3.5 h-3.5"></i> Send for approval →</button>
-                  <button onclick="publishAllApproved()" class="px-3 py-2 rounded-lg bg-primary text-white text-[12.5px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5 shadow-soft">Publish All Drafts <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+                  <button id="publishAllBtn" onclick="publishAllApproved()" class="px-3 py-2 rounded-lg bg-primary text-white text-[12.5px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5 shadow-soft">Publish All Drafts <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
                 </div>
               </div>
 
               <!-- Approval: status banner (persists across navigation) + inline confirm panel (slides) -->
               <div id="approvalStatusWrap" class="approval-status-wrap"><div id="approvalStatusBanner"></div></div>
+              <!-- Approved / Published ribbon (between status banner and table) -->
+              <div id="approvalRibbonWrap" class="approval-ribbon-wrap" aria-live="polite"><div id="approvalRibbon"></div></div>
               <div id="approvalConfirmWrap" class="approval-confirm-wrap"><div id="approvalConfirmPanel"></div></div>
 
               <!-- Active filter chips -->
@@ -1432,6 +1677,17 @@
           <label class="block text-[11.5px] font-semibold text-ink-500 uppercase tracking-wide mb-1">Response Deadline</label>
           <input id="utFieldDue" type="date" class="w-full bg-white border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
         </div>
+      </div>
+      <!-- C2: AI Query Intelligence Summary toggle (default ON) -->
+      <div class="ut-ai-row">
+        <div style="min-width:0;">
+          <div class="lbl">AI Query Intelligence Summary</div>
+          <div class="sub">Auto-generates a summary of all queries received for this tender</div>
+        </div>
+        <label class="ai-toggle" title="Toggle AI summary">
+          <input id="utAiSummary" type="checkbox" checked />
+          <span class="track"></span><span class="thumb"></span>
+        </label>
       </div>
     </div>
 
@@ -2488,19 +2744,276 @@
   rebuildGroupMembers();
 
   // ============================================================
+  // SHARED HELPERS — smart pills (C3), key-term highlight (C4), approver pool (C5)
+  // ============================================================
+  function generateResponsePills(queryText){
+    const text = (queryText || '').toLowerCase();
+    const pills = [];
+    if (text.includes('turnover') || text.includes('eligib') || text.includes('experience')) pills.push('As per criteria','Refer clause 4','No relaxation');
+    if (text.includes('specification') || text.includes('grade') || text.includes('capacity') || text.includes('material')) pills.push('Spec as stated','IS standard applies','No substitution');
+    if (text.includes('date') || text.includes('deadline') || text.includes('extend') || text.includes('duration') || text.includes('window')) pills.push('Date is final','No extension','Refer schedule');
+    if (text.includes('site') || text.includes('visit') || text.includes('access') || text.includes('vehicle')) pills.push('Site accessible','Visit by appointment','Refer clause 5');
+    if (text.includes('scope') || text.includes('includ') || text.includes('exclud') || text.includes('marking') || text.includes('work')) pills.push('As per scope','Refer section 2','Included in scope');
+    if (text.includes('jv') || text.includes('joint venture') || text.includes('consortium') || text.includes('partner')) pills.push('JV permitted','Refer JV clause','Combined turnover');
+    if (text.includes('boq') || text.includes('quantit') || text.includes('item') || text.includes('rate')) pills.push('BOQ is final','Verify drawing','Rate as tendered');
+    if (text.includes('source code') || text.includes('intellectual') || text.includes('ip') || text.includes('ownership')) pills.push('IP with authority','Refer Schedule 5','Full ownership');
+    if (text.includes('cloud') || text.includes('hosting') || text.includes('infrastructure') || text.includes('server')) pills.push('Vendor to host','Costs included','Refer tech spec');
+    if (text.includes('clarif') || text.includes('amend') || text.includes('change') || text.includes('revise')) pills.push('Via corrigendum','Formal amendment','Refer addendum');
+    if (pills.length === 0) pills.push('Noted, refer doc','No change','As per tender');
+    return [...new Set(pills)].slice(0, 3);
+  }
+  // Append a pill's text to a contenteditable/textarea response editor.
+  function applyResponsePill(editorId, pillText){
+    const ed = document.getElementById(editorId);
+    if (!ed) return;
+    const isCE = ed.getAttribute('contenteditable') === 'true';
+    const cur = isCE ? (ed.innerText || '') : (ed.value || '');
+    const next = cur.trim() ? (cur.replace(/\s+$/,'') + ' ' + pillText) : pillText;
+    if (isCE){ ed.innerHTML = esc(next).replace(/\n/g,'<br>'); } else { ed.value = next; }
+    // Fire input handlers / state sync
+    if (ed.oninput) { try { ed.oninput({ target: ed }); } catch(e){} }
+    ed.dispatchEvent(new Event('input', { bubbles:true }));
+    ed.focus();
+  }
+
+  function highlightKeyTerms(text){
+    const patterns = [
+      { regex: /\b(VG-\d+|IS\s+\d+[:\d]*|Clause\s+[\d.]+|Section\s+[\d.]+|Schedule\s+\d+)\b/g, color:'#1D4ED8', bg:'#DBEAFE' },
+      { regex: /\b(\d+\s*(?:days?|weeks?|months?|years?))\b/gi, color:'#065F46', bg:'#D1FAE5' },
+      { regex: /\b(₹[\d,]+|[\d,]+\s*(?:lakhs?|crores?|rupees?))\b/gi, color:'#065F46', bg:'#D1FAE5' },
+      { regex: /\b(\d{1,2}[\s/-]\w+[\s/-]\d{4}|\d{1,2}\/\d{1,2}\/\d{4})\b/g, color:'#065F46', bg:'#D1FAE5' },
+      { regex: /\b(revised|extended|clarified|amended|changed|updated|corrected|replaced|added|removed)\b/gi, color:'#92400E', bg:'#FEF3C7' },
+      { regex: /\b(mandatory|required|must|shall|prohibited|not permitted|excluded|included)\b/gi, color:'#991B1B', bg:'#FEE2E2' },
+      { regex: /\b(from\s+\S+\s+to\s+\S+)\b/gi, color:'#065F46', bg:'#D1FAE5' },
+    ];
+    let result = text;
+    patterns.forEach(({ regex, color, bg }) => {
+      result = result.replace(regex, (match) => `<mark style="background:${bg};color:${color};border-radius:3px;padding:1px 4px;font-weight:500;">${match}</mark>`);
+    });
+    return result;
+  }
+
+  // Multi-person approver selection (shared by Responses + Corrigendum flows). One panel open at a time.
+  const APPROVER_POOL = [
+    { id:'priya-shah',    name:'Priya Shah',    designation:'Technical Officer',   email:'priya.shah@amc.gov.in', required:true, role:'Technical' },
+    { id:'amit-patil',    name:'Amit Patil',    designation:'Finance Officer',     email:'amit.patil@amc.gov.in', role:'Finance' },
+    { id:'sunita-rao',    name:'Sunita Rao',    designation:'Deputy Commissioner', email:'sunita.rao@amc.gov.in', role:'HOD' },
+    { id:'ravi-mehta',    name:'Ravi Mehta',    designation:'Accounts Officer',    email:'ravi.mehta@amc.gov.in', role:'Finance' },
+    { id:'legal-advisor', name:'Legal Advisor', designation:'Law Department',      email:'legal@amc.gov.in', role:'Legal' },
+  ];
+  let _approverSel = null;       // { ids:[ordered selected ids], manual:[{...}], addOpen:bool }
+  let _approverDragId = null;
+  function approverInitials(name){ return String(name||'').split(/\s+/).map(w=>w[0]).filter(Boolean).slice(0,2).join('').toUpperCase(); }
+  function approverSelInit(){ _approverSel = { ids:['priya-shah'], manual:[], addOpen:false }; }
+  function approverSelAll(){ return APPROVER_POOL.concat(_approverSel ? _approverSel.manual : []); }
+  function approverById(id){ return approverSelAll().find(a => a.id === id) || null; }
+  function approverSelCount(){ return _approverSel ? _approverSel.ids.length : 0; }
+  function approverSelToggle(id){
+    if (!_approverSel) approverSelInit();
+    const a = approverById(id);
+    if (a && a.required) return;
+    const i = _approverSel.ids.indexOf(id);
+    if (i >= 0) _approverSel.ids.splice(i,1); else _approverSel.ids.push(id);
+    approverSelRender();
+  }
+  function approverSelRemove(id){
+    if (!_approverSel) return;
+    const a = approverById(id);
+    if (a && a.required) return;
+    _approverSel.ids = _approverSel.ids.filter(x => x !== id);
+    approverSelRender();
+  }
+  function approverSelOpenAdd(){ if (!_approverSel) approverSelInit(); _approverSel.addOpen = true; approverSelRender(); }
+  function approverSelAddPerson(){
+    if (!_approverSel) approverSelInit();
+    const nm = (document.getElementById('apAddName')||{}).value || '';
+    const dg = (document.getElementById('apAddDesig')||{}).value || '';
+    const em = (document.getElementById('apAddEmail')||{}).value || '';
+    if (!nm.trim()){ showToast('Enter a name'); return; }
+    const id = 'manual-' + (_approverSel.manual.length + 1);
+    _approverSel.manual.push({ id, name:nm.trim(), designation:dg.trim()||'—', email:em.trim(), manuallyAdded:true });
+    _approverSel.ids.push(id);
+    _approverSel.addOpen = false;
+    approverSelRender();
+    showToast(nm.trim() + ' added to approvers');
+  }
+  function approverSelReorder(targetId){
+    if (!_approverSel || !_approverDragId || _approverDragId === targetId) return;
+    const ids = _approverSel.ids;
+    const from = ids.indexOf(_approverDragId);
+    const to = ids.indexOf(targetId);
+    _approverDragId = null;
+    if (from < 0 || to < 0) return;
+    ids.splice(to, 0, ids.splice(from, 1)[0]);
+    approverSelRender();
+  }
+  function approverSelChain(){
+    if (!_approverSel) approverSelInit();
+    const now = new Date().toISOString();
+    return _approverSel.ids.map((id, idx) => {
+      const a = approverById(id) || {};
+      return { approverId:id, name:a.name, designation:a.designation, email:a.email||'', required:!!a.required,
+        manuallyAdded:!!a.manuallyAdded, status:'pending', sentAt: idx===0 ? now : null, approvedAt:null, comment:null, order: idx+1 };
+    });
+  }
+  function approverSelRender(){
+    const host = document.getElementById('approverSelector');
+    if (!host || !_approverSel) return;
+    const rows = APPROVER_POOL.concat(_approverSel.manual).map(a => {
+      const checked = _approverSel.ids.indexOf(a.id) >= 0;
+      const reqBadge = a.required ? '<span style="color:#EF4444; font-size:10px; font-weight:700; margin-left:6px;">Required</span>' : '';
+      const removeManual = a.manuallyAdded ? `<button type="button" aria-label="Remove ${esc(a.name)}" onclick="approverSelRemove('${a.id}')" style="margin-left:auto; background:transparent; border:none; color:#9CA3AF; cursor:pointer; font-size:15px; line-height:1;">×</button>` : '';
+      return `<div class="ap-approver-row">
+        <input type="checkbox" ${checked?'checked':''} ${a.required?'disabled':''} aria-checked="${checked}" aria-label="${esc(a.name)}" onchange="approverSelToggle('${a.id}')" class="ap-cb${a.required?' req':''}" />
+        <span class="ap-avatar">${esc(approverInitials(a.name))}</span>
+        <div style="min-width:0;"><div style="font-size:13px; font-weight:700; color:#111827;">${esc(a.name)}${reqBadge}</div><div style="font-size:12px; color:#6B7280;">${esc(a.designation)}</div></div>
+        ${removeManual}
+      </div>`;
+    }).join('');
+    const addBlock = _approverSel.addOpen
+      ? `<div class="ap-add-form">
+          <input id="apAddName" type="text" placeholder="Full name" />
+          <input id="apAddDesig" type="text" placeholder="Designation" />
+          <input id="apAddEmail" type="email" placeholder="Email address" />
+          <button type="button" class="ap-add-btn" onclick="approverSelAddPerson()">Add</button>
+        </div>`
+      : `<button type="button" class="ap-add-link" onclick="approverSelOpenAdd()"><i data-lucide="user-plus" style="width:13px; height:13px;"></i> Add someone not listed</button>`;
+    const orderChips = _approverSel.ids.map((id, idx) => {
+      const a = approverById(id) || {};
+      const removeX = a.required ? '' : `<span class="ap-chip-x" onclick="approverSelRemove('${id}')" title="Remove">×</span>`;
+      return `<span class="ap-order-chip" draggable="true" data-apid="${id}"
+        ondragstart="_approverDragId='${id}'; this.style.opacity='0.5'; if(event.dataTransfer){event.dataTransfer.effectAllowed='move';}"
+        ondragend="this.style.opacity='1';"
+        ondragover="event.preventDefault();"
+        ondrop="event.preventDefault(); approverSelReorder('${id}');">
+        <span class="ap-chip-handle">⠿</span><span class="ap-chip-num">${idx+1}</span><span>${esc(a.name)}</span>${removeX}</span>`;
+    }).join('');
+    host.innerHTML = `
+      <div class="ap-sel-title">Who should approve this?</div>
+      <div class="ap-approver-list" role="group" aria-label="Select approvers" aria-live="polite">${rows}</div>
+      ${addBlock}
+      <div class="ap-order-wrap"><div class="ap-order-label">Approval order:</div><div class="ap-order-chips">${orderChips}</div></div>`;
+    if (window.lucide) lucide.createIcons();
+    const n = approverSelCount();
+    document.querySelectorAll('[data-approver-confirm]').forEach(btn => {
+      btn.disabled = n < 1;
+      btn.style.opacity = n < 1 ? '0.5' : '';
+      btn.style.cursor = n < 1 ? 'not-allowed' : '';
+    });
+  }
+  // Dynamic stepper shared by both tracking views. chain = approvalChain array. opts.submitted = {by,role,time}.
+  function approverStepperHTML(chain, opts){
+    opts = opts || {};
+    let html = '';
+    const subState = 'done';
+    html += approverStepNode({ state:subState, icon:'check', title:'Submitted for approval',
+      name:(opts.submittedBy||'Rajesh Kumar')+' · '+(opts.submittedRole||'Super Admin'), time:opts.submittedTime||'' }, false);
+    let activeFound = false;
+    (chain || []).forEach((a, idx) => {
+      const last = idx === (chain.length - 1);
+      let state, icon, statusLine, action = '';
+      if (a.status === 'approved'){ state='done'; icon='check'; statusLine = 'Approved' + (a.approvedAt ? ' · ' + approvalFmtSentLine(a.approvedAt) : ''); }
+      else if (a.status === 'sent_back'){ state='sentback'; icon='undo-2'; statusLine = 'Sent back'; }
+      else if (!activeFound){ state='active'; icon='clock'; activeFound = true; statusLine = 'Awaiting review · Sent ' + (a.sentAt ? approvalFmtAgo(a.sentAt) : 'just now');
+        action = '<button type="button" id="apRemind-'+esc(a.approverId)+'" class="s-remind" onclick="corrigSendReminder(\'apRemind-'+esc(a.approverId)+'\')"><i data-lucide="bell" style="width:11px;height:11px;"></i> Send reminder</button>'
+               + ' <button type="button" class="s-remind" style="color:#9CA3AF;" onclick="showToast(\'No comments yet\')"><i data-lucide="message-square" style="width:11px;height:11px;"></i> View comments</button>'; }
+      else { state='locked'; icon='lock'; statusLine = 'Pending · In queue'; }
+      const sentBackBox = (a.status === 'sent_back' && a.comment)
+        ? '<div class="ap-sentback-box">' + esc(a.comment) + '</div>' : '';
+      html += approverStepNode({
+        state, icon,
+        title: a.status==='sent_back' ? ('Sent back — ' + (a.comment ? esc(a.comment).slice(0,40) : 'Revision required')) : esc(a.name),
+        name: a.status==='sent_back' ? (esc(a.name)+' · '+(a.designation||'')) : esc((a.designation||'')),
+        time: statusLine, action, sentBackBox, sentback: a.status==='sent_back',
+      }, last);
+    });
+    return html;
+  }
+  function approverStepNode(s, last){
+    const lineCls = s.state === 'done' ? 'line done' : 'line';
+    const muted = (s.state === 'locked');
+    return '<div class="corrig-step" role="listitem">'
+      + (last ? '' : '<div class="'+lineCls+'"></div>')
+      + '<div class="node '+s.state+'"><i data-lucide="'+s.icon+'" style="width:14px;height:14px;"></i></div>'
+      + '<div class="body">'
+      +   '<div class="s-title '+(muted?'muted':'')+(s.sentback?' ap-sentback-title':'')+'">'+s.title+'</div>'
+      +   (s.name ? '<div class="s-name '+(muted?'muted':'')+'">'+s.name+'</div>' : '')
+      +   (s.time ? '<div class="s-time">'+esc(s.time)+'</div>' : '')
+      +   (s.action || '')
+      +   (s.sentBackBox || '')
+      + '</div></div>';
+  }
+  function approvalFmtAgo(iso){
+    try { const d = new Date(iso); const mins = Math.max(0, Math.round((Date.now() - d.getTime())/60000));
+      if (mins < 1) return 'just now'; if (mins < 60) return mins + ' min ago';
+      const hrs = Math.round(mins/60); if (hrs < 24) return hrs + ' hr ago'; return Math.round(hrs/24) + ' days ago';
+    } catch(e){ return 'just now'; }
+  }
+
+  // ============================================================
   // LANDING SCREEN
   // ============================================================
   function statusDotColor(s){ return s === 'overdue' ? '#EF4444' : (s === 'done' ? '#10B981' : '#F59E0B'); }
   function statusPulse(s){ return s === 'overdue' ? '' : (s === 'done' ? '' : 'pulse-amber'); }
-  function renderActiveList(filter){
-    const q = (filter || '').toLowerCase();
+
+  // C1 — sort/filter/search state. _seq drives "date added" ordering (higher = newer).
+  let _landSort = 'newest', _landFilter = 'all', _landSearch = '';
+  let _tenderSeq = 0;
+  (function stampTenderSeq(){ for (let i = ACTIVE_TENDERS.length - 1; i >= 0; i--){ ACTIVE_TENDERS[i]._seq = ++_tenderSeq; } })();
+  function landSetSort(v){ _landSort = v; landReRenderAnimated(); }
+  function landSetFilter(v){
+    _landFilter = v;
+    document.querySelectorAll('.land-chip').forEach(c => c.classList.toggle('active', c.dataset.filter === v));
+    landReRenderAnimated();
+  }
+  function landSetSearch(v){ _landSearch = v; renderActiveList(); }
+  function landReRenderAnimated(){
     const wrap = document.getElementById('activeList');
-    const filtered = ACTIVE_TENDERS.filter(t => !q || t.name.toLowerCase().includes(q) || t.id.toLowerCase().includes(q) || t.dept.toLowerCase().includes(q));
-    if (!filtered.length){
-      wrap.innerHTML = '<div class="text-center text-[13px] text-ink-500 italic py-12">No tenders match this search</div>';
+    if (!wrap){ renderActiveList(); return; }
+    wrap.style.opacity = '0.6';
+    requestAnimationFrame(() => { renderActiveList(); requestAnimationFrame(() => { wrap.style.opacity = '1'; }); });
+  }
+  const _LAND_MONTH = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+  function landDueKey(t){
+    const m = (t.dueDate || '').match(/([A-Za-z]{3})[A-Za-z]*\s+(\d+)/);
+    if (!m) return 9e15;
+    const mi = _LAND_MONTH[m[1].toLowerCase()];
+    return new Date(2026, mi == null ? 0 : mi, parseInt(m[2], 10)).getTime();
+  }
+  function landSortList(list){
+    const arr = list.slice();
+    switch (_landSort){
+      case 'oldest':      arr.sort((a,b) => (a._seq||0) - (b._seq||0)); break;
+      case 'closeSoon':   arr.sort((a,b) => landDueKey(a) - landDueKey(b)); break;
+      case 'closeLate':   arr.sort((a,b) => landDueKey(b) - landDueKey(a)); break;
+      case 'queriesMost': arr.sort((a,b) => (b.queries||0) - (a.queries||0)); break;
+      case 'nameAZ':      arr.sort((a,b) => String(a.name).localeCompare(String(b.name))); break;
+      case 'newest':
+      default:            arr.sort((a,b) => (b._seq||0) - (a._seq||0)); break;
+    }
+    return arr;
+  }
+  function renderActiveList(filter){
+    if (filter !== undefined && filter !== null) _landSearch = filter;
+    const q = (_landSearch || '').toLowerCase().trim();
+    const wrap = document.getElementById('activeList');
+    if (!wrap) return;
+    let list = ACTIVE_TENDERS.filter(t => {
+      if (_landFilter === 'open')      return t.status === 'open';
+      if (_landFilter === 'closed')    return t.status === 'overdue';
+      if (_landFilter === 'due')       return (t.unanswered || 0) > 0;
+      if (_landFilter === 'completed') return t.status === 'done';
+      return true;
+    });
+    if (q) list = list.filter(t => t.name.toLowerCase().includes(q) || t.id.toLowerCase().includes(q) || t.dept.toLowerCase().includes(q));
+    list = landSortList(list);
+    const cnt = document.getElementById('landCount');
+    if (cnt) cnt.textContent = list.length + (list.length === 1 ? ' tender' : ' tenders');
+    if (!list.length){
+      wrap.innerHTML = '<div class="text-center text-[13px] text-ink-500 italic py-12">No tenders match these filters</div>';
       return;
     }
-    wrap.innerHTML = filtered.map(t => {
+    wrap.innerHTML = list.map(t => {
       const queriesStr = `${t.queries} queries`;
       const subRight = t.unanswered > 0
         ? `<div class="text-[12px] font-bold" style="color:#F59E0B;">${t.unanswered} unanswered</div>`
@@ -2568,7 +3081,9 @@
     renderActiveList(document.getElementById('landingSearch')?.value || '');
     window.scrollTo({ top: 0 });
   }
+  let CURRENT_TND = 'TND-2026-001';
   function openWorkspace(tndId){
+    CURRENT_TND = tndId || 'TND-2026-001';
     try { history.replaceState(null, '', '?tender=' + encodeURIComponent(tndId)); } catch(e){}
     const t = ACTIVE_TENDERS.find(x => x.id === tndId) || PAST_TENDERS.find(x => x.id === tndId);
     if (t){
@@ -2582,12 +3097,14 @@
     setTab('queries');
     selectQuery(null); // empty state
     renderTimeline();
+    if (typeof initGroupState === 'function') initGroupState();
     renderTab1();
     renderDocsTable();
     if (typeof renderApprovalUI === 'function') renderApprovalUI();
     renderCorrigendum();
     mnInit();
     initDeadlineCountdown();
+    if (typeof applyAiSummaryVisibility === 'function') applyAiSummaryVisibility();
     window.scrollTo({ top: 0 });
     refreshIcons();
   }
@@ -3160,14 +3677,20 @@
       }
     }
 
+    // C3 — query-relevant smart response pills (from query text / group topic)
+    const pillSourceText = isQuery
+      ? ((QUERIES.find(x => x.num === scopeData.num) || {}).text || '')
+      : ((GROUPS[scopeData.gid] || {}).topic || '');
+    const smartPills = generateResponsePills(pillSourceText)
+      .map(p => `<button type="button" class="smart-pill" onclick="applyResponsePill('${editorId}', '${esc(p)}')">${esc(p)}</button>`)
+      .join('');
+
     // The action row — hidden entirely when locked
     const actionRow = locked ? `<div class="pb-locked-banner" role="status"><i data-lucide="lock" style="width:12px; height:12px;"></i> Editing locked — response box is owned by ${esc(lockedAssignee)}</div>`
       : `<div class="mt-3 flex items-center gap-2 flex-wrap">
           <button onclick="${isQuery ? `generateAIResponse('${esc(scopeData.num)}')` : `generateGroupAIResponse('${esc(scopeData.gid)}')`}" class="px-2.5 py-1.5 rounded-md border border-primary-border text-primary text-[12px] font-medium hover:bg-primary-light inline-flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Generate AI Response</button>
           <button type="button" id="pbUseStdTrigger-${editorId}" class="pb-use-std-trigger px-2.5 py-1.5 rounded-md border border-line text-ink-900 text-[12px] hover:bg-surface inline-flex items-center gap-1.5" onclick="openUseStdDropdown('${editorId}', this); event.stopPropagation();" aria-label="Use standard response for this query"><i data-lucide="library" class="w-3.5 h-3.5"></i> Use standard response ▾</button>
-          <button onclick="${isQuery ? `applyChip('${esc(scopeData.num)}','refer')` : `applyGroupChip('${esc(scopeData.gid)}','refer')`}" class="text-[12px] text-ink-900 hover:border-primary hover:text-primary" style="border:1px solid #E5E7EB; border-radius:20px; padding:4px 12px; background:white;">Refer to document</button>
-          <button onclick="${isQuery ? `applyChip('${esc(scopeData.num)}','cannot')` : `applyGroupChip('${esc(scopeData.gid)}','cannot')`}" class="text-[12px] text-ink-900 hover:border-primary hover:text-primary" style="border:1px solid #E5E7EB; border-radius:20px; padding:4px 12px; background:white;">Cannot disclose</button>
-          <button onclick="${isQuery ? `applyChip('${esc(scopeData.num)}','nochange')` : `applyGroupChip('${esc(scopeData.gid)}','nochange')`}" class="text-[12px] text-ink-900 hover:border-primary hover:text-primary" style="border:1px solid #E5E7EB; border-radius:20px; padding:4px 12px; background:white;">No change required</button>
+          ${smartPills}
         </div>`;
 
     // Send-to-corrigendum + Save-as-standard row (only when not locked)
@@ -3307,18 +3830,30 @@
         </div>`;
       }).join('');
 
+      const gLabel = groupLabelFor(gid);
+      const badgeHtml = g.custom
+        ? `<span class="text-[10px] font-medium" style="background:#F3F4F6; color:#6B7280; border-radius:14px; padding:1px 7px;">Custom</span>`
+        : (sec ? `<span class="text-[10px] font-medium" style="${sectionPillStyle()}">${sec}</span>` : '');
+      // Ungroup affordance — hidden when only 1 query (nothing meaningful to ungroup)
+      const ungroupArea = (g.members.length > 1)
+        ? (_ungroupConfirmFor === gid
+            ? `<span class="ung-confirm" style="margin-left:auto;"><span class="q">Ungroup this group?</span><button type="button" class="ung-yes" onclick="event.stopPropagation(); confirmUngroup('${gid}')">Yes</button><button type="button" class="ung-cancel" onclick="event.stopPropagation(); cancelUngroup()">Cancel</button></span>`
+            : `<button type="button" class="ung-btn" style="margin-left:auto;" aria-label="Ungroup ${esc(gLabel)}" onclick="event.stopPropagation(); startUngroup('${gid}')"><i data-lucide="unlink" style="width:12px; height:12px;"></i> Ungroup</button>`)
+        : '';
+      const chevronCls = (g.members.length > 1) ? '' : 'ml-auto ';
       const headerHtml = `
         <div class="flex items-center gap-3" style="padding:12px 16px; cursor:pointer;" onclick="toggleGroupExpand('${gid}', event)" onmouseenter="this.style.background='#F8FBFF';" onmouseleave="this.style.background='';">
           <input type="checkbox" checked onclick="event.stopPropagation();" onchange="toggleEntireGroup('${gid}', this.checked)" class="accent-primary" />
-          <span class="text-[14px] font-bold text-ink-900">Group ${gid} · ${g.topic}</span>
+          <span class="text-[14px] font-bold text-ink-900">${esc(gLabel)}</span>
           <span class="text-[11px] font-medium" style="background:#EFF6FF; color:#0F5EE8; border-radius:20px; padding:2px 8px;" aria-live="polite">${g.members.length} queries</span>
-          ${sec ? `<span class="text-[10px] font-medium" style="${sectionPillStyle()}">${sec}</span>` : ''}
-          <button class="ml-auto text-ink-500 hover:text-ink-900" aria-expanded="${expanded}" aria-label="Toggle group" onclick="event.stopPropagation(); toggleGroupExpand('${gid}')"><i data-lucide="${expanded?'chevron-up':'chevron-down'}" class="w-4 h-4"></i></button>
+          ${badgeHtml}
+          ${ungroupArea}
+          <button class="${chevronCls}text-ink-500 hover:text-ink-900" aria-expanded="${expanded}" aria-label="Toggle group" onclick="event.stopPropagation(); toggleGroupExpand('${gid}')"><i data-lucide="${expanded?'chevron-up':'chevron-down'}" class="w-4 h-4"></i></button>
         </div>`;
 
       const responseBlock = expanded ? responseEditorHtml('g', { gid, g }) : '';
 
-      return `<div style="background:white; border:1px solid #DBEAFE; border-radius:10px; margin-bottom:10px; overflow:hidden;" data-group="${gid}">
+      return `<div class="grp-card" style="background:white; border:1px solid #DBEAFE; border-radius:10px; margin-bottom:10px;" data-group="${gid}">
         ${headerHtml}
         ${expanded ? subRows : ''}
         ${responseBlock}
@@ -3357,11 +3892,203 @@
     renderTab1();
   }
 
+  // ============================================================
+  // UNGROUP + UNDO + RE-GROUP (AI Grouped Queries)
+  // ============================================================
+  let _enterStagger = 0;
+  let _ungroupConfirmFor = null;          // gid showing the inline "Ungroup this group?" confirm
+  const _undoToasts = new Map();          // gid -> { gid, label, queries:[qNums], seq } — session only
+  let _undoSeq = 0;
+  const _selectedIndividual = new Set();  // qNums checked in Individual Queries for re-grouping
+  let _regroupPromptOpen = false;
+  let _customGroupSeq = 0;
+  let _groupOriginalMembers = {};
+  let _groupOriginalMembersCaptured = false;
+
+  function groupStateKey(){ return 'groupState_' + ((typeof CURRENT_TND !== 'undefined' && CURRENT_TND) ? CURRENT_TND : 'TND-2026-001'); }
+  function loadGroupState(){ try { const r = localStorage.getItem(groupStateKey()); if (r) return JSON.parse(r); } catch(e){} return null; }
+  function saveGroupState(s){ try { localStorage.setItem(groupStateKey(), JSON.stringify(s)); } catch(e){} }
+  function groupLabelFor(gid){
+    const g = GROUPS[gid];
+    if (!g) return gid;
+    return g.custom ? g.topic : ('Group ' + gid + ' · ' + g.topic);
+  }
+  function ungTrunc(s, n){ s = String(s || ''); return s.length > n ? (s.slice(0, n) + '…') : s; }
+
+  // Capture original membership/order, then apply persisted ungroup state. Runs on workspace open.
+  function initGroupState(){
+    if (!_groupOriginalMembersCaptured){
+      _groupOriginalMembers = {};
+      Object.keys(GROUPS).forEach(gid => { _groupOriginalMembers[gid] = QUERIES.filter(q => q.group === gid).map(q => q.num); });
+      _groupOriginalMembersCaptured = true;
+    }
+    _undoToasts.clear();
+    _selectedIndividual.clear();
+    _ungroupConfirmFor = null;
+    _regroupPromptOpen = false;
+    let s = loadGroupState();
+    if (!s || !s.groups){
+      s = { groups: {}, originalOrder: [] };
+      Object.keys(GROUPS).forEach((gid, i) => {
+        if ((_groupOriginalMembers[gid] || []).length){ s.groups[gid] = { status: 'grouped', originalIndex: i }; s.originalOrder.push(gid); }
+      });
+      saveGroupState(s);
+    }
+    // Reconcile the live model with the persisted state
+    Object.keys(s.groups).forEach(gid => {
+      const gs = s.groups[gid];
+      // Restore custom groups that survived (definition stored in state)
+      if (gs.custom && Array.isArray(gs.queries) && !GROUPS[gid]){
+        GROUPS[gid] = { topic: gs.topic || 'Custom group', members: [], expanded: false, custom: true };
+      }
+      const origMembers = gs.custom && Array.isArray(gs.queries) ? gs.queries : (_groupOriginalMembers[gid] || []);
+      const label = gs.custom ? (gs.topic || 'Custom group') : groupLabelFor(gid);
+      if (gs.status === 'ungrouped'){
+        origMembers.forEach(qn => { const q = QUERIES.find(x => x.num === qn); if (q){ q.group = null; q._wasInGroup = gid; q._wasInGroupLabel = label; } });
+      } else if (gs.custom){
+        origMembers.forEach(qn => { const q = QUERIES.find(x => x.num === qn); if (q){ q.group = gid; delete q._wasInGroup; delete q._wasInGroupLabel; } });
+      }
+    });
+    rebuildGroupMembers();
+  }
+
+  function startUngroup(gid){ _ungroupConfirmFor = gid; renderGroupsList(); }
+  function cancelUngroup(){ _ungroupConfirmFor = null; renderGroupsList(); }
+  function confirmUngroup(gid){
+    _ungroupConfirmFor = null;
+    const g = GROUPS[gid];
+    if (!g) return;
+    const label = groupLabelFor(gid);
+    const members = g.members.slice();
+    const card = document.querySelector('#groupsList [data-group="' + gid + '"]');
+    if (card){
+      card.style.maxHeight = card.scrollHeight + 'px';
+      requestAnimationFrame(() => { card.style.maxHeight = '0'; card.style.opacity = '0'; card.style.marginBottom = '0'; });
+    }
+    setTimeout(() => {
+      members.forEach(qn => { const q = QUERIES.find(x => x.num === qn); if (q){ q.group = null; q._wasInGroup = gid; q._wasInGroupLabel = label; q._justUngrouped = true; } });
+      rebuildGroupMembers();
+      const s = loadGroupState() || { groups: {}, originalOrder: [] };
+      if (!s.groups[gid]) s.groups[gid] = { status: 'grouped', originalIndex: Object.keys(s.groups).length };
+      s.groups[gid].status = 'ungrouped';
+      if (g.custom){ s.groups[gid].custom = true; s.groups[gid].topic = g.topic; s.groups[gid].queries = members.slice(); }
+      saveGroupState(s);
+      _addUndoToast(gid, label, members);
+      renderTab1();
+      renderUndoToasts();
+    }, 250);
+  }
+
+  function _addUndoToast(gid, label, queries){
+    if (_undoToasts.size >= 3){   // max 3 — auto-dismiss the oldest
+      let oldest = null;
+      _undoToasts.forEach(v => { if (!oldest || v.seq < oldest.seq) oldest = v; });
+      if (oldest){
+        const el = document.querySelector('#groupUndoToasts [data-toast="' + oldest.gid + '"]');
+        if (el) el.style.opacity = '0';
+        _undoToasts.delete(oldest.gid);
+        setTimeout(() => renderUndoToasts(), 200);
+      }
+    }
+    _undoToasts.set(gid, { gid, label, queries: queries.slice(), seq: _undoSeq++ });
+  }
+
+  function renderUndoToasts(){
+    const wrap = document.getElementById('groupUndoToasts');
+    if (!wrap) return;
+    const toasts = Array.from(_undoToasts.values()).sort((a, b) => a.seq - b.seq);
+    wrap.innerHTML = toasts.map(t =>
+      '<div class="ung-toast" data-toast="' + t.gid + '" role="status">'
+      + '<div class="left"><i data-lucide="unlink" style="width:14px; height:14px; color:rgba(255,255,255,0.6);"></i>'
+      +   '<span class="msg">Group ‘' + esc(ungTrunc(t.label, 30)) + '’ ungrouped</span></div>'
+      + '<div class="right"><button type="button" class="undo" onclick="undoUngroup(\'' + t.gid + '\')">Undo</button>'
+      +   '<button type="button" class="dismiss" aria-label="Dismiss" onclick="dismissUndoToast(\'' + t.gid + '\')">×</button></div>'
+      + '</div>').join('');
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function dismissUndoToast(gid){
+    const el = document.querySelector('#groupUndoToasts [data-toast="' + gid + '"]');
+    if (el) el.style.opacity = '0';
+    _undoToasts.delete(gid);
+    setTimeout(() => renderUndoToasts(), 200);
+  }
+
+  function undoUngroup(gid){
+    const t = _undoToasts.get(gid);
+    const queries = t ? t.queries.slice() : (_groupOriginalMembers[gid] || []).slice();
+    const el = document.querySelector('#groupUndoToasts [data-toast="' + gid + '"]');
+    if (el) el.style.opacity = '0';
+    _undoToasts.delete(gid);
+    queries.forEach((qn, i) => {
+      const c = document.querySelector('#queryList [data-q="' + qn + '"]');
+      if (c){ c.style.transition = 'opacity 200ms ease'; setTimeout(() => { c.style.opacity = '0'; }, i * 40); }
+    });
+    setTimeout(() => {
+      queries.forEach(qn => { const q = QUERIES.find(x => x.num === qn); if (q){ q.group = gid; delete q._wasInGroup; delete q._wasInGroupLabel; delete q._justUngrouped; } });
+      rebuildGroupMembers();
+      const s = loadGroupState() || { groups: {}, originalOrder: [] };
+      if (s.groups[gid]) s.groups[gid].status = 'grouped';
+      saveGroupState(s);
+      renderTab1();
+      renderUndoToasts();
+      const card = document.querySelector('#groupsList [data-group="' + gid + '"]');
+      if (card){
+        const orig = card.style.borderColor;
+        card.style.borderColor = '#10B981';
+        setTimeout(() => { card.style.borderColor = orig || '#DBEAFE'; }, 600);
+      }
+    }, queries.length * 40 + 210);
+  }
+
+  // ===== Part 5: re-group from Individual Queries =====
+  function toggleIndividualSelect(qn, checked){
+    if (checked) _selectedIndividual.add(qn); else { _selectedIndividual.delete(qn); _regroupPromptOpen = false; }
+    renderRegroupBar();
+  }
+  function renderRegroupBar(){
+    const bar = document.getElementById('regroupBar');
+    if (!bar) return;
+    Array.from(_selectedIndividual).forEach(qn => { const q = QUERIES.find(x => x.num === qn); if (!q || q.group) _selectedIndividual.delete(qn); });
+    const n = _selectedIndividual.size;
+    if (n < 2){ bar.innerHTML = ''; _regroupPromptOpen = false; return; }
+    if (_regroupPromptOpen){
+      bar.innerHTML = '<div class="regroup-bar"><span class="cnt">' + n + ' queries selected</span>'
+        + '<div class="regroup-prompt"><label for="regroupLabel">Group label:</label>'
+        + '<input id="regroupLabel" type="text" value="Custom group" />'
+        + '<button type="button" class="regroup-create" onclick="createCustomGroup()">Create group</button>'
+        + '<button type="button" class="regroup-cancel" onclick="regroupCancelPrompt()">Cancel</button></div></div>';
+    } else {
+      bar.innerHTML = '<div class="regroup-bar"><span class="cnt">' + n + ' queries selected</span>'
+        + '<button type="button" class="regroup-these" onclick="regroupOpenPrompt()">Group these →</button></div>';
+    }
+    if (window.lucide) lucide.createIcons();
+  }
+  function regroupOpenPrompt(){ _regroupPromptOpen = true; renderRegroupBar(); setTimeout(() => { const i = document.getElementById('regroupLabel'); if (i){ i.focus(); i.select(); } }, 30); }
+  function regroupCancelPrompt(){ _regroupPromptOpen = false; renderRegroupBar(); }
+  function createCustomGroup(){
+    const label = (((document.getElementById('regroupLabel') || {}).value) || 'Custom group').trim() || 'Custom group';
+    const qns = Array.from(_selectedIndividual);
+    if (qns.length < 2){ showToast('Select at least 2 queries to group'); return; }
+    const gid = 'CUSTOM' + (++_customGroupSeq);
+    GROUPS[gid] = { topic: label, members: [], expanded: false, custom: true };
+    qns.forEach(qn => { const q = QUERIES.find(x => x.num === qn); if (q){ q.group = gid; delete q._wasInGroup; delete q._wasInGroupLabel; } });
+    rebuildGroupMembers();
+    _selectedIndividual.clear();
+    _regroupPromptOpen = false;
+    const s = loadGroupState() || { groups: {}, originalOrder: [] };
+    s.groups[gid] = { status: 'grouped', originalIndex: Object.keys(s.groups).length, custom: true, topic: label, queries: qns.slice() };
+    saveGroupState(s);
+    renderTab1();
+    showToast('Created group “' + ungTrunc(label, 30) + '” with ' + qns.length + ' queries');
+  }
+
   // ============= INDIVIDUAL QUERIES RENDERER (with embedded editor) =============
   function renderQueryList(){
     recountFilters();
     const list = document.getElementById('queryList');
     if (!list) return;
+    _enterStagger = 0;   // reset per-render stagger index for ungroup entrance animation
     const search = (document.getElementById('qsSearch')?.value || '').toLowerCase();
     const arr = QUERIES.filter(q => {
       if (q.group) return false;
@@ -3380,12 +4107,17 @@
       const stat = statusPillStyle(q.status);
       const expanded = expandedQueries.has(q.num);
 
+      const originBadge = q._wasInGroup
+        ? `<span class="ung-origin"><i data-lucide="unlink" style="width:10px; height:10px;"></i> Was in: ${esc(ungTrunc(q._wasInGroupLabel || '', 20))}</span>`
+        : '';
       const headerHtml = `
         <div class="flex items-center gap-2.5 flex-wrap" style="padding:12px 16px; cursor:pointer;" onclick="toggleQueryExpand('${q.num}')" onmouseenter="this.style.background='#F9FAFB';" onmouseleave="this.style.background='';">
+          <input type="checkbox" class="ind-select-cb" ${_selectedIndividual.has(q.num)?'checked':''} onclick="event.stopPropagation();" onchange="toggleIndividualSelect('${q.num}', this.checked)" aria-label="Select ${q.num} for grouping" />
           <span class="text-[11.5px] font-bold font-mono shrink-0" style="background:#EFF6FF; color:#0F5EE8; border-radius:4px; padding:1px 6px;">${q.num}</span>
           <span class="text-[10.5px] font-medium" style="${typePillStyle(q.type)}; border-radius:14px; padding:1px 7px;">${q.type}</span>
           <span class="text-[10.5px] font-medium" style="${formPillStyle(q.form)}; border-radius:14px; padding:1px 7px;">${q.form}</span>
           <span class="text-[10px] font-medium" style="${sectionPillStyle()}">${q.section}</span>
+          ${originBadge}
           ${q.imported ? '<span class="text-[10px] font-medium" style="background:#F3F4F6; color:#6B7280; border-radius:4px; padding:1px 5px;">Imported</span>' : ''}
           <span class="text-[11px]" style="color:#9CA3AF;">${q.received}</span>
           <span class="ml-auto inline-flex items-center gap-2">
@@ -3427,7 +4159,9 @@
           ${responseEditorHtml('q', { num: q.num, q })}`;
       }
 
-      return `<div style="background:white; border:1px solid #E5E7EB; border-radius:10px; margin-bottom:10px; overflow:hidden; ${dimStyle}" data-q="${q.num}">
+      const enterCls = q._justUngrouped ? ' qcard-enter' : '';
+      const enterDelay = q._justUngrouped ? `animation-delay:${(_enterStagger++) * 60}ms;` : '';
+      return `<div class="qcard${enterCls}" style="background:white; border:1px solid #E5E7EB; border-radius:10px; margin-bottom:10px; overflow:hidden; ${enterDelay} ${dimStyle}" data-q="${q.num}">
         ${headerHtml}
         ${body}
       </div>`;
@@ -3445,6 +4179,9 @@
       list.innerHTML = arr.map(renderRegularCard).join('');
     }
     refreshIcons();
+    if (typeof renderRegroupBar === 'function') renderRegroupBar();
+    // Clear one-shot entrance flags after the animation has had a frame to start
+    if (arr.some(q => q._justUngrouped)) setTimeout(() => { QUERIES.forEach(q => { delete q._justUngrouped; }); }, 400);
   }
 
   // ============= POST-MEETING TRIAGE =============
@@ -4910,9 +5647,25 @@
   let _approvalSending = false;
   let _approvalWithdrawConfirm = false;
   let _approvalPublishConfirm = false;
+  let _approvalPubConfirm = false;       // inline "Publish all?" confirm in the approved ribbon
+  let _approvalRibbonAnimate = false;    // true only on the pending→approved transition (slide + pulse)
   let _docViewMode = 'main';   // 'main' | 'tracking'
+  function approvalRegSeqKey(){ return 'approvalRegSeq_' + ((typeof CURRENT_TND !== 'undefined' && CURRENT_TND) ? CURRENT_TND : 'TND-2026-001'); }
+  function approvalNextRegNum(){ let n = 0; try { n = parseInt(localStorage.getItem(approvalRegSeqKey()) || '0', 10) || 0; } catch(e){} n += 1; try { localStorage.setItem(approvalRegSeqKey(), String(n)); } catch(e){} return n; }
 
-  function approvalLoad(){ try { const r = localStorage.getItem(APPROVAL_KEY); return r ? JSON.parse(r) : null; } catch(e){ return null; } }
+  function approvalLoad(){
+    try {
+      const r = localStorage.getItem(APPROVAL_KEY);
+      if (!r) return null;
+      const o = JSON.parse(r);
+      // Self-heal: pre-rebuild chains lacked the `.name`/`.id` fields → drop the stale state so the flow restarts clean.
+      if (o && Array.isArray(o.approvalChain) && o.approvalChain.length && !o.approvalChain[0].name){
+        localStorage.removeItem(APPROVAL_KEY);
+        return null;
+      }
+      return o;
+    } catch(e){ return null; }
+  }
   function approvalSaveState(o){ try { localStorage.setItem(APPROVAL_KEY, JSON.stringify(o)); } catch(e){} }
   function approvalClearState(){ try { localStorage.removeItem(APPROVAL_KEY); } catch(e){} }
   function approvalIsSuperAdmin(){ try { return (sessionStorage.getItem('userRole') || 'Super Admin') === 'Super Admin'; } catch(e){ return true; } }
@@ -4937,38 +5690,232 @@
   }
 
   // Toolbar button + status banner reflect localStorage. Called on docs tab load + after every action.
+  // ============================================================
+  // PEOPLE SELECTION MODAL (Responses tab — Send for approval)
+  // Self-contained (apm*) so the shared corrigendum selector stays untouched.
+  // ============================================================
+  let _apm = null;          // { ids:[ordered], manual:[{...}], addOpen, sending }
+  let _apmDragId = null;
+  let _apSbPromptIdx = null;
+  function apmHashStr(s){ let h = 0; s = String(s || ''); for (let i = 0; i < s.length; i++){ h = (h * 31 + s.charCodeAt(i)) | 0; } return Math.abs(h); }
+  function apmRoleOf(a){ return a.manuallyAdded ? (a.role || 'Custom') : (a.role || 'Other'); }
+  function apmRolePillClass(role){ return 'apm-role-' + (['Technical','Finance','Legal','HOD','Custom','Other'].indexOf(role) >= 0 ? role : 'Other'); }
+  function apmRequiredId(){ const r = APPROVER_POOL.find(a => a.required); return r ? r.id : null; }
+  function apmAllPeople(){ return APPROVER_POOL.concat(_apm ? _apm.manual : []); }
+  function apmPerson(id){ return apmAllPeople().find(a => a.id === id) || null; }
+  function apmPinRequired(){ const r = apmRequiredId(); if (r && _apm.ids.indexOf(r) >= 0){ _apm.ids = [r].concat(_apm.ids.filter(x => x !== r)); } }
+  function apmInit(prefill){
+    _apm = { ids: [], manual: [], addOpen: false, sending: false };
+    if (prefill && Array.isArray(prefill.manual)) _apm.manual = prefill.manual.map(m => Object.assign({}, m));
+    if (prefill && Array.isArray(prefill.ids)) _apm.ids = prefill.ids.slice();
+    const reqId = apmRequiredId();
+    if (reqId && _apm.ids.indexOf(reqId) < 0) _apm.ids.unshift(reqId);
+    apmPinRequired();
+  }
+  function apmOpen(prefill){
+    apmInit(prefill);
+    apmRender();
+    requestAnimationFrame(() => { const c = document.querySelector('#apModalHost .apm-card'); if (c) c.classList.add('in'); });
+  }
+  function apmClose(){
+    const card = document.querySelector('#apModalHost .apm-card');
+    const overlay = document.querySelector('#apModalHost .apm-overlay');
+    if (overlay) overlay.style.transition = 'opacity 200ms ease';
+    if (overlay) overlay.style.opacity = '0';
+    if (card) card.classList.remove('in');
+    setTimeout(() => { const host = document.getElementById('apModalHost'); if (host) host.innerHTML = ''; }, 250);
+  }
+  function apmToggle(id){
+    if (!_apm) return;
+    const a = apmPerson(id);
+    if (a && a.required) return;
+    const i = _apm.ids.indexOf(id);
+    if (i >= 0) _apm.ids.splice(i, 1); else _apm.ids.push(id);
+    apmPinRequired();
+    apmRender();
+  }
+  function apmRemove(id){
+    if (!_apm) return;
+    const a = apmPerson(id);
+    if (a && a.required) return;
+    _apm.ids = _apm.ids.filter(x => x !== id);
+    apmRender();
+  }
+  function apmOpenAdd(){ if (_apm){ _apm.addOpen = true; apmRender(); } }
+  function apmCancelAdd(){ if (_apm){ _apm.addOpen = false; apmRender(); } }
+  function apmAddPerson(){
+    if (!_apm) return;
+    const nm = (document.getElementById('apmName') || {}).value || '';
+    const dg = (document.getElementById('apmDesig') || {}).value || '';
+    const em = (document.getElementById('apmEmail') || {}).value || '';
+    const rl = (document.getElementById('apmRole') || {}).value || '';
+    if (!nm.trim()){ showToast('Enter a name'); return; }
+    const id = 'manual-' + (_apm.manual.length + 1) + '-' + apmHashStr(nm + em);
+    _apm.manual.push({ id, name: nm.trim(), designation: dg.trim() || '—', email: em.trim(), role: rl || 'Custom', manuallyAdded: true });
+    _apm.ids.push(id);
+    _apm.addOpen = false;
+    apmPinRequired();
+    apmRender();
+    showToast(nm.trim() + ' added to approvers');
+  }
+  function apmReorder(targetId){
+    if (!_apm || !_apmDragId || _apmDragId === targetId){ _apmDragId = null; return; }
+    const reqId = apmRequiredId();
+    if (_apmDragId === reqId || targetId === reqId){ _apmDragId = null; return; }
+    const ids = _apm.ids;
+    const from = ids.indexOf(_apmDragId), to = ids.indexOf(targetId);
+    _apmDragId = null;
+    if (from < 0 || to < 0) return;
+    ids.splice(to, 0, ids.splice(from, 1)[0]);
+    apmPinRequired();
+    apmRender();
+  }
+  function apmChain(){
+    const now = new Date().toISOString();
+    return _apm.ids.map((id, idx) => {
+      const a = apmPerson(id) || {};
+      return { id: id, name: a.name, designation: a.designation, email: a.email || '', role: apmRoleOf(a),
+        required: !!a.required, order: idx + 1, status: 'pending', sentAt: idx === 0 ? now : null,
+        approvedAt: null, comment: null, manuallyAdded: !!a.manuallyAdded };
+    });
+  }
+  function apmConfirm(){
+    if (!_apm || _apm.sending) return;
+    if (_apm.ids.length < 1){ showToast('Select at least one approver'); return; }
+    _apm.sending = true;
+    apmRender();
+    setTimeout(() => {
+      const nowIso = new Date().toISOString();
+      approvalSaveState({ status: 'pending', sentAt: nowIso, sentBy: 'Rajesh Kumar',
+        draftCount: approvalDraftCount(), totalQueries: QUERIES.length, registerNumber: approvalNextRegNum(),
+        approvalChain: apmChain(), lastUpdated: nowIso });
+      apmClose();
+      renderApprovalUI();
+      showToast('Response register sent for approval');
+    }, 800);
+  }
+  function apmRender(){
+    const host = document.getElementById('apModalHost');
+    if (!host || !_apm) return;
+    const total = QUERIES.length, drafts = approvalDraftCount(), unans = approvalUnansweredCount(), flagged = approvalCorrigFlaggedSet().size;
+    const rowsHTML = apmAllPeople().map(a => {
+      const checked = _apm.ids.indexOf(a.id) >= 0;
+      const cbCls = 'apm-cb' + (checked ? ' on' : '') + (a.required ? ' dis' : '');
+      const reqBadge = a.required ? '<span class="apm-reqbadge">Required</span>' : '';
+      const role = apmRoleOf(a);
+      const pill = a.manuallyAdded
+        ? '<span class="apm-rolepill apm-role-Custom">Custom</span>'
+        : '<span class="apm-rolepill ' + apmRolePillClass(role) + '">' + esc(role) + '</span>';
+      return '<div class="apm-row' + (a.required ? ' req' : '') + '"' + (a.required ? '' : ' onclick="apmToggle(\'' + a.id + '\')"') + '>'
+        + '<div class="' + cbCls + '" role="checkbox" aria-checked="' + checked + '" aria-label="' + esc(a.name) + '">' + (checked ? '<i data-lucide="check" style="width:11px;height:11px;"></i>' : '') + '</div>'
+        + '<div class="apm-av">' + esc(approverInitials(a.name)) + '</div>'
+        + '<div style="flex:1; min-width:0;"><div class="apm-name">' + esc(a.name) + ' ' + reqBadge + '</div><div class="apm-desig">' + esc(a.designation) + '</div></div>'
+        + pill + '</div>';
+    }).join('');
+    const addBlock = '<div class="apm-addsec">'
+      + '<button type="button" class="apm-addlink" onclick="apmOpenAdd()"><i data-lucide="user-plus" style="width:13px;height:13px;"></i> Add someone not listed</button>'
+      + '<div class="apm-addform-wrap' + (_apm.addOpen ? ' open' : '') + '"><div class="apm-addform">'
+      +   '<div class="grid3"><input id="apmName" type="text" placeholder="Full name" /><input id="apmDesig" type="text" placeholder="Designation" /><input id="apmEmail" type="email" placeholder="Email address" /></div>'
+      +   '<div class="row2"><select id="apmRole" class="role"><option value="">Select role...</option><option>Technical</option><option>Finance</option><option>Legal</option><option>HOD</option><option>Other</option></select>'
+      +     '<div style="display:flex; align-items:center; gap:12px;"><button type="button" class="apm-add-cancel" onclick="apmCancelAdd()">Cancel</button><button type="button" class="apm-add-btn" onclick="apmAddPerson()">Add to list</button></div></div>'
+      + '</div></div></div>';
+    const chips = _apm.ids.map((id, idx) => {
+      const a = apmPerson(id) || {};
+      const rm = a.required ? '' : '<span class="rm" onclick="apmRemove(\'' + id + '\')" title="Remove">×</span>';
+      return '<span class="apm-chip" draggable="true" data-apmid="' + id + '" '
+        + 'ondragstart="_apmDragId=\'' + id + '\'; this.style.opacity=\'0.5\'; if(event.dataTransfer){event.dataTransfer.effectAllowed=\'move\';}" '
+        + 'ondragend="this.style.opacity=\'1\';" ondragover="event.preventDefault();" ondrop="event.preventDefault(); apmReorder(\'' + id + '\');">'
+        + '<span class="h">⠿</span><span class="num">' + (idx + 1) + '</span><span>' + esc(a.name) + '</span>' + rm + '</span>';
+    }).join('');
+    const cnt = _apm.ids.length;
+    const sendDisabled = cnt < 1 || _apm.sending;
+    host.innerHTML = '<div class="apm-overlay">'
+      + '<div class="apm-card" role="dialog" aria-modal="true" aria-label="Select approvers for approval">'
+      + '<div class="apm-head"><div><div class="t">Select approvers</div><div class="s">Choose who needs to approve the response register before it is published to vendors.</div></div>'
+      +   '<button type="button" class="apm-x" aria-label="Close" onclick="apmClose()">×</button></div>'
+      + '<div class="apm-body">'
+      +   '<div class="apm-summary">'
+      +     '<div class="cell"><div class="k">Total queries</div><div class="v" style="color:#111827;">' + total + '</div></div>'
+      +     '<div class="cell"><div class="k">Drafted</div><div class="v" style="color:#10B981;">' + drafts + '</div></div>'
+      +     '<div class="cell"><div class="k">Unanswered</div><div class="v" style="color:#F59E0B;">' + unans + '</div></div>'
+      +     '<div class="cell"><div class="k">Flagged for corrigendum</div><div class="v" style="color:#EF4444;">' + flagged + '</div></div>'
+      +   '</div>'
+      +   '<div class="apm-lbl">Approvers</div><div class="apm-sub">Select one or more people who must approve before publication.</div>'
+      +   '<div class="apm-list">' + rowsHTML + '</div>'
+      +   addBlock
+      +   '<div class="apm-order"><div class="t">Approval order</div><div class="s">Drag to change the order in which approvals are collected.</div><div class="apm-chips">' + chips + '</div></div>'
+      + '</div>'
+      + '<div class="apm-foot"><span class="cnt" aria-live="polite">' + cnt + ' approver' + (cnt === 1 ? '' : 's') + ' selected</span>'
+      +   '<div class="right"><button type="button" class="apm-cancel" ' + (_apm.sending ? 'disabled' : '') + ' onclick="apmClose()">Cancel</button>'
+      +   '<button type="button" class="apm-send" ' + (sendDisabled ? 'disabled' : '') + ' onclick="apmConfirm()">' + (_apm.sending ? '<span class="corrig-send-spinner"></span> Sending...' : 'Send for approval →') + '</button></div>'
+      + '</div></div></div>';
+    if (window.lucide) lucide.createIcons();
+  }
+
   function renderApprovalUI(){
     const btn = document.getElementById('approvalSendBtn');
     const statusWrap = document.getElementById('approvalStatusWrap');
     const banner = document.getElementById('approvalStatusBanner');
+    const pubBtn = document.getElementById('publishAllBtn');
     if (!btn) return;
     const st = approvalLoad();
     const drafts = approvalDraftCount();
+    const status = st && st.status;
+    const animate = _approvalRibbonAnimate; _approvalRibbonAnimate = false;
     btn.removeAttribute('onclick');
-    if (st && (st.status === 'pending' || st.status === 'approved')){
-      const isApproved = st.status === 'approved';
-      btn.className = 'approval-pending-btn';
-      btn.disabled = true;
-      btn.title = '';
-      btn.onclick = null;
-      btn.innerHTML = isApproved ? '<i data-lucide="circle-check" style="width:14px;height:14px;"></i> Approved' : 'Pending approval ⏳';
+
+    if (status === 'pending' || status === 'approved' || status === 'published'){
+      const isApproved = status === 'approved', isPublished = status === 'published';
+      // --- Toolbar send button ---
+      btn.disabled = true; btn.onclick = null; btn.title = '';
+      if (isPublished){ btn.className = 'approval-published-btn'; btn.innerHTML = '<i data-lucide="circle-check" style="width:14px;height:14px;"></i> Published ✓'; }
+      else if (isApproved){ btn.className = 'approval-approved-btn'; btn.innerHTML = '<i data-lucide="circle-check" style="width:14px;height:14px;"></i> Approved ✓'; }
+      else { btn.className = 'approval-pending-btn'; btn.innerHTML = 'Pending approval ⏳'; }
+
+      // --- Status banner ---
       if (banner){
-        const sentDt = approvalFmtSentLine(st.sentAt);
-        const awaiting = (st.approvalChain && st.approvalChain[0]) || { approver:'Priya Shah', role:'Technical Officer' };
-        const msg = isApproved
-          ? 'Response register approved · Ready to publish'
-          : 'Response register sent for approval · Awaiting ' + esc(awaiting.approver) + ' (' + esc(awaiting.role) + ')';
-        banner.innerHTML = '<div class="approval-status-banner">'
-          + '<div class="left"><i data-lucide="clock" style="width:16px;height:16px;color:#F59E0B;flex-shrink:0;"></i>'
-          +   '<div style="min-width:0;"><div class="msg">' + msg + '</div><div class="ts">Sent ' + esc(sentDt) + '</div></div></div>'
-          + '<button type="button" class="approval-track-link" onclick="approvalTrackOpen()">Track approval →</button>'
-          + '</div>';
+        if (status === 'pending'){
+          const sentDt = approvalFmtSentLine(st.sentAt);
+          const firstPending = (st.approvalChain || []).find(a => a.status === 'pending' || a.status === 'sent_back') || (st.approvalChain || [])[0] || { name:'Priya Shah', designation:'Technical Officer' };
+          banner.innerHTML = '<div class="approval-status-banner">'
+            + '<div class="left"><i data-lucide="clock" style="width:16px;height:16px;color:#F59E0B;flex-shrink:0;"></i>'
+            +   '<div style="min-width:0;"><div class="msg">Response register sent for approval · Awaiting ' + esc(firstPending.name) + ' (' + esc(firstPending.designation) + ')</div><div class="ts">Sent ' + esc(sentDt) + '</div></div></div>'
+            + '<button type="button" class="approval-track-link" onclick="approvalTrackOpen()">Track approval →</button>'
+            + '</div>';
+        } else {
+          const apprDate = approvalRibbonDate(st.approvedAt || st.lastUpdated || st.sentAt);
+          banner.innerHTML = '<div class="approval-status-banner" style="background:#F0FDF4; border-color:#BBF7D0;">'
+            + '<div class="left"><i data-lucide="circle-check" style="width:16px;height:16px;color:#10B981;flex-shrink:0;"></i>'
+            +   '<div style="min-width:0;"><div class="msg" style="color:#065F46;">All approvals received · Ready to publish</div><div class="ts">Approved ' + esc(apprDate) + '</div></div></div>'
+            + '<button type="button" class="approval-track-link" onclick="approvalTrackOpen()">Track approval →</button>'
+            + '</div>';
+          if (animate){ const inner = banner.firstElementChild; if (inner){ inner.style.transition = 'opacity 200ms ease'; inner.style.opacity = '0'; requestAnimationFrame(() => { inner.style.opacity = '1'; }); } }
+        }
         if (statusWrap) statusWrap.classList.add('open');
       }
+
+      // --- Publish All Drafts button state ---
+      if (pubBtn){
+        if (isPublished){
+          pubBtn.disabled = true; pubBtn.onclick = null;
+          pubBtn.className = 'px-3 py-2 rounded-lg text-[12.5px] font-medium inline-flex items-center gap-1.5';
+          pubBtn.style.background = '#E5E7EB'; pubBtn.style.color = '#9CA3AF'; pubBtn.style.cursor = 'not-allowed';
+          pubBtn.innerHTML = 'Published';
+        } else if (isApproved){
+          pubBtn.disabled = false; pubBtn.onclick = function(){ approvalPubStart(); };
+          pubBtn.className = 'px-3 py-2 rounded-lg text-white text-[12.5px] font-medium inline-flex items-center gap-1.5 shadow-soft';
+          pubBtn.style.background = '#10B981'; pubBtn.style.color = 'white'; pubBtn.style.cursor = 'pointer';
+          pubBtn.innerHTML = 'Publish All Drafts <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>';
+          if (animate){ pubBtn.classList.add('approval-pub-pulse'); setTimeout(() => pubBtn.classList.remove('approval-pub-pulse'), 700); }
+        } else {
+          renderApprovalPubBtnDefault(pubBtn);
+        }
+      }
     } else {
+      // null / withdrawn → Send for approval
       btn.disabled = false;
       btn.className = 'approval-send-btn' + (drafts === 0 ? ' disabled' : '');
-      btn.innerHTML = '<i data-lucide="send" style="width:14px;height:14px;"></i> Send for approval →';
+      btn.innerHTML = '<i data-lucide="send" style="width:14px;height:14px;"></i> Send for approval';
       if (drafts === 0){
         btn.title = 'Draft at least one response before sending for approval';
         btn.onclick = function(){ showToast('Draft at least one response before sending for approval'); };
@@ -4978,18 +5925,76 @@
       }
       if (banner) banner.innerHTML = '';
       if (statusWrap) statusWrap.classList.remove('open');
+      if (pubBtn) renderApprovalPubBtnDefault(pubBtn);
     }
+    renderApprovalRibbon(animate);
+    if (window.lucide) lucide.createIcons();
+  }
+  function renderApprovalPubBtnDefault(pubBtn){
+    pubBtn.disabled = false; pubBtn.onclick = function(){ publishAllApproved(); };
+    pubBtn.className = 'px-3 py-2 rounded-lg bg-primary text-white text-[12.5px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5 shadow-soft';
+    pubBtn.style.background = ''; pubBtn.style.color = ''; pubBtn.style.cursor = '';
+    pubBtn.innerHTML = 'Publish All Drafts <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>';
+  }
+  function approvalRibbonDate(iso){ try { return new Date(iso).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }); } catch(e){ return 'today'; } }
+  function approvalRibbonPdf(){ showToast('Register PDF downloaded'); }
+  function approvalPubStart(){ _approvalPubConfirm = true; renderApprovalRibbon(false); }
+  function approvalPubCancel(){ _approvalPubConfirm = false; renderApprovalRibbon(false); }
+  function approvalPubConfirm(){
+    const st = approvalLoad(); if (!st) return;
+    st.status = 'published'; st.publishedAt = new Date().toISOString(); st.lastUpdated = st.publishedAt;
+    approvalSaveState(st);
+    _approvalPubConfirm = false;
+    _approvalRibbonAnimate = false;
+    renderApprovalUI();
+    showToast('Responses published to vendors');
+  }
+  // Renders the green Approved / Published ribbon between the status banner and the table.
+  function renderApprovalRibbon(animate){
+    const wrap = document.getElementById('approvalRibbonWrap');
+    const host = document.getElementById('approvalRibbon');
+    if (!wrap || !host) return;
+    const st = approvalLoad();
+    if (!st || (st.status !== 'approved' && st.status !== 'published')){
+      wrap.classList.remove('open');
+      host.innerHTML = '';
+      return;
+    }
+    const published = st.status === 'published';
+    const regN = st.registerNumber || 1;
+    const drafts = (st.draftCount != null) ? st.draftCount : approvalDraftCount();
+    const names = (st.approvalChain || []).filter(a => a.status === 'approved').map(a => a.name).filter(Boolean).join(', ') || '—';
+    const dateStr = approvalRibbonDate(published ? (st.publishedAt || st.lastUpdated) : (st.approvedAt || st.lastUpdated || st.sentAt));
+    const label = published ? 'PUBLISHED' : 'APPROVED';
+    const sub = (published ? 'Published on ' : 'Approved on ') + dateStr + ' · ' + drafts + ' responses · Approved by ' + esc(names);
+    const body = published
+      ? 'All drafted responses to pre-bid queries have been published to vendors. Vendors who downloaded the tender have been notified.'
+      : "All drafted responses have been approved and are ready to publish. Click 'Publish All Drafts' to notify vendors.";
+    const pubConfirm = (!published && _approvalPubConfirm)
+      ? '<div class="corrig-inline-confirm" role="alertdialog" style="margin-top:12px;"><div class="txt">Publish all ' + drafts + ' responses? 34 vendors who downloaded this tender will be notified.</div>'
+        + '<div class="acts"><button type="button" class="corrig-ic-no" onclick="approvalPubCancel()">Cancel</button><button type="button" class="corrig-ic-yes" style="background:#10B981;" onclick="approvalPubConfirm()">Confirm &amp; Publish</button></div></div>'
+      : '';
+    host.innerHTML = '<div class="approval-ribbon">'
+      + '<div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">'
+      +   '<div style="min-width:0;">'
+      +     '<div class="rb-head"><i data-lucide="circle-check" style="width:16px;height:16px;color:#10B981;"></i><span class="rb-label">' + label + '</span></div>'
+      +     '<div class="rb-title">Response Register ' + regN + '</div>'
+      +     '<div class="rb-sub">' + sub + '</div>'
+      +     '<div class="rb-body">' + body + '</div>'
+      +   '</div>'
+      +   '<button type="button" class="rb-pdf" onclick="approvalRibbonPdf()"><i data-lucide="download" style="width:13px;height:13px;"></i> PDF</button>'
+      + '</div>' + pubConfirm + '</div>';
+    if (animate){ wrap.classList.remove('open'); requestAnimationFrame(() => { wrap.classList.add('open'); }); }
+    else { wrap.classList.add('open'); }
     if (window.lucide) lucide.createIcons();
   }
 
-  // --- Inline confirmation panel ---
+  // Opens the people-selection modal (Screen 2).
   function approvalStartConfirm(){
     const st = approvalLoad();
     if (st && (st.status === 'pending' || st.status === 'approved')){ approvalTrackOpen(); return; }
     if (approvalDraftCount() === 0){ showToast('Draft at least one response before sending for approval'); return; }
-    _approvalConfirmOpen = true;
-    _approvalSending = false;
-    renderApprovalConfirmPanel();
+    apmOpen();
   }
   function approvalCancelConfirm(){
     _approvalConfirmOpen = false;
@@ -5019,20 +6024,14 @@
           <span class="st" style="color:#EF4444;">Flagged for corrigendum:<b>${flagged}</b></span>
         </div>
         ${warning}
-        <div class="approval-chain-preview">
-          <div class="ttl">Will be reviewed by:</div>
-          <div class="approval-chain-chips">
-            <span class="approval-chip">Priya Shah · Technical Officer</span>
-            <span class="approval-chain-arrow">→</span>
-            <span class="approval-chip">Sunita Rao · Deputy Commissioner</span>
-          </div>
-        </div>
+        <div class="approval-chain-preview" style="background:white; border:1px solid #BFDBFE; border-radius:8px; padding:12px 14px; margin-top:12px;"><div id="approverSelector"></div></div>
         <div class="approval-confirm-foot">
           <button type="button" class="cancel" onclick="approvalCancelConfirm()" ${_approvalSending?'disabled':''}>Cancel</button>
-          <button type="button" class="confirm" onclick="approvalConfirmSend()" ${_approvalSending?'disabled':''}>${_approvalSending?'<span class="corrig-send-spinner"></span> Sending…':'Confirm &amp; Send →'}</button>
+          <button type="button" class="confirm" data-approver-confirm onclick="approvalConfirmSend()" ${_approvalSending?'disabled':''}>${_approvalSending?'<span class="corrig-send-spinner"></span> Sending…':'Confirm &amp; Send →'}</button>
         </div>
       </div>`;
     wrap.classList.add('open');
+    approverSelRender();
     if (window.lucide) lucide.createIcons();
   }
   function approvalConfirmSend(){
@@ -5048,10 +6047,7 @@
         sentBy: 'Rajesh Kumar',
         draftCount: drafts,
         totalQueries: QUERIES.length,
-        approvalChain: [
-          { approver: 'Priya Shah', role: 'Technical Officer',   status: 'pending', sentAt: nowIso },
-          { approver: 'Sunita Rao', role: 'Deputy Commissioner', status: 'waiting' },
-        ],
+        approvalChain: approverSelChain(),
       });
       _approvalSending = false;
       _approvalConfirmOpen = false;
@@ -5197,23 +6193,19 @@
     const sentLine = approvalFmtSentLine(st.sentAt);
     const submittedDate = (function(){ try { return new Date(st.sentAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); } catch(e){ return 'today'; } })();
 
-    const c0 = (st.approvalChain && st.approvalChain[0]) || { approver:'Priya Shah', role:'Technical Officer' };
-    const c1 = (st.approvalChain && st.approvalChain[1]) || { approver:'Sunita Rao', role:'Deputy Commissioner' };
-    const steps = [
-      { state:'done', icon:'check', title:'Register submitted', name:(st.sentBy||'Rajesh Kumar')+' · Super Admin', time:sentLine },
-      { state: approved?'done':'active', icon: approved?'check':'clock', title: approved?'Reviewed & approved':'Awaiting review', name: c0.approver+' · '+c0.role, time: approved?(submittedDate+' · Approved'):'Sent just now · Pending', remind:!approved },
-      { state: approved?'done':'locked', icon: approved?'check':'lock', title: approved?'Approved':'Pending', name: c1.approver+' · '+c1.role, time: approved?(submittedDate+' · Approved'):'', muted:!approved },
-      { state: approved?'done':'locked', icon: approved?'check':'send', title: approved?'Ready to publish':'Publication pending approval', name:'All vendors will be notified', time:'', muted:!approved },
-    ];
-    const stepperHTML = steps.map((s,i) => {
-      const last = i === steps.length-1;
-      const lineCls = s.state==='done' ? 'line done' : 'line';
-      const remind = s.remind ? '<button type="button" id="approvalRemindStep" class="s-remind" onclick="corrigSendReminder(\'approvalRemindStep\')"><i data-lucide="bell" style="width:11px;height:11px;"></i> Send reminder</button>' : '';
-      return '<div class="corrig-step" role="listitem">'
-        + (last?'':'<div class="'+lineCls+'"></div>')
-        + '<div class="node '+s.state+'"><i data-lucide="'+s.icon+'" style="width:14px;height:14px;"></i></div>'
-        + '<div class="body"><div class="s-title '+(s.muted?'muted':'')+'">'+esc(s.title)+'</div><div class="s-name '+(s.muted?'muted':'')+'">'+esc(s.name)+'</div>'+(s.time?'<div class="s-time">'+esc(s.time)+'</div>':'')+remind+'</div></div>';
-    }).join('');
+    const chain = st.approvalChain || [];
+    const stepperHTML = apTrackStepperHTML(chain, st);
+    const allApproverNames = chain.map(a => a.name).filter(Boolean);
+    const sentBack = chain.find(a => a.status === 'sent_back');
+    const revisionBanner = sentBack ? `<div class="ap-revision-banner" role="alert" style="display:block;">
+        <div class="msg">⚠ Revision required</div>
+        <div style="font-size:13px; color:#92400E; margin-top:4px;">${esc(sentBack.name)} has sent the register back. Make the necessary changes and resubmit.</div>
+        ${sentBack.comment ? `<div style="font-size:12px; font-style:italic; color:#374151; margin-top:6px;">‘${esc(sentBack.comment)}’</div>` : ''}
+        <div style="display:flex; align-items:center; gap:12px; margin-top:12px;">
+          <button type="button" class="ap-rev-edit" onclick="apEditResubmit()">Edit and resubmit</button>
+          <button type="button" class="ap-rev-withdraw" onclick="approvalStartWithdraw()">Withdraw submission</button>
+        </div>
+      </div>` : '';
 
     const summaryCard = `<div class="corrig-summary-card">
       <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
@@ -5252,9 +6244,12 @@
       <button type="button" onclick="approvalDownloadRegister()" class="corrig-back-btn" style="margin-top:14px;"><i data-lucide="download" style="width:13px;height:13px;vertical-align:-2px;"></i> Download register (PDF)</button>
     </div>`;
 
+    const approvedByLine = allApproverNames.length
+      ? ('Approved by ' + (allApproverNames.length === 1 ? allApproverNames[0] : allApproverNames.slice(0,-1).join(', ') + ' and ' + allApproverNames[allApproverNames.length-1]))
+      : 'All approvers signed off';
     const publishCta = approved ? `<div class="approval-publish-cta">
         <div class="pc-left"><i data-lucide="circle-check" style="width:24px;height:24px;color:#10B981;flex-shrink:0;"></i>
-          <div><div class="pc-title">All approvals received — ready to publish</div><div class="pc-sub">Approved by Priya Shah and Sunita Rao</div></div></div>
+          <div><div class="pc-title">All approvals received</div><div class="pc-sub">${esc(approvedByLine)}</div></div></div>
         <button type="button" class="approval-publish-btn" onclick="approvalStartPublish()">Publish responses now →</button>
       </div>` : '';
     const publishConfirm = (approved && _approvalPublishConfirm) ? `<div class="corrig-inline-confirm" role="alertdialog" style="margin-top:12px;">
@@ -5263,13 +6258,11 @@
       </div>` : '';
 
     const withdrawConfirm = _approvalWithdrawConfirm ? `<div class="corrig-inline-confirm" role="alertdialog" style="margin-top:12px;">
-        <div class="txt">Withdraw this submission? The register will return to draft status.</div>
+        <div class="txt">Withdraw? This will cancel the approval and return the register to draft status.</div>
         <div class="acts"><button type="button" class="corrig-ic-no" onclick="approvalCancelWithdraw()">Cancel</button><button type="button" class="corrig-ic-yes red" onclick="approvalConfirmWithdraw()">Withdraw</button></div>
       </div>` : '';
-    const simLink = (!approved && approvalIsSuperAdmin()) ? '<button type="button" class="corrig-sim-link" onclick="approvalSimulate()" title="Demo: advance all approvals">Simulate approval</button>' : '';
-    const footer = approved ? '' : `<div style="display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:24px; flex-wrap:wrap;">
-        <button type="button" onclick="approvalStartWithdraw()" style="background:transparent; border:none; color:#9CA3AF; font-size:12px; cursor:pointer;">Withdraw submission</button>
-        ${simLink}
+    const footer = `<div style="display:flex; align-items:center; justify-content:flex-end; gap:16px; margin-top:24px; flex-wrap:wrap;">
+        <button type="button" onclick="approvalStartWithdraw()" style="background:transparent; border:none; color:#9CA3AF; font-size:12px; cursor:pointer;">Withdraw this submission</button>
       </div>${withdrawConfirm}`;
 
     view.innerHTML = `
@@ -5277,6 +6270,7 @@
       <button type="button" class="corrig-back-link" onclick="approvalTrackBack()" aria-label="Back to Responses"><i data-lucide="arrow-left" style="width:12px;height:12px;"></i> Back to Responses</button>
       <h1 class="corrig-page-title">Response Register — Approval Tracking</h1>
       <p class="corrig-page-sub">Submitted ${esc(submittedDate)} · ${drafts} drafted response${drafts===1?'':'s'} · ${approved?'Approved — ready to publish':'Awaiting approval before publication'}</p>
+      ${revisionBanner}
       <div style="margin-top:20px;" aria-live="polite">
         <div class="corrig-track-title">Approval status</div>
         <div role="list" aria-label="Approval chain">${stepperHTML}</div>
@@ -5299,15 +6293,88 @@
     showToast('Submission withdrawn — register returned to draft');
     approvalTrackBack();
   }
-  function approvalSimulate(){
+  // Responses-specific vertical stepper (per-approver, with Super-Admin simulate actions).
+  function apTrackStepperHTML(chain, st){
+    const isSA = approvalIsSuperAdmin();
+    const sbIdx = chain.findIndex(a => a.status === 'sent_back');
+    let activeIdx = -1;
+    if (sbIdx < 0){ for (let i = 0; i < chain.length; i++){ if (chain[i].status !== 'approved'){ activeIdx = i; break; } } }
+    return chain.map((a, i) => {
+      const last = i === chain.length - 1;
+      let state, icon, statusLine, statusColor;
+      if (a.status === 'approved'){ state = 'done'; icon = 'check'; statusLine = 'Approved · ' + approvalFmtSentLine(a.approvedAt || a.sentAt); statusColor = '#10B981'; }
+      else if (a.status === 'sent_back'){ state = 'sentback'; icon = 'undo-2'; statusLine = 'Sent back · ' + approvalFmtSentLine(a.sentAt || st.sentAt); statusColor = '#EF4444'; }
+      else if (i === activeIdx){ state = 'active'; icon = 'clock'; statusLine = 'Awaiting review · Sent ' + approvalFmtAgo(a.sentAt || st.sentAt); statusColor = '#F59E0B'; }
+      else { state = 'locked'; icon = 'lock'; const prev = chain[i-1]; statusLine = 'In queue · Will be notified when ' + (prev ? esc(prev.name) : 'previous approver') + ' approves'; statusColor = '#9CA3AF'; }
+      const rolePill = a.role ? '<span class="ap-role-inline ' + apmRolePillClass(a.role) + '">' + esc(a.role) + '</span>' : '';
+      let statusHTML = '<div class="s-time" style="color:' + statusColor + ';">' + esc(statusLine);
+      if (state === 'active'){ statusHTML += ' <button type="button" id="apRemind-' + i + '" class="s-remind" onclick="apSendReminder(\'apRemind-' + i + '\')"><i data-lucide="bell" style="width:11px;height:11px;"></i> Send reminder</button>'; }
+      statusHTML += '</div>';
+      const sbBox = (a.status === 'sent_back' && a.comment) ? '<div class="ap-sentback-box">' + esc(a.comment) + '</div>' : '';
+      const contactRow = (state === 'active') ? '<div class="ap-sim-row"><button type="button" class="s-remind" style="color:#9CA3AF;" onclick="showToast(\'Contact: ' + esc(a.email || '—') + '\')"><i data-lucide="user" style="width:11px;height:11px;"></i> View contact</button></div>' : '';
+      const sbPrompt = (_apSbPromptIdx === i) ? '<div class="ap-sb-prompt"><span style="font-size:11px; color:#374151;">Reason for sending back (optional):</span><input id="apSbReason" type="text" placeholder="Reason…" /><button type="button" class="ap-sb-yes" onclick="apSimSendBackConfirm(' + i + ')">Send back</button><button type="button" class="ap-sb-cancel" onclick="apSimSendBackCancel()">Cancel</button></div>' : '';
+      let simRow = '';
+      if (isSA && a.status !== 'approved' && a.status !== 'sent_back'){
+        simRow = '<div class="ap-sim-row"><button type="button" class="ap-sim-link" aria-label="Approve step ' + esc(a.name) + '" onclick="apSimApprove(' + i + ')">[Simulate: Approve]</button><span class="ap-sim-sep">·</span><button type="button" class="ap-sim-link" aria-label="Send back from ' + esc(a.name) + '" onclick="apSimSendBack(' + i + ')">[Simulate: Send back]</button></div>';
+      }
+      return '<div class="corrig-step" role="listitem">'
+        + (last ? '' : '<div class="line' + (a.status === 'approved' ? ' done' : '') + '"></div>')
+        + '<div class="node ' + state + '"><i data-lucide="' + icon + '" style="width:14px;height:14px;"></i></div>'
+        + '<div class="body">'
+        +   '<div class="s-title">' + esc(a.name) + rolePill + '</div>'
+        +   '<div class="s-name">' + esc(a.designation || '') + '</div>'
+        +   statusHTML + sbBox + contactRow + sbPrompt + simRow
+        + '</div></div>';
+    }).join('');
+  }
+  function apSendReminder(btnId){ if (typeof corrigSendReminder === 'function') corrigSendReminder(btnId); }
+  function apSimApprove(i){
     const st = approvalLoad();
-    if (!st) return;
-    st.status = 'approved';
-    (st.approvalChain || []).forEach(a => { a.status = 'approved'; });
-    st.approvedAt = new Date().toISOString();
+    if (!st || !st.approvalChain || !st.approvalChain[i]) return;
+    const now = new Date().toISOString();
+    st.approvalChain[i].status = 'approved';
+    st.approvalChain[i].approvedAt = now;
+    const nxt = st.approvalChain[i + 1];
+    if (nxt && !nxt.sentAt) nxt.sentAt = now;
+    if (st.approvalChain.every(a => a.status === 'approved')){
+      st.status = 'approved'; st.approvedAt = now;
+      _approvalRibbonAnimate = true;   // animate ribbon slide + publish pulse on return to Responses
+      showToast('Response register approved — ready to publish');
+    }
+    st.lastUpdated = now;
     approvalSaveState(st);
+    _apSbPromptIdx = null;
     renderApprovalTracking();
-    showToast('All approvals received — ready to publish');
+  }
+  function apSimSendBack(i){ _apSbPromptIdx = i; renderApprovalTracking(); setTimeout(() => { const el = document.getElementById('apSbReason'); if (el) el.focus(); }, 30); }
+  function apSimSendBackCancel(){ _apSbPromptIdx = null; renderApprovalTracking(); }
+  function apSimSendBackConfirm(i){
+    const reason = ((document.getElementById('apSbReason') || {}).value || '').trim();
+    const st = approvalLoad();
+    if (!st || !st.approvalChain || !st.approvalChain[i]) return;
+    const now = new Date().toISOString();
+    st.approvalChain[i].status = 'sent_back';
+    st.approvalChain[i].comment = reason || 'Please revise and resubmit.';
+    st.approvalChain[i].sentAt = st.approvalChain[i].sentAt || now;
+    st.status = 'pending';
+    st.lastUpdated = now;
+    approvalSaveState(st);
+    _apSbPromptIdx = null;
+    renderApprovalTracking();
+  }
+  function apEditResubmit(){
+    const st = approvalLoad();
+    let prefill = null;
+    if (st && st.approvalChain){
+      prefill = {
+        ids: st.approvalChain.map(a => a.id),
+        manual: st.approvalChain.filter(a => a.manuallyAdded).map(a => ({ id: a.id, name: a.name, designation: a.designation, email: a.email, role: a.role, manuallyAdded: true })),
+      };
+    }
+    approvalClearState();
+    approvalTrackBack();
+    showToast('Register returned to draft — edit and resubmit');
+    setTimeout(() => { apmOpen(prefill); }, 120);
   }
   function approvalStartPublish(){ _approvalPublishConfirm = true; renderApprovalTracking(); }
   function approvalCancelPublish(){ _approvalPublishConfirm = false; renderApprovalTracking(); }
@@ -5758,7 +6825,7 @@
     // Pre-populate the details textarea + affected sections from the pushed points.
     // The officer landed here because they already picked these points on the previous screen
     // — they shouldn't have to click "Generate Corrigendum" first to see them in the editor.
-    const detailsHTML = pushedPoints.map((p, i) => '<p>' + (i + 1) + '. [' + esc(p.type) + '] ' + esc(p.summary) + '</p>').join('');
+    const detailsHTML = pushedPoints.map((p, i) => '<p>' + (i + 1) + '. [' + esc(p.type) + '] ' + highlightKeyTerms(esc(p.summary)) + '</p>').join('');
     const affected = {};
     CORRIG_ALL_SECTIONS.forEach(s => { affected[s] = false; });
     pushedPoints.forEach(p => {
@@ -5830,14 +6897,15 @@
 
     const sectionsHTML = CORRIG_ALL_SECTIONS.map(s => `<label><input type="checkbox" ${d.affectedSections[s]?'checked':''} onchange="corrigToggleSection('${esc(s)}', this.checked)" /> ${esc(s)}</label>`).join('');
 
-    const confirmStrip = _corrigSendingConfirm ? `<div class="corrig-confirm-strip" role="status">
+    const confirmStrip = _corrigSendingConfirm ? `<div class="corrig-confirm-strip" role="status" style="flex-direction:column; align-items:stretch; gap:12px;">
       <div class="text">
         <div class="h">Send Corrigendum ${esc(d.number)} for approval?</div>
         <div class="sub">This will be sent to the approval chain before being published to vendors.</div>
       </div>
-      <div class="actions">
+      <div id="approverSelector" style="background:white; border:1px solid #BFDBFE; border-radius:8px; padding:12px 14px;"></div>
+      <div class="actions" style="justify-content:flex-end;">
         <button type="button" class="btn-cancel" onclick="corrigCancelSendConfirm()" ${_corrigSending?'disabled style="opacity:0.5; cursor:not-allowed;"':''}>Cancel</button>
-        <button type="button" class="btn-confirm" onclick="corrigConfirmSend()" ${_corrigSending?'disabled style="opacity:0.85; cursor:wait;"':''}>${_corrigSending?'<span class="corrig-send-spinner"></span> Sending…':'Confirm &amp; Send →'}</button>
+        <button type="button" class="btn-confirm" data-approver-confirm onclick="corrigConfirmSend()" ${_corrigSending?'disabled style="opacity:0.85; cursor:wait;"':''}>${_corrigSending?'<span class="corrig-send-spinner"></span> Sending…':'Confirm &amp; Send →'}</button>
       </div>
     </div>` : '';
 
@@ -5892,6 +6960,7 @@
             </div>
             <div id="corrigFieldDetails" contenteditable="true" aria-required="true" data-placeholder="Describe what is being changed, what it was, and what it is now..." oninput="corrigSetField('details', this.innerHTML)">${d.details}</div>
           </div>
+          <button type="button" class="corrig-regen-hl" onclick="corrigRegenHighlights()"><i data-lucide="refresh-cw" style="width:10px; height:10px;"></i> Regenerate highlights</button>
         </div>
 
         <!-- Extend bid submission deadline -->
@@ -5929,6 +6998,7 @@
       </div>
     `;
     refreshIcons();
+    if (_corrigSendingConfirm && document.getElementById('approverSelector')) approverSelRender();
   }
 
   // === Form field handlers ===
@@ -5956,8 +7026,8 @@
     setTimeout(() => {
       const d = _corrigPendingDraft;
       const pushed = CORRIGENDUM_PENDING.filter(p => d.pushedPointIds.indexOf(p.id) >= 0);
-      // 1. Concatenate amendment details from pushed points
-      const detailsHTML = pushed.map((p, i) => '<p>' + (i+1) + '. [' + esc(p.type) + '] ' + esc(p.summary) + '</p>').join('');
+      // 1. Concatenate amendment details from pushed points — with key-term highlighting (C4)
+      const detailsHTML = pushed.map((p, i) => '<p>' + (i+1) + '. [' + esc(p.type) + '] ' + highlightKeyTerms(esc(p.summary)) + '</p>').join('');
       d.details = detailsHTML;
       // 2. Auto-select reason from most common type
       d.reason = deriveCorrigReason(pushed);
@@ -5971,12 +7041,22 @@
       showToast('Corrigendum draft generated from ' + pushed.length + ' pushed point' + (pushed.length===1?'':'s'));
     }, 800);
   }
+  // C4 — re-run key-term highlighting on the current Amendment Details content.
+  function corrigRegenHighlights(){
+    const ed = document.getElementById('corrigFieldDetails');
+    if (!ed) return;
+    const plain = ed.innerText || '';
+    ed.innerHTML = highlightKeyTerms(esc(plain));
+    if (_corrigPendingDraft) _corrigPendingDraft.details = ed.innerHTML;
+    showToast('Highlights regenerated');
+  }
   function corrigStartSendConfirm(){
     if (!_corrigPendingDraft) return;
     if (!_corrigPendingDraft.reason){ showToast('Pick a reason for amendment'); return; }
     const detailsText = (_corrigPendingDraft.details || '').replace(/<[^>]+>/g,'').trim();
     if (!detailsText){ showToast('Add amendment details before sending'); return; }
     if (_corrigPendingDraft.extendDeadline && !_corrigPendingDraft.newDeadline){ showToast('Pick the new deadline'); return; }
+    approverSelInit();
     _corrigSendingConfirm = true;
     renderIssueCorrigendumForm();
     // Scroll the confirm strip into view
@@ -6012,10 +7092,7 @@
       currentDeadline: d.currentDeadline || 'May 15, 2026',
       notifyVendors: d.notifyVendors !== false,
       vendorCount: 34,
-      approvalChain: [
-        { approver: 'Priya Shah', role: 'Technical Officer',    status: 'pending', sentAt: now.date + ' · ' + now.time },
-        { approver: 'Sunita Rao', role: 'Deputy Commissioner',  status: 'waiting' },
-      ],
+      approvalChain: approverSelChain(),
     };
   }
 
@@ -6065,46 +7142,8 @@
     const sectionsComma = (e.affectedSections || []).join(', ');
     const sectionsDot = (e.affectedSections || []).join(' · ');
 
-    // --- Vertical stepper (4 steps: Submitted, Technical review, Deputy Commissioner, Published) ---
-    const c0 = chain[0] || { approver:'Priya Shah', role:'Technical Officer' };
-    const c1 = chain[1] || { approver:'Sunita Rao', role:'Deputy Commissioner' };
-    const steps = [
-      { state:'done', icon:'check', title:'Submitted for approval',
-        name: e.submittedBy + ' · ' + e.submittedByRole,
-        time: e.submittedDate + ' · ' + e.submittedTime },
-      { state: issued ? 'done' : 'active', icon: issued ? 'check' : 'clock',
-        title: issued ? 'Reviewed & approved' : 'Awaiting review',
-        name: c0.approver + ' · ' + c0.role,
-        time: issued ? (e.submittedDate + ' · Approved') : 'Sent just now · Pending',
-        remind: !issued },
-      { state: issued ? 'done' : 'locked', icon: issued ? 'check' : 'lock',
-        title: issued ? 'Approved' : 'Pending',
-        name: c1.approver + ' · ' + c1.role,
-        time: issued ? (e.submittedDate + ' · Approved') : '',
-        muted: !issued },
-      { state: issued ? 'done' : 'locked', icon: 'send',
-        title: issued ? 'Published to vendors' : 'Will be notified on approval',
-        name: e.vendorCount + ' vendors · Email notification',
-        time: issued ? e.submittedDate : '',
-        muted: !issued },
-    ];
-    const stepperHTML = steps.map((s, i) => {
-      const last = i === steps.length - 1;
-      const lineCls = s.state === 'done' ? 'line done' : 'line';
-      const remindBtn = s.remind
-        ? '<button type="button" id="corrigRemindStep" class="s-remind" onclick="corrigSendReminder(\'corrigRemindStep\')"><i data-lucide="bell" style="width:11px; height:11px;"></i> Send reminder</button>'
-        : '';
-      return '<div class="corrig-step" role="listitem">'
-        + (last ? '' : '<div class="' + lineCls + '"></div>')
-        + '<div class="node ' + s.state + '"><i data-lucide="' + s.icon + '" style="width:14px; height:14px;"></i></div>'
-        + '<div class="body">'
-        +   '<div class="s-title ' + (s.muted ? 'muted' : '') + '">' + esc(s.title) + '</div>'
-        +   '<div class="s-name ' + (s.muted ? 'muted' : '') + '">' + esc(s.name) + '</div>'
-        +   (s.time ? '<div class="s-time">' + esc(s.time) + '</div>' : '')
-        +   remindBtn
-        + '</div>'
-      + '</div>';
-    }).join('');
+    // --- Dynamic vertical stepper built from the selected approvers (C5) ---
+    const stepperHTML = approverStepperHTML(chain, { submittedBy: e.submittedBy, submittedRole: e.submittedByRole, submittedTime: e.submittedDate + ' · ' + e.submittedTime });
 
     // --- Summary card ---
     const statusPill = issued
@@ -6208,12 +7247,23 @@
   function corrigSimulateApproval(){
     const e = _corrigSuccessEntry;
     if (!e) return;
-    (e.approvalChain || []).forEach(a => { a.status = 'approved'; });
-    e.status = 'issued';
-    corrigFinalizeIssued(e);
-    renderCorrigSuccessView();   // re-render stepper all-green
-    refreshCorrigendumTabBadge();
-    showToast('All approvals complete — Corrigendum No. ' + e.number + ' issued');
+    const chain = e.approvalChain || [];
+    let i = 0;
+    (function step(){
+      if (i >= chain.length){
+        e.status = 'issued';
+        corrigFinalizeIssued(e);
+        renderCorrigSuccessView();
+        refreshCorrigendumTabBadge();
+        showToast('All approvals complete — Corrigendum No. ' + e.number + ' issued');
+        return;
+      }
+      chain[i].status = 'approved';
+      chain[i].approvedAt = new Date().toISOString();
+      renderCorrigSuccessView();
+      i++;
+      setTimeout(step, 500);
+    })();
   }
 
   // Move an approved pending corrigendum into the issued list + stamp its points.
@@ -6974,15 +8024,129 @@
     const meet = document.getElementById('utFieldMeeting').value;
     const dueLabel = due ? new Date(due).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : 'TBD';
     const meetLabel = meet ? new Date(meet).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : 'TBD';
+    const aiOn = !!(document.getElementById('utAiSummary') || {}).checked;
+    tenderPrefsSave(tnd, { aiSummaryEnabled: aiOn });
     ACTIVE_TENDERS.unshift({
       id: tnd, name: title, dept: dept, cat: sector, cost: '—',
       queries: 0, unanswered: 0, dueDate: dueLabel,
       daysText: 'New', daysCls: 'text-success', status: 'open', meetingDate: meetLabel,
-      uploaded: true,
+      uploaded: true, _seq: ++_tenderSeq,
     });
     closeUploadTenderModal();
     renderActiveList(document.getElementById('landingSearch')?.value || '');
     showToast(`${tnd} added to Pre-Bid Queries`);
+  }
+  // Per-tender preferences (tenderPrefs_[TND-ID]) — used by the AI Query Summary opt-in gate.
+  function tenderPrefsKey(tnd){ return 'tenderPrefs_' + (tnd || 'TND-2026-001'); }
+  function tenderPrefsLoadRaw(tnd){
+    try { const r = localStorage.getItem(tenderPrefsKey(tnd)); if (r) return JSON.parse(r) || null; } catch(e){}
+    return null;   // null = key does not exist yet
+  }
+  function tenderPrefsLoad(tnd){ return tenderPrefsLoadRaw(tnd) || { aiSummaryEnabled: true }; }
+  function tenderPrefsSave(tnd, prefs){
+    try { localStorage.setItem(tenderPrefsKey(tnd), JSON.stringify(prefs)); } catch(e){}
+  }
+  // Merge new keys into the existing object — never overwrite the whole thing.
+  function tenderPrefsMerge(tnd, patch){
+    const obj = tenderPrefsLoadRaw(tnd) || {};
+    Object.assign(obj, patch);
+    tenderPrefsSave(tnd, obj);
+    return obj;
+  }
+  function qisTnd(){ return (typeof CURRENT_TND !== 'undefined' && CURRENT_TND) ? CURRENT_TND : 'TND-2026-001'; }
+  function qisQueriesImported(){ return (typeof QUERIES !== 'undefined' && QUERIES.length > 0); }
+  // Decide which of the three pre/post states to show: 'full' | 'prompt' | 'recovery' | 'none'.
+  function qisGateState(){
+    const raw = tenderPrefsLoadRaw(qisTnd());
+    if (raw && raw.aiSummaryGenerated === true) return 'full';
+    if (raw && raw.aiSummaryEnabled === false)  return 'recovery';
+    // neither generated nor explicitly skipped → opt-in prompt (only once queries exist)
+    return qisQueriesImported() ? 'prompt' : 'none';
+  }
+  function qisPromptCardHTML(){
+    return '<div id="qisPromptCard" class="qis-prompt-card" role="group" aria-label="AI Query Summary">'
+      + '<div class="left"><i data-lucide="sparkles" style="width:16px;height:16px;color:#9CA3AF;"></i>'
+      +   '<div style="min-width:0;"><div class="ttl">AI Query Summary</div>'
+      +     '<div class="sub">Get an AI-generated overview of all queries — themes, risks, and response progress.</div></div></div>'
+      + '<div class="right">'
+      +   '<button type="button" id="qisGenBtn" class="qis-gen-btn" aria-label="Generate AI query summary" onclick="qisGenerateSummary(this)">Generate summary</button>'
+      +   '<button type="button" class="qis-skip-link" onclick="qisSkipSummary()">Skip</button>'
+      + '</div></div>';
+  }
+  function qisRecoveryLineHTML(){
+    return '<div id="qisRecoveryLine" class="qis-recovery-line"><i data-lucide="sparkles" style="width:12px;height:12px;color:#9CA3AF;"></i>'
+      + '<span style="color:#9CA3AF;">AI summary skipped —</span>'
+      + '<button type="button" class="qis-gen-now" onclick="qisGenerateNow(this)">Generate now</button></div>';
+  }
+  function qisGate(){ return document.getElementById('qisGate'); }
+  function qisEnsureGate(panel){
+    let gate = document.getElementById('qisGate');
+    if (!gate){
+      gate = document.createElement('div');
+      gate.id = 'qisGate';
+      gate.setAttribute('aria-live', 'polite');
+      panel.parentNode.insertBefore(gate, panel);
+    }
+    return gate;
+  }
+  // Apply the gate state for the current tender: show prompt / full card / recovery line / nothing.
+  function applyAiSummaryVisibility(){
+    const panel = document.getElementById('aiSummaryPanel');
+    if (!panel) return;
+    const gate = qisEnsureGate(panel);
+    const state = qisGateState();
+    if (state === 'full'){
+      gate.innerHTML = '';
+      panel.style.display = '';
+    } else if (state === 'prompt'){
+      panel.style.display = 'none';
+      gate.innerHTML = qisPromptCardHTML();
+    } else if (state === 'recovery'){
+      panel.style.display = 'none';
+      gate.innerHTML = qisRecoveryLineHTML();
+    } else { // none
+      panel.style.display = 'none';
+      gate.innerHTML = '';
+    }
+    if (window.lucide) lucide.createIcons();
+  }
+  // Reveal the full Query Intelligence Summary card with a 300ms fade-in.
+  function qisShowFullCard(){
+    tenderPrefsMerge(qisTnd(), { aiSummaryEnabled: true, aiSummaryGenerated: true });
+    const gate = qisGate();
+    if (gate) gate.innerHTML = '';
+    const panel = document.getElementById('aiSummaryPanel');
+    if (panel){
+      panel.style.display = '';
+      panel.style.opacity = '0';
+      panel.style.transition = 'opacity 300ms ease';
+      requestAnimationFrame(() => { panel.style.opacity = '1'; });
+    }
+    if (window.lucide) lucide.createIcons();
+  }
+  // 1000ms generation (setTimeout — no API), spinner on the clicked button, then full card.
+  function qisGenerateSummary(btn){
+    if (btn){ btn.disabled = true; btn.innerHTML = '<span class="corrig-send-spinner"></span> Generating…'; }
+    setTimeout(qisShowFullCard, 1000);
+  }
+  function qisGenerateNow(btn){
+    if (btn){ btn.textContent = 'Generating…'; btn.disabled = true; }
+    setTimeout(qisShowFullCard, 1000);
+  }
+  function qisSkipSummary(){
+    const card = document.getElementById('qisPromptCard');
+    if (card){
+      card.style.maxHeight = card.scrollHeight + 'px';
+      requestAnimationFrame(() => {
+        card.style.maxHeight = '0';
+        card.style.opacity = '0';
+        card.style.paddingTop = '0';
+        card.style.paddingBottom = '0';
+        card.style.marginBottom = '0';
+      });
+    }
+    tenderPrefsMerge(qisTnd(), { aiSummaryEnabled: false, aiSummaryGenerated: false });
+    setTimeout(() => { applyAiSummaryVisibility(); }, 220);
   }
 
   // Close modal on backdrop click + Escape
