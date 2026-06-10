@@ -9,14 +9,55 @@
     catch(e){ return {}; }
   }
 
+  // Alias map — old setting ids that were merged into richer items in the
+  // Admin Console. A portal page still asking for an old id transparently gets
+  // the equivalent slice of the new merged item, so nothing breaks.
+  const ALIASES = {
+    // merged into 'tender.methods-suite' (Evaluation methods & defaults)
+    'tender.method-master':        m => m && m.methods,
+    'tender.sector-method':        m => m && m.sectorDefaults,
+    'tender.qcbs-ratios':          m => m && m.qcbsRatios,
+    'tender.tie-breaker':          m => m && m.tieBreakers,
+    'tender.leaf-method-override': m => m && m.leafOverrides,
+    // merged into 'tender.notifications-suite' (Notifications, reminders & escalation)
+    'tender.reminder-schedule':       n => n && n.events && n.events.map(e => ({k:e.name, v:e.reminders||''})),
+    'tender.notification-channels':   n => n,
+    'tender.notification-recipients': n => n,
+    'tender.escalation-rules':        n => n && n.events && n.events.filter(e=>e.escalation).map(e=>({event:e.name, breachHours:e.escalation.breachHours, escalateTo:e.escalation.escalateTo})),
+    // merged into 'tender.corrigendum'
+    'tender.corrigendum-policy':         c => c,
+    'tender.auto-corrigendum-triggers':  c => c && c.autoDraftTriggers,
+    // absorbed into 'tender.tq-rubric' (sector overrides tab)
+    'eval.tq-sector-overrides':          r => r && r.overrides,
+  };
+  const ALIAS_PARENT = {
+    'tender.method-master':'tender.methods-suite','tender.sector-method':'tender.methods-suite','tender.qcbs-ratios':'tender.methods-suite','tender.tie-breaker':'tender.methods-suite','tender.leaf-method-override':'tender.methods-suite',
+    'tender.reminder-schedule':'tender.notifications-suite','tender.notification-channels':'tender.notifications-suite','tender.notification-recipients':'tender.notifications-suite','tender.escalation-rules':'tender.notifications-suite',
+    'tender.corrigendum-policy':'tender.corrigendum','tender.auto-corrigendum-triggers':'tender.corrigendum',
+    'eval.tq-sector-overrides':'tender.tq-rubric',
+  };
+
   window.AdminState = {
     // get('eval.alb-threshold', 15) → returns saved value or fallback
     get(id, fallback) {
       const s = load();
-      return (id in s) ? s[id] : fallback;
+      if (id in s) return s[id];
+      // Resolve a retired id through the merged item it now lives in.
+      if (ALIASES[id]) {
+        const parent = s[ALIAS_PARENT[id]];
+        if (parent !== undefined) {
+          const v = ALIASES[id](parent);
+          if (v !== undefined && v !== null) return v;
+        }
+      }
+      return fallback;
     },
-    // true if user has customised a setting
-    has(id) { return id in load(); },
+    // true if user has customised a setting (directly, or via its merged parent)
+    has(id) {
+      const s = load();
+      if (id in s) return true;
+      return !!(ALIAS_PARENT[id] && (ALIAS_PARENT[id] in s));
+    },
     // listen for cross-tab admin changes
     onChange(cb) {
       window.addEventListener('storage', e => {

@@ -277,6 +277,10 @@ const ITEMS = [
     title:'GeM-check workflow rules',
     why:'GeM is statutory; categories and evidence list must be central.',
     def:{categories:['Office stationery','Standard IT goods','Standard furniture','Standard vehicles'], evidenceRequired:['GeM non-availability screenshot','Justification note signed by HOD']}},
+  {id:'dpr.gem-justification', m:'dpr', s:'1A · Approval pipeline & stage gates', p:'Core', t:'template',
+    title:'GeM non-availability — justification template',
+    why:'GePNIC publishes a "reason for non-availability on GeM" on every tender that bypasses GeM. This is the standard template officers fill — keep it consistent and audit-defensible.',
+    def:'Reason for non-availability on GeM:\n\nThe item(s) under procurement — {item_category} — {non_availability_reason}. A GeM search dated {gem_search_date} returned {gem_search_result}. Accordingly, this procurement is processed outside GeM under GFR 2017 Rule 149, with the GeM non-availability evidence and HOD-signed justification placed on record.\n\nVerified by: {officer_name}, {designation}\nDate: {date}'},
   {id:'dpr.funding-sources', m:'dpr', s:'1A · Approval pipeline & stage gates', p:'Core', t:'list',
     title:'Funding-source registry',
     why:'Otherwise officers free-type scheme names with no consistency.',
@@ -363,20 +367,6 @@ const ITEMS = [
       {id:'tpl-water', name:'Water Works QCBS', sector:'Water Works', method:'QCBS 70:30', version:'v2.1', status:'Published', content:'QCBS tender — {tender_id}. Technical:Financial = 70:30.', createdAt:'2026-02-19', deprecated:false, description:'Water works QCBS.', tags:['works','water','qcbs'], uses:11},
       {id:'tpl-eng', name:'Engineering NIT', sector:'Engineering Goods', method:'L1', version:'v1.6', status:'Draft', content:'Engineering goods — {tender_id}.', createdAt:'2026-03-05', deprecated:false, description:'Engineering goods NIT.', tags:['engineering'], uses:9},
     ]},
-  {id:'tender.manual-justification', m:'tender', s:'2B · Smart Start & templates', p:'Core', t:'tender-manual-just',
-    title:'Manual mode justification rules',
-    why:'Manual creation bypasses every admin gate. Friction is a feature.',
-    def:{required:true, minWords:20, hintPrompts:['Emergency requiring fast-track','Highly unusual procurement category not in templates']}},
-  {id:'tender.entry-mode-copy', m:'tender', s:'2B · Smart Start & templates', p:'Helpful', t:'kvlist',
-    title:'Entry mode helper text',
-    why:'Onboarding consistency — what officers see under each entry mode card.',
-    def:[
-      {k:'AI describe',v:'Describe your procurement in plain language; AI fills the form and flags compliance gaps.'},
-      {k:'Upload',v:'Upload an existing tender document; AI extracts fields and marks reusable placeholders.'},
-      {k:'Template',v:'Start from an approved sectoral template — fastest route for routine procurements.'},
-      {k:'Clone',v:'Clone a past awarded or completed tender and adjust; never clone flagged or withdrawn tenders.'},
-      {k:'Manual',v:'Build from a blank form. Bypasses admin gates — requires written justification.'},
-    ]},
   {id:'tender.past-tender-cloning', m:'tender', s:'2B · Smart Start & templates', p:'Core', t:'past-tender-cloning',
     title:'Past tender cloning',
     why:'Upload past tenders here so they surface on the Clone screen. Shows everything already uploaded; edit its metadata or remove it.',
@@ -385,10 +375,6 @@ const ITEMS = [
       {id:'pt-2', fileName:'TND-2025-Road-Ward12.pdf', title:'Road resurfacing — Ward 12', sector:'Road Works', method:'L1', ec:8200000, awardedYear:2025, status:'Awarded', uploadedAt:'2026-02-03'},
       {id:'pt-3', fileName:'TND-2024-Consult-TownHall.pdf', title:'Architectural consultancy — Town Hall', sector:'Consultancy', method:'QCBS 80:20', ec:3200000, awardedYear:2024, status:'Completed', uploadedAt:'2025-11-20'},
     ]},
-  {id:'tender.clone-blacklist', m:'tender', s:'2B · Smart Start & templates', p:'Helpful', t:'list',
-    title:'Clone blacklist tags',
-    why:'Categories where Clone is auto-disabled (vigilance-flagged, defence, single-source).',
-    def:['Vigilance flagged','Defence','Single source justification','Foreign-funded']},
   {id:'tender.ai-questionnaire', m:'tender', s:'2B · Smart Start & templates', p:'Core', t:'ai-questionnaire',
     title:'AI describe — structured follow-up questions',
     why:'Transforms Describe-to-Tender from open chat into a guided form. Output quality jumps when input is well-formed.',
@@ -447,48 +433,30 @@ const ITEMS = [
       ]},
       {id:'t-mixed', name:'Mixed (Goods+Services)', enabled:true},
     ]},
-  {id:'tender.sector-method', m:'tender', s:'2C · Classification & evaluation', p:'Core', t:'kvlist',
-    title:'Sector → evaluation-method defaults',
-    why:'Most tenders should follow the default; deviation should require justification.',
-    def:[{k:'IT Goods',v:'L1'},{k:'Infrastructure Works',v:'L1'},{k:'Water Works',v:'QCBS 70:30'},{k:'Consultancy',v:'QCBS 80:20'},{k:'Engineering Goods',v:'L1'},{k:'Urban Dev Works',v:'L1'}]},
-  {id:'tender.types', m:'tender', s:'2C · Classification & evaluation', p:'Helpful', t:'list',
-    title:'Tender-type master list',
-    why:'Read-only — superseded by tender.tree.',
-    def:['Goods','Works','Services','Consultancy','Engineering Goods','Mixed (Goods+Services)']},
-  {id:'tender.subtypes', m:'tender', s:'2C · Classification & evaluation', p:'Helpful', t:'kvlist',
-    title:'Sub-types per tender type',
-    why:'Read-only — superseded by tender.tree.',
-    def:[
-      {k:'Goods',v:'IT Goods, Office Goods, Vehicles, Furniture, Medical Goods, Stationery'},
-      {k:'Works',v:'Road Works, Water Works, Building Works, Maintenance Works, Drainage Works, Electrical Works'},
-      {k:'Services',v:'Housekeeping, Security, Catering, Transport, Garbage Collection'},
-      {k:'Consultancy',v:'Architectural, Engineering, Financial, Legal, IT Consultancy, Environmental'},
-      {k:'Engineering Goods',v:'Electrical Equipment, Mechanical Equipment, Pumps & Motors, Generators, Tools & Instruments'},
-    ]},
+  {id:'tender.methods-suite', m:'tender', s:'2C · Classification & evaluation', p:'Core', t:'methods-suite',
+    title:'Evaluation methods & defaults',
+    why:'The evaluation-method engine in one place — the method master list (with GFR value thresholds), sector defaults, allowed QCBS splits, tie-breakers, and per-leaf overrides. Replaces five separate settings.',
+    def:{
+      methods:[
+        {label:'L1', enabled:true,  minValue:0, maxValue:null, justify:false},
+        {label:'QCBS', enabled:true, minValue:0, maxValue:null, justify:false},
+        {label:'LCS', enabled:true,  minValue:0, maxValue:null, justify:false},
+        {label:'QBS', enabled:true,  minValue:0, maxValue:null, justify:false},
+        {label:'FBS', enabled:false, minValue:0, maxValue:null, justify:false},
+        {label:'SSS', enabled:false, minValue:0, maxValue:null, justify:true},
+        {label:'Open Tender Enquiry (OTE)',    enabled:true,  minValue:2500000, maxValue:null,    justify:false},
+        {label:'Limited Tender Enquiry (LTE)', enabled:true,  minValue:0,       maxValue:2500000, justify:false},
+        {label:'Single Tender Enquiry (STE)',  enabled:false, minValue:0,       maxValue:null,    justify:true},
+      ],
+      sectorDefaults:[{k:'IT Goods',v:'L1'},{k:'Infrastructure Works',v:'L1'},{k:'Water Works',v:'QCBS 70:30'},{k:'Consultancy',v:'QCBS 80:20'},{k:'Engineering Goods',v:'L1'},{k:'Urban Dev Works',v:'L1'}],
+      qcbsRatios:['90:10','80:20','70:30','60:40'],
+      tieBreakers:[{k:'L1',v:'Earlier bid submission timestamp wins.'},{k:'QCBS',v:'Higher technical score wins; if still tied, earlier submission.'},{k:'LCS',v:'Higher technical score wins.'},{k:'QBS',v:'Lower financial quote wins.'},{k:'FBS',v:'Higher technical score wins.'}],
+      leafOverrides:[{k:'Goods → IT Goods → Software',v:'QCBS 70:30'},{k:'Consultancy → IT Consultancy',v:'QCBS 80:20'}],
+    }},
   {id:'tender.emd-policy', m:'tender', s:'2C · Classification & evaluation', p:'Core', t:'kvlist',
     title:'EMD policy matrix',
     why:'EMD rules are statutory and money-related; mistakes are expensive.',
     def:[{k:'Default EMD %',v:'2'},{k:'Min EMD (₹)',v:'10000'},{k:'Max EMD (₹)',v:'2500000'},{k:'MSME Micro exempt',v:'true'},{k:'MSME Small exempt',v:'true'}]},
-  {id:'tender.leaf-method-override', m:'tender', s:'2C · Classification & evaluation', p:'Helpful', t:'kvlist',
-    title:'Per-leaf evaluation method override',
-    why:'Edge cases where a specific subtype + sector needs to deviate from sector default. Key = catalog leaf path, Value = method.',
-    def:[{k:'Goods → IT Goods → Software',v:'QCBS 70:30'},{k:'Consultancy → IT Consultancy',v:'QCBS 80:20'}]},
-  {id:'tender.method-master', m:'tender', s:'2C · Classification & evaluation', p:'Core', t:'list',
-    title:'Evaluation method master list',
-    why:'Toggle which methods are available org-wide. Disabled methods do not appear in officer pickers.',
-    def:[{label:'L1',enabled:true},{label:'QCBS',enabled:true},{label:'LCS',enabled:true},{label:'QBS',enabled:true},{label:'FBS',enabled:false},{label:'SSS',enabled:false}]},
-  {id:'tender.qcbs-ratios', m:'tender', s:'2C · Classification & evaluation', p:'Helpful', t:'list',
-    title:'Allowed QCBS ratio splits',
-    why:'QCBS T:F ratio varies by sector; admin defines the menu.',
-    def:['90:10','80:20','70:30','60:40']},
-  {id:'tender.tie-breaker', m:'tender', s:'2C · Classification & evaluation', p:'Helpful', t:'kvlist',
-    title:'Tie-breaker rule per method',
-    why:'Rare but legally important when two bidders score identically.',
-    def:[{k:'L1',v:'Earlier bid submission timestamp wins.'},{k:'QCBS',v:'Higher technical score wins; if still tied, earlier submission.'},{k:'LCS',v:'Higher technical score wins.'},{k:'QBS',v:'Lower financial quote wins.'},{k:'FBS',v:'Higher technical score wins.'}]},
-  {id:'tender.bsd-policy', m:'tender', s:'2C · Classification & evaluation', p:'Core', t:'bsd-policy',
-    title:'Bid Security Declaration policy',
-    why:'GFR 2017 allows BSD instead of EMD for certain tenders. Reduces vendor capital lock-up.',
-    def:{enabled:true, allowedForTypes:['Goods','Services'], allowedForValueTiers:['HOD','Deputy Commissioner'], template:'I/We hereby submit this Bid Security Declaration in lieu of Earnest Money Deposit, and accept that I/We will be suspended from participating in tenders of the Ahmedabad Municipal Corporation for a period of one year from the date of disqualification if I/We withdraw or modify the bid during its validity, or fail to furnish the Performance Security upon award.'}},
   // 2D — the PQ/TQ heart
   {id:'tender.custom-criteria', m:'tender', s:'2D · PQ & TQ libraries (80-60-40 / TQ marks)', p:'Core', t:'criterion-builder',
     title:'Custom PQ/TQ criterion builder',
@@ -502,23 +470,38 @@ const ITEMS = [
     title:'80-60-40 PQ rule',
     why:"It's a rule, not a constant.",
     def:[{k:'Option A: # work orders × % of EC',v:'1 × 80%'},{k:'Option B',v:'2 × 60%'},{k:'Option C',v:'3 × 40%'}]},
-  {id:'tender.tq-rubric', m:'tender', s:'2D · PQ & TQ libraries (80-60-40 / TQ marks)', p:'Core', t:'lib',
+  {id:'tender.tq-rubric', m:'tender', s:'2D · PQ & TQ libraries (80-60-40 / TQ marks)', p:'Core', t:'tq-rubric',
     title:'TQ marks rubric (/100)',
     why:'This rubric drives every TQ scoring screen in Evaluation. Single source of truth or chaos.',
-    def:[
-      {criterion:'Work orders – similar (≥80% EC)', max:5},
-      {criterion:'Work orders – similar (≥60% EC)', max:5},
-      {criterion:'Work orders – sector experience', max:10},
-      {criterion:'ISO 9001', max:2},
-      {criterion:'ISO 14001 / 45001', max:5},
-      {criterion:'ISO additional', max:10},
-      {criterion:'CMMI Level 3', max:2},
-      {criterion:'CMMI Level 4', max:5},
-      {criterion:'CMMI Level 5', max:10},
-      {criterion:'Turnover (3 FY)', max:20},
-      {criterion:'Key personnel CVs', max:15},
-      {criterion:'Methodology & approach', max:11},
-    ]},
+    def:{
+      groups:[
+        {id:'g-wo', name:'Work orders', criteria:[
+          {id:'r-wo80', name:'Work orders – similar (≥80% EC)', max:5, libId:null},
+          {id:'r-wo60', name:'Work orders – similar (≥60% EC)', max:5, libId:null},
+          {id:'r-woexp', name:'Work orders – sector experience', max:10, libId:null},
+        ]},
+        {id:'g-iso', name:'Certifications — ISO', criteria:[
+          {id:'r-iso9001', name:'ISO 9001', max:2, libId:null},
+          {id:'r-iso14001', name:'ISO 14001 / 45001', max:5, libId:null},
+          {id:'r-isoadd', name:'ISO additional', max:10, libId:null},
+        ]},
+        {id:'g-cmmi', name:'Certifications — CMMI', criteria:[
+          {id:'r-cmmi3', name:'CMMI Level 3', max:2, libId:null},
+          {id:'r-cmmi4', name:'CMMI Level 4', max:5, libId:null},
+          {id:'r-cmmi5', name:'CMMI Level 5', max:10, libId:null},
+        ]},
+        {id:'g-cap', name:'Capacity & approach', criteria:[
+          {id:'r-turnover', name:'Turnover (3 FY)', max:20, libId:null},
+          {id:'r-cv', name:'Key personnel CVs', max:15, libId:null},
+          {id:'r-method', name:'Methodology & approach', max:11, libId:null},
+        ]},
+      ],
+      overrides:[
+        {id:'o-it', sector:'IT Goods', rows:[{ref:'r-cmmi5', newMax:15}]},
+        {id:'o-civil', sector:'Civil Works', rows:[{ref:'r-turnover', newMax:25}]},
+        {id:'o-consult', sector:'Consultancy', rows:[{ref:'r-method', newMax:20}]},
+      ],
+    }},
   {id:'tender.pq-by-company', m:'tender', s:'2D · PQ & TQ libraries (80-60-40 / TQ marks)', p:'Core', t:'lib',
     title:'PQ criterion library by company type',
     why:'Officer-added criteria with no master list = inconsistency across tenders.',
@@ -555,22 +538,22 @@ const ITEMS = [
     title:'Working-day / holiday calendar',
     why:'Centralised; otherwise officers count weekends wrong.',
     def:true},
-  {id:'tender.reminder-schedule', m:'tender', s:'2E · Timeline defaults', p:'Core', t:'kvlist',
-    title:'Reminder schedule per event',
-    why:'Without this, reminders are hardcoded in the portal. Value = comma-separated offsets (D-N days, H-N hours).',
-    def:[{k:'Bid close',v:'D-7, D-3, D-1'},{k:'Pre-bid meeting',v:'D-3, D-1'},{k:'Tech eval due',v:'D-2, D-1'},{k:'Financial reveal',v:'D-1, H-4'},{k:'Award decision',v:'D-3, D-1'}]},
-  {id:'tender.notification-channels', m:'tender', s:'2E · Timeline defaults', p:'Core', t:'matrix',
-    title:'Notification channels per event',
-    why:'SMS costs money. Admin chooses per event type.',
-    def:{rows:['NIT published','Corrigendum issued','Pre-bid meeting reminder','Bid close approaching','Bid opened','Award announced','Deadline missed'],cols:['Email','SMS','In-app'],cells:{'0_0':true,'0_2':true,'1_0':true,'1_1':true,'1_2':true,'2_0':true,'2_2':true,'3_0':true,'3_1':true,'3_2':true,'4_0':true,'4_2':true,'5_0':true,'5_2':true,'6_0':true,'6_1':true,'6_2':true}}},
-  {id:'tender.notification-recipients', m:'tender', s:'2E · Timeline defaults', p:'Core', t:'matrix',
-    title:'Notification recipients per event',
-    why:'Which committee role is pinged for each event. Currently hard-wired.',
-    def:{rows:['NIT published','Corrigendum issued','Pre-bid meeting reminder','Bid close approaching','Bid opened','Award announced','Deadline missed'],cols:['Drafter','Tender Inviting Authority','Technical Member','Finance Member','Vigilance Observer','HOD','Procurement Cell'],cells:{'0_0':true,'0_6':true,'1_0':true,'1_4':true,'1_6':true,'2_0':true,'2_6':true,'3_0':true,'3_6':true,'4_2':true,'4_6':true,'5_5':true,'5_6':true,'6_0':true,'6_5':true,'6_6':true}}},
-  {id:'tender.escalation-rules', m:'tender', s:'2E · Timeline defaults', p:'Helpful', t:'lib',
-    title:'Deadline escalation rules',
-    why:'If a deadline is missed by N hours, escalate.',
-    def:[{event:'Tech eval due',breachHours:48,escalateTo:'HOD'},{event:'Award decision',breachHours:72,escalateTo:'Commissioner'},{event:'Corrigendum approval',breachHours:24,escalateTo:'Vigilance Officer'}]},
+  {id:'tender.notifications-suite', m:'tender', s:'2E · Timeline defaults', p:'Core', t:'notif-events',
+    title:'Notifications, reminders & escalation',
+    why:'Organised per event — pick what happens (NIT published, Bid close approaching, Corrigendum issued…) and set its reminders, channels, recipients and escalation in one place. Replaces four separate matrices.',
+    def:{
+      channels:['Email','SMS','In-app'],
+      recipientRoles:['Drafter','Tender Inviting Authority','Technical Member','Finance Member','Vigilance Observer','HOD','Procurement Cell'],
+      events:[
+        {name:'NIT published',              reminders:'',              channels:{Email:true,SMS:false,'In-app':true}, recipients:['Drafter','Procurement Cell'], escalation:null},
+        {name:'Bid close approaching',      reminders:'D-7, D-3, D-1', channels:{Email:true,SMS:true, 'In-app':true}, recipients:['Drafter','Procurement Cell'], escalation:null},
+        {name:'Corrigendum issued',         reminders:'',              channels:{Email:true,SMS:true, 'In-app':true}, recipients:['Drafter','Vigilance Observer','Procurement Cell'], escalation:{breachHours:24, escalateTo:'Vigilance Officer'}},
+        {name:'Pre-bid meeting reminder',   reminders:'D-3, D-1',      channels:{Email:true,SMS:false,'In-app':true}, recipients:['Drafter','Procurement Cell'], escalation:null},
+        {name:'Bid opened',                 reminders:'',              channels:{Email:true,SMS:false,'In-app':true}, recipients:['Technical Member','Procurement Cell'], escalation:null},
+        {name:'Award announced',            reminders:'D-3, D-1',      channels:{Email:true,SMS:false,'In-app':true}, recipients:['HOD','Procurement Cell'], escalation:{breachHours:72, escalateTo:'Commissioner'}},
+        {name:'Deadline missed',            reminders:'',              channels:{Email:true,SMS:false,'In-app':true}, recipients:['Drafter','HOD','Procurement Cell'], escalation:{breachHours:48, escalateTo:'HOD'}},
+      ],
+    }},
   {id:'tender.milestones-tier-overrides', m:'tender', s:'2E · Timeline defaults', p:'Helpful', t:'kvlist',
     title:'Per-tier minimum duration overrides',
     why:'Commissioner-level tenders need longer windows than HOD-level. Key = "Milestone @ Tier", Value = days. Falls back to the milestone default when no override is set.',
@@ -602,7 +585,7 @@ const ITEMS = [
   {id:'tender.mandatory-attachments', m:'tender', s:'2F · Document generation & branding (NIT)', p:'Core', t:'matrix',
     title:'Mandatory attachments per tender type',
     why:'Quality gate; prevents incomplete publishes.',
-    def:{rows:['Goods','Works','Services','Consultancy','Engineering Goods','Mixed (Goods+Services)'],cols:['BOQ template','Drawings','Schedule of rates','Site plan','Compliance certificates','Sample specifications'],cells:{'0_0':true,'0_4':true,'0_5':true,'1_0':true,'1_1':true,'1_2':true,'1_3':true,'1_4':true,'2_4':true,'3_4':true,'4_0':true,'4_4':true,'4_5':true,'5_0':true,'5_4':true}}},
+    def:{rows:['Goods','Works','Services','Consultancy','Engineering Goods','Mixed (Goods+Services)'],cols:['BOQ template','Drawings','Schedule of rates','Site plan','Compliance certificates','Sample specifications','Press Notice (newspaper)','Approved Makes/Suppliers list','EMD/BG format','Schedule of Quantity'],cells:{'0_0':true,'0_4':true,'0_5':true,'0_6':true,'0_8':true,'1_0':true,'1_1':true,'1_2':true,'1_3':true,'1_4':true,'1_6':true,'1_8':true,'1_9':true,'2_4':true,'2_6':true,'2_8':true,'3_4':true,'3_6':true,'3_8':true,'4_0':true,'4_4':true,'4_5':true,'4_6':true,'4_7':true,'4_8':true,'5_0':true,'5_4':true,'5_6':true,'5_8':true}}},
   {id:'tender.per-language-templates', m:'tender', s:'2F · Document generation & branding (NIT)', p:'Helpful', t:'kvlist',
     title:'Per-language NIT cover page overrides',
     why:'Different cover wording per language; English-default is not enough for Hindi/Marathi legal validity. Sourced from enabled languages.',
@@ -625,12 +608,6 @@ const ITEMS = [
     title:'Tender ID format',
     why:'Tender ID appears on every document; AMC has a house format.',
     def:{format:'AMC/{dept}/{fy}/{seq:04}', sequence:1, resetFY:true, fyStartMonth:4}},
-  {id:'tender.auto-corrigendum-triggers', m:'tender', s:'2G · Review & publish', p:'Core', t:'matrix',
-    title:'Auto-corrigendum triggers',
-    why:'Events that auto-draft a corrigendum. Reduces "we forgot to corrigendum" errors.',
-    def:{rows:['BOQ quantity change','Date change','Scope change','Financial term change','PQ criteria change','EMD change','Specification change'],
-         cols:['Auto-draft on change','Require approval before issue','Auto-extend deadline'],
-         cells:{'0_0':true,'0_1':true,'1_0':true,'1_1':true,'1_2':true,'2_0':true,'2_1':true,'3_0':true,'3_1':true,'4_0':true,'4_1':true,'5_0':true,'5_1':true,'5_2':true,'6_0':true,'6_1':true}}},
   {id:'tender.cvc-chain', m:'tender', s:'2G · Review & publish', p:'Core', t:'chain',
     title:'CVC review committee chain',
     why:'CVC sign-off is statutory; can\'t be ad-hoc.',
@@ -654,17 +631,36 @@ const ITEMS = [
       {event:'Award announced',template:'Tender {tender_id} has been awarded.',recipients:'EMD paid',channels:'email'},
       {event:'Tender withdrawn',template:'Tender {tender_id} has been withdrawn.',recipients:'All registered',channels:'email, in-app'},
     ]},
-  {id:'tender.corrigendum-policy', m:'tender', s:'2G · Review & publish', p:'Core', t:'corrigendum-policy',
+  {id:'tender.corrigendum', m:'tender', s:'2G · Review & publish', p:'Core', t:'corrigendum-gepnic',
     title:'Corrigendum policy',
-    why:'Corrigendums are common and legally weighty. Officers issuing without clear policy is a major audit risk.',
-    def:{mandatoryTriggers:['BOQ qty change','Date change','EMD change','PQ criteria change'],optionalTriggers:['Typo','Scope clarification'],autoExtendsTimeline:true,extensionDays:7,approvalChain:['Drafter','TIA','CVC Officer']}},
+    why:'The seven statutory GePNIC corrigendum types — each with its stage cutoff, approval chain and auto-extend behaviour — plus the change-events that auto-draft a corrigendum. Combines the old policy and auto-trigger settings. Type vocabulary is shared with Pre-Bid › Corrigendum types.',
+    def:{
+      cutoffOptions:['Before bid submission start','Before bid submission end','Before bid opening','Any stage'],
+      types:[
+        {name:'Date corrigendum',           enabled:true, cutoff:'Before bid opening',          approval:['Drafter','TIA','CVC Officer'], autoExtend:true},
+        {name:'BOQ corrigendum',            enabled:true, cutoff:'Before bid submission end',   approval:['Drafter','TIA','CVC Officer'], autoExtend:false},
+        {name:'Technical bid corrigendum',  enabled:true, cutoff:'Before bid submission end',   approval:['Drafter','TIA','CVC Officer'], autoExtend:false},
+        {name:'Financial bid corrigendum',  enabled:true, cutoff:'Before bid submission end',   approval:['Drafter','TIA','Finance Member','CVC Officer'], autoExtend:false},
+        {name:'Bid openers corrigendum',    enabled:true, cutoff:'Before bid submission start', approval:['TIA','CVC Officer'], autoExtend:false},
+        {name:'Fees / EMD corrigendum',     enabled:true, cutoff:'Before bid submission start', approval:['Drafter','Finance Member','TIA','CVC Officer'], autoExtend:false},
+        {name:'Cancel corrigendum',         enabled:true, cutoff:'Any stage',                   approval:['TIA','HOD','Commissioner'], autoExtend:false},
+      ],
+      autoExtend:true, extensionDays:7,
+      autoDraftTriggers:[
+        {change:'BOQ qty change',      type:'BOQ corrigendum'},
+        {change:'Date change',         type:'Date corrigendum'},
+        {change:'EMD change',          type:'Fees / EMD corrigendum'},
+        {change:'PQ criteria change',  type:'Technical bid corrigendum'},
+        {change:'Scope change',        type:'BOQ corrigendum'},
+      ],
+    }},
   {id:'tender.withdrawal-policy', m:'tender', s:'2G · Review & publish', p:'Core', t:'withdrawal-policy',
     title:'Withdrawal / cancellation policy',
     why:'Money and reputation involved. Should be policy.',
     def:{allowedStages:['Draft','Published','Pre-bid'],justificationRequired:true,approvalRoles:['HOD','Commissioner'],emdRefundOnWithdrawal:'Always',auditLogRetentionYears:7}},
 
   /* ====== PRE-BID QUERIES ====== */
-  {id:'prebid.committee', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'prebid-committee',
+  {id:'prebid.committee', m:'prebid', s:'3 · Committee', p:'Core', t:'prebid-committee',
     title:'Pre-Bid Committee — members, designations & permissions',
     why:'Specific committee for pre-bid query handling. Designations are committee titles you can grant; Actions are the operations members can be permitted to do; Members is the table that pairs an officer with a designation and explicit permissions for each action. The portal reads this to decide what each member can do.',
     def:{
@@ -703,7 +699,7 @@ const ITEMS = [
         'Generate AI summary','Override anonymisation rules',
       ],
     }},
-  {id:'prebid.dates', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'prebid-dates',
+  {id:'prebid.dates', m:'prebid', s:'3D · Meeting, dates & notes', p:'Core', t:'prebid-dates',
     title:'Pre-Bid date management — policy & per-tender overrides',
     why:'One place to set default windows (Release → Pre-bid → Window close → Response due), the lock policy that kicks in after publish, who can edit dates, and to make per-tender date overrides on live tenders.',
     def:{
@@ -734,11 +730,11 @@ const ITEMS = [
         {id:'TND-2026-005', title:'Office housekeeping — Worli depot',      status:'Active',    dates:{publish:'2026-05-20', preBidMeeting:'2026-05-27', windowClose:'2026-06-10', responseDue:'2026-06-15'}},
       ],
     }},
-  {id:'prebid.sections', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'list',
+  {id:'prebid.sections', m:'prebid', s:'3B · Response table (query register)', p:'Core', t:'list',
     title:'Query categorisation sections',
     why:'Drives AI grouping, charts, and exports.',
     def:['PQ / TQ & Eligibility','BOQ & Quantities','Dates & Timeline','Scope of Work','Financial & EMD','Technical Specifications','General / Other']},
-  {id:'prebid.response-columns', m:'prebid', s:'3 · Pre-Bid Queries', p:'Helpful', t:'kvlist',
+  {id:'prebid.response-columns', m:'prebid', s:'3B · Response table (query register)', p:'Helpful', t:'kvlist',
     title:'Response register table — visible columns',
     why:'Which columns appear in the response register table on the pre-bid page. Toggle to suit reporting needs and screen width.',
     def:[
@@ -755,11 +751,11 @@ const ITEMS = [
       {k:'Date published',v:'true'},
       {k:'AI confidence',v:'false'},
     ]},
-  {id:'prebid.ai-threshold', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'percent',
+  {id:'prebid.ai-threshold', m:'prebid', s:'3A · Query response drafting & approval', p:'Core', t:'percent',
     title:'AI grouping similarity threshold',
     why:'ML knob; not an officer setting.',
     def:78},
-  {id:'prebid.summary-options', m:'prebid', s:'3 · Pre-Bid Queries', p:'Helpful', t:'kvlist',
+  {id:'prebid.summary-options', m:'prebid', s:'3B · Response table (query register)', p:'Helpful', t:'kvlist',
     title:'AI summary widgets — which to show on the screen',
     why:'4 summary widgets appear on the pre-bid query screen. Admin can disable any that aren\'t useful for the org or that distract officers.',
     def:[
@@ -768,7 +764,7 @@ const ITEMS = [
       {k:'Corrigendum risk (queries likely to need corrigendum)',v:'true'},
       {k:'Response window (countdown)',v:'true'},
     ]},
-  {id:'prebid.std-responses', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'std-responses-library',
+  {id:'prebid.std-responses', m:'prebid', s:'3A · Query response drafting & approval', p:'Core', t:'std-responses-library',
     title:'Standard responses library',
     why:'Combined library + pending review queue. Officers in the portal can submit new responses → they appear here as Pending → admin approves to publish into the live library. CRUD on existing responses, search, category filters, and per-response usage counts all in one place.',
     def:[
@@ -781,7 +777,7 @@ const ITEMS = [
       {status:'pending', category:'Eligibility', title:'EMD exemption clarification', body:'MSME bidders registered under Udyam and falling under Micro or Small enterprise category are exempt from EMD per GFR Rule 170(3). Bidders are required to upload a valid Udyam Registration Certificate dated within the last 90 days.', submittedBy:'Priya Shah', submittedAt:Date.now()-3*86400000},
       {status:'pending', category:'BOQ', title:'BOQ quantity tolerance', body:'A tolerance of ±5% on BOQ quantities is admissible at the time of execution. Any variation beyond this requires prior written approval from the Engineer-in-Charge and shall be regularised through a variation order.', submittedBy:'Amit Patil', submittedAt:Date.now()-1*86400000},
     ]},
-  {id:'prebid.generic-presets', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'generic-presets-combined',
+  {id:'prebid.generic-presets', m:'prebid', s:'3A · Query response drafting & approval', p:'Core', t:'generic-presets-combined',
     title:'Generic-response presets',
     why:'Short reusable phrases shown as quick picks when officers draft query replies. Manage the presets (with toggle for enable/disable) and which roles can add new ones from the portal, all in one place. The full permissions matrix overrides the access toggles if they conflict.',
     def:{
@@ -799,51 +795,51 @@ const ITEMS = [
         {label:'Accounts Officer', enabled:false},
       ],
     }},
-  {id:'prebid.response-chain', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'chain',
+  {id:'prebid.response-chain', m:'prebid', s:'3A · Query response drafting & approval', p:'Core', t:'chain',
     title:'Response-register approval chain',
     why:'Cross-cutting routing.',
     def:['Drafting officer','Reviewer','Approver (by value tier)']},
-  {id:'prebid.response-chain-mandatory', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'list',
+  {id:'prebid.response-chain-mandatory', m:'prebid', s:'3A · Query response drafting & approval', p:'Core', t:'list',
     title:'Response chain — mandatory steps',
     why:'Steps listed here cannot be skipped during routing. Steps in prebid.response-chain that are not listed here are advisory and can be bypassed by the value-tier authority. Keep this list as a subset of prebid.response-chain.',
     def:['Reviewer','Approver (by value tier)']},
-  {id:'prebid.corr-types', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'lib',
+  {id:'prebid.corr-types', m:'prebid', s:'3C · Corrigendum', p:'Core', t:'lib',
     title:'Corrigendum types & mandatory fields',
-    why:'Compliance — incomplete corrigenda are a major audit finding.',
+    why:'Compliance — incomplete corrigenda are a major audit finding. The canonical corrigendum-type definitions (stage cutoffs, approval chains) live in Tender Creation › Corrigendum policy; this list governs the mandatory fields each type must carry.',
     def:[
       {type:'Technical', required:['Old spec','New spec','Impact']},
       {type:'Financial', required:['Old value','New value','Impact statement']},
       {type:'Timeline',  required:['New date(s)','Reason','Auto-extend?']},
       {type:'Scope',     required:['Revised BOQ ref','Reason']},
     ]},
-  {id:'prebid.corr-numbering', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'text',
+  {id:'prebid.corr-numbering', m:'prebid', s:'3C · Corrigendum', p:'Core', t:'text',
     title:'Corrigendum auto-numbering format',
     why:'Integrity.',
     def:'{TENDER}/COR-{##}'},
-  {id:'prebid.ai-amendment-push', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'list',
+  {id:'prebid.ai-amendment-push', m:'prebid', s:'3C · Corrigendum', p:'Core', t:'list',
     title:'AI Amendment Summary push policy',
     why:'Some changes legally require a corrigendum.',
     def:['BOQ quantity change → mandatory push','Bid-close date change → mandatory push','Technical specification change → mandatory push','Typo / formatting → dismissable']},
-  {id:'prebid.consultants', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'lib',
+  {id:'prebid.consultants', m:'prebid', s:'3A · Query response drafting & approval', p:'Core', t:'lib',
     title:'Approved external consultants registry',
     why:'Data-exposure risk; restrict who can receive.',
     def:[
       {name:'Mehta & Associates', email:'partners@mehtassoc.in', scope:'Water Works only'},
       {name:'PwC India', email:'amc-projects@pwc.com', scope:'IT & Consultancy'},
     ]},
-  {id:'prebid.response-sheet', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'template',
+  {id:'prebid.response-sheet', m:'prebid', s:'3B · Response table (query register)', p:'Core', t:'template',
     title:'Pre-Bid Query Response Sheet template',
     why:'Regulated output document.',
     def:'PRE-BID QUERY RESPONSE SHEET\nTender: {tender_id} — {title}\nDate of Meeting: {meeting_date}\nQueries received: {count}\n[Anonymised — vendor identifiers are redacted per CVC anonymisation policy.]\n\n| # | Section | Query (anonymised) | AMC Response |\n|---|---|---|---|\n{rows}\n\nSigned for AMC: {officer_name}, {designation}'},
-  {id:'prebid.mom-template', m:'prebid', s:'3 · Pre-Bid Queries', p:'Helpful', t:'template',
+  {id:'prebid.mom-template', m:'prebid', s:'3D · Meeting, dates & notes', p:'Helpful', t:'template',
     title:'MoM template',
     why:'Audit consistency.',
     def:'MINUTES OF PRE-BID MEETING\nTender: {tender_id}\nDate / Time: {date} / {time}\nVenue: {venue}\n\nAttendees:\n- AMC: {amc_attendees}\n- Vendors: {vendor_attendees}\n\nDiscussion:\n{discussion}\n\nClarifications agreed:\n{clarifications}\n\nNext steps:\n{next_steps}'},
-  {id:'prebid.anonymisation', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'list',
+  {id:'prebid.anonymisation', m:'prebid', s:'3B · Response table (query register)', p:'Core', t:'list',
     title:'Anonymisation rules',
     why:'Statutory anonymisation.',
     def:['Strip vendor company name','Strip vendor representative name','Strip phone / email','Strip PAN / GST','Replace with V1, V2, V3…']},
-  {id:'prebid.permissions-link', m:'prebid', s:'3 · Pre-Bid Queries', p:'Core', t:'toggle',
+  {id:'prebid.permissions-link', m:'prebid', s:'3 · Committee', p:'Core', t:'toggle',
     title:'Per-action permissions enforced',
     why:'Segregation of duties — managed under Cross-cutting → Permissions.',
     def:true},
@@ -893,14 +889,6 @@ const ITEMS = [
     why:'Below this AI confidence, officer must manually verify.',
     def:75},
   // 4B — TQ (HEART)
-  {id:'eval.tq-sector-overrides', m:'eval', s:'4B · TQ Evaluation (scoring rubric)', p:'Core', t:'lib',
-    title:'Sector-specific rubric overrides',
-    why:'Sensible variation but only with policy approval.',
-    def:[
-      {sector:'IT Goods', override:'CMMI Level 5 weight 15 (vs 10 default)'},
-      {sector:'Civil Works', override:'Work orders weight 25 (vs 20 default)'},
-      {sector:'Consultancy', override:'Methodology weight 20'},
-    ]},
   {id:'eval.committee-comp', m:'eval', s:'4B · TQ Evaluation (scoring rubric)', p:'Core', t:'kvlist',
     title:'Committee size & composition',
     why:'Committee composition is statutory.',
@@ -1280,7 +1268,7 @@ const ITEMS = [
     def:['Procurement Cell','Engineering','Water Works','Roads','IT & Goods','Urban Development','Finance','Accounts','Vigilance','Commissioner Office']},
   {id:'officers.sectors', m:'officers', s:'F · Officers & departments', p:'Core', t:'list',
     title:'Sectors master (canonical)',
-    why:'Read-only — superseded by tender.tree (sector level). Other modules still reference this canonical list until they migrate to tender.tree.',
+    why:'Canonical sector list other modules still reference. For tender creation the catalog tree (Tender Creation › Classification) is canonical — edit sectors there; this list stays for modules that have not migrated yet.',
     def:['Water Works','Roads','IT Goods','Engineering Goods','Urban Dev Works','Consultancy','Electrical & Lighting','Drainage & Sewage','Solid Waste Management','Health & Sanitation']},
   {id:'officers.committees', m:'officers', s:'F · Officers & departments', p:'Core', t:'lib',
     title:'Standing committee templates',
@@ -1525,26 +1513,151 @@ function renderDashboard(){
 }
 
 /* =========================================================
-   SECTION RENDERER
+   SECTION RENDERER  —  grouped, collapsible drill-down
    ========================================================= */
 let currentFilter = 'All';
 let currentSearch = '';
+
+/* One-line plain-English description per category (keyed by full subsection label). */
+const CATEGORY_DESC = {
+  // DPR
+  '1 · Committee':'Who can draft, review and sanction DPRs, and exactly what each member may do.',
+  '1A · Approval pipeline & stage gates':'The AA/TS route, competent-authority thresholds, revision limits and GeM gate.',
+  '1B · Templates, BOQ & libraries':'Per-sector DPR templates, BOQ/DSR linkage and the evidence officers must attach.',
+  '1C · Quality controls':'Version history, clone scope and the AI readiness checks that guard DPR quality.',
+  // TENDER
+  '2 · Committee':'The tender-drafting committee, their designations and per-action permissions.',
+  '2B · Smart Start & templates':'How a tender is started — AI, upload, template, clone or manual — and the template library.',
+  '2C · Classification & evaluation':'The catalog tree, envelope/cover rules, EMD and the evaluation-method engine.',
+  '2D · PQ & TQ libraries (80-60-40 / TQ marks)':'Pre-qualification and technical-scoring criteria libraries shared with Evaluation.',
+  '2E · Timeline defaults':'Minimum milestone durations and the per-event notification, reminder and escalation rules.',
+  '2F · Document generation & branding (NIT)':'NIT section structure, languages, mandatory attachments and AI section prompts.',
+  '2G · Review & publish':'Pre-publish gates, tender numbering, corrigendum policy and withdrawal rules.',
+  // PRE-BID
+  '3 · Pre-Bid Queries':'Query intake, AI behaviour, standard responses and corrigendum workflow for pre-bid queries.',
+  '3 · Committee':'Who handles pre-bid queries and exactly what each member may do.',
+  '3A · Query response drafting & approval':'How responses get drafted, AI-assisted, reviewed, and approved before publishing.',
+  '3B · Response table (query register)':'What the query register shows — columns, categories, anonymisation, and the AI summary widgets on the screen.',
+  '3C · Corrigendum':'When query responses become formal tender amendments — types, numbering, and AI push rules.',
+  '3D · Meeting, dates & notes':'Pre-bid meeting record, minutes template, and the query/response date windows.',
+  // EVALUATION
+  '4A · PQ Evaluation':'How pre-qualification verdicts are captured and what disqualifies a bidder.',
+  '4B · TQ Evaluation (scoring rubric)':'How marks are assigned and aggregated. Rubric and sector overrides live in Tender Creation → PQ & TQ libraries.',
+  '4C · Results & Actions':'What happens after scoring — shortlisting, rejection notices and next steps.',
+  '4D · Financial Evaluation methods':'L1, QCBS and the other methods, their ratios and reveal sequence.',
+  '4E · Reasonableness Check':'The estimate-vs-quote reasonableness test and its tolerance bands.',
+  '4F · Evaluation Committee':'The committee that scores and signs off evaluation, with COI rules.',
+  '4G · AI evaluation aids':'AI assists that speed up scoring without replacing the committee.',
+  // BID MANAGEMENT
+  '5A · Stage gates':'The gates a bid must clear as it moves through bid management.',
+  '5B · Reasonableness Check':'Reasonableness verification at the bid-management stage.',
+  '5C · Committee Review':'Committee review and verdict capture before award.',
+  '5D · Negotiation':'When negotiation is allowed and what triggers it.',
+  '5E · Award Recommendation':'How the award recommendation is built and routed for approval.',
+  '5F · Letter of Acceptance (LoA)':'LoA generation, performance security and acceptance window.',
+  // CROSS-CUTTING
+  'A · Signatures & letterheads':'One shared library of logos, seals, signatures and letterheads.',
+  'B · AI configuration':'Master prompts, tone, model and the on/off matrix for every AI surface.',
+  'C · Value-tier routing':'AMC approval thresholds and the chains they drive across all modules.',
+  'D · Document templates':'Every outgoing document template — NIT, corrigendum, LoA and more.',
+  'E · Vendor master':'Vendor registry, blacklist, MSME flag and performance model.',
+  'F · Officers & departments':'Officer directory, departments and standing committees.',
+  'G · Permissions':'Per-action permission matrix, scoping and special-action allowlists.',
+  'H · Notifications':'Triggers, channels, escalation and message templates.',
+  'I · Audit & compliance':'Audit trail, anonymisation, retention and compliance scoring.',
+  'J · System':'Auto-save, version retention, calendar, financial year and activity trail.',
+};
+
+/* ---- collapsible group state (per session) ---- */
+const EXPAND_KEY = 'admin_expanded_v1';
+function loadExpanded(){ try{ return JSON.parse(sessionStorage.getItem(EXPAND_KEY)||'{}'); }catch(e){ return {}; } }
+function saveExpanded(o){ try{ sessionStorage.setItem(EXPAND_KEY, JSON.stringify(o)); }catch(e){} }
+let expandedState = loadExpanded();
+
+function stripGroupPrefix(s){ return String(s).replace(/^\s*\d+[A-Za-z]?\s*·\s*/, ''); }
+function groupPrefixKey(s){ const p=String(s).split('·')[0].trim(); const m=/^(\d*)\s*([A-Za-z]*)/.exec(p)||[]; return [m[1]?parseInt(m[1],10):0, (m[2]||'')]; }
+function groupNamesFor(key){
+  const n=[]; ITEMS.filter(i=>i.m===key).forEach(i=>{ if(!n.includes(i.s)) n.push(i.s); });
+  // order by subsection prefix (e.g. 3 · before 3A before 3B); committee (no letter) sorts first within its number
+  return n.sort((a,b)=>{ const ka=groupPrefixKey(a), kb=groupPrefixKey(b); return ka[0]-kb[0] || ka[1].localeCompare(kb[1]); });
+}
+function groupIsCommittee(items){ return items.some(i=>i.t==='prebid-committee'); }
+function isGroupExpanded(key,name,items){ const k=key+'::'+name; if(k in expandedState) return !!expandedState[k]; return groupIsCommittee(items); }
+function toggleGroup(key,idx){
+  const names=groupNamesFor(key); const name=names[idx];
+  const items=ITEMS.filter(i=>i.m===key&&i.s===name);
+  expandedState[key+'::'+name] = !isGroupExpanded(key,name,items);
+  saveExpanded(expandedState);
+  renderSection(key);
+}
+function setAllGroups(key,val){
+  groupNamesFor(key).forEach(n=>{ expandedState[key+'::'+n]=val; });
+  saveExpanded(expandedState);
+  renderSection(key);
+}
 
 function renderSection(key){
   if (key==='dashboard') return renderDashboard();
   const sec = SECTIONS.find(s=>s.k===key);
   if (!sec) return renderDashboard();
   const all = ITEMS.filter(i=>i.m===key);
-  // group by subsection
+  const store = loadStore();
+  const names = groupNamesFor(key);
   const groups = {};
   all.forEach(i=>{ (groups[i.s]=groups[i.s]||[]).push(i); });
-  const filtered = (items) => items.filter(i => {
+  const matchFilter = (i) => {
     if (currentFilter!=='All' && i.p!==currentFilter) return false;
     if (currentSearch && !(i.title+' '+i.why).toLowerCase().includes(currentSearch)) return false;
     return true;
-  });
+  };
   const total = all.length;
-  const shown = all.filter(i => (currentFilter==='All'||i.p===currentFilter) && (!currentSearch || (i.title+' '+i.why).toLowerCase().includes(currentSearch))).length;
+  const shown = all.filter(matchFilter).length;
+  const grouped = total > 6;            // small sections stay flat
+  const searching = !!currentSearch || currentFilter!=='All';
+
+  let groupsHtml = '';
+  if (!grouped){
+    groupsHtml = names.map(g => {
+      const items = groups[g].filter(matchFilter);
+      if (!items.length) return '';
+      return `
+        <section class="sec-anchor space-y-3">
+          <h3 class="text-[15px] font-semibold text-ink-900 mt-2">${escapeHtml(g)}</h3>
+          <div class="space-y-2">${items.map(renderItemRow).join('')}</div>
+        </section>`;
+    }).join('');
+  } else {
+    groupsHtml = names.map((g, idx) => {
+      const itemsAll = groups[g];
+      const items = itemsAll.filter(matchFilter);
+      if (searching && !items.length) return '';                 // hide non-matching groups while searching/filtering
+      const expanded = searching ? true : isGroupExpanded(key, g, itemsAll);
+      const custCount = itemsAll.filter(i => i.id in store).length;
+      const shownCount = searching ? items.length : itemsAll.length;
+      const isComm = groupIsCommittee(itemsAll);
+      const header = `
+        <button onclick="toggleGroup('${key}',${idx})" class="group w-full flex items-center gap-3 text-left bg-white border border-line rounded-xl px-4 py-3 hover:border-primary/30 transition">
+          <i data-lucide="chevron-right" class="w-4 h-4 text-ink-400 shrink-0 transition-transform ${expanded?'rotate-90':''}"></i>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-[14.5px] font-semibold text-ink-900">${escapeHtml(stripGroupPrefix(g))}</span>
+              ${isComm ? '<span class="chip pri-Core">Committee</span>' : ''}
+            </div>
+            <p class="text-[12px] text-ink-500 mt-0.5 leading-snug max-w-2xl">${escapeHtml(CATEGORY_DESC[g]||'')}</p>
+          </div>
+          <span class="shrink-0 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-surface text-ink-500 border border-line">${shownCount} item${shownCount===1?'':'s'}</span>
+          ${custCount ? `<span class="shrink-0 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary-light text-primary">${custCount} customised</span>` : ''}
+        </button>`;
+      const body = expanded ? `<div class="space-y-2 mt-2 mb-1 pl-1">${items.map(renderItemRow).join('')}</div>` : '';
+      return `<section class="sec-anchor">${header}${body}</section>`;
+    }).join('');
+  }
+
+  const expandBar = (grouped && !searching) ? `
+      <span class="ml-auto flex items-center gap-2">
+        <button onclick="setAllGroups('${key}',true)" class="text-[12px] px-2.5 py-1 rounded-full border border-line hover:bg-surface text-ink-500">Expand all</button>
+        <button onclick="setAllGroups('${key}',false)" class="text-[12px] px-2.5 py-1 rounded-full border border-line hover:bg-surface text-ink-500">Collapse all</button>
+      </span>` : '';
 
   document.getElementById('content').innerHTML = `
     <div>
@@ -1557,18 +1670,10 @@ function renderSection(key){
       <span class="text-[12px] text-ink-500 ml-1">Filter:</span>
       ${['All','Core','Helpful','Optional'].map(p => `<button onclick="setFilter('${p}')" class="text-[12px] px-2.5 py-1 rounded-full border border-line ${currentFilter===p?'tab-active':'hover:bg-surface text-ink-500'}">${p}</button>`).join('')}
       <span class="text-[12px] text-ink-400 ml-2">${shown} of ${total} shown</span>
+      ${expandBar}
     </div>
 
-    ${Object.keys(groups).map(g => {
-      const items = filtered(groups[g]);
-      if (!items.length) return '';
-      return `
-        <section class="sec-anchor space-y-3">
-          <h3 class="text-[15px] font-semibold text-ink-900 mt-2">${g}</h3>
-          <div class="space-y-2">${items.map(renderItemRow).join('')}</div>
-        </section>
-      `;
-    }).join('')}
+    <div class="space-y-3">${groupsHtml || '<p class="text-[13px] text-ink-500 px-1">No settings match.</p>'}</div>
   `;
   refreshIcons();
   bindItemHandlers();
@@ -1707,10 +1812,45 @@ function renderPreview(item, val){
     case 'bsd-policy':
       if (!val || typeof val !== 'object') return '';
       return `<div class="text-[12px] ${val.enabled?'text-success font-medium':'text-ink-500'}">${val.enabled?'Enabled':'Disabled'} · ${(val.allowedForTypes||[]).length} types · ${(val.allowedForValueTiers||[]).length} tiers</div>`;
+    case 'methods-suite': {
+      if (!val || typeof val !== 'object') return '';
+      const _ms_on = (val.methods||[]).filter(m=>m.enabled!==false).length;
+      const _ms_total = (val.methods||[]).length;
+      return `<div class="flex items-center gap-3 text-[12px] text-ink-500 flex-wrap"><span><strong class="text-ink-900">${_ms_on}</strong> of ${_ms_total} methods on</span><span class="text-ink-300">•</span><span>${(val.sectorDefaults||[]).length} sector defaults</span><span class="text-ink-300">•</span><span>${(val.leafOverrides||[]).length} overrides</span></div>`;
+    }
+    case 'tender-structure': {
+      if (!val || typeof val !== 'object') return '';
+      const _ts_sub = val.submission||{};
+      const _ts_on = ['allowResubmission','allowWithdrawal','allowOffline'].filter(k=>_ts_sub[k]&&_ts_sub[k].on).length;
+      return `<div class="flex items-center gap-3 text-[12px] text-ink-500 flex-wrap"><span><strong class="text-ink-900">${(val.covers&&val.covers.options||[]).length}</strong> cover options</span><span class="text-ink-300">•</span><span>${_ts_on}/3 submission switches on</span><span class="text-ink-300">•</span><span>${(val.bidValidity&&val.bidValidity.presets||[]).length} validity presets</span></div>`;
+    }
+    case 'notif-events': {
+      if (!val || typeof val !== 'object') return '';
+      const _ne = val.events||[];
+      const _ne_esc = _ne.filter(e=>e.escalation).length;
+      return `<div class="flex items-center gap-3 text-[12px] text-ink-500 flex-wrap"><span><strong class="text-ink-900">${_ne.length}</strong> events configured</span><span class="text-ink-300">•</span><span>${_ne_esc} with escalation</span></div>`;
+    }
+    case 'corrigendum-gepnic': {
+      if (!val || typeof val !== 'object') return '';
+      const _cg_on = (val.types||[]).filter(t=>t.enabled!==false).length;
+      return `<div class="flex items-center gap-3 text-[12px] text-ink-500 flex-wrap"><span><strong class="text-ink-900">${_cg_on}</strong> of ${(val.types||[]).length} corrigendum types on</span><span class="text-ink-300">•</span><span>${(val.autoDraftTriggers||[]).length} auto-draft triggers</span>${val.autoExtend?`<span class="text-ink-300">•</span><span>+${val.extensionDays||0}d auto-extend</span>`:''}</div>`;
+    }
     case 'criterion-builder': {
       if (!Array.isArray(val)) return '';
       const act = val.filter(c=>c.active!==false).length;
       return `<div class="text-[12px] text-ink-500"><strong class="text-ink-900">${val.length}</strong> criteria · ${act} active</div>`;
+    }
+    case 'tq-rubric': {
+      if (!val || typeof val !== 'object') return '';
+      const groups = Array.isArray(val.groups) ? val.groups : [];
+      const crit = groups.reduce((n,g)=>n+((g.criteria||[]).length),0);
+      const total = groups.reduce((n,g)=>n+(g.criteria||[]).reduce((m,c)=>m+(Number(c.max)||0),0),0);
+      const ok = total===100;
+      return `<div class="flex items-center gap-2 text-[12px] text-ink-500 flex-wrap">
+        <span>${crit} criteria · ${groups.length} groups · ${(val.overrides||[]).length} sector override${(val.overrides||[]).length===1?'':'s'}</span>
+        <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full ${ok?'bg-success/10 text-success':'bg-danger/10 text-danger'}">Total ${total}/100</span>
+        ${ok?'':'<span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-danger text-white">Total ≠ 100</span>'}
+      </div>`;
     }
     case 'milestones-matrix':
       if (!Array.isArray(val)) return '';
@@ -1804,8 +1944,11 @@ function openEdit(id){
   document.getElementById('epTitle').textContent = item.title;
   document.getElementById('epWhy').textContent = item.why;
   document.getElementById('epBody').innerHTML = renderEditor(item, editingDraft);
-  // Wider panel for the permissions matrix; default width for every other item.
-  document.getElementById('editPanel').style.width = (item.t === 'prebid-committee') ? '1080px' : '';
+  // Wider panel for the permissions matrix and the merged multi-section editors.
+  document.getElementById('editPanel').style.width =
+    (item.t === 'prebid-committee' || item.t === 'tender-tree') ? '1080px'
+    : (['methods-suite','notif-events','corrigendum-gepnic','tender-structure','tq-rubric'].includes(item.t)) ? '980px'
+    : '';
   document.getElementById('editPanel').classList.add('open');
   document.getElementById('backdrop').classList.add('open');
   refreshIcons();
@@ -1849,6 +1992,11 @@ function renderEditor(item, draft){
     case 'ai-questionnaire': return editorAiQuestionnaire(draft);
     case 'starter-chips-grouped': return editorStarterChipsGrouped(draft);
     case 'bsd-policy': return editorBsdPolicy(draft);
+    case 'methods-suite': return editorMethodsSuite(draft);
+    case 'tender-structure': return editorTenderStructure(draft);
+    case 'notif-events': return editorNotifEvents(draft);
+    case 'corrigendum-gepnic': return editorCorrigendumGepnic(draft);
+    case 'tq-rubric': return editorTqRubric(draft);
     case 'criterion-builder': return editorCriterionBuilder(draft);
     case 'milestones-matrix': return editorMilestonesMatrix(draft);
     case 'corrigendum-policy': return editorCorrigendumPolicy(draft);
@@ -1926,6 +2074,11 @@ function bindEditorHandlers(){
     case 'ai-questionnaire': return renderAiQuestionnaireAll();
     case 'starter-chips-grouped': return renderStarterChipsGroupedAll();
     case 'bsd-policy': return renderBsdPolicyAll();
+    case 'methods-suite': return renderMethodsSuiteAll();
+    case 'tender-structure': return renderTenderStructureAll();
+    case 'notif-events': return renderNotifEventsAll();
+    case 'corrigendum-gepnic': return renderCorrigendumGepnicAll();
+    case 'tq-rubric': return renderTqRubricAll();
     case 'criterion-builder': return renderCriterionBuilderAll();
     case 'milestones-matrix': return renderMilestonesMatrixAll();
     case 'corrigendum-policy': return renderCorrigendumPolicyAll();
@@ -3077,51 +3230,209 @@ function renderTenderManualJustAll(){
   refreshIcons();
 }
 
-/* ---- tender catalog tree (3-level: Type → Subtype → Sector) ---- */
-let ttreeExpanded = {};
-function ttreeNodeAt(path){ let arr = editingDraft, node = null; for (const i of path){ node = arr[i]; arr = (node && node.children) || []; } return node; }
-function ttreeArrAt(path){ let arr = editingDraft; for (let k=0;k<path.length;k++){ arr = arr[path[k]].children || (arr[path[k]].children = []); } return arr; }
-function ttreeUid(){ return 'n_' + Date.now().toString(36) + Math.floor(Math.random()*46656).toString(36); }
-function editorTenderTree(){
-  return `
-    <div class="space-y-3" id="ttreeOuter">
-      <p class="text-[11.5px] text-ink-500">Three levels: Type → Subtype → Sector. Toggle to enable/disable, rename inline, add a child, or delete. Disabled nodes are hidden from officer pickers.</p>
-      <div id="ttreeWrap" class="space-y-1"></div>
-      <button class="btn btn-primary" id="ttreeAddRoot"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add type</button>
-    </div>`;
-}
-function ttreeRows(nodes, parentPath, level){
-  return nodes.map((n,i)=>{
-    const path=[...parentPath,i], ps=path.join('/');
-    const kids = Array.isArray(n.children) ? n.children : [];
-    const hasKids = kids.length>0;
-    const expanded = ttreeExpanded[ps] !== false;
-    const canHaveKids = level < 2;
-    const caret = canHaveKids
-      ? `<button data-ttree-exp="${ps}" class="w-4 text-ink-400 hover:text-ink-900 text-[11px]">${hasKids?(expanded?'▾':'▸'):'·'}</button>`
-      : `<span class="w-4 inline-block text-ink-300 text-center">·</span>`;
-    const row = `<div class="flex items-center gap-2 px-2 py-1.5 rounded-lg ${n.enabled?'bg-white':'bg-surface'} border border-line" style="margin-left:${level*22}px">
-        ${caret}
-        <button class="toggle ${n.enabled?'on':''}" data-ttree-toggle="${ps}" aria-pressed="${!!n.enabled}"><span class="dot"></span></button>
-        <input class="flex-1 bg-transparent text-[13px] ${n.enabled?'text-ink-900':'line-through text-ink-400'} focus:outline-none border-0 p-0" data-ttree-name="${ps}" value="${escapeHtml(n.name||'')}">
-        ${canHaveKids?`<button data-ttree-add="${ps}" class="btn" style="padding:2px 8px;font-size:11px"><i data-lucide="plus" class="w-3 h-3"></i> child</button>`:''}
-        <button data-ttree-del="${ps}" class="text-ink-400 hover:text-danger" aria-label="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-      </div>`;
-    const childRows = (hasKids && expanded) ? ttreeRows(kids, path, level+1) : '';
-    return row + childRows;
-  }).join('');
-}
+/* ---- tender catalog tree — Miller-column (3-pane) browser ---- */
+/* Data shape unchanged: array of {id,name,enabled,children?} nested 3 deep. */
+let ttSel = {t:null, s:null, sec:null};   // selected indices per column
+let ttSearch = '';
+let ttRename = null;                        // "level|idx" of node being renamed
+let ttRenameOrig = '';
+let ttAdd = null;                           // 'type' | 'sub' | 'sec'
+let ttResizeBound = false;
+function ttUid(){ return 'n_' + Date.now().toString(36) + Math.floor(Math.random()*46656).toString(36); }
+function ttKids(n){ return (n && Array.isArray(n.children)) ? n.children : []; }
+function ttTypes(){ return Array.isArray(editingDraft) ? editingDraft : (editingDraft=[]); }
+function ttSubs(t){ return (t!=null && ttTypes()[t]) ? ttKids(ttTypes()[t]) : []; }
+function ttSecs(t,s){ const sub = (t!=null && s!=null) ? ttSubs(t)[s] : null; return sub ? ttKids(sub) : []; }
+function ttSubtreeHasMatch(n,q){ if((n.name||'').toLowerCase().includes(q)) return true; return ttKids(n).some(c=>ttSubtreeHasMatch(c,q)); }
+
+function editorTenderTree(){ ttSel={t:null,s:null,sec:null}; ttSearch=''; ttRename=null; ttAdd=null; return `<div id="ttRoot"></div>`; }
+
 function renderTenderTreeAll(){
   if (!Array.isArray(editingDraft)) editingDraft = [];
-  const wrap = document.getElementById('ttreeWrap');
-  wrap.innerHTML = ttreeRows(editingDraft, [], 0) || '<div class="text-[12px] text-ink-400 py-4 text-center border border-dashed border-line rounded-lg">No catalog nodes. Add a type to begin.</div>';
-  wrap.querySelectorAll('[data-ttree-exp]').forEach(b => b.onclick = () => { const ps=b.dataset.ttreeExp; ttreeExpanded[ps] = !(ttreeExpanded[ps] !== false); renderTenderTreeAll(); });
-  wrap.querySelectorAll('[data-ttree-toggle]').forEach(b => b.onclick = () => { const n=ttreeNodeAt(b.dataset.ttreeToggle.split('/').map(Number)); if(n) n.enabled=!n.enabled; renderTenderTreeAll(); });
-  wrap.querySelectorAll('[data-ttree-name]').forEach(inp => { inp.oninput = e => { const n=ttreeNodeAt(e.target.dataset.ttreeName.split('/').map(Number)); if(n) n.name=e.target.value; }; });
-  wrap.querySelectorAll('[data-ttree-add]').forEach(b => b.onclick = () => { const path=b.dataset.ttreeAdd.split('/').map(Number); const arr=ttreeArrAt(path); arr.push({id:ttreeUid(), name:'New node', enabled:true}); ttreeExpanded[path.join('/')]=true; renderTenderTreeAll(); });
-  wrap.querySelectorAll('[data-ttree-del]').forEach(b => b.onclick = () => { const path=b.dataset.ttreeDel.split('/').map(Number); const i=path.pop(); const arr = path.length ? (ttreeNodeAt(path).children||[]) : editingDraft; arr.splice(i,1); renderTenderTreeAll(); });
-  const addRoot = document.getElementById('ttreeAddRoot');
-  if (addRoot && !addRoot.dataset.bound) { addRoot.dataset.bound='1'; addRoot.onclick = () => { editingDraft.push({id:ttreeUid(), name:'New type', enabled:true, children:[]}); renderTenderTreeAll(); }; }
+  const root = document.getElementById('ttRoot');
+  if (!ttResizeBound){ ttResizeBound = true; window.addEventListener('resize', ()=>{ if (editingId && (ITEMS.find(i=>i.id===editingId)||{}).t==='tender-tree' && document.getElementById('ttRoot')) renderTenderTreeAll(); }); }
+  const narrow = (typeof window!=='undefined' && window.innerWidth && window.innerWidth < 900);
+  const q = ttSearch.trim().toLowerCase();
+
+  // effective selection (search auto-selects ancestors of the first match without mutating ttSel)
+  let effT = ttSel.t, effS = ttSel.s, effSec = ttSel.sec;
+  if (q){
+    effT = ttTypes().findIndex(t=>ttSubtreeHasMatch(t,q)); if (effT<0) effT=null;
+    effS = (effT!=null) ? ttSubs(effT).findIndex(s=>ttSubtreeHasMatch(s,q)) : -1; if (effS<0) effS=null;
+    effSec = (effS!=null) ? ttSecs(effT,effS).findIndex(se=>(se.name||'').toLowerCase().includes(q)) : -1; if (effSec<0) effSec=null;
+  }
+  const vis = (n)=> !q || ttSubtreeHasMatch(n,q);
+
+  // global counts
+  let nT=0,nS=0,nSec=0,nDis=0;
+  ttTypes().forEach(t=>{ nT++; if(t.enabled===false)nDis++; ttKids(t).forEach(s=>{ nS++; if(s.enabled===false)nDis++; ttKids(s).forEach(se=>{ nSec++; if(se.enabled===false)nDis++; }); }); });
+
+  // breadcrumb
+  const crumb=[];
+  if(effT!=null && ttTypes()[effT]) crumb.push(ttTypes()[effT].name);
+  if(effS!=null && ttSubs(effT)[effS]) crumb.push(ttSubs(effT)[effS].name);
+  if(effSec!=null && ttSecs(effT,effS)[effSec]) crumb.push(ttSecs(effT,effS)[effSec].name);
+  const crumbHtml = crumb.length ? crumb.map((c,i)=>`<span class="${i===crumb.length-1?'text-ink-900 font-medium':'text-ink-500'}">${escapeHtml(c||'(unnamed)')}</span>`).join('<i data-lucide="chevron-right" class="w-3.5 h-3.5 text-ink-300 inline align-middle mx-0.5"></i>') : '<span class="text-ink-400">No selection</span>';
+
+  // ---- one row ----
+  // level: 0 type, 1 subtype, 2 sector. inheritDisabled => show "hidden via X" instead of toggle.
+  function row(n, level, idx, selected, inheritDisabled, inheritName){
+    const renameKey = level+'|'+idx;
+    const renaming = ttRename===renameKey;
+    const count = level<2 ? ttKids(n).length : null;
+    const indivOff = n.enabled===false;
+    const dim = inheritDisabled || indivOff;
+    const nameCls = dim ? 'text-ink-400'+(indivOff&&!inheritDisabled?' line-through':'') : 'text-ink-900';
+    const left = selected ? '<span class="absolute left-0 top-0 bottom-0 w-[3px] bg-primary"></span>' : '';
+    const ctrl = inheritDisabled
+      ? `<span class="text-[10px] text-ink-400 italic shrink-0" title="Disabled because ${escapeHtml(inheritName||'a parent')} is off">hidden via ${escapeHtml(inheritName||'parent')}</span>`
+      : `<button class="toggle ${n.enabled?'on':''}" data-tt-tog="${level}|${idx}" aria-pressed="${!!n.enabled}"><span class="dot"></span></button>`;
+    const nameEl = renaming
+      ? `<input data-tt-rinput="${level}|${idx}" class="flex-1 min-w-0 inp" style="padding:2px 6px;font-size:12.5px" value="${escapeHtml(n.name||'')}">`
+      : `<span class="flex-1 min-w-0 truncate text-[13px] ${nameCls}">${escapeHtml(n.name||'(unnamed)')}</span>`;
+    const badge = count!=null ? `<span class="shrink-0 text-[10.5px] font-semibold px-1.5 py-0.5 rounded-full bg-surface text-ink-500 border border-line">${count}</span>` : '';
+    const chevron = level<2 ? `<i data-lucide="chevron-right" class="w-3.5 h-3.5 text-ink-400 shrink-0"></i>` : '';
+    const actions = renaming ? '' : `<span class="opacity-0 group-hover:opacity-100 flex items-center gap-1 shrink-0 transition-opacity">
+        <button data-tt-ren="${level}|${idx}" class="text-ink-400 hover:text-primary" title="Rename"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+        <button data-tt-del="${level}|${idx}" class="text-ink-400 hover:text-danger" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+      </span>`;
+    return `<div data-tt-sel="${level}|${idx}" class="group relative flex items-center gap-2 px-3 py-2 cursor-pointer border-b border-line ${selected?'bg-primary-light':'hover:bg-surface'}">
+        ${left}${ctrl}${nameEl}${actions}${badge}${chevron}
+      </div>`;
+  }
+
+  function emptyHint(txt){ return `<div class="px-3 py-5 text-[12px] text-ink-400 text-center">${txt}</div>`; }
+
+  function addFooter(level, label, disabled, hint){
+    const key = level===0?'type':level===1?'sub':'sec';
+    if (ttAdd===key){
+      return `<div class="flex items-center gap-1 px-2 py-2 border-t border-line bg-surface">
+        <input data-tt-ainput="${key}" class="inp flex-1" style="padding:3px 8px;font-size:12.5px" placeholder="Name…">
+        <button data-tt-acommit="${key}" class="btn btn-primary" style="padding:3px 8px"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>
+        <button data-tt-acancel class="btn" style="padding:3px 8px"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+      </div>`;
+    }
+    return `<button data-tt-add="${key}" ${disabled?'disabled':''} title="${disabled?escapeHtml(hint):''}" class="w-full flex items-center gap-1.5 px-3 py-2 border-t border-line text-[12px] text-left ${disabled?'text-ink-300 cursor-not-allowed':'text-primary hover:bg-primary-light'}">
+        <i data-lucide="plus" class="w-3.5 h-3.5"></i> ${escapeHtml(label)}</button>`;
+  }
+
+  function column(headerTitle, headerSub, bodyHtml, footerHtml, dimmed){
+    return `<div class="flex-1 min-w-0 border border-line rounded-xl overflow-hidden flex flex-col ${dimmed?'opacity-60':''}" style="height:520px">
+      <div class="px-3 py-2 border-b border-line bg-white shrink-0">
+        <div class="text-[12.5px] font-semibold text-ink-900">${escapeHtml(headerTitle)}</div>
+        ${headerSub?`<div class="text-[11px] text-ink-500 truncate">${escapeHtml(headerSub)}</div>`:''}
+      </div>
+      <div class="flex-1 overflow-y-auto">${bodyHtml}</div>
+      ${footerHtml||''}
+    </div>`;
+  }
+
+  // ---- column bodies ----
+  const typeRows = ttTypes().map((t,i)=>vis(t)?row(t,0,i,effT===i,false,''):'').join('') || emptyHint('No tender types yet.');
+
+  let subBody, subDim=false, subHeaderSub='';
+  if (effT==null){ subBody = emptyHint('Select a type to see its subtypes.'); }
+  else {
+    const tNode = ttTypes()[effT]; subHeaderSub = 'Subtypes of '+(tNode.name||'');
+    subDim = tNode.enabled===false;
+    const rows = ttSubs(effT).map((s,i)=>vis(s)?row(s,1,i,effS===i,subDim,tNode.name):'').join('');
+    subBody = rows || emptyHint('No subtypes. Add one below.');
+  }
+
+  let secBody, secDim=false, secHeaderSub='';
+  if (effT==null || effS==null){ secBody = emptyHint('Select a subtype to see its sectors.'); }
+  else {
+    const sNode = ttSubs(effT)[effS]; secHeaderSub = 'Sectors of '+((sNode&&sNode.name)||'');
+    const typeOff = ttTypes()[effT].enabled===false;
+    secDim = typeOff || (sNode && sNode.enabled===false);
+    const inheritName = (sNode && sNode.enabled===false) ? sNode.name : ttTypes()[effT].name;
+    const rows = ttSecs(effT,effS).map((se,i)=>vis(se)?row(se,2,i,effSec===i,secDim,inheritName):'').join('');
+    secBody = rows || emptyHint('No sectors. Add one below.');
+  }
+
+  const col1 = column('Tender Type','', typeRows, addFooter(0,'Add tender type',false,''), false);
+  const col2 = column('Subtype', subHeaderSub, subBody,
+    addFooter(1, effT!=null?('Add subtype to '+(ttTypes()[effT].name||'')):'Add subtype', effT==null, 'Select a type first'), subDim);
+  const col3 = column('Sector', secHeaderSub, secBody,
+    addFooter(2, effS!=null?('Add sector to '+((ttSubs(effT)[effS]||{}).name||'')):'Add sector', effS==null, 'Select a subtype first'), secDim);
+
+  // ---- narrow (drill-in) vs wide (3 columns) ----
+  let columnsHtml;
+  if (narrow){
+    let one;
+    if (effT==null) one = col1;
+    else if (effS==null) one = col2;
+    else one = col3;
+    const canBack = effT!=null;
+    columnsHtml = `<div class="space-y-2">
+      ${canBack?`<button id="ttBack" class="btn"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back</button>`:''}
+      ${one}
+    </div>`;
+  } else {
+    columnsHtml = `<div class="flex gap-3 items-start">${col1}${col2}${col3}</div>`;
+  }
+
+  root.innerHTML = `
+    <div class="space-y-3">
+      <p class="text-[11.5px] text-ink-500">Click a type to see its subtypes, a subtype to see its sectors. Disabled nodes are hidden from officer pickers.</p>
+      <div class="flex items-center justify-between gap-3 flex-wrap">
+        <div class="text-[12px] text-ink-500"><strong class="text-ink-900">${nT}</strong> types · <strong class="text-ink-900">${nS}</strong> subtypes · <strong class="text-ink-900">${nSec}</strong> sectors · ${nDis} disabled</div>
+        <div class="relative">
+          <i data-lucide="search" class="w-3.5 h-3.5 text-ink-400 absolute left-2.5 top-1/2 -translate-y-1/2"></i>
+          <input id="ttSearchInp" class="inp pl-8" style="width:230px" placeholder="Search all levels…" value="${escapeHtml(ttSearch)}">
+        </div>
+      </div>
+      <div class="flex items-center gap-1 text-[12.5px] bg-surface border border-line rounded-lg px-3 py-1.5">${crumbHtml}</div>
+      ${columnsHtml}
+    </div>`;
+
+  // ---- bindings ----
+  const resolvePath = (level, idx)=> level===0 ? [idx] : level===1 ? [effT, idx] : [effT, effS, idx];
+  const nodeAt = (path)=>{ let n=ttTypes()[path[0]]; if(path.length>1) n=ttKids(n)[path[1]]; if(path.length>2) n=ttKids(n)[path[2]]; return n; };
+  const arrAt = (level)=> level===0 ? ttTypes() : level===1 ? ttSubs(effT) : ttSecs(effT,effS);
+
+  root.querySelectorAll('[data-tt-sel]').forEach(el=>{ el.onclick=()=>{
+    const [lv,ix]=el.dataset.ttSel.split('|').map(Number);
+    if (lv===0){ ttSel={t:ix,s:null,sec:null}; }
+    else if (lv===1){ ttSel={t:effT,s:ix,sec:null}; }
+    else { ttSel={t:effT,s:effS,sec:ix}; }
+    ttSearch=''; ttRename=null; ttAdd=null; renderTenderTreeAll();
+  };});
+  root.querySelectorAll('[data-tt-tog]').forEach(b=>{ b.onclick=(e)=>{ e.stopPropagation(); const [lv,ix]=b.dataset.ttTog.split('|').map(Number); const n=nodeAt(resolvePath(lv,ix)); if(n) n.enabled=!n.enabled; renderTenderTreeAll(); };});
+  root.querySelectorAll('[data-tt-ren]').forEach(b=>{ b.onclick=(e)=>{ e.stopPropagation(); const key=b.dataset.ttRen; const [lv,ix]=key.split('|').map(Number); ttRename=key; ttRenameOrig=(nodeAt(resolvePath(lv,ix))||{}).name||''; renderTenderTreeAll(); };});
+  root.querySelectorAll('[data-tt-rinput]').forEach(inp=>{
+    inp.onclick=(e)=>e.stopPropagation();
+    inp.oninput=(e)=>{ const [lv,ix]=inp.dataset.ttRinput.split('|').map(Number); const n=nodeAt(resolvePath(lv,ix)); if(n) n.name=e.target.value; };
+    inp.onkeydown=(e)=>{ if(e.key==='Enter'){ ttRename=null; renderTenderTreeAll(); } else if(e.key==='Escape'){ const [lv,ix]=inp.dataset.ttRinput.split('|').map(Number); const n=nodeAt(resolvePath(lv,ix)); if(n) n.name=ttRenameOrig; ttRename=null; renderTenderTreeAll(); } };
+    inp.onblur=()=>{ if(ttRename){ ttRename=null; renderTenderTreeAll(); } };
+    setTimeout(()=>{ try{ inp.focus(); }catch(_){} },0);
+  });
+  root.querySelectorAll('[data-tt-del]').forEach(b=>{ b.onclick=(e)=>{ e.stopPropagation(); const [lv,ix]=b.dataset.ttDel.split('|').map(Number); const path=resolvePath(lv,ix); const n=nodeAt(path); if(!n) return;
+    const kc=ttKids(n).length; const childWord = lv===0?'subtype':'sector';
+    const msg = kc>0 ? `Delete ${n.name||'this node'} and its ${kc} ${childWord}${kc===1?'':'s'}?` : `Delete ${n.name||'this node'}?`;
+    if(!confirm(msg)) return;
+    arrAt(lv).splice(ix,1);
+    if(lv===0){ if(ttSel.t===ix) ttSel={t:null,s:null,sec:null}; else if(ttSel.t!=null&&ttSel.t>ix) ttSel.t--; }
+    else if(lv===1){ if(ttSel.s===ix){ttSel.s=null;ttSel.sec=null;} else if(ttSel.s!=null&&ttSel.s>ix) ttSel.s--; }
+    else { if(ttSel.sec===ix) ttSel.sec=null; else if(ttSel.sec!=null&&ttSel.sec>ix) ttSel.sec--; }
+    renderTenderTreeAll();
+  };});
+
+  // add controls
+  root.querySelectorAll('[data-tt-add]').forEach(b=>{ b.onclick=()=>{ if(b.disabled) return; ttAdd=b.dataset.ttAdd; renderTenderTreeAll(); };});
+  const acancel=root.querySelector('[data-tt-acancel]'); if(acancel) acancel.onclick=()=>{ ttAdd=null; renderTenderTreeAll(); };
+  const acommit=root.querySelector('[data-tt-acommit]'); const ainput=root.querySelector('[data-tt-ainput]');
+  const doAdd=()=>{ const v=((ainput&&ainput.value)||'').trim(); if(!v){ ttAdd=null; return renderTenderTreeAll(); }
+    if(ttAdd==='type'){ ttTypes().push({id:ttUid(),name:v,enabled:true,children:[]}); ttSel={t:ttTypes().length-1,s:null,sec:null}; }
+    else if(ttAdd==='sub'){ ttSubs(effT).push({id:ttUid(),name:v,enabled:true,children:[]}); ttSel={t:effT,s:ttSubs(effT).length-1,sec:null}; }
+    else { ttSecs(effT,effS).push({id:ttUid(),name:v,enabled:true}); ttSel={t:effT,s:effS,sec:ttSecs(effT,effS).length-1}; }
+    ttAdd=null; ttSearch=''; renderTenderTreeAll();
+  };
+  if(acommit) acommit.onclick=doAdd;
+  if(ainput){ ainput.onkeydown=(e)=>{ if(e.key==='Enter') doAdd(); else if(e.key==='Escape'){ ttAdd=null; renderTenderTreeAll(); } }; setTimeout(()=>{ try{ainput.focus();}catch(_){} },0); }
+
+  const back=document.getElementById('ttBack'); if(back) back.onclick=()=>{ if(ttSel.sec!=null){ttSel.sec=null;} else if(ttSel.s!=null){ttSel.s=null;ttSel.sec=null;} else {ttSel={t:null,s:null,sec:null};} renderTenderTreeAll(); };
+  const si=document.getElementById('ttSearchInp'); if(si){ si.oninput=(e)=>{ ttSearch=e.target.value; renderTenderTreeAll(); const f=document.getElementById('ttSearchInp'); if(f){ try{ f.focus(); f.setSelectionRange(f.value.length,f.value.length);}catch(_){} } }; }
   refreshIcons();
 }
 
@@ -3477,6 +3788,473 @@ function renderWithdrawalPolicyAll(){
   document.getElementById('wpRefund').onchange=e=>{editingDraft.emdRefundOnWithdrawal=e.target.value;};
   document.getElementById('wpRetention').onchange=e=>{editingDraft.auditLogRetentionYears=parseInt(e.target.value,10)||0;};
   refreshIcons();
+}
+
+/* ---- Evaluation methods & defaults (merged: methods + sector defaults + QCBS ratios + tie-breakers + leaf overrides) ---- */
+let msTab='methods';
+function editorMethodsSuite(){ return `<div id="msWrap"></div>`; }
+function renderMethodsSuiteAll(){
+  if(!editingDraft||typeof editingDraft!=='object'||Array.isArray(editingDraft)) editingDraft={};
+  const d=editingDraft;
+  d.methods=d.methods||[]; d.sectorDefaults=d.sectorDefaults||[]; d.qcbsRatios=d.qcbsRatios||[]; d.tieBreakers=d.tieBreakers||[]; d.leafOverrides=d.leafOverrides||[];
+  const wrap=document.getElementById('msWrap');
+  const tabs=[['methods','Methods'],['sectors','Sector defaults'],['qcbs','QCBS ratios'],['tie','Tie-breakers'],['leaf','Leaf overrides']];
+  const tabBar=`<div class="flex items-center gap-1 border-b border-line mb-4 flex-wrap">${tabs.map(([k,l])=>`<button data-ms-tab="${k}" class="px-3 py-2 text-[12.5px] font-medium border-b-2 ${msTab===k?'border-primary text-primary':'border-transparent text-ink-500 hover:text-ink-900'}">${escapeHtml(l)}</button>`).join('')}</div>`;
+  const kvTable=(arr,pfx,kPh,vPh)=>`<table class="w-full text-[12.5px]" style="border-collapse:separate;border-spacing:0"><tbody>${arr.map((p,i)=>`<tr class="border-t border-line"><td class="p-2"><input class="inp w-full" data-${pfx}-k="${i}" value="${escapeHtml(p.k||'')}" placeholder="${kPh}"></td><td class="p-2"><input class="inp w-full" data-${pfx}-v="${i}" value="${escapeHtml(String(p.v==null?'':p.v))}" placeholder="${vPh}"></td><td class="p-2 text-center" style="width:40px"><button class="text-ink-400 hover:text-danger" data-${pfx}-rm="${i}"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td></tr>`).join('')}</tbody></table>`;
+  let body='';
+  if(msTab==='methods'){
+    body=`<div class="text-[12px] text-ink-500 mb-2">Master on/off list with GFR 2017 Rule 161 value thresholds (OTE mandatory above ₹25L; LTE below; STE needs justification). Min/Max in ₹ — leave Max blank for no upper limit.</div>
+    <table class="w-full text-[12.5px]" style="border-collapse:separate;border-spacing:0"><thead><tr class="text-ink-500"><th class="text-left p-2">Method</th><th class="p-2">On</th><th class="p-2">Min ₹</th><th class="p-2">Max ₹</th><th class="p-2">Justify</th><th class="p-2"></th></tr></thead>
+    <tbody>${d.methods.map((m,i)=>`<tr class="border-t border-line">
+      <td class="p-2"><input class="inp w-full" data-ms-mlabel="${i}" value="${escapeHtml(m.label||'')}"></td>
+      <td class="p-2 text-center"><button class="toggle ${m.enabled!==false?'on':''}" data-ms-men="${i}" style="margin:0 auto"><span class="dot"></span></button></td>
+      <td class="p-2 text-center"><input type="number" class="inp w-28 text-right" data-ms-mmin="${i}" value="${m.minValue!=null?m.minValue:''}"></td>
+      <td class="p-2 text-center"><input type="number" class="inp w-28 text-right" data-ms-mmax="${i}" value="${m.maxValue!=null?m.maxValue:''}" placeholder="∞"></td>
+      <td class="p-2 text-center"><button class="toggle ${m.justify?'on':''}" data-ms-mjust="${i}" style="margin:0 auto"><span class="dot"></span></button></td>
+      <td class="p-2 text-center"><button class="text-ink-400 hover:text-danger" data-ms-mrm="${i}"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td></tr>`).join('')}</tbody></table>
+    <button class="btn mt-3" id="msAddM"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add method</button>`;
+  } else if(msTab==='sectors'){
+    body=`<div class="text-[12px] text-ink-500 mb-2">Default evaluation method per sector. Deviation should require justification.</div>${kvTable(d.sectorDefaults,'ms-sec','Sector','Method')}<button class="btn mt-3" id="msAddSec"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add sector default</button>`;
+  } else if(msTab==='qcbs'){
+    body=`<div class="text-[12px] text-ink-500 mb-2">Allowed QCBS technical:financial splits offered to officers.</div><div class="flex flex-wrap gap-1.5 mb-2">${d.qcbsRatios.length?d.qcbsRatios.map((r,i)=>`<span class="chip-input">${escapeHtml(r)} <button data-ms-qrm="${i}">✕</button></span>`).join(''):'<span class="text-[11px] text-ink-400">None</span>'}</div><div class="flex gap-2"><input class="inp flex-1" id="msNewQ" placeholder="e.g. 75:25"><button class="btn" id="msAddQ">Add</button></div>`;
+  } else if(msTab==='tie'){
+    body=`<div class="text-[12px] text-ink-500 mb-2">Tie-breaker rule per method when two bidders score identically.</div>${kvTable(d.tieBreakers,'ms-tie','Method','Rule')}<button class="btn mt-3" id="msAddTie"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add rule</button>`;
+  } else {
+    body=`<div class="text-[12px] text-ink-500 mb-2">Per-leaf exceptions where a specific catalog subtype+sector deviates from the sector default. Key = catalog leaf path, Value = method.</div>${kvTable(d.leafOverrides,'ms-leaf','Catalog leaf path','Method')}<button class="btn mt-3" id="msAddLeaf"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add override</button>`;
+  }
+  wrap.innerHTML=tabBar+`<div>${body}</div>`;
+  wrap.querySelectorAll('[data-ms-tab]').forEach(b=>b.onclick=()=>{msTab=b.dataset.msTab;renderMethodsSuiteAll();});
+  // methods tab
+  wrap.querySelectorAll('[data-ms-mlabel]').forEach(inp=>inp.oninput=e=>{d.methods[+e.target.dataset.msMlabel].label=e.target.value;});
+  wrap.querySelectorAll('[data-ms-men]').forEach(b=>b.onclick=()=>{const m=d.methods[+b.dataset.msMen];m.enabled=m.enabled===false;renderMethodsSuiteAll();});
+  wrap.querySelectorAll('[data-ms-mjust]').forEach(b=>b.onclick=()=>{const m=d.methods[+b.dataset.msMjust];m.justify=!m.justify;renderMethodsSuiteAll();});
+  wrap.querySelectorAll('[data-ms-mmin]').forEach(inp=>inp.onchange=e=>{const v=e.target.value.trim();d.methods[+e.target.dataset.msMmin].minValue=v===''?0:(parseInt(v,10)||0);});
+  wrap.querySelectorAll('[data-ms-mmax]').forEach(inp=>inp.onchange=e=>{const v=e.target.value.trim();d.methods[+e.target.dataset.msMmax].maxValue=v===''?null:(parseInt(v,10)||0);});
+  wrap.querySelectorAll('[data-ms-mrm]').forEach(b=>b.onclick=()=>{d.methods.splice(+b.dataset.msMrm,1);renderMethodsSuiteAll();});
+  const addM=document.getElementById('msAddM'); if(addM) addM.onclick=()=>{d.methods.push({label:'New method',enabled:true,minValue:0,maxValue:null,justify:false});renderMethodsSuiteAll();};
+  // kv tabs
+  const bindKv=(pfx,arr,addId,blank)=>{
+    wrap.querySelectorAll(`[data-${pfx}-k]`).forEach(inp=>inp.oninput=e=>{arr[+e.target.getAttribute(`data-${pfx}-k`)].k=e.target.value;});
+    wrap.querySelectorAll(`[data-${pfx}-v]`).forEach(inp=>inp.oninput=e=>{arr[+e.target.getAttribute(`data-${pfx}-v`)].v=e.target.value;});
+    wrap.querySelectorAll(`[data-${pfx}-rm]`).forEach(b=>b.onclick=()=>{arr.splice(+b.getAttribute(`data-${pfx}-rm`),1);renderMethodsSuiteAll();});
+    const a=document.getElementById(addId); if(a) a.onclick=()=>{arr.push(blank());renderMethodsSuiteAll();};
+  };
+  bindKv('ms-sec',d.sectorDefaults,'msAddSec',()=>({k:'',v:''}));
+  bindKv('ms-tie',d.tieBreakers,'msAddTie',()=>({k:'',v:''}));
+  bindKv('ms-leaf',d.leafOverrides,'msAddLeaf',()=>({k:'',v:''}));
+  // qcbs
+  wrap.querySelectorAll('[data-ms-qrm]').forEach(b=>b.onclick=()=>{d.qcbsRatios.splice(+b.dataset.msQrm,1);renderMethodsSuiteAll();});
+  const addQ=document.getElementById('msAddQ'); if(addQ) addQ.onclick=()=>{const inp=document.getElementById('msNewQ');const v=(inp.value||'').trim();if(v){d.qcbsRatios.push(v);renderMethodsSuiteAll();}};
+  refreshIcons();
+}
+
+/* ---- Tender structure & submission rules (covers / submission switches / bid validity) ---- */
+let tsTab='covers';
+function editorTenderStructure(){ return `<div id="tsWrap"></div>`; }
+function renderTenderStructureAll(){
+  if(!editingDraft||typeof editingDraft!=='object'||Array.isArray(editingDraft)) editingDraft={};
+  const d=editingDraft;
+  d.covers=d.covers||{}; d.covers.options=d.covers.options||[]; d.covers.defaultByCategory=d.covers.defaultByCategory||[]; d.covers.defaultByTier=d.covers.defaultByTier||[];
+  d.submission=d.submission||{}; ['allowResubmission','allowWithdrawal','allowOffline'].forEach(k=>{ d.submission[k]=d.submission[k]||{on:false,officerOverride:false}; });
+  d.bidValidity=d.bidValidity||{}; d.bidValidity.presets=d.bidValidity.presets||[]; d.bidValidity.defaultByCategory=d.bidValidity.defaultByCategory||[];
+  const wrap=document.getElementById('tsWrap');
+  const tabs=[['covers','Covers'],['submission','Submission switches'],['validity','Bid validity']];
+  const tabBar=`<div class="flex items-center gap-1 border-b border-line mb-4 flex-wrap">${tabs.map(([k,l])=>`<button data-ts-tab="${k}" class="px-3 py-2 text-[12.5px] font-medium border-b-2 ${tsTab===k?'border-primary text-primary':'border-transparent text-ink-500 hover:text-ink-900'}">${escapeHtml(l)}</button>`).join('')}</div>`;
+  const countOpts=()=>d.covers.options.map(o=>o.count).filter(c=>c!=null);
+  const countSelect=(pfx,i,val)=>`<select class="inp" data-${pfx}="${i}">${countOpts().map(c=>`<option ${c==val?'selected':''} value="${c}">${c} cover${c==1?'':'s'}</option>`).join('')}</select>`;
+  let body='';
+  if(tsTab==='covers'){
+    body=`<div class="text-[12px] text-ink-500 mb-2">Allowed cover (envelope) counts and their standard compositions.</div>
+    <table class="w-full text-[12.5px]" style="border-collapse:separate;border-spacing:0"><thead><tr class="text-ink-500"><th class="p-2" style="width:90px">Covers</th><th class="text-left p-2">Composition</th><th class="p-2"></th></tr></thead>
+    <tbody>${d.covers.options.map((o,i)=>`<tr class="border-t border-line"><td class="p-2 text-center"><input type="number" class="inp w-16 text-right" data-ts-ocount="${i}" value="${o.count!=null?o.count:''}"></td><td class="p-2"><input class="inp w-full" data-ts-ocomp="${i}" value="${escapeHtml(o.composition||'')}"></td><td class="p-2 text-center"><button class="text-ink-400 hover:text-danger" data-ts-orm="${i}"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td></tr>`).join('')}</tbody></table>
+    <button class="btn mt-2 mb-4" id="tsAddOpt"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add cover option</button>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-line">
+      <div><div class="text-[12px] font-medium text-ink-900 mb-1.5">Default covers per tender category</div>${d.covers.defaultByCategory.map((p,i)=>`<div class="flex items-center gap-2 mb-1.5"><input class="inp flex-1" data-ts-catk="${i}" value="${escapeHtml(p.k||'')}"><span class="text-ink-400">→</span>${countSelect('ts-catv',i,p.v)}<button class="text-ink-400 hover:text-danger" data-ts-catrm="${i}"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`).join('')}<button class="btn" id="tsAddCat"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add</button></div>
+      <div><div class="text-[12px] font-medium text-ink-900 mb-1.5">Default covers per value tier</div>${d.covers.defaultByTier.map((p,i)=>`<div class="flex items-center gap-2 mb-1.5"><input class="inp flex-1" data-ts-tierk="${i}" value="${escapeHtml(p.k||'')}"><span class="text-ink-400">→</span>${countSelect('ts-tierv',i,p.v)}<button class="text-ink-400 hover:text-danger" data-ts-tierrm="${i}"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`).join('')}<button class="btn" id="tsAddTier"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add</button></div>
+    </div>`;
+  } else if(tsTab==='submission'){
+    const sw=(key,label)=>{const s=d.submission[key];return `<div class="flex items-center justify-between gap-4 py-2.5 border-b border-line"><div class="text-[13px] text-ink-900">${label}</div><div class="flex items-center gap-5"><div class="flex items-center gap-2"><span class="text-[11.5px] text-ink-500">Default</span><button class="toggle ${s.on?'on':''}" data-ts-swon="${key}"><span class="dot"></span></button></div><div class="flex items-center gap-2"><span class="text-[11.5px] text-ink-500">Officers may override</span><button class="toggle ${s.officerOverride?'on':''}" data-ts-swov="${key}"><span class="dot"></span></button></div></div></div>`;};
+    body=`<div class="text-[12px] text-ink-500 mb-2">Per-tender submission defaults, and whether officers may override each one.</div>${sw('allowResubmission','Allow resubmission')}${sw('allowWithdrawal','Allow withdrawal')}${sw('allowOffline','Allow offline submission')}`;
+  } else {
+    body=`<div class="text-[12px] text-ink-500 mb-2">Bid-validity preset options (days) and the default per tender category.</div>
+    <div class="text-[12px] font-medium text-ink-900 mb-1.5">Preset options (days)</div><div class="flex flex-wrap gap-1.5 mb-4">${d.bidValidity.presets.length?d.bidValidity.presets.map((p,i)=>`<span class="chip-input">${escapeHtml(String(p))} <button data-ts-prm="${i}">✕</button></span>`).join(''):'<span class="text-[11px] text-ink-400">None</span>'}<span class="inline-flex items-center gap-1 ml-1"><input type="number" class="inp w-20" id="tsNewPreset" placeholder="days"><button class="btn" id="tsAddPreset">Add</button></span></div>
+    <div class="text-[12px] font-medium text-ink-900 mb-1.5">Default validity per tender category (days)</div>${d.bidValidity.defaultByCategory.map((p,i)=>`<div class="flex items-center gap-2 mb-1.5"><input class="inp flex-1" data-ts-vcatk="${i}" value="${escapeHtml(p.k||'')}"><span class="text-ink-400">→</span><input type="number" class="inp w-24 text-right" data-ts-vcatv="${i}" value="${p.v!=null?p.v:''}"><button class="text-ink-400 hover:text-danger" data-ts-vcatrm="${i}"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`).join('')}<button class="btn" id="tsAddVCat"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add</button>`;
+  }
+  wrap.innerHTML=tabBar+`<div>${body}</div>`;
+  wrap.querySelectorAll('[data-ts-tab]').forEach(b=>b.onclick=()=>{tsTab=b.dataset.tsTab;renderTenderStructureAll();});
+  // covers
+  wrap.querySelectorAll('[data-ts-ocount]').forEach(inp=>inp.onchange=e=>{d.covers.options[+e.target.dataset.tsOcount].count=parseInt(e.target.value,10)||0;renderTenderStructureAll();});
+  wrap.querySelectorAll('[data-ts-ocomp]').forEach(inp=>inp.oninput=e=>{d.covers.options[+e.target.dataset.tsOcomp].composition=e.target.value;});
+  wrap.querySelectorAll('[data-ts-orm]').forEach(b=>b.onclick=()=>{d.covers.options.splice(+b.dataset.tsOrm,1);renderTenderStructureAll();});
+  const addOpt=document.getElementById('tsAddOpt'); if(addOpt) addOpt.onclick=()=>{d.covers.options.push({count:1,composition:''});renderTenderStructureAll();};
+  wrap.querySelectorAll('[data-ts-catk]').forEach(inp=>inp.oninput=e=>{d.covers.defaultByCategory[+e.target.dataset.tsCatk].k=e.target.value;});
+  wrap.querySelectorAll('[data-ts-catv]').forEach(s=>s.onchange=e=>{d.covers.defaultByCategory[+e.target.dataset.tsCatv].v=parseInt(e.target.value,10)||0;});
+  wrap.querySelectorAll('[data-ts-catrm]').forEach(b=>b.onclick=()=>{d.covers.defaultByCategory.splice(+b.dataset.tsCatrm,1);renderTenderStructureAll();});
+  const addCat=document.getElementById('tsAddCat'); if(addCat) addCat.onclick=()=>{d.covers.defaultByCategory.push({k:'',v:(countOpts()[0]||1)});renderTenderStructureAll();};
+  wrap.querySelectorAll('[data-ts-tierk]').forEach(inp=>inp.oninput=e=>{d.covers.defaultByTier[+e.target.dataset.tsTierk].k=e.target.value;});
+  wrap.querySelectorAll('[data-ts-tierv]').forEach(s=>s.onchange=e=>{d.covers.defaultByTier[+e.target.dataset.tsTierv].v=parseInt(e.target.value,10)||0;});
+  wrap.querySelectorAll('[data-ts-tierrm]').forEach(b=>b.onclick=()=>{d.covers.defaultByTier.splice(+b.dataset.tsTierrm,1);renderTenderStructureAll();});
+  const addTier=document.getElementById('tsAddTier'); if(addTier) addTier.onclick=()=>{d.covers.defaultByTier.push({k:'',v:(countOpts()[0]||1)});renderTenderStructureAll();};
+  // submission
+  wrap.querySelectorAll('[data-ts-swon]').forEach(b=>b.onclick=()=>{const s=d.submission[b.dataset.tsSwon];s.on=!s.on;renderTenderStructureAll();});
+  wrap.querySelectorAll('[data-ts-swov]').forEach(b=>b.onclick=()=>{const s=d.submission[b.dataset.tsSwov];s.officerOverride=!s.officerOverride;renderTenderStructureAll();});
+  // validity
+  wrap.querySelectorAll('[data-ts-prm]').forEach(b=>b.onclick=()=>{d.bidValidity.presets.splice(+b.dataset.tsPrm,1);renderTenderStructureAll();});
+  const addPreset=document.getElementById('tsAddPreset'); if(addPreset) addPreset.onclick=()=>{const inp=document.getElementById('tsNewPreset');const v=parseInt(inp.value,10);if(v){d.bidValidity.presets.push(v);renderTenderStructureAll();}};
+  wrap.querySelectorAll('[data-ts-vcatk]').forEach(inp=>inp.oninput=e=>{d.bidValidity.defaultByCategory[+e.target.dataset.tsVcatk].k=e.target.value;});
+  wrap.querySelectorAll('[data-ts-vcatv]').forEach(inp=>inp.onchange=e=>{d.bidValidity.defaultByCategory[+e.target.dataset.tsVcatv].v=parseInt(e.target.value,10)||0;});
+  wrap.querySelectorAll('[data-ts-vcatrm]').forEach(b=>b.onclick=()=>{d.bidValidity.defaultByCategory.splice(+b.dataset.tsVcatrm,1);renderTenderStructureAll();});
+  const addVCat=document.getElementById('tsAddVCat'); if(addVCat) addVCat.onclick=()=>{d.bidValidity.defaultByCategory.push({k:'',v:90});renderTenderStructureAll();};
+  refreshIcons();
+}
+
+/* ---- Notifications, reminders & escalation (organised per event) ---- */
+let neIdx=0;
+function editorNotifEvents(){ return `<div id="neWrap"></div>`; }
+function renderNotifEventsAll(){
+  if(!editingDraft||typeof editingDraft!=='object'||Array.isArray(editingDraft)) editingDraft={};
+  const d=editingDraft;
+  d.events=d.events||[]; d.channels=d.channels||['Email','SMS','In-app'];
+  d.recipientRoles=d.recipientRoles||['Drafter','Tender Inviting Authority','Technical Member','Finance Member','Vigilance Observer','HOD','Procurement Cell'];
+  if(neIdx>=d.events.length) neIdx=0;
+  const wrap=document.getElementById('neWrap');
+  const ev=d.events[neIdx];
+  const list=`<div class="w-[230px] shrink-0 border-r border-line pr-3 space-y-1">${d.events.map((e,i)=>`<button data-ne-pick="${i}" class="w-full text-left px-3 py-2 rounded-lg text-[12.5px] ${i===neIdx?'bg-primary text-white font-medium':'text-ink-700 hover:bg-surface'}"><div class="flex items-center justify-between gap-2"><span class="truncate">${escapeHtml(e.name||'(unnamed)')}</span>${e.escalation?`<i data-lucide="alert-triangle" class="w-3.5 h-3.5 ${i===neIdx?'text-white':'text-warning'}"></i>`:''}</div></button>`).join('')}<button class="btn w-full mt-2" id="neAddEvent"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add event</button></div>`;
+  let detail='<div class="flex-1 text-[12px] text-ink-400 px-4">No event selected.</div>';
+  if(ev){
+    ev.channels=ev.channels||{}; ev.recipients=ev.recipients||[];
+    const esc=ev.escalation;
+    detail=`<div class="flex-1 min-w-0 pl-4 space-y-4">
+      <div class="flex items-center gap-2"><input class="inp flex-1 text-[14px] font-medium" data-ne-name value="${escapeHtml(ev.name||'')}"><button class="text-ink-400 hover:text-danger" id="neRmEvent" title="Delete event"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>
+      <div><div class="text-[12px] font-medium text-ink-900 mb-1">Reminders</div><input class="inp w-full" data-ne-reminders value="${escapeHtml(ev.reminders||'')}" placeholder="Offsets e.g. D-7, D-3, D-1, H-4 (blank = none)"><div class="text-[11px] text-ink-400 mt-1">Comma-separated offsets — D-N days before, H-N hours before.</div></div>
+      <div><div class="text-[12px] font-medium text-ink-900 mb-1.5">Channels</div><div class="flex flex-wrap gap-1.5">${d.channels.map(c=>{const on=ev.channels[c];return `<button class="chip-input" style="cursor:pointer;${on?'background:#EFF6FF;border-color:#93C5FD;color:#0F5EE8':''}" data-ne-chan="${escapeHtml(c)}">${escapeHtml(c)}</button>`;}).join('')}</div></div>
+      <div><div class="text-[12px] font-medium text-ink-900 mb-1.5">Recipients</div><div class="flex flex-wrap gap-1.5">${d.recipientRoles.map(r=>{const on=ev.recipients.includes(r);return `<button class="chip-input" style="cursor:pointer;${on?'background:#EFF6FF;border-color:#93C5FD;color:#0F5EE8':''}" data-ne-rcpt="${escapeHtml(r)}">${escapeHtml(r)}</button>`;}).join('')}</div></div>
+      <div class="pt-3 border-t border-line"><div class="flex items-center gap-2 mb-2"><button class="toggle ${esc?'on':''}" id="neEscToggle"><span class="dot"></span></button><span class="text-[13px] font-medium text-ink-900">Escalate if breached</span></div>
+        ${esc?`<div class="flex items-end gap-3 flex-wrap"><label class="block"><span class="text-[12px] text-ink-500">Breach after (hours)</span><input type="number" class="inp w-28 mt-0.5" id="neEscHours" value="${esc.breachHours!=null?esc.breachHours:24}"></label><label class="block"><span class="text-[12px] text-ink-500">Escalate to</span><select class="inp mt-0.5" id="neEscTo">${pgRoles().concat(esc.escalateTo&&!pgRoles().includes(esc.escalateTo)?[esc.escalateTo]:[]).map(r=>`<option ${esc.escalateTo===r?'selected':''}>${escapeHtml(r)}</option>`).join('')}</select></label></div>`:''}</div>
+    </div>`;
+  }
+  wrap.innerHTML=`<div class="flex gap-1">${list}${detail}</div>`;
+  wrap.querySelectorAll('[data-ne-pick]').forEach(b=>b.onclick=()=>{neIdx=+b.dataset.nePick;renderNotifEventsAll();});
+  const addEv=document.getElementById('neAddEvent'); if(addEv) addEv.onclick=()=>{d.events.push({name:'New event',reminders:'',channels:{Email:true,SMS:false,'In-app':true},recipients:[],escalation:null});neIdx=d.events.length-1;renderNotifEventsAll();};
+  const nm=wrap.querySelector('[data-ne-name]'); if(nm) nm.oninput=e=>{ev.name=e.target.value;wrap.querySelectorAll('[data-ne-pick]')[neIdx].querySelector('span').textContent=e.target.value||'(unnamed)';};
+  const rem=wrap.querySelector('[data-ne-reminders]'); if(rem) rem.oninput=e=>{ev.reminders=e.target.value;};
+  const rmEv=document.getElementById('neRmEvent'); if(rmEv) rmEv.onclick=()=>{d.events.splice(neIdx,1);neIdx=0;renderNotifEventsAll();};
+  wrap.querySelectorAll('[data-ne-chan]').forEach(b=>b.onclick=()=>{const c=b.dataset.neChan;ev.channels[c]=!ev.channels[c];renderNotifEventsAll();});
+  wrap.querySelectorAll('[data-ne-rcpt]').forEach(b=>b.onclick=()=>{const r=b.dataset.neRcpt;const i=ev.recipients.indexOf(r);i>=0?ev.recipients.splice(i,1):ev.recipients.push(r);renderNotifEventsAll();});
+  const escT=document.getElementById('neEscToggle'); if(escT) escT.onclick=()=>{ev.escalation=ev.escalation?null:{breachHours:24,escalateTo:pgRoles()[0]||'HOD'};renderNotifEventsAll();};
+  const escH=document.getElementById('neEscHours'); if(escH) escH.onchange=e=>{ev.escalation.breachHours=parseInt(e.target.value,10)||0;};
+  const escTo=document.getElementById('neEscTo'); if(escTo) escTo.onchange=e=>{ev.escalation.escalateTo=e.target.value;};
+  refreshIcons();
+}
+
+/* ---- Corrigendum policy — 7 GePNIC types + auto-draft triggers ---- */
+function editorCorrigendumGepnic(){ return `<div id="cgWrap" class="space-y-5"></div>`; }
+function renderCorrigendumGepnicAll(){
+  if(!editingDraft||typeof editingDraft!=='object'||Array.isArray(editingDraft)) editingDraft={};
+  const d=editingDraft;
+  d.types=d.types||[]; d.autoDraftTriggers=d.autoDraftTriggers||[];
+  d.cutoffOptions=d.cutoffOptions||['Before bid submission start','Before bid submission end','Before bid opening','Any stage'];
+  if(d.autoExtend==null) d.autoExtend=true; if(d.extensionDays==null) d.extensionDays=7;
+  const typeNames=d.types.map(t=>t.name).filter(Boolean);
+  const wrap=document.getElementById('cgWrap');
+  const cutSel=(i,val)=>`<select class="inp" data-cg-cut="${i}">${d.cutoffOptions.map(o=>`<option ${o===val?'selected':''}>${escapeHtml(o)}</option>`).join('')}</select>`;
+  const typeSel=(i,val)=>`<select class="inp" data-cg-ttype="${i}">${(typeNames.length?typeNames:['—']).map(o=>`<option ${o===val?'selected':''}>${escapeHtml(o)}</option>`).join('')}</select>`;
+  wrap.innerHTML=`
+    <div>
+      <div class="text-[13px] font-semibold text-ink-900 mb-1">Corrigendum types (GePNIC)</div>
+      <div class="text-[12px] text-ink-500 mb-2">The seven statutory types. Each carries a stage cutoff (latest point it can be issued), an approval chain and auto-extend behaviour.</div>
+      <div class="space-y-2">${d.types.map((t,i)=>`<div class="bg-white border border-line rounded-xl p-3 space-y-2">
+        <div class="flex items-center gap-2"><button class="toggle ${t.enabled!==false?'on':''}" data-cg-en="${i}"><span class="dot"></span></button><input class="inp flex-1 text-[13px] font-medium" data-cg-name="${i}" value="${escapeHtml(t.name||'')}"><button class="text-ink-400 hover:text-danger" data-cg-trm="${i}"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>
+        <div class="flex items-center gap-4 flex-wrap text-[12px]">
+          <label class="flex items-center gap-2"><span class="text-ink-500">Stage cutoff</span>${cutSel(i,t.cutoff)}</label>
+          <label class="flex items-center gap-2"><span class="text-ink-500">Auto-extend</span><button class="toggle ${t.autoExtend?'on':''}" data-cg-ae="${i}"><span class="dot"></span></button></label>
+        </div>
+        <div><div class="text-[11px] text-ink-500 mb-1">Approval chain</div><div class="flex flex-wrap items-center gap-1">${(t.approval||[]).map((x,j)=>`<span class="chip-input">${escapeHtml(x)} <button data-cg-arm="${i}|${j}">✕</button></span>${j<(t.approval||[]).length-1?'<span class="text-ink-400 px-1">→</span>':''}`).join('')||'<span class="text-[11px] text-ink-400">None</span>'}<span class="inline-flex items-center gap-1 ml-1"><input class="inp w-40" data-cg-anew="${i}" placeholder="Add step…"><button class="btn" data-cg-aadd="${i}">Add</button></span></div></div>
+      </div>`).join('')}</div>
+      <button class="btn mt-2" id="cgAddType"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add corrigendum type</button>
+    </div>
+    <div class="flex items-center gap-4 flex-wrap pt-3 border-t border-line">
+      <div class="flex items-center gap-2"><button class="toggle ${d.autoExtend?'on':''}" id="cgAuto"><span class="dot"></span></button><span class="text-[13px]">Auto-extend deadline on corrigendum</span></div>
+      <label class="block"><span class="text-[12px] text-ink-500">Extension days</span><input type="number" class="inp w-24 mt-0.5" id="cgExt" value="${d.extensionDays}"></label>
+    </div>
+    <div class="pt-3 border-t border-line">
+      <div class="text-[13px] font-semibold text-ink-900 mb-1">Auto-draft triggers</div>
+      <div class="text-[12px] text-ink-500 mb-2">Change events that auto-draft a corrigendum, mapped to the type used.</div>
+      ${d.autoDraftTriggers.map((t,i)=>`<div class="flex items-center gap-2 mb-1.5"><input class="inp flex-1" data-cg-tchg="${i}" value="${escapeHtml(t.change||'')}" placeholder="Change event"><span class="text-ink-400">→</span>${typeSel(i,t.type)}<button class="text-ink-400 hover:text-danger" data-cg-tdrm="${i}"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`).join('')}
+      <button class="btn" id="cgAddTrig"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add trigger</button>
+    </div>`;
+  wrap.querySelectorAll('[data-cg-en]').forEach(b=>b.onclick=()=>{const t=d.types[+b.dataset.cgEn];t.enabled=t.enabled===false;renderCorrigendumGepnicAll();});
+  wrap.querySelectorAll('[data-cg-name]').forEach(inp=>inp.oninput=e=>{d.types[+e.target.dataset.cgName].name=e.target.value;});
+  wrap.querySelectorAll('[data-cg-cut]').forEach(s=>s.onchange=e=>{d.types[+e.target.dataset.cgCut].cutoff=e.target.value;});
+  wrap.querySelectorAll('[data-cg-ae]').forEach(b=>b.onclick=()=>{const t=d.types[+b.dataset.cgAe];t.autoExtend=!t.autoExtend;renderCorrigendumGepnicAll();});
+  wrap.querySelectorAll('[data-cg-trm]').forEach(b=>b.onclick=()=>{d.types.splice(+b.dataset.cgTrm,1);renderCorrigendumGepnicAll();});
+  wrap.querySelectorAll('[data-cg-arm]').forEach(b=>b.onclick=()=>{const [i,j]=b.dataset.cgArm.split('|').map(Number);d.types[i].approval.splice(j,1);renderCorrigendumGepnicAll();});
+  wrap.querySelectorAll('[data-cg-aadd]').forEach(b=>b.onclick=()=>{const i=+b.dataset.cgAadd;const inp=wrap.querySelector(`[data-cg-anew="${i}"]`);const v=(inp.value||'').trim();if(v){d.types[i].approval=d.types[i].approval||[];d.types[i].approval.push(v);renderCorrigendumGepnicAll();}});
+  const addType=document.getElementById('cgAddType'); if(addType) addType.onclick=()=>{d.types.push({name:'New corrigendum type',enabled:true,cutoff:d.cutoffOptions[1],approval:[],autoExtend:false});renderCorrigendumGepnicAll();};
+  document.getElementById('cgAuto').onclick=()=>{d.autoExtend=!d.autoExtend;renderCorrigendumGepnicAll();};
+  document.getElementById('cgExt').onchange=e=>{d.extensionDays=parseInt(e.target.value,10)||0;};
+  wrap.querySelectorAll('[data-cg-tchg]').forEach(inp=>inp.oninput=e=>{d.autoDraftTriggers[+e.target.dataset.cgTchg].change=e.target.value;});
+  wrap.querySelectorAll('[data-cg-ttype]').forEach(s=>s.onchange=e=>{d.autoDraftTriggers[+e.target.dataset.cgTtype].type=e.target.value;});
+  wrap.querySelectorAll('[data-cg-tdrm]').forEach(b=>b.onclick=()=>{d.autoDraftTriggers.splice(+b.dataset.cgTdrm,1);renderCorrigendumGepnicAll();});
+  const addTrig=document.getElementById('cgAddTrig'); if(addTrig) addTrig.onclick=()=>{d.autoDraftTriggers.push({change:'',type:typeNames[0]||''});renderCorrigendumGepnicAll();};
+  refreshIcons();
+}
+
+/* ---- TQ marks rubric — dedicated grouped editor + sector overrides ---- */
+let tqTab='default';
+let tqCollapsed={};      // groupId -> collapsed
+let tqAddMenuFor=null;   // groupId with open add-criterion menu
+let tqDrag=null;         // {gi,ci} during drag
+function tqUid(p){ return (p||'r')+'_'+Date.now().toString(36)+Math.floor(Math.random()*46656).toString(36); }
+function tqGroups(){ return (editingDraft&&Array.isArray(editingDraft.groups))?editingDraft.groups:[]; }
+function tqOverrides(){ return (editingDraft&&Array.isArray(editingDraft.overrides))?editingDraft.overrides:[]; }
+function tqGroupSubtotal(g){ return (g.criteria||[]).reduce((m,c)=>m+(Number(c.max)||0),0); }
+function tqTotal(){ return tqGroups().reduce((n,g)=>n+tqGroupSubtotal(g),0); }
+function tqAllCriteria(){ const a=[]; tqGroups().forEach(g=>(g.criteria||[]).forEach(c=>a.push(c))); return a; }
+function tqLibTqCriteria(){ const lib=getValue('tender.custom-criteria')||[]; return Array.isArray(lib)?lib.filter(c=>c.classification==='TQ'&&c.active!==false):[]; }
+function tqTreeSectors(){ const out=[]; const walk=n=>{ if(n&&n.name&&!out.includes(n.name)) out.push(n.name); (n&&n.children||[]).forEach(walk); }; (getValue('tender.tree')||[]).forEach(walk); return out; }
+function tqBadgeCls(t){ return t===100?'bg-success/10 text-success':t<100?'bg-warning/10 text-warning':'bg-danger/10 text-danger'; }
+function tqTxtCls(t){ return t===100?'text-success':t<100?'text-warning':'text-danger'; }
+function tqFillCls(t){ return t===100?'bg-success':t<100?'bg-warning':'bg-danger'; }
+function tqDeltaText(t){ return t===100?'Balanced — totals 100':(t<100?(100-t)+' marks under — add somewhere':(t-100)+' marks over — reduce somewhere'); }
+function tqNormalize(v){
+  const def=JSON.parse(JSON.stringify(ITEMS.find(i=>i.id==='tender.tq-rubric').def));
+  if(Array.isArray(v)){
+    const nameToGroup={}; def.groups.forEach(g=>g.criteria.forEach(c=>{ nameToGroup[(c.name||'').toLowerCase()]=g.id; }));
+    const groups=def.groups.map(g=>({id:g.id,name:g.name,criteria:[]}));
+    const gById={}; groups.forEach(g=>gById[g.id]=g); let other=null;
+    v.forEach(row=>{ const nm=row.criterion||row.name||''; const crit={id:tqUid(),name:nm,max:Number(row.max)||0,libId:null};
+      const gid=nameToGroup[nm.toLowerCase()];
+      if(gid&&gById[gid]) gById[gid].criteria.push(crit);
+      else { if(!other){ other={id:tqUid('g'),name:'Other',criteria:[]}; groups.push(other); } other.criteria.push(crit); } });
+    return {groups, overrides:def.overrides};
+  }
+  if(v&&typeof v==='object') return {groups:Array.isArray(v.groups)?v.groups:def.groups, overrides:Array.isArray(v.overrides)?v.overrides:def.overrides};
+  return def;
+}
+function tqMoveCriterion(src,destGi,destCi){
+  if(!src) return; const groups=tqGroups();
+  if(!groups[src.gi]||!groups[destGi]) return;
+  const arr=groups[src.gi].criteria; if(src.ci<0||src.ci>=arr.length) return;
+  const [moved]=arr.splice(src.ci,1);
+  let insert=(destCi==null)?groups[destGi].criteria.length:destCi;
+  if(src.gi===destGi && destCi!=null && src.ci<destCi) insert=destCi-1;
+  groups[destGi].criteria.splice(insert,0,moved);
+}
+function editorTqRubric(){ tqTab='default'; tqCollapsed={}; tqAddMenuFor=null; tqDrag=null; return `<div id="tqRoot"></div>`; }
+
+function tqRowHtml(g,gi,c,ci){
+  const linked = c.libId ? ` <i data-lucide="link" class="w-3 h-3 text-primary inline align-middle" title="Defined in criterion builder"></i>` : '';
+  return `<div data-tq-row="${gi}|${ci}" draggable="true" class="group flex items-center gap-2 px-3 py-2 hover:bg-surface">
+    <span data-tq-handle class="opacity-0 group-hover:opacity-100 cursor-grab text-ink-300 shrink-0" title="Drag to move"><i data-lucide="grip-vertical" class="w-3.5 h-3.5"></i></span>
+    <span class="flex-1 min-w-0 flex items-center"><input data-tq-cname="${gi}|${ci}" class="flex-1 min-w-0 bg-transparent text-[13px] text-ink-900 border-0 focus:outline-none focus:bg-white rounded px-1 -ml-1" value="${escapeHtml(c.name||'')}">${linked}</span>
+    <div class="flex items-center shrink-0 border border-line rounded-lg overflow-hidden bg-white">
+      <button data-tq-dec="${gi}|${ci}" class="px-1.5 py-1 text-ink-500 hover:bg-surface" title="Decrease"><i data-lucide="minus" class="w-3.5 h-3.5"></i></button>
+      <input data-tq-cmax="${gi}|${ci}" type="number" min="0" max="100" class="w-10 text-center text-[13px] text-ink-900 border-0 focus:outline-none" style="font-variant-numeric:tabular-nums" value="${Number(c.max)||0}">
+      <button data-tq-inc="${gi}|${ci}" class="px-1.5 py-1 text-ink-500 hover:bg-surface" title="Increase"><i data-lucide="plus" class="w-3.5 h-3.5"></i></button>
+    </div>
+    <button data-tq-crm="${gi}|${ci}" class="opacity-0 group-hover:opacity-100 text-ink-400 hover:text-danger shrink-0" title="Remove"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+  </div>`;
+}
+function tqAddRowHtml(g,gi){
+  if(tqAddMenuFor!==g.id) return `<div class="px-3 py-2 border-t border-line"><button data-tq-addrow="${gi}" class="text-[12px] text-primary hover:underline inline-flex items-center gap-1"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add criterion</button></div>`;
+  const lib=tqLibTqCriteria();
+  const libOpts = lib.length ? lib.map(c=>`<button data-tq-addlib="${gi}|${c.id}" class="w-full text-left px-3 py-1.5 text-[12.5px] hover:bg-surface inline-flex items-center gap-2"><i data-lucide="link" class="w-3 h-3 text-primary"></i> ${escapeHtml(c.name)} <span class="text-[11px] text-ink-400">${c.maxMarks!=null?'· '+c.maxMarks+' marks':''}</span></button>`).join('') : '<div class="px-3 py-1.5 text-[11.5px] text-ink-400">No TQ criteria in the library yet.</div>';
+  return `<div class="px-3 py-2 border-t border-line bg-surface space-y-1.5">
+    <div class="text-[11px] uppercase tracking-wide text-ink-400 font-semibold">Add criterion</div>
+    <button data-tq-addcustom="${gi}" class="w-full text-left px-3 py-1.5 text-[12.5px] bg-white border border-line rounded-lg hover:border-primary/40 inline-flex items-center gap-2"><i data-lucide="pencil" class="w-3 h-3"></i> Custom (this rubric only)</button>
+    <div class="text-[11px] uppercase tracking-wide text-ink-400 font-semibold pt-1">From criterion library</div>
+    <div class="bg-white border border-line rounded-lg overflow-hidden divide-y divide-line">${libOpts}</div>
+    <button data-tq-addcancel class="text-[11.5px] text-ink-500 hover:underline">Cancel</button>
+  </div>`;
+}
+function tqFooterHtml(){
+  const t=tqTotal(); const pct=Math.max(0,Math.min(100,Math.round(t)));
+  return `<div class="sticky bottom-0 -mx-6 px-6 py-3 bg-white border-t border-line mt-3" style="position:sticky">
+    <div class="flex items-center justify-between gap-3 mb-1.5">
+      <span class="text-[12px] font-semibold text-ink-900">Total: <span id="tqFooterNum" class="${tqTxtCls(t)}">${t}</span> / 100</span>
+      <span id="tqFooterDelta" class="text-[11.5px] font-medium ${tqTxtCls(t)}">${tqDeltaText(t)}</span>
+    </div>
+    <div class="h-1.5 rounded-full bg-line overflow-hidden"><div id="tqFooterTrack" class="h-full ${tqFillCls(t)}" style="width:${pct}%"></div></div>
+  </div>`;
+}
+function tqDefaultTabHtml(){
+  const colHead=`<div class="flex items-center gap-2 px-3">
+    <span class="w-5"></span>
+    <div class="flex-1 text-[11px] uppercase tracking-wide text-ink-400 font-semibold">Criterion</div>
+    <div class="text-[11px] uppercase tracking-wide text-ink-400 font-semibold text-right" style="width:120px">Max marks</div>
+    <span class="w-5"></span>
+  </div>`;
+  const cards=tqGroups().map((g,gi)=>{
+    const collapsed=!!tqCollapsed[g.id]; const sub=tqGroupSubtotal(g);
+    const rows=collapsed?'':`<div data-tq-drop="${gi}" class="divide-y divide-line">${(g.criteria||[]).map((c,ci)=>tqRowHtml(g,gi,c,ci)).join('')||'<div class="px-3 py-3 text-[11.5px] text-ink-400">No criteria yet.</div>'}</div>`;
+    return `<div class="bg-white border border-line rounded-xl shadow-soft overflow-hidden">
+      <div class="flex items-center gap-2 px-3 py-2.5 ${collapsed?'':'border-b border-line'}">
+        <button data-tq-gcol="${gi}" class="text-ink-400 hover:text-ink-900 shrink-0"><i data-lucide="chevron-${collapsed?'right':'down'}" class="w-3.5 h-3.5"></i></button>
+        <input data-tq-gname="${gi}" class="flex-1 min-w-0 bg-transparent text-[13px] font-semibold text-ink-900 border-0 focus:outline-none focus:bg-surface rounded px-1 -ml-1" value="${escapeHtml(g.name||'')}">
+        <span id="tqSub-${g.id}" class="shrink-0 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-surface text-ink-500 border border-line">${sub} marks</span>
+        <button data-tq-grm="${gi}" class="text-ink-400 hover:text-danger shrink-0" title="Remove group"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+      </div>
+      ${rows}
+      ${collapsed?'':tqAddRowHtml(g,gi)}
+    </div>`;
+  }).join('');
+  return `<div class="space-y-2.5">${colHead}${cards}<button id="tqAddGroup" class="btn"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add group</button></div>${tqFooterHtml()}`;
+}
+function tqOverridesTabHtml(){
+  const defById={}; tqAllCriteria().forEach(c=>defById[c.id]=c);
+  const allCrit=tqAllCriteria();
+  const cards=tqOverrides().map((o,oi)=>{
+    let eff=tqTotal(); (o.rows||[]).forEach(r=>{ const dc=defById[r.ref]; if(dc) eff+=(Number(r.newMax)||0)-(Number(dc.max)||0); });
+    const rows=(o.rows||[]).map((r,ri)=>{
+      const dc=defById[r.ref];
+      return `<div class="flex items-center gap-2 py-1.5">
+        <select data-tq-oref="${oi}|${ri}" class="inp flex-1">${allCrit.map(c=>`<option value="${c.id}" ${c.id===r.ref?'selected':''}>${escapeHtml(c.name)}</option>`).join('')}</select>
+        <span class="text-[11.5px] text-ink-400 shrink-0">${dc?`<span class="line-through">${dc.max}</span> →`:'→'}</span>
+        <input data-tq-onewmax="${oi}|${ri}" type="number" min="0" max="100" class="inp w-16 text-right" style="font-variant-numeric:tabular-nums" value="${Number(r.newMax)||0}">
+        <button data-tq-orowrm="${oi}|${ri}" class="text-ink-400 hover:text-danger shrink-0" title="Remove"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+      </div>`;
+    }).join('')||'<div class="text-[11.5px] text-ink-400 py-1.5">No overrides for this sector yet.</div>';
+    const legacy = o.legacyNote ? `<div class="text-[11px] text-ink-400 italic mt-1.5">Imported note: ${escapeHtml(o.legacyNote)}</div>` : '';
+    return `<div class="bg-white border border-line rounded-xl shadow-soft p-3">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-[13px] font-semibold text-ink-900 flex-1 min-w-0 truncate">${escapeHtml(o.sector||'')}</span>
+        <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full ${tqBadgeCls(eff)}">Effective ${eff}/100</span>
+        <button data-tq-ocardrm="${oi}" class="text-ink-400 hover:text-danger shrink-0" title="Remove sector"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+      </div>
+      <div class="divide-y divide-line">${rows}</div>${legacy}
+      <button data-tq-oaddrow="${oi}" class="mt-2 text-[12px] text-primary hover:underline inline-flex items-center gap-1"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add override row</button>
+    </div>`;
+  }).join('')||'<div class="text-[12px] text-ink-400 text-center py-6 border border-dashed border-line rounded-xl">No sector overrides. Add one below.</div>';
+  const existing=tqOverrides().map(o=>o.sector);
+  const addOpts=tqTreeSectors().filter(s=>!existing.includes(s));
+  return `<div class="space-y-3">
+    <div class="text-[11.5px] text-ink-500">Per-sector deviations from the default rubric. Each row replaces one criterion's max for that sector; the effective total recomputes accordingly.</div>
+    ${cards}
+    <div class="flex items-center gap-2">
+      <select id="tqNewSector" class="inp"><option value="">Add sector override…</option>${addOpts.map(s=>`<option>${escapeHtml(s)}</option>`).join('')}</select>
+      <button id="tqAddSector" class="btn"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add</button>
+    </div>
+  </div>`;
+}
+function tqRefreshTotals(){
+  const t=tqTotal();
+  const chip=document.getElementById('tqTotalChip'); if(chip){ chip.textContent='Total '+t+'/100'; chip.className='text-[11px] font-semibold px-2 py-0.5 rounded-full '+(t===100?'bg-success/10 text-success':'bg-danger/10 text-danger'); }
+  tqGroups().forEach(g=>{ const el=document.getElementById('tqSub-'+g.id); if(el) el.textContent=tqGroupSubtotal(g)+' marks'; });
+  const fn=document.getElementById('tqFooterNum'); if(fn){ fn.textContent=t; fn.className=tqTxtCls(t); }
+  const fd=document.getElementById('tqFooterDelta'); if(fd){ fd.textContent=tqDeltaText(t); fd.className='text-[11.5px] font-medium '+tqTxtCls(t); }
+  const ft=document.getElementById('tqFooterTrack'); if(ft){ ft.className='h-full '+tqFillCls(t); ft.style.width=Math.max(0,Math.min(100,Math.round(t)))+'%'; }
+}
+function renderTqRubricAll(){
+  if(!editingDraft||typeof editingDraft!=='object'||Array.isArray(editingDraft)) editingDraft=tqNormalize(editingDraft);
+  editingDraft.groups=editingDraft.groups||[]; editingDraft.overrides=editingDraft.overrides||[];
+  const root=document.getElementById('tqRoot');
+  const total=tqTotal(); const headerOk=total===100;
+  const info=`<div class="flex gap-2.5 bg-primary-light border border-primary/20 rounded-xl p-3 text-[13px] text-ink-700"><i data-lucide="info" class="w-3.5 h-3.5 text-primary shrink-0 mt-0.5"></i><div>Every technical bid is scored out of 100 using this breakdown. Evaluation screens are generated from these rows — marks must total exactly 100.</div></div>`;
+  const chips=`<div class="flex items-center gap-2 flex-wrap" id="tqStatChips">
+    <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-surface text-ink-500 border border-line">${tqAllCriteria().length} criteria</span>
+    <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-surface text-ink-500 border border-line">${tqGroups().length} groups</span>
+    <span id="tqTotalChip" class="text-[11px] font-semibold px-2 py-0.5 rounded-full ${headerOk?'bg-success/10 text-success':'bg-danger/10 text-danger'}">Total ${total}/100</span>
+  </div>`;
+  const tabs=`<div class="flex items-center gap-1 border-b border-line">
+    <button data-tq-tab="default" class="px-3 py-2 text-[12.5px] font-medium border-b-2 ${tqTab==='default'?'border-primary text-primary':'border-transparent text-ink-500 hover:text-ink-900'}">Default rubric</button>
+    <button data-tq-tab="overrides" class="px-3 py-2 text-[12.5px] font-medium border-b-2 ${tqTab==='overrides'?'border-primary text-primary':'border-transparent text-ink-500 hover:text-ink-900'}">Sector overrides</button>
+  </div>`;
+  root.innerHTML=`<div class="space-y-3">${info}${chips}${tabs}<div>${tqTab==='default'?tqDefaultTabHtml():tqOverridesTabHtml()}</div></div>`;
+  // ---- bindings ----
+  root.querySelectorAll('[data-tq-tab]').forEach(b=>b.onclick=()=>{ tqTab=b.dataset.tqTab; tqAddMenuFor=null; renderTqRubricAll(); });
+  root.querySelectorAll('[data-tq-gcol]').forEach(b=>b.onclick=()=>{ const g=tqGroups()[+b.dataset.tqGcol]; tqCollapsed[g.id]=!tqCollapsed[g.id]; renderTqRubricAll(); });
+  root.querySelectorAll('[data-tq-gname]').forEach(inp=>inp.oninput=e=>{ tqGroups()[+e.target.dataset.tqGname].name=e.target.value; });
+  root.querySelectorAll('[data-tq-grm]').forEach(b=>b.onclick=()=>{ const gi=+b.dataset.tqGrm; const g=tqGroups()[gi]; if(confirm(`Remove group "${g.name}" and its ${(g.criteria||[]).length} criteria (${tqGroupSubtotal(g)} marks)?`)){ tqGroups().splice(gi,1); renderTqRubricAll(); } });
+  root.querySelectorAll('[data-tq-cname]').forEach(inp=>inp.oninput=e=>{ const [gi,ci]=e.target.dataset.tqCname.split('|').map(Number); tqGroups()[gi].criteria[ci].name=e.target.value; });
+  root.querySelectorAll('[data-tq-cmax]').forEach(inp=>{ inp.oninput=e=>{ const [gi,ci]=e.target.dataset.tqCmax.split('|').map(Number); let v=parseInt(e.target.value,10); if(isNaN(v))v=0; v=Math.max(0,Math.min(100,v)); tqGroups()[gi].criteria[ci].max=v; tqRefreshTotals(); }; inp.onchange=()=>renderTqRubricAll(); });
+  root.querySelectorAll('[data-tq-inc]').forEach(b=>b.onclick=()=>{ const [gi,ci]=b.dataset.tqInc.split('|').map(Number); const c=tqGroups()[gi].criteria[ci]; c.max=Math.min(100,(Number(c.max)||0)+1); renderTqRubricAll(); });
+  root.querySelectorAll('[data-tq-dec]').forEach(b=>b.onclick=()=>{ const [gi,ci]=b.dataset.tqDec.split('|').map(Number); const c=tqGroups()[gi].criteria[ci]; c.max=Math.max(0,(Number(c.max)||0)-1); renderTqRubricAll(); });
+  root.querySelectorAll('[data-tq-crm]').forEach(b=>b.onclick=()=>{ const [gi,ci]=b.dataset.tqCrm.split('|').map(Number); const c=tqGroups()[gi].criteria[ci]; if(confirm(`Remove '${c.name}'? Its ${Number(c.max)||0} marks must be redistributed.`)){ tqGroups()[gi].criteria.splice(ci,1); renderTqRubricAll(); } });
+  root.querySelectorAll('[data-tq-addrow]').forEach(b=>b.onclick=()=>{ tqAddMenuFor=tqGroups()[+b.dataset.tqAddrow].id; renderTqRubricAll(); });
+  const ac=root.querySelector('[data-tq-addcancel]'); if(ac) ac.onclick=()=>{ tqAddMenuFor=null; renderTqRubricAll(); };
+  root.querySelectorAll('[data-tq-addcustom]').forEach(b=>b.onclick=()=>{ const gi=+b.dataset.tqAddcustom; tqGroups()[gi].criteria.push({id:tqUid(),name:'New criterion',max:0,libId:null}); tqAddMenuFor=null; renderTqRubricAll(); });
+  root.querySelectorAll('[data-tq-addlib]').forEach(b=>b.onclick=()=>{ const [gi,cid]=b.dataset.tqAddlib.split('|'); const lib=tqLibTqCriteria().find(c=>c.id===cid); if(lib){ tqGroups()[+gi].criteria.push({id:tqUid(),name:lib.name,max:Number(lib.maxMarks)||0,libId:lib.id}); } tqAddMenuFor=null; renderTqRubricAll(); });
+  const ag=document.getElementById('tqAddGroup'); if(ag) ag.onclick=()=>{ tqGroups().push({id:tqUid('g'),name:'New group',criteria:[]}); renderTqRubricAll(); };
+  root.querySelectorAll('[data-tq-row]').forEach(rowEl=>{
+    rowEl.ondragstart=e=>{ const [gi,ci]=rowEl.dataset.tqRow.split('|').map(Number); tqDrag={gi,ci}; try{ e.dataTransfer.effectAllowed='move'; }catch(_){} };
+    rowEl.ondragover=e=>e.preventDefault();
+    rowEl.ondrop=e=>{ e.preventDefault(); e.stopPropagation(); const [gi,ci]=rowEl.dataset.tqRow.split('|').map(Number); tqMoveCriterion(tqDrag,gi,ci); tqDrag=null; renderTqRubricAll(); };
+  });
+  root.querySelectorAll('[data-tq-drop]').forEach(zone=>{ zone.ondragover=e=>e.preventDefault(); zone.ondrop=e=>{ e.preventDefault(); const gi=+zone.dataset.tqDrop; tqMoveCriterion(tqDrag,gi,null); tqDrag=null; renderTqRubricAll(); }; });
+  root.querySelectorAll('[data-tq-oref]').forEach(s=>s.onchange=e=>{ const [oi,ri]=e.target.dataset.tqOref.split('|').map(Number); tqOverrides()[oi].rows[ri].ref=e.target.value; renderTqRubricAll(); });
+  root.querySelectorAll('[data-tq-onewmax]').forEach(inp=>{ inp.oninput=e=>{ const [oi,ri]=e.target.dataset.tqOnewmax.split('|').map(Number); let v=parseInt(e.target.value,10); if(isNaN(v))v=0; tqOverrides()[oi].rows[ri].newMax=Math.max(0,Math.min(100,v)); }; inp.onchange=()=>renderTqRubricAll(); });
+  root.querySelectorAll('[data-tq-orowrm]').forEach(b=>b.onclick=()=>{ const [oi,ri]=b.dataset.tqOrowrm.split('|').map(Number); tqOverrides()[oi].rows.splice(ri,1); renderTqRubricAll(); });
+  root.querySelectorAll('[data-tq-oaddrow]').forEach(b=>b.onclick=()=>{ const oi=+b.dataset.tqOaddrow; const first=tqAllCriteria()[0]; tqOverrides()[oi].rows.push({ref:first?first.id:'',newMax:first?first.max:0}); renderTqRubricAll(); });
+  root.querySelectorAll('[data-tq-ocardrm]').forEach(b=>b.onclick=()=>{ const oi=+b.dataset.tqOcardrm; if(confirm(`Remove override card for "${tqOverrides()[oi].sector}"?`)){ tqOverrides().splice(oi,1); renderTqRubricAll(); } });
+  const addSec=document.getElementById('tqAddSector'); if(addSec) addSec.onclick=()=>{ const sel=document.getElementById('tqNewSector'); const v=sel&&sel.value; if(v){ tqOverrides().push({id:tqUid('o'),sector:v,rows:[]}); renderTqRubricAll(); } };
+  refreshIcons();
+}
+
+/* =========================================================
+   ONE-TIME MIGRATION (merge old setting ids into new merged items)
+   ========================================================= */
+function runMigrations(){
+  const store=loadStore();
+  // TQ rubric migration — independent guard so it runs even if the v2 flag is already set.
+  if(!store['_tq_migrated_v3']){
+    if(('tender.tq-rubric' in store) && Array.isArray(store['tender.tq-rubric'])) store['tender.tq-rubric']=tqNormalize(store['tender.tq-rubric']);
+    if('eval.tq-sector-overrides' in store){
+      const rub = (store['tender.tq-rubric'] && typeof store['tender.tq-rubric']==='object' && !Array.isArray(store['tender.tq-rubric']))
+        ? store['tender.tq-rubric'] : (store['tender.tq-rubric']=JSON.parse(JSON.stringify(ITEMS.find(i=>i.id==='tender.tq-rubric').def)));
+      rub.overrides=rub.overrides||[];
+      const old=store['eval.tq-sector-overrides'];
+      if(Array.isArray(old)) old.forEach(o=>{ const sec=o.sector||''; if(sec && !rub.overrides.find(x=>x.sector===sec)) rub.overrides.push({id:tqUid('o'),sector:sec,rows:[],legacyNote:o.override||''}); });
+    }
+    store['_tq_migrated_v3']=true;
+    saveStore(store);
+  }
+  if(store['_admin_migrated_v2']) return;
+  let changed=false;
+  const defOf=id=>{const it=ITEMS.find(i=>i.id===id);return it?JSON.parse(JSON.stringify(it.def)):null;};
+  const has=id=>id in store;
+  // 2.2 + 3.4 — methods suite
+  if(!has('tender.methods-suite') && ['tender.method-master','tender.sector-method','tender.qcbs-ratios','tender.tie-breaker','tender.leaf-method-override'].some(has)){
+    const m=defOf('tender.methods-suite')||{};
+    if(has('tender.method-master') && Array.isArray(store['tender.method-master'])){
+      store['tender.method-master'].forEach(old=>{ const lab=(typeof old==='string')?old:old.label; const en=(typeof old==='string')?true:(old.enabled!==false); const hit=m.methods.find(x=>x.label===lab); if(hit) hit.enabled=en; else m.methods.push({label:lab,enabled:en,minValue:0,maxValue:null,justify:false}); });
+    }
+    if(has('tender.sector-method') && Array.isArray(store['tender.sector-method'])) m.sectorDefaults=store['tender.sector-method'];
+    if(has('tender.qcbs-ratios') && Array.isArray(store['tender.qcbs-ratios'])) m.qcbsRatios=store['tender.qcbs-ratios'];
+    if(has('tender.tie-breaker') && Array.isArray(store['tender.tie-breaker'])) m.tieBreakers=store['tender.tie-breaker'];
+    if(has('tender.leaf-method-override') && Array.isArray(store['tender.leaf-method-override'])) m.leafOverrides=store['tender.leaf-method-override'];
+    store['tender.methods-suite']=m; changed=true;
+  }
+  // 2.3 — notifications suite
+  if(!has('tender.notifications-suite') && ['tender.reminder-schedule','tender.notification-channels','tender.notification-recipients','tender.escalation-rules'].some(has)){
+    const n=defOf('tender.notifications-suite')||{};
+    const NAME_ALIAS={'Bid close':'Bid close approaching','Pre-bid meeting':'Pre-bid meeting reminder','Award decision':'Award announced','Corrigendum approval':'Corrigendum issued'};
+    const evByName=raw=>{ const name=NAME_ALIAS[raw]||raw; let e=n.events.find(x=>x.name===name); if(!e){ e={name,reminders:'',channels:{},recipients:[],escalation:null}; n.events.push(e); } return e; };
+    if(has('tender.reminder-schedule') && Array.isArray(store['tender.reminder-schedule'])) store['tender.reminder-schedule'].forEach(p=>{ evByName(p.k).reminders=p.v; });
+    const fromMatrix=(mid,apply)=>{ const mx=store[mid]; if(mx&&mx.rows&&mx.cols){ mx.rows.forEach((rn,ri)=>{ const e=evByName(rn); mx.cols.forEach((cn,ci)=>{ apply(e,cn,!!(mx.cells&&mx.cells[ri+'_'+ci])); }); }); } };
+    if(has('tender.notification-channels')) fromMatrix('tender.notification-channels',(e,cn,on)=>{ e.channels[cn]=on; });
+    if(has('tender.notification-recipients')) fromMatrix('tender.notification-recipients',(e,cn,on)=>{ if(on && !e.recipients.includes(cn)) e.recipients.push(cn); });
+    if(has('tender.escalation-rules') && Array.isArray(store['tender.escalation-rules'])) store['tender.escalation-rules'].forEach(r=>{ evByName(r.event).escalation={breachHours:r.breachHours,escalateTo:r.escalateTo}; });
+    store['tender.notifications-suite']=n; changed=true;
+  }
+  // 2.4 + 3.1 — corrigendum
+  if(!has('tender.corrigendum') && (has('tender.corrigendum-policy')||has('tender.auto-corrigendum-triggers'))){
+    const c=defOf('tender.corrigendum')||{};
+    const old=store['tender.corrigendum-policy'];
+    if(old&&typeof old==='object'){ if(old.autoExtendsTimeline!=null) c.autoExtend=old.autoExtendsTimeline; if(old.extensionDays!=null) c.extensionDays=old.extensionDays; }
+    store['tender.corrigendum']=c; changed=true;
+  }
+  // 2.1 — types/subtypes enabled state into the tree (best-effort)
+  if((has('tender.types')||has('tender.subtypes')) && !store['_tree_migrated']){
+    let tree=store['tender.tree']; if(!tree){ tree=defOf('tender.tree'); }
+    if(Array.isArray(tree) && has('tender.types') && Array.isArray(store['tender.types'])){
+      store['tender.types'].forEach(old=>{ if(old&&typeof old==='object'&&old.enabled===false){ const node=tree.find(t=>t.name===old.label); if(node) node.enabled=false; } });
+      store['tender.tree']=tree; store['_tree_migrated']=true; changed=true;
+    }
+  }
+  store['_admin_migrated_v2']=true;
+  saveStore(store);
+  if(changed && typeof logAction==='function'){ /* silent — migration is structural */ }
 }
 
 /* =========================================================
@@ -4047,6 +4825,7 @@ function normalizeListItem(x) {
 /* =========================================================
    INIT
    ========================================================= */
+runMigrations();
 renderActivity();
 route();
 refreshIcons();

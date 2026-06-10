@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tender Creation — TenderAI Hub</title>
-  <meta name="description" content="Create a new tender — describe in plain language, upload a document, use a template, or clone a past tender." />
+  <meta name="description" content="Create a new tender — describe in plain language, upload a document, clone a past tender, or fill the form manually." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
@@ -411,6 +411,25 @@
     .draft-doc-body .nit-section.custom .cs-doc-table td, .draft-doc-body .nit-section.custom .cs-doc-table th { border:1px solid #D1D5DB; padding:6px 10px; font-size:12.5px; }
     .draft-doc-body .nit-section.custom .cs-doc-table th { background:#F9FAFB; font-weight:600; }
     .draft-doc-body .nit-section.custom .cs-doc-file { font-size:13px; display:flex; align-items:center; gap:6px; margin:4px 0; }
+    /* ----- in-document custom-section inline editor (relocated feature) ----- */
+    .ta-cs-inline { border:1.5px dashed #0F5EE8; border-radius:12px; background:#F8FBFF; padding:20px 24px; margin:16px 0; overflow:hidden; opacity:0; max-height:0; transition:opacity 250ms ease, max-height 250ms ease; }
+    .ta-cs-inline.show { opacity:1; max-height:4000px; }
+    .ta-cs-inline.committing { transition:border-color 300ms ease, background-color 300ms ease; border-color:transparent; background:#ffffff; }
+    .ta-cs-inline-label { font-size:10px; font-weight:700; text-transform:uppercase; color:#0F5EE8; letter-spacing:0.08em; margin-bottom:10px; }
+    .ta-cs-inline .ta-cs-card { background:transparent; border:none; padding:0; margin:0; box-shadow:none; }
+    .ta-cs-inline-footer { border-top:1px solid #E5E7EB; padding-top:12px; margin-top:16px; display:flex; justify-content:flex-end; align-items:center; gap:10px; }
+    .ta-cs-inline-cancel { color:#6B7280; font-size:13px; background:transparent; border:none; cursor:pointer; }
+    .ta-cs-inline-cancel:hover { color:#374151; text-decoration:underline; }
+    .ta-cs-inline-save { background:#0F5EE8; color:#fff; border:none; border-radius:7px; padding:8px 18px; font-size:13px; font-weight:700; cursor:pointer; }
+    .ta-cs-inline-save:hover { background:#0d52cc; }
+    .ta-cs-inline-save:disabled { background:#E5E7EB; color:#9CA3AF; cursor:not-allowed; }
+    .ta-cs-inline-discwrap { display:flex; align-items:center; gap:8px; font-size:13px; color:#374151; }
+    .ta-cs-inline-discwrap .yes { color:#EF4444; font-weight:600; background:transparent; border:none; cursor:pointer; font-size:13px; }
+    .ta-cs-inline-discwrap .no  { color:#6B7280; background:transparent; border:none; cursor:pointer; font-size:13px; }
+    /* insertion-position popover */
+    .ta-cs-insert-pop { position:absolute; top:16px; left:12px; z-index:60; background:#fff; border:1px solid #E5E7EB; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.1); padding:6px; min-width:220px; }
+    .ta-cs-insert-pop button { display:flex; align-items:center; gap:8px; width:100%; padding:8px 14px; border-radius:6px; font-size:13px; color:#374151; cursor:pointer; background:transparent; border:none; text-align:left; }
+    .ta-cs-insert-pop button:hover, .ta-cs-insert-pop button:focus-visible { background:#F3F4F6; outline:none; }
   </style>
 </head>
 <body class="min-h-screen">
@@ -592,19 +611,7 @@
               <div class="text-[11px] text-ink-400 mt-1.5">Upload file → Review extraction → Form</div>
             </a>
 
-            <!-- Card 3 — Templates -->
-            <a href="#templates" class="start-card bg-white border border-line rounded-2xl p-7 block">
-              <div class="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center mb-4">
-                <i data-lucide="layout-grid" class="w-5 h-5"></i>
-              </div>
-              <h3 class="text-[16px] font-bold text-ink-900">Use a Template</h3>
-              <p class="text-[13px] text-ink-500 mt-1.5 leading-relaxed">Browse pre-approved templates by sector — Roads, IT, Water, Sanitation and more.</p>
-              <div class="text-[12px] italic text-ink-400 mt-2.5">~5 minutes</div>
-              <div class="mt-4 text-[13px] font-bold text-primary inline-flex items-center gap-1">Get started <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></div>
-              <div class="text-[11px] text-ink-400 mt-1.5">Browse templates → Preview → Form</div>
-            </a>
-
-            <!-- Card 4 — Clone -->
+            <!-- Card 3 — Clone -->
             <a href="#clone" class="start-card bg-white border border-line rounded-2xl p-7 block">
               <div class="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center mb-4">
                 <i data-lucide="copy" class="w-5 h-5"></i>
@@ -615,13 +622,21 @@
               <div class="mt-4 text-[13px] font-bold text-primary inline-flex items-center gap-1">Get started <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></div>
               <div class="text-[11px] text-ink-400 mt-1.5">Search past tenders → Confirm → Form</div>
             </a>
+
+            <!-- Card 4 — Manual -->
+            <a href="#precheck" class="start-card bg-white border border-line rounded-2xl p-7 block">
+              <div class="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center mb-4">
+                <i data-lucide="pencil-line" class="w-5 h-5"></i>
+              </div>
+              <h3 class="text-[16px] font-bold text-ink-900">Start Manually</h3>
+              <p class="text-[13px] text-ink-500 mt-1.5 leading-relaxed">Fill the step-by-step form yourself on a blank tender — full control over every field.</p>
+              <div class="text-[12px] italic text-ink-400 mt-2.5">~10 minutes</div>
+              <div class="mt-4 text-[13px] font-bold text-primary inline-flex items-center gap-1">Get started <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></div>
+              <div class="text-[11px] text-ink-400 mt-1.5">Blank form → Step 1 → Publish</div>
+            </a>
           </div>
 
           <div class="max-w-[900px]">
-            <div class="text-center text-[13px] text-ink-500 mb-3">
-              Prefer to fill it yourself?
-              <a href="#precheck" class="text-primary font-medium hover:underline ml-1 inline-flex items-center gap-0.5">Start manually <i data-lucide="arrow-right" class="w-3.5 h-3.5 inline-block -mb-0.5"></i></a>
-            </div>
             <div class="bg-primary-light border border-primary-border rounded-[10px] px-4 py-3 flex items-start gap-2.5">
               <i data-lucide="info" class="w-4 h-4 text-primary shrink-0 mt-0.5"></i>
               <p class="text-[13px] text-ink-900">Not sure which to pick? Most officers use <strong>"Describe What You Need"</strong> — it takes under 2 minutes and AI handles the rest.</p>
@@ -821,37 +836,6 @@
         <!-- ===================================================== -->
         <!-- VIEW: TEMPLATES                                         -->
         <!-- ===================================================== -->
-        <section id="view-templates" class="view hidden px-8 py-6">
-          <div class="flex items-start justify-between gap-3 flex-wrap mb-4">
-            <div>
-              <div class="text-[13px] text-ink-500 mb-1.5">
-                <a href="index.html" class="hover:text-ink-900">Dashboard</a>
-                <span class="mx-1.5 text-ink-400">/</span>
-                <a href="#start" class="hover:text-ink-900">Tender Creation</a>
-                <span class="mx-1.5 text-ink-400">/</span>
-                <span class="text-ink-900">Use a Template</span>
-              </div>
-              <a href="#start" class="text-[13px] text-ink-500 hover:text-ink-900 inline-flex items-center gap-1.5"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back</a>
-            </div>
-            <button onclick="saveAndExit()" class="text-[13px] text-ink-500 hover:text-ink-900 inline-flex items-center gap-1.5"><i data-lucide="save" class="w-3.5 h-3.5"></i> Save &amp; Exit</button>
-          </div>
-
-          <h1 class="text-[20px] font-bold text-ink-900">Choose a Template</h1>
-          <p class="text-[14px] text-ink-500 mt-1">Pre-approved templates that meet GFR and CVC compliance standards.</p>
-
-          <!-- Filters -->
-          <div class="mt-5 flex flex-wrap gap-2">
-            <button class="tpl-filter active px-4 py-1.5 rounded-full text-[13px] bg-primary text-white border border-primary" data-filter="all">All</button>
-            <button class="tpl-filter px-4 py-1.5 rounded-full text-[13px] bg-white border border-line text-ink-500 hover:text-ink-900" data-filter="works">Works</button>
-            <button class="tpl-filter px-4 py-1.5 rounded-full text-[13px] bg-white border border-line text-ink-500 hover:text-ink-900" data-filter="goods">Goods</button>
-            <button class="tpl-filter px-4 py-1.5 rounded-full text-[13px] bg-white border border-line text-ink-500 hover:text-ink-900" data-filter="services">Services</button>
-            <button class="tpl-filter px-4 py-1.5 rounded-full text-[13px] bg-white border border-line text-ink-500 hover:text-ink-900" data-filter="consultancy">Consultancy</button>
-          </div>
-
-          <!-- Grid -->
-          <div id="tplGrid" class="mt-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
-        </section>
-
         <!-- ===================================================== -->
         <!-- VIEW: CLONE                                             -->
         <!-- ===================================================== -->
@@ -2836,23 +2820,6 @@
     </div>
   </div>
 
-  <!-- Template Preview Modal -->
-  <div id="tplModal" class="hidden fixed inset-0 z-50 bg-ink-900/40 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-lift">
-      <div class="flex items-start justify-between px-6 py-4 border-b border-line">
-        <div>
-          <h3 id="tplModalTitle" class="text-[16px] font-bold text-ink-900">Template Preview</h3>
-          <p id="tplModalSub" class="text-[12.5px] text-ink-500">Read-only preview</p>
-        </div>
-        <div class="flex items-center gap-2">
-          <a href="#precheck" class="px-3 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5 shadow-soft">Use This Template <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></a>
-          <button onclick="closeTplModal()" aria-label="Close" class="w-9 h-9 rounded-lg border border-line text-ink-500 hover:text-ink-900 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4"></i></button>
-        </div>
-      </div>
-      <div class="overflow-y-auto px-6 py-5 space-y-5" id="tplModalBody"></div>
-    </div>
-  </div>
-
   <!-- ============================================================= -->
   <!-- SCRIPTS                                                          -->
   <!-- ============================================================= -->
@@ -2860,7 +2827,7 @@
     function refreshIcons(){ if (window.lucide) lucide.createIcons(); }
 
     // ================= ROUTER =================
-    const views = ['start','describe','upload','templates','clone','precheck','step1','step2','step3','step4','step5','step6','step7','corrigendum'];
+    const views = ['start','describe','upload','clone','precheck','step1','step2','step3','step4','step5','step6','step7','corrigendum'];
     const STEP_VIEWS = ['step1','step2','step3','step4','step5','step6','step7'];
     function setView(name){
       views.forEach(v => document.getElementById('view-'+v).classList.toggle('hidden', v !== name));
@@ -3126,91 +3093,6 @@
       document.getElementById('upProgress').style.width = '0%';
       refreshIcons();
     }
-
-    // ================= TEMPLATES =================
-    const templates = [
-      { id: 1, name: 'Road Repair & Maintenance', cat: 'works', tag: 'Civil Works', tagCls: 'bg-amber-50 text-amber-700', desc: 'Standard tender for road resurfacing, pothole repair, drain works.', uses: 67, updated: 'Feb 2026' },
-      { id: 2, name: 'Supply of Desktop Computers', cat: 'goods', tag: 'IT Goods', tagCls: 'bg-primary-light text-primary', desc: 'Bulk procurement of desktops with 3-year warranty and AMC.', uses: 43, updated: 'Mar 2026' },
-      { id: 3, name: 'Security Guard Services', cat: 'services', tag: 'Services', tagCls: 'bg-success-light text-success', desc: 'Annual contract for armed/unarmed guards across municipal offices.', uses: 29, updated: 'Jan 2026' },
-      { id: 4, name: 'Water Pipeline Installation', cat: 'works', tag: 'Civil Works', tagCls: 'bg-amber-50 text-amber-700', desc: 'Pipeline laying, valves, chamber works for water supply zones.', uses: 51, updated: 'Mar 2026' },
-      { id: 5, name: 'Office Housekeeping', cat: 'services', tag: 'Services', tagCls: 'bg-success-light text-success', desc: 'Daily cleaning, sanitation and pest control services.', uses: 38, updated: 'Feb 2026' },
-      { id: 6, name: 'LED Street Light Procurement', cat: 'goods', tag: 'Goods', tagCls: 'bg-primary-light text-primary', desc: 'Energy-efficient LED fixtures with smart controllers.', uses: 22, updated: 'Mar 2026' },
-    ];
-    function renderTemplates(filter){
-      const grid = document.getElementById('tplGrid');
-      grid.innerHTML = templates.filter(t => filter === 'all' || t.cat === filter).map(t => `
-        <div class="bg-white border border-line rounded-xl p-5 transition hover:border-primary hover:shadow-lift">
-          <span class="inline-block px-2 py-0.5 rounded-full ${t.tagCls} text-[10.5px] font-semibold uppercase tracking-wide mb-3">${t.tag}</span>
-          <h4 class="text-[15px] font-bold text-ink-900">${t.name}</h4>
-          <p class="text-[13px] text-ink-500 mt-1.5 leading-relaxed">${t.desc}</p>
-          <div class="text-[12px] text-ink-400 mt-2.5">Used ${t.uses} times • Last updated: ${t.updated}</div>
-          <div class="mt-4 pt-4 border-t border-line flex items-center gap-2">
-            <button onclick="openTplModal(${t.id})" class="px-3 py-1.5 rounded-lg border border-line text-ink-900 text-[12.5px] hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="eye" class="w-3.5 h-3.5"></i> Preview</button>
-            <a href="#precheck" class="ml-auto px-3 py-1.5 rounded-lg bg-primary text-white text-[12.5px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5">Use Template <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></a>
-          </div>
-        </div>
-      `).join('');
-      refreshIcons();
-    }
-    document.querySelectorAll('.tpl-filter').forEach(b => b.addEventListener('click', () => {
-      document.querySelectorAll('.tpl-filter').forEach(x => {
-        x.classList.remove('active','bg-primary','text-white','border-primary');
-        x.classList.add('bg-white','border-line','text-ink-500');
-      });
-      b.classList.add('active','bg-primary','text-white','border-primary');
-      b.classList.remove('bg-white','border-line','text-ink-500');
-      renderTemplates(b.dataset.filter);
-    }));
-    function openTplModal(id){
-      const t = templates.find(x => x.id === id);
-      document.getElementById('tplModalTitle').textContent = t.name;
-      document.getElementById('tplModalSub').textContent = `${t.tag} • Used ${t.uses} times`;
-      document.getElementById('tplModalBody').innerHTML = `
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="bg-surface border border-line rounded-lg p-4">
-            <div class="text-[11.5px] uppercase tracking-wide font-semibold text-ink-500 mb-1">Tender Type</div>
-            <div class="text-[14px] text-ink-900">${t.cat === 'works' ? 'Works' : t.cat === 'goods' ? 'Goods' : 'Services'}</div>
-          </div>
-          <div class="bg-surface border border-line rounded-lg p-4">
-            <div class="text-[11.5px] uppercase tracking-wide font-semibold text-ink-500 mb-1">Sub-Type</div>
-            <div class="text-[14px] text-ink-900">${t.tag}</div>
-          </div>
-          <div class="bg-surface border border-line rounded-lg p-4">
-            <div class="text-[11.5px] uppercase tracking-wide font-semibold text-ink-500 mb-1">Procurement Method</div>
-            <div class="text-[14px] text-ink-900">Open Tender</div>
-          </div>
-          <div class="bg-surface border border-line rounded-lg p-4">
-            <div class="text-[11.5px] uppercase tracking-wide font-semibold text-ink-500 mb-1">Evaluation</div>
-            <div class="text-[14px] text-ink-900">L1 (Lowest Cost)</div>
-          </div>
-        </div>
-        <div>
-          <h4 class="text-[14px] font-bold text-ink-900 mb-2">Pre-Qualification Criteria (PQ)</h4>
-          <ul class="list-disc list-inside text-[13px] text-ink-900 space-y-1">
-            <li>Average annual turnover ≥ 50% of estimated cost over last 3 financial years.</li>
-            <li>Similar work experience: 1 of value 80% / 2 of value 50% / 3 of value 40% of estimated cost.</li>
-            <li>Net worth positive in last 3 financial years.</li>
-            <li>EPF, ESIC and GST registration mandatory.</li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="text-[14px] font-bold text-ink-900 mb-2">Technical Qualification (TQ)</h4>
-          <ul class="list-disc list-inside text-[13px] text-ink-900 space-y-1">
-            <li>Technical bid evaluation against fixed scoring rubric.</li>
-            <li>Site visit / sample inspection if applicable.</li>
-            <li>Past performance certificates from similar works.</li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="text-[14px] font-bold text-ink-900 mb-2">Standard BOQ Items</h4>
-          <p class="text-[13px] text-ink-500">12 standard line items pre-mapped — editable in Step 3.</p>
-        </div>
-      `;
-      document.getElementById('tplModal').classList.remove('hidden');
-      refreshIcons();
-    }
-    function closeTplModal(){ document.getElementById('tplModal').classList.add('hidden'); }
-    document.getElementById('tplModal').addEventListener('click', (e) => { if (e.target.id === 'tplModal') closeTplModal(); });
 
     // ================= CLONE =================
     function confirmClone(id, name){
@@ -5172,7 +5054,6 @@
     });
 
     // ================= INIT =================
-    renderTemplates('all');
     renderLogoCards();
     routeFromHash();
     refreshCompliance();
@@ -5731,6 +5612,8 @@
         sec.classList.add('section-active');
         // Add action bar
         if (!sec.querySelector('.section-action-bar')){
+          const isCustom = sec.classList.contains('custom');
+          const secTitle = (sec.querySelector('h3') ? sec.querySelector('h3').textContent : 'section').trim();
           const bar = document.createElement('div');
           bar.className = 'section-action-bar';
           bar.contentEditable = 'false';
@@ -5738,15 +5621,17 @@
             <button type="button" data-act="edit"><i data-lucide="pencil" class="w-3 h-3"></i> Edit section</button>
             <button type="button" data-act="ai"><i data-lucide="sparkles" class="w-3 h-3"></i> AI rewrite</button>
             <button type="button" data-act="move"><i data-lucide="arrow-up-down" class="w-3 h-3"></i> Move</button>
-            <button type="button" data-act="clear"><i data-lucide="trash-2" class="w-3 h-3"></i> Clear</button>`;
+            <button type="button" data-act="clear"><i data-lucide="trash-2" class="w-3 h-3"></i> ${isCustom ? 'Delete' : 'Clear'}</button>
+            <button type="button" data-act="add" aria-label="Add custom section relative to ${secTitle.replace(/"/g,'&quot;')}"><i data-lucide="plus" class="w-3 h-3"></i> Add section</button>`;
           sec.appendChild(bar);
           bar.querySelectorAll('button').forEach(b => b.addEventListener('click', (e) => {
             e.stopPropagation();
             const act = b.dataset.act;
-            if (act === 'edit') enterSectionEditMode(sec);
+            if (act === 'edit'){ if (isCustom && window.taCs) window.taCs.editCustom(sec); else enterSectionEditMode(sec); }
             else if (act === 'ai') aiRewriteSection(sec);
             else if (act === 'move') startSectionMove(sec);
-            else if (act === 'clear') clearSection(sec);
+            else if (act === 'clear'){ if (isCustom) confirmDeleteCustom(sec, bar); else clearSection(sec); }
+            else if (act === 'add'){ if (window.taCs) window.taCs.openInsert(sec); }
           }));
           refreshIcons();
         }
@@ -5833,7 +5718,17 @@
           }
         });
       }
+      // Inline "Delete this custom section?" confirm shown inside the section's action bar.
+      function confirmDeleteCustom(sec, bar){
+        if (!bar) return;
+        bar.innerHTML = `<span style="font-size:12px;">Delete this custom section?</span>
+          <button type="button" data-del="yes" style="color:#fff;font-weight:600;">Delete</button>
+          <button type="button" data-del="no">Cancel</button>`;
+        bar.querySelector('[data-del="yes"]').addEventListener('click', (e) => { e.stopPropagation(); if (window.taCs) window.taCs.deleteCustom(sec); });
+        bar.querySelector('[data-del="no"]').addEventListener('click', (e) => { e.stopPropagation(); deactivateSection(sec); });
+      }
       function startSectionMove(sec){
+        const isCustom = sec.classList.contains('custom');
         sec.draggable = true;
         sec.style.cursor = 'grabbing';
         const onDragStart = (e) => { e.dataTransfer.effectAllowed = 'move'; sec.style.opacity = '0.6'; };
@@ -5842,6 +5737,8 @@
           sec.removeEventListener('dragstart', onDragStart);
           sec.removeEventListener('dragend', onDragEnd);
           draftDoc.querySelectorAll('.section-drop').forEach(d => d.remove());
+          // A moved custom section re-anchors to its new document neighbours.
+          if (isCustom && window.taCs) { try { window.taCs.syncAnchorFromDom(sec); } catch(e){} }
           showToast('Section order updated');
         };
         sec.addEventListener('dragstart', onDragStart);
@@ -5861,8 +5758,12 @@
         });
       }
 
+      // Exposed so the relocated custom-section module can re-render the document after a save.
+      window.renderDraftDoc = renderDraftDoc;
+
       // ============ OPEN / CLOSE ============
       window.openDraftPanel = function(){
+        window.draftPanelOpen = true;
         lastTriggerBtn = document.getElementById('checkDraftBtn');
         renderDraftDoc();
         backdrop.classList.remove('hidden');
@@ -5883,6 +5784,7 @@
         forceClose();
       };
       function forceClose(){
+        window.draftPanelOpen = false;
         panel.style.transform = 'translateX(100%)';
         backdrop.classList.add('opacity-0');
         setTimeout(() => backdrop.classList.add('hidden'), 280);
@@ -6122,6 +6024,7 @@
   let _rmConfirm = null;     // section id awaiting remove confirm
   let _dragSecId = null;     // section being dragged
   let _dragListCtx = null;   // {sectionId, blockId, idx}
+  let _editing = null;       // inline doc editor: {mode:'new'|'edit', sec, snapshot, hostEl, discardConfirm}
 
   function uid(p){ return p + '-' + Date.now().toString(36) + Math.floor(Math.random()*1e4).toString(36); }
   function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
@@ -6134,17 +6037,19 @@
     return state();
   }
   function save(){
+    // While an inline editor is open, edits live on the in-memory draft only and are
+    // committed on "Save section" / "Save changes" — not persisted on every keystroke.
+    if (_editing) return;
     try {
       const json = JSON.stringify(state());
       localStorage.setItem(LS_KEY, json);
       if (json.length > 4*1024*1024 && typeof showToast === 'function') showToast('Draft is large (>4MB). Consider fewer/smaller file attachments.');
     } catch(e){}
     // live update the Check Draft document if open
-    const panel = document.getElementById('draftPanel');
-    if (panel && !panel.classList.contains('hidden') && typeof renderDraftDoc === 'function'){ try { renderDraftDoc(); } catch(e){} }
+    if (typeof window.renderDraftDoc === 'function' && window.draftPanelOpen){ try { window.renderDraftDoc(); } catch(e){} }
   }
   function stepSections(n){ return state().filter(s => s.step === n).sort((a,b) => (a.order||0) - (b.order||0)); }
-  function findSec(id){ return state().find(s => s.id === id); }
+  function findSec(id){ if (_editing && _editing.sec && _editing.sec.id === id) return _editing.sec; return state().find(s => s.id === id); }
   function findBlock(sec, bid){ return (sec.blocks||[]).find(b => b.id === bid); }
 
   // ---------- AI assist (rules-based) ----------
@@ -6186,18 +6091,14 @@
 
   // ---------- render ----------
   function renderStep(n){
+    // The custom-section feature now lives in the Check Draft document panel.
+    // '__inline' routes all editor re-renders to the in-document inline editor.
+    if (n === '__inline'){ renderInlineEditor(); return; }
     const host = document.querySelector('.ta-cs-host[data-cs-step="'+n+'"]');
     if (!host) return;
-    const cards = stepSections(n).map(cardHTML).join('');
-    host.innerHTML = cards
-      + '<div class="ta-cs-entry" role="button" tabindex="0" aria-label="Add custom section to Step '+n+' — '+esc(STEP_LABELS[n])+'" onclick="taCs.add('+n+')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault(); taCs.add('+n+');}">'
-      +   '<span class="ta-cs-entry-ic"><i data-lucide="circle-plus" style="width:20px;height:20px;"></i></span>'
-      +   '<span class="ta-cs-entry-txt">'
-      +     '<span class="t1">Add custom section to this step</span>'
-      +     '<span class="t2">Add any data not covered above — text, table, list, or file</span>'
-      +   '</span>'
-      +   '<span class="ta-cs-entry-btn"><i data-lucide="plus" style="width:13px;height:13px;"></i> Add section</span>'
-      + '</div>';
+    // Render existing custom-section cards only (the step-level "Add custom section"
+    // entry point has been relocated to the document panel's floating action bar).
+    host.innerHTML = stepSections(n).map(cardHTML).join('');
     icons();
   }
   function renderAll(){ for (let n=1;n<=6;n++) renderStep(n); }
@@ -6362,14 +6263,188 @@
   }
   function fmtSize(n){ n=n||0; if (n<1024) return n+' B'; if (n<1048576) return (n/1024).toFixed(0)+' KB'; return (n/1048576).toFixed(1)+' MB'; }
 
+  // ---------- in-document inline editor (relocated custom-section feature) ----------
+  let _pendingAnchor = null;   // {id, title, el} for the insertion popover
+  let _insertPop = null;       // popover element
+  function dDoc(){ return document.getElementById('draftDoc'); }
+
+  function secHasContent(sec){
+    return (sec.blocks||[]).some(b => {
+      if (b.type==='text'){ return String(b.content||'').replace(/<[^>]+>/g,'').replace(/&nbsp;/g,' ').trim().length>0; }
+      if (b.type==='table'){ const tc=b.content; return !!(tc && (tc.cells||[]).some(r => (r||[]).some(c => String(c||'').trim()))); }
+      if (b.type==='list'){ const lc=b.content; return !!(lc && (lc.items||[]).some(i => String(i||'').trim())); }
+      if (b.type==='file'){ const fc=b.content; return !!(fc && ((fc.files||[]).length>0 || String(fc.label||'').trim())); }
+      return false;
+    });
+  }
+  function inlineValid(sec){ return String(sec.title||'').trim().length>=2 && secHasContent(sec); }
+  function inlineDirty(){
+    if (!_editing) return false;
+    const sec=_editing.sec;
+    if (_editing.mode==='new') return String(sec.title||'').trim().length>0 || secHasContent(sec);
+    const a=Object.assign({},sec), b=Object.assign({},_editing.snapshot);
+    delete a.step; delete b.step; delete a.collapsed; delete b.collapsed;
+    return JSON.stringify(a)!==JSON.stringify(b);
+  }
+  function updateSaveState(){
+    if (!_editing) return;
+    const btn=document.getElementById('taCsInlineSave');
+    if (btn) btn.disabled = !inlineValid(_editing.sec);
+  }
+  function renderInlineEditor(){
+    if (!_editing || !_editing.hostEl) return;
+    const sec=_editing.sec, host=_editing.hostEl, isEdit=_editing.mode==='edit';
+    const lbl = isEdit ? 'EDIT CUSTOM SECTION' : 'NEW CUSTOM SECTION';
+    const saveLbl = isEdit ? 'Save changes' : 'Save section';
+    let discHtml;
+    if (isEdit) discHtml='<button type="button" class="ta-cs-inline-cancel" onclick="taCs.inlineCancel()">Cancel</button>';
+    else if (_editing.discardConfirm) discHtml='<span class="ta-cs-inline-discwrap">Discard this section?<button type="button" class="yes" onclick="taCs.inlineDiscardConfirm()">Yes</button><button type="button" class="no" onclick="taCs.inlineDiscardCancel()">No</button></span>';
+    else discHtml='<button type="button" class="ta-cs-inline-cancel" onclick="taCs.inlineDiscardStart()">Discard</button>';
+    host.innerHTML = '<div class="ta-cs-inline-label">'+lbl+'</div>'
+      + cardHTML(sec)
+      + '<div class="ta-cs-inline-footer">'+discHtml
+      +   '<button type="button" class="ta-cs-inline-save" id="taCsInlineSave" onclick="taCs.inlineSave()">'+saveLbl+'</button>'
+      + '</div>';
+    icons();
+    updateSaveState();
+  }
+  function mountHost(refEl, where){
+    const host=document.createElement('div');
+    host.className='ta-cs-inline';
+    if (where==='before') refEl.parentNode.insertBefore(host, refEl);
+    else if (where==='after') refEl.parentNode.insertBefore(host, refEl.nextSibling);
+    else { refEl.parentNode.insertBefore(host, refEl); refEl.parentNode.removeChild(refEl); }
+    return host;
+  }
+  function focusEditorTitle(host){ setTimeout(()=>{ const ti=host.querySelector('.ta-cs-title-in'); if(ti) ti.focus(); }, 60); }
+
+  function closeEditorSilently(){
+    if (!_editing) return;
+    if (_editing.mode==='edit'){ const sec=_editing.sec, snap=_editing.snapshot; Object.keys(sec).forEach(k=>{ if(!(k in snap)) delete sec[k]; }); Object.assign(sec, JSON.parse(JSON.stringify(snap))); }
+    if (_editing.hostEl && _editing.hostEl.parentNode) _editing.hostEl.parentNode.removeChild(_editing.hostEl);
+    _editing=null;
+    if (typeof window.renderDraftDoc==='function') window.renderDraftDoc();
+  }
+  // Only one editor open at a time — close current (with discard confirm if dirty), then run next().
+  function proceedAfterCloseEditor(next){
+    if (!_editing){ next(); return; }
+    if (!inlineDirty()){ closeEditorSilently(); next(); return; }
+    if (window.confirm('Discard the section you are currently editing?')){ closeEditorSilently(); next(); }
+  }
+
+  // ----- insertion-position popover -----
+  function _popOutside(e){ if (_insertPop && !_insertPop.contains(e.target)) closeInsertPopover(true); }
+  function _popKey(e){ if (e.key==='Escape'){ e.preventDefault(); closeInsertPopover(true); } }
+  function closeInsertPopover(refocus){
+    if (!_insertPop) return;
+    const anchorEl = _pendingAnchor && _pendingAnchor.el;
+    _insertPop.remove(); _insertPop=null;
+    document.removeEventListener('mousedown', _popOutside, true);
+    document.removeEventListener('keydown', _popKey, true);
+    if (refocus && anchorEl){ const b=anchorEl.querySelector('.section-action-bar [data-act="add"]'); if (b) b.focus(); }
+  }
+  function openInsert(secEl){
+    closeInsertPopover(false);
+    const anchorId = secEl.getAttribute('data-sec-id');
+    if (!anchorId) return;
+    const anchorTitle = (secEl.querySelector('h3') ? secEl.querySelector('h3').textContent : 'section').trim();
+    _pendingAnchor = { id:anchorId, title:anchorTitle, el:secEl };
+    const pop=document.createElement('div');
+    pop.className='ta-cs-insert-pop';
+    pop.setAttribute('role','dialog');
+    pop.setAttribute('aria-label','Insert custom section relative to '+anchorTitle);
+    pop.innerHTML = '<button type="button" data-pos="above"><i data-lucide="arrow-up" style="width:13px;height:13px;"></i> Insert above this section</button>'
+      + '<button type="button" data-pos="below"><i data-lucide="arrow-down" style="width:13px;height:13px;"></i> Insert below this section</button>';
+    secEl.appendChild(pop);
+    _insertPop=pop;
+    pop.querySelectorAll('button').forEach(b => b.addEventListener('click', (e)=>{ e.stopPropagation(); insertChoose(b.getAttribute('data-pos')); }));
+    icons();
+    setTimeout(()=>{ const f=pop.querySelector('button'); if (f) f.focus(); }, 0);
+    setTimeout(()=>{ document.addEventListener('mousedown', _popOutside, true); document.addEventListener('keydown', _popKey, true); }, 0);
+  }
+  function insertChoose(position){
+    const anchor=_pendingAnchor;
+    closeInsertPopover(false);
+    if (!anchor) return;
+    beginAdd(anchor.id, position);
+  }
+  function beginAdd(anchorId, position){
+    proceedAfterCloseEditor(function(){
+      const doc=dDoc(); if (!doc) return;
+      const anchorEl=doc.querySelector('[data-sec-id="'+anchorId+'"]'); if (!anchorEl) return;
+      const sec={ id:uid('custom'), anchorSectionId:anchorId, position:position, order:0, title:'', collapsed:false, blocks:[newBlock('text')], step:'__inline' };
+      const host=mountHost(anchorEl, position==='above' ? 'before' : 'after');
+      _editing={ mode:'new', sec:sec, hostEl:host, editingId:sec.id, origStep:undefined, snapshot:null, discardConfirm:false };
+      host.addEventListener('input', updateSaveState);
+      renderInlineEditor();
+      requestAnimationFrame(()=>host.classList.add('show'));
+      focusEditorTitle(host);
+    });
+  }
+  function beginEdit(secElId){
+    proceedAfterCloseEditor(function(){
+      const sec=state().find(s=>s.id===secElId); if (!sec) return;
+      const doc=dDoc(); const el=doc && doc.querySelector('[data-cs-doc="'+secElId+'"]'); if (!el) return;
+      const snapshot=JSON.parse(JSON.stringify(sec));
+      const origStep=sec.step;
+      sec.step='__inline'; sec.collapsed=false;
+      const host=mountHost(el, 'replace');
+      _editing={ mode:'edit', sec:sec, snapshot:snapshot, hostEl:host, editingId:secElId, origStep:origStep, discardConfirm:false };
+      host.addEventListener('input', updateSaveState);
+      renderInlineEditor();
+      requestAnimationFrame(()=>host.classList.add('show'));
+      focusEditorTitle(host);
+    });
+  }
+  function inlineCommit(){
+    if (!_editing || !inlineValid(_editing.sec)) return;
+    const ed=_editing, sec=ed.sec, host=ed.hostEl;
+    host.classList.add('committing');
+    setTimeout(()=>{
+      if (ed.mode==='new'){
+        delete sec.step; delete sec.stepLabel;
+        const same=state().filter(s => s.anchorSectionId===sec.anchorSectionId && (s.position||'below')===(sec.position||'below'));
+        sec.order=same.length;
+        state().push(sec);
+      } else {
+        if (ed.origStep==null) delete sec.step; else sec.step=ed.origStep;
+      }
+      _editing=null;
+      save();
+      if (typeof window.renderDraftDoc==='function') window.renderDraftDoc();
+      if (typeof showToast==='function') showToast(ed.mode==='edit' ? 'Custom section updated' : 'Custom section added');
+    }, 300);
+  }
+
   // ---------- public API (taCs.*) ----------
   const api = {
     add(n){ const s = newSection(n); state().push(s); save(); renderStep(n); },
+    // ----- relocated inline-editor entry points (called from the document action bar) -----
+    openInsert(secEl){ openInsert(secEl); },
+    editCustom(secEl){ beginEdit(secEl.getAttribute('data-cs-doc')); },
+    deleteCustom(secEl){ const id=secEl.getAttribute('data-cs-doc'); if(!id) return; if(_editing && _editing.editingId===id){ if(_editing.hostEl&&_editing.hostEl.parentNode) _editing.hostEl.parentNode.removeChild(_editing.hostEl); _editing=null; } const arr=state(); const i=arr.findIndex(s=>s.id===id); if(i>=0) arr.splice(i,1); save(); if(typeof window.renderDraftDoc==='function') window.renderDraftDoc(); if(typeof showToast==='function') showToast('Custom section deleted'); },
+    syncAnchorFromDom(secEl){ const id=secEl.getAttribute('data-cs-doc'); if(!id) return; const sec=state().find(s=>s.id===id); if(!sec) return;
+      let prev=secEl.previousElementSibling; while(prev && !prev.classList.contains('nit-section')) prev=prev.previousElementSibling;
+      let next=secEl.nextElementSibling; while(next && !next.classList.contains('nit-section')) next=next.nextElementSibling;
+      if (prev && prev.getAttribute('data-sec-id')){ sec.anchorSectionId=prev.getAttribute('data-sec-id'); sec.position='below'; }
+      else if (next && next.getAttribute('data-sec-id')){ sec.anchorSectionId=next.getAttribute('data-sec-id'); sec.position='above'; }
+      if (sec.anchorSectionId){ delete sec.step; delete sec.stepLabel; sec.order=0; save(); } },
+    inlineSave(){ inlineCommit(); },
+    inlineDiscardStart(){ if(_editing){ _editing.discardConfirm=true; renderInlineEditor(); } },
+    inlineDiscardCancel(){ if(_editing){ _editing.discardConfirm=false; renderInlineEditor(); } },
+    inlineDiscardConfirm(){ if(_editing && _editing.mode==='new'){ if(_editing.hostEl&&_editing.hostEl.parentNode) _editing.hostEl.parentNode.removeChild(_editing.hostEl); _editing=null; } },
+    inlineCancel(){ if(_editing && _editing.mode==='edit'){ const sec=_editing.sec, snap=_editing.snapshot; Object.keys(sec).forEach(k=>{ if(!(k in snap)) delete sec[k]; }); Object.assign(sec, JSON.parse(JSON.stringify(snap))); _editing=null; save(); if(typeof window.renderDraftDoc==='function') window.renderDraftDoc(); } },
     setTitle(id, v){ const s=findSec(id); if(s){ s.title=v; save(); const card=document.querySelector('[data-section-id="'+id+'"]'); if(card) card.setAttribute('aria-label','Custom section: '+(v||'Untitled')); } },
     toggleCollapse(id){ const s=findSec(id); if(s){ s.collapsed=!s.collapsed; save(); renderStep(s.step); } },
     removeStart(id){ _rmConfirm=id; const s=findSec(id); if(s) renderStep(s.step); },
     removeCancel(){ const id=_rmConfirm; _rmConfirm=null; const s=findSec(id); if(s) renderStep(s.step); },
-    removeConfirm(id){ const s=findSec(id); _rmConfirm=null; if(!s) return; const step=s.step; const arr=state(); arr.splice(arr.indexOf(s),1); reorder(step); save(); renderStep(step); },
+    removeConfirm(id){ _rmConfirm=null;
+      if (_editing && _editing.sec.id===id){
+        if (_editing.mode==='edit'){ const arr=state(); const i=arr.findIndex(x=>x.id===id); if(i>=0) arr.splice(i,1); if(_editing.hostEl&&_editing.hostEl.parentNode) _editing.hostEl.parentNode.removeChild(_editing.hostEl); _editing=null; save(); if(typeof window.renderDraftDoc==='function') window.renderDraftDoc(); if(typeof showToast==='function') showToast('Custom section deleted'); }
+        else { if(_editing.hostEl&&_editing.hostEl.parentNode) _editing.hostEl.parentNode.removeChild(_editing.hostEl); _editing=null; }
+        return;
+      }
+      const s=findSec(id); if(!s) return; const step=s.step; const arr=state(); arr.splice(arr.indexOf(s),1); reorder(step); save(); renderStep(step); },
     addBlock(id){ const s=findSec(id); if(s){ s.blocks.push(newBlock('text')); save(); renderStep(s.step); } },
     removeBlock(id, bid){ const s=findSec(id); if(s){ s.blocks=s.blocks.filter(b=>b.id!==bid); if(!s.blocks.length) s.blocks.push(newBlock('text')); save(); renderStep(s.step); } },
     setType(id, bid, type){ const s=findSec(id); const b=s&&findBlock(s,bid); if(b && b.type!==type){ Object.assign(b, newBlock(type)); b.id=bid; save(); renderStep(s.step); } },
@@ -6454,7 +6529,7 @@
   function docSectionHTML(sec){
     const title = (sec.title||'Custom Section').toUpperCase();
     const body = (sec.blocks||[]).map(docBlockHTML).join('');
-    return '<section class="nit-section custom" data-cs-doc="'+sec.id+'"><h3>'+esc(title)+'</h3>'+body+'</section>';
+    return '<section class="nit-section custom" data-cs-doc="'+sec.id+'" data-sec-id="'+sec.id+'"><h3>'+esc(title)+'</h3>'+body+'</section>';
   }
   function docBlockHTML(b){
     if (b.type==='text'){ const c=b.content||''; return c ? '<div class="nit-para">'+sanitizeHtml(c)+'</div>' : ''; }
@@ -6471,14 +6546,36 @@
     docEl = docEl || document.getElementById('draftDoc');
     if (!docEl) return;
     docEl.querySelectorAll('.nit-section.custom, [data-cs-doc]').forEach(n=>n.remove());
+    // Assign stable ids to the fixed document sections (anchor targets for new-schema customs).
+    docEl.querySelectorAll('.nit-section:not(.custom)').forEach((s,i)=>{ s.setAttribute('data-sec-id','section-'+(i+1)); });
+
+    const all = state().filter(s => !(_editing && _editing.editingId === s.id)); // skip a section being inline-edited
+    const oldSchema = all.filter(s => !s.anchorSectionId && s.step != null);
+    const newSchema = all.filter(s => s.anchorSectionId);
+
+    // ---- backward compatibility: old step-anchored custom sections render at their old positions ----
     const secs = docEl.querySelectorAll('.nit-section');
     const insertAfter = (idx, html) => { if (secs[idx]) secs[idx].insertAdjacentHTML('afterend', html); };
-    // step1 → after section 1; step4 → after section 3; step2 → after section 4; step3 → after section 6
-    const map = {1:0, 4:2, 2:3, 3:5};
-    [1,4,2,3].forEach(step => { const h = stepSections(step).map(docSectionHTML).join(''); if (h) insertAfter(map[step], h); });
-    // steps 5 + 6 → before footer
-    const endHtml = stepSections(5).concat(stepSections(6)).map(docSectionHTML).join('');
+    const oldStep = (n) => oldSchema.filter(s => s.step === n).sort((a,b)=>(a.order||0)-(b.order||0));
+    const map = {1:0, 4:2, 2:3, 3:5};   // step1 → after section 1; step4 → after section 3; step2 → after section 4; step3 → after section 6
+    [1,4,2,3].forEach(step => { const h = oldStep(step).map(docSectionHTML).join(''); if (h) insertAfter(map[step], h); });
+    const endHtml = oldStep(5).concat(oldStep(6)).map(docSectionHTML).join('');
     if (endHtml){ const footer = docEl.querySelector('.doc-footer'); if (footer) footer.insertAdjacentHTML('beforebegin', endHtml); else docEl.insertAdjacentHTML('beforeend', endHtml); }
+
+    // ---- new-schema custom sections anchored to a document section ----
+    const orphans = [];
+    const groups = {};
+    newSchema.forEach(sec => { const k = sec.anchorSectionId + '||' + (sec.position === 'above' ? 'above' : 'below'); (groups[k] = groups[k] || []).push(sec); });
+    Object.keys(groups).forEach(k => {
+      const arr = groups[k].sort((a,b)=>(a.order||0)-(b.order||0));
+      const sep = k.lastIndexOf('||');
+      const anchorId = k.slice(0, sep), pos = k.slice(sep+2);
+      const html = arr.map(docSectionHTML).join('');
+      const anchor = docEl.querySelector('[data-sec-id="'+anchorId+'"]');
+      if (!anchor){ orphans.push(html); return; }   // anchor cleared/removed → fall back to end of document
+      anchor.insertAdjacentHTML(pos === 'above' ? 'beforebegin' : 'afterend', html);
+    });
+    if (orphans.length){ const footer = docEl.querySelector('.doc-footer'); const h = orphans.join(''); if (footer) footer.insertAdjacentHTML('beforebegin', h); else docEl.insertAdjacentHTML('beforeend', h); }
   };
 
   // ---------- wire into step navigation ----------

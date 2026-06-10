@@ -326,6 +326,123 @@
     .sv-pop-foot-total{ font-weight:600; }
     .surveillance-indicator { background:#1a1a1a; color:white; border-radius:20px; padding:4px 12px; font-size:11px; font-weight:500; display:inline-flex; align-items:center; gap:5px; flex-shrink:0; margin-right:4px; font-family:'DM Sans', sans-serif; }
 
+    /* ===== Stage 4 — Recommendation & Approval (people modal + vertical stepper + ribbon),
+       pattern reused from the pre-bid response-approval flow ===== */
+    @keyframes bmap-pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(15,94,232,0.4); } 100% { box-shadow: 0 0 0 12px rgba(15,94,232,0); } }
+    @keyframes bmap-pulse-once { 0% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); } 100% { box-shadow: 0 0 0 12px rgba(16,185,129,0); } }
+    @keyframes bmap-spin { to { transform: rotate(360deg); } }
+    /* committee signatures strip */
+    .bmap-sig-row { display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid #F3F4F6; }
+    .bmap-sig-row:last-child { border-bottom:none; }
+    .bmap-sig-av { width:30px; height:30px; border-radius:50%; background:#EFF6FF; color:#0F5EE8; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .bmap-sig-name { font-size:13px; font-weight:600; color:#111827; }
+    .bmap-sig-desig { font-size:11.5px; color:#6B7280; }
+    .bmap-sig-status { font-size:12px; font-weight:600; display:inline-flex; align-items:center; gap:4px; }
+    .bmap-sig-status.signed { color:#10B981; }
+    .bmap-sig-status.unsigned { color:#9CA3AF; }
+    .bmap-dissent-chip { background:#FFFBEB; color:#92400E; border:1px solid #FCD34D; border-radius:20px; padding:2px 9px; font-size:10.5px; font-weight:600; display:inline-flex; align-items:center; gap:4px; }
+    .bmap-send-btn { background:#0F5EE8; color:white; border:none; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:7px; }
+    .bmap-send-btn:disabled { opacity:0.5; cursor:not-allowed; }
+    .bmap-spinner { width:12px; height:12px; border:2px solid rgba(255,255,255,0.55); border-top-color:white; border-radius:50%; display:inline-block; animation: bmap-spin 0.7s linear infinite; }
+    /* people-selection modal */
+    .bmap-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.35); z-index:600; display:flex; align-items:flex-start; justify-content:center; padding:40px 16px; overflow-y:auto; }
+    .bmap-card { background:white; border-radius:14px; width:580px; max-width:100%; box-shadow:0 8px 32px rgba(0,0,0,0.18); opacity:0; transform:translateY(-10px); transition: opacity 250ms ease, transform 250ms ease; }
+    .bmap-card.in { opacity:1; transform:translateY(0); }
+    .bmap-head { padding:20px 24px; border-bottom:1px solid #E5E7EB; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+    .bmap-head .t { font-size:17px; font-weight:700; color:#111827; }
+    .bmap-head .s { font-size:13px; color:#6B7280; margin-top:4px; }
+    .bmap-x { font-size:20px; color:#6B7280; cursor:pointer; background:transparent; border:none; line-height:1; }
+    .bmap-x:hover { color:#111827; }
+    .bmap-body { padding:18px 24px; }
+    .bmap-authbanner { background:#EFF6FF; border-radius:8px; padding:10px 14px; font-size:12px; color:#0C447C; margin-bottom:16px; display:flex; gap:8px; align-items:flex-start; }
+    .bmap-lbl { font-size:13px; font-weight:700; color:#374151; margin-bottom:4px; }
+    .bmap-sub { font-size:12px; color:#6B7280; margin-bottom:12px; }
+    .bmap-list { max-height:260px; overflow-y:auto; }
+    .bmap-row { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:8px; cursor:pointer; margin-bottom:4px; transition: background 150ms ease; }
+    .bmap-row:hover { background:#F9FAFB; }
+    .bmap-row.req { cursor:default; }
+    .bmap-cb { width:18px; height:18px; border-radius:4px; border:1.5px solid #D1D5DB; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:white; }
+    .bmap-cb.on { background:#0F5EE8; border-color:#0F5EE8; }
+    .bmap-cb.dis { opacity:0.6; }
+    .bmap-cb i { color:white; }
+    .bmap-av { width:34px; height:34px; border-radius:50%; background:#EFF6FF; color:#0F5EE8; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .bmap-name { font-size:14px; font-weight:700; color:#111827; display:flex; align-items:center; gap:6px; }
+    .bmap-desig { font-size:12px; color:#6B7280; }
+    .bmap-reqbadge { background:#FEF2F2; color:#991B1B; border-radius:4px; padding:1px 6px; font-size:10px; font-weight:700; }
+    .bmap-rolepill { border-radius:20px; padding:2px 8px; font-size:11px; font-weight:600; white-space:nowrap; }
+    .bmap-role-Technical { background:#EFF6FF; color:#1D4ED8; } .bmap-role-Finance { background:#F0FDF4; color:#065F46; }
+    .bmap-role-Legal { background:#F5F3FF; color:#6D28D9; } .bmap-role-HOD { background:#FFFBEB; color:#92400E; }
+    .bmap-role-Custom, .bmap-role-Other { background:#F3F4F6; color:#6B7280; }
+    .bmap-addsec { margin-top:12px; border-top:1px solid #F3F4F6; padding-top:12px; }
+    .bmap-addlink { display:inline-flex; align-items:center; gap:6px; background:transparent; border:none; color:#0F5EE8; font-size:13px; cursor:pointer; padding:0; }
+    .bmap-addlink:hover { text-decoration:underline; }
+    .bmap-addform-wrap { max-height:0; overflow:hidden; transition: max-height 200ms ease; }
+    .bmap-addform-wrap.open { max-height:240px; }
+    .bmap-addform { background:#F9FAFB; border-radius:8px; padding:12px 14px; margin-top:10px; }
+    .bmap-addform .grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+    .bmap-addform input, .bmap-addform select { border:1px solid #D1D5DB; border-radius:6px; padding:6px 9px; font-size:12px; outline:none; background:white; }
+    .bmap-addform .row2 { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:8px; }
+    .bmap-add-btn { background:#0F5EE8; color:white; border:none; border-radius:6px; padding:6px 14px; font-size:12px; font-weight:600; cursor:pointer; }
+    .bmap-add-cancel { background:transparent; border:none; color:#9CA3AF; font-size:12px; cursor:pointer; }
+    .bmap-order { margin-top:16px; border-top:1px solid #F3F4F6; padding-top:14px; }
+    .bmap-order .t { font-size:13px; font-weight:700; color:#374151; margin-bottom:4px; }
+    .bmap-order .s { font-size:11px; color:#9CA3AF; margin-bottom:10px; }
+    .bmap-chips { display:flex; gap:8px; flex-wrap:wrap; }
+    .bmap-chip { background:white; border:1px solid #E5E7EB; border-radius:6px; padding:5px 10px; display:flex; align-items:center; gap:7px; font-size:12px; color:#374151; cursor:grab; }
+    .bmap-chip .h { font-size:11px; color:#C4C9D4; }
+    .bmap-chip .num { background:#0F5EE8; color:white; border-radius:50%; width:16px; height:16px; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; }
+    .bmap-chip .rm { font-size:12px; color:#9CA3AF; cursor:pointer; }
+    .bmap-chip .rm:hover { color:#EF4444; }
+    .bmap-foot { padding:14px 24px; border-top:1px solid #E5E7EB; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+    .bmap-foot .cnt { font-size:12px; color:#6B7280; }
+    .bmap-foot .note { font-size:11px; color:#9CA3AF; font-style:italic; flex-basis:100%; }
+    .bmap-foot .right { display:flex; align-items:center; gap:14px; }
+    .bmap-cancel { background:transparent; border:none; color:#6B7280; font-size:13px; cursor:pointer; }
+    /* vertical stepper */
+    .bmap-step { display:flex; align-items:flex-start; gap:14px; position:relative; }
+    .bmap-step .node { width:32px; height:32px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:white; position:relative; z-index:1; }
+    .bmap-step .node.done { background:#10B981; }
+    .bmap-step .node.active { background:#0F5EE8; animation: bmap-pulse-ring 1.5s infinite; }
+    .bmap-step .node.locked { background:#F3F4F6; border:1.5px solid #D1D5DB; color:#9CA3AF; }
+    .bmap-step .node.sentback { background:#EF4444; }
+    .bmap-step .node.clarify { background:#F59E0B; }
+    .bmap-step .line { position:absolute; left:15px; top:32px; width:2px; height:calc(100% - 4px); background:#E5E7EB; z-index:0; }
+    .bmap-step .line.done { background:#10B981; }
+    .bmap-step .body { flex:1; min-width:0; padding-bottom:22px; }
+    .bmap-step:last-child .body { padding-bottom:0; }
+    .bmap-step .s-title { font-size:13px; font-weight:700; color:#111827; }
+    .bmap-step .s-title.muted { color:#9CA3AF; font-weight:400; }
+    .bmap-step .s-name { font-size:12px; color:#6B7280; margin-top:2px; }
+    .bmap-step .s-time { font-size:11px; color:#9CA3AF; margin-top:3px; }
+    .bmap-step .s-remind { display:inline-flex; align-items:center; gap:4px; font-size:11px; color:#0F5EE8; background:transparent; border:none; cursor:pointer; padding:0; margin-left:8px; }
+    .bmap-step .s-remind:hover { text-decoration:underline; }
+    .bmap-role-inline { border-radius:20px; padding:1px 7px; font-size:10px; font-weight:600; margin-left:6px; }
+    .bmap-sb-box { background:#FEF2F2; border-radius:6px; padding:8px 10px; margin-top:6px; font-size:12px; color:#374151; font-style:italic; }
+    .bmap-clarify-box { background:#FFFBEB; border-radius:6px; padding:8px 10px; margin-top:6px; font-size:12px; color:#92400E; }
+    .bmap-sim-row { margin-top:8px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .bmap-sim-link { background:transparent; border:1px solid #E5E7EB; border-radius:6px; color:#6B7280; font-size:11px; cursor:pointer; padding:3px 9px; }
+    .bmap-sim-link:hover { color:#111827; border-color:#9CA3AF; }
+    .bmap-sb-prompt, .bmap-clar-respond { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+    .bmap-sb-prompt input, .bmap-clar-respond textarea { border:1px solid #D1D5DB; border-radius:6px; padding:6px 9px; font-size:12px; outline:none; width:260px; }
+    .bmap-sb-yes { background:#EF4444; color:white; border:none; border-radius:6px; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer; }
+    .bmap-sb-cancel { background:transparent; border:none; color:#9CA3AF; font-size:12px; cursor:pointer; }
+    /* approved ribbon + banners */
+    .bmap-ribbon { background:#F0FDF4; border:1px solid #BBF7D0; border-radius:12px; padding:16px 20px; margin-bottom:16px; animation: bmap-pulse-once 700ms ease; }
+    .bmap-ribbon .rb-head { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+    .bmap-ribbon .rb-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#10B981; }
+    .bmap-ribbon .rb-sub { font-size:13px; color:#6B7280; margin-top:2px; }
+    .bmap-ribbon .rb-body { font-size:13px; color:#374151; margin-top:8px; }
+    .bmap-revision { background:#FFFBEB; border:1px solid #FCD34D; border-radius:10px; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+    .bmap-revision .msg { font-size:13px; color:#92400E; font-weight:600; }
+    .bmap-rev-edit { background:#F59E0B; color:white; border:none; border-radius:8px; padding:8px 16px; font-size:13px; font-weight:700; cursor:pointer; }
+    .bmap-rev-withdraw { background:transparent; border:none; color:#9CA3AF; font-size:12px; cursor:pointer; }
+    .bmap-info-banner { border-radius:10px; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+    .bmap-info-banner.neg { background:#EEEDFE; border:1px solid #C4B5FD; }
+    .bmap-info-banner.neg .msg { color:#3C3489; font-weight:600; font-size:13px; }
+    .bmap-info-banner.retender { background:#FEF2F2; border:1px solid #FCA5A5; }
+    .bmap-info-banner.retender .msg { color:#991B1B; font-weight:600; font-size:13px; }
+    .bmap-go-btn { background:#8B5CF6; color:white; border:none; border-radius:8px; padding:8px 16px; font-size:13px; font-weight:700; cursor:pointer; }
+
     @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
   </style>
 </head>
@@ -494,6 +611,8 @@
     <!-- In-flow confirmation modal -->
     <div id="modalBackdrop" class="modal-backdrop" onclick="closeConfirmModal()"></div>
     <div id="modalDialog" class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle"></div>
+    <!-- Host for the Recommendation & Approval people-selection modal -->
+    <div id="bmapModalHost"></div>
   </div>
 </div>
 
@@ -761,6 +880,9 @@
     if (!s) return { dot:'#F59E0B', dotCls:'pulse-amber', text:'Reasonableness check pending', textCol:'#92400E' };
     if (s.loaIssued && s.loaAcknowledged) return { dot:'#10B981', dotCls:'', text:'Complete', textCol:'#065F46' };
     if (s.loaIssued)        return { dot:'#10B981', dotCls:'', text:'Awaiting acknowledgement', textCol:'#065F46' };
+    let _ba = null; try { _ba = JSON.parse(localStorage.getItem('bidApproval_'+tnd) || 'null'); } catch(e){}
+    if (_ba && _ba.status === 'approved') return { dot:'#10B981', dotCls:'', text:'Award sanctioned — issue LoA', textCol:'#065F46' };
+    if (_ba && _ba.sentAt)  return { dot:'#0F5EE8', dotCls:'pulse-blue', text:'Pending CA approval', textCol:'#0C447C' };
     if (s.stage4aComplete)  return { dot:'#10B981', dotCls:'', text:'Issue LoA', textCol:'#065F46' };
     if (s.stage === 3)      return { dot:'#8B5CF6', dotCls:'pulse-amber', text:'Negotiation', textCol:'#3C3489' };
     if (s.stage2Complete)   return { dot:'#10B981', dotCls:'', text:'Award recommendation', textCol:'#065F46' };
@@ -931,35 +1053,39 @@
         { key:1, label:'Open Financial Bid' },
         { key:2, label:'Negotiation' },
         { key:3, label:'Committee Review' },
-        { key:4, label:'Award & LoA' },
+        { key:4, label:'Recommendation & Approval' },
+        { key:5, label:'Award & LoA' },
       ];
     }
-    // All four stages always shown — design-review unlock (L1 / QCBS / LCS / FBS)
+    // All five stages always shown — design-review unlock (L1 / QCBS / LCS / FBS)
     return [
       { key:1, label:'Reasonableness' },
       { key:2, label:'Committee Review' },
       { key:3, label:'Negotiation' },
-      { key:4, label:'Award & LoA' },
+      { key:4, label:'Recommendation & Approval' },
+      { key:5, label:'Award & LoA' },
     ];
   }
   function isStageComplete(key){
     if (isQBS()){
-      // QBS node mapping: 1=Open Bid, 2=Negotiation (uses stage3Complete), 3=Committee Review (uses stage2Complete), 4=Award & LoA
+      // QBS node mapping: 1=Open Bid, 2=Negotiation (uses stage3Complete), 3=Committee Review (uses stage2Complete), 4=Recommendation & Approval, 5=Award & LoA
       if (key === 1) return !!(BM.qbsOpening && BM.qbsOpening.confirmed && BM.qbsOpenedAmount != null);
       if (key === 2) return BM.stage3Complete;
       if (key === 3) return BM.stage2Complete;
-      if (key === 4) return BM.loaIssued;
+      if (key === 4) return bmapIsApproved();
+      if (key === 5) return BM.loaIssued;
       return false;
     }
     if (key === 1) return BM.stage1Complete;
     if (key === 2) return BM.stage2Complete;
     if (key === 3) return BM.stage3Complete;
-    if (key === 4) return BM.loaIssued;
+    if (key === 4) return bmapIsApproved();
+    if (key === 5) return BM.loaIssued;
     return false;
   }
-  // All stages unlocked for design-review purposes. Saved completion state (above) is still
-  // honoured visually (green checkmarks) — only the GATE is removed.
-  function isStageLocked(_key){ return false; }
+  // Stages 1–4 remain open for design-review. Stage 5 (Award & LoA) is GATED:
+  // it stays locked until the Competent Authority approval (bidApproval_<TND>.status === 'approved').
+  function isStageLocked(key){ return key === 5 && !bmapIsApproved(); }
   function renderWorkspace(){
     renderHeaderStatus();
     renderStageProgress();
@@ -1008,18 +1134,19 @@
   function renderStageBody(){
     const body = document.getElementById('stageBody');
     if (isQBS()){
-      // QBS node order: 1=Open Bid → 2=Negotiation (mandatory) → 3=Committee Review → 4=Award & LoA.
-      // Reuses existing Stage 2 / Stage 3 / Stage 4 functions by passing opts; only Open Bid is new.
+      // QBS node order: 1=Open Bid → 2=Negotiation (mandatory) → 3=Committee Review → 4=Recommendation & Approval → 5=Award & LoA.
       if (BM.stage === 1) body.innerHTML = qbsStage1HTML();
       else if (BM.stage === 2) body.innerHTML = stage3HTML({ isQBSMandatory:true });
       else if (BM.stage === 3) body.innerHTML = stage2HTML({ isQBSCommittee:true });
-      else if (BM.stage === 4) body.innerHTML = stage4HTML();
+      else if (BM.stage === 4) body.innerHTML = stage4RecApprovalHTML();
+      else if (BM.stage === 5) body.innerHTML = stage5AwardLoaHTML();
       return;
     }
     if (BM.stage === 1) body.innerHTML = stage1HTML();
     else if (BM.stage === 2) body.innerHTML = stage2HTML();
     else if (BM.stage === 3) body.innerHTML = stage3HTML();
-    else if (BM.stage === 4) body.innerHTML = stage4HTML();
+    else if (BM.stage === 4) body.innerHTML = stage4RecApprovalHTML();
+    else if (BM.stage === 5) body.innerHTML = stage5AwardLoaHTML();
   }
 
   // ============ STAGE 1 — REASONABLENESS ============
@@ -1966,9 +2093,421 @@
       </div>`;
   }
 
+  // ============================================================================
+  // STAGE 4 — RECOMMENDATION & APPROVAL  (Committee recommends → Competent
+  // Authority approves). People modal, vertical stepper and simulate controls
+  // reuse the pre-bid response-approval pattern, ported into this file.
+  // ============================================================================
+  function bmapKey(tnd){ return 'bidApproval_' + (tnd || (BM ? BM.tnd : '')); }
+  function bmapLoad(){ try { const r = localStorage.getItem(bmapKey()); return r ? JSON.parse(r) : null; } catch(e){ return null; } }
+  function bmapSave(o){ try { localStorage.setItem(bmapKey(), JSON.stringify(o)); } catch(e){} }
+  function bmapClear(){ try { localStorage.removeItem(bmapKey()); } catch(e){} }
+  function bmapIsApproved(){ const a = bmapLoad(); return !!(a && a.status === 'approved'); }
+  function bmapIsSuperAdmin(){ try { return sessionStorage.getItem('userRole') === 'Super Admin'; } catch(e){ return false; } }
+  function bmInitials(name){ if (!name) return '··'; return String(name).trim().split(/\s+/).map(w => w[0]||'').join('').slice(0,2).toUpperCase(); }
+  function bmHashStr(s){ let h = 0; s = String(s||''); for (let i=0;i<s.length;i++){ h = ((h<<5)-h + s.charCodeAt(i))|0; } return Math.abs(h); }
+  function bmapSanctionRef(){ const n = 1000 + (bmHashStr(BM.tnd) % 9000); return 'SAN/AMC/2026-27/' + n; }
+  function bmapAuthorityFor(amt){ if (amt < 2500000) return 'Deputy Commissioner'; if (amt < 5000000) return 'Commissioner'; return 'Standing Committee / State Government'; }
+  function bmapPeople(amt){
+    const authority = bmapAuthorityFor(amt);
+    const base = [
+      { id:'amit',  name:'Amit Patil',         designation:'Finance Officer (concurrence)', role:'Finance' },
+      { id:'legal', name:'Legal Advisor',      designation:'Law Department',                role:'Legal' },
+      { id:'desk',  name:'Commissioner Office', designation:'Desk scrutiny',                role:'Other' },
+    ];
+    if (authority === 'Deputy Commissioner'){
+      return [ { id:'sunita', name:'Sunita Rao', designation:'Deputy Commissioner', role:'HOD', required:true, suggested:true } ].concat(base);
+    }
+    return [
+      { id:'auth-suggested', name:authority, designation:'Competent Authority — suggested', role:'HOD', required:true, suggested:true },
+      { id:'sunita', name:'Sunita Rao', designation:'Deputy Commissioner', role:'HOD' },
+    ].concat(base);
+  }
+  // Committee signatures — prefer the recorded sign-offs in eval_<TND>, fall back to BM committee verdicts.
+  function getCommitteeSignatures(){
+    let ev = null;
+    try { ev = JSON.parse(localStorage.getItem('eval_' + BM.tnd) || 'null'); } catch(e){}
+    const bmByName = {};
+    (BM.committeeMembers || []).forEach(m => { bmByName[m.name] = m; });
+    if (ev && Array.isArray(ev.committeeMembers) && ev.committeeMembers.length){
+      const so = ev.signoffs || {};
+      return ev.committeeMembers.map(m => {
+        const s = so[m.id] || {};
+        const signed = !!(s.financial || s.TQ);
+        const bmm = bmByName[m.name] || {};
+        const dissent = (bmm.verdict === 'concern' || bmm.verdict === 'neg') || !!(bmm.concern && String(bmm.concern).trim());
+        return { name:m.name, designation:m.designation || m.role || '', initials:bmInitials(m.name), signed, signedDate:s.dateFin || s.dateTQ || null, dissent };
+      });
+    }
+    return (BM.committeeMembers || []).map(m => {
+      const signed = !!(m.verdict && m.verdict !== 'pending');
+      const dissent = (m.verdict === 'concern' || m.verdict === 'neg') || !!(m.concern && String(m.concern).trim());
+      return { name:m.name, designation:m.designation || '', initials:m.initials || bmInitials(m.name), signed, signedDate:m.date, dissent };
+    });
+  }
+  function bmapRecommendationNote(t, amt){
+    const known = bmIsAmountRevealedFor(BM.tnd, t.l1Vendor);
+    const amtStr = known ? fmtINR(amt) : '₹ ••••••';
+    const pct = known ? Math.abs(((amt - t.estimate) / t.estimate) * 100).toFixed(1) : '—';
+    const dir = (known && amt > t.estimate) ? 'above' : 'below';
+    const priceWord = isQBS() ? 'negotiated price' : 'evaluated price';
+    return `<p>The Bid Evaluation Committee, having completed pre-qualification, technical and financial evaluation of Tender ${esc(t.id)}, recommends award of the contract to <strong>${esc(t.l1Vendor)}</strong> at their ${priceWord} of <strong>${amtStr}</strong> (${esc(t.method)} basis). The quoted price is ${pct}% ${dir} the estimated cost of ${fmtINR(t.estimate)} and within the Technical Sanction value of ${fmtINR(t.ts)}. All PQ and TQ criteria have been satisfied. The committee recommends acceptance by the Competent Authority.</p>`;
+  }
+  function bmapRegenNote(){ const t = tenderInfo(); BM.committeeRecNote = bmapRecommendationNote(t, finalAmount()); saveBM(); renderStageBody(); refreshIcons(); showToast('Recommendation note regenerated'); }
+
+  function stage4RecApprovalHTML(){
+    const t = tenderInfo();
+    const amt = finalAmount();
+    const ap = bmapLoad();
+    const header = `<div class="stage-header"><h2>Recommendation &amp; Approval</h2><p>The Evaluation Committee records its recommendation; the Competent Authority approves the award. The committee recommends — it does not award.</p></div>`;
+    if (ap && ap.status === 'approved') return header + bmapApprovedHTML(ap, t);
+    if (ap && ap.sentAt) return header + bmapTrackHTML(ap, t, amt);
+    // ---- Part A + B: recommendation document + committee signatures + send ----
+    if (!BM.committeeRecNote) BM.committeeRecNote = bmapRecommendationNote(t, amt);
+    const sigs = getCommitteeSignatures();
+    const allSigned = sigs.length > 0 && sigs.every(s => s.signed);
+    const sigRows = sigs.map(s => `<div class="bmap-sig-row">
+        <span class="bmap-sig-av">${esc(s.initials)}</span>
+        <div style="flex:1; min-width:0;"><div class="bmap-sig-name">${esc(s.name)}</div><div class="bmap-sig-desig">${esc(s.designation)}</div></div>
+        ${s.dissent ? '<span class="bmap-dissent-chip"><i data-lucide="alert-triangle" style="width:11px;height:11px;"></i> Dissent note attached</span>' : ''}
+        <span class="bmap-sig-status ${s.signed?'signed':'unsigned'}">${s.signed ? '<i data-lucide="check" style="width:13px;height:13px;"></i> Signed' : 'Pending'}${(s.signed && s.signedDate) ? ' · '+fmtDate(s.signedDate) : ''}</span>
+      </div>`).join('');
+    const recCard = `<div class="card">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+        <div style="font-size:15px; font-weight:700; color:#111827;">Committee Recommendation</div>
+        <div style="display:flex; gap:8px; align-items:center;"><span class="ai-pill">✦ Auto-drafted</span><button class="row-link" onclick="bmapRegenNote()">✦ Regenerate</button></div>
+      </div>
+      <div id="bmapRecEditor" class="editor-area" contenteditable="true" oninput="BM.committeeRecNote=this.innerHTML; saveBM();">${BM.committeeRecNote}</div>
+    </div>`;
+    const sigCard = `<div class="card">
+      <div class="text-[14px] font-bold text-ink-900" style="margin-bottom:6px;">Committee signatures</div>
+      <div style="font-size:12px; color:#6B7280; margin-bottom:8px;">All committee members must sign before the recommendation is sent to the Competent Authority. Any recorded dissent travels with the file and does not block sending.</div>
+      ${sigRows}
+    </div>`;
+    const sendCard = `<div class="card">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+        <div style="font-size:12px; color:#6B7280;" aria-live="polite">${allSigned ? 'All committee members have signed — ready to send to the Competent Authority.' : 'Awaiting committee signatures.'}</div>
+        <button class="bmap-send-btn" ${allSigned?'':'disabled'} onclick="bmapOpen()">Send to Competent Authority →</button>
+      </div>
+    </div>`;
+    return header + recCard + sigCard + sendCard;
+  }
+
+  // ---------- people-selection modal ----------
+  let _bmap = null, _bmapDragId = null;
+  function bmapHost(){ return document.getElementById('bmapModalHost'); }
+  function bmapAllPeople(){ return (_bmap.people || []).concat(_bmap.manual || []); }
+  function bmapPerson(id){ return bmapAllPeople().find(p => p.id === id); }
+  function bmapRoleOf(p){ return (p && p.role) || 'Other'; }
+  function bmapRolePillClass(role){ return 'bmap-role-' + (['Technical','Finance','Legal','HOD','Custom','Other'].indexOf(role) >= 0 ? role : 'Other'); }
+  function bmapPinRequired(){ const req = (_bmap.people||[]).filter(p => p.required).map(p => p.id); req.slice().reverse().forEach(rid => { const i = _bmap.ids.indexOf(rid); if (i > 0){ _bmap.ids.splice(i,1); _bmap.ids.unshift(rid); } else if (i < 0){ _bmap.ids.unshift(rid); } }); }
+  function bmapOpen(){
+    const amt = finalAmount();
+    _bmap = { amt, authority: bmapAuthorityFor(amt), people: bmapPeople(amt), manual: [], ids: [], addOpen:false, sending:false };
+    _bmap.people.forEach(p => { if (p.required) _bmap.ids.push(p.id); });
+    bmapModalRender();
+    requestAnimationFrame(() => { const c = document.querySelector('#bmapModalHost .bmap-card'); if (c) c.classList.add('in'); });
+  }
+  function bmapClose(){
+    const card = document.querySelector('#bmapModalHost .bmap-card');
+    const overlay = document.querySelector('#bmapModalHost .bmap-overlay');
+    if (overlay){ overlay.style.transition = 'opacity 200ms ease'; overlay.style.opacity = '0'; }
+    if (card) card.classList.remove('in');
+    setTimeout(() => { const h = bmapHost(); if (h) h.innerHTML = ''; }, 250);
+  }
+  function bmapToggle(id){ const p = bmapPerson(id); if (p && p.required) return; const i = _bmap.ids.indexOf(id); if (i >= 0) _bmap.ids.splice(i,1); else _bmap.ids.push(id); bmapPinRequired(); bmapModalRender(); }
+  function bmapRemove(id){ const p = bmapPerson(id); if (p && p.required) return; _bmap.ids = _bmap.ids.filter(x => x !== id); bmapModalRender(); }
+  function bmapReorder(targetId){ if (!_bmapDragId || _bmapDragId === targetId){ _bmapDragId = null; return; } const dp = bmapPerson(_bmapDragId), tp = bmapPerson(targetId); if ((dp && dp.required) || (tp && tp.required)){ _bmapDragId = null; return; } const ids = _bmap.ids; const from = ids.indexOf(_bmapDragId), to = ids.indexOf(targetId); _bmapDragId = null; if (from < 0 || to < 0) return; ids.splice(to, 0, ids.splice(from,1)[0]); bmapPinRequired(); bmapModalRender(); }
+  function bmapOpenAdd(){ if (_bmap){ _bmap.addOpen = true; bmapModalRender(); } }
+  function bmapCancelAdd(){ if (_bmap){ _bmap.addOpen = false; bmapModalRender(); } }
+  function bmapAddPerson(){
+    if (!_bmap) return;
+    const nm = (document.getElementById('bmapName')||{}).value || '';
+    const dg = (document.getElementById('bmapDesig')||{}).value || '';
+    const em = (document.getElementById('bmapEmail')||{}).value || '';
+    const rl = (document.getElementById('bmapRole')||{}).value || '';
+    if (!nm.trim()){ showToast('Enter a name'); return; }
+    const id = 'manual-' + (_bmap.manual.length + 1) + '-' + bmHashStr(nm + em);
+    _bmap.manual.push({ id, name:nm.trim(), designation:dg.trim() || '—', email:em.trim(), role:rl || 'Custom', manuallyAdded:true });
+    _bmap.ids.push(id); _bmap.addOpen = false; bmapPinRequired(); bmapModalRender();
+    showToast(nm.trim() + ' added to approvers');
+  }
+  function bmapChain(){
+    const now = new Date().toISOString();
+    return _bmap.ids.map((id, idx) => { const a = bmapPerson(id) || {};
+      return { id, name:a.name, designation:a.designation, email:a.email||'', role:bmapRoleOf(a), required:!!a.required, isAuthority:!!a.suggested, order:idx+1, status:'pending', sentAt: idx===0?now:null, approvedAt:null, comment:null, clarResponse:null, manuallyAdded:!!a.manuallyAdded };
+    });
+  }
+  function bmapConfirm(){
+    if (!_bmap || _bmap.sending) return;
+    if (_bmap.ids.length < 1){ showToast('Select at least one approver'); return; }
+    _bmap.sending = true; bmapModalRender();
+    setTimeout(() => {
+      const t = tenderInfo(), amt = finalAmount(), now = new Date().toISOString();
+      bmapSave({ status:'pending', sentAt:now, sentBy:'Rajesh Kumar', recommendedVendor:t.l1Vendor, amount:amt, method:t.method, authority:_bmap.authority, sanctionRef:bmapSanctionRef(), approvalChain:bmapChain(), lastUpdated:now });
+      bmapClose(); renderWorkspace();
+      showToast('Recommendation sent to Competent Authority');
+      // Touchpoint 25 — award recommendation sent for approval
+      logCriticalAction(BM.tnd, { touchpointId:25, action:'award_recommendation_sent', category:'award', description:'Award recommendation sent to Competent Authority', page:'bid-management', section:'Recommendation & Approval', detail:'Competent authority: ' + _bmap.authority + ' · Recommended vendor: ' + (t.l1Vendor||'—') });
+    }, 800);
+  }
+  function bmapModalRender(){
+    const host = bmapHost();
+    if (!host || !_bmap) return;
+    const rows = bmapAllPeople().map(a => {
+      const checked = _bmap.ids.indexOf(a.id) >= 0;
+      const cbCls = 'bmap-cb' + (checked ? ' on' : '') + (a.required ? ' dis' : '');
+      const reqBadge = a.required ? '<span class="bmap-reqbadge">Required</span>' : '';
+      const role = bmapRoleOf(a);
+      const pill = '<span class="bmap-rolepill ' + bmapRolePillClass(role) + '">' + esc(role) + '</span>';
+      return '<div class="bmap-row' + (a.required ? ' req' : '') + '"' + (a.required ? '' : ' onclick="bmapToggle(\'' + a.id + '\')"') + '>'
+        + '<div class="' + cbCls + '" role="checkbox" aria-checked="' + checked + '" aria-label="' + esc(a.name) + '">' + (checked ? '<i data-lucide="check" style="width:11px;height:11px;"></i>' : '') + '</div>'
+        + '<div class="bmap-av">' + esc(bmInitials(a.name)) + '</div>'
+        + '<div style="flex:1; min-width:0;"><div class="bmap-name">' + esc(a.name) + ' ' + reqBadge + '</div><div class="bmap-desig">' + esc(a.designation) + '</div></div>'
+        + pill + '</div>';
+    }).join('');
+    const addBlock = '<div class="bmap-addsec">'
+      + '<button type="button" class="bmap-addlink" onclick="bmapOpenAdd()"><i data-lucide="user-plus" style="width:13px;height:13px;"></i> Add someone not listed</button>'
+      + '<div class="bmap-addform-wrap' + (_bmap.addOpen ? ' open' : '') + '"><div class="bmap-addform">'
+      +   '<div class="grid3"><input id="bmapName" type="text" placeholder="Full name" /><input id="bmapDesig" type="text" placeholder="Designation" /><input id="bmapEmail" type="email" placeholder="Email address" /></div>'
+      +   '<div class="row2"><select id="bmapRole"><option value="">Select role…</option><option>Technical</option><option>Finance</option><option>Legal</option><option>HOD</option><option>Other</option></select>'
+      +     '<div style="display:flex; align-items:center; gap:12px;"><button type="button" class="bmap-add-cancel" onclick="bmapCancelAdd()">Cancel</button><button type="button" class="bmap-add-btn" onclick="bmapAddPerson()">Add to list</button></div></div>'
+      + '</div></div></div>';
+    const chips = _bmap.ids.map((id, idx) => { const a = bmapPerson(id) || {};
+      const rm = a.required ? '' : '<span class="rm" onclick="bmapRemove(\'' + id + '\')" title="Remove">×</span>';
+      return '<span class="bmap-chip" draggable="true" data-bmapid="' + id + '" ondragstart="_bmapDragId=\'' + id + '\'; this.style.opacity=\'0.5\'; if(event.dataTransfer){event.dataTransfer.effectAllowed=\'move\';}" ondragend="this.style.opacity=\'1\';" ondragover="event.preventDefault();" ondrop="event.preventDefault(); bmapReorder(\'' + id + '\');">'
+        + '<span class="h">⠿</span><span class="num">' + (idx + 1) + '</span><span>' + esc(a.name) + '</span>' + rm + '</span>';
+    }).join('');
+    const cnt = _bmap.ids.length;
+    const sendDisabled = cnt < 1 || _bmap.sending;
+    host.innerHTML = '<div class="bmap-overlay">'
+      + '<div class="bmap-card" role="dialog" aria-modal="true" aria-label="Select competent authority approvers">'
+      + '<div class="bmap-head"><div><div class="t">Send to Competent Authority</div><div class="s">Choose who must approve the committee recommendation before the award is sanctioned.</div></div>'
+      +   '<button type="button" class="bmap-x" aria-label="Close" onclick="bmapClose()">×</button></div>'
+      + '<div class="bmap-body">'
+      +   '<div class="bmap-authbanner"><span>ℹ</span><span>Based on tender value <strong>' + fmtINR(_bmap.amt) + '</strong>, the competent authority is <strong>' + esc(_bmap.authority) + '</strong>.</span></div>'
+      +   '<div class="bmap-lbl">Approvers</div><div class="bmap-sub">The suggested authority is pre-selected and required. Add concurrence/scrutiny roles as needed.</div>'
+      +   '<div class="bmap-list">' + rows + '</div>'
+      +   addBlock
+      +   '<div class="bmap-order"><div class="t">Approval order</div><div class="s">Drag to change the order in which approvals are collected.</div><div class="bmap-chips">' + chips + '</div></div>'
+      + '</div>'
+      + '<div class="bmap-foot"><span class="cnt" aria-live="polite">' + cnt + ' approver' + (cnt === 1 ? '' : 's') + ' selected</span>'
+      +   '<div class="right"><button type="button" class="bmap-cancel" ' + (_bmap.sending ? 'disabled' : '') + ' onclick="bmapClose()">Cancel</button>'
+      +   '<button type="button" class="bmap-send-btn" ' + (sendDisabled ? 'disabled' : '') + ' onclick="bmapConfirm()">' + (_bmap.sending ? '<span class="bmap-spinner"></span> Sending…' : 'Send for approval →') + '</button></div>'
+      +   '<div class="note">Approver roles and authority thresholds will be configurable from the Admin Panel.</div>'
+      + '</div></div></div>';
+    refreshIcons();
+  }
+
+  // ---------- Part C — track approval (vertical stepper + simulate) ----------
+  let _bmapSbIdx = null;   // step index awaiting send-back reason
+  function bmapTrackHTML(ap, t, amt){
+    const chain = ap.approvalChain || [];
+    // negotiation_ordered / retender terminal banners
+    if (ap.status === 'negotiation_ordered'){
+      const negBanner = `<div class="bmap-info-banner neg" role="status" aria-live="polite"><div class="msg">Competent Authority has directed negotiation with ${esc(ap.recommendedVendor || t.l1Vendor)}.</div>
+        <div style="display:flex; gap:10px; align-items:center;"><button class="bmap-go-btn" onclick="bmapGoToNegotiation()">Go to Negotiation stage →</button><button class="bmap-rev-withdraw" onclick="bmapWithdraw()">Withdraw &amp; redraft</button></div></div>`;
+      return negBanner + bmapStepperCard(ap);
+    }
+    if (ap.status === 'retender'){
+      return `<div class="bmap-info-banner retender" role="status" aria-live="polite"><div class="msg">⛔ Re-tender ordered — procurement returns to the tender stage.</div><button class="bmap-rev-withdraw" onclick="bmapWithdraw()">Withdraw record</button></div>` + bmapStepperCard(ap);
+    }
+    const sb = chain.find(a => a.status === 'sent_back');
+    let revision = '';
+    if (sb){
+      revision = `<div class="bmap-revision" role="status" aria-live="polite"><div class="msg">${esc(sb.name)} sent the recommendation back for revision.</div>
+        <div style="display:flex; gap:14px; align-items:center;"><button class="bmap-rev-edit" onclick="bmapEditResubmit()">Edit and resubmit</button><button class="bmap-rev-withdraw" onclick="bmapWithdraw()">Withdraw</button></div></div>`;
+    }
+    return revision + bmapStepperCard(ap);
+  }
+  function bmapStepperCard(ap){
+    return `<div class="card">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+        <div class="text-[14px] font-bold text-ink-900">Competent Authority approval</div>
+        <div style="font-size:12px; color:#6B7280;">${esc(ap.authority||'')} · Sent ${fmtDate((ap.sentAt||'').slice(0,10))}</div>
+      </div>
+      <div role="list">${bmapStepperHTML(ap)}</div>
+    </div>`;
+  }
+  function bmapStepperHTML(ap){
+    const chain = ap.approvalChain || [];
+    const isSA = bmapIsSuperAdmin();
+    let activeIdx = -1;
+    if (!chain.some(a => a.status === 'sent_back')){
+      for (let i=0;i<chain.length;i++){ if (chain[i].status !== 'approved'){ activeIdx = i; break; } }
+    }
+    return chain.map((a, i) => {
+      const last = i === chain.length - 1;
+      let state, icon, statusLine, statusColor;
+      if (a.status === 'approved'){ state='done'; icon='check'; statusLine='Approved · ' + fmtDate((a.approvedAt||a.sentAt||'').slice(0,10)); statusColor='#10B981'; }
+      else if (a.status === 'sent_back'){ state='sentback'; icon='undo-2'; statusLine='Sent back for revision'; statusColor='#EF4444'; }
+      else if (a.status === 'clarification'){ state='clarify'; icon='help-circle'; statusLine='Clarification sought'; statusColor='#F59E0B'; }
+      else if (i === activeIdx){ state='active'; icon='clock'; statusLine='Awaiting review'; statusColor='#F59E0B'; }
+      else { state='locked'; icon='lock'; const prev = chain[i-1]; statusLine = 'In queue · notified when ' + (prev ? esc(prev.name) : 'previous approver') + ' approves'; statusColor='#9CA3AF'; }
+      const rolePill = a.role ? '<span class="bmap-role-inline ' + bmapRolePillClass(a.role) + '">' + esc(a.role) + '</span>' : '';
+      const authPill = a.isAuthority ? '<span class="bmap-role-inline" style="background:#FFFBEB;color:#92400E;">Competent Authority</span>' : '';
+      let statusHTML = '<div class="s-time" style="color:' + statusColor + ';">' + statusLine;
+      if (state === 'active'){ statusHTML += '<button type="button" id="bmapRemind-' + i + '" class="s-remind" onclick="bmapSendReminder(\'bmapRemind-' + i + '\')"><i data-lucide="bell" style="width:11px;height:11px;"></i> Send reminder</button>'; }
+      statusHTML += '</div>';
+      const sbBox = (a.status === 'sent_back' && a.comment) ? '<div class="bmap-sb-box">' + esc(a.comment) + '</div>' : '';
+      // clarification: show the query + an officer "respond" textarea
+      let clarBox = '';
+      if (a.status === 'clarification'){
+        clarBox = '<div class="bmap-clarify-box">' + esc(a.comment || 'Clarification requested.') + '</div>'
+          + '<div class="bmap-clar-respond"><textarea id="bmapClar-' + i + '" placeholder="Respond to clarification…"></textarea>'
+          + '<button type="button" class="bmap-sb-yes" style="background:#0F5EE8;" onclick="bmapSubmitClarResponse(' + i + ')">Submit response →</button></div>';
+      }
+      if (a.clarResponse){ clarBox += '<div class="s-time" style="color:#10B981;">Clarification answered: ' + esc(a.clarResponse) + '</div>'; }
+      // simulate controls (Super Admin only) on the active step
+      let simRow = '';
+      if (isSA && i === activeIdx && a.status !== 'approved'){
+        if (a.isAuthority){
+          simRow = '<div class="bmap-sim-row">'
+            + '<button type="button" class="bmap-sim-link" onclick="bmapSimApprove(' + i + ')">Approve</button>'
+            + '<button type="button" class="bmap-sim-link" onclick="bmapSimClarify(' + i + ')">Seek clarification</button>'
+            + '<button type="button" class="bmap-sim-link" onclick="bmapSimNegotiation()">Order negotiation</button>'
+            + '<button type="button" class="bmap-sim-link" onclick="bmapSimRetender()">Order re-tender</button></div>';
+        } else {
+          simRow = '<div class="bmap-sim-row"><button type="button" class="bmap-sim-link" onclick="bmapSimApprove(' + i + ')">Approve</button>'
+            + '<button type="button" class="bmap-sim-link" onclick="bmapSimSendBack(' + i + ')">Send back</button></div>';
+        }
+      }
+      const sbPrompt = (_bmapSbIdx === i) ? '<div class="bmap-sb-prompt"><input id="bmapSbReason" type="text" placeholder="Reason for sending back…" /><button type="button" class="bmap-sb-yes" onclick="bmapSimSendBackConfirm(' + i + ')">Send back</button><button type="button" class="bmap-sb-cancel" onclick="bmapSimSendBackCancel()">Cancel</button></div>' : '';
+      return '<div class="bmap-step" role="listitem">'
+        + (last ? '' : '<div class="line' + (a.status === 'approved' ? ' done' : '') + '"></div>')
+        + '<div class="node ' + state + '"><i data-lucide="' + icon + '" style="width:14px;height:14px;"></i></div>'
+        + '<div class="body"><div class="s-title">' + esc(a.name) + rolePill + authPill + '</div>'
+        +   '<div class="s-name">' + esc(a.designation || '') + '</div>'
+        +   statusHTML + sbBox + clarBox + sbPrompt + simRow
+        + '</div></div>';
+    }).join('');
+  }
+  function bmapAfterStepChange(ap){ ap.lastUpdated = new Date().toISOString(); bmapSave(ap); renderWorkspace(); }
+  function bmapSimApprove(i){
+    const ap = bmapLoad(); if (!ap || !ap.approvalChain || !ap.approvalChain[i]) return;
+    const now = new Date().toISOString();
+    ap.approvalChain[i].status = 'approved'; ap.approvalChain[i].approvedAt = now;
+    const nxt = ap.approvalChain[i+1]; if (nxt && !nxt.sentAt) nxt.sentAt = now;
+    if (ap.approvalChain.every(a => a.status === 'approved')){
+      ap.status = 'approved'; ap.approvedAt = now;
+      ap.approvedNames = ap.approvalChain.map(a => a.name);
+      showToast('Award sanctioned by the Competent Authority');
+      logCriticalAction(BM.tnd, { touchpointId:25, action:'competent_authority_approved', category:'award', description:'Competent Authority approved the award', page:'bid-management', section:'Recommendation & Approval', detail:'Approved by: ' + ap.approvedNames.join(', ') + ' · ' + (ap.sanctionRef||'') });
+    } else {
+      ap.status = 'pending';
+    }
+    _bmapSbIdx = null; bmapAfterStepChange(ap);
+  }
+  function bmapSimSendBack(i){ _bmapSbIdx = i; renderStageBody(); refreshIcons(); setTimeout(() => { const el = document.getElementById('bmapSbReason'); if (el) el.focus(); }, 30); }
+  function bmapSimSendBackCancel(){ _bmapSbIdx = null; renderStageBody(); refreshIcons(); }
+  function bmapSimSendBackConfirm(i){
+    const reason = ((document.getElementById('bmapSbReason')||{}).value || '').trim();
+    const ap = bmapLoad(); if (!ap || !ap.approvalChain || !ap.approvalChain[i]) return;
+    ap.approvalChain[i].status = 'sent_back'; ap.approvalChain[i].comment = reason || 'Please revise and resubmit.';
+    ap.status = 'pending'; _bmapSbIdx = null; bmapAfterStepChange(ap);
+  }
+  function bmapSimClarify(i){
+    const reason = (window.prompt('What clarification does the Competent Authority seek?') || '').trim();
+    const ap = bmapLoad(); if (!ap || !ap.approvalChain || !ap.approvalChain[i]) return;
+    ap.approvalChain[i].status = 'clarification'; ap.approvalChain[i].comment = reason || 'Clarification requested before approval.';
+    ap.status = 'clarification'; bmapAfterStepChange(ap);
+  }
+  function bmapSubmitClarResponse(i){
+    const resp = ((document.getElementById('bmapClar-' + i)||{}).value || '').trim();
+    if (!resp){ showToast('Enter a response'); return; }
+    const ap = bmapLoad(); if (!ap || !ap.approvalChain || !ap.approvalChain[i]) return;
+    ap.approvalChain[i].clarResponse = resp; ap.approvalChain[i].status = 'pending'; ap.approvalChain[i].comment = null;
+    ap.status = 'pending'; bmapAfterStepChange(ap); showToast('Clarification response submitted');
+  }
+  function bmapSimNegotiation(){ const ap = bmapLoad(); if (!ap) return; ap.status = 'negotiation_ordered'; bmapAfterStepChange(ap); showToast('Competent Authority directed negotiation'); }
+  function bmapSimRetender(){ const ap = bmapLoad(); if (!ap) return; ap.status = 'retender'; bmapAfterStepChange(ap); showToast('Re-tender ordered'); }
+  function bmapSendReminder(btnId){ const b = document.getElementById(btnId); if (b){ b.innerHTML = 'Reminder sent ✓'; b.disabled = true; } showToast('Reminder sent'); }
+  function bmapGoToNegotiation(){ BM.negotiationTriggered = true; BM.negotiationReason = 'Competent Authority directed negotiation with ' + (tenderInfo().l1Vendor || 'the recommended vendor'); BM.stage3Complete = false; BM.stage = isQBS() ? 2 : 3; saveBM(); renderWorkspace(); showToast('Negotiation stage activated'); }
+  function bmapEditResubmit(){ bmapClear(); BM.stage = 4; saveBM(); renderWorkspace(); showToast('Returned to recommendation — edit and resubmit'); }
+  function bmapWithdraw(){ bmapClear(); BM.stage = 4; saveBM(); renderWorkspace(); showToast('Approval request withdrawn'); }
+  function bmapProceedToAward(){ if (!bmapIsApproved()){ showToast('Awaiting Competent Authority approval'); return; } BM.stage = 5; saveBM(); renderWorkspace(); }
+
+  // ---------- Part D — approved ribbon ----------
+  function bmapApprovedHTML(ap, t){
+    const names = (ap.approvedNames || (ap.approvalChain||[]).map(a => a.name)).join(', ');
+    const dateStr = fmtDate((ap.approvedAt||'').slice(0,10));
+    return `<div class="bmap-ribbon" role="status" aria-live="polite">
+        <div class="rb-head"><i data-lucide="circle-check" style="width:16px;height:16px;color:#10B981;"></i><span class="rb-label">APPROVED — Award of contract sanctioned</span></div>
+        <div class="rb-sub">Approved by ${esc(names)} · ${esc(dateStr)} · Sanction ref: ${esc(ap.sanctionRef || bmapSanctionRef())}</div>
+        <div class="rb-body">The Competent Authority has accorded approval. Proceed to issue the Letter of Acceptance.</div>
+      </div>
+      <div style="display:flex; justify-content:flex-end;"><button class="btn-success" onclick="bmapProceedToAward()">Proceed to Award &amp; LoA →</button></div>`;
+  }
+
+  // ============================================================================
+  // STAGE 5 — AWARD & LoA  (existing LoA flow + performance-security tracker + EMD refund)
+  // ============================================================================
+  function stage5AwardLoaHTML(){
+    const t = tenderInfo(), amt = finalAmount();
+    let html = renderLoASection(t, amt);
+    if (BM.loaIssued){ html += bmapPerfSecurityHTML(t, amt) + bmapEmdRefundHTML(t); }
+    return html;
+  }
+  function bmapPerfSecurityHTML(t, amt){
+    if (!BM.perfSec) BM.perfSec = { amount: Math.round(finalAmount() * (AdminState.get('mgmt.perf-security', 5)/100)), received:false, receivedDate:'', instrumentRef:'' };
+    const ps = BM.perfSec;
+    const due = addDaysISO(BM.loaIssuedDate || BM.loaDetails.dateOfLoa || todayISO(), 21);
+    const days = daysBetween(todayISO(), due);
+    const cdCls = days > 7 ? 'countdown-green' : days >= 0 ? 'countdown-amber' : 'countdown-red';
+    const cdText = days > 0 ? days + ' days remaining' : days === 0 ? 'Due today' : Math.abs(days) + ' days overdue';
+    const calc = Math.round(amt * (AdminState.get('mgmt.perf-security', 5)/100));
+    let strip = '';
+    if (ps.received){
+      strip = `<div class="success-banner" style="margin-top:12px;"><i data-lucide="check-circle-2" style="width:18px;height:18px;color:#10B981;"></i><span class="sb-text">Performance security received ✓ — ${esc(fmtDate(ps.receivedDate||todayISO()))}${ps.instrumentRef?' · Ref: '+esc(ps.instrumentRef):''}</span></div>`;
+    } else if (days < 0){
+      strip = `<div style="margin-top:12px; background:#FEF2F2; border:1px solid #FCA5A5; border-radius:8px; padding:12px 14px; font-size:12.5px; color:#991B1B;" role="alert">⚠ Not furnished within deadline — grounds for annulment of award. Options: extend deadline · annul and award to L2 · re-tender.</div>`;
+    }
+    return `<div class="card" style="background:#F9FAFB;">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:8px;">
+        <div class="text-[14px] font-bold text-ink-900">Performance security</div>
+        <div class="${cdCls}">${esc(cdText)}</div>
+      </div>
+      <div style="font-size:13px; color:#374151; margin-bottom:10px;">Performance security due: <strong>${fmtDate(due)}</strong> <span style="color:#9CA3AF;">(LoA date + 21 days)</span></div>
+      <div class="form-grid-2">
+        <div class="form-field"><label>Amount (₹) — ${AdminState.get('mgmt.perf-security', 5)}% of contract value = ${fmtINR(calc)}</label><input type="number" value="${ps.amount}" oninput="bmPerfField('amount', parseFloat(this.value)||0)" ${ps.received?'readonly':''}/></div>
+        <div class="form-field"><label>Instrument reference (BG no.)</label><input type="text" value="${esc(ps.instrumentRef)}" oninput="bmPerfField('instrumentRef', this.value)" placeholder="e.g. BG/SBI/2026/00123" ${ps.received?'readonly':''}/></div>
+      </div>
+      <div style="margin-top:10px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+        <label style="display:inline-flex; align-items:center; gap:6px; font-size:13px;"><input type="checkbox" ${ps.received?'checked':''} onchange="bmPerfToggle(this.checked)"> Mark as received</label>
+        ${ps.received ? `<div class="form-field" style="margin:0;"><input type="date" value="${esc(ps.receivedDate||todayISO())}" oninput="bmPerfField('receivedDate', this.value)"/></div>` : ''}
+      </div>
+      ${strip}
+    </div>`;
+  }
+  function bmPerfField(key, val){ if (!BM.perfSec) return; BM.perfSec[key] = val; saveBM(); }
+  function bmPerfToggle(checked){ if (!BM.perfSec) return; BM.perfSec.received = !!checked; if (checked && !BM.perfSec.receivedDate) BM.perfSec.receivedDate = todayISO(); saveBM(); renderStageBody(); refreshIcons(); showToast(checked ? 'Performance security recorded' : 'Marked not received'); }
+  function bmapEmdRefundHTML(t){
+    if (!BM.emdRefund) BM.emdRefund = { done:false, date:'' };
+    const er = BM.emdRefund;
+    const n = Math.max(0, (t.bidsReceived || 1) - 1);
+    return `<div class="card">
+      <div class="text-[14px] font-bold text-ink-900" style="margin-bottom:8px;">EMD refund</div>
+      <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+        <label style="display:inline-flex; align-items:center; gap:6px; font-size:13px;"><input type="checkbox" ${er.done?'checked':''} onchange="bmEmdToggle(this.checked)"> Refund EMD to unsuccessful bidders (${n} vendor${n===1?'':'s'})</label>
+        ${er.done ? `<div class="form-field" style="margin:0;"><input type="date" value="${esc(er.date||todayISO())}" oninput="BM.emdRefund.date=this.value; saveBM();"/></div><span class="pill-green">Refund recorded ✓</span>` : ''}
+      </div>
+    </div>`;
+  }
+  function bmEmdToggle(checked){
+    if (!BM.emdRefund) BM.emdRefund = { done:false, date:'' };
+    BM.emdRefund.done = !!checked;
+    if (checked && !BM.emdRefund.date) BM.emdRefund.date = todayISO();
+    saveBM(); renderStageBody(); refreshIcons();
+    if (checked){
+      const t = tenderInfo(); const n = Math.max(0, (t.bidsReceived||1) - 1);
+      logCriticalAction(BM.tnd, { touchpointId:26, action:'emd_refunded', category:'financial', description:'EMD refunded to ' + n + ' unsuccessful bidder' + (n===1?'':'s'), page:'bid-management', section:'Award & LoA' });
+      showToast('EMD refund logged to activity trail');
+    }
+  }
+
   // ===================== GLOBAL HANDLERS =====================
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape'){ closeLoaPanel(); closeConfirmModal(); }
+    if (e.key === 'Escape'){ closeLoaPanel(); closeConfirmModal(); if (document.querySelector('#bmapModalHost .bmap-card')) bmapClose(); }
   });
 
   // ===================== SUPER ADMIN SURVEILLANCE LAYER =====================
@@ -2178,8 +2717,8 @@
       if (!isSuperAdmin()) return;
       const tenderId = currentTenderId();
       if (!tenderId) return;
-      // T25 — "Send for approval →" (Stage 4 Award Recommendation)
-      document.querySelectorAll('button[onclick*="sendForApproval"]').forEach(btn => {
+      // T25 — "Send for approval →" / "Send to Competent Authority →" (Stage 4 Recommendation & Approval)
+      document.querySelectorAll('button[onclick*="sendForApproval"], button[onclick*="bmapOpen"]').forEach(btn => {
         attachBadge(btn, tenderId, 25, {}, 'Award recommendation sent');
       });
       // T2 — Eye icons inside bid-management (if any present, eg. reveal in Stage 4)
