@@ -386,12 +386,13 @@
 
   function renderWorkspace(){
     const c = contractFor(CUR); const st = curState();
-    const tabs = [['overview','Overview'],['milestones','Milestones'],['bills','RA Bills'],['extensions','Extensions']];
+    const tabs = [['overview','Overview'],['milestones','Milestones'],['bills','RA Bills'],['extensions','Extensions'],['analytics','Analytics']];
     const tabBar = tabs.map(([k,l]) => '<button class="ex-tab px-4 py-1.5 rounded-full text-[13px] '+(CURTAB===k?'border border-primary bg-primary text-white':'border border-line bg-white text-ink-500 hover:text-ink-900')+'" onclick="setTab(\''+k+'\')">'+l+'</button>').join('');
     let body = '';
     if (CURTAB==='overview') body = renderOverview(c, st);
     else if (CURTAB==='milestones') body = renderMilestones(c, st);
     else if (CURTAB==='bills') body = renderBills(c, st);
+    else if (CURTAB==='analytics') body = renderAnalytics(c, st);
     else body = renderExtensions(c, st);
     const stt = contractStatus(st);
     document.getElementById('exec-workspace').innerHTML =
@@ -612,6 +613,182 @@
       onConfirm:(chain)=>{ eot.approvalChain=chain; st.eotRequests=st.eotRequests||[]; st.eotRequests.push(eot); logAct(st,'EoT requested', days+' days requested — '+eot.reason); exSave(st); _eotForm=false; renderWorkspace(); showToast('EoT request submitted for approval'); }
     });
   }
+
+  // =====================================================================
+  // TAB: ANALYTICS — full-lifecycle analysis for this tender (read-only)
+  // =====================================================================
+  function lsGet(key){ try { const r=localStorage.getItem(key); return r?JSON.parse(r):null; } catch(e){ return null; } }
+  function pct1(n){ return (Math.round(n*10)/10); }
+  function emptyNote(){ return '<div style="font-size:12px;color:#9CA3AF;font-style:italic;">Data unavailable for this stage</div>'; }
+  function aBar(label, valueLabel, w, color, ariaVal){
+    w = Math.max(2, Math.min(100, Math.round(w)));
+    return '<div style="margin-bottom:11px;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span style="color:#374151;">'+label+'</span><span style="font-weight:600;color:#111827;">'+valueLabel+'</span></div>'
+      + '<div class="ex-bar" role="img" aria-label="'+esc(ariaVal||(label+': '+valueLabel))+'"><span style="width:'+w+'%;background:'+color+';"></span></div></div>';
+  }
+  function secCard(title, inner){ return '<div class="ex-card" style="padding:20px 22px;margin-bottom:16px;"><div class="text-[14px] font-bold text-ink-900 mb-3">'+title+'</div>'+inner+'</div>'; }
+
+  function renderAnalytics(c, st){
+    const TND = CUR;
+    // ---------- 1. Lifecycle timeline ----------
+    const STAGES = [
+      { k:'DPR',              date:'2026-04-02' },
+      { k:'AA / TS',          date:'2026-04-18' },
+      { k:'Tender published', date:'2026-04-30' },
+      { k:'Pre-bid window',   date:'2026-05-12' },
+      { k:'Bid submission',   date:'2026-05-19' },
+      { k:'Evaluation',       date:'2026-05-22' },
+      { k:'Award approval',   date:'2026-05-24' },
+      { k:'LoA',              date:'2026-05-25' },
+      { k:'Execution',        date: st.contract.commencement || '2026-05-25', ongoing:true },
+    ];
+    for (let i=0;i<STAGES.length;i++){
+      const next = STAGES[i+1] ? new Date(STAGES[i+1].date) : today();
+      STAGES[i].days = Math.max(0, daysBetween(new Date(STAGES[i].date), next));
+    }
+    const cycleDays = daysBetween(new Date(STAGES[0].date), new Date('2026-05-25'));
+    // bottleneck = longest non-ongoing stage
+    let bnIdx=-1, bnMax=-1; STAGES.forEach((s,i)=>{ if(!s.ongoing && s.days>bnMax){ bnMax=s.days; bnIdx=i; } });
+    const tlNodes = STAGES.map((s,i)=>{
+      const dot = s.ongoing ? '' : 'done';
+      const daysChip = s.ongoing
+        ? '<span class="ex-chip" style="background:#EFF6FF;color:#1D4ED8;">ongoing</span>'
+        : '<span class="ex-chip" style="background:#F3F4F6;color:#6B7280;">'+s.days+'d</span>';
+      const bn = (i===bnIdx) ? ' <span class="ex-chip" style="background:#FFFBEB;color:#92400E;">Bottleneck</span>' : '';
+      return '<div class="ex-tl-node" style="min-width:104px;"><div class="ex-tl-dot '+dot+'"></div>'
+        + '<div class="text-[12px] font-semibold text-ink-900 text-center" style="line-height:1.2;">'+s.k+'</div>'
+        + '<div class="text-[11px] text-ink-500 text-center">'+fmtD(s.date)+'</div>'
+        + '<div style="margin-top:2px;text-align:center;">'+daysChip+bn+'</div></div>';
+    }).join('<div class="ex-tl-leg" style="min-width:18px;"></div>');
+    const sec1 = secCard('Lifecycle timeline',
+      '<div class="text-[18px] font-bold text-ink-900 mb-4">Procurement cycle: '+cycleDays+' days from DPR to LoA</div>'
+      + '<div style="overflow-x:auto;padding-bottom:6px;"><div class="ex-timeline" role="img" aria-label="Procurement lifecycle stages" style="min-width:920px;">'+tlNodes+'</div></div>');
+
+    // ---------- 2. Financial analysis ----------
+    const ec = 2785350, ts = 2800000;
+    const awarded = st.contract.value || 2640000;
+    const paid = paidTillDate(st);
+    const savings = ec - awarded;
+    const savePct = ec ? pct1(savings/ec*100) : 0;
+    const saveSub = savings>=0 ? '<span style="color:#10B981;">'+Math.abs(savePct)+'% below EC</span>' : '<span style="color:#EF4444;">'+Math.abs(savePct)+'% above EC</span>';
+    const paidPct = awarded ? Math.round(paid/awarded*100) : 0;
+    const fmax = Math.max(ec, ts, awarded, paid, 1);
+    const finBars = aBar('Estimated cost (EC)', fmtINR(ec), ec/fmax*100, '#93C5FD')
+      + aBar('Technical Sanction (TS)', fmtINR(ts), ts/fmax*100, '#60A5FA')
+      + aBar('Awarded value', fmtINR(awarded), awarded/fmax*100, '#10B981')
+      + aBar('Paid till date', fmtINR(paid), paid/fmax*100, '#34D399');
+    const sec2 = secCard('Financial analysis',
+      '<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">'
+      + card('Estimated cost', fmtINR(ec), 'From DPR / evaluation')
+      + card('Awarded value', fmtINR(awarded), 'L1 accepted')
+      + '<div class="ex-card"><div class="text-[12px] text-ink-500">Savings vs estimate</div><div class="text-[20px] font-bold text-ink-900 mt-1">'+fmtINR(Math.abs(savings))+'</div><div class="text-[11px] mt-1.5">'+saveSub+'</div></div>'
+      + card('Paid till date', fmtINR(paid), paidPct+'% of contract')
+      + '</div>'
+      + '<div role="img" aria-label="Cost comparison">'+finBars+'</div>');
+
+    // ---------- 3. Bid competition analysis ----------
+    const VENDORS = [
+      { name:'Rajesh Constructions', quote:2640000, winner:true },
+      { name:'Maharashtra Roads Co.', quote:2710000 },
+      { name:'BuildTech Solutions', quote:2890000 },
+      { name:'NCC Infrastructure', quote:3175920 },
+    ];
+    const bidsReceived = VENDORS.length;
+    const disq = [ { name:'(1 bidder)', reason:'Turnover certificate below threshold (PQ 4.1)' } ];
+    const techQual = bidsReceived - disq.length;
+    const quotes = VENDORS.map(v=>v.quote);
+    const qMin = Math.min(...quotes), qMax = Math.max(...quotes);
+    const spread = pct1((qMax-qMin)/qMin*100);
+    const albThreshold = ec*0.85;
+    const qBars = VENDORS.map(v=>{
+      const vs = pct1((v.quote-ec)/ec*100);
+      const vsLabel = (vs>=0?'+':'')+vs+'% vs EC';
+      const alb = v.quote < albThreshold;
+      const color = v.winner ? '#10B981' : (alb ? '#EF4444' : '#93C5FD');
+      const albChip = alb ? ' <span class="ex-chip" style="background:#FEF2F2;color:#991B1B;">ALB</span>' : '';
+      const winChip = v.winner ? ' <span class="ex-chip" style="background:#F0FDF4;color:#065F46;">Winner</span>' : '';
+      return aBar(esc(v.name)+winChip+albChip, fmtINR(v.quote)+' · '+vsLabel, v.quote/qMax*100, color, v.name+' quote '+fmtINR(v.quote));
+    }).join('');
+    let compNote;
+    if (bidsReceived < 3) compNote = '<span class="ex-chip" style="background:#FFFBEB;color:#92400E;">'+bidsReceived+' bids · limited competition</span>';
+    else if (spread < 5) compNote = '<span class="ex-chip" style="background:#FEF2F2;color:#991B1B;">'+bidsReceived+' bids · spread '+spread+'% · clustered quotes — review for cartel indicators</span>';
+    else compNote = '<span class="ex-chip" style="background:#F0FDF4;color:#065F46;">'+bidsReceived+' bids · quote spread '+spread+'% · healthy competition</span>';
+    const sec3 = secCard('Bid competition analysis',
+      '<div class="flex items-center gap-3 mb-3 flex-wrap">'
+      + '<span class="ex-chip" style="background:#EFF6FF;color:#1D4ED8;">'+bidsReceived+' bids received</span>'
+      + '<span class="ex-chip" style="background:#F0FDF4;color:#065F46;">'+techQual+' technically qualified</span>'
+      + '<span class="ex-chip" style="background:#FEF2F2;color:#991B1B;">'+disq.length+' disqualified</span></div>'
+      + (disq.length ? '<ul style="margin:0 0 12px;padding-left:18px;font-size:12px;color:#6B7280;">'+disq.map(d=>'<li>'+esc(d.reason)+'</li>').join('')+'</ul>' : emptyNote())
+      + '<div class="text-[12px] font-semibold text-ink-700 mb-2">Quote spread</div>'
+      + '<div role="img" aria-label="Vendor quote spread">'+qBars+'</div>'
+      + '<div style="margin-top:6px;">'+compNote+'</div>');
+
+    // ---------- 4. Pre-bid engagement ----------
+    const corrigState = lsGet('prebid_corrigendum_'+TND);
+    const corrCount = corrigState && Array.isArray(corrigState.issuedCorrigenda) ? corrigState.issuedCorrigenda.length : 1;
+    const totalQ = 24, answeredQ = 22, respCycle = 10;
+    const sec4 = secCard('Pre-bid engagement',
+      '<div class="flex items-center gap-3 mb-3 flex-wrap">'
+      + '<span class="ex-chip" style="background:#F3F4F6;color:#374151;">'+totalQ+' total queries</span>'
+      + '<span class="ex-chip" style="background:#F0FDF4;color:#065F46;">'+answeredQ+' answered</span>'
+      + '<span class="ex-chip" style="background:#FFFBEB;color:#92400E;">'+corrCount+' corrigend'+(corrCount===1?'um':'a')+' issued</span>'
+      + '<span class="ex-chip" style="background:#EFF6FF;color:#1D4ED8;">'+respCycle+'-day response cycle</span></div>'
+      + '<div class="text-[13px] text-ink-700">✦ 30% of queries concerned Technical Specifications — consider clearer specifications in future tenders of this category.</div>');
+
+    // ---------- 5. Evaluation integrity summary ----------
+    const clog = lsGet('criticalLog_'+TND);
+    let sec5Inner;
+    if (clog && Array.isArray(clog) && clog.length){
+      const officers = new Set(); let tqEdits=0, pqChanges=0;
+      clog.forEach(e=>{ const blob=((e.officer||e.by||'')+'').trim(); if(blob) officers.add(blob); const txt=((e.action||'')+' '+(e.detail||'')+' '+(e.section||'')).toLowerCase(); if(txt.includes('tq')||txt.includes('score')) tqEdits++; if(txt.includes('pq')||txt.includes('verdict')) pqChanges++; });
+      sec5Inner = integrityGrid(clog.length, officers.size, tqEdits, pqChanges);
+    } else {
+      // demo fallback (key absent on a fresh visit) — show note + demo figures
+      sec5Inner = '<div style="margin-bottom:10px;">'+emptyNote()+'</div>' + integrityGrid(12, 4, 2, 1);
+    }
+    const sec5 = secCard('Evaluation integrity summary',
+      sec5Inner + '<a href="evaluation.html?tender='+esc(TND)+'#critical" class="ex-link mt-3 inline-flex items-center gap-1">View full critical log <i data-lucide="arrow-right" style="width:13px;height:13px;"></i></a>');
+
+    // ---------- 6. Execution health (live) ----------
+    const tp = timeProgress(st), phys = physProgress(st);
+    const variance = phys - tp;
+    const varChip = variance >= 0
+      ? '<span class="ex-chip" style="background:#F0FDF4;color:#065F46;">+'+variance+' pts ahead</span>'
+      : '<span class="ex-chip" style="background:#FFFBEB;color:#92400E;">'+variance+' pts behind</span>';
+    const billsPaid = (st.bills||[]).filter(b=>b.status==='Paid').length, billsTotal=(st.bills||[]).length;
+    const eotDays = st.contract.eotDays||0;
+    const ldTotal = (st.bills||[]).reduce((s,b)=>s+((b.deductions&&b.deductions.ld)||0),0);
+    let proj = '';
+    if (tp - phys > 10){
+      const totalDays = daysBetween(st.contract.commencement, st.contract.completion);
+      const lagDays = Math.round((tp-phys)/100*totalDays);
+      const projDate = isoDate(addDays(new Date(st.contract.completion), lagDays));
+      proj = '<div class="ex-card" style="background:#FFFBEB;border-color:#FCD34D;margin-top:12px;"><div class="text-[13px] font-bold" style="color:#92400E;">Projected completion: '+fmtD(projDate)+'</div>'
+        + '<div class="text-[11px]" style="color:#92400E;">Estimate: scheduled completion + lag-proportional days ('+(tp-phys)+'-point lag × '+totalDays+' contract days).</div></div>';
+    }
+    const sec6 = secCard('Execution health (live)',
+      '<div class="mb-2"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span style="color:#374151;">Time elapsed</span><span style="font-weight:600;">'+tp+'%</span></div><div class="ex-bar" role="img" aria-label="Time elapsed '+tp+'%"><span style="width:'+Math.max(2,tp)+'%;background:#0F5EE8;"></span></div></div>'
+      + '<div class="mb-2"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span style="color:#374151;">Physical progress</span><span style="font-weight:600;">'+phys+'% '+varChip+'</span></div><div class="ex-bar" role="img" aria-label="Physical progress '+phys+'%"><span style="width:'+Math.max(2,phys)+'%;background:'+(variance<0?'#F59E0B':'#10B981')+';"></span></div></div>'
+      + '<div class="flex items-center gap-3 mt-3 flex-wrap">'
+      + '<span class="ex-chip" style="background:#EFF6FF;color:#1D4ED8;">Bills paid '+billsPaid+' of '+billsTotal+'</span>'
+      + '<span class="ex-chip" style="background:#F3F4F6;color:#374151;">EoT days granted: '+eotDays+'</span>'
+      + '<span class="ex-chip" style="background:#FEF2F2;color:#991B1B;">LD applied: '+fmtINR(ldTotal)+'</span></div>'
+      + proj);
+
+    // ---------- 7. Export ----------
+    const sec7 = secCard('Export',
+      '<button class="ex-btn ghost" onclick="analyticsExport()"><i data-lucide="download" style="width:14px;height:14px;"></i> Download tender analysis report (PDF)</button>');
+
+    return sec1 + sec2 + sec3 + sec4 + sec5 + sec6 + sec7;
+  }
+  function integrityGrid(logged, officers, tqEdits, pqChanges){
+    return '<div class="grid grid-cols-2 lg:grid-cols-4 gap-3">'
+      + card('Critical actions logged', logged, 'Across evaluation stages')
+      + card('Officers involved', officers, 'Unique signatories')
+      + '<div class="ex-card"><div class="text-[12px] text-ink-500">TQ score edits after submission</div><div class="text-[20px] font-bold mt-1" style="color:'+(tqEdits>0?'#92400E':'#111827')+';">'+tqEdits+'</div><div class="text-[11px] text-ink-400 mt-1.5">'+(tqEdits>0?'Review recommended':'None')+'</div></div>'
+      + card('PQ verdict changes', pqChanges, pqChanges>0?'Post-review':'None')
+      + '</div>';
+  }
+  function analyticsExport(){ showToast('Report downloaded'); }
 
   // =====================================================================
   // APPROVAL — people selection modal + tracking stepper

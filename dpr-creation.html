@@ -291,6 +291,140 @@
     .dpr-section-done-link { position: absolute; bottom: 8px; right: 12px; font-size: 12px; color: #10B981; font-weight: 600; cursor: pointer; z-index: 5; background: transparent; border: none; }
     .dpr-section-done-link:hover { text-decoration: underline; }
 
+    /* ======================= CUSTOM SECTIONS (ported from tender-creation) ======================= */
+    .ta-cs-host { margin-top: 0; }
+    .ta-cs-entry { display:flex; align-items:center; gap:14px; padding:16px 20px; border:1.5px dashed #BFDBFE; border-radius:12px; background:#F8FBFF; margin-top:24px; cursor:pointer; transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease, transform 150ms ease; }
+    .ta-cs-entry:hover { border-color:#0F5EE8; background:#EFF6FF; box-shadow:0 2px 8px rgba(15,94,232,0.10); }
+    .ta-cs-entry:focus-visible { outline:2px solid #BFDBFE; outline-offset:2px; }
+    .ta-cs-entry .ta-cs-entry-ic { width:40px; height:40px; border-radius:10px; background:#EFF6FF; color:#0F5EE8; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition: background 150ms ease, color 150ms ease; }
+    .ta-cs-entry:hover .ta-cs-entry-ic { background:#0F5EE8; color:#fff; }
+    .ta-cs-entry .ta-cs-entry-txt { display:flex; flex-direction:column; gap:2px; min-width:0; flex:1; }
+    .ta-cs-entry .t1 { font-size:13.5px; font-weight:600; color:#0C447C; }
+    .ta-cs-entry .t2 { font-size:12px; color:#6B7280; }
+    .ta-cs-entry .ta-cs-entry-btn { flex-shrink:0; display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid #0F5EE8; color:#0F5EE8; border-radius:8px; padding:7px 14px; font-size:12.5px; font-weight:600; transition: background 150ms ease, color 150ms ease; }
+    .ta-cs-entry:hover .ta-cs-entry-btn { background:#0F5EE8; color:#fff; }
+    .ta-cs-card { position:relative; background:white; border:1.5px solid #E5E7EB; border-radius:12px; padding:20px 24px; margin-bottom:16px; }
+    .ta-cs-card.appear { animation: ta-cs-in 250ms ease both; }
+    @keyframes ta-cs-in { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .ta-cs-card.collapsed .ta-cs-collapsible { display:none; }
+    .ta-cs-drag { position:absolute; left:-20px; top:50%; transform:translateY(-50%); color:#C4C9D4; cursor:grab; font-size:16px; line-height:1; user-select:none; }
+    .ta-cs-card.dragover { box-shadow: 0 -2px 0 0 #0F5EE8; }
+    .ta-cs-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
+    .ta-cs-title-in { border:none; border-bottom:1.5px solid #E5E7EB; padding:4px 0; font-size:15px; font-weight:500; color:#111827; width:300px; max-width:100%; background:transparent; outline:none; transition: border-color 150ms ease; }
+    .ta-cs-title-in:focus { border-bottom-color:#0F5EE8; }
+    .ta-cs-head .right { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+    .ta-cs-collapse-link { background:transparent; border:none; color:#6B7280; font-size:12px; cursor:pointer; }
+    .ta-cs-collapse-link:hover { text-decoration:underline; }
+    .ta-cs-trash { background:transparent; border:none; color:#9CA3AF; cursor:pointer; display:inline-flex; align-items:center; transition: color 150ms ease; }
+    .ta-cs-trash:hover { color:#EF4444; }
+    .ta-cs-rmconfirm { display:inline-flex; align-items:center; gap:6px; font-size:11px; color:#6B7280; }
+    .ta-cs-rmconfirm .yes { background:#EF4444; color:white; border:none; border-radius:4px; padding:2px 8px; font-size:11px; cursor:pointer; }
+    .ta-cs-rmconfirm .no { background:transparent; border:none; color:#9CA3AF; cursor:pointer; font-size:13px; }
+    .ta-cs-collapsedbar { display:flex; align-items:center; gap:8px; font-size:13px; color:#374151; }
+    .ta-cs-types { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:16px; }
+    .ta-cs-type { border:1.5px solid #E5E7EB; border-radius:8px; padding:10px 12px; cursor:pointer; text-align:center; transition: border-color 200ms ease, background 200ms ease; }
+    .ta-cs-type:hover { border-color:#0F5EE8; background:#EFF6FF; }
+    .ta-cs-type.sel { border-color:#0F5EE8; background:#EFF6FF; }
+    .ta-cs-type .ty-t { font-size:12px; font-weight:700; color:#111827; margin-top:4px; }
+    .ta-cs-type .ty-s { font-size:10px; color:#9CA3AF; margin-top:1px; }
+    .ta-cs-block { border-top:1px solid #F3F4F6; padding-top:14px; margin-top:14px; }
+    .ta-cs-block:first-of-type { border-top:none; padding-top:0; margin-top:0; }
+    .ta-cs-block-rm { float:right; background:transparent; border:none; color:#C4C9D4; cursor:pointer; font-size:11px; display:inline-flex; align-items:center; gap:3px; }
+    .ta-cs-block-rm:hover { color:#EF4444; }
+    .ta-cs-lbl { font-size:13px; font-weight:500; color:#374151; margin-bottom:6px; }
+    /* text editor */
+    .ta-cs-rt { border:1px solid #D1D5DB; border-radius:8px; min-height:120px; overflow:hidden; }
+    .ta-cs-toolbar { background:#F9FAFB; border-bottom:1px solid #E5E7EB; padding:6px 10px; display:flex; gap:4px; flex-wrap:wrap; }
+    .ta-cs-tb { width:28px; height:28px; border-radius:4px; border:none; background:transparent; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; font-size:13px; color:#374151; }
+    .ta-cs-tb:hover { background:#E5E7EB; }
+    .ta-cs-ce { padding:12px 14px; font-size:14px; line-height:1.7; color:#111827; min-height:100px; outline:none; }
+    .ta-cs-ce:empty:before { content: attr(data-ph); color:#9CA3AF; }
+    .ta-cs-ce ul { list-style:disc; padding-left:22px; margin:6px 0; }
+    .ta-cs-ce ol { list-style:decimal; padding-left:22px; margin:6px 0; }
+    .ta-cs-ce h2 { font-size:17px; font-weight:700; margin:8px 0; }
+    .ta-cs-meta { display:flex; align-items:center; justify-content:space-between; margin-top:6px; }
+    .ta-cs-charcount { font-size:11px; color:#9CA3AF; }
+    .ta-cs-ai-link { background:transparent; border:none; color:#0F5EE8; font-size:11px; cursor:pointer; padding:0; }
+    .ta-cs-ai-link:hover { text-decoration:underline; }
+    .ta-cs-ai-box { display:flex; align-items:center; gap:8px; margin-top:8px; flex-wrap:wrap; }
+    .ta-cs-ai-box input { border:1px solid #D1D5DB; border-radius:6px; padding:6px 9px; font-size:12px; flex:1; min-width:160px; outline:none; }
+    .ta-cs-ai-box .gen { background:#0F5EE8; color:white; border:none; border-radius:6px; padding:6px 12px; font-size:12px; font-weight:600; cursor:pointer; }
+    /* table editor */
+    .ta-cs-tblctrl { display:flex; gap:8px; margin-bottom:10px; align-items:center; flex-wrap:wrap; }
+    .ta-cs-tblctrl label { font-size:12px; color:#374151; }
+    .ta-cs-tblctrl input[type=number] { width:60px; border:1px solid #D1D5DB; border-radius:6px; padding:5px 8px; font-size:12px; }
+    .ta-cs-tbl-btn { border:1px solid #0F5EE8; color:#0F5EE8; background:white; border-radius:6px; padding:5px 10px; font-size:12px; cursor:pointer; }
+    .ta-cs-tbl-btn:hover { background:#EFF6FF; }
+    .ta-cs-table { width:100%; border-collapse:collapse; }
+    .ta-cs-table td { border:1px solid #D1D5DB; padding:0; position:relative; vertical-align:top; }
+    .ta-cs-table td.hdr { background:#F9FAFB; }
+    .ta-cs-table tr.zebra td:not(.hdr) { background:#FAFAFA; }
+    .ta-cs-table .cell { padding:8px 10px; min-height:36px; font-size:13px; outline:none; }
+    .ta-cs-table td.hdr .cell { font-weight:500; }
+    .ta-cs-colrm { position:absolute; top:-9px; left:50%; transform:translateX(-50%); width:16px; height:16px; border-radius:50%; background:white; border:1px solid #E5E7EB; color:#9CA3AF; font-size:11px; line-height:1; cursor:pointer; display:none; align-items:center; justify-content:center; z-index:2; }
+    .ta-cs-table tr:first-child td:hover .ta-cs-colrm { display:flex; }
+    .ta-cs-colrm:hover { color:#EF4444; border-color:#EF4444; }
+    .ta-cs-rowrm { position:absolute; right:-9px; top:50%; transform:translateY(-50%); width:16px; height:16px; border-radius:50%; background:white; border:1px solid #E5E7EB; color:#9CA3AF; font-size:11px; line-height:1; cursor:pointer; display:none; align-items:center; justify-content:center; z-index:2; }
+    .ta-cs-table td:last-child:hover .ta-cs-rowrm { display:flex; }
+    .ta-cs-rowrm:hover { color:#EF4444; border-color:#EF4444; }
+    .ta-cs-tbltoggles { display:flex; gap:18px; margin-top:10px; }
+    .ta-cs-tbltoggles label { font-size:12px; color:#374151; display:inline-flex; align-items:center; gap:6px; cursor:pointer; }
+    /* list editor */
+    .ta-cs-liststyle { display:flex; gap:8px; margin-bottom:10px; }
+    .ta-cs-pill { border:1px solid #E5E7EB; border-radius:20px; padding:4px 12px; font-size:12px; color:#374151; background:white; cursor:pointer; }
+    .ta-cs-pill.sel { border-color:#0F5EE8; color:#0F5EE8; background:#EFF6FF; }
+    .ta-cs-item { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+    .ta-cs-item.appear { animation: ta-cs-in 200ms ease both; }
+    .ta-cs-item .h { color:#C4C9D4; cursor:grab; font-size:12px; }
+    .ta-cs-item .bullet { font-size:13px; color:#6B7280; width:18px; text-align:center; flex-shrink:0; }
+    .ta-cs-item input { border:none; border-bottom:1px solid #E5E7EB; padding:4px 0; font-size:14px; flex:1; outline:none; background:transparent; }
+    .ta-cs-item input:focus { border-bottom-color:#0F5EE8; }
+    .ta-cs-item .rm { color:#C4C9D4; cursor:pointer; display:inline-flex; }
+    .ta-cs-item .rm:hover { color:#EF4444; }
+    .ta-cs-additem { background:transparent; border:none; color:#0F5EE8; font-size:12px; cursor:pointer; padding:4px 0; display:inline-flex; align-items:center; gap:4px; }
+    .ta-cs-additem:hover { text-decoration:underline; }
+    /* file editor */
+    .ta-cs-annlabel { width:100%; border:1px solid #D1D5DB; border-radius:6px; padding:7px 10px; font-size:13px; outline:none; margin-bottom:10px; }
+    .ta-cs-annlabel:focus { border-color:#0F5EE8; }
+    .ta-cs-upzone { border:1.5px dashed #D1D5DB; border-radius:8px; padding:20px 24px; background:#F9FAFB; text-align:center; cursor:pointer; transition: border-color 150ms ease; }
+    .ta-cs-upzone:hover, .ta-cs-upzone.drag { border-color:#0F5EE8; }
+    .ta-cs-upzone .ut { font-size:14px; font-weight:700; color:#111827; margin-top:6px; }
+    .ta-cs-upzone .us { font-size:12px; color:#9CA3AF; margin-top:2px; }
+    .ta-cs-filechip { display:flex; align-items:center; gap:10px; background:#F9FAFB; border:1px solid #E5E7EB; border-radius:8px; padding:8px 12px; margin-top:8px; }
+    .ta-cs-filechip .fn { font-size:13px; color:#111827; font-weight:500; }
+    .ta-cs-filechip .fs { font-size:11px; color:#9CA3AF; }
+    .ta-cs-filechip .prog { height:3px; background:#E5E7EB; border-radius:2px; overflow:hidden; margin-top:3px; }
+    .ta-cs-filechip .prog > div { height:100%; background:#10B981; width:0; transition: width 1.5s ease; }
+    .ta-cs-filechip .rm { margin-left:auto; color:#9CA3AF; cursor:pointer; }
+    .ta-cs-filechip .rm:hover { color:#EF4444; }
+    .ta-cs-filedesc { width:100%; border:1px solid #D1D5DB; border-radius:6px; padding:8px 10px; font-size:13px; min-height:56px; outline:none; margin-top:10px; }
+    .ta-cs-addblock { background:transparent; border:none; color:#6B7280; font-size:12px; cursor:pointer; margin-top:14px; display:inline-flex; align-items:center; gap:4px; }
+    .ta-cs-addblock:hover { color:#0F5EE8; }
+    /* document rendering of custom sections */
+    .dpr-draft-doc-body .dpr-doc-section.custom .cs-doc-table { width:100%; border-collapse:collapse; margin:8px 0; }
+    .dpr-draft-doc-body .dpr-doc-section.custom .cs-doc-table td, .dpr-draft-doc-body .dpr-doc-section.custom .cs-doc-table th { border:1px solid #D1D5DB; padding:6px 10px; font-size:12.5px; }
+    .dpr-draft-doc-body .dpr-doc-section.custom .cs-doc-table th { background:#F9FAFB; font-weight:600; }
+    .dpr-draft-doc-body .dpr-doc-section.custom .cs-doc-file { font-size:13px; display:flex; align-items:center; gap:6px; margin:4px 0; }
+    /* ----- in-document custom-section inline editor (relocated feature) ----- */
+    .ta-cs-inline { border:1.5px dashed #0F5EE8; border-radius:12px; background:#F8FBFF; padding:20px 24px; margin:16px 0; overflow:hidden; opacity:0; max-height:0; transition:opacity 250ms ease, max-height 250ms ease; }
+    .ta-cs-inline.show { opacity:1; max-height:4000px; }
+    .ta-cs-inline.committing { transition:border-color 300ms ease, background-color 300ms ease; border-color:transparent; background:#ffffff; }
+    .ta-cs-inline-label { font-size:10px; font-weight:700; text-transform:uppercase; color:#0F5EE8; letter-spacing:0.08em; margin-bottom:10px; }
+    .ta-cs-inline .ta-cs-card { background:transparent; border:none; padding:0; margin:0; box-shadow:none; }
+    .ta-cs-inline-footer { border-top:1px solid #E5E7EB; padding-top:12px; margin-top:16px; display:flex; justify-content:flex-end; align-items:center; gap:10px; }
+    .ta-cs-inline-cancel { color:#6B7280; font-size:13px; background:transparent; border:none; cursor:pointer; }
+    .ta-cs-inline-cancel:hover { color:#374151; text-decoration:underline; }
+    .ta-cs-inline-save { background:#0F5EE8; color:#fff; border:none; border-radius:7px; padding:8px 18px; font-size:13px; font-weight:700; cursor:pointer; }
+    .ta-cs-inline-save:hover { background:#0d52cc; }
+    .ta-cs-inline-save:disabled { background:#E5E7EB; color:#9CA3AF; cursor:not-allowed; }
+    .ta-cs-inline-discwrap { display:flex; align-items:center; gap:8px; font-size:13px; color:#374151; }
+    .ta-cs-inline-discwrap .yes { color:#EF4444; font-weight:600; background:transparent; border:none; cursor:pointer; font-size:13px; }
+    .ta-cs-inline-discwrap .no  { color:#6B7280; background:transparent; border:none; cursor:pointer; font-size:13px; }
+    /* insertion-position popover */
+    .ta-cs-insert-pop { position:absolute; top:16px; left:12px; z-index:60; background:#fff; border:1px solid #E5E7EB; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.1); padding:6px; min-width:220px; }
+    .ta-cs-insert-pop button { display:flex; align-items:center; gap:8px; width:100%; padding:8px 14px; border-radius:6px; font-size:13px; color:#374151; cursor:pointer; background:transparent; border:none; text-align:left; }
+    .ta-cs-insert-pop button:hover, .ta-cs-insert-pop button:focus-visible { background:#F3F4F6; outline:none; }
+
     /* ===== AI Suggestions ===== */
     .ai-suggestion-strip { background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 8px; padding: 8px 12px; margin-top: 6px; display: flex; align-items: center; gap: 8px; font-size: 12px; color: #0C447C; transition: opacity 200ms ease, max-height 200ms ease, margin 200ms ease, padding 200ms ease; overflow: hidden; }
     .ai-suggestion-strip.dismissing { opacity: 0; max-height: 0; margin-top: 0; padding-top: 0; padding-bottom: 0; }
@@ -4344,12 +4478,15 @@
     <div class="doc-watermark">${tDpr('foot.watermark', lang)}</div>`;
 
     document.getElementById('dprDraftDoc').innerHTML = headerHTML + s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + s9 + s10 + footer;
+    if (typeof window.dprCsInjectIntoDoc === 'function') window.dprCsInjectIntoDoc(document.getElementById('dprDraftDoc'));
     const pct = dprComputePct(d);
     document.getElementById('dprDraftPct').textContent = pct;
     document.getElementById('dprDraftPctBar').style.width = pct + '%';
     wireDprSectionEditing();
     refreshIcons();
   }
+  // Exposed so the custom-section module can re-render the document after a save.
+  window.renderDprDraftDoc = renderDprDraftDoc;
 
   // ===== Open / close panel =====
   window.openDprDraftPanel = function(){
@@ -4360,6 +4497,7 @@
     }
     // Close any other panel (Version History) — mutually exclusive
     closeVersionHistory();
+    window.dprDraftPanelOpen = true;
     dprLastTriggerBtn = document.getElementById('checkDprDraftBtn');
     // Initialize language label from session storage
     document.getElementById('dprPanelLangLabel').textContent = DPR_LANG_NAMES[dprPanelLang] || 'English';
@@ -4376,6 +4514,7 @@
     setTimeout(() => { document.getElementById('dprDraftCloseBtn')?.focus(); }, 100);
   };
   window.closeDprDraftPanel = function(){
+    window.dprDraftPanelOpen = false;
     const backdrop = document.getElementById('dprDraftBackdrop');
     const panel = document.getElementById('dprDraftPanel');
     panel.style.transform = 'translateX(100%)';
@@ -4483,6 +4622,8 @@
     dprActiveSection = sec;
     sec.classList.add('section-active');
     if (!sec.querySelector('.dpr-section-action-bar')){
+      const isCustom = sec.classList.contains('custom');
+      const secTitle = (sec.querySelector('h3') ? sec.querySelector('h3').textContent : 'section').trim();
       const bar = document.createElement('div');
       bar.className = 'dpr-section-action-bar';
       bar.contentEditable = 'false';
@@ -4490,18 +4631,29 @@
         <button type="button" data-act="edit"><i data-lucide="pencil" class="w-3 h-3"></i> Edit section</button>
         <button type="button" data-act="ai"><i data-lucide="sparkles" class="w-3 h-3"></i> AI rewrite</button>
         <button type="button" data-act="move"><i data-lucide="arrow-up-down" class="w-3 h-3"></i> Move</button>
-        <button type="button" data-act="clear"><i data-lucide="trash-2" class="w-3 h-3"></i> Clear</button>`;
+        <button type="button" data-act="clear"><i data-lucide="trash-2" class="w-3 h-3"></i> ${isCustom ? 'Delete' : 'Clear'}</button>
+        <button type="button" data-act="add" aria-label="Add custom section relative to ${secTitle.replace(/"/g,'&quot;')}"><i data-lucide="plus" class="w-3 h-3"></i> Add section</button>`;
       sec.appendChild(bar);
       bar.querySelectorAll('button').forEach(b => b.addEventListener('click', ev => {
         ev.stopPropagation();
         const act = b.dataset.act;
-        if (act === 'edit') dprEnterSectionEditMode(sec);
+        if (act === 'edit'){ if (isCustom && window.dprCs) window.dprCs.editCustom(sec); else dprEnterSectionEditMode(sec); }
         else if (act === 'ai') dprAiRewriteSection(sec);
         else if (act === 'move') dprStartSectionMove(sec);
-        else if (act === 'clear') dprClearSection(sec);
+        else if (act === 'clear'){ if (isCustom) dprConfirmDeleteCustom(sec, bar); else dprClearSection(sec); }
+        else if (act === 'add'){ if (window.dprCs) window.dprCs.openInsert(sec); }
       }));
       refreshIcons();
     }
+  }
+  // Inline "Delete this custom section?" confirm shown inside the section's action bar.
+  function dprConfirmDeleteCustom(sec, bar){
+    if (!bar) return;
+    bar.innerHTML = `<span style="font-size:12px;">Delete this custom section?</span>
+      <button type="button" data-del="yes" style="color:#fff;font-weight:600;">Delete</button>
+      <button type="button" data-del="no">Cancel</button>`;
+    bar.querySelector('[data-del="yes"]').addEventListener('click', (e) => { e.stopPropagation(); if (window.dprCs) window.dprCs.deleteCustom(sec); });
+    bar.querySelector('[data-del="no"]').addEventListener('click', (e) => { e.stopPropagation(); dprDeactivateSection(sec); });
   }
   function dprDeactivateSection(sec){
     if (!sec) return;
@@ -4569,9 +4721,14 @@
     dprShowSyncIndicator();
   }
   function dprStartSectionMove(sec){
+    const isCustom = sec.classList.contains('custom');
     showToast('Drag section to reorder — drop on another section');
     sec.draggable = true;
-    const onDragEnd = () => { sec.draggable = false; sec.style.opacity = ''; sec.removeEventListener('dragend', onDragEnd); };
+    const onDragEnd = () => {
+      sec.draggable = false; sec.style.opacity = ''; sec.removeEventListener('dragend', onDragEnd);
+      // A moved custom section re-anchors to its new document neighbours.
+      if (isCustom && window.dprCs){ try { window.dprCs.syncAnchorFromDom(sec); } catch(e){} }
+    };
     sec.addEventListener('dragstart', e => { sec.style.opacity = '0.6'; e.dataTransfer.effectAllowed = 'move'; });
     sec.addEventListener('dragend', onDragEnd);
     document.getElementById('dprDraftDoc').querySelectorAll('.dpr-doc-section').forEach(other => {
@@ -4845,6 +5002,530 @@
   renderDprList('all');
   routeFromHash();
   refreshIcons();
+</script>
+<script>
+/* ======================================================================
+   CUSTOM SECTIONS — add any content to the DPR document at an anchored
+   position. Ported from tender-creation.html (taCs module), adapted to
+   the DPR document structure. Self-contained; persists to its own
+   localStorage key and re-renders the Check DPR Draft panel on save.
+   ====================================================================== */
+(function(){
+  "use strict";
+  const LS_KEY = 'dprCustomSections_DPR-2026-001';
+  let _rmConfirm = null;     // section id awaiting remove confirm
+  let _dragSecId = null;     // section being dragged
+  let _dragListCtx = null;   // {sectionId, blockId, idx}
+  let _editing = null;       // inline doc editor: {mode:'new'|'edit', sec, snapshot, hostEl, discardConfirm}
+
+  function uid(p){ return p + '-' + Date.now().toString(36) + Math.floor(Math.random()*1e4).toString(36); }
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+  function icons(){ if (window.lucide) lucide.createIcons(); }
+
+  // ---------- state + persistence ----------
+  function state(){ window.dprDraft = window.dprDraft || {}; if (!Array.isArray(window.dprDraft.customSections)) window.dprDraft.customSections = []; return window.dprDraft.customSections; }
+  function load(){
+    try { const r = localStorage.getItem(LS_KEY); if (r){ const a = JSON.parse(r); if (Array.isArray(a)){ window.dprDraft = window.dprDraft || {}; window.dprDraft.customSections = a; } } } catch(e){}
+    return state();
+  }
+  function save(){
+    // While an inline editor is open, edits live on the in-memory draft only and are
+    // committed on "Save section" / "Save changes" — not persisted on every keystroke.
+    if (_editing) return;
+    try {
+      const json = JSON.stringify(state());
+      localStorage.setItem(LS_KEY, json);
+      if (json.length > 4*1024*1024 && typeof showToast === 'function') showToast('Draft is large (>4MB). Consider fewer/smaller file attachments.');
+    } catch(e){}
+    // live update the Check DPR Draft document if open
+    if (typeof window.renderDprDraftDoc === 'function' && window.dprDraftPanelOpen){ try { window.renderDprDraftDoc(); } catch(e){} }
+  }
+  function findSec(id){ if (_editing && _editing.sec && _editing.sec.id === id) return _editing.sec; return state().find(s => s.id === id); }
+  function findBlock(sec, bid){ return (sec.blocks||[]).find(b => b.id === bid); }
+
+  // ---------- AI assist (rules-based, DPR context) ----------
+  function aiSuggest(title){
+    const t = (title||'').toLowerCase();
+    if (t.includes('market')) return 'The estimated rates adopted in this DPR are based on a market enquiry conducted in accordance with the prevailing procurement guidelines. Quotations were obtained from multiple vendors, and the lowest reasonable rate has been adopted as the basis of estimation. The market enquiry is justified as the item/work is not available on GeM at competitive rates, and the rates so derived are considered fair and reasonable for the purpose of this Detailed Project Report.';
+    if (t.includes('site')) return 'A site assessment was carried out to record the prevailing ground conditions relevant to the proposed work. The site is accessible and the conditions observed (soil, drainage, existing structures, and surroundings) have been accounted for in the scope and cost estimation. No abnormal site conditions were noted that would materially affect the project execution beyond what is provided for in the contingency.';
+    if (t.includes('environment')) return 'The proposed project shall comply with all applicable environmental laws and regulations, including the Environment (Protection) Act, 1986. Necessary statutory environmental clearances, where applicable, shall be obtained prior to commencement of work. Dust suppression, noise control, and debris disposal shall be carried out as per CPCB norms, and the cost of compliance has been factored into the project estimate.';
+    if (t.includes('maintenance')) return 'Following completion and handover of the work, a Defect Liability and Maintenance Period of twelve (12) months shall apply, during which the executing agency shall be responsible for rectifying any defects arising from faulty materials or workmanship at no additional cost. Routine post-completion maintenance requirements and their indicative annual cost have been considered as part of the project lifecycle assessment in this DPR.';
+    return "Please describe this section's purpose for AI to generate relevant content.";
+  }
+
+  // ---------- block factories ----------
+  function newBlock(type){
+    const b = { id: uid('block'), type: type || 'text', content: null };
+    if (b.type === 'text') b.content = '';
+    else if (b.type === 'table') b.content = { cols:3, rows:3, cells:[['','',''],['','',''],['','','']], header:true, zebra:false };
+    else if (b.type === 'list') b.content = { style:'bullet', items:['','',''] };
+    else if (b.type === 'file') b.content = { label:'', desc:'', files:[] };
+    return b;
+  }
+
+  // ---------- render (card editor lives only inside the in-document inline editor) ----------
+  function renderStep(n){
+    // The custom-section feature lives in the Check DPR Draft document panel.
+    // '__inline' routes all editor re-renders to the in-document inline editor.
+    if (n === '__inline'){ renderInlineEditor(); return; }
+  }
+
+  function cardHTML(sec){
+    const multi = false;
+    const dragHandle = '';
+    if (sec.collapsed){
+      const firstType = (sec.blocks[0]||{}).type || 'text';
+      const tIcon = {text:'align-left',table:'table',list:'list',file:'paperclip'}[firstType] || 'align-left';
+      return '<div class="ta-cs-card collapsed" data-section-id="'+sec.id+'" aria-label="Custom section: '+esc(sec.title||'Untitled')+'">'
+        + dragHandle
+        + '<div class="ta-cs-collapsedbar"><i data-lucide="'+tIcon+'" style="width:14px;height:14px;color:#9CA3AF;"></i>'
+        +   '<span style="font-weight:500; color:#111827;">'+esc(sec.title||'Untitled section')+'</span>'
+        +   '<button class="ta-cs-collapse-link" style="margin-left:auto;" onclick="dprCs.toggleCollapse(\''+sec.id+'\')">Expand ▾</button></div>'
+        + '</div>';
+    }
+    return '<div class="ta-cs-card appear" data-section-id="'+sec.id+'" aria-label="Custom section: '+esc(sec.title||'Untitled')+'">'
+      + dragHandle
+      + '<div class="ta-cs-head">'
+      +   '<input class="ta-cs-title-in" type="text" value="'+esc(sec.title)+'" placeholder="Section title (e.g. Market Enquiry Justification, Site Condition Note...)" oninput="dprCs.setTitle(\''+sec.id+'\', this.value)" aria-label="Section title" />'
+      +   '<div class="right">'+rmArea(sec)+'</div>'
+      + '</div>'
+      + '<div class="ta-cs-collapsible">'
+      +   (sec.blocks||[]).map(b => blockHTML(sec, b)).join('')
+      +   '<button class="ta-cs-addblock" onclick="dprCs.addBlock(\''+sec.id+'\')"><i data-lucide="plus" style="width:12px;height:12px;"></i> Add another content block</button>'
+      + '</div>'
+      + '</div>';
+  }
+  function rmArea(sec){
+    const collapse = '<button class="ta-cs-collapse-link" onclick="dprCs.toggleCollapse(\''+sec.id+'\')">Collapse ▴</button>';
+    if (_rmConfirm === sec.id){
+      return collapse + '<span class="ta-cs-rmconfirm">Remove this section?<button class="yes" onclick="dprCs.removeConfirm(\''+sec.id+'\')">Yes</button><button class="no" onclick="dprCs.removeCancel()">×</button></span>';
+    }
+    return collapse + '<button class="ta-cs-trash" aria-label="Remove section" onclick="dprCs.removeStart(\''+sec.id+'\')"><i data-lucide="trash-2" style="width:16px;height:16px;"></i></button>';
+  }
+
+  function blockHTML(sec, b){
+    const types = [
+      {k:'text', i:'align-left', c:'#0F5EE8', t:'Text', s:'Paragraphs, clauses, notes'},
+      {k:'table',i:'table', c:'#8B5CF6', t:'Table', s:'Custom rows and columns'},
+      {k:'list', i:'list', c:'#10B981', t:'List', s:'Numbered or bulleted'},
+      {k:'file', i:'paperclip', c:'#F59E0B', t:'File / Annexure', s:'Upload PDF, Word, Excel'},
+    ];
+    const typeCards = types.map(ty =>
+      '<div class="ta-cs-type'+(b.type===ty.k?' sel':'')+'" onclick="dprCs.setType(\''+sec.id+'\',\''+b.id+'\',\''+ty.k+'\')">'
+      + '<i data-lucide="'+ty.i+'" style="width:20px;height:20px;color:'+ty.c+';"></i>'
+      + '<div class="ty-t">'+ty.t+'</div><div class="ty-s">'+ty.s+'</div></div>').join('');
+    const multiBlock = (sec.blocks||[]).length > 1;
+    const blockRm = multiBlock ? '<button class="ta-cs-block-rm" onclick="dprCs.removeBlock(\''+sec.id+'\',\''+b.id+'\')"><i data-lucide="trash-2" style="width:11px;height:11px;"></i> Remove block</button>' : '';
+    return '<div class="ta-cs-block" data-block-id="'+b.id+'">'
+      + blockRm
+      + '<div class="ta-cs-types">'+typeCards+'</div>'
+      + editorHTML(sec, b)
+      + '</div>';
+  }
+
+  function editorHTML(sec, b){
+    if (b.type === 'table') return tableEditorHTML(sec, b);
+    if (b.type === 'list')  return listEditorHTML(sec, b);
+    if (b.type === 'file')  return fileEditorHTML(sec, b);
+    return textEditorHTML(sec, b);
+  }
+
+  // ---- TEXT ----
+  function textEditorHTML(sec, b){
+    const html = b.content || '';
+    const plain = String(html).replace(/<[^>]+>/g,'');
+    const tb = [
+      ['B','bold','<strong>B</strong>'],['I','italic','<em>I</em>'],['U','underline','<u>U</u>'],
+      ['UL','insertUnorderedList','≡'],['OL','insertOrderedList','1.'],['H2','__h2','H2'],['HR','__hr','—'],['IND','indent','⇥'],['OUT','outdent','⇤']
+    ];
+    const tbHtml = tb.map(x => '<button type="button" class="ta-cs-tb" title="'+x[0]+'" onmousedown="event.preventDefault(); dprCs.exec(\''+sec.id+'\',\''+b.id+'\',\''+x[1]+'\')">'+x[2]+'</button>').join('');
+    return '<div class="ta-cs-lbl">Content</div>'
+      + '<div class="ta-cs-rt"><div class="ta-cs-toolbar">'+tbHtml+'</div>'
+      +   '<div class="ta-cs-ce" id="ce-'+b.id+'" contenteditable="true" spellcheck="true" lang="en" data-ph="Type your content here. Paste from Word, add clauses, conditions, notes..." '
+      +     'oninput="dprCs.textInput(\''+sec.id+'\',\''+b.id+'\', this)" onpaste="dprCs.paste(event,\''+sec.id+'\',\''+b.id+'\')">'+html+'</div></div>'
+      + '<div class="ta-cs-meta"><button class="ta-cs-ai-link" onclick="dprCs.aiOpen(\''+sec.id+'\',\''+b.id+'\')">✦ AI assist</button>'
+      +   '<span class="ta-cs-charcount" id="cc-'+b.id+'">'+plain.length+' characters</span></div>'
+      + '<div id="aibox-'+b.id+'"></div>';
+  }
+
+  // ---- TABLE ----
+  function tableEnsure(tc){
+    tc.cells = tc.cells || [];
+    for (let r=0;r<tc.rows;r++){ tc.cells[r] = tc.cells[r] || []; for (let c=0;c<tc.cols;c++){ if (tc.cells[r][c]==null) tc.cells[r][c]=''; } tc.cells[r].length = tc.cols; }
+    tc.cells.length = tc.rows;
+  }
+  function tableEditorHTML(sec, b){
+    const tc = b.content; tableEnsure(tc);
+    let rows = '';
+    for (let r=0;r<tc.rows;r++){
+      let tds = '';
+      for (let c=0;c<tc.cols;c++){
+        const isHdr = tc.header && r===0;
+        const colrm = (r===0) ? '<span class="ta-cs-colrm" title="Remove column" onclick="dprCs.tblRmCol(\''+sec.id+'\',\''+b.id+'\','+c+')">×</span>' : '';
+        const rowrm = (c===tc.cols-1) ? '<span class="ta-cs-rowrm" title="Remove row" onclick="dprCs.tblRmRow(\''+sec.id+'\',\''+b.id+'\','+r+')">×</span>' : '';
+        tds += '<td class="'+(isHdr?'hdr':'')+'">'+colrm+rowrm+'<div class="cell" contenteditable="true" oninput="dprCs.tblCell(\''+sec.id+'\',\''+b.id+'\','+r+','+c+', this)">'+esc(tc.cells[r][c])+'</div></td>';
+      }
+      rows += '<tr class="'+(tc.zebra && r%2===1 ? 'zebra':'')+'">'+tds+'</tr>';
+    }
+    return '<div class="ta-cs-lbl">Table editor</div>'
+      + '<div class="ta-cs-tblctrl">'
+      +   '<label>Columns:</label><input type="number" min="1" max="10" value="'+tc.cols+'" onchange="dprCs.tblSize(\''+sec.id+'\',\''+b.id+'\',\'cols\', this.value)" />'
+      +   '<label>Rows:</label><input type="number" min="1" max="50" value="'+tc.rows+'" onchange="dprCs.tblSize(\''+sec.id+'\',\''+b.id+'\',\'rows\', this.value)" />'
+      +   '<button class="ta-cs-tbl-btn" onclick="dprCs.tblAddRow(\''+sec.id+'\',\''+b.id+'\')">+ Add row</button>'
+      +   '<button class="ta-cs-tbl-btn" onclick="dprCs.tblAddCol(\''+sec.id+'\',\''+b.id+'\')">+ Add column</button>'
+      + '</div>'
+      + '<table class="ta-cs-table">'+rows+'</table>'
+      + '<div class="ta-cs-tbltoggles">'
+      +   '<label><input type="checkbox" '+(tc.header?'checked':'')+' onchange="dprCs.tblToggle(\''+sec.id+'\',\''+b.id+'\',\'header\', this.checked)" /> First row is header</label>'
+      +   '<label><input type="checkbox" '+(tc.zebra?'checked':'')+' onchange="dprCs.tblToggle(\''+sec.id+'\',\''+b.id+'\',\'zebra\', this.checked)" /> Zebra stripes</label>'
+      + '</div>';
+  }
+
+  // ---- LIST ----
+  function listEditorHTML(sec, b){
+    const lc = b.content;
+    const items = (lc.items||[]).map((it, i) =>
+      '<div class="ta-cs-item" data-li="'+i+'" draggable="true" ondragstart="dprCs.liDragStart(event,\''+sec.id+'\',\''+b.id+'\','+i+')" ondragover="event.preventDefault()" ondrop="dprCs.liDrop(event,\''+sec.id+'\',\''+b.id+'\','+i+')">'
+      + '<span class="h" aria-hidden="true">⠿</span>'
+      + '<span class="bullet">'+(lc.style==='number' ? (i+1)+'.' : '•')+'</span>'
+      + '<input type="text" value="'+esc(it)+'" placeholder="List item..." oninput="dprCs.liInput(\''+sec.id+'\',\''+b.id+'\','+i+', this.value)" />'
+      + '<span class="rm" onclick="dprCs.liRemove(\''+sec.id+'\',\''+b.id+'\','+i+')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></span>'
+      + '</div>').join('');
+    return '<div class="ta-cs-lbl">List content</div>'
+      + '<div class="ta-cs-liststyle">'
+      +   '<button class="ta-cs-pill'+(lc.style!=='number'?' sel':'')+'" onclick="dprCs.liStyle(\''+sec.id+'\',\''+b.id+'\',\'bullet\')">● Bulleted</button>'
+      +   '<button class="ta-cs-pill'+(lc.style==='number'?' sel':'')+'" onclick="dprCs.liStyle(\''+sec.id+'\',\''+b.id+'\',\'number\')">① Numbered</button>'
+      + '</div>'
+      + '<div>'+items+'</div>'
+      + '<button class="ta-cs-additem" onclick="dprCs.liAdd(\''+sec.id+'\',\''+b.id+'\')"><i data-lucide="plus" style="width:12px;height:12px;"></i> Add item</button>';
+  }
+
+  // ---- FILE ----
+  function fileEditorHTML(sec, b){
+    const fc = b.content;
+    const chips = (fc.files||[]).map((f, i) =>
+      '<div class="ta-cs-filechip"><i data-lucide="file" style="width:16px;height:16px;color:#0F5EE8;"></i>'
+      + '<div style="min-width:0;"><div class="fn">'+esc(f.name)+'</div><div class="fs">'+fmtSize(f.size)+'</div><div class="prog"><div style="width:'+(f.done?100:0)+'%;"></div></div></div>'
+      + '<span class="rm" onclick="dprCs.fileRemove(\''+sec.id+'\',\''+b.id+'\','+i+')"><i data-lucide="x" style="width:14px;height:14px;"></i></span></div>').join('');
+    return '<div class="ta-cs-lbl">Annexure / supporting document</div>'
+      + '<input class="ta-cs-annlabel" type="text" value="'+esc(fc.label||'')+'" placeholder="e.g. Annexure A — Drawings" oninput="dprCs.fileLabel(\''+sec.id+'\',\''+b.id+'\', this.value)" />'
+      + '<div class="ta-cs-upzone" onclick="document.getElementById(\'fi-'+b.id+'\').click()" ondragover="event.preventDefault(); this.classList.add(\'drag\')" ondragleave="this.classList.remove(\'drag\')" ondrop="dprCs.fileDrop(event,\''+sec.id+'\',\''+b.id+'\')">'
+      +   '<i data-lucide="upload" style="width:28px;height:28px;color:#0F5EE8;"></i>'
+      +   '<div class="ut">Click to upload or drag and drop</div>'
+      +   '<div class="us">PDF, DOCX, XLSX, JPG, PNG — max 20MB</div>'
+      +   '<div class="us" style="color:#0F5EE8;">Browse files</div>'
+      +   '<input id="fi-'+b.id+'" type="file" multiple style="display:none;" onchange="dprCs.filePick(this,\''+sec.id+'\',\''+b.id+'\')" />'
+      + '</div>'
+      + chips
+      + '<textarea class="ta-cs-filedesc" placeholder="Description (optional)" oninput="dprCs.fileDesc(\''+sec.id+'\',\''+b.id+'\', this.value)">'+esc(fc.desc||'')+'</textarea>';
+  }
+  function fmtSize(n){ n=n||0; if (n<1024) return n+' B'; if (n<1048576) return (n/1024).toFixed(0)+' KB'; return (n/1048576).toFixed(1)+' MB'; }
+
+  // ---------- in-document inline editor ----------
+  let _pendingAnchor = null;   // {id, title, el} for the insertion popover
+  let _insertPop = null;       // popover element
+  function dDoc(){ return document.getElementById('dprDraftDoc'); }
+
+  function secHasContent(sec){
+    return (sec.blocks||[]).some(b => {
+      if (b.type==='text'){ return String(b.content||'').replace(/<[^>]+>/g,'').replace(/&nbsp;/g,' ').trim().length>0; }
+      if (b.type==='table'){ const tc=b.content; return !!(tc && (tc.cells||[]).some(r => (r||[]).some(c => String(c||'').trim()))); }
+      if (b.type==='list'){ const lc=b.content; return !!(lc && (lc.items||[]).some(i => String(i||'').trim())); }
+      if (b.type==='file'){ const fc=b.content; return !!(fc && ((fc.files||[]).length>0 || String(fc.label||'').trim())); }
+      return false;
+    });
+  }
+  function inlineValid(sec){ return String(sec.title||'').trim().length>=2 && secHasContent(sec); }
+  function inlineDirty(){
+    if (!_editing) return false;
+    const sec=_editing.sec;
+    if (_editing.mode==='new') return String(sec.title||'').trim().length>0 || secHasContent(sec);
+    const a=Object.assign({},sec), b=Object.assign({},_editing.snapshot);
+    delete a.step; delete b.step; delete a.collapsed; delete b.collapsed;
+    return JSON.stringify(a)!==JSON.stringify(b);
+  }
+  function updateSaveState(){
+    if (!_editing) return;
+    const btn=document.getElementById('dprCsInlineSave');
+    if (btn) btn.disabled = !inlineValid(_editing.sec);
+  }
+  function renderInlineEditor(){
+    if (!_editing || !_editing.hostEl) return;
+    const sec=_editing.sec, host=_editing.hostEl, isEdit=_editing.mode==='edit';
+    const lbl = isEdit ? 'EDIT CUSTOM SECTION' : 'NEW CUSTOM SECTION';
+    const saveLbl = isEdit ? 'Save changes' : 'Save section';
+    let discHtml;
+    if (isEdit) discHtml='<button type="button" class="ta-cs-inline-cancel" onclick="dprCs.inlineCancel()">Cancel</button>';
+    else if (_editing.discardConfirm) discHtml='<span class="ta-cs-inline-discwrap">Discard this section?<button type="button" class="yes" onclick="dprCs.inlineDiscardConfirm()">Yes</button><button type="button" class="no" onclick="dprCs.inlineDiscardCancel()">No</button></span>';
+    else discHtml='<button type="button" class="ta-cs-inline-cancel" onclick="dprCs.inlineDiscardStart()">Discard</button>';
+    host.innerHTML = '<div class="ta-cs-inline-label">'+lbl+'</div>'
+      + cardHTML(sec)
+      + '<div class="ta-cs-inline-footer">'+discHtml
+      +   '<button type="button" class="ta-cs-inline-save" id="dprCsInlineSave" onclick="dprCs.inlineSave()">'+saveLbl+'</button>'
+      + '</div>';
+    icons();
+    updateSaveState();
+  }
+  function mountHost(refEl, where){
+    const host=document.createElement('div');
+    host.className='ta-cs-inline';
+    if (where==='before') refEl.parentNode.insertBefore(host, refEl);
+    else if (where==='after') refEl.parentNode.insertBefore(host, refEl.nextSibling);
+    else { refEl.parentNode.insertBefore(host, refEl); refEl.parentNode.removeChild(refEl); }
+    return host;
+  }
+  function focusEditorTitle(host){ setTimeout(()=>{ const ti=host.querySelector('.ta-cs-title-in'); if(ti) ti.focus(); }, 60); }
+
+  function closeEditorSilently(){
+    if (!_editing) return;
+    if (_editing.mode==='edit'){ const sec=_editing.sec, snap=_editing.snapshot; Object.keys(sec).forEach(k=>{ if(!(k in snap)) delete sec[k]; }); Object.assign(sec, JSON.parse(JSON.stringify(snap))); }
+    if (_editing.hostEl && _editing.hostEl.parentNode) _editing.hostEl.parentNode.removeChild(_editing.hostEl);
+    _editing=null;
+    if (typeof window.renderDprDraftDoc==='function') window.renderDprDraftDoc();
+  }
+  // Only one editor open at a time — close current (with discard confirm if dirty), then run next().
+  function proceedAfterCloseEditor(next){
+    if (!_editing){ next(); return; }
+    if (!inlineDirty()){ closeEditorSilently(); next(); return; }
+    if (window.confirm('Discard the section you are currently editing?')){ closeEditorSilently(); next(); }
+  }
+
+  // ----- insertion-position popover -----
+  function _popOutside(e){ if (_insertPop && !_insertPop.contains(e.target)) closeInsertPopover(true); }
+  function _popKey(e){ if (e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); closeInsertPopover(true); } }
+  function closeInsertPopover(refocus){
+    if (!_insertPop) return;
+    const anchorEl = _pendingAnchor && _pendingAnchor.el;
+    _insertPop.remove(); _insertPop=null;
+    document.removeEventListener('mousedown', _popOutside, true);
+    document.removeEventListener('keydown', _popKey, true);
+    if (refocus && anchorEl){ const b=anchorEl.querySelector('.dpr-section-action-bar [data-act="add"]'); if (b) b.focus(); }
+  }
+  function openInsert(secEl){
+    closeInsertPopover(false);
+    const anchorId = secEl.getAttribute('data-sec-id');
+    if (!anchorId) return;
+    const anchorTitle = (secEl.querySelector('h3') ? secEl.querySelector('h3').textContent : 'section').trim();
+    _pendingAnchor = { id:anchorId, title:anchorTitle, el:secEl };
+    const pop=document.createElement('div');
+    pop.className='ta-cs-insert-pop';
+    pop.setAttribute('role','dialog');
+    pop.setAttribute('aria-label','Insert custom section relative to '+anchorTitle);
+    pop.innerHTML = '<button type="button" data-pos="above"><i data-lucide="arrow-up" style="width:13px;height:13px;"></i> Insert above this section</button>'
+      + '<button type="button" data-pos="below"><i data-lucide="arrow-down" style="width:13px;height:13px;"></i> Insert below this section</button>';
+    secEl.appendChild(pop);
+    _insertPop=pop;
+    pop.querySelectorAll('button').forEach(b => b.addEventListener('click', (e)=>{ e.stopPropagation(); insertChoose(b.getAttribute('data-pos')); }));
+    icons();
+    setTimeout(()=>{ const f=pop.querySelector('button'); if (f) f.focus(); }, 0);
+    setTimeout(()=>{ document.addEventListener('mousedown', _popOutside, true); document.addEventListener('keydown', _popKey, true); }, 0);
+  }
+  function insertChoose(position){
+    const anchor=_pendingAnchor;
+    closeInsertPopover(false);
+    if (!anchor) return;
+    beginAdd(anchor.id, position);
+  }
+  function beginAdd(anchorId, position){
+    proceedAfterCloseEditor(function(){
+      const doc=dDoc(); if (!doc) return;
+      const anchorEl=doc.querySelector('[data-sec-id="'+anchorId+'"]'); if (!anchorEl) return;
+      const sec={ id:uid('custom'), anchorSectionId:anchorId, position:position, order:0, title:'', collapsed:false, blocks:[newBlock('text')], step:'__inline' };
+      const host=mountHost(anchorEl, position==='above' ? 'before' : 'after');
+      _editing={ mode:'new', sec:sec, hostEl:host, editingId:sec.id, origStep:undefined, snapshot:null, discardConfirm:false };
+      host.addEventListener('input', updateSaveState);
+      renderInlineEditor();
+      requestAnimationFrame(()=>host.classList.add('show'));
+      focusEditorTitle(host);
+    });
+  }
+  function beginEdit(secElId){
+    proceedAfterCloseEditor(function(){
+      const sec=state().find(s=>s.id===secElId); if (!sec) return;
+      const doc=dDoc(); const el=doc && doc.querySelector('[data-cs-doc="'+secElId+'"]'); if (!el) return;
+      const snapshot=JSON.parse(JSON.stringify(sec));
+      const origStep=sec.step;
+      sec.step='__inline'; sec.collapsed=false;
+      const host=mountHost(el, 'replace');
+      _editing={ mode:'edit', sec:sec, snapshot:snapshot, hostEl:host, editingId:secElId, origStep:origStep, discardConfirm:false };
+      host.addEventListener('input', updateSaveState);
+      renderInlineEditor();
+      requestAnimationFrame(()=>host.classList.add('show'));
+      focusEditorTitle(host);
+    });
+  }
+  function inlineCommit(){
+    if (!_editing || !inlineValid(_editing.sec)) return;
+    const ed=_editing, sec=ed.sec, host=ed.hostEl;
+    host.classList.add('committing');
+    setTimeout(()=>{
+      if (ed.mode==='new'){
+        delete sec.step; delete sec.stepLabel;
+        const same=state().filter(s => s.anchorSectionId===sec.anchorSectionId && (s.position||'below')===(sec.position||'below'));
+        sec.order=same.length;
+        state().push(sec);
+      } else {
+        if (ed.origStep==null) delete sec.step; else sec.step=ed.origStep;
+      }
+      _editing=null;
+      save();
+      if (typeof window.renderDprDraftDoc==='function') window.renderDprDraftDoc();
+      if (typeof showToast==='function') showToast(ed.mode==='edit' ? 'Custom section updated' : 'Custom section added');
+    }, 300);
+  }
+
+  // ---------- public API (dprCs.*) ----------
+  const api = {
+    // ----- inline-editor entry points (called from the document action bar) -----
+    openInsert(secEl){ openInsert(secEl); },
+    editCustom(secEl){ beginEdit(secEl.getAttribute('data-cs-doc')); },
+    deleteCustom(secEl){ const id=secEl.getAttribute('data-cs-doc'); if(!id) return; if(_editing && _editing.editingId===id){ if(_editing.hostEl&&_editing.hostEl.parentNode) _editing.hostEl.parentNode.removeChild(_editing.hostEl); _editing=null; } const arr=state(); const i=arr.findIndex(s=>s.id===id); if(i>=0) arr.splice(i,1); save(); if(typeof window.renderDprDraftDoc==='function') window.renderDprDraftDoc(); if(typeof showToast==='function') showToast('Custom section deleted'); },
+    syncAnchorFromDom(secEl){ const id=secEl.getAttribute('data-cs-doc'); if(!id) return; const sec=state().find(s=>s.id===id); if(!sec) return;
+      let prev=secEl.previousElementSibling; while(prev && !prev.classList.contains('dpr-doc-section')) prev=prev.previousElementSibling;
+      let next=secEl.nextElementSibling; while(next && !next.classList.contains('dpr-doc-section')) next=next.nextElementSibling;
+      if (prev && prev.getAttribute('data-sec-id')){ sec.anchorSectionId=prev.getAttribute('data-sec-id'); sec.position='below'; }
+      else if (next && next.getAttribute('data-sec-id')){ sec.anchorSectionId=next.getAttribute('data-sec-id'); sec.position='above'; }
+      if (sec.anchorSectionId){ delete sec.step; delete sec.stepLabel; sec.order=0; save(); } },
+    inlineSave(){ inlineCommit(); },
+    inlineDiscardStart(){ if(_editing){ _editing.discardConfirm=true; renderInlineEditor(); } },
+    inlineDiscardCancel(){ if(_editing){ _editing.discardConfirm=false; renderInlineEditor(); } },
+    inlineDiscardConfirm(){ if(_editing && _editing.mode==='new'){ if(_editing.hostEl&&_editing.hostEl.parentNode) _editing.hostEl.parentNode.removeChild(_editing.hostEl); _editing=null; } },
+    inlineCancel(){ if(_editing && _editing.mode==='edit'){ const sec=_editing.sec, snap=_editing.snapshot; Object.keys(sec).forEach(k=>{ if(!(k in snap)) delete sec[k]; }); Object.assign(sec, JSON.parse(JSON.stringify(snap))); _editing=null; save(); if(typeof window.renderDprDraftDoc==='function') window.renderDprDraftDoc(); } },
+    setTitle(id, v){ const s=findSec(id); if(s){ s.title=v; save(); const card=document.querySelector('[data-section-id="'+id+'"]'); if(card) card.setAttribute('aria-label','Custom section: '+(v||'Untitled')); } },
+    toggleCollapse(id){ const s=findSec(id); if(s){ s.collapsed=!s.collapsed; save(); renderStep(s.step); } },
+    removeStart(id){ _rmConfirm=id; const s=findSec(id); if(s) renderStep(s.step); },
+    removeCancel(){ const id=_rmConfirm; _rmConfirm=null; const s=findSec(id); if(s) renderStep(s.step); },
+    removeConfirm(id){ _rmConfirm=null;
+      if (_editing && _editing.sec.id===id){
+        if (_editing.mode==='edit'){ const arr=state(); const i=arr.findIndex(x=>x.id===id); if(i>=0) arr.splice(i,1); if(_editing.hostEl&&_editing.hostEl.parentNode) _editing.hostEl.parentNode.removeChild(_editing.hostEl); _editing=null; save(); if(typeof window.renderDprDraftDoc==='function') window.renderDprDraftDoc(); if(typeof showToast==='function') showToast('Custom section deleted'); }
+        else { if(_editing.hostEl&&_editing.hostEl.parentNode) _editing.hostEl.parentNode.removeChild(_editing.hostEl); _editing=null; }
+        return;
+      }
+      const s=findSec(id); if(!s) return; const arr=state(); arr.splice(arr.indexOf(s),1); save(); if(typeof window.renderDprDraftDoc==='function') window.renderDprDraftDoc(); },
+    addBlock(id){ const s=findSec(id); if(s){ s.blocks.push(newBlock('text')); save(); renderStep(s.step); } },
+    removeBlock(id, bid){ const s=findSec(id); if(s){ s.blocks=s.blocks.filter(b=>b.id!==bid); if(!s.blocks.length) s.blocks.push(newBlock('text')); save(); renderStep(s.step); } },
+    setType(id, bid, type){ const s=findSec(id); const b=s&&findBlock(s,bid); if(b && b.type!==type){ Object.assign(b, newBlock(type)); b.id=bid; save(); renderStep(s.step); } },
+    // text
+    exec(id, bid, cmd){ const ce=document.getElementById('ce-'+bid); if(!ce) return; ce.focus();
+      if (cmd==='__h2'){ document.execCommand('formatBlock', false, 'h2'); }
+      else if (cmd==='__hr'){ document.execCommand('insertHorizontalRule'); }
+      else { document.execCommand(cmd, false, null); }
+      api.textInput(id, bid, ce); },
+    textInput(id, bid, el){ const s=findSec(id); const b=s&&findBlock(s,bid); if(b){ b.content=el.innerHTML; const cc=document.getElementById('cc-'+bid); if(cc) cc.textContent=(el.innerText||'').length+' characters'; save(); } },
+    paste(e, id, bid){ e.preventDefault(); const cd=e.clipboardData||window.clipboardData; const html=cd.getData('text/html'); let out;
+      if (html) out=sanitizeHtml(html); else out=esc(cd.getData('text/plain')).replace(/\n/g,'<br>');
+      document.execCommand('insertHTML', false, out); const ce=document.getElementById('ce-'+bid); if(ce) api.textInput(id, bid, ce); },
+    aiOpen(id, bid){ const box=document.getElementById('aibox-'+bid); if(!box) return;
+      if (box.innerHTML){ box.innerHTML=''; return; }
+      box.innerHTML='<div class="ta-cs-ai-box"><span style="font-size:11px;color:#374151;">What do you want to add or improve?</span><input type="text" id="aip-'+bid+'" placeholder="e.g. add a standard clause" /><button class="gen" onclick="dprCs.aiGen(\''+id+'\',\''+bid+'\')">Generate</button></div>'; const inp=document.getElementById('aip-'+bid); if(inp) inp.focus(); },
+    aiGen(id, bid){ const s=findSec(id); const b=s&&findBlock(s,bid); if(!b) return; const txt=aiSuggest(s.title);
+      const ce=document.getElementById('ce-'+bid); if(ce){ ce.innerHTML += (ce.innerHTML?'<br>':'') + '<p>'+esc(txt)+'</p>'; api.textInput(id, bid, ce); } const box=document.getElementById('aibox-'+bid); if(box) box.innerHTML=''; if(typeof showToast==='function') showToast('AI suggestion added'); },
+    // table
+    tblSize(id, bid, dim, v){ const s=findSec(id); const b=s&&findBlock(s,bid); if(!b) return; let n=parseInt(v,10)||1; n=Math.max(1, Math.min(dim==='cols'?10:50, n)); b.content[dim]=n; tableEnsure(b.content); save(); renderStep(s.step); },
+    tblAddRow(id, bid){ const s=findSec(id); const b=s&&findBlock(s,bid); if(!b) return; b.content.rows++; tableEnsure(b.content); save(); renderStep(s.step); },
+    tblAddCol(id, bid){ const s=findSec(id); const b=s&&findBlock(s,bid); if(!b) return; b.content.cols++; tableEnsure(b.content); save(); renderStep(s.step); },
+    tblRmRow(id, bid, r){ const s=findSec(id); const b=s&&findBlock(s,bid); if(!b||b.content.rows<=1) return; b.content.cells.splice(r,1); b.content.rows--; save(); renderStep(s.step); },
+    tblRmCol(id, bid, c){ const s=findSec(id); const b=s&&findBlock(s,bid); if(!b||b.content.cols<=1) return; b.content.cells.forEach(row=>row.splice(c,1)); b.content.cols--; save(); renderStep(s.step); },
+    tblCell(id, bid, r, c, el){ const s=findSec(id); const b=s&&findBlock(s,bid); if(b){ tableEnsure(b.content); b.content.cells[r][c]=el.innerText; save(); } },
+    tblToggle(id, bid, key, on){ const s=findSec(id); const b=s&&findBlock(s,bid); if(b){ b.content[key]=!!on; save(); renderStep(s.step); } },
+    // list
+    liStyle(id, bid, st){ const s=findSec(id); const b=s&&findBlock(s,bid); if(b){ b.content.style=st; save(); renderStep(s.step); } },
+    liInput(id, bid, i, v){ const s=findSec(id); const b=s&&findBlock(s,bid); if(b){ b.content.items[i]=v; save(); } },
+    liAdd(id, bid){ const s=findSec(id); const b=s&&findBlock(s,bid); if(b){ b.content.items.push(''); save(); renderStep(s.step); } },
+    liRemove(id, bid, i){ const s=findSec(id); const b=s&&findBlock(s,bid); if(b){ b.content.items.splice(i,1); if(!b.content.items.length) b.content.items.push(''); save(); renderStep(s.step); } },
+    liDragStart(e, id, bid, i){ _dragListCtx={id,bid,i}; if(e.dataTransfer) e.dataTransfer.effectAllowed='move'; },
+    liDrop(e, id, bid, i){ e.preventDefault(); if(!_dragListCtx||_dragListCtx.id!==id||_dragListCtx.bid!==bid) return; const s=findSec(id); const b=s&&findBlock(s,bid); if(!b) return; const arr=b.content.items; const from=_dragListCtx.i; arr.splice(i,0,arr.splice(from,1)[0]); _dragListCtx=null; save(); renderStep(s.step); },
+    // file
+    fileLabel(id, bid, v){ const s=findSec(id); const b=s&&findBlock(s,bid); if(b){ b.content.label=v; save(); } },
+    fileDesc(id, bid, v){ const s=findSec(id); const b=s&&findBlock(s,bid); if(b){ b.content.desc=v; save(); } },
+    fileRemove(id, bid, i){ const s=findSec(id); const b=s&&findBlock(s,bid); if(b){ b.content.files.splice(i,1); save(); renderStep(s.step); } },
+    filePick(input, id, bid){ handleFiles(input.files, id, bid); input.value=''; },
+    fileDrop(e, id, bid){ e.preventDefault(); e.currentTarget.classList.remove('drag'); handleFiles(e.dataTransfer.files, id, bid); },
+  };
+  window.dprCs = api;
+
+  function handleFiles(fileList, id, bid){
+    const s=findSec(id); const b=s&&findBlock(s,bid); if(!b) return;
+    Array.from(fileList||[]).forEach(file => {
+      if (file.size > 20*1024*1024){ if(typeof showToast==='function') showToast(file.name+' exceeds 20MB'); return; }
+      const reader=new FileReader();
+      reader.onload=function(){ b.content.files.push({ name:file.name, size:file.size, dataUrl:reader.result, done:false }); save(); renderStep(s.step);
+        setTimeout(()=>{ const f=b.content.files[b.content.files.length-1]; if(f){ f.done=true; save(); } const chips=document.querySelectorAll('[data-block-id="'+bid+'"] .ta-cs-filechip .prog > div'); if(chips.length){ chips[chips.length-1].style.width='100%'; } }, 60);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function sanitizeHtml(html){
+    const allowed={B:1,STRONG:1,I:1,EM:1,U:1,UL:1,OL:1,LI:1,P:1,BR:1,TABLE:1,TR:1,TD:1,TH:1,H2:1};
+    let doc; try { doc=new DOMParser().parseFromString(html,'text/html'); } catch(e){ return esc(html.replace(/<[^>]+>/g,'')); }
+    doc.querySelectorAll('style,script').forEach(n=>n.remove());
+    let guard=0;
+    let changed=true;
+    while (changed && guard++<500){
+      changed=false;
+      const all=doc.body.querySelectorAll('*');
+      for (let i=0;i<all.length;i++){ const el=all[i];
+        Array.from(el.attributes).forEach(a=>el.removeAttribute(a.name));
+        if (!allowed[el.tagName]){ const p=el.parentNode; while(el.firstChild) p.insertBefore(el.firstChild, el); p.removeChild(el); changed=true; break; }
+      }
+    }
+    return doc.body.innerHTML;
+  }
+
+  // ---------- Check DPR Draft document injection ----------
+  function docSectionHTML(sec){
+    const title = (sec.title||'Custom Section').toUpperCase();
+    const body = (sec.blocks||[]).map(docBlockHTML).join('');
+    return '<section class="dpr-doc-section custom" data-cs-doc="'+sec.id+'" data-sec-id="'+sec.id+'"><h3>'+esc(title)+'</h3>'+body+'</section>';
+  }
+  function docBlockHTML(b){
+    if (b.type==='text'){ const c=b.content||''; return c ? '<div class="nit-para">'+sanitizeHtml(c)+'</div>' : ''; }
+    if (b.type==='table'){ const tc=b.content; if(!tc) return ''; tableEnsure(tc); let rows='';
+      for (let r=0;r<tc.rows;r++){ let cells='';
+        for (let c=0;c<tc.cols;c++){ const tag=(tc.header&&r===0)?'th':'td'; cells+='<'+tag+'>'+esc(tc.cells[r][c]||'')+'</'+tag+'>'; }
+        rows+='<tr>'+cells+'</tr>'; }
+      return '<table class="cs-doc-table">'+rows+'</table>'; }
+    if (b.type==='list'){ const lc=b.content; const tag=lc.style==='number'?'ol':'ul'; const items=(lc.items||[]).filter(x=>x.trim()).map(x=>'<li>'+esc(x)+'</li>').join(''); return items?'<'+tag+' class="formal-list">'+items+'</'+tag+'>':''; }
+    if (b.type==='file'){ const fc=b.content; const lbl=fc.label||'Annexure'; return (fc.files||[]).map(f=>'<div class="cs-doc-file">📎 '+esc(lbl)+' — '+esc(f.name)+' (attached)</div>').join('') || (fc.label?'<div class="cs-doc-file">📎 '+esc(fc.label)+' (no file attached)</div>':''); }
+    return '';
+  }
+  window.dprCsInjectIntoDoc = function(docEl){
+    docEl = docEl || document.getElementById('dprDraftDoc');
+    if (!docEl) return;
+    docEl.querySelectorAll('.dpr-doc-section.custom, [data-cs-doc]').forEach(n=>n.remove());
+    // Assign stable ids to the fixed document sections (anchor targets for new-schema customs).
+    docEl.querySelectorAll('.dpr-doc-section:not(.custom)').forEach((s,i)=>{ s.setAttribute('data-sec-id','section-'+(i+1)); });
+
+    const all = state().filter(s => !(_editing && _editing.editingId === s.id)); // skip a section being inline-edited
+    const legacy = all.filter(s => !s.anchorSectionId && s.step != null); // backward-compat: old step-anchored entries → render at end
+    const newSchema = all.filter(s => s.anchorSectionId);
+
+    // ---- new-schema custom sections anchored to a document section ----
+    const orphans = [];
+    const groups = {};
+    newSchema.forEach(sec => { const k = sec.anchorSectionId + '||' + (sec.position === 'above' ? 'above' : 'below'); (groups[k] = groups[k] || []).push(sec); });
+    Object.keys(groups).forEach(k => {
+      const arr = groups[k].sort((a,b)=>(a.order||0)-(b.order||0));
+      const sep = k.lastIndexOf('||');
+      const anchorId = k.slice(0, sep), pos = k.slice(sep+2);
+      const html = arr.map(docSectionHTML).join('');
+      const anchor = docEl.querySelector('[data-sec-id="'+anchorId+'"]');
+      if (!anchor){ orphans.push(html); return; }   // anchor cleared/removed → fall back to end of document
+      anchor.insertAdjacentHTML(pos === 'above' ? 'beforebegin' : 'afterend', html);
+    });
+
+    // ---- backward compatibility: legacy step-anchored entries render at the END (not migrated/deleted) ----
+    const legacyHtml = legacy.sort((a,b)=>(a.order||0)-(b.order||0)).map(docSectionHTML).join('');
+
+    const endHtml = orphans.join('') + legacyHtml;
+    if (endHtml){ const footer = docEl.querySelector('.doc-footer'); if (footer) footer.insertAdjacentHTML('beforebegin', endHtml); else docEl.insertAdjacentHTML('beforeend', endHtml); }
+  };
+
+  // ---------- init ----------
+  function init(){ load(); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
 </script>
 <script>(function(){var b=document.getElementById("avatarBtn"),m=document.getElementById("avatarMenu");if(!b||!m)return;b.addEventListener("click",function(e){e.stopPropagation();m.classList.toggle("hidden");});document.addEventListener("click",function(e){if(!m.contains(e.target)&&!b.contains(e.target))m.classList.add("hidden");});document.addEventListener("keydown",function(e){if(e.key==="Escape")m.classList.add("hidden");});if(window.lucide)lucide.createIcons();})();</script>
 </body>

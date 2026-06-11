@@ -170,11 +170,11 @@ tailwind.config = { theme: { extend: {
 const SECTIONS = [
   // group, key, title, icon, subtitle, intro
   // OVERVIEW
-  { g:'OVERVIEW', k:'dashboard', t:'Dashboard',           i:'layout-dashboard', s:'149 settings · 16 sections', intro:'A single place to choose how every part of the procurement portal behaves. Tick what matters, leave the rest with sensible defaults.' },
+  { g:'OVERVIEW', k:'dashboard', t:'Dashboard',           i:'layout-dashboard', s:'143 settings · 16 sections', intro:'A single place to choose how every part of the procurement portal behaves. Tick what matters, leave the rest with sensible defaults.' },
 
   // MODULE POLICIES
   { g:'MODULE POLICIES', k:'dpr',     t:'DPR Creation',         i:'file-text',   s:'15 settings · 3 groups',  intro:'Policies that govern Detailed Project Report creation, approval pipeline, and AA/TS lifecycle.' },
-  { g:'MODULE POLICIES', k:'tender',  t:'Tender Creation',      i:'file-edit',   s:'19 settings · 7 groups',  intro:'Defaults and rules for NIT creation, PQ/TQ libraries, pre-checks, and publish workflow.' },
+  { g:'MODULE POLICIES', k:'tender',  t:'Tender Creation',      i:'file-edit',   s:'13 settings · 8 groups',  intro:'Defaults and rules for NIT creation, PQ/TQ libraries, pre-checks, and publish workflow.' },
   { g:'MODULE POLICIES', k:'prebid',  t:'Pre-Bid Queries',      i:'message-square-quote', s:'15 settings · 1 group',  intro:'Query intake, AI behaviour, standard responses, corrigendum workflow.' },
   { g:'MODULE POLICIES', k:'eval',    t:'Bid Evaluation',       i:'gavel',       s:'28 settings · 7 groups · most important',  intro:'The densest configuration surface in the portal — PQ verdicts, TQ scoring rubric, 5 evaluation methods, reasonableness check, committee rules, financial reveal flow.' },
   { g:'MODULE POLICIES', k:'mgmt',    t:'Bid Management',       i:'briefcase',   s:'22 settings · 6 groups',  intro:'Stage gates, committee verdicts, negotiation triggers, award recommendation, LoA.' },
@@ -210,9 +210,9 @@ const SECTIONS = [
 const ITEMS = [
   /* ====== DPR CREATION ====== */
   // 1A
-  {id:'dpr.committee', m:'dpr', s:'1 · Committee', p:'Core', t:'prebid-committee',
-    title:'DPR Committee — members, designations & permissions',
-    why:'Committee involved in creating, reviewing, and approving Detailed Project Reports under the Indian govt procurement framework (AA & TS workflow).',
+  {id:'dpr.committee', m:'dpr', s:'1 · Role Management', p:'Core', t:'prebid-committee',
+    title:'DPR Role Management — members, designations & permissions',
+    why:'Role management for the DPR committee — who can create, review and approve Detailed Project Reports under the Indian govt procurement framework (AA & TS workflow), and exactly what each member may do.',
     def:{
       designations:[
         {label:'Project Engineer (Drafter)', enabled:true},
@@ -306,10 +306,13 @@ const ITEMS = [
     title:'Site-visit notes requirements',
     why:'Audit baseline; officers can\'t guess.',
     def:[{k:'Min photos – Works',v:'6'},{k:'Min photos – Goods',v:'2'},{k:'Mandatory measurements',v:'true'}]},
-  {id:'dpr.market-enquiry', m:'dpr', s:'1B · Templates, BOQ & libraries', p:'Core', t:'kvlist',
-    title:'Market enquiry log structure',
-    why:'Cost-basis audit; format must not drift.',
-    def:[{k:'Minimum quotes',v:'3'},{k:'Required columns',v:'vendor, quote, date, source'},{k:'Max age of quote (days)',v:'90'}]},
+  {id:'dpr.market-enquiry', m:'dpr', s:'1B · Templates, BOQ & libraries', p:'Core', t:'market-enquiry',
+    title:'Market enquiry — log structure & rules',
+    why:'Cost-basis audit. The log structure (above) defines the format; the Rules (below) set how many quotes, validity, acceptance basis, the value threshold above which enquiry is mandatory, and the spread that flags a quote set for review.',
+    def:{
+      logStructure:[{k:'Required columns',v:'vendor, quote, date, source'},{k:'Attachment required',v:'true'}],
+      rules:{minQuotes:3, validityDays:90, acceptanceBasis:'lowest', mandatoryAbove:null, deviationPct:25}
+    }},
   // 1C
   {id:'dpr.version-limit', m:'dpr', s:'1C · Quality controls', p:'Optional', t:'number',
     title:'Version-history limit',
@@ -323,17 +326,147 @@ const ITEMS = [
     title:'AI Readiness Check rules',
     why:'AI is making a quality judgement; criteria must be policy.',
     def:['Completeness ≥ 90%','BOQ matches scope','All approvals captured','Market enquiry present','Site visit logged']},
-  {id:'dpr.competency-precheck', m:'dpr', s:'1C · Quality controls', p:'Core', t:'toggle',
-    title:'Competency-authority pre-check enabled',
-    why:'Already org policy — wire it into the DPR form so it shows live.',
-    def:true},
+  // dpr.competency-precheck removed — absorbed as a blocking row in dpr.submission-gates (AA set).
+
+  // 1D · Entry modes & AI assistance
+  {id:'dpr.smart-start', m:'dpr', s:'1D · Entry modes & AI assistance', p:'Core', t:'matrix',
+    title:'Entry modes by officer type',
+    why:'Which DPR entry modes each officer type may use. Disabled modes render greyed-with-reason on the Start screen, never hidden. Clone is gated here as well as by Clone-past-DPR scope.',
+    def:{rows:['Manual entry','AI describe','Upload document','Clone past DPR'], cols:['New','Standard','Sensitive'], cells:{'0_1':true,'0_2':true,'1_0':true,'1_1':true,'1_2':true,'2_1':true,'2_2':true,'3_0':true,'3_1':true,'3_2':true}}},
+  {id:'dpr.ai-questionnaire', m:'dpr', s:'1D · Entry modes & AI assistance', p:'Core', t:'ai-questionnaire',
+    title:'AI describe — structured follow-up questions',
+    why:'Guided questions after the DPR describe conversation. Pills can sync from tiers.def, the sector tree, or dpr.funding-sources.',
+    def:[
+      {id:'dq-cost', question:'Estimated project cost?', order:1, inputType:'pills', sourceRef:'tiers.def', pills:[], required:true, enabled:true, skipIf:null, integration:'classifier-feed'},
+      {id:'dq-sector', question:'Sector', order:2, inputType:'pills', sourceRef:'tender.tree', pills:[], required:true, enabled:true, skipIf:null, integration:'classifier-feed'},
+      {id:'dq-funding', question:'Funding source', order:3, inputType:'pills', sourceRef:'dpr.funding-sources', pills:[], required:false, enabled:true, skipIf:null, integration:null},
+      {id:'dq-priority', question:'Priority', order:4, inputType:'pills', pills:[{label:'Routine',value:'routine'},{label:'Priority',value:'priority'},{label:'Emergency',value:'emergency'}], required:false, enabled:true, skipIf:null, integration:null},
+      {id:'dq-site', question:'Site visit needed', order:5, inputType:'pills', pills:[{label:'Yes',value:'yes'},{label:'No',value:'no'},{label:'Not sure',value:'unknown'}], required:false, enabled:false, skipIf:null, integration:null},
+      {id:'dq-period', question:'Expected completion period', order:6, inputType:'pills', pills:[{label:'<6 months',value:'lt6'},{label:'6–12 months',value:'6-12'},{label:'>12 months',value:'gt12'}], required:false, enabled:false, skipIf:null, integration:null},
+      {id:'dq-drawings', question:'Drawings available', order:7, inputType:'pills', pills:[{label:'Yes',value:'yes'},{label:'No',value:'no'}], required:false, enabled:false, skipIf:null, integration:null},
+    ]},
+  {id:'dpr.ai-touchpoints', m:'dpr', s:'1D · Entry modes & AI assistance', p:'Core', t:'ai-touchpoints',
+    title:'AI assistance — where it’s on and off',
+    why:'One control deciding where AI participates across DPR creation. The portal reads this before rendering any AI affordance: Off = nothing renders; On-demand = button only; Proactive = unprompted suggestions. The master switch suppresses everything when off — for emergency or vigilance-sensitive DPRs needing a human-only trail. Whether the AI Readiness Check blocks submission is governed by Submission gates & policies, not here.',
+    def:{
+      master:true,
+      touchpoints:[
+        {id:'entry-describe',     stage:'Entry',    kind:'suggestion', mode:'proactive', name:'AI describe entry',                  desc:'The “Describe what you need” option on the DPR Start screen.', restrict:{sensitive:false, maxValue:null}},
+        {id:'entry-questionnaire',stage:'Entry',    kind:'suggestion', mode:'proactive', name:'AI follow-up questionnaire',         desc:'Structured follow-up questions after the describe conversation.', restrict:{sensitive:false, maxValue:null}},
+        {id:'entry-autofill',     stage:'Entry',    kind:'suggestion', mode:'proactive', name:'Field auto-fill from describe',       desc:'Pre-fills DPR fields (title, sector, cost) from the describe conversation.', restrict:{sensitive:false, maxValue:null}},
+        {id:'draft-scope',        stage:'Drafting', kind:'suggestion', mode:'ondemand', name:'Scope-of-work suggestions',           desc:'Suggests scope statements while drafting the DPR.', restrict:{sensitive:false, maxValue:null}},
+        {id:'draft-boq',          stage:'Drafting', kind:'suggestion', mode:'ondemand', name:'BOQ item suggestions',                desc:'Proposes Bill-of-Quantities line items from the DSR-linked library.', restrict:{sensitive:false, maxValue:null}},
+        {id:'draft-market',       stage:'Drafting', kind:'suggestion', mode:'ondemand', name:'Market-enquiry summary',              desc:'Summarises collected quotations into a cost-basis note.', restrict:{sensitive:false, maxValue:null}},
+        {id:'draft-cost',         stage:'Drafting', kind:'suggestion', mode:'ondemand', name:'Cost-estimate suggestion',            desc:'Suggests an estimate from rate sources within the configured tolerance.', restrict:{sensitive:false, maxValue:null}},
+        {id:'review-readiness',   stage:'Review',   kind:'check',      mode:'on',  name:'AI Readiness Check',                       desc:'Runs the configured readiness rules over the DPR before submission.', restrict:{sensitive:false, maxValue:null}},
+      ],
+    }},
+  {id:'dpr.languages', m:'dpr', s:'1D · Entry modes & AI assistance', p:'Helpful', t:'lang-toggles',
+    title:'Languages enabled',
+    why:'Languages the DPR may be authored / issued in; pick a default from the enabled ones.',
+    def:{
+      languages:[
+        {label:'English', enabled:true},  {label:'Hindi', enabled:true},   {label:'Marathi', enabled:true},
+        {label:'Gujarati', enabled:false},{label:'Bengali', enabled:false},{label:'Tamil', enabled:false},
+        {label:'Telugu', enabled:false},  {label:'Kannada', enabled:false},{label:'Malayalam', enabled:false},
+        {label:'Odia', enabled:false},    {label:'Punjabi', enabled:false},{label:'Urdu', enabled:false},
+        {label:'Assamese', enabled:false},
+      ],
+      default:'English'
+    }},
+
+  // 1E · Submission gates & policies
+  {id:'dpr.submission-gates', m:'dpr', s:'1E · Submission gates & policies', p:'Core', t:'submission-gates',
+    title:'Pre-submission gates (AA & TS)',
+    why:'Checklists that must be satisfied before Administrative Approval (AA) and Technical Sanction (TS) submission. Each row: blocking or advisory, whether override is allowed, and by which roles. Absorbs the old competency pre-check as an AA row.',
+    def:{
+      aa:[
+        {check:'Scope of work complete', blocking:true, canOverride:false, overrideRoles:[]},
+        {check:'BOQ complete', blocking:true, canOverride:false, overrideRoles:[]},
+        {check:'Cost estimate with valid basis', blocking:true, canOverride:false, overrideRoles:[]},
+        {check:'Budget head verified', blocking:true, canOverride:true, overrideRoles:['HOD']},
+        {check:'Market enquiry done per rules', blocking:true, canOverride:true, overrideRoles:['HOD']},
+        {check:'Competent authority verified for value tier', blocking:true, canOverride:false, overrideRoles:[]},
+        {check:'Site visit logged', blocking:false, canOverride:false, overrideRoles:[]},
+        {check:'GeM check done', blocking:true, canOverride:false, overrideRoles:[]},
+        {check:'AI Readiness passed', blocking:false, canOverride:false, overrideRoles:[]},
+      ],
+      ts:[
+        {check:'AA granted', blocking:true, canOverride:false, overrideRoles:[]},
+        {check:'Drawings attached per policy', blocking:true, canOverride:true, overrideRoles:['Chief Engineer']},
+        {check:'Technical specifications complete', blocking:true, canOverride:false, overrideRoles:[]},
+      ],
+    }},
+  {id:'dpr.cost-basis', m:'dpr', s:'1E · Submission gates & policies', p:'Core', t:'cost-basis',
+    title:'Estimate rate sources & tolerance',
+    why:'The DPR-side twin of the ALB reasonableness threshold — what AA authorities scrutinise. Rate sources are ordered by priority; the estimate may deviate from the top-priority source up to the tolerance before justification is required.',
+    def:{
+      sources:[
+        {label:'State Schedule of Rates / DSR', enabled:true},
+        {label:'GeM price reference', enabled:true},
+        {label:'Market enquiry average', enabled:true},
+        {label:'Consultant estimate', enabled:false},
+        {label:'Past tender rates', enabled:false},
+      ],
+      tolerancePct:15,
+      justifyMandatory:true
+    }},
+  {id:'dpr.budget-heads', m:'dpr', s:'1E · Submission gates & policies', p:'Core', t:'budget-heads',
+    title:'Budget head registry & validation',
+    why:'The budget heads a DPR may be charged to, and how strictly the head is validated before AA submission.',
+    def:{
+      heads:[
+        {label:'Capital Works', code:'CW-100', enabled:true},
+        {label:'Revenue O&M', code:'RM-200', enabled:true},
+        {label:'IT & e-Governance', code:'IT-300', enabled:true},
+        {label:'Water Supply Capital', code:'WS-400', enabled:true},
+        {label:'SJMMSVY / State Grant', code:'SG-500', enabled:true},
+        {label:'Urban Transport', code:'UT-600', enabled:false},
+      ],
+      validation:'Blocking',
+      minBalanceRule:{enabled:false, pct:100}
+    }},
+  {id:'dpr.emergency-policy', m:'dpr', s:'1E · Submission gates & policies', p:'Core', t:'emergency-policy',
+    title:'Emergency fast-track policy',
+    why:'Emergency marking bypasses scrutiny and is a standing audit finding — this item is the audit trail. Only advisory AA gates may be skipped; blocking gates can never be skipped.',
+    def:{
+      markRoles:['Commissioner','HOD'],
+      justify:{lockedOn:true, minWords:30},
+      skippableGates:['Site visit logged'],
+      postFactoDays:7
+    }},
+  {id:'dpr.handoff-rules', m:'dpr', s:'1E · Submission gates & policies', p:'Core', t:'handoff-rules',
+    title:'DPR → Tender handoff',
+    why:'What auto-populates a tender when it is created from a sanctioned DPR, and what happens for unsanctioned DPRs. Production must use Hard block for unsanctioned DPRs.',
+    def:{
+      carryForward:[
+        {label:'Estimated cost (EC)', enabled:true},
+        {label:'Sector / classification', enabled:true},
+        {label:'BOQ', enabled:true},
+        {label:'Scope of work', enabled:true},
+        {label:'Drawings & attachments', enabled:true},
+        {label:'Funding source', enabled:true},
+        {label:'Market-enquiry summary', enabled:false},
+      ],
+      unsanctioned:'Hard block',
+      editAfterHandoff:false
+    }},
+  {id:'dpr.consultant-access', m:'dpr', s:'1E · Submission gates & policies', p:'Core', t:'consultant-access',
+    title:'External consultant rules',
+    why:'What an external consultant may do on a DPR, the mandatory “Prepared by consultant” disclosure, and whether consultant-drafted DPRs need an extra internal review. When the extra-review toggle is on, the portal adds an advisory row to the AA gate set.',
+    def:{
+      accessLevel:'Read-only',
+      disclosureMandatory:true,
+      allowedSections:['Scope','BOQ'],
+      extraReviewGate:true
+    }},
 
   /* ====== TENDER CREATION ====== */
   // 2A
   // 2B
-  {id:'tender.committee', m:'tender', s:'2 · Committee', p:'Core', t:'prebid-committee',
-    title:'Tender Creation Committee — members, designations & permissions',
-    why:'Committee responsible for drafting the NIT, setting PQ/TQ criteria, evaluation method, EMD policy, and obtaining CVC sign-off before publish.',
+  {id:'tender.committee', m:'tender', s:'2 · Role Management', p:'Core', t:'prebid-committee',
+    title:'Tender Creation Role Management — members, designations & permissions',
+    why:'Role management for the tender-creation committee — who drafts the NIT, sets PQ/TQ criteria, evaluation method and EMD policy, and obtains CVC sign-off before publish, and exactly what each member may do.',
     def:{
       designations:[ {label:'Tender Drafter', enabled:true}, {label:'Tender Inviting Authority', enabled:true}, {label:'Technical Member', enabled:true}, {label:'Finance Member', enabled:true}, {label:'Legal Advisor', enabled:true}, {label:'Vigilance / CVC Officer', enabled:true}, {label:'Department HOD', enabled:true}, {label:'Competent Authority (per value tier)', enabled:true}, {label:'Procurement Cell Coordinator', enabled:true} ],
       actions:[ {label:'View tender draft', enabled:true}, {label:'Create new tender', enabled:true}, {label:'Edit NIT sections', enabled:true}, {label:'Edit PQ criteria (80-60-40 rule)', enabled:true}, {label:'Edit TQ rubric (/100)', enabled:true}, {label:'Set evaluation method', enabled:true}, {label:'Set EMD parameters', enabled:true}, {label:'Set timeline / milestones', enabled:true}, {label:'Upload reference documents', enabled:true}, {label:'Apply template', enabled:true}, {label:'Clone past tender', enabled:true}, {label:'Run AI Compliance Check', enabled:true}, {label:'Submit for CVC review', enabled:true}, {label:'Sign off CVC review', enabled:true}, {label:'Publish NIT', enabled:true}, {label:'Issue corrigendum on live NIT', enabled:true} ],
@@ -348,7 +481,9 @@ const ITEMS = [
   {id:'tender.smart-start', m:'tender', s:'2B · Smart Start & templates', p:'Helpful', t:'list',
     title:'Smart Start methods enabled',
     why:'Which tender entry points are available to officers. Toggle a method off to remove it from the Start screen.',
-    def:[{label:'AI describe',enabled:true},{label:'Upload',enabled:true},{label:'Template',enabled:true},{label:'Clone',enabled:true},{label:'Manual',enabled:true}]},
+    // CHANGELOG: "Template" entry mode removed — the template entry point was deleted from
+    // tender-creation.html and the admin template library was retired, so the row is gone here too.
+    def:[{label:'AI describe',enabled:true},{label:'Upload',enabled:true},{label:'Clone',enabled:true},{label:'Manual',enabled:true}]},
   {id:'tender.starter-chips', m:'tender', s:'2B · Smart Start & templates', p:'Helpful', t:'starter-chips-grouped',
     title:'AI describe — quick-suggestion chips',
     why:'Chips shown on the AI describe screen, grouped by tender type. The first 5 enabled chips appear first; the rest rotate on refresh.',
@@ -358,24 +493,37 @@ const ITEMS = [
       {category:'Services', chips:[{label:'Security services',enabled:true},{label:'Office housekeeping',enabled:true},{label:'Garbage collection',enabled:false}]},
       {category:'Consultancy', chips:[{label:'GIS mapping consultancy',enabled:false},{label:'Architectural design',enabled:false}]},
     ]},
-  {id:'tender.template-library', m:'tender', s:'2B · Smart Start & templates', p:'Core', t:'tender-template-builder',
-    title:'Tender template library',
-    why:'Single highest-leverage admin asset for tender creation. Open the builder to author content with {placeholders}, set metadata, and preview.',
-    def:[
-      {id:'tpl-itg', name:'IT Goods NIT', sector:'IT Goods', method:'L1', version:'v3.0', status:'Published', content:'Invitation for Bids — {tender_id}\n\n{sector} procurement, estimated cost {ec}. Bid submission closes {bid_close}.', createdAt:'2026-01-10', deprecated:false, description:'Standard IT goods NIT.', tags:['goods','it'], uses:24},
-      {id:'tpl-works', name:'Works NIT', sector:'Infrastructure Works', method:'L1', version:'v2.4', status:'Published', content:'Invitation for Bids — {tender_id}\n\nWorks at {sector}. Estimated cost {ec}.', createdAt:'2026-02-02', deprecated:false, description:'Standard works NIT.', tags:['works'], uses:18},
-      {id:'tpl-water', name:'Water Works QCBS', sector:'Water Works', method:'QCBS 70:30', version:'v2.1', status:'Published', content:'QCBS tender — {tender_id}. Technical:Financial = 70:30.', createdAt:'2026-02-19', deprecated:false, description:'Water works QCBS.', tags:['works','water','qcbs'], uses:11},
-      {id:'tpl-eng', name:'Engineering NIT', sector:'Engineering Goods', method:'L1', version:'v1.6', status:'Draft', content:'Engineering goods — {tender_id}.', createdAt:'2026-03-05', deprecated:false, description:'Engineering goods NIT.', tags:['engineering'], uses:9},
-    ]},
   {id:'tender.past-tender-cloning', m:'tender', s:'2B · Smart Start & templates', p:'Core', t:'past-tender-cloning',
     title:'Past tender cloning',
-    why:'Upload past tenders here so they surface on the Clone screen. Shows everything already uploaded; edit its metadata or remove it.',
+    why:'Upload past tenders here so they surface on the Clone screen. Each row carries a viewable tender document (PDF/Word). Edit metadata, view/replace/remove the document, or remove the tender.',
     def:[
-      {id:'pt-1', fileName:'TND-2025-IT-200-desktops.pdf', title:'Supply of 200 desktops', sector:'IT Goods', method:'L1', ec:4500000, awardedYear:2025, status:'Completed', uploadedAt:'2026-01-12'},
-      {id:'pt-2', fileName:'TND-2025-Road-Ward12.pdf', title:'Road resurfacing — Ward 12', sector:'Road Works', method:'L1', ec:8200000, awardedYear:2025, status:'Awarded', uploadedAt:'2026-02-03'},
-      {id:'pt-3', fileName:'TND-2024-Consult-TownHall.pdf', title:'Architectural consultancy — Town Hall', sector:'Consultancy', method:'QCBS 80:20', ec:3200000, awardedYear:2024, status:'Completed', uploadedAt:'2025-11-20'},
+      {id:'pt-1', fileName:'TND-2025-IT-200-desktops.pdf', title:'Supply of 200 desktops', sector:'IT Goods', method:'L1', ec:4500000, awardedYear:2025, status:'Completed', uploadedAt:'2026-01-12', doc:ptcSampleDoc('TND-2025-IT-200-desktops','Supply of 200 Desktop Computers','IT Goods','L1 (Lowest Cost)','₹45,00,000',2025)},
+      {id:'pt-2', fileName:'TND-2025-Road-Ward12.pdf', title:'Road resurfacing — Ward 12', sector:'Road Works', method:'L1', ec:8200000, awardedYear:2025, status:'Awarded', uploadedAt:'2026-02-03', doc:ptcSampleDoc('TND-2025-Road-Ward12','Road Resurfacing — Ward 12','Road Works','L1 (Lowest Cost)','₹82,00,000',2025)},
+      {id:'pt-3', fileName:'TND-2024-Consult-TownHall.pdf', title:'Architectural consultancy — Town Hall', sector:'Consultancy', method:'QCBS 80:20', ec:3200000, awardedYear:2024, status:'Completed', uploadedAt:'2025-11-20', doc:ptcSampleDoc('TND-2024-Consult-TownHall','Architectural Consultancy — Town Hall','Consultancy','QCBS 80:20','₹32,00,000',2024)},
     ]},
-  {id:'tender.ai-questionnaire', m:'tender', s:'2B · Smart Start & templates', p:'Core', t:'ai-questionnaire',
+  // 2H — AI assistance (central control + the AI items moved here)
+  {id:'tender.ai-touchpoints', m:'tender', s:'2H · AI assistance', p:'Core', t:'ai-touchpoints',
+    title:'AI assistance — where it’s on and off',
+    why:'One control deciding where AI participates across tender creation. The portal reads this before rendering any AI affordance: Off = the button / suggestion strip does not render at all; On-demand = no proactive popups, the AI button only; Proactive = AI may offer suggestions unprompted. The master switch suppresses everything when off — for vigilance-sensitive tenders that need a fully human-attributable drafting trail. Per-touchpoint restrictions can additionally disable AI for sensitive / vigilance-flagged tenders or above a value ceiling. Whether the two Review checks block publish is governed by Pre-publish hard gates, not here.',
+    def:{
+      master:true,
+      touchpoints:[
+        {id:'entry-describe',     stage:'Entry',    kind:'suggestion', mode:'proactive', smartStartRef:true, name:'AI describe entry mode',                 desc:'The “Describe what you need” option on the Start screen. Visibility is also governed by the Smart Start methods matrix — both must allow it for the option to appear.', restrict:{sensitive:false, maxValue:null}},
+        {id:'entry-questionnaire',stage:'Entry',    kind:'suggestion', mode:'proactive', name:'AI follow-up questionnaire',                                 desc:'Structured follow-up questions after the describe conversation to firm up scope, budget and sector.', restrict:{sensitive:false, maxValue:null}},
+        {id:'entry-autofill',     stage:'Entry',    kind:'suggestion', mode:'proactive', name:'Tender field auto-fill from describe',                       desc:'Pre-fills tender form fields (title, sector, estimated cost) from the describe conversation.', restrict:{sensitive:false, maxValue:null}},
+        {id:'draft-section',      stage:'Drafting', kind:'suggestion', mode:'ondemand', hasSections:true, name:'Per-section NIT drafting',                  desc:'AI drafts the body text of each NIT section. Expand to allow or block AI per individual section.', restrict:{sensitive:false, maxValue:null}},
+        {id:'draft-scope-boq',    stage:'Drafting', kind:'suggestion', mode:'ondemand', name:'Scope of work / BOQ suggestions',                            desc:'Suggests scope statements and Bill-of-Quantities line items while drafting.', restrict:{sensitive:false, maxValue:null}},
+        {id:'draft-pq',           stage:'Drafting', kind:'suggestion', mode:'ondemand', name:'PQ criteria suggestions',                                    desc:'Proposes pre-qualification criteria from the 80-60-40 library based on tender value and sector.', restrict:{sensitive:false, maxValue:null}},
+        {id:'draft-tq',           stage:'Drafting', kind:'suggestion', mode:'ondemand', name:'TQ rubric suggestions',                                      desc:'Proposes a technical-scoring rubric (/100) for the tender.', restrict:{sensitive:false, maxValue:null}},
+        {id:'draft-method',       stage:'Drafting', kind:'suggestion', mode:'ondemand', name:'Evaluation method recommendation',                           desc:'Recommends an evaluation method (L1 / QCBS / LCS / QBS / FBS) for the tender.', restrict:{sensitive:false, maxValue:null}},
+        {id:'draft-emd-timeline', stage:'Drafting', kind:'suggestion', mode:'ondemand', name:'EMD / timeline value suggestions',                          desc:'Suggests EMD amounts and milestone dates within the configured policy limits.', restrict:{sensitive:false, maxValue:null}},
+        {id:'review-compliance',  stage:'Review',   kind:'check',      mode:'on',  name:'AI Compliance Check',                                              desc:'Runs the configured compliance rules over the draft before publish.', restrict:{sensitive:false, maxValue:null}},
+        {id:'review-eligibility', stage:'Review',   kind:'check',      mode:'on',  name:'AI Eligibility Risk Check',                                        desc:'Flags restrictive-tender risks (single-OEM, narrow turnover, thin vendor universe).', restrict:{sensitive:false, maxValue:null}},
+        {id:'review-corrigendum', stage:'Review',   kind:'suggestion', mode:'ondemand', name:'Corrigendum auto-draft suggestions',                        desc:'Drafts corrigendum text when a published NIT is amended.', restrict:{sensitive:false, maxValue:null}},
+      ],
+      sectionDrafting:{'Scope of work':true, 'Submission instructions':true, 'Eligibility (PQ)':false, 'General conditions':false}
+    }},
+  {id:'tender.ai-questionnaire', m:'tender', s:'2H · AI assistance', p:'Core', t:'ai-questionnaire',
     title:'AI describe — structured follow-up questions',
     why:'Transforms Describe-to-Tender from open chat into a guided form. Output quality jumps when input is well-formed.',
     def:[
@@ -434,29 +582,25 @@ const ITEMS = [
       {id:'t-mixed', name:'Mixed (Goods+Services)', enabled:true},
     ]},
   {id:'tender.methods-suite', m:'tender', s:'2C · Classification & evaluation', p:'Core', t:'methods-suite',
-    title:'Evaluation methods & defaults',
-    why:'The evaluation-method engine in one place — the method master list (with GFR value thresholds), sector defaults, allowed QCBS splits, tie-breakers, and per-leaf overrides. Replaces five separate settings.',
+    title:'Evaluation methods & procurement modes',
+    why:'Which evaluation methods (L1, QCBS, LCS, QBS, FBS, SSS) and procurement modes (OTE, LTE, STE) officers may use, each with only the controls that method actually needs — QCBS T:F ratios, LCS technical cutoff, OTE/LTE value thresholds (GFR 2017 Rule 161), and locked justification for single-source modes.',
     def:{
       methods:[
-        {label:'L1', enabled:true,  minValue:0, maxValue:null, justify:false},
-        {label:'QCBS', enabled:true, minValue:0, maxValue:null, justify:false},
-        {label:'LCS', enabled:true,  minValue:0, maxValue:null, justify:false},
-        {label:'QBS', enabled:true,  minValue:0, maxValue:null, justify:false},
-        {label:'FBS', enabled:false, minValue:0, maxValue:null, justify:false},
-        {label:'SSS', enabled:false, minValue:0, maxValue:null, justify:true},
-        {label:'Open Tender Enquiry (OTE)',    enabled:true,  minValue:2500000, maxValue:null,    justify:false},
-        {label:'Limited Tender Enquiry (LTE)', enabled:true,  minValue:0,       maxValue:2500000, justify:false},
-        {label:'Single Tender Enquiry (STE)',  enabled:false, minValue:0,       maxValue:null,    justify:true},
+        {id:'l1',  group:'method', label:'L1 (Lowest Cost)',                enabled:true},
+        {id:'qcbs',group:'method', label:'QCBS',                            enabled:true, ratios:['90:10','80:20','70:30','60:40'], allowedRatios:['90:10','80:20','70:30','60:40'], defaultRatio:'70:30'},
+        {id:'lcs', group:'method', label:'LCS',                             enabled:true, techCutoff:60},
+        {id:'qbs', group:'method', label:'QBS',                             enabled:true},
+        {id:'fbs', group:'method', label:'FBS',                             enabled:false},
+        {id:'sss', group:'method', label:'SSS (Single Source Selection)',   enabled:false, justify:true, justifyLocked:true},
+        {id:'ote', group:'mode',   label:'Open Tender Enquiry (OTE)',       enabled:true,  mandatoryAbove:2500000},
+        {id:'lte', group:'mode',   label:'Limited Tender Enquiry (LTE)',    enabled:true,  allowedUpto:2500000},
+        {id:'ste', group:'mode',   label:'Single Tender Enquiry (STE)',     enabled:false, justify:true, justifyLocked:true},
       ],
-      sectorDefaults:[{k:'IT Goods',v:'L1'},{k:'Infrastructure Works',v:'L1'},{k:'Water Works',v:'QCBS 70:30'},{k:'Consultancy',v:'QCBS 80:20'},{k:'Engineering Goods',v:'L1'},{k:'Urban Dev Works',v:'L1'}],
-      qcbsRatios:['90:10','80:20','70:30','60:40'],
-      tieBreakers:[{k:'L1',v:'Earlier bid submission timestamp wins.'},{k:'QCBS',v:'Higher technical score wins; if still tied, earlier submission.'},{k:'LCS',v:'Higher technical score wins.'},{k:'QBS',v:'Lower financial quote wins.'},{k:'FBS',v:'Higher technical score wins.'}],
-      leafOverrides:[{k:'Goods → IT Goods → Software',v:'QCBS 70:30'},{k:'Consultancy → IT Consultancy',v:'QCBS 80:20'}],
     }},
-  {id:'tender.emd-policy', m:'tender', s:'2C · Classification & evaluation', p:'Core', t:'kvlist',
-    title:'EMD policy matrix',
-    why:'EMD rules are statutory and money-related; mistakes are expensive.',
-    def:[{k:'Default EMD %',v:'2'},{k:'Min EMD (₹)',v:'10000'},{k:'Max EMD (₹)',v:'2500000'},{k:'MSME Micro exempt',v:'true'},{k:'MSME Small exempt',v:'true'}]},
+  {id:'tender.emd-policy', m:'tender', s:'2C · Classification & evaluation', p:'Core', t:'emd-policy',
+    title:'EMD policy',
+    why:'EMD is computed as this percentage of estimated cost; exemptions per MSME policy.',
+    def:{percent:2, msmeExempt:true}},
   // 2D — the PQ/TQ heart
   {id:'tender.custom-criteria', m:'tender', s:'2D · PQ & TQ libraries (80-60-40 / TQ marks)', p:'Core', t:'criterion-builder',
     title:'Custom PQ/TQ criterion builder',
@@ -512,28 +656,17 @@ const ITEMS = [
       {type:'Sole Proprietor', docs:['GST','PAN','ITR (3 FY)','Turnover certificate (CA UAN)']},
       {type:'JV', docs:['JV Agreement','Lead partner docs','Each partner docs','Liability declaration']},
     ]},
-  {id:'tender.pq-types-8', m:'tender', s:'2D · PQ & TQ libraries (80-60-40 / TQ marks)', p:'Core', t:'list',
-    title:'PQ criterion type library (8 types)',
-    why:'Officer-added criteria with no master list = inconsistency.',
-    def:['Turnover','Work experience','Technical capacity','Financial capability','Manpower','Equipment','Quality certifications','Past performance']},
-  {id:'tender.ai-compliance', m:'tender', s:'2D · PQ & TQ libraries (80-60-40 / TQ marks)', p:'Helpful', t:'list',
+  // tender.pq-types-8 removed — superseded by the custom PQ/TQ criterion builder.
+  {id:'tender.ai-compliance', m:'tender', s:'2H · AI assistance', p:'Helpful', t:'list',
     title:'AI Compliance Check rules',
     why:'Compliance criteria are policy, not AI defaults.',
     def:['CVC compliance present','GFR alignment','EMD matches policy','PQ not restrictive','TS sanction valid','GeM mandatory check']},
-  {id:'tender.ai-eligibility', m:'tender', s:'2D · PQ & TQ libraries (80-60-40 / TQ marks)', p:'Helpful', t:'list',
+  {id:'tender.ai-eligibility', m:'tender', s:'2H · AI assistance', p:'Helpful', t:'list',
     title:'AI Eligibility Risk Check rules',
     why:'Anti-restrictive-tender control; admin defines red flags.',
     def:['Vendor universe < 5 likely qualifiers','Single OEM specification','Turnover criterion > 3× EC','Sector experience too narrow']},
   // 2E
-  {id:'tender.milestones', m:'tender', s:'2E · Timeline defaults', p:'Core', t:'milestones-matrix',
-    title:'Minimum durations per milestone',
-    why:'Tenders below statutory minimum bid-window get challenged. Each milestone carries a required flag, a default minimum, and a tighter Emergency minimum.',
-    def:[
-      {name:'Publish → Pre-bid meeting', required:true, minDays:7, emergencyDays:4},
-      {name:'Pre-bid → Bid open', required:true, minDays:14, emergencyDays:7},
-      {name:'Bid open → Tech eval', required:true, minDays:10, emergencyDays:5},
-      {name:'Tech eval → Financial open', required:true, minDays:7, emergencyDays:4},
-    ]},
+  // tender.milestones removed (minimum durations per milestone).
   {id:'tender.calendar', m:'tender', s:'2E · Timeline defaults', p:'Helpful', t:'toggle',
     title:'Working-day / holiday calendar',
     why:'Centralised; otherwise officers count weekends wrong.',
@@ -554,22 +687,28 @@ const ITEMS = [
         {name:'Deadline missed',            reminders:'',              channels:{Email:true,SMS:false,'In-app':true}, recipients:['Drafter','HOD','Procurement Cell'], escalation:{breachHours:48, escalateTo:'HOD'}},
       ],
     }},
-  {id:'tender.milestones-tier-overrides', m:'tender', s:'2E · Timeline defaults', p:'Helpful', t:'kvlist',
-    title:'Per-tier minimum duration overrides',
-    why:'Commissioner-level tenders need longer windows than HOD-level. Key = "Milestone @ Tier", Value = days. Falls back to the milestone default when no override is set.',
-    def:[{k:'Pre-bid → Bid open @ Commissioner',v:'21'},{k:'Pre-bid → Bid open @ State Government',v:'28'},{k:'Bid open → Tech eval @ Commissioner',v:'14'},{k:'Tech eval → Financial open @ State Government',v:'10'}]},
+  // tender.milestones-tier-overrides removed (per-tier minimum duration overrides).
   // 2F
   {id:'tender.nit-sections', m:'tender', s:'2F · Document generation & branding (NIT)', p:'Core', t:'list',
     title:'NIT section structure (10 sections)',
     why:'The published NIT is a legal document; structure should not vary.',
     def:['Invitation','Scope of work','Eligibility (PQ)','Technical specs','Evaluation method','Bid security (EMD)','Submission instructions','Opening of bids','Award','General conditions']},
-  {id:'tender.languages', m:'tender', s:'2F · Document generation & branding (NIT)', p:'Helpful', t:'kvlist',
+  {id:'tender.languages', m:'tender', s:'2F · Document generation & branding (NIT)', p:'Helpful', t:'lang-toggles',
     title:'Languages enabled',
-    why:'Multilingual = policy choice and translation budget.',
-    def:[{k:'English',v:'true'},{k:'Hindi',v:'true'},{k:'Marathi',v:'true'},{k:'Default',v:'English'}]},
-  {id:'tender.ai-section-prompts', m:'tender', s:'2F · Document generation & branding (NIT)', p:'Core', t:'kvlist',
+    why:'Multilingual = policy choice and translation budget. Toggle the languages the NIT may be issued in; pick a default from the enabled ones.',
+    def:{
+      languages:[
+        {label:'English', enabled:true},  {label:'Hindi', enabled:true},   {label:'Marathi', enabled:true},
+        {label:'Gujarati', enabled:false},{label:'Bengali', enabled:false},{label:'Tamil', enabled:false},
+        {label:'Telugu', enabled:false},  {label:'Kannada', enabled:false},{label:'Malayalam', enabled:false},
+        {label:'Odia', enabled:false},    {label:'Punjabi', enabled:false},{label:'Urdu', enabled:false},
+        {label:'Assamese', enabled:false},
+      ],
+      default:'English'
+    }},
+  {id:'tender.ai-section-prompts', m:'tender', s:'2H · AI assistance', p:'Core', t:'section-prompts',
     title:'AI section-edit prompts (per section)',
-    why:'Determines NIT voice per section; sourced from tender.nit-sections. One prompt per section.',
+    why:'Determines NIT voice per section. Section names are read-only, synced from NIT section structure — one prompt per section. A section greyed here has AI drafting switched off in “AI assistance — where it’s on and off”; this panel only sets the prompt text, never whether AI runs.',
     def:[
       {k:'Invitation',v:'Draft a formal Invitation for Bids in third-person Indian government English. State the procuring authority, tender ID, and a one-line scope.'},
       {k:'Scope of work',v:'Describe the scope precisely and measurably. Avoid ambiguity. Number each deliverable. Cite GFR 2017 where relevant.'},
@@ -616,10 +755,7 @@ const ITEMS = [
     title:'Vendor-notification template on publish',
     why:'Org-voice + statutory wording.',
     def:'Dear {vendor},\n\nThe Ahmedabad Municipal Corporation has published tender {tender_id} — {title}. Estimated cost: {ec}. Bid submission closes on {bid_close}.\n\nDocuments are available at {portal_link}.\n\nRegards,\nProcurement Cell\nAhmedabad Municipal Corporation'},
-  {id:'tender.autosave', m:'tender', s:'2G · Review & publish', p:'Optional', t:'number',
-    title:'Auto-save interval',
-    why:'Trivial to change once, easy to forget per-page.',
-    def:60, unit:'seconds'},
+  // tender.autosave removed (auto-save interval).
   {id:'tender.vendor-notifications', m:'tender', s:'2G · Review & publish', p:'Core', t:'lib',
     title:'Vendor notification rules',
     why:'Transparency mandate. Vendors need to know about corrigendum / clarification / deadline change / award. (channels stored as comma-separated text.)',
@@ -631,38 +767,13 @@ const ITEMS = [
       {event:'Award announced',template:'Tender {tender_id} has been awarded.',recipients:'EMD paid',channels:'email'},
       {event:'Tender withdrawn',template:'Tender {tender_id} has been withdrawn.',recipients:'All registered',channels:'email, in-app'},
     ]},
-  {id:'tender.corrigendum', m:'tender', s:'2G · Review & publish', p:'Core', t:'corrigendum-gepnic',
-    title:'Corrigendum policy',
-    why:'The seven statutory GePNIC corrigendum types — each with its stage cutoff, approval chain and auto-extend behaviour — plus the change-events that auto-draft a corrigendum. Combines the old policy and auto-trigger settings. Type vocabulary is shared with Pre-Bid › Corrigendum types.',
-    def:{
-      cutoffOptions:['Before bid submission start','Before bid submission end','Before bid opening','Any stage'],
-      types:[
-        {name:'Date corrigendum',           enabled:true, cutoff:'Before bid opening',          approval:['Drafter','TIA','CVC Officer'], autoExtend:true},
-        {name:'BOQ corrigendum',            enabled:true, cutoff:'Before bid submission end',   approval:['Drafter','TIA','CVC Officer'], autoExtend:false},
-        {name:'Technical bid corrigendum',  enabled:true, cutoff:'Before bid submission end',   approval:['Drafter','TIA','CVC Officer'], autoExtend:false},
-        {name:'Financial bid corrigendum',  enabled:true, cutoff:'Before bid submission end',   approval:['Drafter','TIA','Finance Member','CVC Officer'], autoExtend:false},
-        {name:'Bid openers corrigendum',    enabled:true, cutoff:'Before bid submission start', approval:['TIA','CVC Officer'], autoExtend:false},
-        {name:'Fees / EMD corrigendum',     enabled:true, cutoff:'Before bid submission start', approval:['Drafter','Finance Member','TIA','CVC Officer'], autoExtend:false},
-        {name:'Cancel corrigendum',         enabled:true, cutoff:'Any stage',                   approval:['TIA','HOD','Commissioner'], autoExtend:false},
-      ],
-      autoExtend:true, extensionDays:7,
-      autoDraftTriggers:[
-        {change:'BOQ qty change',      type:'BOQ corrigendum'},
-        {change:'Date change',         type:'Date corrigendum'},
-        {change:'EMD change',          type:'Fees / EMD corrigendum'},
-        {change:'PQ criteria change',  type:'Technical bid corrigendum'},
-        {change:'Scope change',        type:'BOQ corrigendum'},
-      ],
-    }},
-  {id:'tender.withdrawal-policy', m:'tender', s:'2G · Review & publish', p:'Core', t:'withdrawal-policy',
-    title:'Withdrawal / cancellation policy',
-    why:'Money and reputation involved. Should be policy.',
-    def:{allowedStages:['Draft','Published','Pre-bid'],justificationRequired:true,approvalRoles:['HOD','Commissioner'],emdRefundOnWithdrawal:'Always',auditLogRetentionYears:7}},
+  // tender.corrigendum removed — corrigendum behaviour is now governed only in Pre-Bid › Corrigendum.
+  // tender.withdrawal-policy removed (withdrawal / cancellation policy).
 
   /* ====== PRE-BID QUERIES ====== */
-  {id:'prebid.committee', m:'prebid', s:'3 · Committee', p:'Core', t:'prebid-committee',
-    title:'Pre-Bid Committee — members, designations & permissions',
-    why:'Specific committee for pre-bid query handling. Designations are committee titles you can grant; Actions are the operations members can be permitted to do; Members is the table that pairs an officer with a designation and explicit permissions for each action. The portal reads this to decide what each member can do.',
+  {id:'prebid.committee', m:'prebid', s:'3 · Role Management', p:'Core', t:'prebid-committee',
+    title:'Pre-Bid Role Management — members, designations & permissions',
+    why:'Role management for the pre-bid committee that handles query responses. Designations are committee titles you can grant; Actions are the operations members can be permitted to do; Members is the table that pairs an officer with a designation and explicit permissions for each action. The portal reads this to decide what each member can do.',
     def:{
       designations:[
         {label:'Chairperson (Pre-Bid Committee)', enabled:true},
@@ -839,16 +950,16 @@ const ITEMS = [
     title:'Anonymisation rules',
     why:'Statutory anonymisation.',
     def:['Strip vendor company name','Strip vendor representative name','Strip phone / email','Strip PAN / GST','Replace with V1, V2, V3…']},
-  {id:'prebid.permissions-link', m:'prebid', s:'3 · Committee', p:'Core', t:'toggle',
+  {id:'prebid.permissions-link', m:'prebid', s:'3 · Role Management', p:'Core', t:'toggle',
     title:'Per-action permissions enforced',
     why:'Segregation of duties — managed under Cross-cutting → Permissions.',
     def:true},
 
   /* ====== BID EVALUATION ====== */
   // 4A — PQ Evaluation
-  {id:'eval.committee', m:'eval', s:'4 · Committee', p:'Core', t:'prebid-committee',
-    title:'Bid Evaluation Committee — members, designations & permissions',
-    why:'Committee that evaluates bids — PQ verdicts, TQ scoring, financial reveal flow, reasonableness check, and final sign-off. Composition and permissions here are statutory under CVC guidelines.',
+  {id:'eval.committee', m:'eval', s:'4 · Role Management', p:'Core', t:'prebid-committee',
+    title:'Bid Evaluation Role Management — members, designations & permissions',
+    why:'Role management for the bid-evaluation committee — PQ verdicts, TQ scoring, financial reveal flow, reasonableness check, and final sign-off. Composition and permissions here are statutory under CVC guidelines.',
     def:{
       designations:[ {label:'Evaluation Committee Chairperson', enabled:true}, {label:'Senior Technical Member', enabled:true}, {label:'Subject Matter Expert (Technical)', enabled:true}, {label:'Finance Member', enabled:true}, {label:'Legal Advisor', enabled:true}, {label:'Vigilance Observer', enabled:true}, {label:'Tender Inviting Authority', enabled:true}, {label:'External Expert / Independent Advisor', enabled:true}, {label:'Recording Secretary', enabled:true}, {label:'Department HOD', enabled:true} ],
       actions:[ {label:'View evaluation', enabled:true}, {label:'View bids (anonymised)', enabled:true}, {label:'Mark PQ verdict (Pass/Fail/Pending/Clarification)', enabled:true}, {label:'Issue clarification request to vendor', enabled:true}, {label:'View technical bid contents', enabled:true}, {label:'Score TQ rubric', enabled:true}, {label:'Edit own TQ score (after submit)', enabled:true}, {label:'Edit any committee member\'s TQ score', enabled:true}, {label:'Declare NTQ (Non-Technically Qualified)', enabled:true}, {label:'Issue NTQ Justification Letter', enabled:true}, {label:'Apply evaluation method calculation (L1/QCBS/LCS/QBS/FBS)', enabled:true}, {label:'Reveal financial bid — Phase 1 click', enabled:true}, {label:'Reveal financial bid — Phase 2 click', enabled:true}, {label:'Mark Reasonableness verdict', enabled:true}, {label:'Sign off evaluation', enabled:true}, {label:'Declare conflict of interest / recuse', enabled:true}, {label:'Run AI parser on bid documents', enabled:true}, {label:'Export evaluation matrix', enabled:true}, {label:'View evaluation audit log', enabled:true} ],
@@ -1010,9 +1121,9 @@ const ITEMS = [
 
   /* ====== BID MANAGEMENT ====== */
   // 5A
-  {id:'mgmt.committee', m:'mgmt', s:'5 · Committee', p:'Core', t:'prebid-committee',
-    title:'Bid Management Committee — members, designations & permissions',
-    why:'Committee responsible for post-evaluation stages — committee review verdict, negotiation (when triggered), award recommendation, approval routing, and Letter of Acceptance issuance.',
+  {id:'mgmt.committee', m:'mgmt', s:'5 · Role Management', p:'Core', t:'prebid-committee',
+    title:'Bid Management Role Management — members, designations & permissions',
+    why:'Role management for the bid-management committee — post-evaluation stages including committee review verdict, negotiation (when triggered), award recommendation, approval routing, and Letter of Acceptance issuance.',
     def:{
       designations:[ {label:'Bid Management Chairperson', enabled:true}, {label:'Department HOD', enabled:true}, {label:'Finance Member', enabled:true}, {label:'Accounts Officer', enabled:true}, {label:'Legal Advisor', enabled:true}, {label:'Vigilance Observer', enabled:true}, {label:'Negotiation Lead', enabled:true}, {label:'LoA Issuing Authority', enabled:true}, {label:'Competent Authority (per value tier)', enabled:true}, {label:'Procurement Cell Coordinator', enabled:true} ],
       actions:[ {label:'View Bid Management dashboard', enabled:true}, {label:'Approve Reasonableness verdict', enabled:true}, {label:'Cast vote in Committee Review (Approve/Conditions/Concern/Negotiation)', enabled:true}, {label:'Trigger negotiation', enabled:true}, {label:'Lead negotiation session', enabled:true}, {label:'Document quote movement table', enabled:true}, {label:'Mark sustainability check', enabled:true}, {label:'Decide negotiation outcome (Accept/Reject/Re-tender)', enabled:true}, {label:'Draft Award Recommendation Note', enabled:true}, {label:'Edit Award Recommendation Note', enabled:true}, {label:'Send for approval routing', enabled:true}, {label:'Approve at tier authority', enabled:true}, {label:'Generate Letter of Acceptance (LoA)', enabled:true}, {label:'Edit LoA per tender', enabled:true}, {label:'Sign LoA', enabled:true}, {label:'Issue LoA', enabled:true}, {label:'Track acknowledgement', enabled:true}, {label:'Send acknowledgement reminders', enabled:true}, {label:'Mark performance security received', enabled:true} ],
@@ -1124,14 +1235,17 @@ const ITEMS = [
 
   /* ====== CROSS-CUTTING ====== */
   // A. Signatures & letterheads
-  {id:'sig.logos', m:'signatures', s:'A · Signatures & letterheads', p:'Core', t:'lib',
+  {id:'sig.logos', m:'signatures', s:'A · Signatures & letterheads', p:'Core', t:'logo-library',
     title:'Logo & seal library',
-    why:'Used by NIT, Corrigendum, NTQ letter, Clarification letter, LoA, Award note.',
+    why:'Real image assets for every outgoing document. Portal reads the DEFAULT asset per usage tag: AdminState.logo("Header logo" | "Official seal" | "Watermark" | "Footer emblem") returns its image.dataUrl (or read sig.logos and pick the entry where tag matches and isDefault). Header logo → NIT cover; Official seal → LoA & signed letters.',
     def:[
-      {name:'AMC Official Seal', use:'All letters', file:'amc-seal.png'},
-      {name:'AMC Logo Color', use:'NIT cover page', file:'amc-logo-color.png'},
-      {name:'AMC Logo BW', use:'B&W exports', file:'amc-logo-bw.png'},
-      {name:'Commissioner Seal', use:'Commissioner-signed letters', file:'commissioner-seal.png'},
+      sigSampleLogo('amc-logo-color','AMC Logo (Colour)','Header logo',true,200,80,'<svg xmlns="http://www.w3.org/2000/svg" width="200" height="80" viewBox="0 0 200 80"><rect width="200" height="80" rx="12" fill="#0F5EE8"/><text x="100" y="36" font-family="DM Sans,Arial,sans-serif" font-size="30" font-weight="700" fill="#ffffff" text-anchor="middle">AMC</text><text x="100" y="58" font-family="Arial,sans-serif" font-size="8.5" letter-spacing="1" fill="#cfe0ff" text-anchor="middle">AHMEDABAD MUNICIPAL CORPORATION</text></svg>'),
+      sigSampleLogo('amc-logo-bw','AMC Logo (B&W)','Header logo',false,200,80,'<svg xmlns="http://www.w3.org/2000/svg" width="200" height="80" viewBox="0 0 200 80"><rect width="200" height="80" rx="12" fill="#111827"/><text x="100" y="36" font-family="DM Sans,Arial,sans-serif" font-size="30" font-weight="700" fill="#ffffff" text-anchor="middle">AMC</text><text x="100" y="58" font-family="Arial,sans-serif" font-size="8.5" letter-spacing="1" fill="#9ca3af" text-anchor="middle">AHMEDABAD MUNICIPAL CORPORATION</text></svg>'),
+      sigSampleLogo('amc-seal','AMC Official Seal','Official seal',true,160,160,'<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><circle cx="80" cy="80" r="76" fill="#ffffff" stroke="#0F5EE8" stroke-width="3"/><circle cx="80" cy="80" r="60" fill="none" stroke="#0F5EE8" stroke-width="1"/><path id="amcseal" d="M80,80 m-68,0 a68,68 0 1,1 136,0 a68,68 0 1,1 -136,0" fill="none"/><text font-family="Arial,sans-serif" font-size="10" font-weight="600" fill="#0F5EE8"><textPath href="#amcseal" startOffset="4%">AHMEDABAD MUNICIPAL CORPORATION</textPath></text><text x="80" y="74" font-family="DM Sans,Arial,sans-serif" font-size="24" font-weight="700" fill="#0F5EE8" text-anchor="middle">AMC</text><text x="80" y="96" font-family="Arial,sans-serif" font-size="8" fill="#0F5EE8" text-anchor="middle">EST. 1950</text></svg>'),
+      sigSampleLogo('commissioner-seal','Commissioner Seal','Official seal',false,160,160,'<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><circle cx="80" cy="80" r="76" fill="#ffffff" stroke="#7f1d1d" stroke-width="3"/><circle cx="80" cy="80" r="60" fill="none" stroke="#7f1d1d" stroke-width="1"/><path id="commseal" d="M80,80 m-68,0 a68,68 0 1,1 136,0 a68,68 0 1,1 -136,0" fill="none"/><text font-family="Arial,sans-serif" font-size="10" font-weight="600" fill="#7f1d1d"><textPath href="#commseal" startOffset="8%">OFFICE OF THE COMMISSIONER</textPath></text><text x="80" y="86" font-family="DM Sans,Arial,sans-serif" font-size="15" font-weight="700" fill="#7f1d1d" text-anchor="middle">COMMISSIONER</text></svg>'),
+      sigSampleLogo('gujarat-emblem','Gujarat State Emblem','Footer emblem',true,160,160,'<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><circle cx="80" cy="80" r="76" fill="#ffffff" stroke="#065f46" stroke-width="3"/><circle cx="80" cy="80" r="60" fill="none" stroke="#065f46" stroke-width="1"/><path id="gjemb" d="M80,80 m-68,0 a68,68 0 1,1 136,0 a68,68 0 1,1 -136,0" fill="none"/><text font-family="Arial,sans-serif" font-size="11" font-weight="600" fill="#065f46"><textPath href="#gjemb" startOffset="12%">GOVERNMENT OF GUJARAT</textPath></text><text x="80" y="88" font-family="DM Sans,Arial,sans-serif" font-size="20" font-weight="700" fill="#065f46" text-anchor="middle">GUJARAT</text></svg>'),
+      sigSampleLogo('dpr-header','AMC DPR Header','DPR header logo',true,200,80,'<svg xmlns="http://www.w3.org/2000/svg" width="200" height="80" viewBox="0 0 200 80"><rect width="200" height="80" rx="12" fill="#0E7490"/><text x="100" y="34" font-family="DM Sans,Arial,sans-serif" font-size="26" font-weight="700" fill="#ffffff" text-anchor="middle">AMC · DPR</text><text x="100" y="56" font-family="Arial,sans-serif" font-size="8" letter-spacing="1" fill="#cffafe" text-anchor="middle">DETAILED PROJECT REPORT</text></svg>'),
+      sigSampleLogo('dpr-cover-seal','DPR Cover Seal','DPR cover seal',true,160,160,'<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><circle cx="80" cy="80" r="76" fill="#ffffff" stroke="#0E7490" stroke-width="3"/><circle cx="80" cy="80" r="60" fill="none" stroke="#0E7490" stroke-width="1"/><path id="dprseal" d="M80,80 m-68,0 a68,68 0 1,1 136,0 a68,68 0 1,1 -136,0" fill="none"/><text font-family="Arial,sans-serif" font-size="10" font-weight="600" fill="#0E7490"><textPath href="#dprseal" startOffset="6%">DETAILED PROJECT REPORT · AMC</textPath></text><text x="80" y="78" font-family="DM Sans,Arial,sans-serif" font-size="22" font-weight="700" fill="#0E7490" text-anchor="middle">DPR</text><text x="80" y="98" font-family="Arial,sans-serif" font-size="8" fill="#0E7490" text-anchor="middle">SANCTIONED</text></svg>'),
     ]},
   {id:'sig.fonts', m:'signatures', s:'A · Signatures & letterheads', p:'Core', t:'lib',
     title:'E-signature settings',
@@ -1521,24 +1635,25 @@ let currentSearch = '';
 /* One-line plain-English description per category (keyed by full subsection label). */
 const CATEGORY_DESC = {
   // DPR
-  '1 · Committee':'Who can draft, review and sanction DPRs, and exactly what each member may do.',
+  '1 · Role Management':'Who can draft, review and sanction DPRs, and exactly what each member may do.',
   '1A · Approval pipeline & stage gates':'The AA/TS route, competent-authority thresholds, revision limits and GeM gate.',
   '1B · Templates, BOQ & libraries':'Per-sector DPR templates, BOQ/DSR linkage and the evidence officers must attach.',
   '1C · Quality controls':'Version history, clone scope and the AI readiness checks that guard DPR quality.',
   // TENDER
-  '2 · Committee':'The tender-drafting committee, their designations and per-action permissions.',
-  '2B · Smart Start & templates':'How a tender is started — AI, upload, template, clone or manual — and the template library.',
+  '2 · Role Management':'The tender-drafting committee, their designations and per-action permissions.',
+  '2B · Smart Start & templates':'How a tender is started — AI, upload, clone or manual — and the past-tender library used for cloning.',
   '2C · Classification & evaluation':'The catalog tree, envelope/cover rules, EMD and the evaluation-method engine.',
   '2D · PQ & TQ libraries (80-60-40 / TQ marks)':'Pre-qualification and technical-scoring criteria libraries shared with Evaluation.',
-  '2E · Timeline defaults':'Minimum milestone durations and the per-event notification, reminder and escalation rules.',
+  '2E · Timeline defaults':'The working-day calendar and the per-event notification, reminder and escalation rules.',
   '2F · Document generation & branding (NIT)':'NIT section structure, languages, mandatory attachments and AI section prompts.',
-  '2G · Review & publish':'Pre-publish gates, tender numbering, corrigendum policy and withdrawal rules.',
+  '2G · Review & publish':'Pre-publish hard gates, tender numbering, the CVC review chain and publish templates.',
+  '2H · AI assistance':'Where AI participates across tender creation — one master switch and a per-touchpoint Proactive / On-demand / Off control, with sensitivity restrictions.',
   // PRE-BID
   '3 · Pre-Bid Queries':'Query intake, AI behaviour, standard responses and corrigendum workflow for pre-bid queries.',
-  '3 · Committee':'Who handles pre-bid queries and exactly what each member may do.',
+  '3 · Role Management':'Who handles pre-bid queries and exactly what each member may do.',
   '3A · Query response drafting & approval':'How responses get drafted, AI-assisted, reviewed, and approved before publishing.',
   '3B · Response table (query register)':'What the query register shows — columns, categories, anonymisation, and the AI summary widgets on the screen.',
-  '3C · Corrigendum':'When query responses become formal tender amendments — types, numbering, and AI push rules.',
+  '3C · Corrigendum':'When query responses become formal tender amendments — types, numbering, and AI push rules. Corrigendum behavior is governed here for all modules.',
   '3D · Meeting, dates & notes':'Pre-bid meeting record, minutes template, and the query/response date windows.',
   // EVALUATION
   '4A · PQ Evaluation':'How pre-qualification verdicts are captured and what disqualifies a bidder.',
@@ -1778,6 +1893,25 @@ function renderPreview(item, val){
         <span class="text-ink-300">•</span>
         <span><strong class="text-ink-900">${_pbc_a}</strong> action${_pbc_a!==1?'s':''}</span>
       </div>`;
+    case 'ai-touchpoints': {
+      if (!val || typeof val !== 'object') return '';
+      if (!val.master) return `<div class="text-[12px] text-ink-500 flex items-center gap-2"><span class="chip pri-Helpful">Master OFF</span> all AI assistance suppressed</div>`;
+      const _tps = Array.isArray(val.touchpoints) ? val.touchpoints : [];
+      const _pro = _tps.filter(t => t.kind!=='check' && t.mode==='proactive').length;
+      const _od  = _tps.filter(t => t.kind!=='check' && t.mode==='ondemand').length;
+      const _off = _tps.filter(t => t.mode==='off').length;
+      const _restr = _tps.filter(t => t.restrict && (t.restrict.sensitive || t.restrict.maxValue)).length;
+      return `<div class="flex items-center gap-3 text-[12px] text-ink-500 flex-wrap">
+        <span><strong class="text-ink-900">${_pro}</strong> proactive</span><span class="text-ink-300">•</span>
+        <span><strong class="text-ink-900">${_od}</strong> on-demand</span><span class="text-ink-300">•</span>
+        <span><strong class="text-ink-900">${_off}</strong> off</span>
+        ${_restr ? `<span class="text-ink-300">•</span><span>${_restr} restricted</span>` : ''}
+      </div>`;
+    }
+    case 'section-prompts': {
+      if (!Array.isArray(val)) return '';
+      return `<div class="text-[12px] text-ink-500"><strong class="text-ink-900">${val.length}</strong> section prompt${val.length===1?'':'s'}</div>`;
+    }
     case 'tender-tree': {
       if (!Array.isArray(val)) return '';
       let nodes=0, leaves=0; const walk=a=>a.forEach(n=>{ nodes++; if(n.children&&n.children.length) walk(n.children); else leaves++; });
@@ -1790,14 +1924,61 @@ function renderPreview(item, val){
     case 'tender-manual-just':
       if (!val || typeof val !== 'object') return '';
       return `<div class="text-[12px] text-ink-500">${val.required ? `Required · min ${val.minWords||0} words · ${(val.hintPrompts||[]).length} hints` : 'Optional'}</div>`;
-    case 'tender-template-builder': {
+    case 'past-tender-cloning': {
       if (!Array.isArray(val)) return '';
-      const pub = val.filter(t=>t.status==='Published').length;
-      return `<div class="text-[12px] text-ink-500"><strong class="text-ink-900">${val.length}</strong> template${val.length!==1?'s':''} · ${pub} published</div>`;
+      const _ptc_docs = val.filter(t=>t.doc).length;
+      return `<div class="text-[12px] text-ink-500"><strong class="text-ink-900">${val.length}</strong> past tender${val.length!==1?'s':''} · ${_ptc_docs} with document${_ptc_docs!==1?'s':''}</div>`;
     }
-    case 'past-tender-cloning':
+    case 'lang-toggles': {
+      if (!val || typeof val !== 'object') return '';
+      const _lg_on = (val.languages||[]).filter(l=>l.enabled!==false).map(l=>l.label);
+      return `<div class="flex flex-wrap gap-1.5">${_lg_on.map(l=>`<span class="chip-input">${escapeHtml(l)}${l===val.default?' ★':''}</span>`).join('') || '<span class="text-[11px] text-ink-400">None enabled</span>'}</div>`;
+    }
+    case 'emd-policy': {
+      const _emd = Array.isArray(val) ? emdFromKv(val) : val;
+      if (!_emd || typeof _emd !== 'object') return '';
+      return `<div class="text-[12px] text-ink-500"><strong class="text-ink-900">${_emd.percent}%</strong> of EC${_emd.msmeExempt?' · MSME Micro/Small exempt':''}</div>`;
+    }
+    case 'logo-library': {
       if (!Array.isArray(val)) return '';
-      return `<div class="text-[12px] text-ink-500"><strong class="text-ink-900">${val.length}</strong> past tender${val.length!==1?'s':''} uploaded</div>`;
+      const _ll_def = val.filter(a=>a.isDefault).length;
+      return `<div class="text-[12px] text-ink-500"><strong class="text-ink-900">${val.length}</strong> asset${val.length!==1?'s':''} · ${_ll_def} default${_ll_def!==1?'s':''}</div>`;
+    }
+    case 'market-enquiry': {
+      const _me = Array.isArray(val) ? meFromOld(val) : val;
+      if (!_me || typeof _me !== 'object') return '';
+      const _r = _me.rules || {};
+      return `<div class="text-[12px] text-ink-500">min <strong class="text-ink-900">${_r.minQuotes||0}</strong> quotes · ${_r.validityDays||0}d validity · ${escapeHtml(_r.acceptanceBasis||'lowest')} · flag &gt;${_r.deviationPct||0}%</div>`;
+    }
+    case 'submission-gates': {
+      if (!val || typeof val !== 'object') return '';
+      const _aa=(val.aa||[]), _ts=(val.ts||[]);
+      const _aab=_aa.filter(g=>g.blocking).length, _tsb=_ts.filter(g=>g.blocking).length;
+      return `<div class="flex items-center gap-3 text-[12px] text-ink-500 flex-wrap"><span>AA: <strong class="text-ink-900">${_aa.length}</strong> gates (${_aab} blocking)</span><span class="text-ink-300">•</span><span>TS: <strong class="text-ink-900">${_ts.length}</strong> (${_tsb} blocking)</span></div>`;
+    }
+    case 'cost-basis': {
+      if (!val || typeof val !== 'object') return '';
+      const _cs=(val.sources||[]).filter(s=>s.enabled!==false).length;
+      return `<div class="text-[12px] text-ink-500"><strong class="text-ink-900">${_cs}</strong> rate source${_cs!==1?'s':''} · ±${val.tolerancePct!=null?val.tolerancePct:15}% tolerance</div>`;
+    }
+    case 'budget-heads': {
+      if (!val || typeof val !== 'object') return '';
+      const _bh=(val.heads||[]).filter(h=>h.enabled!==false).length;
+      return `<div class="text-[12px] text-ink-500"><strong class="text-ink-900">${_bh}</strong> head${_bh!==1?'s':''} · ${escapeHtml(val.validation||'Blocking')}</div>`;
+    }
+    case 'emergency-policy': {
+      if (!val || typeof val !== 'object') return '';
+      return `<div class="text-[12px] text-ink-500"><strong class="text-ink-900">${(val.markRoles||[]).length}</strong> role${(val.markRoles||[]).length!==1?'s':''} can mark · ${(val.skippableGates||[]).length} skippable gate${(val.skippableGates||[]).length!==1?'s':''}</div>`;
+    }
+    case 'handoff-rules': {
+      if (!val || typeof val !== 'object') return '';
+      const _cf=(val.carryForward||[]).filter(c=>c.enabled!==false).length;
+      return `<div class="text-[12px] text-ink-500"><strong class="text-ink-900">${_cf}</strong> field${_cf!==1?'s':''} carried · ${escapeHtml(val.unsanctioned||'Hard block')}</div>`;
+    }
+    case 'consultant-access': {
+      if (!val || typeof val !== 'object') return '';
+      return `<div class="text-[12px] text-ink-500">${escapeHtml(val.accessLevel||'Read-only')}${val.disclosureMandatory?' · disclosure required':''}</div>`;
+    }
     case 'ai-questionnaire': {
       if (!Array.isArray(val)) return '';
       const _aq_en = val.filter(q=>q.enabled!==false).length;
@@ -1814,9 +1995,12 @@ function renderPreview(item, val){
       return `<div class="text-[12px] ${val.enabled?'text-success font-medium':'text-ink-500'}">${val.enabled?'Enabled':'Disabled'} · ${(val.allowedForTypes||[]).length} types · ${(val.allowedForValueTiers||[]).length} tiers</div>`;
     case 'methods-suite': {
       if (!val || typeof val !== 'object') return '';
-      const _ms_on = (val.methods||[]).filter(m=>m.enabled!==false).length;
-      const _ms_total = (val.methods||[]).length;
-      return `<div class="flex items-center gap-3 text-[12px] text-ink-500 flex-wrap"><span><strong class="text-ink-900">${_ms_on}</strong> of ${_ms_total} methods on</span><span class="text-ink-300">•</span><span>${(val.sectorDefaults||[]).length} sector defaults</span><span class="text-ink-300">•</span><span>${(val.leafOverrides||[]).length} overrides</span></div>`;
+      const _ms_all = (val.methods||[]);
+      const _ms_em_on = _ms_all.filter(m=>m.group==='method' && m.enabled!==false).length;
+      const _ms_em = _ms_all.filter(m=>m.group==='method').length;
+      const _ms_pm_on = _ms_all.filter(m=>m.group==='mode' && m.enabled!==false).length;
+      const _ms_pm = _ms_all.filter(m=>m.group==='mode').length;
+      return `<div class="flex items-center gap-3 text-[12px] text-ink-500 flex-wrap"><span><strong class="text-ink-900">${_ms_em_on}</strong> of ${_ms_em} methods on</span><span class="text-ink-300">•</span><span><strong class="text-ink-900">${_ms_pm_on}</strong> of ${_ms_pm} modes on</span></div>`;
     }
     case 'tender-structure': {
       if (!val || typeof val !== 'object') return '';
@@ -1947,7 +2131,7 @@ function openEdit(id){
   // Wider panel for the permissions matrix and the merged multi-section editors.
   document.getElementById('editPanel').style.width =
     (item.t === 'prebid-committee' || item.t === 'tender-tree') ? '1080px'
-    : (['methods-suite','notif-events','corrigendum-gepnic','tender-structure','tq-rubric'].includes(item.t)) ? '980px'
+    : (['methods-suite','notif-events','corrigendum-gepnic','tender-structure','tq-rubric','ai-touchpoints','logo-library','submission-gates'].includes(item.t)) ? '980px'
     : '';
   document.getElementById('editPanel').classList.add('open');
   document.getElementById('backdrop').classList.add('open');
@@ -1987,9 +2171,20 @@ function renderEditor(item, draft){
     case 'tender-tree': return editorTenderTree(draft);
     case 'tender-numbering': return editorTenderNumbering(draft);
     case 'tender-manual-just': return editorTenderManualJust(draft);
-    case 'tender-template-builder': return editorTplBuilder(draft);
     case 'past-tender-cloning': return editorPastTenderCloning(draft);
+    case 'lang-toggles': return editorLangToggles(draft);
+    case 'emd-policy': return editorEmdPolicy(draft);
+    case 'logo-library': return editorLogoLibrary(draft);
+    case 'market-enquiry': return editorMarketEnquiry(draft);
+    case 'submission-gates': return editorSubmissionGates(draft);
+    case 'cost-basis': return editorCostBasis(draft);
+    case 'budget-heads': return editorBudgetHeads(draft);
+    case 'emergency-policy': return editorEmergencyPolicy(draft);
+    case 'handoff-rules': return editorHandoffRules(draft);
+    case 'consultant-access': return editorConsultantAccess(draft);
     case 'ai-questionnaire': return editorAiQuestionnaire(draft);
+    case 'ai-touchpoints': return editorAiTouchpoints(draft);
+    case 'section-prompts': return editorSectionPrompts(draft);
     case 'starter-chips-grouped': return editorStarterChipsGrouped(draft);
     case 'bsd-policy': return editorBsdPolicy(draft);
     case 'methods-suite': return editorMethodsSuite(draft);
@@ -2069,9 +2264,20 @@ function bindEditorHandlers(){
     case 'tender-tree': return renderTenderTreeAll();
     case 'tender-numbering': return renderTenderNumberingAll();
     case 'tender-manual-just': return renderTenderManualJustAll();
-    case 'tender-template-builder': return renderTplBuilderAll();
     case 'past-tender-cloning': return renderPastTenderCloningAll();
+    case 'lang-toggles': return renderLangTogglesAll();
+    case 'emd-policy': return renderEmdPolicyAll();
+    case 'logo-library': return renderLogoLibraryAll();
+    case 'market-enquiry': return renderMarketEnquiryAll();
+    case 'submission-gates': return renderSubmissionGatesAll();
+    case 'cost-basis': return renderCostBasisAll();
+    case 'budget-heads': return renderBudgetHeadsAll();
+    case 'emergency-policy': return renderEmergencyPolicyAll();
+    case 'handoff-rules': return renderHandoffRulesAll();
+    case 'consultant-access': return renderConsultantAccessAll();
     case 'ai-questionnaire': return renderAiQuestionnaireAll();
+    case 'ai-touchpoints': return renderAiTouchpointsAll();
+    case 'section-prompts': return renderSectionPromptsAll();
     case 'starter-chips-grouped': return renderStarterChipsGroupedAll();
     case 'bsd-policy': return renderBsdPolicyAll();
     case 'methods-suite': return renderMethodsSuiteAll();
@@ -2163,6 +2369,557 @@ function renderKvRows(){
   refreshIcons();
 }
 function addKvEntry(){ editingDraft = editingDraft||[]; editingDraft.push({k:'',v:''}); renderKvRows(); }
+
+/* ===== AI assistance — central touchpoint control (tender.ai-touchpoints) ===== */
+let aitUI = {restrict:{}, sectionsOpen:false};
+function aitFmtMoney(n){ n=Number(n)||0; if(!n) return ''; if(n>=10000000) return '₹'+(n/10000000).toFixed(n%10000000?2:0)+' Cr'; if(n>=100000) return '₹'+(n/100000).toFixed(n%100000?1:0)+' L'; return '₹'+n.toLocaleString('en-IN'); }
+// Section names synced (read-only) from the NIT section structure item.
+function aitNitSections(){ const raw=getValue('tender.nit-sections')||[]; return (Array.isArray(raw)?raw:[]).map(normalizeListItem).filter(s=>s.enabled!==false).map(s=>s.label); }
+// One source of truth for "is AI drafting allowed for this section": the touchpoints item.
+function aitSectionDrafting(){ const v=getValue('tender.ai-touchpoints'); return (v && v.sectionDrafting) || {}; }
+function editorAiTouchpoints(draft){ aitUI={restrict:{}, sectionsOpen:false}; return `<div id="aitRoot"></div>`; }
+function renderAiTouchpointsAll(){
+  if (!editingDraft || typeof editingDraft!=='object' || Array.isArray(editingDraft)) {
+    const _it = ITEMS.find(i=>i.id===editingId) || ITEMS.find(i=>i.id==='tender.ai-touchpoints');
+    editingDraft = JSON.parse(JSON.stringify(_it.def));
+  }
+  const draft = editingDraft;
+  draft.touchpoints = draft.touchpoints || [];
+  draft.sectionDrafting = draft.sectionDrafting || {};
+  const masterOn = !!draft.master;
+  const root = document.getElementById('aitRoot');
+  // Module-aware cross-reference for the Review checks' "where blocking lives" caption.
+  const _gatesCaption = String(editingId||'').startsWith('dpr.')
+    ? 'set in Submission gates &amp; policies → Pre-submission gates (AA/TS), not here.'
+    : 'set in Review &amp; publish → Pre-publish hard gates, not here.';
+
+  const sectionSubList = () => {
+    const secs = aitNitSections();
+    const enabled = secs.filter(s => draft.sectionDrafting[s] !== false).length;
+    const open = aitUI.sectionsOpen;
+    return `<div class="mt-2.5 pt-2.5 border-t border-line">
+      <button id="aitSecToggle" class="text-[11.5px] font-medium text-ink-500 inline-flex items-center gap-1.5">
+        <i data-lucide="list-tree" class="w-3.5 h-3.5"></i> Per section (${enabled}/${secs.length} allow AI)
+        <i data-lucide="chevron-${open?'up':'down'}" class="w-3.5 h-3.5"></i>
+      </button>
+      ${open ? `<div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+        ${secs.map(s => { const on = draft.sectionDrafting[s] !== false; return `
+          <label class="flex items-center gap-2 text-[12px] px-2.5 py-1.5 border border-line rounded-lg ${on?'bg-white':'bg-surface'}">
+            <button class="toggle ${on?'on':''}" data-sec-draft="${escapeHtml(s)}" aria-pressed="${on}"><span class="dot"></span></button>
+            <span class="${on?'text-ink-900':'text-ink-400 line-through'}">${escapeHtml(s)}</span>
+          </label>`; }).join('')}
+      </div>
+      <p class="text-[11px] text-ink-400 italic mt-1.5">Synced from NIT section structure. Turn AI off where legal wants human-only text (e.g. General conditions, Eligibility).</p>` : ''}
+    </div>`;
+  };
+
+  const rowHtml = (tp) => {
+    const isCheck = tp.kind==='check';
+    const r = tp.restrict || {};
+    const rActive = !!(r.sensitive || r.maxValue);
+    const rOpen = !!aitUI.restrict[tp.id];
+    const seg = isCheck
+      ? `<div class="inline-flex rounded-lg border border-line overflow-hidden text-[12px] shrink-0">
+           <button data-mode="${tp.id}|on"  class="px-3 py-1.5 ${tp.mode==='on' ?'bg-primary text-white':'bg-white text-ink-500 hover:bg-surface'}">On</button>
+           <button data-mode="${tp.id}|off" class="px-3 py-1.5 border-l border-line ${tp.mode==='off'?'bg-ink-900 text-white':'bg-white text-ink-500 hover:bg-surface'}">Off</button>
+         </div>`
+      : `<div class="inline-flex rounded-lg border border-line overflow-hidden text-[12px] shrink-0">
+           ${[['proactive','Proactive'],['ondemand','On-demand'],['off','Off']].map(([v,l],idx)=>`<button data-mode="${tp.id}|${v}" class="px-3 py-1.5 ${idx?'border-l border-line ':''}${tp.mode===v?(v==='off'?'bg-ink-900 text-white':'bg-primary text-white'):'bg-white text-ink-500 hover:bg-surface'}">${l}</button>`).join('')}
+         </div>`;
+    return `<div class="rounded-xl border border-line bg-white px-4 py-3">
+      <div class="flex items-start gap-3">
+        <div class="flex-1 min-w-0">
+          <div class="text-[13.5px] font-semibold text-ink-900">${escapeHtml(tp.name)}</div>
+          <p class="text-[12px] text-ink-500 mt-0.5 leading-snug">${escapeHtml(tp.desc)}</p>
+          ${tp.smartStartRef ? `<p class="text-[11px] text-ink-400 mt-1 italic">Precedence: this and the Smart Start methods matrix must <em>both</em> allow it — if either is off, the describe entry is hidden.</p>` : ''}
+          ${isCheck ? `<p class="text-[11px] text-ink-400 mt-1 italic">On/Off controls visibility only. Whether this check blocks submission is ${_gatesCaption}</p>` : ''}
+        </div>
+        ${seg}
+      </div>
+      ${tp.hasSections ? sectionSubList() : ''}
+      <div class="mt-2 pt-2 border-t border-line">
+        <button data-restrict-toggle="${tp.id}" class="text-[11.5px] font-medium text-ink-500 inline-flex items-center gap-1.5">
+          <i data-lucide="shield" class="w-3.5 h-3.5"></i> Restrict
+          ${rActive ? `<span class="chip pri-Core ml-0.5">${[r.sensitive?'sensitive':'', r.maxValue?('> '+aitFmtMoney(r.maxValue)):''].filter(Boolean).join(' · ')}</span>` : ''}
+          <i data-lucide="chevron-${rOpen?'up':'down'}" class="w-3.5 h-3.5"></i>
+        </button>
+        ${rOpen ? `<div class="mt-2 space-y-2 pl-1">
+          <div class="flex items-center gap-2 text-[12px] text-ink-700">
+            <button class="toggle ${r.sensitive?'on':''}" data-restrict-sens="${tp.id}" aria-pressed="${!!r.sensitive}"><span class="dot"></span></button>
+            <span>Disable for sensitive / vigilance-flagged tenders</span>
+          </div>
+          <div class="flex items-center gap-2 text-[12px] text-ink-700">
+            <span>Disable above</span>
+            <input class="inp w-40" inputmode="numeric" placeholder="No limit (₹)" data-restrict-max="${tp.id}" value="${r.maxValue?escapeHtml(String(r.maxValue)):''}">
+            <span class="text-ink-400">${r.maxValue?aitFmtMoney(r.maxValue):'blank = no limit'}</span>
+          </div>
+          <p class="text-[11px] text-ink-400 italic">High-value and sensitive tenders need a fully human-attributable drafting trail.</p>
+        </div>` : ''}
+      </div>
+    </div>`;
+  };
+
+  const stageBlock = (stage) => {
+    const rows = draft.touchpoints.filter(t => t.stage===stage);
+    if (!rows.length) return '';
+    return `<div class="mb-5">
+      <div class="text-[11px] font-semibold uppercase tracking-wide text-ink-400 mb-2">${stage} stage</div>
+      <div class="space-y-2">${rows.map(rowHtml).join('')}</div>
+    </div>`;
+  };
+
+  root.innerHTML = `
+    <div class="space-y-5">
+      <div class="flex items-start gap-3 p-4 rounded-xl border ${masterOn?'border-primary/40 bg-primary-light/40':'border-line bg-surface'}">
+        <button class="toggle ${masterOn?'on':''}" id="aitMaster" aria-pressed="${masterOn}"><span class="dot"></span></button>
+        <div class="flex-1 min-w-0">
+          <div class="text-[14px] font-semibold text-ink-900">AI assistance in Tender Creation</div>
+          <p class="text-[12px] text-ink-500 mt-0.5 leading-snug">Master switch. When off, no AI affordance renders anywhere in tender creation — every touchpoint below is suppressed regardless of its own setting.</p>
+        </div>
+        <span class="chip ${masterOn?'pri-Core':'pri-Helpful'} shrink-0">${masterOn?'On':'Off'}</span>
+      </div>
+      <div class="${masterOn?'':'opacity-50 pointer-events-none select-none'}">
+        ${masterOn ? '' : '<div class="text-[12px] text-warning font-medium mb-3">Master switch is off. Every touchpoint below is disabled until you switch it on.</div>'}
+        ${['Entry','Drafting','Review'].map(stageBlock).join('')}
+      </div>
+    </div>`;
+
+  root.querySelector('#aitMaster').onclick = () => { draft.master = !draft.master; renderAiTouchpointsAll(); };
+  if (masterOn) {
+    root.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { const [id,m]=b.dataset.mode.split('|'); const tp=draft.touchpoints.find(t=>t.id===id); if(tp){ tp.mode=m; renderAiTouchpointsAll(); } });
+    root.querySelectorAll('[data-restrict-toggle]').forEach(b => b.onclick = () => { const id=b.dataset.restrictToggle; aitUI.restrict[id]=!aitUI.restrict[id]; renderAiTouchpointsAll(); });
+    root.querySelectorAll('[data-restrict-sens]').forEach(b => b.onclick = () => { const id=b.dataset.restrictSens; const tp=draft.touchpoints.find(t=>t.id===id); if(tp){ tp.restrict=tp.restrict||{}; tp.restrict.sensitive=!tp.restrict.sensitive; renderAiTouchpointsAll(); } });
+    root.querySelectorAll('[data-restrict-max]').forEach(inp => inp.onchange = e => { const id=e.target.dataset.restrictMax; const tp=draft.touchpoints.find(t=>t.id===id); if(tp){ tp.restrict=tp.restrict||{}; const n=parseInt(String(e.target.value).replace(/[^0-9]/g,''),10); tp.restrict.maxValue=(n>0)?n:null; renderAiTouchpointsAll(); } });
+    const st = root.querySelector('#aitSecToggle'); if (st) st.onclick = () => { aitUI.sectionsOpen=!aitUI.sectionsOpen; renderAiTouchpointsAll(); };
+    root.querySelectorAll('[data-sec-draft]').forEach(b => b.onclick = () => { const s=b.dataset.secDraft; const on=draft.sectionDrafting[s]!==false; draft.sectionDrafting[s]=!on; renderAiTouchpointsAll(); });
+  }
+  refreshIcons();
+}
+
+/* ===== AI section-edit prompts (tender.ai-section-prompts) — names synced from NIT sections ===== */
+function aitAutosize(ta){ ta.style.height='auto'; const lh=parseFloat(getComputedStyle(ta).lineHeight)||18; const max=lh*10+16; ta.style.height=Math.min(ta.scrollHeight, max)+'px'; ta.style.overflowY = ta.scrollHeight>max ? 'auto' : 'hidden'; }
+function editorSectionPrompts(draft){ return `<div id="spRoot"></div>`; }
+function renderSectionPromptsAll(){
+  editingDraft = Array.isArray(editingDraft) ? editingDraft : [];
+  const draft = editingDraft;
+  const root = document.getElementById('spRoot');
+  const secs = aitNitSections();                       // authoritative, ordered, read-only names
+  const secDraft = aitSectionDrafting();               // cross-reference: AI on/off per section
+  const aiOff = s => secDraft[s] === false;
+  const have = new Set(draft.map(p => p.k));
+  const rowsBySec = {}; draft.forEach(p => { rowsBySec[p.k] = p; });
+  const visible = secs.filter(s => have.has(s));        // section removed from NIT sections → row hides, data retained
+  const missing = secs.filter(s => !have.has(s));       // promptless sections only
+
+  root.innerHTML = `
+    <div class="space-y-3">
+      <div id="spRows" class="space-y-3"></div>
+      <div class="pt-3 border-t border-line">
+        ${missing.length
+          ? `<div class="flex items-center gap-2">
+               <select id="spAddSel" class="inp flex-1">${missing.map(s=>`<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('')}</select>
+               <button class="btn btn-primary" id="spAddBtn"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add prompt</button>
+             </div>`
+          : `<div class="text-[12px] text-ink-400 italic">Every NIT section has a prompt.</div>`}
+        <p class="text-[11px] text-ink-400 mt-1.5">Section names are managed in NIT section structure and are read-only here. “Add prompt” only lists sections that don’t have one yet.</p>
+      </div>
+    </div>`;
+
+  const rowsEl = root.querySelector('#spRows');
+  rowsEl.innerHTML = visible.map(s => {
+    const p = rowsBySec[s]; const off = aiOff(s);
+    return `<div class="rounded-xl border border-line ${off?'bg-surface opacity-80':'bg-white'} px-3.5 py-3">
+      <div class="flex items-center justify-between mb-1.5">
+        <div class="text-[13px] font-semibold text-ink-900 flex items-center gap-2">${escapeHtml(s)}${off?'<span class="chip pri-Helpful">AI off</span>':''}</div>
+        <button data-sp-rm="${escapeHtml(s)}" class="text-ink-400 hover:text-danger transition" aria-label="Remove prompt"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+      </div>
+      ${off ? `<p class="text-[11px] text-warning mb-1.5">AI drafting disabled for this section in AI assistance settings.</p>` : ''}
+      <textarea data-sp-prompt="${escapeHtml(s)}" rows="3" class="inp w-full text-[12.5px] leading-relaxed" placeholder="Drafting instruction for this section…">${escapeHtml(String(p.v||''))}</textarea>
+    </div>`;
+  }).join('') || `<div class="text-center py-6 text-ink-400 text-[13px] border border-dashed border-line rounded-xl">No section prompts yet. Use “Add prompt” below.</div>`;
+
+  rowsEl.querySelectorAll('textarea').forEach(ta => { aitAutosize(ta); ta.oninput = () => { const s=ta.dataset.spPrompt; const row=draft.find(x=>x.k===s); if(row) row.v=ta.value; aitAutosize(ta); }; });
+  rowsEl.querySelectorAll('[data-sp-rm]').forEach(b => b.onclick = () => { const s=b.dataset.spRm; const i=draft.findIndex(x=>x.k===s); if(i>=0) draft.splice(i,1); renderSectionPromptsAll(); });
+  const addBtn = root.querySelector('#spAddBtn');
+  if (addBtn) addBtn.onclick = () => { const sel=root.querySelector('#spAddSel'); const s=sel&&sel.value; if(!s) return; draft.push({k:s, v:''}); renderSectionPromptsAll(); };
+  refreshIcons();
+}
+
+/* ---- languages (fixed toggle list + default-language select) ---- */
+function editorLangToggles(){ return `<div id="lgWrap" class="space-y-3"></div>`; }
+function renderLangTogglesAll(){
+  if(!editingDraft || typeof editingDraft!=='object' || Array.isArray(editingDraft)) editingDraft={languages:[],default:'English'};
+  const d=editingDraft;
+  d.languages = Array.isArray(d.languages) ? d.languages : [];
+  const enabled = d.languages.filter(l=>l.enabled!==false).map(l=>l.label);
+  if(!enabled.includes(d.default)) d.default = enabled[0] || '';
+  const wrap=document.getElementById('lgWrap');
+  wrap.innerHTML=`
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+      ${d.languages.map((l,i)=>{const on=l.enabled!==false;return `<label class="flex items-center gap-2 text-[13px] px-3 py-2 border border-line rounded-lg ${on?'bg-white':'bg-surface'}">
+        <button class="toggle ${on?'on':''}" data-lg-toggle="${i}" aria-pressed="${on}"><span class="dot"></span></button>
+        <span class="${on?'text-ink-900':'text-ink-400'}">${escapeHtml(l.label)}</span>
+        ${l.label===d.default?'<span class="text-[10px] text-primary font-semibold ml-auto">default</span>':''}
+      </label>`;}).join('')}
+    </div>
+    <div class="pt-3 border-t border-line flex items-center gap-2">
+      <span class="text-[12px] text-ink-500">Default language</span>
+      <select class="inp" id="lgDefault">${enabled.length?enabled.map(l=>`<option ${d.default===l?'selected':''}>${escapeHtml(l)}</option>`).join(''):'<option value="">— enable a language first —</option>'}</select>
+    </div>`;
+  wrap.querySelectorAll('[data-lg-toggle]').forEach(b=>b.onclick=()=>{const l=d.languages[+b.dataset.lgToggle];l.enabled=l.enabled===false?true:false;renderLangTogglesAll();});
+  const sel=document.getElementById('lgDefault'); if(sel) sel.onchange=e=>{ d.default=e.target.value; renderLangTogglesAll(); };
+  refreshIcons();
+}
+
+/* ---- EMD policy (percentage of EC + MSME exemption only) ---- */
+function emdFromKv(arr){
+  const find=k=>{ const p=(arr||[]).find(x=>x && String(x.k||'').toLowerCase().includes(k)); return p?p.v:undefined; };
+  const truthy=v=>v===true||v==='true'||v==='True';
+  const pctRaw=find('emd %')!=null?find('emd %'):find('%');
+  const pct=parseFloat(pctRaw);
+  const micro=find('micro'), small=find('small');
+  const exempt=(micro===undefined && small===undefined) ? true : (truthy(micro)||truthy(small));
+  return { percent:isNaN(pct)?2:pct, msmeExempt:exempt };
+}
+function editorEmdPolicy(){ return `<div id="emdWrap" class="space-y-4"></div>`; }
+function renderEmdPolicyAll(){
+  if(Array.isArray(editingDraft)) editingDraft=emdFromKv(editingDraft);
+  if(!editingDraft || typeof editingDraft!=='object') editingDraft={percent:2,msmeExempt:true};
+  const d=editingDraft;
+  if(d.percent==null) d.percent=2;
+  if(d.msmeExempt==null) d.msmeExempt=true;
+  const wrap=document.getElementById('emdWrap');
+  wrap.innerHTML=`
+    <label class="block"><span class="text-[12px] text-ink-500">EMD percentage (of estimated cost)</span>
+      <div class="flex items-center gap-2 mt-1"><input type="number" min="0" step="0.5" class="inp w-32 text-right" id="emdPct" value="${d.percent}"><span class="text-ink-400 text-[13px]">% of EC</span></div></label>
+    <div class="flex items-center gap-3 px-3 py-2.5 border border-line rounded-lg ${d.msmeExempt?'bg-white':'bg-surface'}">
+      <button class="toggle ${d.msmeExempt?'on':''}" id="emdMsme" aria-pressed="${!!d.msmeExempt}"><span class="dot"></span></button>
+      <div class="flex-1"><div class="text-[13px] text-ink-900">MSME Micro / Small exempt from EMD</div><div class="text-[11px] text-ink-400">Statutory exemption per MSME policy (GFR Rule 170).</div></div>
+    </div>`;
+  document.getElementById('emdPct').onchange=e=>{ const v=parseFloat(e.target.value); d.percent=isNaN(v)?0:v; };
+  document.getElementById('emdMsme').onclick=()=>{ d.msmeExempt=!d.msmeExempt; renderEmdPolicyAll(); };
+  refreshIcons();
+}
+
+/* ---- logo & seal image library (real uploads, usage tags, one default per tag) ---- */
+const LL_TAGS=['Header logo','Official seal','Watermark','Footer emblem','DPR header logo','DPR cover seal'];
+const LL_MAX_BYTES=307200;     // ~300 KB per image
+const LL_BUDGET=4500000;       // ~4.5 MB total serialized budget for this item
+let llMode='new', llIdx=null;
+// Build a seeded asset from an inline SVG (used in the item def; function declaration hoists).
+function sigSampleLogo(id,name,tag,isDefault,w,h,svg){ const dataUrl='data:image/svg+xml,'+encodeURIComponent(svg); return {id, name, tag, isDefault, seeded:true, image:{name:id+'.svg', type:'image/svg+xml', dataUrl, width:w, height:h, size:svg.length}}; }
+function llFmtSize(n){ n=Number(n)||0; if(n>=1048576) return (n/1048576).toFixed(1)+' MB'; if(n>=1024) return Math.round(n/1024)+' KB'; return n+' B'; }
+function llOverBudget(){ try{ return JSON.stringify(editingDraft).length > LL_BUDGET; }catch(e){ return true; } }
+function llReadImage(file, cb){
+  if(!/image\/(png|jpeg|jpg|svg\+xml)/i.test(file.type||'')){ cb({error:'type'}); return; }
+  if(file.size > LL_MAX_BYTES){ cb({error:'size'}); return; }
+  const r=new FileReader();
+  r.onload=()=>{
+    const dataUrl=r.result;
+    const done=(w,h)=>cb({image:{name:file.name, type:file.type, dataUrl, width:w||null, height:h||null, size:file.size}});
+    try{ const img=new Image(); img.onload=()=>done(img.naturalWidth||img.width, img.naturalHeight||img.height); img.onerror=()=>done(null,null); img.src=dataUrl; }
+    catch(e){ done(null,null); }
+  };
+  r.onerror=()=>cb({error:'read'});
+  r.readAsDataURL(file);
+}
+function llApplyUpload(mode, idx, file){
+  llReadImage(file, res=>{
+    if(res.error==='type'){ toast('Only PNG, JPG or SVG images are allowed.'); return; }
+    if(res.error==='size'){ toast('Image too large ('+llFmtSize(file.size)+'). Max 300 KB — please compress and retry.'); return; }
+    if(res.error){ toast('Could not read that image.'); return; }
+    if(mode==='replace'){
+      const a=editingDraft[idx]; if(!a) return; const prev=a.image, prevName=a.name;
+      a.image=res.image;
+      if(llOverBudget()){ a.image=prev; toast('Storage budget exceeded — image not saved. Try a smaller file.'); renderLogoLibraryAll(); return; }
+      toast('Replaced “'+a.name+'”');
+    } else {
+      const tag='Header logo';
+      const hasDef=editingDraft.some(x=>x.tag===tag && x.isDefault);
+      const a={id:'logo_'+Date.now().toString(36), name:(file.name||'logo').replace(/\.[^.]+$/,''), tag, isDefault:!hasDef, seeded:false, image:res.image};
+      editingDraft.push(a);
+      if(llOverBudget()){ editingDraft.pop(); toast('Storage budget exceeded — image not saved. Try a smaller file.'); renderLogoLibraryAll(); return; }
+      toast('Logo added');
+    }
+    renderLogoLibraryAll();
+  });
+}
+function llSetDefault(i){ const a=editingDraft[i]; if(!a) return; editingDraft.forEach(x=>{ if(x.tag===a.tag) x.isDefault=false; }); a.isDefault=true; renderLogoLibraryAll(); }
+function llChangeTag(i, newTag){
+  const a=editingDraft[i]; if(!a) return; const oldTag=a.tag; a.tag=newTag;
+  const newHasDefault=editingDraft.some((x,j)=>j!==i && x.tag===newTag && x.isDefault);
+  a.isDefault=!newHasDefault;
+  if(oldTag!==newTag){ const oldAssets=editingDraft.filter(x=>x.tag===oldTag); if(oldAssets.length && !oldAssets.some(x=>x.isDefault)) oldAssets[0].isDefault=true; }
+  renderLogoLibraryAll();
+}
+function llDelete(i){
+  const a=editingDraft[i]; if(!a) return;
+  const msg='Delete “'+a.name+'”'+(a.isDefault?' — the current default for '+a.tag+'. A new default will be picked.':'')+'?';
+  if(typeof window.confirm==='function' && !window.confirm(msg)) return;
+  const tag=a.tag, wasDefault=a.isDefault;
+  editingDraft.splice(i,1);
+  if(wasDefault){ const repl=editingDraft.find(x=>x.tag===tag); if(repl){ repl.isDefault=true; toast('New default for '+tag+': '+repl.name); } }
+  renderLogoLibraryAll();
+}
+function llDownload(i){ const a=editingDraft[i]; if(!a||!a.image||!a.image.dataUrl) return; const link=document.createElement('a'); link.href=a.image.dataUrl; link.download=a.image.name||((a.name||'logo')+'.png'); document.body.appendChild(link); link.click(); link.remove(); }
+function llTriggerFile(mode, idx){ llMode=mode; llIdx=idx; const fi=document.getElementById('llFile'); if(fi){ fi.value=''; fi.click(); } }
+function editorLogoLibrary(){ return `
+  <div class="space-y-3">
+    <div class="text-[11.5px] text-ink-500 leading-snug">Real image assets used on outgoing documents. The portal reads the <b>default</b> asset per usage tag — <code class="text-[11px] bg-surface px-1 rounded">AdminState.logo('Header logo')</code> returns its <code class="text-[11px] bg-surface px-1 rounded">image.dataUrl</code>. PNG / JPG / SVG, ≤ 300 KB each.</div>
+    <div id="llDrop" class="border-2 border-dashed border-line rounded-xl p-3 transition">
+      <div class="flex items-center justify-between gap-2 mb-2">
+        <div class="text-[12px] text-ink-500">Drag &amp; drop an image here, or</div>
+        <button class="btn btn-primary" id="llUpload"><i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload logo</button>
+      </div>
+      <div id="llGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+    </div>
+    <input type="file" id="llFile" accept="image/png,image/jpeg,image/svg+xml" class="hidden">
+  </div>`; }
+function renderLogoLibraryAll(){
+  if(!Array.isArray(editingDraft)) editingDraft=[];
+  editingDraft.forEach(a=>{ if(!a.tag||!LL_TAGS.includes(a.tag)) a.tag='Header logo'; if(!a.image) a.image={}; });
+  // Enforce exactly one default per tag that has assets.
+  LL_TAGS.forEach(tag=>{ const assets=editingDraft.filter(a=>a.tag===tag); if(assets.length){ const defs=assets.filter(a=>a.isDefault); if(defs.length===0) assets[0].isDefault=true; else if(defs.length>1) defs.slice(1).forEach(a=>a.isDefault=false); } });
+  const grid=document.getElementById('llGrid');
+  grid.innerHTML = editingDraft.length ? editingDraft.map((a,i)=>{
+    const img=a.image||{};
+    const dims=(img.width&&img.height)?`${img.width}×${img.height}`:'—';
+    return `<div class="group relative border border-line rounded-xl p-3 bg-white">
+      <div class="flex items-center justify-center rounded-lg bg-surface mb-2 overflow-hidden" style="height:96px">
+        ${img.dataUrl?`<img src="${img.dataUrl}" alt="${escapeHtml(a.name||'')}" style="max-height:88px;max-width:100%;object-fit:contain">`:`<span class="text-[11px] text-ink-400">No image</span>`}
+      </div>
+      <input class="inp w-full text-[12.5px] font-medium mb-1.5" data-ll-name="${i}" value="${escapeHtml(a.name||'')}">
+      <div class="flex items-center gap-2">
+        <select class="inp flex-1 text-[12px]" data-ll-tag="${i}">${LL_TAGS.map(t=>`<option ${a.tag===t?'selected':''}>${t}</option>`).join('')}</select>
+        <button data-ll-default="${i}" title="${a.isDefault?'Default for '+a.tag:'Make default for '+a.tag}" style="font-size:18px;line-height:1;color:${a.isDefault?'#F59E0B':'#CBD5E1'}">${a.isDefault?'★':'☆'}</button>
+      </div>
+      <div class="flex items-center gap-2 mt-1.5 text-[10.5px] text-ink-400 flex-wrap">
+        <span>${escapeHtml((img.type||'').replace('image/','').toUpperCase())||'—'}</span><span>·</span><span>${dims}</span><span>·</span><span>${img.size?llFmtSize(img.size):'—'}</span>
+        ${a.seeded?'<span class="chip" style="background:#EEEDFE;color:#8B5CF6">seeded</span>':''}
+        ${a.isDefault?`<span class="chip" style="background:#EFF6FF;color:#0F5EE8">default · ${escapeHtml(a.tag)}</span>`:''}
+      </div>
+      <div class="absolute top-2 right-2 hidden group-hover:flex items-center gap-1 bg-white border border-line rounded-lg px-1 py-0.5 shadow-sm">
+        <button class="text-ink-500 hover:text-primary p-1" data-ll-replace="${i}" title="Replace"><i data-lucide="repeat" class="w-3.5 h-3.5"></i></button>
+        <button class="text-ink-500 hover:text-primary p-1" data-ll-download="${i}" title="Download"><i data-lucide="download" class="w-3.5 h-3.5"></i></button>
+        <button class="text-ink-500 hover:text-danger p-1" data-ll-del="${i}" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+      </div>
+    </div>`;
+  }).join('') : `<div class="col-span-full text-[12px] text-ink-400 text-center py-6 border border-dashed border-line rounded-xl">No logos yet. Upload PNG/JPG/SVG to start.</div>`;
+  grid.querySelectorAll('[data-ll-name]').forEach(inp=>inp.oninput=e=>{ editingDraft[+e.target.dataset.llName].name=e.target.value; });
+  grid.querySelectorAll('[data-ll-tag]').forEach(s=>s.onchange=e=>{ llChangeTag(+e.target.dataset.llTag, e.target.value); });
+  grid.querySelectorAll('[data-ll-default]').forEach(b=>b.onclick=()=>llSetDefault(+b.dataset.llDefault));
+  grid.querySelectorAll('[data-ll-replace]').forEach(b=>b.onclick=()=>llTriggerFile('replace', +b.dataset.llReplace));
+  grid.querySelectorAll('[data-ll-download]').forEach(b=>b.onclick=()=>llDownload(+b.dataset.llDownload));
+  grid.querySelectorAll('[data-ll-del]').forEach(b=>b.onclick=()=>llDelete(+b.dataset.llDel));
+  const up=document.getElementById('llUpload'); if(up) up.onclick=()=>llTriggerFile('new', null);
+  const drop=document.getElementById('llDrop');
+  if(drop){
+    drop.ondragover=e=>{ e.preventDefault(); drop.classList.add('border-primary'); };
+    drop.ondragleave=()=>drop.classList.remove('border-primary');
+    drop.ondrop=e=>{ e.preventDefault(); drop.classList.remove('border-primary'); const f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(f) llApplyUpload('new', null, f); };
+  }
+  const fi=document.getElementById('llFile'); if(fi && !fi.dataset.bound){ fi.dataset.bound='1'; fi.onchange=e=>{ const f=e.target.files&&e.target.files[0]; if(f) llApplyUpload(llMode, llIdx, f); llMode='new'; llIdx=null; }; }
+  refreshIcons();
+}
+
+/* ======================= DPR module editors ======================= */
+
+/* ---- market enquiry: log structure + rules ---- */
+function meFromOld(v){
+  if(!Array.isArray(v)) return v;
+  const find=k=>{ const p=v.find(x=>x && String(x.k||'').toLowerCase().includes(k)); return p?p.v:undefined; };
+  const mq=parseInt(find('minimum quote'),10), age=parseInt(find('max age'),10);
+  const struct=v.filter(x=>x && !/minimum quote|max age/i.test(x.k||''));
+  return { logStructure: struct.length?struct:[{k:'Required columns',v:'vendor, quote, date, source'}],
+           rules:{minQuotes:isNaN(mq)?3:mq, validityDays:isNaN(age)?90:age, acceptanceBasis:'lowest', mandatoryAbove:null, deviationPct:25} };
+}
+function editorMarketEnquiry(){ return `<div id="meWrap" class="space-y-5"></div>`; }
+function renderMarketEnquiryAll(){
+  if(Array.isArray(editingDraft)) editingDraft=meFromOld(editingDraft);
+  if(!editingDraft||typeof editingDraft!=='object') editingDraft={};
+  const d=editingDraft; d.logStructure=Array.isArray(d.logStructure)?d.logStructure:[]; d.rules=d.rules||{}; const r=d.rules;
+  if(r.minQuotes==null)r.minQuotes=3; if(r.validityDays==null)r.validityDays=90; if(!r.acceptanceBasis)r.acceptanceBasis='lowest'; if(r.deviationPct==null)r.deviationPct=25; if(r.mandatoryAbove===undefined)r.mandatoryAbove=null;
+  const wrap=document.getElementById('meWrap');
+  wrap.innerHTML=`
+    <div><div class="text-[12px] font-semibold uppercase tracking-wide text-ink-500 mb-2">Log structure</div>
+      <div id="meLog" class="space-y-2"></div>
+      <button class="btn mt-2" id="meAddLog"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add field</button></div>
+    <div class="pt-4 border-t border-line"><div class="text-[12px] font-semibold uppercase tracking-wide text-ink-500 mb-2">Rules</div>
+      <div class="space-y-3">
+        <div class="flex items-center gap-2 text-[12px]"><span class="text-ink-500" style="width:230px">Minimum quotations required</span><input type="number" min="1" class="inp w-24 text-right" data-me-r="minQuotes" value="${r.minQuotes}"></div>
+        <div class="flex items-center gap-2 text-[12px]"><span class="text-ink-500" style="width:230px">Quotation validity window (days)</span><input type="number" min="1" class="inp w-24 text-right" data-me-r="validityDays" value="${r.validityDays}"></div>
+        <div class="flex items-center gap-2 text-[12px]"><span class="text-ink-500" style="width:230px">Acceptance basis</span><select class="inp" data-me-basis>${[['lowest','Lowest quote'],['average','Average of quotes'],['median','Median']].map(([v,l])=>`<option value="${v}" ${r.acceptanceBasis===v?'selected':''}>${l}</option>`).join('')}</select></div>
+        <div class="flex items-center gap-2 text-[12px]"><span class="text-ink-500" style="width:230px">Market enquiry mandatory above ₹</span><input type="number" class="inp w-36 text-right" data-me-r="mandatoryAbove" value="${r.mandatoryAbove!=null?r.mandatoryAbove:''}" placeholder="blank = always"><span class="text-ink-400">${r.mandatoryAbove?aitFmtMoney(r.mandatoryAbove):'always'}</span></div>
+        <div class="flex items-center gap-2 text-[12px]"><span class="text-ink-500" style="width:230px">Deviation flag — spread exceeds</span><input type="number" min="0" class="inp w-20 text-right" data-me-r="deviationPct" value="${r.deviationPct}"><span class="text-ink-400">% → flag for review</span></div>
+      </div></div>`;
+  const logEl=document.getElementById('meLog');
+  logEl.innerHTML=d.logStructure.map((p,i)=>`<div class="flex items-center gap-2"><input class="inp flex-1" data-me-lk="${i}" value="${escapeHtml(p.k||'')}" placeholder="Field"><input class="inp flex-1" data-me-lv="${i}" value="${escapeHtml(String(p.v==null?'':p.v))}" placeholder="Value"><button class="text-ink-400 hover:text-danger" data-me-lrm="${i}"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`).join('')||'<div class="text-[11px] text-ink-400 italic">No fields.</div>';
+  logEl.querySelectorAll('[data-me-lk]').forEach(inp=>inp.oninput=e=>{d.logStructure[+e.target.dataset.meLk].k=e.target.value;});
+  logEl.querySelectorAll('[data-me-lv]').forEach(inp=>inp.oninput=e=>{d.logStructure[+e.target.dataset.meLv].v=e.target.value;});
+  logEl.querySelectorAll('[data-me-lrm]').forEach(b=>b.onclick=()=>{d.logStructure.splice(+b.dataset.meLrm,1);renderMarketEnquiryAll();});
+  const addLog=document.getElementById('meAddLog'); if(addLog) addLog.onclick=()=>{d.logStructure.push({k:'',v:''});renderMarketEnquiryAll();};
+  wrap.querySelectorAll('[data-me-r]').forEach(inp=>inp.onchange=e=>{ const f=e.target.dataset.meR; const v=e.target.value.trim(); if(f==='mandatoryAbove'){ r.mandatoryAbove=v===''?null:(parseInt(v,10)||0); } else { r[f]=parseInt(v,10)||0; } renderMarketEnquiryAll(); });
+  const basis=wrap.querySelector('[data-me-basis]'); if(basis) basis.onchange=e=>{ r.acceptanceBasis=e.target.value; };
+  refreshIcons();
+}
+
+/* ---- submission gates: two sets (AA / TS), gate-row pattern ---- */
+let sgTab='aa';
+function editorSubmissionGates(){ return `<div id="sgWrap"></div>`; }
+function renderSubmissionGatesAll(){
+  if(!editingDraft||typeof editingDraft!=='object'||Array.isArray(editingDraft)) editingDraft={aa:[],ts:[]};
+  const d=editingDraft; d.aa=Array.isArray(d.aa)?d.aa:[]; d.ts=Array.isArray(d.ts)?d.ts:[];
+  const wrap=document.getElementById('sgWrap'); const baseRoles=pgRoles();
+  const tabs=[['aa','Before AA submission'],['ts','Before TS submission']];
+  const tabBar=`<div class="flex items-center gap-1 border-b border-line mb-4">${tabs.map(([k,l])=>`<button data-sg-tab="${k}" class="px-3 py-2 text-[12.5px] font-medium border-b-2 ${sgTab===k?'border-primary text-primary':'border-transparent text-ink-500 hover:text-ink-900'}">${escapeHtml(l)}</button>`).join('')}</div>`;
+  const arr=d[sgTab];
+  const rows=arr.length?arr.map((g,i)=>{ const roles=Array.from(new Set(baseRoles.concat(g.overrideRoles||[])));
+    return `<div class="bg-white border border-line rounded-xl p-2.5 space-y-2">
+    <div class="flex items-center gap-2"><input class="inp flex-1 text-[13px]" data-sg-check="${i}" value="${escapeHtml(g.check||'')}"><button class="text-ink-400 hover:text-danger" data-sg-rm="${i}"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>
+    <div class="flex items-center gap-4 flex-wrap text-[12px]">
+      <div class="flex items-center gap-2"><button class="toggle ${g.blocking?'on':''}" data-sg-block="${i}"><span class="dot"></span></button><span>Blocking</span></div>
+      <div class="flex items-center gap-2"><button class="toggle ${g.canOverride?'on':''}" data-sg-over="${i}"><span class="dot"></span></button><span>Can override</span></div>
+    </div>
+    ${g.canOverride?`<div><div class="text-[11px] text-ink-500 mb-1">Override roles</div><div class="flex flex-wrap gap-1.5">${roles.map(rr=>{const on=(g.overrideRoles||[]).includes(rr);return `<button class="chip-input" style="cursor:pointer;${on?'background:#EFF6FF;border-color:#93C5FD;color:#0F5EE8':''}" data-sg-role="${i}|${escapeHtml(rr)}">${escapeHtml(rr)}</button>`;}).join('')}</div></div>`:''}
+  </div>`;}).join('') : '<div class="text-[12px] text-ink-400 text-center py-6 border border-dashed border-line rounded-xl">No gates in this set.</div>';
+  wrap.innerHTML=tabBar+`<div class="space-y-2">${rows}</div><button class="btn btn-primary mt-3" id="sgAdd"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add gate</button>`;
+  wrap.querySelectorAll('[data-sg-tab]').forEach(b=>b.onclick=()=>{sgTab=b.dataset.sgTab;renderSubmissionGatesAll();});
+  wrap.querySelectorAll('[data-sg-check]').forEach(inp=>inp.oninput=e=>{arr[+e.target.dataset.sgCheck].check=e.target.value;});
+  wrap.querySelectorAll('[data-sg-rm]').forEach(b=>b.onclick=()=>{arr.splice(+b.dataset.sgRm,1);renderSubmissionGatesAll();});
+  wrap.querySelectorAll('[data-sg-block]').forEach(b=>b.onclick=()=>{const g=arr[+b.dataset.sgBlock];g.blocking=!g.blocking;renderSubmissionGatesAll();});
+  wrap.querySelectorAll('[data-sg-over]').forEach(b=>b.onclick=()=>{const g=arr[+b.dataset.sgOver];g.canOverride=!g.canOverride;g.overrideRoles=g.overrideRoles||[];if(!g.canOverride)g.overrideRoles=[];renderSubmissionGatesAll();});
+  wrap.querySelectorAll('[data-sg-role]').forEach(b=>b.onclick=()=>{const [i,rr]=b.dataset.sgRole.split('|');const g=arr[+i];g.overrideRoles=g.overrideRoles||[];const k=g.overrideRoles.indexOf(rr);k>=0?g.overrideRoles.splice(k,1):g.overrideRoles.push(rr);renderSubmissionGatesAll();});
+  const add=document.getElementById('sgAdd'); if(add) add.onclick=()=>{arr.push({check:'New gate',blocking:true,canOverride:false,overrideRoles:[]});renderSubmissionGatesAll();};
+  refreshIcons();
+}
+
+/* ---- cost basis: rate-source priority list + tolerance ---- */
+function editorCostBasis(){ return `<div id="cbsWrap" class="space-y-4"></div>`; }
+function renderCostBasisAll(){
+  if(!editingDraft||typeof editingDraft!=='object'||Array.isArray(editingDraft)) editingDraft={};
+  const d=editingDraft; d.sources=Array.isArray(d.sources)?d.sources:[]; if(d.tolerancePct==null)d.tolerancePct=15; if(d.justifyMandatory==null)d.justifyMandatory=true;
+  const wrap=document.getElementById('cbsWrap');
+  wrap.innerHTML=`
+    <div><div class="text-[12px] font-semibold uppercase tracking-wide text-ink-500 mb-1">Rate sources (priority order — top wins)</div>
+      <div class="space-y-1.5">${d.sources.map((s,i)=>`<div class="flex items-center gap-2 px-3 py-2 border border-line rounded-lg ${s.enabled!==false?'bg-white':'bg-surface'}">
+        <span class="text-[11px] text-ink-400 w-4 text-center">${i+1}</span>
+        <button class="toggle ${s.enabled!==false?'on':''}" data-cbs-en="${i}"><span class="dot"></span></button>
+        <span class="flex-1 text-[13px] ${s.enabled!==false?'text-ink-900':'text-ink-400 line-through'}">${escapeHtml(s.label)}</span>
+        <button class="btn" style="padding:2px 6px;${i===0?'opacity:.3':''}" data-cbs-up="${i}"><i data-lucide="chevron-up" class="w-3.5 h-3.5"></i></button>
+        <button class="btn" style="padding:2px 6px;${i===d.sources.length-1?'opacity:.3':''}" data-cbs-dn="${i}"><i data-lucide="chevron-down" class="w-3.5 h-3.5"></i></button>
+      </div>`).join('')}</div></div>
+    <div class="pt-3 border-t border-line space-y-3">
+      <div class="flex items-center gap-2 text-[12px]"><span class="text-ink-500" style="width:280px">Deviation tolerance from top-priority source</span><input type="number" min="0" class="inp w-20 text-right" id="cbsTol" value="${d.tolerancePct}"><span class="text-ink-400">% before justification needed</span></div>
+      <div class="flex items-center gap-3 px-3 py-2.5 border border-line rounded-lg ${d.justifyMandatory?'bg-white':'bg-surface'}"><button class="toggle ${d.justifyMandatory?'on':''}" id="cbsJust"><span class="dot"></span></button><div class="flex-1 text-[13px] text-ink-900">Justification mandatory beyond tolerance</div></div>
+      <p class="text-[11px] text-ink-400 italic">DPR-side twin of the ALB reasonableness threshold — what AA authorities scrutinise.</p>
+    </div>`;
+  wrap.querySelectorAll('[data-cbs-en]').forEach(b=>b.onclick=()=>{const s=d.sources[+b.dataset.cbsEn];s.enabled=s.enabled===false?true:false;renderCostBasisAll();});
+  wrap.querySelectorAll('[data-cbs-up]').forEach(b=>b.onclick=()=>{const i=+b.dataset.cbsUp;if(i>0){const t=d.sources[i-1];d.sources[i-1]=d.sources[i];d.sources[i]=t;renderCostBasisAll();}});
+  wrap.querySelectorAll('[data-cbs-dn]').forEach(b=>b.onclick=()=>{const i=+b.dataset.cbsDn;if(i<d.sources.length-1){const t=d.sources[i+1];d.sources[i+1]=d.sources[i];d.sources[i]=t;renderCostBasisAll();}});
+  const tol=document.getElementById('cbsTol'); if(tol) tol.onchange=e=>{d.tolerancePct=Math.max(0,parseInt(e.target.value,10)||0);};
+  const just=document.getElementById('cbsJust'); if(just) just.onclick=()=>{d.justifyMandatory=!d.justifyMandatory;renderCostBasisAll();};
+  refreshIcons();
+}
+
+/* ---- budget heads registry + validation ---- */
+function editorBudgetHeads(){ return `<div id="bhWrap" class="space-y-4"></div>`; }
+function renderBudgetHeadsAll(){
+  if(!editingDraft||typeof editingDraft!=='object'||Array.isArray(editingDraft)) editingDraft={};
+  const d=editingDraft; d.heads=Array.isArray(d.heads)?d.heads:[]; if(!d.validation)d.validation='Blocking'; d.minBalanceRule=d.minBalanceRule||{enabled:false,pct:100};
+  const wrap=document.getElementById('bhWrap');
+  wrap.innerHTML=`
+    <div><div class="text-[12px] font-semibold uppercase tracking-wide text-ink-500 mb-1">Budget heads</div>
+      <div id="bhRows" class="space-y-1.5"></div>
+      <div class="flex items-center gap-2 pt-2"><input class="inp flex-1" id="bhNewLabel" placeholder="Budget head name"><input class="inp w-28" id="bhNewCode" placeholder="Code"><button class="btn btn-primary" id="bhAdd"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add</button></div></div>
+    <div class="pt-3 border-t border-line space-y-3">
+      <div class="flex items-center gap-2 text-[12px]"><span class="text-ink-500" style="width:200px">Validation behaviour</span><select class="inp" id="bhValidation">${['Blocking','Advisory'].map(o=>`<option ${d.validation===o?'selected':''}>${o}</option>`).join('')}</select><span class="text-ink-400">${d.validation==='Blocking'?'cannot submit AA without a verified head':'warn only'}</span></div>
+      <div class="flex items-center gap-3 px-3 py-2.5 border border-line rounded-lg ${d.minBalanceRule.enabled?'bg-white':'bg-surface'}">
+        <button class="toggle ${d.minBalanceRule.enabled?'on':''}" id="bhMinEn"><span class="dot"></span></button>
+        <div class="flex-1 text-[13px] text-ink-900">Require minimum remaining balance</div>
+        <input type="number" min="0" max="100" class="inp w-20 text-right" id="bhMinPct" value="${d.minBalanceRule.pct}" ${d.minBalanceRule.enabled?'':'disabled'}><span class="text-ink-400 text-[12px]">% of EC</span></div></div>`;
+  const rows=document.getElementById('bhRows');
+  rows.innerHTML=d.heads.length?d.heads.map((h,i)=>`<div class="flex items-center gap-2 px-3 py-2 border border-line rounded-lg ${h.enabled!==false?'bg-white':'bg-surface'}">
+    <button class="toggle ${h.enabled!==false?'on':''}" data-bh-en="${i}"><span class="dot"></span></button>
+    <input class="inp flex-1 text-[13px]" data-bh-label="${i}" value="${escapeHtml(h.label||'')}">
+    <input class="inp w-28 text-[12px]" data-bh-code="${i}" value="${escapeHtml(h.code||'')}" placeholder="Code">
+    <button class="text-ink-400 hover:text-danger" data-bh-rm="${i}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+  </div>`).join(''):'<div class="text-[11px] text-ink-400 italic">No heads.</div>';
+  rows.querySelectorAll('[data-bh-en]').forEach(b=>b.onclick=()=>{const h=d.heads[+b.dataset.bhEn];h.enabled=h.enabled===false?true:false;renderBudgetHeadsAll();});
+  rows.querySelectorAll('[data-bh-label]').forEach(inp=>inp.oninput=e=>{d.heads[+e.target.dataset.bhLabel].label=e.target.value;});
+  rows.querySelectorAll('[data-bh-code]').forEach(inp=>inp.oninput=e=>{d.heads[+e.target.dataset.bhCode].code=e.target.value;});
+  rows.querySelectorAll('[data-bh-rm]').forEach(b=>b.onclick=()=>{d.heads.splice(+b.dataset.bhRm,1);renderBudgetHeadsAll();});
+  const add=document.getElementById('bhAdd'); if(add) add.onclick=()=>{const l=(document.getElementById('bhNewLabel').value||'').trim();const c=(document.getElementById('bhNewCode').value||'').trim();if(!l)return;d.heads.push({label:l,code:c,enabled:true});renderBudgetHeadsAll();};
+  const val=document.getElementById('bhValidation'); if(val) val.onchange=e=>{d.validation=e.target.value;renderBudgetHeadsAll();};
+  const minEn=document.getElementById('bhMinEn'); if(minEn) minEn.onclick=()=>{d.minBalanceRule.enabled=!d.minBalanceRule.enabled;renderBudgetHeadsAll();};
+  const minPct=document.getElementById('bhMinPct'); if(minPct) minPct.onchange=e=>{d.minBalanceRule.pct=Math.max(0,Math.min(100,parseInt(e.target.value,10)||0));};
+  refreshIcons();
+}
+
+/* ---- emergency fast-track policy (reads advisory AA gates) ---- */
+function editorEmergencyPolicy(){ return `<div id="emgWrap" class="space-y-4"></div>`; }
+function renderEmergencyPolicyAll(){
+  if(!editingDraft||typeof editingDraft!=='object'||Array.isArray(editingDraft)) editingDraft={};
+  const d=editingDraft; d.markRoles=Array.isArray(d.markRoles)?d.markRoles:[]; d.justify=d.justify||{lockedOn:true,minWords:30}; d.justify.lockedOn=true; if(d.justify.minWords==null)d.justify.minWords=30; d.skippableGates=Array.isArray(d.skippableGates)?d.skippableGates:[]; if(d.postFactoDays==null)d.postFactoDays=7;
+  const roles=pgRoles();
+  const gatesItem=getValue('dpr.submission-gates'); const aa=(gatesItem&&Array.isArray(gatesItem.aa))?gatesItem.aa:[];
+  const wrap=document.getElementById('emgWrap');
+  const chip=(label,on,attr)=>`<button class="chip-input" style="cursor:pointer;${on?'background:#EFF6FF;border-color:#93C5FD;color:#0F5EE8':''}" ${attr}>${escapeHtml(label)}</button>`;
+  wrap.innerHTML=`
+    <div><div class="text-[12px] text-ink-500 mb-1.5">Who can mark a DPR Emergency</div><div class="flex flex-wrap gap-1.5">${roles.map(r=>chip(r,d.markRoles.includes(r),`data-emg-role="${escapeHtml(r)}"`)).join('')}</div></div>
+    <div class="flex items-center gap-3 px-3 py-2.5 border border-line rounded-lg bg-white">
+      <button class="toggle on" id="emgJustLocked" style="opacity:.6;cursor:not-allowed"><span class="dot"></span></button>
+      <div class="flex-1 text-[13px] text-ink-900">Justification mandatory <span class="text-[11px] text-ink-400 italic">— locked on</span></div>
+      <span class="text-[12px] text-ink-500">min words</span><input type="number" min="0" class="inp w-20 text-right" id="emgMinWords" value="${d.justify.minWords}"></div>
+    <div><div class="text-[12px] text-ink-500 mb-1.5">Gates Emergency may skip <span class="text-[11px] text-ink-400">(only advisory AA gates — blocking gates can never be skipped)</span></div>
+      <div class="flex flex-wrap gap-1.5">${aa.length?aa.map(g=>{ const adv=!g.blocking; const on=d.skippableGates.includes(g.check); return adv?chip(g.check,on,`data-emg-gate="${escapeHtml(g.check)}"`):`<span class="chip-input" style="opacity:.45;cursor:not-allowed" title="Blocking gate — cannot be skipped">${escapeHtml(g.check)} 🔒</span>`;}).join(''):'<span class="text-[11px] text-ink-400">No AA gates configured.</span>'}</div></div>
+    <div class="flex items-center gap-2 text-[12px]"><span class="text-ink-500" style="width:280px">Post-facto approval required within</span><input type="number" min="0" class="inp w-20 text-right" id="emgPostFacto" value="${d.postFactoDays}"><span class="text-ink-400">days</span></div>
+    <p class="text-[11px] text-ink-400 italic">Emergency marking bypasses scrutiny and is a standing audit finding — this item is the audit trail.</p>`;
+  wrap.querySelectorAll('[data-emg-role]').forEach(b=>b.onclick=()=>{const r=b.dataset.emgRole;const k=d.markRoles.indexOf(r);k>=0?d.markRoles.splice(k,1):d.markRoles.push(r);renderEmergencyPolicyAll();});
+  wrap.querySelectorAll('[data-emg-gate]').forEach(b=>b.onclick=()=>{const g=b.dataset.emgGate;const k=d.skippableGates.indexOf(g);k>=0?d.skippableGates.splice(k,1):d.skippableGates.push(g);renderEmergencyPolicyAll();});
+  const mw=document.getElementById('emgMinWords'); if(mw) mw.onchange=e=>{d.justify.minWords=Math.max(0,parseInt(e.target.value,10)||0);};
+  const pf=document.getElementById('emgPostFacto'); if(pf) pf.onchange=e=>{d.postFactoDays=Math.max(0,parseInt(e.target.value,10)||0);};
+  const jl=document.getElementById('emgJustLocked'); if(jl) jl.onclick=()=>toast('Justification is mandatory for Emergency DPRs and can’t be switched off.');
+  refreshIcons();
+}
+
+/* ---- DPR → Tender handoff rules ---- */
+function editorHandoffRules(){ return `<div id="hoWrap" class="space-y-4"></div>`; }
+function renderHandoffRulesAll(){
+  if(!editingDraft||typeof editingDraft!=='object'||Array.isArray(editingDraft)) editingDraft={};
+  const d=editingDraft; d.carryForward=Array.isArray(d.carryForward)?d.carryForward:[]; if(!d.unsanctioned)d.unsanctioned='Hard block'; if(d.editAfterHandoff==null)d.editAfterHandoff=false;
+  const wrap=document.getElementById('hoWrap');
+  wrap.innerHTML=`
+    <div><div class="text-[12px] font-semibold uppercase tracking-wide text-ink-500 mb-1">Carry-forward to tender</div>
+      <div class="space-y-1.5">${d.carryForward.map((c,i)=>`<div class="flex items-center gap-3 px-3 py-2 border border-line rounded-lg ${c.enabled!==false?'bg-white':'bg-surface'}"><button class="toggle ${c.enabled!==false?'on':''}" data-ho-en="${i}"><span class="dot"></span></button><span class="flex-1 text-[13px] ${c.enabled!==false?'text-ink-900':'text-ink-400 line-through'}">${escapeHtml(c.label)}</span></div>`).join('')}</div></div>
+    <div class="pt-3 border-t border-line space-y-3">
+      <div class="flex items-center gap-2 text-[12px]"><span class="text-ink-500" style="width:200px">Unsanctioned-DPR rule</span><select class="inp" id="hoUnsanc">${['Hard block','Allow with warning'].map(o=>`<option ${d.unsanctioned===o?'selected':''}>${o}</option>`).join('')}</select></div>
+      <p class="text-[11px] ${d.unsanctioned==='Allow with warning'?'text-warning':'text-ink-400'} italic">${d.unsanctioned==='Allow with warning'?'Demo mode only — production must be Hard block.':'Production-safe: tenders cannot be created from unsanctioned DPRs.'}</p>
+      <div class="flex items-center gap-3 px-3 py-2.5 border border-line rounded-lg ${d.editAfterHandoff?'bg-white':'bg-surface'}"><button class="toggle ${d.editAfterHandoff?'on':''}" id="hoEdit"><span class="dot"></span></button><div class="flex-1 text-[13px] text-ink-900">Carried fields editable after handoff <span class="text-[11px] text-ink-400">(${d.editAfterHandoff?'editable with change-log':'locked in the tender'})</span></div></div>
+    </div>`;
+  wrap.querySelectorAll('[data-ho-en]').forEach(b=>b.onclick=()=>{const c=d.carryForward[+b.dataset.hoEn];c.enabled=c.enabled===false?true:false;renderHandoffRulesAll();});
+  const uns=document.getElementById('hoUnsanc'); if(uns) uns.onchange=e=>{d.unsanctioned=e.target.value;renderHandoffRulesAll();};
+  const ed=document.getElementById('hoEdit'); if(ed) ed.onclick=()=>{d.editAfterHandoff=!d.editAfterHandoff;renderHandoffRulesAll();};
+  refreshIcons();
+}
+
+/* ---- external consultant access rules ---- */
+function editorConsultantAccess(){ return `<div id="caWrap" class="space-y-4"></div>`; }
+function renderConsultantAccessAll(){
+  if(!editingDraft||typeof editingDraft!=='object'||Array.isArray(editingDraft)) editingDraft={};
+  const d=editingDraft; if(!d.accessLevel)d.accessLevel='Read-only'; if(d.disclosureMandatory==null)d.disclosureMandatory=true; d.allowedSections=Array.isArray(d.allowedSections)?d.allowedSections:[]; if(d.extraReviewGate==null)d.extraReviewGate=true;
+  const SEC=['Scope','BOQ','Drawings','Cost estimate']; const canDraft=d.accessLevel==='Can draft';
+  const wrap=document.getElementById('caWrap');
+  wrap.innerHTML=`
+    <div class="flex items-center gap-2 text-[12px]"><span class="text-ink-500" style="width:170px">Access level</span><select class="inp" id="caLevel">${['None','Read-only','Can draft'].map(o=>`<option ${d.accessLevel===o?'selected':''}>${o}</option>`).join('')}</select></div>
+    <div class="flex items-center gap-3 px-3 py-2.5 border border-line rounded-lg ${d.disclosureMandatory?'bg-white':'bg-surface'}"><button class="toggle ${d.disclosureMandatory?'on':''}" id="caDisc"><span class="dot"></span></button><div class="flex-1 text-[13px] text-ink-900">“Prepared by consultant” disclosure mandatory on the DPR</div></div>
+    <div><div class="text-[12px] text-ink-500 mb-1.5">Sections a consultant may draft ${canDraft?'':'<span class="text-[11px] text-ink-400">(enable “Can draft” to use)</span>'}</div><div class="flex flex-wrap gap-1.5">${SEC.map(s=>{const on=d.allowedSections.includes(s);return `<button class="chip-input" style="cursor:${canDraft?'pointer':'not-allowed'};${on?'background:#EFF6FF;border-color:#93C5FD;color:#0F5EE8':''}${canDraft?'':'opacity:.45'}" ${canDraft?`data-ca-sec="${escapeHtml(s)}"`:''}>${escapeHtml(s)}</button>`;}).join('')}</div></div>
+    <div class="flex items-center gap-3 px-3 py-2.5 border border-line rounded-lg ${d.extraReviewGate?'bg-white':'bg-surface'}"><button class="toggle ${d.extraReviewGate?'on':''}" id="caReview"><span class="dot"></span></button><div class="flex-1 text-[13px] text-ink-900">Consultant-drafted DPRs need an extra internal review <span class="text-[11px] text-ink-400">(adds an advisory row to the AA gate set when on)</span></div></div>`;
+  const lvl=document.getElementById('caLevel'); if(lvl) lvl.onchange=e=>{d.accessLevel=e.target.value;renderConsultantAccessAll();};
+  const disc=document.getElementById('caDisc'); if(disc) disc.onclick=()=>{d.disclosureMandatory=!d.disclosureMandatory;renderConsultantAccessAll();};
+  wrap.querySelectorAll('[data-ca-sec]').forEach(b=>b.onclick=()=>{const s=b.dataset.caSec;const k=d.allowedSections.indexOf(s);k>=0?d.allowedSections.splice(k,1):d.allowedSections.push(s);renderConsultantAccessAll();});
+  const rev=document.getElementById('caReview'); if(rev) rev.onclick=()=>{d.extraReviewGate=!d.extraReviewGate;renderConsultantAccessAll();};
+  refreshIcons();
+}
 
 /* chain editor */
 function renderChainRows(){
@@ -2863,8 +3620,19 @@ function pbcAvatarColor(name){ const colors=['#0F5EE8','#10B981','#F59E0B','#8B5
 function editorPreBidCommittee(draft) {
   return `
     <div class="space-y-6" id="pbcContainer">
-      <!-- Section 1: Designations -->
+      <!-- Section 1: Members matrix (most-touched — at top) -->
       <div>
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-[13px] font-semibold text-ink-900">Committee members &amp; permissions</h3>
+          <span class="text-[11px] text-ink-500" id="pbcMemberCount"></span>
+        </div>
+        <p class="text-[11.5px] text-ink-500 mb-3">Each row is a committee member. The Officer and Designation columns stay fixed while permission columns scroll. Toggle a cell to grant or revoke that action. Designations and the action columns shown here are managed in the sections below.</p>
+        <div id="pbcMembersWrap" class="overflow-x-auto -mx-1 px-1"></div>
+        <button class="btn btn-primary mt-3" id="pbcInviteBtn"><i data-lucide="user-plus" class="w-3.5 h-3.5"></i> Invite member</button>
+      </div>
+
+      <!-- Section 2: Designations -->
+      <div class="pt-4 border-t border-line">
         <div class="flex items-center justify-between mb-2">
           <h3 class="text-[13px] font-semibold text-ink-900">Designations</h3>
           <span class="text-[11px] text-ink-500" id="pbcDesigCount"></span>
@@ -2877,7 +3645,7 @@ function editorPreBidCommittee(draft) {
         </div>
       </div>
 
-      <!-- Section 2: Actions / permissions -->
+      <!-- Section 3: Actions / permissions -->
       <div class="pt-4 border-t border-line">
         <div class="flex items-center justify-between mb-2">
           <h3 class="text-[13px] font-semibold text-ink-900">Actions / permissions</h3>
@@ -2886,17 +3654,6 @@ function editorPreBidCommittee(draft) {
         <p class="text-[11.5px] text-ink-500 mb-3">Actions members can be permitted to do on the pre-bid screen. Toggle an action off to remove its column from the matrix. Add more from the standard action list below.</p>
         <div id="pbcActions" class="space-y-1.5"></div>
         <div id="pbcAddActionWrap" class="flex items-center gap-2 pt-3 mt-2 border-t border-line"></div>
-      </div>
-
-      <!-- Section 3: Members matrix -->
-      <div class="pt-4 border-t border-line">
-        <div class="flex items-center justify-between mb-2">
-          <h3 class="text-[13px] font-semibold text-ink-900">Committee members &amp; permissions</h3>
-          <span class="text-[11px] text-ink-500" id="pbcMemberCount"></span>
-        </div>
-        <p class="text-[11.5px] text-ink-500 mb-3">Each row is a committee member. The Officer and Designation columns stay fixed while permission columns scroll. Toggle a cell to grant or revoke that action.</p>
-        <div id="pbcMembersWrap" class="overflow-x-auto -mx-1 px-1"></div>
-        <button class="btn btn-primary mt-3" id="pbcInviteBtn"><i data-lucide="user-plus" class="w-3.5 h-3.5"></i> Invite member</button>
       </div>
 
       <!-- Invite-member modal -->
@@ -3436,60 +4193,99 @@ function renderTenderTreeAll(){
   refreshIcons();
 }
 
-/* ---- tender template builder (list + per-row content/metadata/preview) ---- */
-let tplbOpen = null;
-function tplbStatusChip(s){ const m={Published:'background:#F0FDF4;color:#10B981',Draft:'background:#F9FAFB;color:#6B7280;border:1px solid #E5E7EB',Deprecated:'background:#FEF2F2;color:#EF4444'}; return `<span class="chip" style="${m[s]||m.Draft}">${escapeHtml(s||'Draft')}</span>`; }
-function tplbPreview(c){ return String(c||'').replace(/\{tender_id\}/g,'AMC/PROC/2026-27/0042').replace(/\{sector\}/g,'IT Goods').replace(/\{ec\}/g,'₹45,00,000').replace(/\{bid_close\}/g,'10 Jun 2026').replace(/\{method\}/g,'L1'); }
-function editorTplBuilder(){ return `<div class="space-y-3" id="tplbWrap"></div><button class="btn btn-primary mt-3" id="tplbAdd"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add template</button>`; }
-function renderTplBuilderAll(){
-  if (!Array.isArray(editingDraft)) editingDraft = [];
-  const wrap = document.getElementById('tplbWrap');
-  wrap.innerHTML = editingDraft.length ? editingDraft.map((t,i)=>{
-    const open = tplbOpen===t.id;
-    const head = `<div class="flex items-center justify-between gap-2">
-        <div class="min-w-0"><div class="text-[13.5px] font-semibold text-ink-900">${escapeHtml(t.name||'Untitled')} <span class="text-[11px] text-ink-400 font-normal">${escapeHtml(t.version||'')}</span></div>
-        <div class="text-[11.5px] text-ink-500">${escapeHtml(t.sector||'—')} · ${escapeHtml(t.method||'—')} · used ${t.uses||0}×</div></div>
-        <div class="flex items-center gap-2 shrink-0">${tplbStatusChip(t.status)}<button class="btn" data-tplb-open="${i}">${open?'Close':'Open builder'}</button><button class="text-ink-400 hover:text-danger" data-tplb-del="${i}" aria-label="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>
-      </div>`;
-    const body = open ? `<div class="mt-3 pt-3 border-t border-line grid grid-cols-2 gap-3">
-        <div class="space-y-2">
-          <div class="text-[12px] font-semibold text-ink-700">Metadata</div>
-          ${['name','sector','method','version','description'].map(f=>`<label class="block"><span class="text-[11px] text-ink-500">${f}</span><input class="inp w-full mt-0.5" data-tplb-f="${i}|${f}" value="${escapeHtml(String(t[f]==null?'':t[f]))}"></label>`).join('')}
-          <label class="block"><span class="text-[11px] text-ink-500">status</span><select class="inp w-full mt-0.5" data-tplb-status="${i}">${['Draft','Published','Deprecated'].map(s=>`<option ${t.status===s?'selected':''}>${s}</option>`).join('')}</select></label>
-          <label class="block"><span class="text-[11px] text-ink-500">tags (comma-separated)</span><input class="inp w-full mt-0.5" data-tplb-tags="${i}" value="${escapeHtml((t.tags||[]).join(', '))}"></label>
-        </div>
-        <div class="space-y-2">
-          <div class="text-[12px] font-semibold text-ink-700">Content</div>
-          <textarea class="inp w-full font-mono" rows="7" data-tplb-content="${i}">${escapeHtml(t.content||'')}</textarea>
-          <div class="text-[11px] text-ink-400">Placeholders: ${['{tender_id}','{sector}','{ec}','{bid_close}','{method}'].map(p=>`<span class="font-mono">${p}</span>`).join(' · ')}</div>
-          <div class="text-[12px] font-semibold text-ink-700 pt-1">Preview</div>
-          <div class="border border-line rounded-lg p-2 bg-surface text-[12px] whitespace-pre-wrap">${escapeHtml(tplbPreview(t.content||''))}</div>
-        </div>
-      </div>` : '';
-    return `<div class="bg-white border border-line rounded-xl p-3">${head}${body}</div>`;
-  }).join('') : `<div class="text-[12px] text-ink-400 text-center py-6 border border-dashed border-line rounded-xl">No templates. Add one to start.</div>`;
-  wrap.querySelectorAll('[data-tplb-open]').forEach(b=>b.onclick=()=>{ const t=editingDraft[+b.dataset.tplbOpen]; tplbOpen=(tplbOpen===t.id)?null:t.id; renderTplBuilderAll(); });
-  wrap.querySelectorAll('[data-tplb-del]').forEach(b=>b.onclick=()=>{ editingDraft.splice(+b.dataset.tplbDel,1); renderTplBuilderAll(); });
-  wrap.querySelectorAll('[data-tplb-f]').forEach(inp=>inp.oninput=e=>{ const [i,f]=e.target.dataset.tplbF.split('|'); editingDraft[+i][f]=e.target.value; });
-  wrap.querySelectorAll('[data-tplb-status]').forEach(s=>s.onchange=e=>{ editingDraft[+e.target.dataset.tplbStatus].status=e.target.value; renderTplBuilderAll(); });
-  wrap.querySelectorAll('[data-tplb-tags]').forEach(inp=>inp.oninput=e=>{ editingDraft[+e.target.dataset.tplbTags].tags=e.target.value.split(',').map(x=>x.trim()).filter(Boolean); });
-  wrap.querySelectorAll('[data-tplb-content]').forEach(t=>t.oninput=e=>{ editingDraft[+e.target.dataset.tplbContent].content=e.target.value; });
-  const add=document.getElementById('tplbAdd'); if(add&&!add.dataset.bound){ add.dataset.bound='1'; add.onclick=()=>{ const id='tpl_'+Date.now().toString(36); editingDraft.push({id,name:'New template',sector:'',method:'L1',version:'v1.0',status:'Draft',content:'',createdAt:'',deprecated:false,description:'',tags:[],uses:0}); tplbOpen=id; renderTplBuilderAll(); }; }
-  refreshIcons();
-}
+/* tender template builder removed — template library retired from Tender Creation. */
 
-/* ---- document → template extractor (upload stub + review + save) ---- */
-function editorPastTenderCloning(){ return `<div class="space-y-3"><p class="text-[11.5px] text-ink-500">Upload past tenders so they surface on the Clone screen. Already-uploaded tenders are listed below — edit metadata or remove. (Upload is stubbed in admin; the document is stored and parsed downstream.)</p><div id="ptcWrap" class="space-y-2"></div><button class="btn btn-primary" id="ptcUpload"><i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload past tender</button></div>`; }
+/* ---- past tender library (metadata + a viewable tender document per row) ---- */
+let ptcUploadIdx = null;
+const PTC_MAX_BYTES = 1200000;   // ~1.2 MB raw per file (≈1.6 MB base64) — localStorage budget guard
+const PTC_STORE_BUDGET = 4500000; // refuse if the whole item would exceed ~4.5 MB serialized
+// Generate a small, self-contained sample tender document (HTML) for the seeded rows.
+function ptcSampleDoc(idBase, title, sector, method, ec, year){
+  const html='<!doctype html><html lang="en"><head><meta charset="utf-8"><title>'+title+'</title>'
+    +'<style>body{font-family:Georgia,"Times New Roman",serif;max-width:720px;margin:32px auto;padding:0 28px;color:#1a1a1a;line-height:1.6}'
+    +'h1{font-size:19px;text-align:center;margin:0}h2{font-size:14px;border-bottom:1px solid #ccc;padding-bottom:4px;margin-top:26px}'
+    +'.muted{color:#666;text-align:center;margin:4px 0 20px}table{width:100%;border-collapse:collapse;margin:10px 0}'
+    +'td,th{border:1px solid #cbd5e1;padding:6px 10px;text-align:left;font-size:13px}th{background:#f1f5f9;width:40%}'
+    +'.seal{margin-top:36px;font-size:13px;color:#444}</style></head><body>'
+    +'<h1>Ahmedabad Municipal Corporation</h1><p class="muted">Invitation for Bids · sample tender document for cloning</p>'
+    +'<h2>1. Notice</h2><p>Sealed online bids are invited for <b>'+title+'</b> under the '+sector+' category.</p>'
+    +'<table><tr><th>Tender reference</th><td>'+idBase+'</td></tr><tr><th>Category / Sector</th><td>'+sector+'</td></tr>'
+    +'<tr><th>Evaluation method</th><td>'+method+'</td></tr><tr><th>Estimated cost</th><td>'+ec+'</td></tr>'
+    +'<tr><th>Award year</th><td>'+year+'</td></tr></table>'
+    +'<h2>2. Scope of work</h2><p>The successful bidder shall execute the work as detailed in the schedule, in accordance with GFR 2017 and applicable CVC guidelines.</p>'
+    +'<h2>3. Eligibility (PQ)</h2><p>Bidders must meet the pre-qualification turnover and similar-work thresholds specified in the detailed NIT.</p>'
+    +'<h2>4. Submission</h2><p>Bids shall be submitted online on the e-procurement portal before the notified deadline. Late bids are not accepted.</p>'
+    +'<p class="seal">For Ahmedabad Municipal Corporation<br>Tender Inviting Authority</p></body></html>';
+  return { name:idBase+'.html', type:'text/html', kind:'sample', size:html.length, html:html };
+}
+function ptcFmtSize(n){ n=Number(n)||0; if(n>=1048576) return (n/1048576).toFixed(1)+' MB'; if(n>=1024) return Math.round(n/1024)+' KB'; return n+' B'; }
+function ptcDataUrlToBlob(dataUrl){
+  const c=String(dataUrl).split(','); const meta=c[0]||''; const isB64=/;base64/i.test(meta);
+  const mime=(meta.match(/data:([^;,]+)/)||[])[1]||'application/octet-stream';
+  const data=c.slice(1).join(',');
+  if(isB64){ const bin=atob(data); const arr=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i); return new Blob([arr],{type:mime}); }
+  return new Blob([decodeURIComponent(data)],{type:mime});
+}
+function ptcViewDoc(doc){
+  if(!doc){ return; }
+  let blob=null;
+  try{ blob = doc.dataUrl ? ptcDataUrlToBlob(doc.dataUrl) : (doc.html ? new Blob([doc.html],{type:'text/html'}) : null); }
+  catch(e){ blob=null; }
+  if(!blob){ toast('This document can’t be opened.'); return; }
+  const url=URL.createObjectURL(blob);
+  const win=window.open(url,'_blank');
+  if(!win) toast('Allow pop-ups to view the document.');
+  setTimeout(()=>{ try{ URL.revokeObjectURL(url); }catch(e){} }, 60000);
+}
+function editorPastTenderCloning(){ return `<div class="space-y-3"><p class="text-[11.5px] text-ink-500">Upload past tenders so they surface on the Clone screen. Each row carries a viewable tender document — view it, replace it, or remove it. Documents are stored locally; very large files are rejected with a message.</p><div id="ptcWrap" class="space-y-2"></div><button class="btn btn-primary" id="ptcUpload"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add past tender</button><input type="file" id="ptcFileInput" accept=".pdf,.doc,.docx,.html,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/html" class="hidden"></div>`; }
+function ptcAttachDoc(idx, file){
+  if(!file) return;
+  if(file.size > PTC_MAX_BYTES){ toast('Document too large to store locally (max ~1.2 MB). Use a smaller file.'); return; }
+  const r=new FileReader();
+  r.onload=()=>{
+    const row=editingDraft[idx]; if(!row) return;
+    const prevDoc=row.doc, prevName=row.fileName;
+    row.doc={ name:file.name, type:file.type||'application/octet-stream', kind:'upload', size:file.size, dataUrl:r.result };
+    row.fileName=file.name;
+    // Guard against blowing the localStorage budget for this item.
+    let tooBig=false; try{ tooBig = JSON.stringify(editingDraft).length > PTC_STORE_BUDGET; }catch(e){ tooBig=true; }
+    if(tooBig){ row.doc=prevDoc; row.fileName=prevName; toast('Document too large to store locally — total exceeds the local limit.'); renderPastTenderCloningAll(); return; }
+    toast('Document attached'); renderPastTenderCloningAll();
+  };
+  r.onerror=()=>toast('Could not read that file.');
+  r.readAsDataURL(file);
+}
 function renderPastTenderCloningAll(){
   if (!Array.isArray(editingDraft)) editingDraft = [];
   const wrap = document.getElementById('ptcWrap');
   const statusChip=s=>{const m={Completed:'background:#F0FDF4;color:#10B981',Awarded:'background:#EFF6FF;color:#0F5EE8',Withdrawn:'background:#FEF2F2;color:#EF4444',Cancelled:'background:#FEF2F2;color:#EF4444'};return `<span class="chip" style="${m[s]||'background:#F9FAFB;color:#6B7280;border:1px solid #E5E7EB'}">${escapeHtml(s||'—')}</span>`;};
+  const badge=(t)=>`<span class="chip" style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0">${escapeHtml(t)}</span>`;
+  const docArea=(x,i)=> x.doc
+    ? `<div class="flex items-center gap-2 flex-wrap px-2.5 py-1.5 bg-surface border border-line rounded-lg">
+         <i data-lucide="paperclip" class="w-3.5 h-3.5 text-ink-400 shrink-0"></i>
+         <span class="text-[12px] text-ink-700 truncate" style="max-width:240px">${escapeHtml(x.doc.name||'document')}</span>
+         ${x.doc.kind==='sample'?'<span class="chip" style="background:#EEEDFE;color:#8B5CF6">sample</span>':''}
+         <span class="text-[11px] text-ink-400">${ptcFmtSize(x.doc.size)}</span>
+         <span class="flex-1"></span>
+         <button class="btn" style="padding:3px 9px" data-ptc-view="${i}"><i data-lucide="eye" class="w-3.5 h-3.5"></i> View document</button>
+         <button class="btn" style="padding:3px 9px" data-ptc-replace="${i}"><i data-lucide="repeat" class="w-3.5 h-3.5"></i> Replace</button>
+         <button class="text-ink-400 hover:text-danger" data-ptc-docrm="${i}" aria-label="Remove document"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+       </div>`
+    : `<div class="flex items-center gap-2 px-2.5 py-1.5 border border-dashed border-line rounded-lg">
+         <i data-lucide="file-plus" class="w-3.5 h-3.5 text-ink-400 shrink-0"></i>
+         <span class="text-[12px] text-ink-400 flex-1">No document attached</span>
+         <button class="btn btn-primary" style="padding:3px 9px" data-ptc-uprow="${i}"><i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload document</button>
+       </div>`;
   wrap.innerHTML = editingDraft.length ? editingDraft.map((x,i)=>`<div class="bg-white border border-line rounded-xl p-3 space-y-2">
-      <div class="flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2 min-w-0"><i data-lucide="file-text" class="w-4 h-4 text-ink-400 shrink-0"></i><span class="text-[12.5px] text-ink-700 truncate">${escapeHtml(x.fileName||'document')}</span>${statusChip(x.status)}</div>
-        <div class="flex items-center gap-2 shrink-0"><span class="text-[11px] text-ink-400">${x.uploadedAt?'Uploaded '+escapeHtml(x.uploadedAt):'Just now'}</span><button class="text-ink-400 hover:text-danger" data-ptc-del="${i}" aria-label="Remove"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>
+      <div class="flex items-start justify-between gap-2">
+        <div class="min-w-0">
+          <div class="text-[13.5px] font-semibold text-ink-900 truncate">${escapeHtml(x.title||'(untitled tender)')}</div>
+          <div class="flex items-center gap-1.5 flex-wrap mt-1">${badge(x.sector||'—')}${badge(x.method||'—')}<span class="text-[11.5px] text-ink-500">${x.awardedYear?('Awarded '+x.awardedYear):''}</span>${statusChip(x.status)}</div>
+        </div>
+        <button class="text-ink-400 hover:text-danger shrink-0" data-ptc-del="${i}" aria-label="Remove tender"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
       </div>
-      <div class="grid grid-cols-2 gap-2">
+      ${docArea(x,i)}
+      <div class="grid grid-cols-2 gap-2 pt-1">
         <label class="block"><span class="text-[11px] text-ink-500">Title</span><input class="inp w-full mt-0.5" data-ptc-f="${i}|title" value="${escapeHtml(x.title||'')}"></label>
         <label class="block"><span class="text-[11px] text-ink-500">Sector</span><input class="inp w-full mt-0.5" data-ptc-f="${i}|sector" value="${escapeHtml(x.sector||'')}"></label>
         <label class="block"><span class="text-[11px] text-ink-500">Method</span><input class="inp w-full mt-0.5" data-ptc-f="${i}|method" value="${escapeHtml(x.method||'')}"></label>
@@ -3497,12 +4293,19 @@ function renderPastTenderCloningAll(){
         <label class="block"><span class="text-[11px] text-ink-500">Awarded year</span><input type="number" class="inp w-full mt-0.5" data-ptc-n="${i}|awardedYear" value="${x.awardedYear!=null?x.awardedYear:''}"></label>
         <label class="block"><span class="text-[11px] text-ink-500">Status</span><select class="inp w-full mt-0.5" data-ptc-status="${i}">${['Completed','Awarded','Withdrawn','Cancelled'].map(o=>`<option ${x.status===o?'selected':''}>${o}</option>`).join('')}</select></label>
       </div>
-    </div>`).join('') : `<div class="text-[12px] text-ink-400 text-center py-6 border border-dashed border-line rounded-xl">No past tenders uploaded yet. Click “Upload past tender” to add one.</div>`;
+    </div>`).join('') : `<div class="text-[12px] text-ink-400 text-center py-6 border border-dashed border-line rounded-xl">No past tenders yet. Click “Add past tender” to create one.</div>`;
   wrap.querySelectorAll('[data-ptc-del]').forEach(b=>b.onclick=()=>{ editingDraft.splice(+b.dataset.ptcDel,1); renderPastTenderCloningAll(); });
   wrap.querySelectorAll('[data-ptc-f]').forEach(inp=>inp.oninput=e=>{ const [i,f]=e.target.dataset.ptcF.split('|'); editingDraft[+i][f]=e.target.value; });
-  wrap.querySelectorAll('[data-ptc-n]').forEach(inp=>inp.onchange=e=>{ const [i,f]=e.target.dataset.ptcN.split('|'); editingDraft[+i][f]=parseInt(e.target.value,10)||0; });
+  wrap.querySelectorAll('[data-ptc-n]').forEach(inp=>inp.onchange=e=>{ const [i,f]=e.target.dataset.ptcN.split('|'); editingDraft[+i][f]=parseInt(e.target.value,10)||0; renderPastTenderCloningAll(); });
   wrap.querySelectorAll('[data-ptc-status]').forEach(s=>s.onchange=e=>{ editingDraft[+e.target.dataset.ptcStatus].status=e.target.value; renderPastTenderCloningAll(); });
-  const up=document.getElementById('ptcUpload'); if(up&&!up.dataset.bound){ up.dataset.bound='1'; up.onclick=()=>{ const n=editingDraft.length+1; editingDraft.push({id:'pt_'+Date.now().toString(36),fileName:'past-tender-'+n+'.pdf',title:'',sector:'',method:'L1',ec:0,awardedYear:2026,status:'Completed',uploadedAt:''}); toast('Past tender uploaded — add its details'); renderPastTenderCloningAll(); }; }
+  wrap.querySelectorAll('[data-ptc-view]').forEach(b=>b.onclick=()=>{ ptcViewDoc(editingDraft[+b.dataset.ptcView].doc); });
+  wrap.querySelectorAll('[data-ptc-docrm]').forEach(b=>b.onclick=()=>{ editingDraft[+b.dataset.ptcDocrm].doc=null; renderPastTenderCloningAll(); });
+  const fileInput=document.getElementById('ptcFileInput');
+  const triggerUpload=i=>{ ptcUploadIdx=i; if(fileInput){ fileInput.value=''; fileInput.click(); } };
+  wrap.querySelectorAll('[data-ptc-replace]').forEach(b=>b.onclick=()=>triggerUpload(+b.dataset.ptcReplace));
+  wrap.querySelectorAll('[data-ptc-uprow]').forEach(b=>b.onclick=()=>triggerUpload(+b.dataset.ptcUprow));
+  if(fileInput && !fileInput.dataset.bound){ fileInput.dataset.bound='1'; fileInput.onchange=e=>{ const f=e.target.files&&e.target.files[0]; if(f!=null && ptcUploadIdx!=null) ptcAttachDoc(ptcUploadIdx, f); ptcUploadIdx=null; }; }
+  const up=document.getElementById('ptcUpload'); if(up&&!up.dataset.bound){ up.dataset.bound='1'; up.onclick=()=>{ editingDraft.push({id:'pt_'+Date.now().toString(36),fileName:'',title:'',sector:'',method:'L1',ec:0,awardedYear:2026,status:'Completed',uploadedAt:'',doc:null}); toast('Past tender added — fill its details and attach a document'); renderPastTenderCloningAll(); }; }
   refreshIcons();
 }
 
@@ -3555,6 +4358,8 @@ function editorAiQuestionnaire(){ return `<div id="aiqWrap" class="space-y-2"></
 function aiqSourcePills(ref){
   if(ref==='tiers.def'){ const t=getValue('tiers.def'); return Array.isArray(t)?t.map((x,i)=>{ const lab=(x.min==null||x.min===0)?('Under '+inrCompact(x.max)):(x.max==null?('Above '+inrCompact(x.min)):(inrCompact(x.min)+'–'+inrCompact(x.max))); return {label:lab,value:String(x.auth||i)}; }):[]; }
   if(ref==='tender.tree'){ const t=getValue('tender.tree'); return Array.isArray(t)?t.filter(n=>n.enabled!==false).map(n=>({label:n.name,value:n.name})):[]; }
+  // generic list source (e.g. dpr.funding-sources) — array of strings or {label}
+  { const v=getValue(ref); if(Array.isArray(v)) return v.map(x=>{ const lab=(typeof x==='string')?x:(x.label||x.name||''); return {label:lab,value:lab}; }).filter(p=>p.label); }
   return [];
 }
 function aiqEffectivePills(q){ return q.sourceRef ? aiqSourcePills(q.sourceRef) : (q.pills||[]); }
@@ -3582,7 +4387,7 @@ function renderAiQuestionnaireAll(){
     const editor = open ? `<div class="mt-2 pt-2 border-t border-line space-y-2 bg-surface p-2 rounded-lg">
       <label class="block"><span class="text-[11px] text-ink-500">Question</span><input class="inp w-full mt-0.5" data-aiq-q="${i}" value="${escapeHtml(q.question||'')}"></label>
       <div class="flex gap-3 items-end flex-wrap"><label class="flex-1"><span class="text-[11px] text-ink-500">Input type</span><select class="inp w-full mt-0.5" data-aiq-type="${i}">${types.map(t=>`<option ${q.inputType===t?'selected':''}>${t}</option>`).join('')}</select></label>
-        <label class="flex-1"><span class="text-[11px] text-ink-500">Pills source</span><select class="inp w-full mt-0.5" data-aiq-src="${i}"><option value="" ${!q.sourceRef?'selected':''}>Static (custom pills)</option><option value="tiers.def" ${q.sourceRef==='tiers.def'?'selected':''}>tiers.def (auto)</option><option value="tender.tree" ${q.sourceRef==='tender.tree'?'selected':''}>tender.tree (auto)</option></select></label>
+        <label class="flex-1"><span class="text-[11px] text-ink-500">Pills source</span><select class="inp w-full mt-0.5" data-aiq-src="${i}"><option value="" ${!q.sourceRef?'selected':''}>Static (custom pills)</option><option value="tiers.def" ${q.sourceRef==='tiers.def'?'selected':''}>tiers.def (auto)</option><option value="tender.tree" ${q.sourceRef==='tender.tree'?'selected':''}>tender.tree (auto)</option>${(q.sourceRef&&!['tiers.def','tender.tree'].includes(q.sourceRef))?`<option value="${escapeHtml(q.sourceRef)}" selected>${escapeHtml(q.sourceRef)} (auto)</option>`:''}</select></label>
         <div class="flex items-center gap-2 pb-1.5"><button class="toggle ${q.required?'on':''}" data-aiq-req="${i}"><span class="dot"></span></button><span class="text-[12px]">Required</span></div></div>
       ${pillsBlock}
       <div class="flex gap-2"><label class="flex-1"><span class="text-[11px] text-ink-500">Skip if question</span><select class="inp w-full mt-0.5" data-aiq-skipf="${i}"><option value="">— none —</option>${editingDraft.filter(x=>x.id!==q.id).map(x=>`<option value="${escapeHtml(x.id)}" ${q.skipIf&&q.skipIf.field===x.id?'selected':''}>${escapeHtml(x.question)}</option>`).join('')}</select></label>
@@ -3633,57 +4438,113 @@ function renderBsdPolicyAll(){
   refreshIcons();
 }
 
-/* ---- custom PQ/TQ criterion builder (text / numeric / table + versioning) ---- */
-let cbOpen=null;
+/* ---- custom PQ/TQ criterion builder — section-builder card pattern (text / numeric / table + versioning) ---- */
+let cbCard=null;        // working copy of the criterion in the open card
+let cbCardMode=null;    // 'new' | 'edit'
+let cbEditId=null;      // id of the existing criterion being edited
 function cbBadge(c){ const m={PQ:'background:#EFF6FF;color:#0F5EE8',TQ:'background:#EEEDFE;color:#8B5CF6',DQ:'background:#FEF2F2;color:#EF4444'}; return `<span class="chip" style="${m[c]||m.PQ}">${escapeHtml(c||'PQ')}</span>`; }
-function editorCriterionBuilder(){ return `<div id="cbWrap" class="space-y-2"></div><button class="btn btn-primary mt-3" id="cbAdd"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add criterion</button>`; }
+function cbTypeIcon(t){ return ({text:'file-text',numeric:'hash',table:'table'})[t]||'file-text'; }
+function cbFreshCriterion(){ return {id:'c_'+Date.now().toString(36),name:'',classification:'PQ',contentType:'text',maxMarks:null,description:'',table:null,numeric:null,version:1,active:true,supersedes:null}; }
+function cbTypeFields(c){
+  if(c.contentType==='numeric'){ const n=c.numeric||{}; return `<div class="space-y-1.5"><div class="text-[11px] font-medium text-ink-700">Numeric threshold</div><div class="flex gap-2 flex-wrap">
+    <label><span class="text-[10.5px] text-ink-400">Min</span><input type="number" class="inp w-24 mt-0.5" data-cbc-nf="min" value="${n.min!=null?n.min:''}"></label>
+    <label><span class="text-[10.5px] text-ink-400">Threshold</span><input type="number" class="inp w-28 mt-0.5" data-cbc-nf="threshold" value="${n.threshold!=null?n.threshold:''}"></label>
+    <label><span class="text-[10.5px] text-ink-400">Max</span><input type="number" class="inp w-24 mt-0.5" data-cbc-nf="max" value="${n.max!=null?n.max:''}"></label>
+    <label><span class="text-[10.5px] text-ink-400">Unit</span><input class="inp w-24 mt-0.5" data-cbc-nf="unit" value="${escapeHtml(n.unit||'')}" placeholder="₹ Cr"></label>
+  </div></div>`; }
+  if(c.contentType==='table'){ const t=c.table||{columns:[],minRows:1,maxRows:10}; return `<div class="space-y-1.5"><div class="text-[11px] font-medium text-ink-700">Table columns the vendor must fill</div>
+    <div class="space-y-1">${(t.columns||[]).map((col,ci)=>`<div class="flex items-center gap-2"><input class="inp flex-1" data-cbc-coln="${ci}" value="${escapeHtml(col.name||'')}" placeholder="Column name"><select class="inp" data-cbc-colt="${ci}">${['text','number','date'].map(tt=>`<option ${col.type===tt?'selected':''}>${tt}</option>`).join('')}</select><button class="toggle ${col.required?'on':''}" data-cbc-colreq="${ci}" title="Required"><span class="dot"></span></button><button class="text-ink-400 hover:text-danger" data-cbc-colrm="${ci}"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div>`).join('')||'<div class="text-[11px] text-ink-400 italic">No columns yet.</div>'}</div>
+    <button class="btn" id="cbcColAdd">+ column</button>
+    <div class="flex gap-2 pt-1"><label><span class="text-[10.5px] text-ink-400">Min rows</span><input type="number" class="inp w-20 mt-0.5" data-cbc-rows="min" value="${t.minRows!=null?t.minRows:0}"></label><label><span class="text-[10.5px] text-ink-400">Max rows</span><input type="number" class="inp w-20 mt-0.5" data-cbc-rows="max" value="${t.maxRows!=null?t.maxRows:0}"></label></div>
+  </div>`; }
+  return '';
+}
+function cbCardHtml(){
+  const c=cbCard;
+  const typeCards=[['text','Text','file-text','Clause or statement'],['numeric','Numeric','hash','Threshold value + unit'],['table','Table','table','Columns the vendor fills']];
+  const valid=!!(c.name||'').trim();
+  return `<div class="border-2 border-dashed border-primary/40 rounded-xl p-4 space-y-3" style="background:#F8FAFF">
+    <div class="text-[13px] font-semibold text-ink-900">${cbCardMode==='edit'?'Edit criterion':'New criterion'}</div>
+    <label class="block"><span class="text-[11px] text-ink-500">Criterion title</span><input class="inp w-full mt-0.5" id="cbcName" value="${escapeHtml(c.name||'')}" placeholder="e.g. Average annual turnover — last 3 FY"></label>
+    <div><div class="text-[11px] text-ink-500 mb-1">Classification</div><div class="inline-flex rounded-lg border border-line overflow-hidden text-[12px]">
+      ${['PQ','TQ','DQ'].map((x,idx)=>`<button data-cbc-class="${x}" class="px-4 py-1.5 ${idx?'border-l border-line ':''}${c.classification===x?'bg-primary text-white':'bg-white text-ink-500 hover:bg-surface'}">${x}</button>`).join('')}
+    </div></div>
+    <div><div class="text-[11px] text-ink-500 mb-1">Content type</div><div class="grid grid-cols-3 gap-2">
+      ${typeCards.map(([v,l,icon,desc])=>`<button data-cbc-ct="${v}" class="text-left p-3 rounded-xl border ${c.contentType===v?'border-primary':'border-line hover:border-primary/40'}" style="${c.contentType===v?'background:#EFF4FF':'background:#fff'}">
+        <i data-lucide="${icon}" class="w-4 h-4 ${c.contentType===v?'text-primary':'text-ink-400'}"></i>
+        <div class="text-[12.5px] font-semibold text-ink-900 mt-1">${l}</div>
+        <div class="text-[10.5px] text-ink-500 leading-snug">${desc}</div>
+      </button>`).join('')}
+    </div></div>
+    ${c.classification==='TQ'?`<label class="block" style="width:160px"><span class="text-[11px] text-ink-500">Max marks</span><input type="number" class="inp w-full mt-0.5" id="cbcMarks" value="${c.maxMarks!=null?c.maxMarks:''}" placeholder="e.g. 40"></label>`:''}
+    ${c.contentType==='text'
+      ? `<label class="block"><span class="text-[11px] text-ink-500">Clause / statement text</span><textarea class="inp w-full mt-0.5" id="cbcDesc" rows="4" placeholder="Draft the clause the vendor must satisfy…">${escapeHtml(c.description||'')}</textarea></label>`
+      : `<label class="block"><span class="text-[11px] text-ink-500">Description</span><input class="inp w-full mt-0.5" id="cbcDesc" value="${escapeHtml(c.description||'')}"></label>`}
+    ${cbTypeFields(c)}
+    <div class="flex items-center justify-between pt-2 border-t border-line">
+      <div>${cbCardMode==='edit'?`<button class="btn" id="cbcNewVer"><i data-lucide="git-branch" class="w-3.5 h-3.5"></i> Save as new version</button>`:''}</div>
+      <div class="flex items-center gap-2">
+        <button class="btn" id="cbcDiscard">Discard</button>
+        <button class="btn btn-primary" id="cbcSave" ${valid?'':'disabled style="opacity:.5;cursor:not-allowed"'}>Save criterion</button>
+      </div>
+    </div>
+  </div>`;
+}
+function cbRowHtml(c,i){
+  return `<div class="bg-white border border-line rounded-xl px-3.5 py-2.5 flex items-center gap-3">
+    ${cbBadge(c.classification)}
+    <i data-lucide="${cbTypeIcon(c.contentType)}" class="w-4 h-4 text-ink-400 shrink-0"></i>
+    <div class="flex-1 min-w-0"><div class="text-[13px] font-medium text-ink-900 truncate">${escapeHtml(c.name||'(unnamed)')} <span class="text-[10.5px] text-ink-400 font-normal">v${c.version||1}${c.active===false?' · inactive':''}</span></div>
+      <div class="text-[11px] text-ink-500">${escapeHtml(c.contentType||'text')}${c.classification==='TQ'?` · ${c.maxMarks||0} marks`:''}</div></div>
+    <button class="toggle ${c.active!==false?'on':''}" data-cb-active="${i}" title="Active"><span class="dot"></span></button>
+    <button class="btn" style="padding:4px 8px" data-cb-edit="${i}" aria-label="Edit"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+    <button class="text-ink-400 hover:text-danger" data-cb-del="${i}" aria-label="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+  </div>`;
+}
+function editorCriterionBuilder(){ return `<div id="cbWrap" class="space-y-3"></div>`; }
+function cbCloseCard(){ cbCard=null; cbCardMode=null; cbEditId=null; }
+function cbCommitCard(){
+  const c=cbCard; if(!(c.name||'').trim()) return false;
+  if(c.classification==='TQ' && c.maxMarks==null) c.maxMarks=0;
+  if(cbCardMode==='edit'){ const idx=editingDraft.findIndex(x=>x.id===cbEditId); if(idx>=0) editingDraft[idx]=c; else editingDraft.push(c); }
+  else { editingDraft.push(c); }
+  return true;
+}
 function renderCriterionBuilderAll(){
   if(!Array.isArray(editingDraft)) editingDraft=[];
   const wrap=document.getElementById('cbWrap');
-  const C=i=>editingDraft[i];
-  wrap.innerHTML = editingDraft.length? editingDraft.map((c,i)=>{
-    const open=cbOpen===c.id;
-    const head=`<div class="flex items-center gap-2"><div class="flex-1 min-w-0"><div class="flex items-center gap-1.5 flex-wrap">${cbBadge(c.classification)}<span class="text-[13px] font-medium text-ink-900">${escapeHtml(c.name||'(unnamed)')}</span><span class="text-[10.5px] text-ink-400">v${c.version||1}${c.active===false?' · inactive':''}</span></div><div class="text-[11px] text-ink-500 mt-0.5">${escapeHtml(c.contentType||'text')}${c.classification==='TQ'?` · ${c.maxMarks||0} marks`:''}</div></div>
-      <button class="btn" style="padding:4px 8px" data-cb-edit="${i}"><i data-lucide="${open?'chevron-up':'sliders-horizontal'}" class="w-3.5 h-3.5"></i></button>
-      <button class="text-ink-400 hover:text-danger" data-cb-del="${i}" aria-label="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`;
-    let detail='';
-    if(open){
-      const tbl=c.contentType==='table', num=c.contentType==='numeric';
-      detail=`<div class="mt-2 pt-2 border-t border-line space-y-2 bg-surface p-2 rounded-lg">
-        <label class="block"><span class="text-[11px] text-ink-500">Name</span><input class="inp w-full mt-0.5" data-cb-f="${i}|name" value="${escapeHtml(c.name||'')}"></label>
-        <div class="flex gap-2 items-end">
-          <label class="flex-1"><span class="text-[11px] text-ink-500">Classification</span><select class="inp w-full mt-0.5" data-cb-class="${i}">${['PQ','TQ','DQ'].map(x=>`<option ${c.classification===x?'selected':''}>${x}</option>`).join('')}</select></label>
-          <label class="flex-1"><span class="text-[11px] text-ink-500">Content type</span><select class="inp w-full mt-0.5" data-cb-ct="${i}">${['text','numeric','table'].map(x=>`<option ${c.contentType===x?'selected':''}>${x}</option>`).join('')}</select></label>
-          ${c.classification==='TQ'?`<label class="w-24"><span class="text-[11px] text-ink-500">Max marks</span><input type="number" class="inp w-full mt-0.5" data-cb-marks="${i}" value="${c.maxMarks||0}"></label>`:''}
-        </div>
-        <label class="block"><span class="text-[11px] text-ink-500">Description</span><input class="inp w-full mt-0.5" data-cb-f="${i}|description" value="${escapeHtml(c.description||'')}"></label>
-        ${tbl?`<div><div class="text-[11px] text-ink-500 mb-1">Table columns</div><div class="space-y-1">${((c.table&&c.table.columns)||[]).map((col,ci)=>`<div class="flex items-center gap-2"><input class="inp flex-1" data-cb-coln="${i}|${ci}" value="${escapeHtml(col.name||'')}"><select class="inp" data-cb-colt="${i}|${ci}">${['text','number','date'].map(t=>`<option ${col.type===t?'selected':''}>${t}</option>`).join('')}</select><button class="toggle ${col.required?'on':''}" data-cb-colreq="${i}|${ci}" title="Required"><span class="dot"></span></button><button class="text-ink-400 hover:text-danger" data-cb-colrm="${i}|${ci}"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div>`).join('')}</div><button class="btn mt-1" data-cb-coladd="${i}">+ column</button>
-          <div class="flex gap-2 mt-1"><label><span class="text-[11px] text-ink-500">Min rows</span><input type="number" class="inp w-20 mt-0.5" data-cb-minrows="${i}" value="${(c.table&&c.table.minRows)||0}"></label><label><span class="text-[11px] text-ink-500">Max rows</span><input type="number" class="inp w-20 mt-0.5" data-cb-maxrows="${i}" value="${(c.table&&c.table.maxRows)||0}"></label></div></div>`:''}
-        ${num?`<div class="flex gap-2 flex-wrap"><label><span class="text-[11px] text-ink-500">Min</span><input type="number" class="inp w-20 mt-0.5" data-cb-nf="${i}|min" value="${c.numeric&&c.numeric.min!=null?c.numeric.min:''}"></label><label><span class="text-[11px] text-ink-500">Max</span><input type="number" class="inp w-20 mt-0.5" data-cb-nf="${i}|max" value="${c.numeric&&c.numeric.max!=null?c.numeric.max:''}"></label><label><span class="text-[11px] text-ink-500">Unit</span><input class="inp w-24 mt-0.5" data-cb-nf="${i}|unit" value="${escapeHtml((c.numeric&&c.numeric.unit)||'')}"></label><label><span class="text-[11px] text-ink-500">Threshold</span><input type="number" class="inp w-24 mt-0.5" data-cb-nf="${i}|threshold" value="${c.numeric&&c.numeric.threshold!=null?c.numeric.threshold:''}"></label></div>`:''}
-        <div class="flex items-center gap-3 pt-1"><div class="flex items-center gap-2"><button class="toggle ${c.active!==false?'on':''}" data-cb-active="${i}"><span class="dot"></span></button><span class="text-[12px]">Active</span></div>
-          <button class="btn" data-cb-newver="${i}"><i data-lucide="git-branch" class="w-3.5 h-3.5"></i> Save as new version</button></div>
-      </div>`;
-    }
-    return `<div class="bg-white border border-line rounded-xl p-2.5">${head}${detail}</div>`;
-  }).join('') : `<div class="text-[12px] text-ink-400 text-center py-6 border border-dashed border-line rounded-xl">No criteria yet.</div>`;
-  wrap.querySelectorAll('[data-cb-edit]').forEach(b=>b.onclick=()=>{const c=C(+b.dataset.cbEdit);cbOpen=cbOpen===c.id?null:c.id;renderCriterionBuilderAll();});
-  wrap.querySelectorAll('[data-cb-del]').forEach(b=>b.onclick=()=>{editingDraft.splice(+b.dataset.cbDel,1);renderCriterionBuilderAll();});
-  wrap.querySelectorAll('[data-cb-f]').forEach(inp=>inp.oninput=e=>{const [i,f]=e.target.dataset.cbF.split('|');C(+i)[f]=e.target.value;});
-  wrap.querySelectorAll('[data-cb-class]').forEach(s=>s.onchange=e=>{const c=C(+e.target.dataset.cbClass);c.classification=e.target.value;if(c.classification==='TQ'&&c.maxMarks==null)c.maxMarks=0;renderCriterionBuilderAll();});
-  wrap.querySelectorAll('[data-cb-ct]').forEach(s=>s.onchange=e=>{const c=C(+e.target.dataset.cbCt);c.contentType=e.target.value;if(c.contentType==='table'&&!c.table)c.table={columns:[],minRows:1,maxRows:10};if(c.contentType==='numeric'&&!c.numeric)c.numeric={min:0,max:null,unit:'',threshold:null};renderCriterionBuilderAll();});
-  wrap.querySelectorAll('[data-cb-marks]').forEach(inp=>inp.onchange=e=>{C(+e.target.dataset.cbMarks).maxMarks=parseInt(e.target.value,10)||0;});
-  wrap.querySelectorAll('[data-cb-coln]').forEach(inp=>inp.oninput=e=>{const [i,ci]=e.target.dataset.cbColn.split('|');C(+i).table.columns[+ci].name=e.target.value;});
-  wrap.querySelectorAll('[data-cb-colt]').forEach(s=>s.onchange=e=>{const [i,ci]=e.target.dataset.cbColt.split('|');C(+i).table.columns[+ci].type=e.target.value;});
-  wrap.querySelectorAll('[data-cb-colreq]').forEach(b=>b.onclick=()=>{const [i,ci]=b.dataset.cbColreq.split('|');const col=C(+i).table.columns[+ci];col.required=!col.required;renderCriterionBuilderAll();});
-  wrap.querySelectorAll('[data-cb-colrm]').forEach(b=>b.onclick=()=>{const [i,ci]=b.dataset.cbColrm.split('|');C(+i).table.columns.splice(+ci,1);renderCriterionBuilderAll();});
-  wrap.querySelectorAll('[data-cb-coladd]').forEach(b=>b.onclick=()=>{const c=C(+b.dataset.cbColadd);c.table.columns.push({name:'Column',type:'text',required:false});renderCriterionBuilderAll();});
-  wrap.querySelectorAll('[data-cb-minrows]').forEach(inp=>inp.onchange=e=>{C(+e.target.dataset.cbMinrows).table.minRows=parseInt(e.target.value,10)||0;});
-  wrap.querySelectorAll('[data-cb-maxrows]').forEach(inp=>inp.onchange=e=>{C(+e.target.dataset.cbMaxrows).table.maxRows=parseInt(e.target.value,10)||0;});
-  wrap.querySelectorAll('[data-cb-nf]').forEach(inp=>inp.onchange=e=>{const [i,f]=e.target.dataset.cbNf.split('|');const c=C(+i);c.numeric=c.numeric||{};c.numeric[f]=(f==='unit')?e.target.value:(e.target.value===''?null:Number(e.target.value));});
-  wrap.querySelectorAll('[data-cb-active]').forEach(b=>b.onclick=()=>{const c=C(+b.dataset.cbActive);c.active=c.active===false?true:false;renderCriterionBuilderAll();});
-  wrap.querySelectorAll('[data-cb-newver]').forEach(b=>b.onclick=()=>{const i=+b.dataset.cbNewver;const c=C(i);const copy=JSON.parse(JSON.stringify(c));copy.id='c_'+Date.now().toString(36);copy.version=(c.version||1)+1;copy.supersedes=c.id;copy.active=true;c.active=false;editingDraft.splice(i+1,0,copy);cbOpen=copy.id;toast('New version v'+copy.version+' created');renderCriterionBuilderAll();});
-  const add=document.getElementById('cbAdd');if(add&&!add.dataset.bound){add.dataset.bound='1';add.onclick=()=>{const id='c_'+Date.now().toString(36);editingDraft.push({id,name:'New criterion',classification:'PQ',contentType:'text',maxMarks:null,description:'',table:null,numeric:null,version:1,active:true,supersedes:null});cbOpen=id;renderCriterionBuilderAll();};}
+  const newCardTop=(cbCardMode==='new' && cbCard) ? cbCardHtml() : '';
+  const rowsHtml = editingDraft.map((c,i)=> (cbCardMode==='edit' && cbCard && c.id===cbEditId) ? cbCardHtml() : cbRowHtml(c,i)).join('');
+  const empty = (!editingDraft.length && !newCardTop) ? `<div class="text-[12px] text-ink-400 text-center py-6 border border-dashed border-line rounded-xl">No criteria yet. Click “Add criterion” to start.</div>` : '';
+  const addBtn = (cbCardMode==='new') ? '' : `<button class="btn btn-primary" id="cbAdd"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add criterion</button>`;
+  wrap.innerHTML = `${newCardTop}${rowsHtml}${empty}<div class="pt-1">${addBtn}</div>`;
+  // saved-row controls
+  wrap.querySelectorAll('[data-cb-active]').forEach(b=>b.onclick=()=>{const c=editingDraft[+b.dataset.cbActive];c.active=c.active===false?true:false;renderCriterionBuilderAll();});
+  wrap.querySelectorAll('[data-cb-edit]').forEach(b=>b.onclick=()=>{const c=editingDraft[+b.dataset.cbEdit];cbCard=JSON.parse(JSON.stringify(c));cbCardMode='edit';cbEditId=c.id;renderCriterionBuilderAll();});
+  wrap.querySelectorAll('[data-cb-del]').forEach(b=>b.onclick=()=>{const i=+b.dataset.cbDel;const wasEditing=(cbCardMode==='edit'&&editingDraft[i]&&editingDraft[i].id===cbEditId);editingDraft.splice(i,1);if(wasEditing)cbCloseCard();renderCriterionBuilderAll();});
+  // open card
+  if(cbCard){ cbBindCard(wrap); }
+  const add=document.getElementById('cbAdd'); if(add) add.onclick=()=>{ cbCard=cbFreshCriterion(); cbCardMode='new'; cbEditId=null; renderCriterionBuilderAll(); };
   refreshIcons();
+}
+function cbBindCard(wrap){
+  const c=cbCard;
+  const nameInp=document.getElementById('cbcName');
+  if(nameInp) nameInp.oninput=e=>{ c.name=e.target.value; const sv=document.getElementById('cbcSave'); if(sv){ const ok=!!e.target.value.trim(); sv.disabled=!ok; sv.style.opacity=ok?'':'.5'; sv.style.cursor=ok?'':'not-allowed'; } };
+  wrap.querySelectorAll('[data-cbc-class]').forEach(b=>b.onclick=()=>{ c.classification=b.dataset.cbcClass; if(c.classification==='TQ'&&c.maxMarks==null)c.maxMarks=0; renderCriterionBuilderAll(); });
+  wrap.querySelectorAll('[data-cbc-ct]').forEach(b=>b.onclick=()=>{ c.contentType=b.dataset.cbcCt; if(c.contentType==='table'&&!c.table)c.table={columns:[],minRows:1,maxRows:10}; if(c.contentType==='numeric'&&!c.numeric)c.numeric={min:0,max:null,unit:'',threshold:null}; renderCriterionBuilderAll(); });
+  const marks=document.getElementById('cbcMarks'); if(marks) marks.onchange=e=>{ c.maxMarks=parseInt(e.target.value,10)||0; };
+  const desc=document.getElementById('cbcDesc'); if(desc) desc.oninput=e=>{ c.description=e.target.value; };
+  wrap.querySelectorAll('[data-cbc-nf]').forEach(inp=>inp.onchange=e=>{ const f=e.target.dataset.cbcNf; c.numeric=c.numeric||{}; c.numeric[f]=(f==='unit')?e.target.value:(e.target.value===''?null:Number(e.target.value)); });
+  wrap.querySelectorAll('[data-cbc-coln]').forEach(inp=>inp.oninput=e=>{ c.table.columns[+e.target.dataset.cbcColn].name=e.target.value; });
+  wrap.querySelectorAll('[data-cbc-colt]').forEach(s=>s.onchange=e=>{ c.table.columns[+e.target.dataset.cbcColt].type=e.target.value; });
+  wrap.querySelectorAll('[data-cbc-colreq]').forEach(b=>b.onclick=()=>{ const col=c.table.columns[+b.dataset.cbcColreq]; col.required=!col.required; renderCriterionBuilderAll(); });
+  wrap.querySelectorAll('[data-cbc-colrm]').forEach(b=>b.onclick=()=>{ c.table.columns.splice(+b.dataset.cbcColrm,1); renderCriterionBuilderAll(); });
+  const colAdd=document.getElementById('cbcColAdd'); if(colAdd) colAdd.onclick=()=>{ c.table.columns.push({name:'Column',type:'text',required:false}); renderCriterionBuilderAll(); };
+  wrap.querySelectorAll('[data-cbc-rows]').forEach(inp=>inp.onchange=e=>{ const f=e.target.dataset.cbcRows; c.table[f==='min'?'minRows':'maxRows']=parseInt(e.target.value,10)||0; });
+  const disc=document.getElementById('cbcDiscard'); if(disc) disc.onclick=()=>{ cbCloseCard(); renderCriterionBuilderAll(); };
+  const save=document.getElementById('cbcSave'); if(save) save.onclick=()=>{ if(cbCommitCard()){ const nm=c.name; cbCloseCard(); toast('Criterion “'+nm+'” saved'); renderCriterionBuilderAll(); } };
+  const nv=document.getElementById('cbcNewVer'); if(nv) nv.onclick=()=>{ if(!(c.name||'').trim()) return; const orig=editingDraft.find(x=>x.id===cbEditId); const copy=JSON.parse(JSON.stringify(c)); copy.id='c_'+Date.now().toString(36); copy.version=((orig&&orig.version)||c.version||1)+1; copy.supersedes=cbEditId; copy.active=true; if(orig){ orig.active=false; const oi=editingDraft.indexOf(orig); editingDraft.splice(oi+1,0,copy); } else editingDraft.push(copy); const ver=copy.version; cbCloseCard(); toast('New version v'+ver+' created'); renderCriterionBuilderAll(); };
 }
 
 /* ---- shared role source for gate/withdrawal multiselects ---- */
@@ -3790,61 +4651,90 @@ function renderWithdrawalPolicyAll(){
   refreshIcons();
 }
 
-/* ---- Evaluation methods & defaults (merged: methods + sector defaults + QCBS ratios + tie-breakers + leaf overrides) ---- */
-let msTab='methods';
+/* ---- Evaluation methods & procurement modes (method-aware controls per row) ---- */
+const MS_QCBS_RATIOS=['90:10','80:20','70:30','60:40'];
+function msNormalize(d){
+  if(!d||typeof d!=='object'||Array.isArray(d)) d={};
+  if(!Array.isArray(d.methods)) d.methods=[];
+  d.methods.forEach(m=>{
+    if(!m.group) m.group = /enquiry|\bote\b|\blte\b|\bste\b/i.test((m.label||'')+' '+(m.id||'')) ? 'mode' : 'method';
+    if((m.id==='qcbs') || /qcbs/i.test(m.label||'')){
+      m.ratios = (Array.isArray(m.ratios)&&m.ratios.length) ? m.ratios : MS_QCBS_RATIOS.slice();
+      m.allowedRatios = Array.isArray(m.allowedRatios) ? m.allowedRatios : ((Array.isArray(d.qcbsRatios)&&d.qcbsRatios.length)?d.qcbsRatios.slice():m.ratios.slice());
+      if(!m.allowedRatios.includes(m.defaultRatio)) m.defaultRatio = m.allowedRatios[0] || '';
+    }
+  });
+  // legacy sibling sections no longer used
+  delete d.sectorDefaults; delete d.qcbsRatios; delete d.tieBreakers; delete d.leafOverrides;
+  return d;
+}
 function editorMethodsSuite(){ return `<div id="msWrap"></div>`; }
 function renderMethodsSuiteAll(){
-  if(!editingDraft||typeof editingDraft!=='object'||Array.isArray(editingDraft)) editingDraft={};
+  editingDraft = msNormalize(editingDraft);
   const d=editingDraft;
-  d.methods=d.methods||[]; d.sectorDefaults=d.sectorDefaults||[]; d.qcbsRatios=d.qcbsRatios||[]; d.tieBreakers=d.tieBreakers||[]; d.leafOverrides=d.leafOverrides||[];
   const wrap=document.getElementById('msWrap');
-  const tabs=[['methods','Methods'],['sectors','Sector defaults'],['qcbs','QCBS ratios'],['tie','Tie-breakers'],['leaf','Leaf overrides']];
-  const tabBar=`<div class="flex items-center gap-1 border-b border-line mb-4 flex-wrap">${tabs.map(([k,l])=>`<button data-ms-tab="${k}" class="px-3 py-2 text-[12.5px] font-medium border-b-2 ${msTab===k?'border-primary text-primary':'border-transparent text-ink-500 hover:text-ink-900'}">${escapeHtml(l)}</button>`).join('')}</div>`;
-  const kvTable=(arr,pfx,kPh,vPh)=>`<table class="w-full text-[12.5px]" style="border-collapse:separate;border-spacing:0"><tbody>${arr.map((p,i)=>`<tr class="border-t border-line"><td class="p-2"><input class="inp w-full" data-${pfx}-k="${i}" value="${escapeHtml(p.k||'')}" placeholder="${kPh}"></td><td class="p-2"><input class="inp w-full" data-${pfx}-v="${i}" value="${escapeHtml(String(p.v==null?'':p.v))}" placeholder="${vPh}"></td><td class="p-2 text-center" style="width:40px"><button class="text-ink-400 hover:text-danger" data-${pfx}-rm="${i}"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td></tr>`).join('')}</tbody></table>`;
-  let body='';
-  if(msTab==='methods'){
-    body=`<div class="text-[12px] text-ink-500 mb-2">Master on/off list with GFR 2017 Rule 161 value thresholds (OTE mandatory above ₹25L; LTE below; STE needs justification). Min/Max in ₹ — leave Max blank for no upper limit.</div>
-    <table class="w-full text-[12.5px]" style="border-collapse:separate;border-spacing:0"><thead><tr class="text-ink-500"><th class="text-left p-2">Method</th><th class="p-2">On</th><th class="p-2">Min ₹</th><th class="p-2">Max ₹</th><th class="p-2">Justify</th><th class="p-2"></th></tr></thead>
-    <tbody>${d.methods.map((m,i)=>`<tr class="border-t border-line">
-      <td class="p-2"><input class="inp w-full" data-ms-mlabel="${i}" value="${escapeHtml(m.label||'')}"></td>
-      <td class="p-2 text-center"><button class="toggle ${m.enabled!==false?'on':''}" data-ms-men="${i}" style="margin:0 auto"><span class="dot"></span></button></td>
-      <td class="p-2 text-center"><input type="number" class="inp w-28 text-right" data-ms-mmin="${i}" value="${m.minValue!=null?m.minValue:''}"></td>
-      <td class="p-2 text-center"><input type="number" class="inp w-28 text-right" data-ms-mmax="${i}" value="${m.maxValue!=null?m.maxValue:''}" placeholder="∞"></td>
-      <td class="p-2 text-center"><button class="toggle ${m.justify?'on':''}" data-ms-mjust="${i}" style="margin:0 auto"><span class="dot"></span></button></td>
-      <td class="p-2 text-center"><button class="text-ink-400 hover:text-danger" data-ms-mrm="${i}"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td></tr>`).join('')}</tbody></table>
-    <button class="btn mt-3" id="msAddM"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add method</button>`;
-  } else if(msTab==='sectors'){
-    body=`<div class="text-[12px] text-ink-500 mb-2">Default evaluation method per sector. Deviation should require justification.</div>${kvTable(d.sectorDefaults,'ms-sec','Sector','Method')}<button class="btn mt-3" id="msAddSec"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add sector default</button>`;
-  } else if(msTab==='qcbs'){
-    body=`<div class="text-[12px] text-ink-500 mb-2">Allowed QCBS technical:financial splits offered to officers.</div><div class="flex flex-wrap gap-1.5 mb-2">${d.qcbsRatios.length?d.qcbsRatios.map((r,i)=>`<span class="chip-input">${escapeHtml(r)} <button data-ms-qrm="${i}">✕</button></span>`).join(''):'<span class="text-[11px] text-ink-400">None</span>'}</div><div class="flex gap-2"><input class="inp flex-1" id="msNewQ" placeholder="e.g. 75:25"><button class="btn" id="msAddQ">Add</button></div>`;
-  } else if(msTab==='tie'){
-    body=`<div class="text-[12px] text-ink-500 mb-2">Tie-breaker rule per method when two bidders score identically.</div>${kvTable(d.tieBreakers,'ms-tie','Method','Rule')}<button class="btn mt-3" id="msAddTie"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add rule</button>`;
-  } else {
-    body=`<div class="text-[12px] text-ink-500 mb-2">Per-leaf exceptions where a specific catalog subtype+sector deviates from the sector default. Key = catalog leaf path, Value = method.</div>${kvTable(d.leafOverrides,'ms-leaf','Catalog leaf path','Method')}<button class="btn mt-3" id="msAddLeaf"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add override</button>`;
-  }
-  wrap.innerHTML=tabBar+`<div>${body}</div>`;
-  wrap.querySelectorAll('[data-ms-tab]').forEach(b=>b.onclick=()=>{msTab=b.dataset.msTab;renderMethodsSuiteAll();});
-  // methods tab
-  wrap.querySelectorAll('[data-ms-mlabel]').forEach(inp=>inp.oninput=e=>{d.methods[+e.target.dataset.msMlabel].label=e.target.value;});
-  wrap.querySelectorAll('[data-ms-men]').forEach(b=>b.onclick=()=>{const m=d.methods[+b.dataset.msMen];m.enabled=m.enabled===false;renderMethodsSuiteAll();});
-  wrap.querySelectorAll('[data-ms-mjust]').forEach(b=>b.onclick=()=>{const m=d.methods[+b.dataset.msMjust];m.justify=!m.justify;renderMethodsSuiteAll();});
-  wrap.querySelectorAll('[data-ms-mmin]').forEach(inp=>inp.onchange=e=>{const v=e.target.value.trim();d.methods[+e.target.dataset.msMmin].minValue=v===''?0:(parseInt(v,10)||0);});
-  wrap.querySelectorAll('[data-ms-mmax]').forEach(inp=>inp.onchange=e=>{const v=e.target.value.trim();d.methods[+e.target.dataset.msMmax].maxValue=v===''?null:(parseInt(v,10)||0);});
-  wrap.querySelectorAll('[data-ms-mrm]').forEach(b=>b.onclick=()=>{d.methods.splice(+b.dataset.msMrm,1);renderMethodsSuiteAll();});
-  const addM=document.getElementById('msAddM'); if(addM) addM.onclick=()=>{d.methods.push({label:'New method',enabled:true,minValue:0,maxValue:null,justify:false});renderMethodsSuiteAll();};
-  // kv tabs
-  const bindKv=(pfx,arr,addId,blank)=>{
-    wrap.querySelectorAll(`[data-${pfx}-k]`).forEach(inp=>inp.oninput=e=>{arr[+e.target.getAttribute(`data-${pfx}-k`)].k=e.target.value;});
-    wrap.querySelectorAll(`[data-${pfx}-v]`).forEach(inp=>inp.oninput=e=>{arr[+e.target.getAttribute(`data-${pfx}-v`)].v=e.target.value;});
-    wrap.querySelectorAll(`[data-${pfx}-rm]`).forEach(b=>b.onclick=()=>{arr.splice(+b.getAttribute(`data-${pfx}-rm`),1);renderMethodsSuiteAll();});
-    const a=document.getElementById(addId); if(a) a.onclick=()=>{arr.push(blank());renderMethodsSuiteAll();};
+  const rowHtml=(m,gi)=>{
+    const on=m.enabled!==false;
+    let controls='';
+    if(m.id==='qcbs'){
+      const allowed=m.allowedRatios||[]; const ratios=(m.ratios&&m.ratios.length)?m.ratios:MS_QCBS_RATIOS;
+      controls=`<div class="mt-2 pl-1 space-y-2">
+        <div><div class="text-[11px] text-ink-500 mb-1">Allowed T:F ratios</div><div class="flex flex-wrap gap-1.5">
+          ${ratios.map(r=>{const a=allowed.includes(r);return `<button class="chip-input" style="cursor:pointer;${a?'background:#EFF6FF;border-color:#93C5FD;color:#0F5EE8':''}" data-ms-ratio="${gi}|${r}">${escapeHtml(r)}</button>`;}).join('')}
+        </div></div>
+        <label class="flex items-center gap-2 text-[12px]"><span class="text-ink-500">Default ratio</span>
+          <select class="inp" data-ms-defratio="${gi}">${allowed.length?allowed.map(r=>`<option ${m.defaultRatio===r?'selected':''}>${escapeHtml(r)}</option>`).join(''):'<option value="">— enable a ratio first —</option>'}</select></label>
+      </div>`;
+    } else if(m.id==='lcs'){
+      controls=`<div class="mt-2 pl-1 flex items-center gap-2 text-[12px]"><span class="text-ink-500">Minimum technical cutoff</span><input type="number" min="0" max="100" class="inp w-24 text-right" data-ms-cutoff="${gi}" value="${m.techCutoff!=null?m.techCutoff:''}"><span class="text-ink-400">/ 100</span></div>`;
+    } else if(m.id==='qbs'){
+      controls=`<div class="mt-2 pl-1 text-[11.5px] text-ink-400 italic">Quality-only by definition — the financial quote is not scored, so there are no thresholds.</div>`;
+    } else if(m.id==='fbs'){
+      controls=`<div class="mt-2 pl-1 text-[11.5px] text-ink-400 italic">Budget is fixed per tender at creation time — no admin-level number here.</div>`;
+    } else if(m.id==='ote'){
+      controls=`<div class="mt-2 pl-1 flex items-center gap-2 text-[12px]"><span class="text-ink-500">Mandatory above ₹</span><input type="number" class="inp w-36 text-right" data-ms-mandatory="${gi}" value="${m.mandatoryAbove!=null?m.mandatoryAbove:''}"><span class="text-ink-400">${m.mandatoryAbove?aitFmtMoney(m.mandatoryAbove):'GFR Rule 161'}</span></div>`;
+    } else if(m.id==='lte'){
+      controls=`<div class="mt-2 pl-1 flex items-center gap-2 text-[12px]"><span class="text-ink-500">Allowed up to ₹</span><input type="number" class="inp w-36 text-right" data-ms-upto="${gi}" value="${m.allowedUpto!=null?m.allowedUpto:''}"><span class="text-ink-400">${m.allowedUpto?aitFmtMoney(m.allowedUpto):'GFR Rule 161'}</span></div>`;
+    }
+    // Locked justification is a statutory fact — always shown, even when the mode is off.
+    const lockedJust = m.justifyLocked
+      ? `<div class="mt-2 pl-1 flex items-center gap-2 text-[12px]"><button class="toggle on" data-ms-justlocked="${gi}" aria-pressed="true" style="opacity:.6;cursor:not-allowed"><span class="dot"></span></button><span class="text-ink-700">Justification required</span><span class="text-[11px] text-ink-400 italic">— locked on; single-source awards always need a recorded justification (CVC).</span></div>`
+      : '';
+    return `<div class="rounded-xl border border-line ${on?'bg-white':'bg-surface'} px-3.5 py-2.5">
+      <div class="flex items-center gap-3">
+        <button class="toggle ${on?'on':''}" data-ms-en="${gi}" aria-pressed="${on}"><span class="dot"></span></button>
+        <div class="flex-1 min-w-0 text-[13.5px] font-semibold ${on?'text-ink-900':'text-ink-400'}">${escapeHtml(m.label||'(unnamed)')}</div>
+        ${m.custom?`<button class="text-ink-400 hover:text-danger" data-ms-rm="${gi}" aria-label="Remove"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`:''}
+      </div>
+      ${lockedJust}${on?controls:''}
+    </div>`;
   };
-  bindKv('ms-sec',d.sectorDefaults,'msAddSec',()=>({k:'',v:''}));
-  bindKv('ms-tie',d.tieBreakers,'msAddTie',()=>({k:'',v:''}));
-  bindKv('ms-leaf',d.leafOverrides,'msAddLeaf',()=>({k:'',v:''}));
-  // qcbs
-  wrap.querySelectorAll('[data-ms-qrm]').forEach(b=>b.onclick=()=>{d.qcbsRatios.splice(+b.dataset.msQrm,1);renderMethodsSuiteAll();});
-  const addQ=document.getElementById('msAddQ'); if(addQ) addQ.onclick=()=>{const inp=document.getElementById('msNewQ');const v=(inp.value||'').trim();if(v){d.qcbsRatios.push(v);renderMethodsSuiteAll();}};
+  const section=(grp,title,desc)=>{
+    const rows=d.methods.filter(m=>m.group===grp);
+    return `<div class="mb-5">
+      <div class="text-[12px] font-semibold uppercase tracking-wide text-ink-500">${title}</div>
+      <div class="text-[11.5px] text-ink-400 mb-2">${desc}</div>
+      <div class="space-y-2">${rows.map(m=>rowHtml(m, d.methods.indexOf(m))).join('') || '<div class="text-[12px] text-ink-400 italic">None.</div>'}</div>
+    </div>`;
+  };
+  wrap.innerHTML=`
+    ${section('method','Evaluation methods','How qualifying bids are compared and ranked.')}
+    ${section('mode','Procurement modes','How vendors are invited — GFR 2017 Rule 161 value gates.')}
+    <div class="pt-3 border-t border-line flex items-end gap-2 flex-wrap">
+      <label class="block"><span class="text-[11px] text-ink-500">Add to</span>
+        <select class="inp mt-0.5" id="msAddGroup"><option value="method">Evaluation methods</option><option value="mode">Procurement modes</option></select></label>
+      <label class="flex-1" style="min-width:180px"><span class="text-[11px] text-ink-500">Name</span><input class="inp w-full mt-0.5" id="msAddName" placeholder="e.g. Two-stage bidding"></label>
+      <button class="btn btn-primary" id="msAddBtn"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add</button>
+    </div>`;
+  wrap.querySelectorAll('[data-ms-en]').forEach(b=>b.onclick=()=>{const m=d.methods[+b.dataset.msEn];m.enabled=m.enabled===false?true:false;renderMethodsSuiteAll();});
+  wrap.querySelectorAll('[data-ms-rm]').forEach(b=>b.onclick=()=>{d.methods.splice(+b.dataset.msRm,1);renderMethodsSuiteAll();});
+  wrap.querySelectorAll('[data-ms-ratio]').forEach(b=>b.onclick=()=>{const [gi,r]=b.dataset.msRatio.split('|');const m=d.methods[+gi];m.allowedRatios=m.allowedRatios||[];const k=m.allowedRatios.indexOf(r);if(k>=0)m.allowedRatios.splice(k,1);else m.allowedRatios.push(r);m.allowedRatios=(m.ratios||MS_QCBS_RATIOS).filter(x=>m.allowedRatios.includes(x));if(!m.allowedRatios.includes(m.defaultRatio))m.defaultRatio=m.allowedRatios[0]||'';renderMethodsSuiteAll();});
+  wrap.querySelectorAll('[data-ms-defratio]').forEach(s=>s.onchange=e=>{d.methods[+e.target.dataset.msDefratio].defaultRatio=e.target.value;});
+  wrap.querySelectorAll('[data-ms-cutoff]').forEach(inp=>inp.onchange=e=>{const v=e.target.value.trim();d.methods[+e.target.dataset.msCutoff].techCutoff=(v===''?null:Math.max(0,Math.min(100,parseInt(v,10)||0)));});
+  wrap.querySelectorAll('[data-ms-mandatory]').forEach(inp=>inp.onchange=e=>{const v=e.target.value.trim();d.methods[+e.target.dataset.msMandatory].mandatoryAbove=(v===''?null:(parseInt(v,10)||0));renderMethodsSuiteAll();});
+  wrap.querySelectorAll('[data-ms-upto]').forEach(inp=>inp.onchange=e=>{const v=e.target.value.trim();d.methods[+e.target.dataset.msUpto].allowedUpto=(v===''?null:(parseInt(v,10)||0));renderMethodsSuiteAll();});
+  wrap.querySelectorAll('[data-ms-justlocked]').forEach(b=>b.onclick=()=>toast('Justification is mandatory for single-source modes and can’t be switched off.'));
+  const addBtn=document.getElementById('msAddBtn'); if(addBtn) addBtn.onclick=()=>{const grp=((document.getElementById('msAddGroup')||{}).value)||'method';const name=(((document.getElementById('msAddName')||{}).value)||'').trim();if(!name)return;d.methods.push({id:'m_'+Date.now().toString(36),group:grp,label:name,enabled:true,custom:true});renderMethodsSuiteAll();};
   refreshIcons();
 }
 
@@ -4194,6 +5084,40 @@ function renderTqRubricAll(){
 /* =========================================================
    ONE-TIME MIGRATION (merge old setting ids into new merged items)
    ========================================================= */
+/* ---- shape-upgrade helpers for the Tender Creation removals/rework ---- */
+function msDefFresh(){ return JSON.parse(JSON.stringify(ITEMS.find(i=>i.id==='tender.methods-suite').def)); }
+function msOldId(lab){ lab=String(lab||'').toLowerCase();
+  if(/single tender|\bste\b/.test(lab)) return 'ste';
+  if(/limited tender|\blte\b/.test(lab)) return 'lte';
+  if(/open tender|\bote\b/.test(lab)) return 'ote';
+  if(/\bsss\b|single source/.test(lab)) return 'sss';
+  if(/\bqcbs\b/.test(lab)) return 'qcbs';
+  if(/\blcs\b/.test(lab)) return 'lcs';
+  if(/\bqbs\b/.test(lab)) return 'qbs';
+  if(/\bfbs\b/.test(lab)) return 'fbs';
+  if(/\bl1\b|lowest/.test(lab)) return 'l1';
+  return null;
+}
+function upgradeMethodsShape(old){
+  const base=msDefFresh();
+  if(!old || typeof old!=='object') return base;
+  const oldMethods=Array.isArray(old.methods)?old.methods:[];
+  base.methods.forEach(nm=>{ const om=oldMethods.find(m=>m && msOldId(m.label)===nm.id); if(om && om.enabled!=null) nm.enabled=om.enabled!==false; });
+  if(Array.isArray(old.qcbsRatios)){ const q=base.methods.find(m=>m.id==='qcbs'); if(q){ const allowed=(q.ratios||MS_QCBS_RATIOS).filter(r=>old.qcbsRatios.includes(r)); if(allowed.length){ q.allowedRatios=allowed; if(!allowed.includes(q.defaultRatio)) q.defaultRatio=allowed[0]; } } }
+  const oOte=oldMethods.find(m=>m && msOldId(m.label)==='ote'); if(oOte && oOte.minValue!=null){ const n=base.methods.find(m=>m.id==='ote'); if(n) n.mandatoryAbove=oOte.minValue; }
+  const oLte=oldMethods.find(m=>m && msOldId(m.label)==='lte'); if(oLte && oLte.maxValue!=null){ const n=base.methods.find(m=>m.id==='lte'); if(n) n.allowedUpto=oLte.maxValue; }
+  return base;
+}
+function upgradeLanguages(oldKv){
+  const base=JSON.parse(JSON.stringify(ITEMS.find(i=>i.id==='tender.languages').def));
+  if(Array.isArray(oldKv)){
+    const enabledSet=new Set(); let def=null;
+    oldKv.forEach(p=>{ if(!p) return; const k=String(p.k||''); if(k.toLowerCase()==='default'){ def=p.v; } else if(p.v===true||p.v==='true'||p.v==='True'){ enabledSet.add(k); } });
+    if(enabledSet.size) base.languages.forEach(l=>{ l.enabled=enabledSet.has(l.label); });
+    if(def && base.languages.find(l=>l.label===def)) base.default=def;
+  }
+  return base;
+}
 function runMigrations(){
   const store=loadStore();
   // TQ rubric migration — independent guard so it runs even if the v2 flag is already set.
@@ -4209,21 +5133,31 @@ function runMigrations(){
     store['_tq_migrated_v3']=true;
     saveStore(store);
   }
+  // Tender Creation removals + shape upgrades — independent guard (runs once regardless of v2).
+  if(!store['_tender_v4']){
+    ['tender.template-library','tender.pq-types-8','tender.milestones','tender.milestones-tier-overrides','tender.autosave','tender.corrigendum','tender.withdrawal-policy','tender.corrigendum-policy','tender.auto-corrigendum-triggers']
+      .forEach(k=>{ if(k in store) delete store[k]; });
+    const _ms=store['tender.methods-suite'];
+    if(_ms && typeof _ms==='object' && !Array.isArray(_ms) && Array.isArray(_ms.methods) && _ms.methods.some(m=>!m.group)) store['tender.methods-suite']=upgradeMethodsShape(_ms);
+    if(Array.isArray(store['tender.languages'])) store['tender.languages']=upgradeLanguages(store['tender.languages']);
+    store['_tender_v4']=true;
+    saveStore(store);
+  }
+  // EMD policy: strip ₹ caps, keep percentage + MSME exemption (independent guard).
+  if(!store['_emd_v2']){
+    if(Array.isArray(store['tender.emd-policy'])) store['tender.emd-policy']=emdFromKv(store['tender.emd-policy']);
+    store['_emd_v2']=true;
+    saveStore(store);
+  }
   if(store['_admin_migrated_v2']) return;
   let changed=false;
   const defOf=id=>{const it=ITEMS.find(i=>i.id===id);return it?JSON.parse(JSON.stringify(it.def)):null;};
   const has=id=>id in store;
-  // 2.2 + 3.4 — methods suite
+  // 2.2 + 3.4 — methods suite (folds the legacy method ids straight into the new method-aware shape)
   if(!has('tender.methods-suite') && ['tender.method-master','tender.sector-method','tender.qcbs-ratios','tender.tie-breaker','tender.leaf-method-override'].some(has)){
-    const m=defOf('tender.methods-suite')||{};
-    if(has('tender.method-master') && Array.isArray(store['tender.method-master'])){
-      store['tender.method-master'].forEach(old=>{ const lab=(typeof old==='string')?old:old.label; const en=(typeof old==='string')?true:(old.enabled!==false); const hit=m.methods.find(x=>x.label===lab); if(hit) hit.enabled=en; else m.methods.push({label:lab,enabled:en,minValue:0,maxValue:null,justify:false}); });
-    }
-    if(has('tender.sector-method') && Array.isArray(store['tender.sector-method'])) m.sectorDefaults=store['tender.sector-method'];
-    if(has('tender.qcbs-ratios') && Array.isArray(store['tender.qcbs-ratios'])) m.qcbsRatios=store['tender.qcbs-ratios'];
-    if(has('tender.tie-breaker') && Array.isArray(store['tender.tie-breaker'])) m.tieBreakers=store['tender.tie-breaker'];
-    if(has('tender.leaf-method-override') && Array.isArray(store['tender.leaf-method-override'])) m.leafOverrides=store['tender.leaf-method-override'];
-    store['tender.methods-suite']=m; changed=true;
+    const legacy={methods:[], qcbsRatios:(has('tender.qcbs-ratios')&&Array.isArray(store['tender.qcbs-ratios']))?store['tender.qcbs-ratios']:undefined};
+    if(has('tender.method-master') && Array.isArray(store['tender.method-master'])) legacy.methods=store['tender.method-master'].map(old=>(typeof old==='string')?{label:old,enabled:true}:{label:old.label,enabled:old.enabled!==false,minValue:old.minValue,maxValue:old.maxValue});
+    store['tender.methods-suite']=upgradeMethodsShape(legacy); changed=true;
   }
   // 2.3 — notifications suite
   if(!has('tender.notifications-suite') && ['tender.reminder-schedule','tender.notification-channels','tender.notification-recipients','tender.escalation-rules'].some(has)){
@@ -4237,13 +5171,7 @@ function runMigrations(){
     if(has('tender.escalation-rules') && Array.isArray(store['tender.escalation-rules'])) store['tender.escalation-rules'].forEach(r=>{ evByName(r.event).escalation={breachHours:r.breachHours,escalateTo:r.escalateTo}; });
     store['tender.notifications-suite']=n; changed=true;
   }
-  // 2.4 + 3.1 — corrigendum
-  if(!has('tender.corrigendum') && (has('tender.corrigendum-policy')||has('tender.auto-corrigendum-triggers'))){
-    const c=defOf('tender.corrigendum')||{};
-    const old=store['tender.corrigendum-policy'];
-    if(old&&typeof old==='object'){ if(old.autoExtendsTimeline!=null) c.autoExtend=old.autoExtendsTimeline; if(old.extensionDays!=null) c.extensionDays=old.extensionDays; }
-    store['tender.corrigendum']=c; changed=true;
-  }
+  // 2.4 + 3.1 — corrigendum: removed. tender.corrigendum no longer exists; the _tender_v4 guard prunes it.
   // 2.1 — types/subtypes enabled state into the tree (best-effort)
   if((has('tender.types')||has('tender.subtypes')) && !store['_tree_migrated']){
     let tree=store['tender.tree']; if(!tree){ tree=defOf('tender.tree'); }
