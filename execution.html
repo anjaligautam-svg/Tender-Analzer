@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Execution — TenderAI Hub</title>
+  <meta name="description" content="Contract execution: milestones, RA bills, and extensions for awarded tenders." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="admin-state.js"></script>
+  <script>
+    tailwind.config = { theme: { extend: {
+      fontFamily: { sans: ['"DM Sans"', 'system-ui', 'sans-serif'] },
+      colors: {
+        primary: { DEFAULT: '#0F5EE8', light: '#EFF6FF', border: '#93C5FD' },
+        success: { DEFAULT: '#10B981', light: '#F0FDF4' },
+        warning: { DEFAULT: '#F59E0B', light: '#FFFBEB' },
+        danger:  { DEFAULT: '#EF4444', light: '#FEF2F2' },
+        ink: { 900: '#111827', 500: '#6B7280', 400: '#9CA3AF' },
+        line: '#E5E7EB', surface: '#F9FAFB',
+      },
+      boxShadow: { soft: '0 1px 3px rgba(0,0,0,0.08)', lift: '0 4px 12px rgba(0,0,0,0.12)' },
+    }}};
+  </script>
+  <style>
+    html, body { font-family: 'DM Sans', system-ui, sans-serif; color: #111827; background: #F9FAFB; }
+    *:focus-visible { outline: 2px solid #0F5EE8; outline-offset: 2px; border-radius: 4px; }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 8px; }
+    ::-webkit-scrollbar-thumb:hover { background: #D1D5DB; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(15,94,232,0.4); } 70% { box-shadow: 0 0 0 8px rgba(15,94,232,0); } 100% { box-shadow: 0 0 0 0 rgba(15,94,232,0); } }
+    @keyframes ex-spin { to { transform: rotate(360deg); } }
+    .toast { transform: translateY(80px); opacity: 0; transition: transform .3s cubic-bezier(.2,.7,.2,1), opacity .25s ease; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .ex-tab { transition: all .15s ease; }
+    .ex-row { cursor:pointer; transition: background .15s ease; }
+    .ex-row:hover { background:#F9FAFB; }
+    .ex-pill { display:inline-flex; align-items:center; gap:5px; border-radius:20px; padding:3px 10px; font-size:11.5px; font-weight:600; }
+    .ex-pill.green  { background:#F0FDF4; color:#065F46; }
+    .ex-pill.amber  { background:#FFFBEB; color:#92400E; }
+    .ex-pill.blue   { background:#EFF6FF; color:#1D4ED8; }
+    .ex-pill.purple { background:#F5F3FF; color:#6D28D9; }
+    .ex-pill.gray   { background:#F3F4F6; color:#6B7280; }
+    .ex-pill.red    { background:#FEF2F2; color:#991B1B; }
+    .ex-card { background:white; border:1px solid #E5E7EB; border-radius:12px; padding:16px 18px; }
+    .ex-bar { height:8px; border-radius:4px; background:#E5E7EB; overflow:hidden; position:relative; }
+    .ex-bar > span { display:block; height:100%; border-radius:4px; transition: width 300ms ease; }
+    .ex-table { width:100%; border-collapse:separate; border-spacing:0; border:1px solid #E5E7EB; border-radius:12px; overflow:hidden; font-size:13px; }
+    .ex-table th { text-align:left; padding:10px 14px; background:#F9FAFB; border-bottom:1px solid #E5E7EB; font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; white-space:nowrap; }
+    .ex-table td { padding:11px 14px; border-bottom:1px solid #F3F4F6; vertical-align:top; }
+    .ex-table tr:last-child td { border-bottom:none; }
+    .ex-btn { display:inline-flex; align-items:center; gap:6px; background:#0F5EE8; color:white; border:none; border-radius:8px; padding:9px 16px; font-size:13px; font-weight:600; cursor:pointer; transition: background 150ms ease; }
+    .ex-btn:hover { background:#0B4FCA; }
+    .ex-btn.ghost { background:white; color:#0F5EE8; border:1px solid #0F5EE8; }
+    .ex-btn.ghost:hover { background:#EFF6FF; }
+    .ex-link { background:transparent; border:none; color:#0F5EE8; font-size:12.5px; cursor:pointer; padding:0; }
+    .ex-link:hover { text-decoration:underline; }
+    .ex-inline { background:#F9FAFB; border:1px solid #E5E7EB; border-radius:10px; padding:16px 18px; margin-top:12px; animation: ex-slide 200ms ease; }
+    @keyframes ex-slide { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+    .ex-input { border:1px solid #D1D5DB; border-radius:8px; padding:8px 11px; font-size:13px; width:100%; outline:none; background:white; }
+    .ex-input:focus { border-color:#0F5EE8; box-shadow:0 0 0 3px rgba(15,94,232,0.1); }
+    .ex-lbl { font-size:12px; font-weight:600; color:#374151; margin-bottom:5px; display:block; }
+    .ex-spinner { width:12px; height:12px; border:2px solid rgba(255,255,255,0.5); border-top-color:white; border-radius:50%; display:inline-block; animation: ex-spin .7s linear infinite; vertical-align:-1px; margin-right:5px; }
+    .ex-chip { display:inline-flex; align-items:center; gap:4px; border-radius:6px; padding:2px 8px; font-size:11px; font-weight:600; }
+    /* timeline strip */
+    .ex-timeline { display:flex; align-items:center; gap:0; }
+    .ex-tl-node { display:flex; flex-direction:column; align-items:center; gap:6px; flex-shrink:0; min-width:96px; }
+    .ex-tl-dot { width:14px; height:14px; border-radius:50%; background:#0F5EE8; }
+    .ex-tl-dot.done { background:#10B981; }
+    .ex-tl-dot.future { background:#D1D5DB; }
+    .ex-tl-leg { flex:1; height:2px; background:#E5E7EB; margin-top:-20px; }
+    /* approval modal (in-flow overlay) */
+    .exm-overlay { position:absolute; top:0; left:0; width:100%; min-height:100%; background:rgba(0,0,0,0.35); z-index:100; display:flex; align-items:flex-start; justify-content:center; padding:40px 16px; }
+    .exm-card { background:white; border-radius:14px; width:560px; max-width:96%; box-shadow:0 8px 32px rgba(0,0,0,0.14); opacity:0; transform:translateY(-10px); transition: opacity 250ms ease, transform 250ms ease; }
+    .exm-card.in { opacity:1; transform:translateY(0); }
+    .exm-head { padding:18px 22px; border-bottom:1px solid #E5E7EB; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+    .exm-head .t { font-size:16px; font-weight:700; color:#111827; }
+    .exm-head .s { font-size:12.5px; color:#6B7280; margin-top:3px; }
+    .exm-x { font-size:20px; color:#6B7280; background:transparent; border:none; cursor:pointer; line-height:1; }
+    .exm-body { padding:18px 22px; }
+    .exm-row { display:flex; align-items:center; gap:11px; padding:9px 10px; border-radius:8px; cursor:pointer; }
+    .exm-row:hover { background:#F9FAFB; }
+    .exm-cb { width:18px; height:18px; border-radius:4px; border:1.5px solid #D1D5DB; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:white; }
+    .exm-cb.on { background:#0F5EE8; border-color:#0F5EE8; color:white; }
+    .exm-cb.dis { opacity:0.6; cursor:not-allowed; }
+    .exm-av { width:34px; height:34px; border-radius:50%; background:#EFF6FF; color:#0F5EE8; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .exm-req { background:#FEF2F2; color:#991B1B; border-radius:4px; padding:1px 6px; font-size:10px; font-weight:700; }
+    .exm-add { display:inline-flex; align-items:center; gap:6px; background:transparent; border:none; color:#0F5EE8; font-size:12.5px; cursor:pointer; margin-top:8px; padding:0; }
+    .exm-addform { display:grid; grid-template-columns:1fr 1fr; gap:8px; background:#F9FAFB; border-radius:8px; padding:12px; margin-top:8px; }
+    .exm-addform input { border:1px solid #D1D5DB; border-radius:6px; padding:6px 9px; font-size:12px; outline:none; }
+    .exm-chips { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+    .exm-chip { background:white; border:1px solid #E5E7EB; border-radius:6px; padding:4px 10px; display:flex; align-items:center; gap:6px; font-size:12px; cursor:grab; }
+    .exm-chip .num { background:#0F5EE8; color:white; border-radius:50%; width:16px; height:16px; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; }
+    .exm-chip .x { color:#9CA3AF; cursor:pointer; }
+    .exm-chip .x:hover { color:#EF4444; }
+    .exm-foot { padding:14px 22px; border-top:1px solid #E5E7EB; display:flex; align-items:center; justify-content:space-between; }
+    .exm-foot .cnt { font-size:12px; color:#6B7280; }
+    /* stepper */
+    .ex-step { display:flex; align-items:flex-start; gap:16px; position:relative; }
+    .ex-step .line { position:absolute; left:15px; top:34px; width:2px; bottom:-4px; background:#E5E7EB; }
+    .ex-step .line.done { background:#10B981; }
+    .ex-step .node { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; flex-shrink:0; z-index:1; }
+    .ex-step .node.done { background:#10B981; }
+    .ex-step .node.active { background:#0F5EE8; animation: pulse-ring 1.5s infinite; }
+    .ex-step .node.locked { background:#F3F4F6; border:1.5px solid #D1D5DB; color:#9CA3AF; }
+    .ex-step .node.sentback { background:#FEF2F2; border:1.5px solid #FECACA; color:#EF4444; }
+    .ex-step .body { padding-bottom:22px; flex:1; min-width:0; }
+    .ex-step:last-child .body { padding-bottom:0; }
+    .ex-step .st-name { font-size:14px; font-weight:700; color:#111827; }
+    .ex-step .st-desig { font-size:12px; color:#6B7280; }
+    .ex-step .st-line { font-size:12px; margin-top:3px; }
+    .ex-sim { font-size:11px; color:#C4C9D4; background:transparent; border:none; cursor:pointer; padding:0; }
+    .ex-sim:hover { color:#9CA3AF; text-decoration:underline; }
+    .ex-thumbs { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+    .ex-thumb { width:64px; height:64px; border-radius:8px; object-fit:cover; border:1px solid #E5E7EB; }
+    .ex-thumb-wrap { position:relative; }
+    .ex-thumb-rm { position:absolute; top:-6px; right:-6px; width:18px; height:18px; border-radius:50%; background:white; border:1px solid #E5E7EB; color:#9CA3AF; font-size:11px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .ex-thumb-rm:hover { color:#EF4444; }
+    .ex-upzone { border:1.5px dashed #D1D5DB; border-radius:8px; padding:14px; text-align:center; background:#F9FAFB; cursor:pointer; font-size:12px; color:#6B7280; }
+    .ex-upzone:hover { border-color:#0F5EE8; }
+  </style>
+</head>
+<body class="bg-surface">
+  <div class="flex h-screen overflow-hidden">
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="w-[244px] shrink-0 bg-white border-r border-line flex flex-col" aria-label="Primary">
+      <div class="px-5 pt-5 pb-4 border-b border-line">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-[15px]">T</div>
+          <div>
+            <div class="text-[15px] font-semibold text-ink-900 leading-tight">TenderAI</div>
+            <div class="text-[11px] text-ink-500 leading-tight">Procurement Portal</div>
+          </div>
+        </div>
+        <button class="mt-4 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-line bg-surface hover:bg-white hover:shadow-soft transition" aria-label="Switch organisation">
+          <div class="w-7 h-7 rounded-md bg-primary-light text-primary flex items-center justify-center"><i data-lucide="building-2" class="w-4 h-4"></i></div>
+          <div class="text-left flex-1 min-w-0">
+            <div class="text-[12.5px] font-medium text-ink-900 truncate">Ahmedabad</div>
+            <div class="text-[10.5px] text-ink-500 truncate">Municipal Corporation</div>
+          </div>
+          <i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 text-ink-400"></i>
+        </button>
+      </div>
+      <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+        <div>
+          <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">OVERVIEW</div>
+          <ul class="space-y-0.5">
+            <li><a href="index.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">TENDERING</div>
+          <ul class="space-y-0.5">
+            <li><a href="dpr-creation.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="clipboard-list" class="w-4 h-4"></i> DPR Creation</a></li>
+            <li><a href="tender-creation.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="file-plus-2" class="w-4 h-4"></i> Tender Creation</a></li>
+            <li><a href="prebid-queries.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="messages-square" class="w-4 h-4"></i> Pre-Bid Queries</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">EVALUATING</div>
+          <ul class="space-y-0.5">
+            <li><a href="evaluation.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="clipboard-check" class="w-4 h-4"></i> Bid Evaluation</a></li>
+            <li><a href="bid-management.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] text-ink-500 hover:bg-surface hover:text-ink-900"><i data-lucide="gavel" class="w-4 h-4"></i> Bid Management</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="text-[10.5px] tracking-[0.08em] text-ink-400 font-semibold px-3 mb-2">POST AWARD</div>
+          <ul class="space-y-0.5">
+            <li><a href="execution.html" aria-current="page" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[13.5px] bg-primary-light text-primary font-medium"><i data-lucide="progress-check" class="w-4 h-4"></i> Execution</a></li>
+          </ul>
+        </div>
+      </nav>
+      <div class="border-t border-line px-4 py-3 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-[12.5px] font-medium text-ink-900 truncate">Rajesh Kumar</div>
+          <div class="text-[10.5px] text-ink-500 truncate">Super Admin</div>
+        </div>
+        <button onclick="sessionStorage.clear(); location.href='login.html'" aria-label="Sign out" class="text-ink-400 hover:text-ink-900"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+      </div>
+    </aside>
+
+    <!-- ============ MAIN ============ -->
+    <div class="flex-1 flex flex-col min-w-0">
+      <header class="h-16 bg-white border-b border-line px-6 flex items-center gap-4 sticky top-0 z-30">
+        <button aria-label="Toggle sidebar" class="text-ink-500 hover:text-ink-900"><i data-lucide="panel-left" class="w-5 h-5"></i></button>
+        <div class="flex-1 max-w-xl relative">
+          <i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+          <input type="search" placeholder="Search tenders, bids, vendors…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] placeholder:text-ink-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+        </div>
+        <button class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">FY 2026-27 <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
+        <button aria-label="Calendar" class="hidden md:flex w-9 h-9 items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500"><i data-lucide="calendar" class="w-4 h-4"></i></button>
+        <button aria-label="Notifications" class="relative w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500">
+          <i data-lucide="bell" class="w-4 h-4"></i>
+          <span class="absolute -top-1 -right-1 bg-danger text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">6</span>
+        </button>
+        <div class="relative">
+          <button id="avatarBtn" aria-label="Account menu" class="flex items-center gap-2 pl-2 border-l border-line">
+            <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-semibold">RK</div>
+            <div class="hidden md:block text-left"><div class="text-[12.5px] font-medium text-ink-900 leading-tight">Rajesh Kumar</div><div class="text-[10.5px] text-ink-500 leading-tight">Super Admin</div></div>
+            <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i>
+          </button>
+          <div id="avatarMenu" class="hidden absolute right-0 mt-2 w-[240px] bg-white border border-line rounded-xl shadow-lift z-40 py-1.5">
+            <a href="#" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="user" class="w-4 h-4 text-ink-500"></i> My profile</a>
+            <a href="admin.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] bg-primary-light text-primary font-medium mx-1.5 rounded-md"><i data-lucide="shield" class="w-4 h-4"></i> Admin Panel</a>
+            <a href="index.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="layout-dashboard" class="w-4 h-4 text-ink-500"></i> Procurement Portal</a>
+            <a href="admin-settings.html" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink-900 hover:bg-surface"><i data-lucide="settings" class="w-4 h-4 text-ink-500"></i> System Settings</a>
+            <div class="my-1.5 border-t border-line"></div>
+            <a href="#" onclick="sessionStorage.clear(); location.href='login.html'; return false;" class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-danger hover:bg-danger-light"><i data-lucide="log-out" class="w-4 h-4"></i> Sign out</a>
+          </div>
+        </div>
+      </header>
+
+      <main class="flex-1 overflow-y-auto px-8 py-6 relative" id="execMain">
+        <!-- ===== LANDING ===== -->
+        <section id="exec-landing">
+          <div class="mb-5">
+            <h1 class="text-[24px] font-bold text-ink-900 leading-tight">Execution</h1>
+            <p class="text-[14px] text-ink-500 mt-1">Track milestones, RA bills, and extensions for awarded contracts.</p>
+          </div>
+          <div id="contractList"></div>
+        </section>
+
+        <!-- ===== WORKSPACE ===== -->
+        <section id="exec-workspace" class="hidden"></section>
+
+        <!-- modal host (in-flow overlay) -->
+        <div id="exModalHost"></div>
+        <!-- track stepper host (in-flow overlay) -->
+        <div id="exTrackHost"></div>
+      </main>
+    </div>
+  </div>
+
+  <!-- toast -->
+  <div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-ink-900 text-white text-[13px] px-4 py-3 rounded-xl shadow-lift inline-flex items-center gap-2.5">
+    <i data-lucide="check-circle-2" class="w-4 h-4 text-success"></i>
+    <span id="toastMsg">Done</span>
+  </div>
+
+<script>
+  function refreshIcons(){ if (window.lucide) lucide.createIcons(); }
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+  let toastTimer;
+  function showToast(msg){ const t=document.getElementById('toast'); document.getElementById('toastMsg').textContent=msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'), 3000); }
+  // ---- money + date helpers ----
+  function fmtINR(n){ return '₹' + Math.round(Number(n)||0).toLocaleString('en-IN'); }
+  function inr(n){ return (Math.round(Number(n)||0)).toLocaleString('en-IN'); }
+  function fmtD(d){ if(!d) return '—'; const x=(typeof d==='string')?new Date(d):d; if(isNaN(x)) return '—'; return x.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}); }
+  function fmtDT(iso){ try { return new Date(iso).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'}); } catch(e){ return ''; } }
+  function addMonths(d,m){ const x=new Date(d); x.setMonth(x.getMonth()+m); return x; }
+  function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+  function daysBetween(a,b){ return Math.round((new Date(b)-new Date(a))/86400000); }
+  function today(){ const d=new Date(); d.setHours(0,0,0,0); return d; }
+  function isoDate(d){ const x=new Date(d); return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); }
+  function isSuperAdmin(){ try { return (sessionStorage.getItem('userRole')||'Super Admin')==='Super Admin'; } catch(e){ return true; } }
+
+  // ---- contracts (awarded tenders) ----
+  const CONTRACTS = [
+    { ref:'CON-2026-001', tnd:'TND-2026-001', title:'Road Resurfacing — Bandra West Zone 4', vendor:'Rajesh Constructions', value:2640000, commence:'2026-05-25', completion:'2026-11-25', method:'L1' },
+    { ref:'CON-2026-002', tnd:'TND-2026-003', title:'Water Supply Pipeline — Kalyan East', vendor:'Maharashtra Roads Co.', value:12000000, commence:'2026-03-10', completion:'2026-09-10', method:'QCBS' },
+    { ref:'CON-2026-003', tnd:'TND-2026-007', title:'LED Street Light Retrofit — Zone 2', vendor:'NCC Infrastructure', value:2850000, commence:'2025-09-01', completion:'2026-03-01', method:'L1' },
+  ];
+  function contractFor(tnd){ return CONTRACTS.find(c => c.tnd === tnd); }
+
+  // ---- storage ----
+  function exKey(tnd){ return 'execution_' + tnd; }
+  function exLoad(tnd){ try { const r=localStorage.getItem(exKey(tnd)); if(r) return JSON.parse(r); } catch(e){} return seed(tnd); }
+  function exSave(st){ try { localStorage.setItem(exKey(st._tnd), JSON.stringify(st)); } catch(e){} }
+  function logAct(st, action, detail){ st.activityLog = st.activityLog||[]; st.activityLog.unshift({ action, detail, officer:'Rajesh Kumar', timestamp:new Date().toISOString() }); }
+
+  function seed(tnd){
+    const c = contractFor(tnd) || CONTRACTS[0];
+    const dlpEnd = isoDate(addMonths(new Date(c.completion), 6));
+    const st = { _tnd:tnd, contract:{ value:c.value, commencement:c.commence, completion:c.completion, dlpEnd, eotDays:0 }, milestones:[], bills:[], eotRequests:[], activityLog:[] };
+    if (tnd === 'TND-2026-001'){
+      st.milestones = [
+        { id:'m1', name:'Site mobilisation', plannedDate:'2026-06-05', actualDate:'2026-06-03', weight:10, status:'completed', photos:[] },
+        { id:'m2', name:'Earthwork & sub-base', plannedDate:'2026-07-20', actualDate:'2026-07-18', weight:25, status:'completed', photos:[] },
+        { id:'m3', name:'BM course laying', plannedDate:'2026-09-10', actualDate:'', weight:30, status:'in_progress', photos:[] },
+        { id:'m4', name:'SDBC finishing', plannedDate:'2026-10-20', actualDate:'', weight:25, status:'pending', photos:[] },
+        { id:'m5', name:'Final finishing & handover', plannedDate:'2026-11-20', actualDate:'', weight:10, status:'pending', photos:[] },
+      ];
+      st.bills = [ billObj({ no:1, periodFrom:'2026-05-25', periodTo:'2026-07-18', gross:880000, status:'Paid',
+        deductions:{ retention:44000, tds:17600, gstTds:17600, ld:0, other:[] } }) ];
+      // net for RA1: 880000 - (44000+17600+17600) = 800800 ... spec says paid 792000; use gross 792000 net? keep gross 880000 net 800800. Paid-till uses sum of paid nets.
+      st.activityLog = [
+        { action:'Bill paid', detail:'RA Bill 1 paid — '+fmtINR(800800), officer:'Amit Patil', timestamp:'2026-07-25T11:20:00' },
+        { action:'Milestone completed', detail:'Earthwork & sub-base marked complete', officer:'Site Engineer', timestamp:'2026-07-18T16:05:00' },
+        { action:'Bill submitted', detail:'RA Bill 1 submitted for verification', officer:'Rajesh Kumar', timestamp:'2026-07-20T10:00:00' },
+        { action:'Milestone completed', detail:'Site mobilisation marked complete', officer:'Site Engineer', timestamp:'2026-06-03T09:30:00' },
+        { action:'Contract commenced', detail:'Work order issued — commencement '+fmtD('2026-05-25'), officer:'Rajesh Kumar', timestamp:'2026-05-25T10:00:00' },
+      ];
+    } else if (tnd === 'TND-2026-003'){
+      // delayed
+      st.milestones = [
+        { id:'m1', name:'Trenching — Reach 1', plannedDate:'2026-04-10', actualDate:'2026-04-22', weight:20, status:'completed', photos:[] },
+        { id:'m2', name:'Pipe laying — Reach 1', plannedDate:'2026-05-20', actualDate:'', weight:35, status:'in_progress', photos:[] },
+        { id:'m3', name:'Pipe laying — Reach 2', plannedDate:'2026-07-15', actualDate:'', weight:30, status:'pending', photos:[] },
+        { id:'m4', name:'Testing & commissioning', plannedDate:'2026-09-05', actualDate:'', weight:15, status:'pending', photos:[] },
+      ];
+      st.activityLog = [ { action:'Contract commenced', detail:'Work order issued', officer:'Rajesh Kumar', timestamp:'2026-03-10T10:00:00' } ];
+    } else if (tnd === 'TND-2026-007'){
+      // completed, in DLP
+      st.milestones = [
+        { id:'m1', name:'Survey & design', plannedDate:'2025-09-20', actualDate:'2025-09-18', weight:15, status:'completed', photos:[] },
+        { id:'m2', name:'Pole foundations', plannedDate:'2025-11-10', actualDate:'2025-11-08', weight:30, status:'completed', photos:[] },
+        { id:'m3', name:'LED fixture installation', plannedDate:'2026-01-15', actualDate:'2026-01-20', weight:40, status:'completed', photos:[] },
+        { id:'m4', name:'Commissioning & handover', plannedDate:'2026-02-28', actualDate:'2026-02-26', weight:15, status:'completed', photos:[] },
+      ];
+      st.bills = [ billObj({ no:1, periodFrom:'2025-09-01', periodTo:'2026-02-26', gross:2850000, status:'Paid', deductions:{ retention:142500, tds:57000, gstTds:57000, ld:0, other:[] } }) ];
+      st.activityLog = [ { action:'Contract completed', detail:'All milestones complete — entered DLP', officer:'Rajesh Kumar', timestamp:'2026-03-01T10:00:00' } ];
+    }
+    exSave(st);
+    return st;
+  }
+  function billObj(o){
+    const dd = o.deductions; const totalDed = dd.retention + dd.tds + dd.gstTds + dd.ld + (dd.other||[]).reduce((s,x)=>s+(x.amount||0),0);
+    return { id:o.id||('bill-'+(o.no)), no:o.no, periodFrom:o.periodFrom, periodTo:o.periodTo, gross:o.gross, deductions:dd, net: o.gross-totalDed, status:o.status||'Submitted', approvalChain:o.approvalChain||[] };
+  }
+
+  // ---- derived ----
+  function physProgress(st){ return Math.round((st.milestones||[]).filter(m=>m.status==='completed').reduce((s,m)=>s+(m.weight||0),0)); }
+  function timeProgress(st){ const c=st.contract; const a=new Date(c.commencement), b=new Date(c.completion), n=today(); const tot=daysBetween(a,b); if(tot<=0) return 100; const el=daysBetween(a,n); return Math.max(0, Math.min(100, Math.round(el/tot*100))); }
+  function paidTillDate(st){ return (st.bills||[]).filter(b=>b.status==='Paid').reduce((s,b)=>s+(b.net||0),0); }
+  function contractStatus(st){
+    const c=st.contract; const n=today(); const comp=new Date(c.completion); const dlpEnd=c.dlpEnd?new Date(c.dlpEnd):addMonths(comp,6);
+    const phys=physProgress(st);
+    if (phys>=100) { if(n<=dlpEnd && n>comp) return {label:'DLP',color:'purple'}; return {label:'Completed',color:'blue'}; }
+    if (n>comp){ if(n<=dlpEnd) return {label:'DLP',color:'purple'}; return {label:'Completed',color:'blue'}; }
+    const tp=timeProgress(st);
+    if (tp - phys > 10) return {label:'Delayed',color:'amber'};
+    return {label:'On track',color:'green'};
+  }
+  function milestoneStatus(m, st){
+    if (m.status==='completed') return {k:'completed',label:'Completed',color:'green'};
+    if (m.status==='in_progress') {
+      if (m.plannedDate && new Date(m.plannedDate) < today()) return {k:'delayed',label:'Delayed',color:'red'};
+      return {k:'in_progress',label:'In progress',color:'blue'};
+    }
+    if (m.plannedDate && new Date(m.plannedDate) < today()) return {k:'delayed',label:'Delayed',color:'red'};
+    return {k:'pending',label:'Pending',color:'gray'};
+  }
+
+  // =====================================================================
+  // LANDING
+  // =====================================================================
+  function renderLanding(){
+    const wrap = document.getElementById('contractList');
+    const rows = CONTRACTS.map(c => {
+      const st = exLoad(c.tnd); st._tnd = c.tnd;
+      const stt = contractStatus(st);
+      const prog = physProgress(st);
+      return '<div class="ex-row" role="button" tabindex="0" onclick="openContract(\''+c.tnd+'\')" onkeydown="if(event.key===\'Enter\'){openContract(\''+c.tnd+'\')}" style="display:flex; align-items:center; gap:16px; padding:14px 16px; border-bottom:1px solid #F3F4F6;">'
+        + '<span class="font-mono text-[12px] font-semibold text-primary shrink-0" style="background:#EFF6FF; border-radius:4px; padding:2px 7px; width:108px; text-align:center;">'+esc(c.ref)+'</span>'
+        + '<div class="flex-1 min-w-0"><div class="text-[14px] font-medium text-ink-900 truncate">'+esc(c.title)+'</div>'
+        +   '<div class="text-[12px] text-ink-500">'+esc(c.vendor)+' · '+esc(c.tnd)+'</div></div>'
+        + '<div class="shrink-0 text-right" style="width:120px;"><div class="text-[13px] font-bold text-ink-900">'+fmtINR(c.value)+'</div><div class="text-[11px] text-ink-400">Contract value</div></div>'
+        + '<div class="shrink-0 text-center" style="width:130px;"><div class="text-[12px] text-ink-900">'+fmtD(c.commence)+'</div><div class="text-[11px] text-ink-400">→ '+fmtD(st.contract.completion)+'</div></div>'
+        + '<div class="shrink-0" style="width:120px;"><div class="ex-bar" aria-live="polite"><span style="width:'+prog+'%; background:'+(stt.color==='amber'?'#F59E0B':stt.color==='blue'?'#1D4ED8':stt.color==='purple'?'#8B5CF6':'#10B981')+';"></span></div><div class="text-[11px] text-ink-500 mt-1">'+prog+'% complete</div></div>'
+        + '<span class="ex-pill '+stt.color+' shrink-0" aria-live="polite">'+esc(stt.label)+'</span>'
+        + '<i data-lucide="chevron-right" class="w-4 h-4 text-ink-400 shrink-0"></i>'
+        + '</div>';
+    }).join('');
+    wrap.innerHTML = '<div class="bg-white border border-line rounded-xl overflow-hidden">'+rows+'</div>';
+    refreshIcons();
+  }
+
+  // =====================================================================
+  // WORKSPACE
+  // =====================================================================
+  let CUR = null;       // current tnd
+  let CURTAB = 'overview';
+  function openContract(tnd){ CUR = tnd; CURTAB='overview'; const st=exLoad(tnd); st._tnd=tnd; exSave(st);
+    document.getElementById('exec-landing').classList.add('hidden');
+    document.getElementById('exec-workspace').classList.remove('hidden');
+    renderWorkspace(); window.scrollTo({top:0});
+  }
+  function backToLanding(){ CUR=null; document.getElementById('exec-workspace').classList.add('hidden'); document.getElementById('exec-landing').classList.remove('hidden'); renderLanding(); }
+  function setTab(t){ CURTAB=t; renderWorkspace(); }
+  function curState(){ const st=exLoad(CUR); st._tnd=CUR; return st; }
+
+  function renderWorkspace(){
+    const c = contractFor(CUR); const st = curState();
+    const tabs = [['overview','Overview'],['milestones','Milestones'],['bills','RA Bills'],['extensions','Extensions']];
+    const tabBar = tabs.map(([k,l]) => '<button class="ex-tab px-4 py-1.5 rounded-full text-[13px] '+(CURTAB===k?'border border-primary bg-primary text-white':'border border-line bg-white text-ink-500 hover:text-ink-900')+'" onclick="setTab(\''+k+'\')">'+l+'</button>').join('');
+    let body = '';
+    if (CURTAB==='overview') body = renderOverview(c, st);
+    else if (CURTAB==='milestones') body = renderMilestones(c, st);
+    else if (CURTAB==='bills') body = renderBills(c, st);
+    else body = renderExtensions(c, st);
+    const stt = contractStatus(st);
+    document.getElementById('exec-workspace').innerHTML =
+      '<button class="ex-link mb-3 inline-flex items-center gap-1" onclick="backToLanding()"><i data-lucide="arrow-left" style="width:13px;height:13px;"></i> All contracts</button>'
+      // tender header bar (reused style)
+      + '<div class="bg-white border border-line rounded-xl px-5 py-4 mb-4" style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">'
+      +   '<span class="font-mono text-[12px] font-bold text-primary" style="background:#EFF6FF; border-radius:6px; padding:3px 9px;">'+esc(c.ref)+'</span>'
+      +   '<div style="min-width:0;"><div class="text-[16px] font-bold text-ink-900">'+esc(c.title)+'</div>'
+      +     '<div class="text-[12.5px] text-ink-500">'+esc(c.vendor)+' · '+esc(c.tnd)+' · <span class="ex-pill blue" style="padding:2px 9px;">'+esc(c.method)+'</span></div></div>'
+      +   '<div style="margin-left:auto; text-align:right;"><div class="text-[16px] font-bold text-ink-900">'+fmtINR(st.contract.value)+'</div><div class="text-[11px] text-ink-400">Contract value</div></div>'
+      +   '<span class="ex-pill '+stt.color+'">'+esc(stt.label)+'</span>'
+      + '</div>'
+      + '<div class="flex items-center gap-2 mb-5 flex-wrap">'+tabBar+'</div>'
+      + '<div id="exTabBody">'+body+'</div>';
+    refreshIcons();
+  }
+
+  // ---- TAB: OVERVIEW ----
+  function renderOverview(c, st){
+    const value=st.contract.value, paid=paidTillDate(st);
+    const paidPct = value? Math.round(paid/value*100):0;
+    const tp=timeProgress(st), phys=physProgress(st);
+    const behind = (tp - phys) > 10;
+    const comp=new Date(st.contract.completion);
+    const dlpEnd=new Date(st.contract.dlpEnd);
+    const eotChip = st.contract.eotDays>0 ? ' <span class="ex-chip" style="background:#FFFBEB;color:#92400E;">+EoT '+st.contract.eotDays+' days</span>' : '';
+    // performance security from bidApproval/Stage 5 (best-effort read)
+    const ps = readPerfSecurity(st, value);
+    const acts = (st.activityLog||[]).slice(0,5).map(a =>
+      '<div style="display:flex; gap:10px; padding:8px 0; border-bottom:1px solid #F3F4F6;"><i data-lucide="'+actIcon(a.action)+'" style="width:14px;height:14px;color:#9CA3AF;flex-shrink:0;margin-top:2px;"></i>'
+      + '<div style="min-width:0;"><div class="text-[13px] text-ink-900">'+esc(a.detail||a.action)+'</div><div class="text-[11px] text-ink-400">'+esc(a.officer||'')+' · '+esc(fmtDT(a.timestamp))+'</div></div></div>').join('') || '<div class="text-[12.5px] text-ink-400 italic py-3">No activity yet</div>';
+    return '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">'
+      + card('Contract value', fmtINR(value), 'Public after award')
+      + card('Paid till date', fmtINR(paid), paidPct+'% of contract')
+      + '<div class="ex-card"><div class="text-[12px] text-ink-500">Time elapsed</div><div class="text-[20px] font-bold text-ink-900 mt-1">'+tp+'%</div>'
+      +   '<div class="ex-bar mt-2" aria-live="polite"><span style="width:'+tp+'%; background:#0F5EE8;"></span></div>'
+      +   '<div class="text-[11px] text-ink-400 mt-1.5">Day '+Math.max(0,daysBetween(st.contract.commencement, today()))+' of '+daysBetween(st.contract.commencement, st.contract.completion)+'</div></div>'
+      + '<div class="ex-card"><div class="text-[12px] text-ink-500">Physical progress</div><div class="text-[20px] font-bold text-ink-900 mt-1" aria-live="polite">'+phys+'% '+(behind?'<span class="ex-chip" style="background:#FFFBEB;color:#92400E;font-size:10px;vertical-align:2px;">Behind schedule</span>':'')+'</div>'
+      +   '<div class="ex-bar mt-2"><span style="width:'+phys+'%; background:'+(behind?'#F59E0B':'#10B981')+';"></span></div>'
+      +   '<div class="text-[11px] text-ink-400 mt-1.5">From completed milestone weights</div></div>'
+      + '</div>'
+      // key dates strip
+      + '<div class="ex-card mb-5"><div class="text-[13px] font-bold text-ink-900 mb-4">Key dates</div>'
+      +   '<div class="ex-timeline">'
+      +     tlNode('Commencement', fmtD(st.contract.commencement), 'done')
+      +     '<div class="ex-tl-leg"></div>'
+      +     tlNode('Scheduled completion', fmtD(st.contract.completion)+eotChip, today()>comp?'done':'now')
+      +     '<div class="ex-tl-leg"></div>'
+      +     tlNode('DLP end', fmtD(st.contract.dlpEnd), today()>dlpEnd?'done':'future')
+      +   '</div></div>'
+      // performance security + recent activity
+      + '<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">'
+      +   '<div class="ex-card"><div class="text-[13px] font-bold text-ink-900 mb-3">Performance security</div>'
+      +     '<div class="text-[13px] text-ink-900" style="display:flex; justify-content:space-between; padding:5px 0;"><span class="text-ink-500">Amount (5%)</span><span class="font-semibold">'+fmtINR(ps.amount)+'</span></div>'
+      +     '<div class="text-[13px]" style="display:flex; justify-content:space-between; padding:5px 0;"><span class="text-ink-500">Instrument</span><span>'+esc(ps.ref)+'</span></div>'
+      +     '<div class="text-[13px]" style="display:flex; justify-content:space-between; padding:5px 0; align-items:center;"><span class="text-ink-500">Valid till</span><span>'+fmtD(ps.validity)+' '+ps.chip+'</span></div></div>'
+      +   '<div class="ex-card"><div class="text-[13px] font-bold text-ink-900 mb-2">Recent activity</div>'+acts+'</div>'
+      + '</div>';
+  }
+  function card(k,v,sub){ return '<div class="ex-card"><div class="text-[12px] text-ink-500">'+k+'</div><div class="text-[20px] font-bold text-ink-900 mt-1">'+v+'</div><div class="text-[11px] text-ink-400 mt-1.5">'+sub+'</div></div>'; }
+  function tlNode(label, date, state){ const dot = state==='done'?'done':(state==='future'?'future':''); return '<div class="ex-tl-node"><div class="ex-tl-dot '+dot+'"></div><div class="text-[12px] font-semibold text-ink-900 text-center">'+label+'</div><div class="text-[11px] text-ink-500 text-center">'+date+'</div></div>'; }
+  function actIcon(a){ a=(a||'').toLowerCase(); if(a.includes('paid')||a.includes('bill')) return 'receipt'; if(a.includes('milestone')) return 'flag'; if(a.includes('eot')||a.includes('extension')) return 'calendar-plus'; if(a.includes('commenc')) return 'play'; return 'activity'; }
+  function readPerfSecurity(st, value){
+    let validity = isoDate(addMonths(new Date(st.contract.completion), 6));
+    const n=today(); const v=new Date(validity); const days=daysBetween(n,v);
+    let chip; if (n>v) chip='<span class="ex-chip" style="background:#FEF2F2;color:#991B1B;">Expired</span>';
+    else if (days<60) chip='<span class="ex-chip" style="background:#FFFBEB;color:#92400E;">'+days+' days left</span>';
+    else chip='<span class="ex-chip" style="background:#F0FDF4;color:#065F46;">'+days+' days left</span>';
+    return { amount: Math.round(value*0.05), ref:'BG-AMC-'+(CUR||'').replace(/\D/g,'').slice(-4)+'/PS', validity, chip };
+  }
+
+  // ---- TAB: MILESTONES ----
+  let _msExpanded = null, _msAction = null, _msAdd = false;
+  function renderMilestones(c, st){
+    const total = (st.milestones||[]).reduce((s,m)=>s+(m.weight||0),0);
+    const warn = total!==100 ? '<span class="ex-chip" style="background:#FFFBEB;color:#92400E;margin-left:8px;">Weights total '+total+'% (should be 100%)</span>' : '';
+    const rows = (st.milestones||[]).map((m,i)=>{
+      const ms = milestoneStatus(m, st);
+      const expand = _msExpanded===m.id;
+      const photos = (m.photos||[]).map((p,pi)=>'<div class="ex-thumb-wrap"><img src="'+p+'" class="ex-thumb" alt="site photo"/><span class="ex-thumb-rm" onclick="msRmPhoto(\''+m.id+'\','+pi+')">×</span></div>').join('');
+      const actCell = m.status==='completed' ? '<span class="text-[12px] text-ink-400">—</span>'
+        : (_msAction===m.id
+            ? '<div class="ex-inline" style="margin-top:0; padding:10px 12px; min-width:240px;"><label class="ex-lbl">Actual completion date</label><input type="date" class="ex-input" id="msDate-'+m.id+'" value="'+isoDate(today())+'"/><label class="ex-lbl" style="margin-top:8px;">Note (optional)</label><input type="text" class="ex-input" id="msNote-'+m.id+'" placeholder="e.g. completed ahead of schedule"/><div style="display:flex;gap:8px;margin-top:10px;"><button class="ex-btn" style="padding:6px 12px;" onclick="msComplete(\''+m.id+'\')">Confirm</button><button class="ex-link" onclick="_msAction=null;renderWorkspace()">Cancel</button></div></div>'
+            : '<button class="ex-link" onclick="_msAction=\''+m.id+'\';renderWorkspace()">Mark complete</button>');
+      let row = '<tr>'
+        + '<td>'+(i+1)+'</td>'
+        + '<td><div style="display:flex;align-items:center;gap:8px;"><button class="ex-link" onclick="msToggle(\''+m.id+'\')" aria-label="Toggle photos"><i data-lucide="'+(expand?'chevron-down':'chevron-right')+'" style="width:14px;height:14px;"></i></button><span class="font-medium text-ink-900">'+esc(m.name)+'</span></div></td>'
+        + '<td>'+fmtD(m.plannedDate)+'</td>'
+        + '<td>'+(m.actualDate?fmtD(m.actualDate):'<span class="text-ink-400">—</span>')+'</td>'
+        + '<td>'+(m.weight||0)+'%</td>'
+        + '<td><span class="ex-pill '+ms.color+'" aria-live="polite">'+ms.label+'</span></td>'
+        + '<td>'+actCell+'</td>'
+        + '</tr>';
+      if (expand){
+        row += '<tr><td colspan="7" style="background:#F9FAFB;"><div style="padding:4px 0;"><div class="text-[12px] font-semibold text-ink-700 mb-2">Site photos ('+(m.photos||[]).length+'/4)</div>'
+          + '<div class="ex-thumbs">'+photos+'</div>'
+          + ((m.photos||[]).length<4 ? '<div class="ex-upzone" style="margin-top:8px;max-width:320px;" onclick="document.getElementById(\'msfi-'+m.id+'\').click()"><i data-lucide="upload" style="width:18px;height:18px;color:#0F5EE8;"></i> Click to upload site photos<input id="msfi-'+m.id+'" type="file" accept="image/*" multiple style="display:none" onchange="msUpload(this,\''+m.id+'\')"/></div>':'')
+          + '</div></td></tr>';
+      }
+      return row;
+    }).join('');
+    const addRow = _msAdd
+      ? '<div class="ex-inline"><div class="text-[13px] font-bold mb-3">Add milestone</div><div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;"><div><label class="ex-lbl">Name</label><input class="ex-input" id="msnName"/></div><div><label class="ex-lbl">Planned date</label><input class="ex-input" id="msnDate" type="date"/></div><div><label class="ex-lbl">Weight %</label><input class="ex-input" id="msnWeight" type="number" min="1" max="100"/></div></div><div style="margin-top:10px;display:flex;gap:8px;"><button class="ex-btn" style="padding:7px 14px;" onclick="msAddSave()">Add milestone</button><button class="ex-link" onclick="_msAdd=false;renderWorkspace()">Cancel</button></div></div>'
+      : '<button class="ex-link mt-3 inline-flex items-center gap-1" onclick="_msAdd=true;renderWorkspace()"><i data-lucide="plus" style="width:13px;height:13px;"></i> Add milestone</button>';
+    return '<div class="flex items-center mb-3"><div class="text-[14px] font-bold text-ink-900">Milestones</div>'+warn+'</div>'
+      + '<table class="ex-table"><thead><tr><th style="width:40px;">#</th><th>Milestone</th><th style="width:120px;">Planned date</th><th style="width:120px;">Actual date</th><th style="width:80px;">Weight %</th><th style="width:110px;">Status</th><th style="width:140px;">Action</th></tr></thead><tbody>'+rows+'</tbody></table>'
+      + addRow;
+  }
+  function msToggle(id){ _msExpanded = _msExpanded===id?null:id; renderWorkspace(); }
+  function msComplete(id){ const st=curState(); const m=st.milestones.find(x=>x.id===id); if(!m) return; const d=(document.getElementById('msDate-'+id)||{}).value||isoDate(today()); const note=(document.getElementById('msNote-'+id)||{}).value||''; m.status='completed'; m.actualDate=d; _msAction=null; logAct(st,'Milestone completed', m.name+' marked complete'+(note?' — '+note:'')); exSave(st); renderWorkspace(); showToast('Milestone completed — physical progress now '+physProgress(st)+'%'); }
+  function msAddSave(){ const st=curState(); const name=(document.getElementById('msnName')||{}).value||''; const date=(document.getElementById('msnDate')||{}).value||''; const w=parseInt((document.getElementById('msnWeight')||{}).value||'0',10)||0; if(!name.trim()){ showToast('Enter a milestone name'); return; } st.milestones.push({ id:'m'+Date.now().toString(36), name:name.trim(), plannedDate:date, actualDate:'', weight:w, status:'pending', photos:[] }); _msAdd=false; logAct(st,'Milestone added', name.trim()+' ('+w+'%)'); exSave(st); renderWorkspace(); showToast('Milestone added'); }
+  function msUpload(input, id){ const st=curState(); const m=st.milestones.find(x=>x.id===id); if(!m) return; Array.from(input.files||[]).forEach(f=>{ if((m.photos||[]).length>=4){ showToast('Max 4 photos per milestone'); return; } if(f.size>5*1024*1024){ showToast(f.name+' exceeds 5MB'); return; } const r=new FileReader(); r.onload=()=>{ m.photos=m.photos||[]; if(m.photos.length<4){ m.photos.push(r.result); exSave(st); renderWorkspace(); } }; r.readAsDataURL(f); }); input.value=''; }
+  function msRmPhoto(id, pi){ const st=curState(); const m=st.milestones.find(x=>x.id===id); if(m){ m.photos.splice(pi,1); exSave(st); renderWorkspace(); } }
+
+  // ---- TAB: RA BILLS ----
+  let _billForm = false, _billOther = [];
+  function renderBills(c, st){
+    const rows = (st.bills||[]).map(b => {
+      const sp = billStatusPill(b.status);
+      return '<tr><td class="font-mono font-semibold text-primary">RA '+b.no+'</td>'
+        + '<td>'+fmtD(b.periodFrom)+' – '+fmtD(b.periodTo)+'</td>'
+        + '<td>'+fmtINR(b.gross)+'</td>'
+        + '<td>'+fmtINR(b.gross-b.net)+'</td>'
+        + '<td class="font-semibold">'+fmtINR(b.net)+'</td>'
+        + '<td><span class="ex-pill '+sp.color+'">'+esc(b.status)+'</span></td>'
+        + '<td>'+(b.approvalChain&&b.approvalChain.length ? '<button class="ex-link" onclick="exTrackOpen(\'bill\',\''+b.id+'\')">Track →</button>' : '<span class="text-ink-400 text-[12px]">—</span>')+'</td></tr>';
+    }).join('') || '<tr><td colspan="7" class="text-center text-ink-400 italic py-6">No bills raised yet</td></tr>';
+    const form = _billForm ? billFormHTML(st) : '<button class="ex-btn mt-3" onclick="billOpenForm()"><i data-lucide="plus" style="width:14px;height:14px;"></i> Raise RA bill</button>';
+    return '<div class="text-[14px] font-bold text-ink-900 mb-3">Running Account (RA) bills</div>'
+      + '<table class="ex-table"><thead><tr><th>Bill No.</th><th>Period</th><th>Gross (₹)</th><th>Deductions (₹)</th><th>Net payable (₹)</th><th>Status</th><th>Action</th></tr></thead><tbody>'+rows+'</tbody></table>'
+      + form;
+  }
+  function billStatusPill(s){ return { 'Submitted':{color:'gray'},'Verified':{color:'blue'},'Sanctioned':{color:'amber'},'Paid':{color:'green'} }[s] || {color:'gray'}; }
+  function billOpenForm(){ _billForm=true; _billOther=[]; renderWorkspace(); setTimeout(billRecalc,30); }
+  function billFormHTML(st){
+    // suggested LD if any milestone delayed
+    let ldNote='', ldVal=0;
+    const delayed = (st.milestones||[]).filter(m=>milestoneStatus(m,st).k==='delayed');
+    if (delayed.length){ const weeks = Math.max(1, Math.ceil(Math.abs(daysBetween(new Date(delayed[0].plannedDate), today()))/7)); ldNote='<div class="ex-chip" style="background:#FFFBEB;color:#92400E;margin-top:4px;">Suggested: 0.5% × '+weeks+' weeks delay (capped 10%)</div>'; }
+    return '<div class="ex-inline"><div class="text-[14px] font-bold mb-3">Raise RA bill</div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">'
+      +   '<div><label class="ex-lbl">Period from</label><input type="date" class="ex-input" id="blFrom"/></div>'
+      +   '<div><label class="ex-lbl">Period to</label><input type="date" class="ex-input" id="blTo"/></div>'
+      +   '<div><label class="ex-lbl">Gross work value (₹)</label><input type="number" class="ex-input" id="blGross" oninput="billRecalc()" placeholder="0"/></div>'
+      + '</div>'
+      + '<div class="text-[13px] font-bold text-ink-900 mt-4 mb-2">Deductions</div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;">'
+      +   dedRow('Retention','blRetPct','5','blRet')
+      +   dedRow('TDS','blTdsPct','2','blTds')
+      +   dedRow('GST TDS','blGstPct','2','blGst')
+      +   '<div><label class="ex-lbl">LD (Liquidated Damages)</label><input type="number" class="ex-input" id="blLd" oninput="billRecalc()" value="0"/>'+ldNote+'</div>'
+      + '</div>'
+      + '<div id="blOther"></div>'
+      + '<button class="ex-link mt-2 inline-flex items-center gap-1" onclick="billAddOther()"><i data-lucide="plus" style="width:12px;height:12px;"></i> Add other recovery</button>'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid #E5E7EB;">'
+      +   '<div class="text-[15px] font-bold text-ink-900">Net payable: <span id="blNet" aria-live="polite">₹0</span></div>'
+      +   '<div style="display:flex;gap:8px;"><button class="ex-link" onclick="_billForm=false;renderWorkspace()">Cancel</button><button class="ex-btn" onclick="billSubmit()">Submit bill →</button></div>'
+      + '</div></div>';
+  }
+  function dedRow(label, pctId, pctDef, amtId){ return '<div><label class="ex-lbl">'+label+' (% <input type="number" id="'+pctId+'" value="'+pctDef+'" style="width:46px;border:1px solid #D1D5DB;border-radius:5px;padding:2px 5px;font-size:12px;" oninput="billRecalc()"/>)</label><input type="text" class="ex-input" id="'+amtId+'" readonly style="background:#F9FAFB;"/></div>'; }
+  function billAddOther(){ const wrap=document.getElementById('blOther'); const idx=_billOther.length; _billOther.push({label:'',amount:0}); const div=document.createElement('div'); div.style='display:grid;grid-template-columns:1fr 140px 28px;gap:8px;margin-top:8px;align-items:center;'; div.innerHTML='<input class="ex-input" placeholder="Recovery label" oninput="_billOther['+idx+'].label=this.value"/><input class="ex-input" type="number" placeholder="Amount" oninput="_billOther['+idx+'].amount=parseFloat(this.value)||0;billRecalc()"/><button class="ex-link" onclick="this.parentNode.remove();_billOther['+idx+']={label:\'\',amount:0};billRecalc()">×</button>'; wrap.appendChild(div); }
+  function billRecalc(){ const gross=parseFloat((document.getElementById('blGross')||{}).value)||0;
+    const ret=Math.round(gross*((parseFloat((document.getElementById('blRetPct')||{}).value)||0)/100));
+    const tds=Math.round(gross*((parseFloat((document.getElementById('blTdsPct')||{}).value)||0)/100));
+    const gst=Math.round(gross*((parseFloat((document.getElementById('blGstPct')||{}).value)||0)/100));
+    const ld=Math.round(parseFloat((document.getElementById('blLd')||{}).value)||0);
+    const other=_billOther.reduce((s,x)=>s+(x.amount||0),0);
+    const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.value='₹'+inr(v); };
+    set('blRet',ret); set('blTds',tds); set('blGst',gst);
+    const net=Math.max(0, gross-ret-tds-gst-ld-other);
+    const ne=document.getElementById('blNet'); if(ne) ne.textContent='₹'+inr(net);
+  }
+  function billSubmit(){ const st=curState(); const gross=parseFloat((document.getElementById('blGross')||{}).value)||0; if(gross<=0){ showToast('Enter gross work value'); return; }
+    const ret=Math.round(gross*((parseFloat((document.getElementById('blRetPct')||{}).value)||0)/100));
+    const tds=Math.round(gross*((parseFloat((document.getElementById('blTdsPct')||{}).value)||0)/100));
+    const gst=Math.round(gross*((parseFloat((document.getElementById('blGstPct')||{}).value)||0)/100));
+    const ld=Math.round(parseFloat((document.getElementById('blLd')||{}).value)||0);
+    const other=_billOther.filter(x=>x.amount>0).map(x=>({label:x.label||'Other',amount:Math.round(x.amount)}));
+    const totalDed=ret+tds+gst+ld+other.reduce((s,x)=>s+x.amount,0);
+    const no=(st.bills||[]).length+1;
+    const bill={ id:'bill-'+Date.now().toString(36), no, periodFrom:(document.getElementById('blFrom')||{}).value||'', periodTo:(document.getElementById('blTo')||{}).value||'', gross:Math.round(gross), deductions:{retention:ret,tds,gstTds:gst,ld,other}, net:Math.round(gross-totalDed), status:'Submitted', approvalChain:[] };
+    // open approval modal
+    exAprOpen({ title:'Send RA Bill '+no+' for approval', subtitle:'Net payable '+fmtINR(bill.net)+' will be routed for verification and sanction.',
+      pool:[ {id:'site-eng',name:'Site Engineer',desig:'Execution',required:true}, {id:'finance',name:'Amit Patil',desig:'Finance Officer'}, {id:'dc',name:'Sunita Rao',desig:'Deputy Commissioner'} ],
+      onConfirm:(chain)=>{ bill.approvalChain=chain; st.bills=st.bills||[]; st.bills.push(bill); logAct(st,'Bill submitted','RA Bill '+no+' submitted for verification ('+fmtINR(bill.net)+')'); exSave(st); _billForm=false; renderWorkspace(); showToast('RA Bill '+no+' submitted for approval'); }
+    });
+  }
+
+  // ---- TAB: EXTENSIONS ----
+  let _eotForm=false;
+  function renderExtensions(c, st){
+    const rows=(st.eotRequests||[]).map(e=>{
+      const sp = e.status==='Approved'?{color:'green'}:(e.status==='Rejected'?{color:'red'}:{color:'gray'});
+      return '<tr><td>'+fmtD(e.requestedDate)+'</td><td>'+e.days+' days</td><td>'+esc(e.reason)+'</td><td>'+(e.withLD?'With LD':'Without LD')+'</td>'
+        + '<td><span class="ex-pill '+sp.color+'">'+esc(e.status)+'</span></td>'
+        + '<td>'+(e.approvalChain&&e.approvalChain.length?'<button class="ex-link" onclick="exTrackOpen(\'eot\',\''+e.id+'\')">Track →</button>':'<span class="text-ink-400 text-[12px]">—</span>')+'</td></tr>';
+    }).join('') || '<tr><td colspan="6" class="text-center text-ink-400 italic py-6">No extension requests yet</td></tr>';
+    const reasons=['Monsoon/weather','Site not available','Scope variation','Material shortage','Other'];
+    const form=_eotForm
+      ? '<div class="ex-inline"><div class="text-[14px] font-bold mb-3">Record EoT request</div>'
+        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'
+        +   '<div><label class="ex-lbl">Requested by vendor (date)</label><input type="date" class="ex-input" id="eotDate" value="'+isoDate(today())+'"/></div>'
+        +   '<div><label class="ex-lbl">Days requested</label><input type="number" class="ex-input" id="eotDays" min="1" placeholder="30"/></div>'
+        + '</div>'
+        + '<div style="margin-top:10px;"><label class="ex-lbl">Reason</label><select class="ex-input" id="eotReason">'+reasons.map(r=>'<option>'+r+'</option>').join('')+'</select></div>'
+        + '<div style="margin-top:10px;"><label class="ex-lbl">Details</label><textarea class="ex-input" id="eotDetails" style="min-height:60px;" placeholder="Explain the circumstances…"></textarea></div>'
+        + '<div style="margin-top:10px;"><label class="ex-lbl">Liquidated damages</label><div style="display:flex;gap:16px;font-size:13px;"><label><input type="radio" name="eotLD" value="without" checked/> Without LD</label><label><input type="radio" name="eotLD" value="with"/> With LD</label></div>'
+        +   '<div class="text-[11px] text-ink-400 mt-1">Without LD: time extended, no penalty (delay not attributable to contractor). With LD: extension granted but liquidated damages still apply.</div></div>'
+        + '<div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end;"><button class="ex-link" onclick="_eotForm=false;renderWorkspace()">Cancel</button><button class="ex-btn" onclick="eotSubmit()">Submit →</button></div></div>'
+      : '<button class="ex-btn mt-3" onclick="_eotForm=true;renderWorkspace()"><i data-lucide="plus" style="width:14px;height:14px;"></i> Record EoT request</button>';
+    return '<div class="text-[14px] font-bold text-ink-900 mb-3">Extension of Time (EoT) requests</div>'
+      + '<table class="ex-table"><thead><tr><th>Requested</th><th>Days</th><th>Reason</th><th>LD basis</th><th>Status</th><th>Action</th></tr></thead><tbody>'+rows+'</tbody></table>'+form;
+  }
+  function eotSubmit(){ const st=curState(); const days=parseInt((document.getElementById('eotDays')||{}).value||'0',10)||0; if(days<=0){ showToast('Enter days requested'); return; }
+    const eot={ id:'eot-'+Date.now().toString(36), requestedDate:(document.getElementById('eotDate')||{}).value||isoDate(today()), days, reason:(document.getElementById('eotReason')||{}).value||'Other', details:(document.getElementById('eotDetails')||{}).value||'', withLD:(document.querySelector('input[name=eotLD]:checked')||{}).value==='with', status:'Submitted', approvalChain:[] };
+    exAprOpen({ title:'Send EoT request for approval', subtitle:days+' days requested ('+(eot.withLD?'with LD':'without LD')+').',
+      pool:[ {id:'site-eng',name:'Site Engineer',desig:'Execution',required:true}, {id:'ee',name:'Executive Engineer',desig:'Technical'}, {id:'dc',name:'Sunita Rao',desig:'Deputy Commissioner'} ],
+      onConfirm:(chain)=>{ eot.approvalChain=chain; st.eotRequests=st.eotRequests||[]; st.eotRequests.push(eot); logAct(st,'EoT requested', days+' days requested — '+eot.reason); exSave(st); _eotForm=false; renderWorkspace(); showToast('EoT request submitted for approval'); }
+    });
+  }
+
+  // =====================================================================
+  // APPROVAL — people selection modal + tracking stepper
+  // =====================================================================
+  let _apm = null;   // { pool, required, ids, manual, addOpen, onConfirm, title, subtitle, sending }
+  let _apmDrag = null;
+  function exAprOpen(ctx){
+    _apm = { pool:ctx.pool.slice(), ids:ctx.pool.filter(a=>a.required).map(a=>a.id), manual:[], addOpen:false, onConfirm:ctx.onConfirm, title:ctx.title, subtitle:ctx.subtitle, sending:false };
+    exAprRender();
+    requestAnimationFrame(()=>{ const c=document.querySelector('#exModalHost .exm-card'); if(c) c.classList.add('in'); });
+  }
+  function exAprClose(){ const c=document.querySelector('#exModalHost .exm-card'); if(c) c.classList.remove('in'); const o=document.querySelector('#exModalHost .exm-overlay'); if(o) o.style.opacity='0'; setTimeout(()=>{ const h=document.getElementById('exModalHost'); if(h) h.innerHTML=''; }, 200); }
+  function apmAll(){ return _apm.pool.concat(_apm.manual); }
+  function apmGet(id){ return apmAll().find(a=>a.id===id); }
+  function apmPin(){ const req=_apm.pool.find(a=>a.required); if(req && _apm.ids.includes(req.id)) _apm.ids=[req.id].concat(_apm.ids.filter(x=>x!==req.id)); }
+  function apmToggle(id){ const a=apmGet(id); if(a&&a.required) return; const i=_apm.ids.indexOf(id); if(i>=0)_apm.ids.splice(i,1); else _apm.ids.push(id); apmPin(); exAprRender(); }
+  function apmRemove(id){ const a=apmGet(id); if(a&&a.required) return; _apm.ids=_apm.ids.filter(x=>x!==id); exAprRender(); }
+  function apmAdd(){ const n=(document.getElementById('apmN')||{}).value||'', d=(document.getElementById('apmD')||{}).value||''; if(!n.trim()){ showToast('Enter a name'); return; } const id='m-'+Date.now().toString(36); _apm.manual.push({id,name:n.trim(),desig:d.trim()||'—',manuallyAdded:true}); _apm.ids.push(id); _apm.addOpen=false; exAprRender(); }
+  function apmReorder(target){ const req=_apm.pool.find(a=>a.required); if(!_apmDrag||_apmDrag===target||target===(req&&req.id)||_apmDrag===(req&&req.id)){_apmDrag=null;return;} const ids=_apm.ids; const f=ids.indexOf(_apmDrag),t=ids.indexOf(target); _apmDrag=null; if(f<0||t<0)return; ids.splice(t,0,ids.splice(f,1)[0]); apmPin(); exAprRender(); }
+  function apmChain(){ const now=new Date().toISOString(); return _apm.ids.map((id,idx)=>{ const a=apmGet(id)||{}; return { id, name:a.name, designation:a.desig, required:!!a.required, manuallyAdded:!!a.manuallyAdded, order:idx+1, status:'pending', sentAt:idx===0?now:null, approvedAt:null, comment:null }; }); }
+  function exAprConfirm(){ if(_apm.sending) return; if(!_apm.ids.length){ showToast('Select at least one approver'); return; } _apm.sending=true; exAprRender(); setTimeout(()=>{ const chain=apmChain(); const cb=_apm.onConfirm; exAprClose(); if(cb) cb(chain); }, 800); }
+  function exAprRender(){
+    const host=document.getElementById('exModalHost'); if(!host||!_apm) return;
+    const rows=apmAll().map(a=>{ const on=_apm.ids.includes(a.id); const cb='exm-cb'+(on?' on':'')+(a.required?' dis':''); const rm=a.manuallyAdded?'<button onclick="apmRemove(\''+a.id+'\')" style="margin-left:auto;background:none;border:none;color:#9CA3AF;cursor:pointer;font-size:15px;">×</button>':'';
+      return '<div class="exm-row"'+(a.required?'':' onclick="apmToggle(\''+a.id+'\')"')+'><div class="'+cb+'">'+(on?'<i data-lucide="check" style="width:11px;height:11px;"></i>':'')+'</div><div class="exm-av">'+initials(a.name)+'</div><div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;color:#111827;">'+esc(a.name)+(a.required?' <span class="exm-req">Required</span>':'')+'</div><div style="font-size:12px;color:#6B7280;">'+esc(a.desig)+'</div></div>'+rm+'</div>'; }).join('');
+    const add=_apm.addOpen?'<div class="exm-addform"><input id="apmN" placeholder="Full name"/><input id="apmD" placeholder="Designation"/><div style="grid-column:1/-1;display:flex;justify-content:flex-end;gap:10px;"><button class="ex-link" onclick="_apm.addOpen=false;exAprRender()">Cancel</button><button class="ex-btn" style="padding:5px 12px;" onclick="apmAdd()">Add to list</button></div></div>':'<button class="exm-add" onclick="_apm.addOpen=true;exAprRender()"><i data-lucide="user-plus" style="width:13px;height:13px;"></i> Add someone not listed</button>';
+    const chips=_apm.ids.map((id,idx)=>{ const a=apmGet(id)||{}; const x=a.required?'':'<span class="x" onclick="apmRemove(\''+id+'\')">×</span>'; return '<span class="exm-chip" draggable="true" ondragstart="_apmDrag=\''+id+'\'" ondragover="event.preventDefault()" ondrop="apmReorder(\''+id+'\')"><span style="color:#C4C9D4;">⠿</span><span class="num">'+(idx+1)+'</span>'+esc(a.name)+x+'</span>'; }).join('');
+    host.innerHTML='<div class="exm-overlay"><div class="exm-card" role="dialog" aria-modal="true" aria-label="Select approvers">'
+      + '<div class="exm-head"><div><div class="t">'+esc(_apm.title)+'</div><div class="s">'+esc(_apm.subtitle)+'</div></div><button class="exm-x" onclick="exAprClose()">×</button></div>'
+      + '<div class="exm-body"><div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:8px;">Who should approve this?</div>'+rows+add
+      +   '<div style="margin-top:14px;border-top:1px solid #F3F4F6;padding-top:12px;"><div style="font-size:12px;color:#6B7280;margin-bottom:6px;">Approval order (drag to reorder)</div><div class="exm-chips">'+chips+'</div></div></div>'
+      + '<div class="exm-foot"><span class="cnt" aria-live="polite">'+_apm.ids.length+' approver'+(_apm.ids.length===1?'':'s')+' selected</span><div style="display:flex;gap:12px;align-items:center;"><button class="ex-link" '+(_apm.sending?'disabled':'')+' onclick="exAprClose()">Cancel</button><button class="ex-btn" '+(_apm.sending?'disabled style=\"opacity:.7\"':'')+' onclick="exAprConfirm()">'+(_apm.sending?'<span class="ex-spinner"></span> Sending…':'Send for approval →')+'</button></div></div>'
+      + '</div></div>';
+    refreshIcons();
+  }
+  function initials(n){ return String(n||'').split(/\s+/).map(w=>w[0]).filter(Boolean).slice(0,2).join('').toUpperCase(); }
+
+  // ---- tracking stepper (per bill / eot) ----
+  let _track = null; // {kind, id}
+  function exTrackOpen(kind, id){ _track={kind,id}; exTrackRender(); requestAnimationFrame(()=>{ const c=document.querySelector('#exTrackHost .exm-card'); if(c) c.classList.add('in'); }); }
+  function exTrackClose(){ const c=document.querySelector('#exTrackHost .exm-card'); if(c) c.classList.remove('in'); setTimeout(()=>{ const h=document.getElementById('exTrackHost'); if(h) h.innerHTML=''; }, 200); }
+  function trackItem(){ const st=curState(); if(_track.kind==='bill') return (st.bills||[]).find(b=>b.id===_track.id); return (st.eotRequests||[]).find(e=>e.id===_track.id); }
+  function exTrackRender(){ const host=document.getElementById('exTrackHost'); if(!host||!_track) return; const item=trackItem(); if(!item){ host.innerHTML=''; return; }
+    const chain=item.approvalChain||[]; const sa=isSuperAdmin();
+    const sbIdx=chain.findIndex(a=>a.status==='sent_back');
+    let activeIdx=-1; if(sbIdx<0){ for(let i=0;i<chain.length;i++){ if(chain[i].status!=='approved'){activeIdx=i;break;} } }
+    const steps=chain.map((a,i)=>{ const last=i===chain.length-1; let state,icon,line; if(a.status==='approved'){state='done';icon='check';line='<div class="st-line" style="color:#10B981;">Approved · '+(a.approvedAt?fmtDT(a.approvedAt):'just now')+'</div>';}
+      else if(a.status==='sent_back'){state='sentback';icon='corner-up-left';line='<div class="st-line" style="color:#EF4444;">Sent back'+(a.comment?' · '+esc(a.comment):'')+'</div>';}
+      else if(i===activeIdx){state='active';icon='clock';line='<div class="st-line" style="color:#F59E0B;">Awaiting review <button class="ex-link" style="font-size:11px;" onclick="exTrackRemind(this)">Send reminder</button></div>';}
+      else {state='locked';icon='lock';line='<div class="st-line" style="color:#9CA3AF;">In queue</div>';}
+      const sim = (sa && a.status!=='approved' && a.status!=='sent_back') ? '<div style="margin-top:5px;"><button class="ex-sim" onclick="exTrackSim(\'approve\','+i+')">[Simulate: Approve]</button> <span style="color:#E5E7EB;">·</span> <button class="ex-sim" onclick="exTrackSim(\'sendback\','+i+')">[Simulate: Send back]</button></div>':'';
+      return '<div class="ex-step">'+(last?'':'<div class="line'+(a.status==='approved'?' done':'')+'"></div>')+'<div class="node '+state+'"><i data-lucide="'+icon+'" style="width:14px;height:14px;"></i></div><div class="body"><div class="st-name">'+esc(a.name)+'</div><div class="st-desig">'+esc(a.designation||'')+'</div>'+line+sim+'</div></div>'; }).join('');
+    const heading=_track.kind==='bill'?('RA Bill '+item.no+' — '+fmtINR(item.net)):('EoT '+item.days+' days');
+    const statusLine=_track.kind==='bill'?('Status: '+item.status):('Status: '+item.status);
+    host.innerHTML='<div class="exm-overlay"><div class="exm-card" role="dialog" aria-modal="true" aria-label="Approval tracking" style="width:520px;">'
+      + '<div class="exm-head"><div><div class="t">'+esc(heading)+'</div><div class="s">'+esc(statusLine)+'</div></div><button class="exm-x" onclick="exTrackClose()">×</button></div>'
+      + '<div class="exm-body" aria-live="polite">'+steps+'</div></div></div>';
+    refreshIcons();
+  }
+  function exTrackRemind(btn){ btn.textContent='✓ Reminder sent'; btn.style.color='#10B981'; setTimeout(()=>{ btn.textContent='Send reminder'; btn.style.color=''; }, 2000); }
+  function exTrackSim(kind, i){ const st=curState(); const item=_track.kind==='bill'?(st.bills||[]).find(b=>b.id===_track.id):(st.eotRequests||[]).find(e=>e.id===_track.id); if(!item) return; const chain=item.approvalChain;
+    if(kind==='approve'){ chain[i].status='approved'; chain[i].approvedAt=new Date().toISOString(); const nx=chain[i+1]; if(nx&&!nx.sentAt) nx.sentAt=new Date().toISOString(); }
+    else { const reason=prompt('Reason for sending back (optional):')||''; chain[i].status='sent_back'; chain[i].comment=reason.trim()||'Please revise and resubmit.'; }
+    // update item status
+    updateItemStatus(st, item);
+    exSave(st); exTrackRender(); renderWorkspace();
+  }
+  function updateItemStatus(st, item){
+    const chain=item.approvalChain||[]; const approvedCount=chain.filter(a=>a.status==='approved').length; const all=chain.length>0&&approvedCount===chain.length; const sentBack=chain.some(a=>a.status==='sent_back');
+    if(_track.kind==='bill'){
+      let s; if(sentBack) s='Submitted'; else if(all) s='Paid'; else if(approvedCount>=2) s='Sanctioned'; else if(approvedCount>=1) s='Verified'; else s='Submitted';
+      const was=item.status; item.status=s;
+      if(s==='Paid' && was!=='Paid'){ logAct(st,'Bill paid','RA Bill '+item.no+' paid — '+fmtINR(item.net)); showToast('RA Bill '+item.no+' paid · paid-till-date updated'); }
+    } else {
+      if(all){ item.status='Approved';
+        if(!item._applied){ item._applied=true; const newComp=isoDate(addDays(new Date(st.contract.completion), item.days)); st.contract.completion=newComp; st.contract.dlpEnd=isoDate(addMonths(new Date(newComp),6)); st.contract.eotDays=(st.contract.eotDays||0)+item.days; logAct(st,'EoT approved', item.days+' days approved — completion now '+fmtD(newComp)); showToast('EoT approved — completion extended by '+item.days+' days'); }
+      } else if(chain.some(a=>a.status==='sent_back')) item.status='Submitted'; else item.status='Submitted';
+    }
+  }
+
+  // ---- boot ----
+  renderLanding();
+  refreshIcons();
+  (function(){ var b=document.getElementById('avatarBtn'),m=document.getElementById('avatarMenu'); if(!b||!m)return; b.addEventListener('click',function(e){e.stopPropagation();m.classList.toggle('hidden');}); document.addEventListener('click',function(e){if(!m.contains(e.target)&&!b.contains(e.target))m.classList.add('hidden');}); })();
+</script>
+</body>
+</html>
