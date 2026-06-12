@@ -504,6 +504,7 @@
           <i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
           <input type="search" placeholder="Search tenders, bids, vendors…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] placeholder:text-ink-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
         </div>
+        <button type="button" id="restartFlowBtn" aria-label="Restart this flow from the beginning" onclick="restartFlow()" style="background:#EFF6FF; border:1px solid #BFDBFE; color:#0C447C; font-size:12px; line-height:1; cursor:pointer; padding:6px 11px; border-radius:7px; display:inline-flex; align-items:center; gap:5px;"><i data-lucide="rotate-ccw" style="width:13px; height:13px;"></i>Restart flow</button>
         <button class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">FY 2026-27 <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
         <button aria-label="Calendar" class="hidden md:flex w-9 h-9 items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500"><i data-lucide="calendar" class="w-4 h-4"></i></button>
         <button aria-label="Notifications" class="relative w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500">
@@ -2917,6 +2918,31 @@
     function saveAndExit(){
       showToast('Draft saved. Resume from your dashboard.');
       setTimeout(() => { location.href = 'index.html'; }, 700);
+    }
+
+    // ================= DESIGN-REVIEW UTILITY: RESTART FLOW =================
+    // Resets THIS module's saved Tender Creation flow for the active tender draft back to
+    // the beginning so the whole Steps 1–6 flow can be walked from scratch during review.
+    // Active tender id is fixed for this module (the page hardcodes TND-2026-010 throughout).
+    // Clears only keys this page OWNS: the custom-sections store (taCustomSections_<id>).
+    // Step progress / draft content live in-memory + sessionStorage (re-seeded on reload),
+    // so we also clear those sessionStorage keys and drop the hash so reload lands at #start.
+    // PRESERVED: criticalLog_<id> (append-only audit, written by other modules) and
+    // tenderPrefs_<id> (owned/read by prebid-queries.html) — neither is written by this page.
+    const RESTART_TND = 'TND-2026-010';
+    function restartFlow(){
+      const id = RESTART_TND;
+      const ok = window.confirm('Restart Tender Creation for ' + id + ' from the beginning?\n\n'
+        + 'This clears saved progress for this tender draft (step progress, draft content, and custom sections). '
+        + 'The audit log is preserved.');
+      if (!ok) return;
+      try { localStorage.removeItem('taCustomSections_' + id); } catch(e){}
+      // Draft step content (document language + logos) is held in sessionStorage for this module.
+      try { sessionStorage.removeItem('ta_doc_lang_logos_tender'); } catch(e){}
+      try { sessionStorage.removeItem('ta_language'); } catch(e){}
+      // Return to the flow's beginning (Smart Start) on reload.
+      try { history.replaceState(null, '', location.pathname + location.search); } catch(e){ location.hash = ''; }
+      location.reload();
     }
 
     // ================= DESCRIBE — chat flow =================

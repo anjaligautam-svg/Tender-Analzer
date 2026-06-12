@@ -613,6 +613,7 @@
         <i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
         <input type="search" placeholder="Search tenders, bids, vendors…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] placeholder:text-ink-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
       </div>
+      <button type="button" id="restartFlowBtn" aria-label="Restart this flow from the beginning" onclick="restartFlow()" style="background:#EFF6FF; border:1px solid #BFDBFE; color:#0C447C; font-size:12px; line-height:1; cursor:pointer; padding:6px 11px; border-radius:7px; display:inline-flex; align-items:center; gap:5px;"><i data-lucide="rotate-ccw" style="width:13px; height:13px;"></i>Restart flow</button>
       <button class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">FY 2026-27 <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
       <button aria-label="Calendar" class="hidden md:flex w-9 h-9 items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500"><i data-lucide="calendar" class="w-4 h-4"></i></button>
       <button aria-label="Notifications" class="relative w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500">
@@ -2711,6 +2712,58 @@
     saveDprData(all);
     // Storage threshold warning at 4MB
     try { const size = (localStorage.getItem(DPR_DATA_KEY) || '').length; if (size > 4 * 1024 * 1024) showToast('Storage nearly full — consider exporting older DPRs'); } catch(e){}
+  }
+
+  // ========================================================================
+  // === DESIGN-REVIEW UTILITY: Restart this DPR Creation flow from the start
+  // === Clears only THIS page's saved flow state for the DPRs it works on
+  // === (the wizard/draft DPR-2026-010 and the document/custom-sections
+  // === DPR-2026-001), then reloads so the page re-seeds its beginning state.
+  // === The append-only audit log (criticalLog_*) and cross-page shared state
+  // === (e.g. dprPrefill, dpr_data_v1 entries for OTHER demo DPRs) are preserved.
+  // ========================================================================
+  // The DPR ids whose flow state this single page owns/persists. This demo
+  // page hardcodes its working draft across two ids: the wizard/draft +
+  // version-history use DPR-2026-010; custom sections + the NIT document
+  // extras (GeM/AA/TS) are keyed to DPR-2026-001.
+  const RESTART_OWNED_DPR_IDS = ['DPR-2026-010', 'DPR-2026-001'];
+  function restartFlow(){
+    const ids = RESTART_OWNED_DPR_IDS;
+    const primaryId = 'DPR-2026-010'; // the draft the wizard/working view edits
+    const ok = window.confirm(
+      'Restart DPR Creation for ' + primaryId + ' from the beginning?\n\n'
+      + 'This clears saved progress for this DPR draft (draft content, custom sections, '
+      + 'version history, revisions, and section workflows). The audit log is preserved.'
+    );
+    if (!ok) return;
+    try {
+      // 1) Surgically prune this page's owned DPR entries from the shared
+      //    per-DPR extras map (marketEnquiry, gemCheck, aaTracking, tsTracking,
+      //    siteVisit, fundingSource, priority, postApproval) — WITHOUT wiping
+      //    the demo extras of other DPRs (002–006) in the same map.
+      const map = loadDprData();
+      let mutated = false;
+      ids.forEach(function(id){ if (map && Object.prototype.hasOwnProperty.call(map, id)){ delete map[id]; mutated = true; } });
+      if (mutated){ saveDprData(map); }
+      // 2) Per-DPR version history.
+      ids.forEach(function(id){ localStorage.removeItem('dpr_versions_' + id); });
+      // 3) Custom document sections (DPR Custom Section feature — own IIFE key).
+      localStorage.removeItem('dprCustomSections_DPR-2026-001');
+      // 4) Page-local document language / logo + draft-panel language + AI
+      //    apply/dismiss markers (sessionStorage; reload does not clear these).
+      try {
+        sessionStorage.removeItem('ta_doc_lang_logos');
+        sessionStorage.removeItem('dprDraftPanelLang');
+        Object.keys(sessionStorage).forEach(function(k){
+          if (k.indexOf('dprAiApplied_') === 0 || k.indexOf('dprAiDismissed_') === 0) sessionStorage.removeItem(k);
+        });
+      } catch(e){}
+      // PRESERVED on purpose:
+      //  - criticalLog_*  (append-only audit log — must survive restart)
+      //  - dprPrefill     (cross-page DPR→tender handoff, owned by tender-creation)
+      //  - dpr_data_v1 entries for OTHER DPRs (demo rows 002–006)
+    } catch(e){}
+    location.reload();
   }
 
   // ========================================================================

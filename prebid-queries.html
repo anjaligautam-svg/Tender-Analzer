@@ -859,6 +859,7 @@
         <i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
         <input type="search" placeholder="Search tenders, bids, vendors…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] placeholder:text-ink-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
       </div>
+      <button type="button" id="restartFlowBtn" aria-label="Restart this flow from the beginning" onclick="restartFlow()" style="background:#EFF6FF; border:1px solid #BFDBFE; color:#0C447C; font-size:12px; line-height:1; cursor:pointer; padding:6px 11px; border-radius:7px; display:inline-flex; align-items:center; gap:5px;"><i data-lucide="rotate-ccw" style="width:13px; height:13px;"></i>Restart flow</button>
       <button class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">FY 2026-27 <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
       <button aria-label="Calendar" class="hidden md:flex w-9 h-9 items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500"><i data-lucide="calendar" class="w-4 h-4"></i></button>
       <button aria-label="Notifications" class="relative w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500">
@@ -7876,6 +7877,48 @@
       renderActiveList('');
     }
   })();
+
+  // ============================================================
+  // RESTART FLOW — design-review utility
+  // Resets the OPEN tender's Pre-Bid Queries flow back to the start so the
+  // whole flow can be walked from scratch during review. Clears only this
+  // tender's flow-state keys (query grouping, responses/approval, corrigendum,
+  // MOM, AI-summary pref). The append-only audit log (criticalLog_) is preserved.
+  // ============================================================
+  function restartFlow(){
+    // Active tender = the one whose workspace is currently open. If the page is
+    // on the landing list (no workspace open), there is nothing to reset.
+    const ws = document.getElementById('screen-workspace');
+    const workspaceOpen = ws && !ws.classList.contains('hidden');
+    const tnd = (workspaceOpen && typeof CURRENT_TND !== 'undefined' && CURRENT_TND) ? CURRENT_TND : null;
+    if (!tnd){ if (typeof showToast === 'function') showToast('Open a tender first'); return; }
+    const ok = window.confirm('Restart Pre-Bid Queries for ' + tnd + ' from the beginning?\n\n'
+      + 'This clears saved progress for this tender (query grouping, responses, approval status, corrigendum, and MOM data). '
+      + 'The audit log is preserved.');
+    if (!ok) return;
+    // Keys this page OWNS for the active tender. Some of these keys are written
+    // with the active tender id; a few (approval/corrigendum) are persisted under
+    // the page's hard-coded TND-2026-001 literal — clear both forms so the page
+    // re-reads a clean "beginning" state regardless of which id is open.
+    const keys = [
+      'momData_' + tnd,                  // MOM upload + answer-reuse data
+      'groupState_' + tnd,               // AI grouping / ungroup state
+      'approvalStatus_' + tnd,           // send-for-approval register + chain
+      'approvalRegSeq_' + tnd,           // approval registration counter
+      'corrigendum_decisions_' + tnd,    // push/dismiss decisions
+      'prebid_corrigendum_' + tnd,       // issued/pending corrigenda
+      'tenderPrefs_' + tnd,              // AI Query Summary opt-in (set in this flow; shared w/ tender-creation)
+      // Hard-coded literals this page reads/writes regardless of CURRENT_TND.
+      'approvalStatus_TND-2026-001',
+      'corrigendum_decisions_TND-2026-001',
+      'prebid_corrigendum_TND-2026-001',
+    ];
+    // PRESERVED on purpose: criticalLog_<tnd> (append-only audit) and
+    // standardResponses_prebid (global response library, not tender-scoped).
+    keys.forEach(function(k){ try { localStorage.removeItem(k); } catch(e){} });
+    location.reload();
+  }
+  if (window.lucide) lucide.createIcons();
 
   // ============================================================
   // BATCH TRIAGE + DEADLINE COUNTDOWN

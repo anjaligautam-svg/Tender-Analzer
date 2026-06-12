@@ -170,10 +170,10 @@ tailwind.config = { theme: { extend: {
 const SECTIONS = [
   // group, key, title, icon, subtitle, intro
   // OVERVIEW
-  { g:'OVERVIEW', k:'dashboard', t:'Dashboard',           i:'layout-dashboard', s:'143 settings · 16 sections', intro:'A single place to choose how every part of the procurement portal behaves. Tick what matters, leave the rest with sensible defaults.' },
+  { g:'OVERVIEW', k:'dashboard', t:'Dashboard',           i:'layout-dashboard', s:'146 settings · 16 sections', intro:'A single place to choose how every part of the procurement portal behaves. Tick what matters, leave the rest with sensible defaults.' },
 
   // MODULE POLICIES
-  { g:'MODULE POLICIES', k:'dpr',     t:'DPR Creation',         i:'file-text',   s:'15 settings · 3 groups',  intro:'Policies that govern Detailed Project Report creation, approval pipeline, and AA/TS lifecycle.' },
+  { g:'MODULE POLICIES', k:'dpr',     t:'DPR Creation',         i:'file-text',   s:'18 settings · 5 groups',  intro:'Policies that govern Detailed Project Report creation, approval pipeline, and AA/TS lifecycle.' },
   { g:'MODULE POLICIES', k:'tender',  t:'Tender Creation',      i:'file-edit',   s:'13 settings · 8 groups',  intro:'Defaults and rules for NIT creation, PQ/TQ libraries, pre-checks, and publish workflow.' },
   { g:'MODULE POLICIES', k:'prebid',  t:'Pre-Bid Queries',      i:'message-square-quote', s:'15 settings · 1 group',  intro:'Query intake, AI behaviour, standard responses, corrigendum workflow.' },
   { g:'MODULE POLICIES', k:'eval',    t:'Bid Evaluation',       i:'gavel',       s:'28 settings · 7 groups · most important',  intro:'The densest configuration surface in the portal — PQ verdicts, TQ scoring rubric, 5 evaluation methods, reasonableness check, committee rules, financial reveal flow.' },
@@ -238,22 +238,21 @@ const ITEMS = [
         {label:'Submit for Administrative Approval (AA)', enabled:true},
         {label:'Grant Administrative Approval (AA)', enabled:true},
         {label:'Clone existing DPR', enabled:true},
-        {label:'Apply sectoral template', enabled:true},
       ],
       availableActions:[
         'View DPR','Create new DPR','Edit DPR — Scope of Work','Edit DPR — Bill of Quantities (BOQ)',
         'Edit DPR — Drawings & Attachments','Edit DPR — Market Enquiry Log','Edit DPR — Site Visit Notes',
         'Run AI Readiness Check','Submit for Administrative Approval (AA)','Grant Administrative Approval (AA)',
         'Submit for Technical Sanction (TS)','Grant Technical Sanction (TS)','Verify budget head allocation',
-        'Run GeM compliance check','Publish DPR (transition to tender)','Clone existing DPR','Apply sectoral template',
+        'Run GeM compliance check','Publish DPR (transition to tender)','Clone existing DPR',
         'Set priority — Routine/Priority','Set priority — Emergency (high-bar)','Revise DPR after AA/TS query',
-        'Override version-history retention','Withdraw / cancel DPR',
+        'Withdraw / cancel DPR',
       ],
       members:[
-        {officer:'Rajesh Kumar', designation:'Project Engineer (Drafter)', permissions:{'View DPR':true, 'Create new DPR':true, 'Edit DPR — Scope of Work':true, 'Edit DPR — Bill of Quantities (BOQ)':true, 'Edit DPR — Drawings & Attachments':true, 'Edit DPR — Market Enquiry Log':true, 'Edit DPR — Site Visit Notes':true, 'Run AI Readiness Check':true, 'Submit for Administrative Approval (AA)':false, 'Grant Administrative Approval (AA)':false, 'Clone existing DPR':true, 'Apply sectoral template':true}},
-        {officer:'Priya Shah', designation:'Assistant / Executive Engineer (Reviewer)', permissions:{'View DPR':true, 'Create new DPR':false, 'Edit DPR — Scope of Work':true, 'Edit DPR — Bill of Quantities (BOQ)':true, 'Edit DPR — Drawings & Attachments':true, 'Edit DPR — Market Enquiry Log':true, 'Edit DPR — Site Visit Notes':true, 'Run AI Readiness Check':true, 'Submit for Administrative Approval (AA)':false, 'Grant Administrative Approval (AA)':false, 'Clone existing DPR':false, 'Apply sectoral template':false}},
-        {officer:'Sunita Rao', designation:'Administrative Sanctioning Authority', permissions:{'View DPR':true, 'Create new DPR':false, 'Edit DPR — Scope of Work':false, 'Edit DPR — Bill of Quantities (BOQ)':false, 'Edit DPR — Drawings & Attachments':false, 'Edit DPR — Market Enquiry Log':false, 'Edit DPR — Site Visit Notes':false, 'Run AI Readiness Check':false, 'Submit for Administrative Approval (AA)':true, 'Grant Administrative Approval (AA)':true, 'Clone existing DPR':false, 'Apply sectoral template':false}},
-        {officer:'Amit Patil', designation:'DPR Coordinator', permissions:{'View DPR':true, 'Create new DPR':false, 'Edit DPR — Scope of Work':false, 'Edit DPR — Bill of Quantities (BOQ)':false, 'Edit DPR — Drawings & Attachments':false, 'Edit DPR — Market Enquiry Log':false, 'Edit DPR — Site Visit Notes':false, 'Run AI Readiness Check':false, 'Submit for Administrative Approval (AA)':false, 'Grant Administrative Approval (AA)':false, 'Clone existing DPR':true, 'Apply sectoral template':true}},
+        {officer:'Rajesh Kumar', designation:'Project Engineer (Drafter)', permissions:{'View DPR':true, 'Create new DPR':true, 'Edit DPR — Scope of Work':true, 'Edit DPR — Bill of Quantities (BOQ)':true, 'Edit DPR — Drawings & Attachments':true, 'Edit DPR — Market Enquiry Log':true, 'Edit DPR — Site Visit Notes':true, 'Run AI Readiness Check':true, 'Submit for Administrative Approval (AA)':false, 'Grant Administrative Approval (AA)':false, 'Clone existing DPR':true}},
+        {officer:'Priya Shah', designation:'Assistant / Executive Engineer (Reviewer)', permissions:{'View DPR':true, 'Create new DPR':false, 'Edit DPR — Scope of Work':true, 'Edit DPR — Bill of Quantities (BOQ)':true, 'Edit DPR — Drawings & Attachments':true, 'Edit DPR — Market Enquiry Log':true, 'Edit DPR — Site Visit Notes':true, 'Run AI Readiness Check':true, 'Submit for Administrative Approval (AA)':false, 'Grant Administrative Approval (AA)':false, 'Clone existing DPR':false}},
+        {officer:'Sunita Rao', designation:'Administrative Sanctioning Authority', permissions:{'View DPR':true, 'Create new DPR':false, 'Edit DPR — Scope of Work':false, 'Edit DPR — Bill of Quantities (BOQ)':false, 'Edit DPR — Drawings & Attachments':false, 'Edit DPR — Market Enquiry Log':false, 'Edit DPR — Site Visit Notes':false, 'Run AI Readiness Check':false, 'Submit for Administrative Approval (AA)':true, 'Grant Administrative Approval (AA)':true, 'Clone existing DPR':false}},
+        {officer:'Amit Patil', designation:'DPR Coordinator', permissions:{'View DPR':true, 'Create new DPR':false, 'Edit DPR — Scope of Work':false, 'Edit DPR — Bill of Quantities (BOQ)':false, 'Edit DPR — Drawings & Attachments':false, 'Edit DPR — Market Enquiry Log':false, 'Edit DPR — Site Visit Notes':false, 'Run AI Readiness Check':false, 'Submit for Administrative Approval (AA)':false, 'Grant Administrative Approval (AA)':false, 'Clone existing DPR':true}},
       ],
     }},
   {id:'dpr.pipeline-stages', m:'dpr', s:'1A · Approval pipeline & stage gates', p:'Core', t:'list',
@@ -269,44 +268,46 @@ const ITEMS = [
       {min:2500000,max:5000000,auth:'Commissioner'},
       {min:5000000,max:null,auth:'State Government'},
     ]},
-  {id:'dpr.revision-limits', m:'dpr', s:'1A · Approval pipeline & stage gates', p:'Core', t:'kvlist',
-    title:'AA/TS revision-cycle limits',
-    why:'Stops endless query loops; auditable.',
-    def:[{k:'Max revisions',v:'3'},{k:'Deadline per cycle (days)',v:'7'},{k:'Escalate after exceeding',v:'true'}]},
-  {id:'dpr.gem-workflow', m:'dpr', s:'1A · Approval pipeline & stage gates', p:'Core', t:'lib',
-    title:'GeM-check workflow rules',
-    why:'GeM is statutory; categories and evidence list must be central.',
-    def:{categories:['Office stationery','Standard IT goods','Standard furniture','Standard vehicles'], evidenceRequired:['GeM non-availability screenshot','Justification note signed by HOD']}},
-  {id:'dpr.gem-justification', m:'dpr', s:'1A · Approval pipeline & stage gates', p:'Core', t:'template',
-    title:'GeM non-availability — justification template',
-    why:'GePNIC publishes a "reason for non-availability on GeM" on every tender that bypasses GeM. This is the standard template officers fill — keep it consistent and audit-defensible.',
-    def:'Reason for non-availability on GeM:\n\nThe item(s) under procurement — {item_category} — {non_availability_reason}. A GeM search dated {gem_search_date} returned {gem_search_result}. Accordingly, this procurement is processed outside GeM under GFR 2017 Rule 149, with the GeM non-availability evidence and HOD-signed justification placed on record.\n\nVerified by: {officer_name}, {designation}\nDate: {date}'},
+  // dpr.revision-limits removed (AA/TS revision-cycle limits).
+  {id:'dpr.gem-workflow', m:'dpr', s:'1A · Approval pipeline & stage gates', p:'Core', t:'gem-workflow',
+    title:'GeM check — workflow & non-availability justification',
+    why:'GeM is statutory. This item holds both the pre-AA GeM-search workflow rules and the non-availability justification text that publishes on the tender (GFR 2017 Rule 149). Absorbs the old standalone justification template.',
+    def:{
+      workflow:{
+        searchMandatory:{Goods:true, Services:true, Works:false},
+        evidenceRequired:true,
+        searchScope:'Similar category',
+        validityDays:30,
+        verifiedByRole:'DPR Coordinator'
+      },
+      reasons:[
+        {label:'Not available on GeM', enabled:true},
+        {label:'Specifications not met by GeM listings', enabled:true},
+        {label:'Quantity beyond GeM limits', enabled:true},
+        {label:'Delivery timeline cannot be met', enabled:true},
+        {label:'GeM rate unreasonable vs market', enabled:false},
+      ],
+      justification:{
+        template:'The requirement of {item} was searched on GeM on {search_date} under category {category}. The requirement could not be fulfilled through GeM for the following reason: {reason}. Accordingly, procurement outside GeM is proposed in accordance with GFR 2017 Rule 149.'
+      }
+    }},
   {id:'dpr.funding-sources', m:'dpr', s:'1A · Approval pipeline & stage gates', p:'Core', t:'list',
     title:'Funding-source registry',
     why:'Otherwise officers free-type scheme names with no consistency.',
     def:['AMRUT 2.0','15th Finance Commission','State Plan – Urban Dev','Smart Cities Mission','SBM-U 2.0','Municipal Own Revenue']},
-  {id:'dpr.priority-sla', m:'dpr', s:'1A · Approval pipeline & stage gates', p:'Helpful', t:'kvlist',
-    title:'Priority labels & SLAs',
-    why:'Emergency tag bypasses normal queues; abuse risk if anyone can set it.',
-    def:[{k:'Routine SLA (days)',v:'21'},{k:'Priority SLA (days)',v:'10'},{k:'Emergency SLA (days)',v:'3'},{k:'Emergency requires role',v:'Commissioner'}]},
+  // dpr.priority-sla removed (Priority labels & SLAs). The priority pills (ai-questionnaire) and dpr.emergency-policy are independent and stay.
   // 1B
-  {id:'dpr.templates', m:'dpr', s:'1B · Templates, BOQ & libraries', p:'Core', t:'lib',
-    title:'DPR templates per sector',
-    why:'Quality + speed; one good template beats 50 hand-written DPRs.',
-    def:[{sector:'Water Works',template:'Water Pipeline DPR v2.1'},{sector:'Roads',template:'Road Maintenance DPR v3.0'},{sector:'IT Goods',template:'IT Procurement DPR v1.4'},{sector:'Engineering Goods',template:'Engineering Goods DPR v1.2'},{sector:'Urban Dev Works',template:'Urban Dev DPR v2.0'}]},
-  {id:'dpr.boq-library', m:'dpr', s:'1B · Templates, BOQ & libraries', p:'Core', t:'toggle',
+  // dpr.templates removed (DPR templates per sector).
+  {id:'dpr.boq-library', m:'dpr', s:'1B · BOQ & libraries', p:'Core', t:'toggle',
     title:'BOQ item library / DSR linkage',
     why:'Cited as a DPR feature — rates auto-populate DPR BOQ.',
     def:true},
-  {id:'dpr.docs-policy', m:'dpr', s:'1B · Templates, BOQ & libraries', p:'Helpful', t:'matrix',
+  {id:'dpr.docs-policy', m:'dpr', s:'1B · BOQ & libraries', p:'Helpful', t:'matrix',
     title:'Drawings & attachments policy',
     why:'Prevents incomplete DPRs reaching AA.',
     def:{rows:['Water Works','Roads','IT Goods','Engineering Goods'], cols:['Site survey','Soil test','Env clearance','Drawings'], cells:{}}},
-  {id:'dpr.site-visit', m:'dpr', s:'1B · Templates, BOQ & libraries', p:'Helpful', t:'kvlist',
-    title:'Site-visit notes requirements',
-    why:'Audit baseline; officers can\'t guess.',
-    def:[{k:'Min photos – Works',v:'6'},{k:'Min photos – Goods',v:'2'},{k:'Mandatory measurements',v:'true'}]},
-  {id:'dpr.market-enquiry', m:'dpr', s:'1B · Templates, BOQ & libraries', p:'Core', t:'market-enquiry',
+  // dpr.site-visit removed (Site-visit notes requirements).
+  {id:'dpr.market-enquiry', m:'dpr', s:'1B · BOQ & libraries', p:'Core', t:'market-enquiry',
     title:'Market enquiry — log structure & rules',
     why:'Cost-basis audit. The log structure (above) defines the format; the Rules (below) set how many quotes, validity, acceptance basis, the value threshold above which enquiry is mandatory, and the spread that flags a quote set for review.',
     def:{
@@ -314,10 +315,7 @@ const ITEMS = [
       rules:{minQuotes:3, validityDays:90, acceptanceBasis:'lowest', mandatoryAbove:null, deviationPct:25}
     }},
   // 1C
-  {id:'dpr.version-limit', m:'dpr', s:'1C · Quality controls', p:'Optional', t:'number',
-    title:'Version-history limit',
-    why:'Storage + audit policy.',
-    def:20, unit:'versions'},
+  // dpr.version-limit removed (Version-history limit).
   {id:'dpr.clone-scope', m:'dpr', s:'1C · Quality controls', p:'Helpful', t:'kvlist',
     title:'Clone-past-DPR scope',
     why:'Stops officers cloning stale or unapproved DPRs.',
@@ -387,7 +385,6 @@ const ITEMS = [
         {check:'Budget head verified', blocking:true, canOverride:true, overrideRoles:['HOD']},
         {check:'Market enquiry done per rules', blocking:true, canOverride:true, overrideRoles:['HOD']},
         {check:'Competent authority verified for value tier', blocking:true, canOverride:false, overrideRoles:[]},
-        {check:'Site visit logged', blocking:false, canOverride:false, overrideRoles:[]},
         {check:'GeM check done', blocking:true, canOverride:false, overrideRoles:[]},
         {check:'AI Readiness passed', blocking:false, canOverride:false, overrideRoles:[]},
       ],
@@ -432,7 +429,7 @@ const ITEMS = [
     def:{
       markRoles:['Commissioner','HOD'],
       justify:{lockedOn:true, minWords:30},
-      skippableGates:['Site visit logged'],
+      skippableGates:[],
       postFactoDays:7
     }},
   {id:'dpr.handoff-rules', m:'dpr', s:'1E · Submission gates & policies', p:'Core', t:'handoff-rules',
@@ -1507,7 +1504,7 @@ function saveLog(l){ localStorage.setItem(LOG_KEY, JSON.stringify(l.slice(0,200)
 function logAction(id, v){
   const item = ITEMS.find(i=>i.id===id);
   const log = loadLog();
-  log.unshift({ id, title: item?.title||id, who:'Rajesh Kumar', when:Date.now(), preview: summarise(v) });
+  log.unshift({ id, title: (item?itemTitle(item):null)||id, who:'Rajesh Kumar', when:Date.now(), preview: summarise(v) });
   saveLog(log);
   renderActivity();
 }
@@ -1560,11 +1557,8 @@ function renderSidebar(){
    DASHBOARD
    ========================================================= */
 function renderDashboard(){
-  const totals = SECTIONS.filter(s=>s.k!=='dashboard').map(s => ({s, count: ITEMS.filter(i=>i.m===s.k).length, core: ITEMS.filter(i=>i.m===s.k&&i.p==='Core').length}));
+  const totals = SECTIONS.filter(s=>s.k!=='dashboard').map(s => ({s, count: ITEMS.filter(i=>i.m===s.k).length}));
   const totalItems = ITEMS.length;
-  const totalCore  = ITEMS.filter(i=>i.p==='Core').length;
-  const totalHelp  = ITEMS.filter(i=>i.p==='Helpful').length;
-  const totalOpt   = ITEMS.filter(i=>i.p==='Optional').length;
   const customised = Object.keys(loadStore()).length;
 
   document.getElementById('content').innerHTML = `
@@ -1590,7 +1584,6 @@ function renderDashboard(){
             <p class="text-[12.5px] text-ink-500 mt-1 leading-snug">${x.s.intro}</p>
             <div class="text-[12px] mt-3 pt-3 border-t border-line flex items-center gap-3">
               <span class="text-ink-900 font-medium">${x.count} settings</span>
-              <span class="chip pri-Core">${x.core} Core</span>
             </div>
           </a>
         `).join('')}
@@ -1629,16 +1622,17 @@ function renderDashboard(){
 /* =========================================================
    SECTION RENDERER  —  grouped, collapsible drill-down
    ========================================================= */
-let currentFilter = 'All';
 let currentSearch = '';
 
 /* One-line plain-English description per category (keyed by full subsection label). */
 const CATEGORY_DESC = {
   // DPR
   '1 · Role Management':'Who can draft, review and sanction DPRs, and exactly what each member may do.',
-  '1A · Approval pipeline & stage gates':'The AA/TS route, competent-authority thresholds, revision limits and GeM gate.',
-  '1B · Templates, BOQ & libraries':'Per-sector DPR templates, BOQ/DSR linkage and the evidence officers must attach.',
-  '1C · Quality controls':'Version history, clone scope and the AI readiness checks that guard DPR quality.',
+  '1A · Approval pipeline & stage gates':'The AA/TS route, competent-authority thresholds, funding sources and the GeM check & non-availability justification.',
+  '1B · BOQ & libraries':'BOQ/DSR linkage, the drawings/attachments policy and the market-enquiry rules. DPR logos are managed in Signatures & letterheads → Logo library.',
+  '1C · Quality controls':'Clone scope and the AI readiness checks that guard DPR quality.',
+  '1D · Entry modes & AI assistance':'How a DPR is started (entry-mode matrix by officer type), the AI describe questionnaire, the AI assistance on/off map, and authoring languages.',
+  '1E · Submission gates & policies':'Pre-AA/TS gates, estimate rate-source tolerance, budget-head validation, emergency fast-track, DPR→tender handoff and external-consultant rules.',
   // TENDER
   '2 · Role Management':'The tender-drafting committee, their designations and per-action permissions.',
   '2B · Smart Start & templates':'How a tender is started — AI, upload, clone or manual — and the past-tender library used for cloning.',
@@ -1683,6 +1677,191 @@ const CATEGORY_DESC = {
   'J · System':'Auto-save, version retention, calendar, financial year and activity trail.',
 };
 
+/* ---- Row metadata: short scannable title (t), one-line contents inventory (c),
+   and search keywords (k) holding old-title words + synonyms. Keyed by item id;
+   the renderer/search/panel consult this, falling back to item.title. ---- */
+const ROW_META = {
+  // DPR
+  'dpr.committee':{t:'Role management',c:'Members matrix · designations · action permissions',k:['committee','members','designations','permissions','roles']},
+  'dpr.pipeline-stages':{t:'Pipeline stages',c:'DPR lifecycle stage list',k:['pipeline','stages','master','lifecycle']},
+  'dpr.aa-ts-authority':{t:'Sanction authorities',c:'AA/TS authority by value tier',k:['AA','TS','competent authority','sanction','tiers','matrix']},
+  'dpr.gem-workflow':{t:'GeM check',c:'Workflow rules · reason list · justification template',k:['GeM','non-availability','justification','workflow','rule 149']},
+  'dpr.funding-sources':{t:'Funding sources',c:'Scheme & grant registry',k:['funding','source','registry','scheme','grant']},
+  'dpr.boq-library':{t:'BOQ library',c:'DSR-linked rate library',k:['BOQ','DSR','library','rates']},
+  'dpr.docs-policy':{t:'Attachments policy',c:'Drawings & docs required per sector',k:['drawings','attachments','documents','policy']},
+  'dpr.market-enquiry':{t:'Market enquiry',c:'Log fields · quotation rules · thresholds',k:['market','enquiry','quotes','quotation','log']},
+  'dpr.clone-scope':{t:'Clone scope',c:'Which past DPRs can be cloned',k:['clone','scope','past DPR']},
+  'dpr.ai-readiness':{t:'Readiness checks',c:'AI readiness rule list',k:['AI','readiness','check','rules','completeness']},
+  'dpr.smart-start':{t:'Entry modes',c:'Modes × officer types matrix',k:['smart start','entry','modes','officer']},
+  'dpr.ai-questionnaire':{t:'AI questionnaire',c:'Questions · suggestion pills · skip rules',k:['AI','describe','questionnaire','questions','pills','follow-up']},
+  'dpr.ai-touchpoints':{t:'AI assistance',c:'Master switch · per-step on/off · restrictions',k:['AI','assistance','touchpoints','master']},
+  'dpr.languages':{t:'Languages',c:'Enabled languages · default',k:['languages','multilingual','default']},
+  'dpr.submission-gates':{t:'Submission gates',c:'AA & TS pre-submission checks',k:['submission','gates','AA','TS','checklist','blocking']},
+  'dpr.cost-basis':{t:'Cost basis',c:'Rate sources · tolerance · justification',k:['cost','estimate','rate source','tolerance','ALB']},
+  'dpr.budget-heads':{t:'Budget heads',c:'Head registry · validation rule',k:['budget','head','registry','validation','balance']},
+  'dpr.emergency-policy':{t:'Emergency policy',c:'Mark roles · skippable gates · post-facto',k:['emergency','fast-track','skip','justification']},
+  'dpr.handoff-rules':{t:'Tender handoff',c:'Carry-forward fields · unsanctioned rule',k:['handoff','tender','carry forward','sanctioned']},
+  'dpr.consultant-access':{t:'Consultant access',c:'Access level · disclosure · sections',k:['consultant','external','access','disclosure']},
+  // TENDER
+  'tender.committee':{t:'Role management',c:'Members matrix · designations · action permissions',k:['committee','members','designations','permissions','roles']},
+  'tender.smart-start':{t:'Entry modes',c:'Start-screen modes enabled',k:['smart start','entry','modes','methods']},
+  'tender.starter-chips':{t:'Suggestion chips',c:'AI describe quick chips by type',k:['starter','chips','AI describe','suggestions','quick']},
+  'tender.past-tender-cloning':{t:'Clone library',c:'Past tenders · documents · sector tags',k:['past tender','clone','cloning','library','documents']},
+  'tender.ai-touchpoints':{t:'AI assistance',c:'Master switch · per-step on/off · restrictions',k:['AI','assistance','touchpoints','master']},
+  'tender.ai-questionnaire':{t:'AI questionnaire',c:'Questions · suggestion pills · skip rules',k:['AI','describe','questionnaire','follow-up','pills']},
+  'tender.tree':{t:'Tender catalog',c:'Types · subtypes · sectors, 3-level browser',k:['catalog','tree','type','subtype','sector']},
+  'tender.methods-suite':{t:'Methods',c:'Evaluation methods · procurement modes · thresholds',k:['evaluation','methods','QCBS','L1','procurement modes','defaults']},
+  'tender.emd-policy':{t:'EMD policy',c:'EMD percentage · MSME exemption',k:['EMD','earnest money','MSME','exemption']},
+  'tender.custom-criteria':{t:'Criterion builder',c:'PQ/TQ/DQ criteria · text, numeric, table types',k:['custom','criterion','criteria','PQ','TQ','builder']},
+  'tender.806040':{t:'80-60-40 rule',c:'PQ work-order options',k:['80-60-40','PQ rule','work orders']},
+  'tender.tq-rubric':{t:'TQ rubric',c:'4 groups · marks /100 · sector overrides',k:['TQ','rubric','marks','100','technical']},
+  'tender.pq-by-company':{t:'PQ library',c:'Criteria by company type',k:['PQ','criterion','company','library']},
+  'tender.ai-compliance':{t:'Compliance rules',c:'AI compliance check list',k:['AI','compliance','check','rules','CVC']},
+  'tender.ai-eligibility':{t:'Eligibility risks',c:'AI restrictive-tender red flags',k:['AI','eligibility','risk','restrictive','red flag']},
+  'tender.calendar':{t:'Working calendar',c:'Working-day & holiday toggle',k:['calendar','holiday','working day']},
+  'tender.notifications-suite':{t:'Notifications',c:'Per-event reminders · channels · recipients',k:['notifications','reminders','escalation','channels']},
+  'tender.nit-sections':{t:'NIT sections',c:'NIT document section structure',k:['NIT','sections','structure','document']},
+  'tender.languages':{t:'Languages',c:'Enabled languages · default',k:['languages','multilingual','default']},
+  'tender.ai-section-prompts':{t:'Section drafting prompts',c:'One AI instruction per NIT section',k:['AI','section','prompts','drafting','NIT']},
+  'tender.mandatory-attachments':{t:'Mandatory attachments',c:'Required docs per tender type',k:['mandatory','attachments','documents']},
+  'tender.per-language-templates':{t:'Language covers',c:'Cover text per enabled language',k:['language','cover','NIT','overrides']},
+  'tender.pre-publish-gates':{t:'Publish gates',c:'Blocking checks · overrides · roles',k:['pre-publish','gates','hard gates','checklist','blocking']},
+  'tender.numbering':{t:'Tender numbering',c:'Format string · sequence · FY reset',k:['tender ID','numbering','format','sequence']},
+  'tender.cvc-chain':{t:'CVC review chain',c:'CVC sign-off approval chain',k:['CVC','review','committee','chain','approval']},
+  'tender.publish-template':{t:'Publish notice',c:'Vendor notification text on publish',k:['publish','vendor','notification','template']},
+  'tender.vendor-notifications':{t:'Vendor notices',c:'Per-event vendor message rules',k:['vendor','notification','rules','events']},
+  // PRE-BID
+  'prebid.committee':{t:'Role management',c:'Members matrix · designations · action permissions',k:['committee','members','designations','permissions','roles']},
+  'prebid.dates':{t:'Pre-bid dates',c:'Date policy · per-tender overrides',k:['pre-bid','dates','policy','overrides','schedule']},
+  'prebid.sections':{t:'Query categories',c:'Query categorisation sections',k:['query','categorisation','sections','categories']},
+  'prebid.response-columns':{t:'Register columns',c:'Visible columns in query register',k:['response','register','columns','table']},
+  'prebid.ai-threshold':{t:'Grouping threshold',c:'AI similarity % for grouping',k:['AI','grouping','similarity','threshold']},
+  'prebid.summary-options':{t:'Summary widgets',c:'Which AI summary widgets show',k:['AI','summary','widgets','screen']},
+  'prebid.std-responses':{t:'Standard responses',c:'Approved replies · categories · pending queue',k:['standard','responses','library','replies','canned']},
+  'prebid.generic-presets':{t:'Generic presets',c:'Reusable generic-response presets',k:['generic','presets','responses']},
+  'prebid.response-chain':{t:'Response approval',c:'Query-response approval chain',k:['response','register','approval','chain']},
+  'prebid.response-chain-mandatory':{t:'Mandatory steps',c:'Required response-chain steps',k:['response','chain','mandatory','steps']},
+  'prebid.corr-types':{t:'Corrigendum types',c:'Types & mandatory fields',k:['corrigendum','types','fields','amendment']},
+  'prebid.corr-numbering':{t:'Corrigendum numbering',c:'Auto-numbering format',k:['corrigendum','numbering','format','auto']},
+  'prebid.ai-amendment-push':{t:'Amendment push',c:'AI amendment summary push policy',k:['AI','amendment','summary','push']},
+  'prebid.consultants':{t:'Approved consultants',c:'External consultant registry',k:['consultants','external','approved','registry']},
+  'prebid.response-sheet':{t:'Response sheet',c:'Query response sheet template',k:['response','sheet','template','query']},
+  'prebid.mom-template':{t:'Minutes template',c:'Pre-bid meeting MoM template',k:['MoM','minutes','meeting','template']},
+  'prebid.anonymisation':{t:'Anonymisation',c:'Bidder anonymisation rules',k:['anonymisation','rules','anonymous']},
+  'prebid.permissions-link':{t:'Permissions toggle',c:'Per-action enforcement on/off',k:['permissions','enforced','per-action']},
+  // BID EVALUATION
+  'eval.committee':{t:'Role management',c:'Members matrix · designations · action permissions',k:['committee','members','designations','permissions','roles']},
+  'eval.pq-vocab':{t:'PQ verdicts',c:'PQ verdict vocabulary',k:['PQ','verdict','vocabulary','pass fail']},
+  'eval.pq-evidence':{t:'PQ evidence',c:'Evidence required per PQ criterion',k:['PQ','evidence','requirements','criterion']},
+  'eval.clarification-letter':{t:'Clarification letter',c:'Clarification request template',k:['clarification','letter','template','request']},
+  'eval.clarification-sla':{t:'Clarification SLA',c:'Response deadline windows',k:['clarification','SLA','deadline']},
+  'eval.tech-bid-sections':{t:'Tech bid sections',c:'Technical bid section structure',k:['technical','bid','sections','structure']},
+  'eval.ai-confidence-pq':{t:'PQ AI confidence',c:'AI confidence threshold for PQ',k:['AI','confidence','threshold','PQ']},
+  'eval.committee-comp':{t:'Committee size',c:'Committee size & composition',k:['committee','size','composition','quorum']},
+  'eval.score-aggregation':{t:'Score aggregation',c:'Aggregation rule for scores',k:['score','aggregation','average','rule']},
+  'eval.inline-edit':{t:'Edit after submit',c:'Inline-edit permissions',k:['inline','edit','after submit','permissions']},
+  'eval.min-tq':{t:'Minimum TQ score',c:'Qualifying technical score',k:['minimum','TQ','qualifying','score']},
+  'eval.vendor-pres':{t:'Vendor presentation',c:'Presentation requirements',k:['vendor','presentation','requirements']},
+  'eval.coi':{t:'Conflict declaration',c:'COI declaration template',k:['conflict','interest','COI','declaration','template']},
+  'eval.ntq-letter':{t:'NTQ letter',c:'NTQ justification template',k:['NTQ','justification','letter','template','non-technically']},
+  'eval.ntq-signing':{t:'NTQ signing',c:'NTQ signing chain',k:['NTQ','signing','chain','approval']},
+  'eval.tq-ready-gate':{t:'TQ-ready gate',c:'TQ-ready gate criteria',k:['TQ','ready','gate','criteria']},
+  'eval.l1':{t:'L1 tie-break',c:'L1 tie-breaking rule',k:['L1','tie','tie-break','lowest']},
+  'eval.qcbs-weights':{t:'QCBS weights',c:'Tech:Financial weight by sector',k:['QCBS','weightage','technical','financial','sector']},
+  'eval.qcbs-warning':{t:'QCBS warning',c:'Winner-change warning threshold',k:['QCBS','warning','winner','threshold']},
+  'eval.lcs-cutoff':{t:'LCS cutoff',c:'Default technical cutoff %',k:['LCS','cutoff','technical']},
+  'eval.qbs':{t:'QBS config',c:'QBS selection settings',k:['QBS','selection','config']},
+  'eval.fbs':{t:'FBS config',c:'FBS budget gate settings',k:['FBS','budget','gate','config']},
+  'eval.method-warning':{t:'Method warnings',c:'Non-default method badge & warning',k:['method','warning','badge','non-default']},
+  'eval.reveal-flow':{t:'Reveal flow',c:'3-phase financial reveal',k:['reveal','financial','3-phase','flow']},
+  'eval.winner-explanation':{t:'Winner card',c:'Winner-card explanation rules',k:['winner','explanation','card','requirements']},
+  'eval.alb-threshold':{t:'ALB threshold',c:'% below estimate trigger',k:['ALB','threshold','below estimate','abnormally low']},
+  'eval.ts-gate':{t:'TS gate',c:'TS gate threshold',k:['TS','gate','threshold','technical sanction']},
+  'eval.reasonableness-4cases':{t:'Reasonableness cases',c:'4-case reasonableness definitions',k:['reasonableness','4 case','cases','definitions']},
+  'eval.l1-ec-ts-config':{t:'L1 benchmarks',c:'L1 vs EC vs TS comparison',k:['L1','EC','TS','comparison','config','benchmark']},
+  'eval.quorum':{t:'Quorum rules',c:'Committee quorum rules',k:['quorum','rules','committee']},
+  'eval.member-rights':{t:'Member rights',c:'Member roles & rights matrix',k:['member','roles','rights','matrix']},
+  'eval.signoff-checklist':{t:'Sign-off checklist',c:'Evaluation sign-off items',k:['sign-off','checklist','evaluation']},
+  'eval.parser-rules':{t:'Parser rules',c:'What AI extracts from bids',k:['AI','parser','rules','extract']},
+  'eval.ai-suggest-on':{t:'AI TQ suggestions',c:'AI suggestion on TQ scoring',k:['AI','suggestion','TQ','scoring']},
+  // BID MANAGEMENT
+  'mgmt.committee':{t:'Role management',c:'Members matrix · designations · action permissions',k:['committee','members','designations','permissions','roles']},
+  'mgmt.stage-gates':{t:'Stage gates',c:'Stage gate definitions',k:['stage','gates','definitions']},
+  'mgmt.stage-skip':{t:'Stage skip rules',c:'When stages can be skipped',k:['stage','skip','rules']},
+  'mgmt.reasonableness-shared':{t:'Shared reasonableness',c:'Use Bid Evaluation reasonableness',k:['reasonableness','shared','bid evaluation']},
+  'mgmt.verdict-vocab':{t:'Verdict vocabulary',c:'Committee verdict labels',k:['verdict','vocabulary','committee']},
+  'mgmt.conditions-flow':{t:'Conditions flow',c:'Conditions resolution steps',k:['conditions','resolution','flow']},
+  'mgmt.committee-reminders':{t:'Review reminders',c:'Committee review reminder cadence',k:['committee','reminder','cadence','review']},
+  'mgmt.negotiation-triggers':{t:'Negotiation triggers',c:'When negotiation is allowed',k:['negotiation','triggers']},
+  'mgmt.quote-movement':{t:'Quote movement',c:'Quote-movement table requirements',k:['quote','movement','table']},
+  'mgmt.sustainability':{t:'Sustainability checks',c:'Sustainability criteria',k:['sustainability','check','criteria']},
+  'mgmt.outcome-vocab':{t:'Outcome vocabulary',c:'Outcome status labels',k:['outcome','vocabulary','status']},
+  'mgmt.award-note':{t:'Award note',c:'Award recommendation template',k:['award','recommendation','note','template']},
+  'mgmt.ai-award-prompt':{t:'Award AI prompts',c:'AI recommendation-note prompts',k:['AI','award','recommendation','prompts']},
+  'mgmt.preapproval-checklist':{t:'Pre-approval checks',c:'6-item pre-approval checklist',k:['pre-approval','checklist','6-item']},
+  'mgmt.routing-shared':{t:'Approval routing',c:'Routing follows value tiers',k:['approval','routing','tiers','chain']},
+  'mgmt.approval-reminders':{t:'Approval reminders',c:'Approval reminder cadence',k:['approval','reminder','cadence']},
+  'mgmt.simulate-perm':{t:'Simulate permissions',c:'Who may simulate approval',k:['simulate','approval','permissions']},
+  'mgmt.loa-template':{t:'LoA template',c:'Letter of Acceptance template',k:['LoA','letter of acceptance','template']},
+  'mgmt.perf-security':{t:'Performance security',c:'Performance security percentage',k:['performance','security','percent']},
+  'mgmt.perf-methods':{t:'Security methods',c:'Accepted performance-security forms',k:['performance','security','methods','forms']},
+  'mgmt.loa-validity':{t:'LoA validity',c:'LoA validity period',k:['LoA','validity','period']},
+  'mgmt.ack-window':{t:'Acknowledgement window',c:'Vendor acknowledgement window',k:['acknowledgement','window','ack']},
+  'mgmt.ack-methods':{t:'Acknowledgement methods',c:'Accepted acknowledgement forms',k:['acknowledgement','methods','ack']},
+  // SIGNATURES
+  'sig.logos':{t:'Logos & seals',c:'Upload · usage tags · defaults',k:['logo','seal','library','upload','tags']},
+  'sig.fonts':{t:'Signature styles',c:'E-signature font presets',k:['signature','fonts','e-signature','styles']},
+  'sig.letterhead':{t:'Letterhead',c:'Header, footer & margins template',k:['letterhead','header','footer','template']},
+  // AI CONFIGURATION
+  'ai.prompts':{t:'Prompt library',c:'Master AI prompt library',k:['prompt','master','library','AI']},
+  'ai.tone':{t:'Default tone',c:'AI tone preset',k:['tone','preset','default']},
+  'ai.feature-matrix':{t:'AI feature matrix',c:'On/off per module & stage',k:['AI','feature','matrix','module','stage']},
+  'ai.confidence-global':{t:'Global confidence',c:'Global AI confidence threshold',k:['AI','confidence','global','threshold']},
+  'ai.usage':{t:'Usage analytics',c:'AI usage analytics toggle',k:['AI','usage','analytics']},
+  'ai.guardrails':{t:'Model guardrails',c:'Model & cost guardrails',k:['model','cost','guardrails']},
+  // VALUE TIERS
+  'tiers.def':{t:'Value tiers',c:'AMC approval value tiers',k:['value','tier','AMC','threshold','definitions']},
+  'tiers.chains':{t:'Approval chains',c:'Per-flow approval chains',k:['approval','chains','flow','tiers']},
+  // DOCUMENT TEMPLATES
+  'templates.registry':{t:'Template registry',c:'Outgoing document templates',k:['template','registry','documents','outgoing']},
+  'templates.versioning':{t:'Template versioning',c:'Versioning & rollback toggle',k:['template','versioning','rollback']},
+  'templates.docbuilder':{t:'Document builder',c:'Custom document form builder',k:['document','builder','custom','form']},
+  // VENDORS
+  'vendors.registry':{t:'Vendor registry',c:'Registered vendor master',k:['vendor','registry','master']},
+  'vendors.blacklist':{t:'Blacklist policy',c:'Blacklisting rules',k:['blacklist','policy','debarment']},
+  'vendors.msme':{t:'MSME status',c:'MSME flags & exemptions',k:['MSME','status','exemption']},
+  'vendors.performance':{t:'Performance model',c:'Performance-score factors',k:['performance','score','model','factors']},
+  // OFFICERS
+  'officers.directory':{t:'Officer directory',c:'Officer master list',k:['officer','directory','master']},
+  'officers.depts':{t:'Departments',c:'Department & sector master',k:['department','depts','sector','master']},
+  'officers.sectors':{t:'Sectors',c:'Canonical sector list',k:['sectors','master','canonical']},
+  'officers.committees':{t:'Committee templates',c:'Standing committee templates',k:['committee','standing','templates']},
+  // PERMISSIONS
+  'perm.matrix':{t:'Permission matrix',c:'Per-action permission grid',k:['permission','matrix','per-action']},
+  'perm.scope':{t:'Scoping',c:'Department & sector scoping',k:['scope','department','sector']},
+  'perm.allowlists':{t:'Allowlists',c:'Special-action allowlists',k:['allowlist','special action']},
+  // NOTIFICATIONS
+  'notif.triggers':{t:'Triggers',c:'Notification trigger registry',k:['notification','triggers','registry']},
+  'notif.channels':{t:'Channel routing',c:'Channels per trigger',k:['channel','routing','trigger','matrix']},
+  'notif.escalation':{t:'Escalation rules',c:'Escalation rule list',k:['escalation','rules']},
+  'notif.templates':{t:'Message templates',c:'Template library toggle',k:['message','template','library']},
+  // AUDIT
+  'audit.config':{t:'Audit trail',c:'What gets logged',k:['audit','trail','config','logging']},
+  'audit.anonymisation':{t:'Export anonymisation',c:'Anonymisation on exports',k:['anonymisation','export','enforcement']},
+  'audit.retention':{t:'Retention policy',c:'Document retention periods',k:['retention','document','policy']},
+  'audit.health-formula':{t:'Health score',c:'Compliance health-score formula',k:['compliance','health','score','formula']},
+  'audit.class-presets':{t:'Compliance presets',c:'Tender-class compliance presets',k:['compliance','class','presets','tender']},
+  // SYSTEM
+  'sys.autosave':{t:'Auto-save',c:'Auto-save interval',k:['autosave','interval','auto-save']},
+  'sys.version-retention':{t:'Version retention',c:'Version-history retention',k:['version','retention','history']},
+  'sys.calendar':{t:'Working calendar',c:'Working-day & holiday calendar',k:['calendar','holiday','working day']},
+  'sys.fy':{t:'Financial year',c:'Financial-year management',k:['financial year','FY','management']},
+  'sys.activity':{t:'Activity trail',c:'Activity-Trail panel config',k:['activity','trail','panel']},
+};
+function itemTitle(item){ const m=item&&ROW_META[item.id]; return (m&&m.t)||(item&&item.title)||''; }
+function itemContents(item){ const m=item&&ROW_META[item.id]; return (m&&m.c)||''; }
+function itemSearchText(item){ const m=(item&&ROW_META[item.id])||{}; return (itemTitle(item)+' '+(item.title||'')+' '+(item.why||'')+' '+((m.k||[]).join(' '))+' '+(item.id||'')).toLowerCase(); }
+
 /* ---- collapsible group state (per session) ---- */
 const EXPAND_KEY = 'admin_expanded_v1';
 function loadExpanded(){ try{ return JSON.parse(sessionStorage.getItem(EXPAND_KEY)||'{}'); }catch(e){ return {}; } }
@@ -1721,14 +1900,12 @@ function renderSection(key){
   const groups = {};
   all.forEach(i=>{ (groups[i.s]=groups[i.s]||[]).push(i); });
   const matchFilter = (i) => {
-    if (currentFilter!=='All' && i.p!==currentFilter) return false;
-    if (currentSearch && !(i.title+' '+i.why).toLowerCase().includes(currentSearch)) return false;
+    if (currentSearch && !itemSearchText(i).includes(currentSearch)) return false;
     return true;
   };
   const total = all.length;
-  const shown = all.filter(matchFilter).length;
   const grouped = total > 6;            // small sections stay flat
-  const searching = !!currentSearch || currentFilter!=='All';
+  const searching = !!currentSearch;
 
   let groupsHtml = '';
   if (!grouped){
@@ -1769,10 +1946,10 @@ function renderSection(key){
   }
 
   const expandBar = (grouped && !searching) ? `
-      <span class="ml-auto flex items-center gap-2">
+      <div class="flex items-center justify-end gap-2">
         <button onclick="setAllGroups('${key}',true)" class="text-[12px] px-2.5 py-1 rounded-full border border-line hover:bg-surface text-ink-500">Expand all</button>
         <button onclick="setAllGroups('${key}',false)" class="text-[12px] px-2.5 py-1 rounded-full border border-line hover:bg-surface text-ink-500">Collapse all</button>
-      </span>` : '';
+      </div>` : '';
 
   document.getElementById('content').innerHTML = `
     <div>
@@ -1781,20 +1958,13 @@ function renderSection(key){
       <p class="text-[14px] text-ink-500 mt-2 max-w-3xl">${sec.intro}</p>
     </div>
 
-    <div class="bg-white border border-line rounded-xl p-3 flex items-center gap-2 flex-wrap">
-      <span class="text-[12px] text-ink-500 ml-1">Filter:</span>
-      ${['All','Core','Helpful','Optional'].map(p => `<button onclick="setFilter('${p}')" class="text-[12px] px-2.5 py-1 rounded-full border border-line ${currentFilter===p?'tab-active':'hover:bg-surface text-ink-500'}">${p}</button>`).join('')}
-      <span class="text-[12px] text-ink-400 ml-2">${shown} of ${total} shown</span>
-      ${expandBar}
-    </div>
+    ${expandBar ? `<div class="flex items-center">${expandBar}</div>` : ''}
 
     <div class="space-y-3">${groupsHtml || '<p class="text-[13px] text-ink-500 px-1">No settings match.</p>'}</div>
   `;
   refreshIcons();
   bindItemHandlers();
 }
-
-function setFilter(p){ currentFilter = p; renderSection((location.hash||'#dashboard').slice(1)); }
 
 function renderItemRow(item){
   const val = getValue(item.id);
@@ -1804,11 +1974,8 @@ function renderItemRow(item){
     <div class="item-row bg-white border border-line rounded-xl p-4" data-id="${item.id}">
       <div class="flex items-start justify-between gap-4">
         <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2 flex-wrap">
-            <div class="text-[14px] font-semibold text-ink-900">${item.title}</div>
-            <span class="chip pri-${item.p}">${item.p}</span>
-          </div>
-          <p class="text-[12.5px] text-ink-500 mt-1 leading-snug max-w-2xl">${item.why}</p>
+          <div class="text-[13px] font-semibold text-ink-900">${escapeHtml(itemTitle(item))}</div>
+          ${itemContents(item) ? `<p class="text-[11.5px] text-ink-500 mt-0.5 leading-snug truncate max-w-2xl">${escapeHtml(itemContents(item))}</p>` : ''}
           ${preview ? `<div class="mt-2.5">${preview}</div>` : ''}
         </div>
         <div class="shrink-0 flex items-center gap-2">${editable}</div>
@@ -1979,6 +2146,13 @@ function renderPreview(item, val){
       if (!val || typeof val !== 'object') return '';
       return `<div class="text-[12px] text-ink-500">${escapeHtml(val.accessLevel||'Read-only')}${val.disclosureMandatory?' · disclosure required':''}</div>`;
     }
+    case 'gem-workflow': {
+      if (!val || typeof val !== 'object') return '';
+      const _gw=val.workflow||{}, _sm=_gw.searchMandatory||{};
+      const _cats=['Goods','Services','Works'].filter(c=>_sm[c]).join(', ')||'none';
+      const _rc=(val.reasons||[]).filter(r=>r.enabled!==false).length;
+      return `<div class="text-[12px] text-ink-500">GeM search: <strong class="text-ink-900">${_cats}</strong> · ${_rc} reason${_rc!==1?'s':''} · ${_gw.validityDays!=null?_gw.validityDays:30}d validity</div>`;
+    }
     case 'ai-questionnaire': {
       if (!Array.isArray(val)) return '';
       const _aq_en = val.filter(q=>q.enabled!==false).length;
@@ -2094,7 +2268,7 @@ function bindItemHandlers(){
       setValue(id, next);
       el.classList.toggle('on', next);
       el.setAttribute('aria-pressed', String(next));
-      toast(`${ITEMS.find(i=>i.id===id).title}: ${next?'enabled':'disabled'}`);
+      toast(`${itemTitle(ITEMS.find(i=>i.id===id))}: ${next?'enabled':'disabled'}`);
     };
   });
   document.querySelectorAll('[data-act="number"]').forEach(el => {
@@ -2125,7 +2299,7 @@ function openEdit(id){
   const item = ITEMS.find(i=>i.id===id);
   editingDraft = JSON.parse(JSON.stringify(getValue(id)));
   document.getElementById('epSection').textContent = item.s;
-  document.getElementById('epTitle').textContent = item.title;
+  document.getElementById('epTitle').textContent = itemTitle(item);
   document.getElementById('epWhy').textContent = item.why;
   document.getElementById('epBody').innerHTML = renderEditor(item, editingDraft);
   // Wider panel for the permissions matrix and the merged multi-section editors.
@@ -2148,7 +2322,7 @@ function saveEdit(){
   if (editingId==null) return;
   setValue(editingId, editingDraft);
   const item = ITEMS.find(i=>i.id===editingId);
-  toast(`${item.title} saved`);
+  toast(`${itemTitle(item)} saved`);
   closeEdit();
   renderSection((location.hash||'#dashboard').slice(1));
 }
@@ -2182,6 +2356,7 @@ function renderEditor(item, draft){
     case 'emergency-policy': return editorEmergencyPolicy(draft);
     case 'handoff-rules': return editorHandoffRules(draft);
     case 'consultant-access': return editorConsultantAccess(draft);
+    case 'gem-workflow': return editorGemWorkflow(draft);
     case 'ai-questionnaire': return editorAiQuestionnaire(draft);
     case 'ai-touchpoints': return editorAiTouchpoints(draft);
     case 'section-prompts': return editorSectionPrompts(draft);
@@ -2275,6 +2450,7 @@ function bindEditorHandlers(){
     case 'emergency-policy': return renderEmergencyPolicyAll();
     case 'handoff-rules': return renderHandoffRulesAll();
     case 'consultant-access': return renderConsultantAccessAll();
+    case 'gem-workflow': return renderGemWorkflowAll();
     case 'ai-questionnaire': return renderAiQuestionnaireAll();
     case 'ai-touchpoints': return renderAiTouchpointsAll();
     case 'section-prompts': return renderSectionPromptsAll();
@@ -2918,6 +3094,56 @@ function renderConsultantAccessAll(){
   const disc=document.getElementById('caDisc'); if(disc) disc.onclick=()=>{d.disclosureMandatory=!d.disclosureMandatory;renderConsultantAccessAll();};
   wrap.querySelectorAll('[data-ca-sec]').forEach(b=>b.onclick=()=>{const s=b.dataset.caSec;const k=d.allowedSections.indexOf(s);k>=0?d.allowedSections.splice(k,1):d.allowedSections.push(s);renderConsultantAccessAll();});
   const rev=document.getElementById('caReview'); if(rev) rev.onclick=()=>{d.extraReviewGate=!d.extraReviewGate;renderConsultantAccessAll();};
+  refreshIcons();
+}
+
+/* ---- GeM check: workflow rules + non-availability justification (merged) ---- */
+function gemRolesList(cur){
+  let roles=['DPR Coordinator','Project Engineer (Drafter)','Department HOD / Chief Engineer','Procurement Cell Coordinator','Finance Officer'];
+  const com=getValue('dpr.committee');
+  if(com && Array.isArray(com.designations)) com.designations.filter(d=>d.enabled!==false).forEach(d=>{ if(d.label && !roles.includes(d.label)) roles.push(d.label); });
+  if(cur && !roles.includes(cur)) roles.unshift(cur);
+  return roles;
+}
+function editorGemWorkflow(){ return `<div id="gemWrap" class="space-y-5"></div>`; }
+function renderGemWorkflowAll(){
+  if(!editingDraft||typeof editingDraft!=='object'||Array.isArray(editingDraft)) editingDraft={};
+  const d=editingDraft; d.workflow=d.workflow||{}; const w=d.workflow;
+  w.searchMandatory=w.searchMandatory||{}; ['Goods','Services','Works'].forEach(k=>{ if(w.searchMandatory[k]==null) w.searchMandatory[k]=(k!=='Works'); });
+  if(w.evidenceRequired==null)w.evidenceRequired=true; if(!w.searchScope)w.searchScope='Similar category'; if(w.validityDays==null)w.validityDays=30; if(!w.verifiedByRole)w.verifiedByRole='DPR Coordinator';
+  d.reasons=Array.isArray(d.reasons)?d.reasons:[]; d.justification=d.justification||{}; if(d.justification.template==null)d.justification.template='';
+  const wrap=document.getElementById('gemWrap');
+  const catToggle=(cat,note)=>`<div class="flex items-center gap-3 px-3 py-2 border border-line rounded-lg ${w.searchMandatory[cat]?'bg-white':'bg-surface'}"><button class="toggle ${w.searchMandatory[cat]?'on':''}" data-gem-cat="${cat}"><span class="dot"></span></button><span class="flex-1 text-[13px] text-ink-900">${cat}</span>${note?`<span class="text-[11px] text-ink-400 italic">${note}</span>`:''}</div>`;
+  wrap.innerHTML=`
+    <div><div class="text-[12px] font-semibold uppercase tracking-wide text-ink-500 mb-2">Workflow rules</div>
+      <div class="text-[12px] text-ink-500 mb-1.5">GeM search mandatory before AA submission for:</div>
+      <div class="space-y-1.5">${catToggle('Goods','')}${catToggle('Services','')}${catToggle('Works','works are out of GeM scope')}</div>
+      <div class="flex items-center gap-3 px-3 py-2.5 mt-3 border border-line rounded-lg ${w.evidenceRequired?'bg-white':'bg-surface'}"><button class="toggle ${w.evidenceRequired?'on':''}" id="gemEvidence"><span class="dot"></span></button><div class="flex-1 text-[13px] text-ink-900">Search evidence required <span class="text-[11px] text-ink-400">(screenshot/PDF of GeM search attached to DPR)</span></div></div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+        <label class="block"><span class="text-[11px] text-ink-500">Search scope</span><select class="inp w-full mt-0.5" id="gemScope">${['Exact specification','Similar category'].map(o=>`<option ${w.searchScope===o?'selected':''}>${o}</option>`).join('')}</select></label>
+        <label class="block"><span class="text-[11px] text-ink-500">Check validity (days before re-verification)</span><input type="number" min="0" class="inp w-full mt-0.5" id="gemValidity" value="${w.validityDays}"></label>
+        <label class="block"><span class="text-[11px] text-ink-500">Verified by</span><select class="inp w-full mt-0.5" id="gemVerifiedBy">${gemRolesList(w.verifiedByRole).map(o=>`<option ${w.verifiedByRole===o?'selected':''}>${escapeHtml(o)}</option>`).join('')}</select></label>
+      </div></div>
+    <div class="pt-4 border-t border-line"><div class="text-[12px] font-semibold uppercase tracking-wide text-ink-500 mb-2">Non-availability justification</div>
+      <div class="text-[12px] text-ink-500 mb-1.5">Reason picklist</div>
+      <div id="gemReasons" class="space-y-1.5"></div>
+      <div class="flex items-center gap-2 pt-2"><input class="inp flex-1" id="gemNewReason" placeholder="Add reason label…"><button class="btn btn-primary" id="gemAddReason"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add</button></div>
+      <div class="mt-4"><div class="flex items-center justify-between flex-wrap gap-2"><span class="text-[12px] text-ink-500">Justification template</span><span class="text-[11px] text-ink-400">Placeholders: <code class="bg-surface px-1 rounded">{item}</code> <code class="bg-surface px-1 rounded">{search_date}</code> <code class="bg-surface px-1 rounded">{category}</code> <code class="bg-surface px-1 rounded">{reason}</code></span></div>
+        <textarea id="gemTemplate" class="inp w-full mt-1 text-[12.5px] leading-relaxed" rows="5">${escapeHtml(d.justification.template)}</textarea>
+        <p class="text-[11px] text-ink-400 italic mt-1.5">Publishes on the tender as the statutory GeM non-availability disclosure (GFR 2017 Rule 149); officers fill the placeholders, the reason comes from the picklist above.</p></div></div>`;
+  const rEl=document.getElementById('gemReasons');
+  rEl.innerHTML=d.reasons.length?d.reasons.map((r,i)=>`<div class="flex items-center gap-3 px-3 py-2 border border-line rounded-lg ${r.enabled!==false?'bg-white':'bg-surface'}"><button class="toggle ${r.enabled!==false?'on':''}" data-gem-ren="${i}"><span class="dot"></span></button><input class="inp flex-1 text-[13px] border-0 bg-transparent p-0 ${r.enabled!==false?'':'line-through text-ink-400'}" data-gem-rlabel="${i}" value="${escapeHtml(r.label||'')}"><button class="text-ink-400 hover:text-danger" data-gem-rrm="${i}"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`).join(''):'<div class="text-[11px] text-ink-400 italic">No reasons.</div>';
+  wrap.querySelectorAll('[data-gem-cat]').forEach(b=>b.onclick=()=>{const c=b.dataset.gemCat;w.searchMandatory[c]=!w.searchMandatory[c];renderGemWorkflowAll();});
+  const ev=document.getElementById('gemEvidence'); if(ev) ev.onclick=()=>{w.evidenceRequired=!w.evidenceRequired;renderGemWorkflowAll();};
+  const sc=document.getElementById('gemScope'); if(sc) sc.onchange=e=>{w.searchScope=e.target.value;};
+  const vd=document.getElementById('gemValidity'); if(vd) vd.onchange=e=>{w.validityDays=Math.max(0,parseInt(e.target.value,10)||0);};
+  const vb=document.getElementById('gemVerifiedBy'); if(vb) vb.onchange=e=>{w.verifiedByRole=e.target.value;};
+  rEl.querySelectorAll('[data-gem-ren]').forEach(b=>b.onclick=()=>{const r=d.reasons[+b.dataset.gemRen];r.enabled=r.enabled===false?true:false;renderGemWorkflowAll();});
+  rEl.querySelectorAll('[data-gem-rlabel]').forEach(inp=>inp.oninput=e=>{d.reasons[+e.target.dataset.gemRlabel].label=e.target.value;});
+  rEl.querySelectorAll('[data-gem-rrm]').forEach(b=>b.onclick=()=>{d.reasons.splice(+b.dataset.gemRrm,1);renderGemWorkflowAll();});
+  const addR=document.getElementById('gemAddReason'); const newR=document.getElementById('gemNewReason');
+  if(addR) addR.onclick=()=>{const v=((newR&&newR.value)||'').trim();if(!v)return;d.reasons.push({label:v,enabled:true});renderGemWorkflowAll();};
+  const tpl=document.getElementById('gemTemplate'); if(tpl) tpl.oninput=e=>{d.justification.template=e.target.value;};
   refreshIcons();
 }
 
@@ -5149,6 +5375,26 @@ function runMigrations(){
     store['_emd_v2']=true;
     saveStore(store);
   }
+  // DPR expansion: market-enquiry → {logStructure,rules}; drop the standalone competency pre-check (now a gate row).
+  if(!store['_dpr_v1']){
+    if(Array.isArray(store['dpr.market-enquiry'])) store['dpr.market-enquiry']=meFromOld(store['dpr.market-enquiry']);
+    if('dpr.competency-precheck' in store) delete store['dpr.competency-precheck'];
+    store['_dpr_v1']=true;
+    saveStore(store);
+  }
+  // DPR removals + GeM consolidation: absorb the standalone justification template, prune removed items.
+  if(!store['_gem_v1']){
+    const oldGw=store['dpr.gem-workflow'], just=store['dpr.gem-justification'];
+    const hadOldGw = oldGw && typeof oldGw==='object' && !oldGw.workflow;
+    if(hadOldGw || (typeof just==='string' && just.trim())){
+      const gw=JSON.parse(JSON.stringify(ITEMS.find(i=>i.id==='dpr.gem-workflow').def));
+      if(typeof just==='string' && just.trim()) gw.justification.template=just;
+      store['dpr.gem-workflow']=gw;
+    }
+    ['dpr.revision-limits','dpr.priority-sla','dpr.templates','dpr.site-visit','dpr.version-limit','dpr.gem-justification'].forEach(k=>{ if(k in store) delete store[k]; });
+    store['_gem_v1']=true;
+    saveStore(store);
+  }
   if(store['_admin_migrated_v2']) return;
   let changed=false;
   const defOf=id=>{const it=ITEMS.find(i=>i.id===id);return it?JSON.parse(JSON.stringify(it.def)):null;};
@@ -5702,7 +5948,7 @@ function dbSave(status){
    ========================================================= */
 function route(){
   const key = (location.hash||'#dashboard').slice(1);
-  currentFilter = 'All'; currentSearch = '';
+  currentSearch = '';
   document.getElementById('searchInput').value = '';
   renderSidebar();
   renderSection(key);
@@ -5722,7 +5968,7 @@ document.getElementById('searchInput').addEventListener('input', e => {
 
 function renderSearch(){
   const q = currentSearch;
-  const matches = ITEMS.filter(i => (i.title+' '+i.why+' '+i.id).toLowerCase().includes(q));
+  const matches = ITEMS.filter(i => itemSearchText(i).includes(q));
   document.getElementById('content').innerHTML = `
     <div>
       <h1 class="text-[22px] font-bold text-ink-900">Search results</h1>

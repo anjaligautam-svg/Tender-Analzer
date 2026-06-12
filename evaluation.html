@@ -1072,6 +1072,7 @@
         <i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
         <input type="search" placeholder="Search tenders, bids, vendors…" class="w-full bg-surface border border-line rounded-lg pl-9 pr-3 py-2 text-[13px] placeholder:text-ink-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
       </div>
+      <button type="button" id="restartFlowBtn" aria-label="Restart this flow from the beginning" onclick="restartFlow()" style="background:#EFF6FF; border:1px solid #BFDBFE; color:#0C447C; font-size:12px; line-height:1; cursor:pointer; padding:6px 11px; border-radius:7px; display:inline-flex; align-items:center; gap:5px;"><i data-lucide="rotate-ccw" style="width:13px; height:13px;"></i>Restart flow</button>
       <button class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">FY 2026-27 <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-400"></i></button>
       <button aria-label="Notifications" class="w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface text-ink-500"><i data-lucide="bell" class="w-4 h-4"></i></button>
       <div class="relative">
@@ -8506,6 +8507,39 @@ Date: ${esc(fmtDateShort(today))}`;
     window.refreshAllSurveillanceBadges = refreshAllSurveillanceBadges;
     window.svScanSurveillance = scanAndAttach;
   })();
+
+  // ===== Restart flow (design-review utility) =====
+  // Clears THIS page's saved evaluation progress for the active tender and reloads to the
+  // beginning, so the whole flow can be walked from scratch. Preserves the append-only
+  // audit log (criticalLog_<TND>) and the SHARED amount-masking reveal state
+  // (winnerReveal_<TND>, also read by Bid Comparison + Bid Management).
+  function restartFlow(){
+    const tnd = (EVAL && EVAL.tnd)
+      || new URLSearchParams(location.search).get('tender')
+      || 'TND-2026-001';
+    const ok = window.confirm('Restart Bid Evaluation for ' + tnd + ' from the beginning?\n\n'
+      + 'This clears saved progress for this tender (PQ/TQ scores, verdicts, financial evaluation phases, and sign-off). '
+      + 'The audit log is preserved.');
+    if (!ok) return;
+    try {
+      // Core evaluation state: bids, matrix (PQ/TQ verdicts+scores), committee, signoffs, conflicts, etc.
+      localStorage.removeItem('eval_' + tnd);
+      // PQ / TQ auto-save snapshots (verdicts, comments, confidence, scores)
+      localStorage.removeItem('pqEval_' + tnd);
+      localStorage.removeItem('tqEval_' + tnd);
+      // TQ presentation notes
+      localStorage.removeItem('presentations_notes_' + tnd);
+      // Bid Comparison tab state
+      localStorage.removeItem('comparison_' + tnd);
+      // Financial F1/F2/F3 phase state — one key per evaluation method
+      ['L1','QCBS','LCS','QBS','FBS'].forEach(function(m){
+        localStorage.removeItem('finEval_' + tnd + '_' + m);
+      });
+      // PRESERVED (do NOT remove): criticalLog_<tnd> (audit) and winnerReveal_<tnd> (shared masking).
+    } catch(e){}
+    location.reload();
+  }
+  window.restartFlow = restartFlow;
 
   (function boot(){
     const tnd = new URLSearchParams(location.search).get('tender');
