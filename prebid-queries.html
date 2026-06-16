@@ -2718,7 +2718,7 @@
     { num:'Q-024', section:'BOQ & Quantities',         vendor:'Rajesh Constructions',  source:'Portal', type:'Spec Change Request', form:'Request',     received:'May 10, 10:00 AM', text:"Item 3 unit shown as 'm²' in BOQ but should be 'm' for linear measurements. Please correct.", status:'unanswered', response:'', assigned:null, group:null, published:'', imported:false, manual:false },
     // ===== POST-MEETING QUERIES (arrived after May 10 pre-bid meeting) =====
     { num:'Q-025', section:'Technical Specifications', vendor:'Maharashtra Roads Co.', source:'Portal', type:'Spec Change Request', form:'Request',     received:'May 11, 3:42 PM',  receivedISO:'2026-05-11T15:42:00', text:'Can the bitumen grade be changed to VG-40 for high traffic zones? Our experience shows VG-30 is insufficient for this application.', status:'unanswered', response:'', assigned:null, group:null, published:'', imported:false, manual:false, postMeeting:true, similarTo:'Q-002', similarTitle:'Bitumen Specification', similarPct:87, suggestedResponse:'The bitumen grade specification is VG-30 as per IS 73:2013. Substitutions are not permitted without formal amendment. The specification has been set after technical review and aligns with PWD standards for this category of work.', triageState:null },
-    { num:'Q-026', section:'Dates & Timeline',         vendor:'BuildTech Solutions',   source:'Portal', type:'Deadline Extension',  form:'Request',     received:'May 11, 6:15 PM',  receivedISO:'2026-05-11T18:15:00', text:'Given the complexity of the scope, can the bid submission deadline be extended by 15 days? Many vendors need more time to prepare accurate BOQ estimates.', status:'unanswered', response:'', assigned:null, group:null, published:'', imported:false, manual:false, postMeeting:true, similarTo:'Q-003', similarTitle:'Site Visit Duration', similarPct:74, suggestedResponse:'The bid submission deadline is as published in the NIT. The procurement authority will consider any extension based on the overall interest of the tender. Vendors are advised to submit bids well before the deadline.', triageState:null },
+    { num:'Q-026', section:'Dates & Timeline',         vendor:'BuildTech Solutions',   source:'Portal', type:'Deadline Extension',  form:'Request',     received:'May 11, 6:15 PM',  receivedISO:'2026-05-11T18:15:00', text:'Given the complexity of the scope, can the bid submission deadline be extended by 15 days? Many vendors need more time to prepare accurate BOQ estimates.', status:'unanswered', response:'', assigned:null, group:null, published:'', imported:false, manual:false, postMeeting:true, similarTo:'Q-003', similarTitle:'Site Visit Duration', similarPct:74, suggestedResponse:'The bid submission deadline is as published in the tender. The procurement authority will consider any extension based on the overall interest of the tender. Vendors are advised to submit bids well before the deadline.', triageState:null },
     { num:'Q-027', section:'PQ / TQ & Eligibility',    vendor:'Patil & Associates',    source:'Email',  type:'Clarification',       form:'Information', received:'May 12, 9:05 AM',  receivedISO:'2026-05-12T09:05:00', text:'Our parent company has the required turnover but we are the executing entity. Can we use parent company financial statements?', status:'unanswered', response:'', assigned:null, group:null, published:'', imported:false, manual:false, postMeeting:true, similarTo:'Q-005', similarTitle:'Parent Company Guarantee', similarPct:91, suggestedResponse:'As per Clause 4.2 of the tender document, a parent company guarantee and financial statements are acceptable provided the parent company provides an undertaking of support. Supporting documents must be submitted with the bid.', triageState:null },
   ];
   const VENDORS = [
@@ -4550,7 +4550,7 @@
 
   function generateAIResponse(qid){
     const q = QUERIES.find(x => x.num === qid); if (!q) return;
-    const html = `<p>Thank you for your query. After due consideration by the Technical Department:</p><ul><li>The matter has been reviewed against the published tender document and standard procurement guidelines.</li><li>A formal response will be issued as per GFR transparency requirements.</li></ul><p>Please refer to the relevant clauses of the NIT for further details. This response is binding on all bidders.</p>`;
+    const html = `<p>Thank you for your query. After due consideration by the Technical Department:</p><ul><li>The matter has been reviewed against the published tender document and standard procurement guidelines.</li><li>A formal response will be issued as per GFR transparency requirements.</li></ul><p>Please refer to the relevant clauses of the tender for further details. This response is binding on all bidders.</p>`;
     _setEditorContent(`qEditor-${qid}`, html);
     q.response = html;
     if (q.status !== 'answered') q.status = 'draft';
@@ -6816,7 +6816,7 @@
     'Scope Clarification': ['Scope'],
     'Date Extension':      ['Dates'],
   };
-  const CORRIG_ALL_SECTIONS = ['NIT','BOQ','PQ/TQ Criteria','Scope','Dates','GCC/SCC'];
+  const CORRIG_ALL_SECTIONS = ['Tender document','BOQ','PQ/TQ Criteria','Scope','Dates','GCC/SCC'];
 
   function openIssueCorrigendumForm(){
     _corrigCurrentView = 'issue';
@@ -7442,7 +7442,7 @@
 
       <div class="corrig-section" data-section>
         <div style="${sectionHeadStyle}">Section 1 — Reference</div>
-        <p>This office invites attention to the Notice Inviting Tender (NIT) No. TND-2026-001/AMC/2026-27 dated 30th April 2026 for the work of 'Supply of Desktop Computers for AMC Offices'. The following amendments/corrigendum are hereby issued and shall form part of the original tender document. All other terms and conditions of the NIT shall remain unchanged.</p>
+        <p>This office invites attention to the tender No. TND-2026-001/AMC/2026-27 dated 30th April 2026 for the work of 'Supply of Desktop Computers for AMC Offices'. The following amendments/corrigendum are hereby issued and shall form part of the original tender document. All other terms and conditions of the tender shall remain unchanged.</p>
       </div>
 
       <div class="corrig-section" data-section>
@@ -7458,8 +7458,8 @@
       ${amendmentBlock(
         '2.2 Amendment to Site Visit Window — Clause 5.1',
         'Section 5.1 — Site Visit',
-        'Prospective bidders may visit the site within 3 (three) days from the date of publication of the NIT.',
-        'Prospective bidders may visit the site within 7 (seven) days from the date of publication of the NIT. Site visit shall be arranged by contacting the site engineer at least 24 hours in advance.',
+        'Prospective bidders may visit the site within 3 (three) days from the date of publication of the tender.',
+        'Prospective bidders may visit the site within 7 (seven) days from the date of publication of the tender. Site visit shall be arranged by contacting the site engineer at least 24 hours in advance.',
         'Based on pre-bid query Q-003. Extended to facilitate better site assessment.'
       )}
       ${amendmentBlock(
@@ -7484,9 +7484,9 @@
       <div class="corrig-section" data-section>
         <div style="${sectionHeadStyle}">Section 4 — General Conditions</div>
         <ol style="padding-left:22px; margin:0;">
-          <li style="margin-bottom:6px;">This Corrigendum shall be read in conjunction with the original NIT and all previously issued Corrigendums (if any).</li>
+          <li style="margin-bottom:6px;">This Corrigendum shall be read in conjunction with the original tender and all previously issued Corrigendums (if any).</li>
           <li style="margin-bottom:6px;">The amendments contained herein shall supersede and replace the corresponding provisions of the original tender document.</li>
-          <li style="margin-bottom:6px;">All prospective bidders who have downloaded the original NIT are requested to take note of these amendments and incorporate the same in their bids.</li>
+          <li style="margin-bottom:6px;">All prospective bidders who have downloaded the original tender are requested to take note of these amendments and incorporate the same in their bids.</li>
           <li style="margin-bottom:6px;">This Corrigendum is being published on the Maharashtra Government e-Procurement Portal (mahatenders.gov.in) and shall be deemed to have been brought to the notice of all concerned.</li>
           <li style="margin-bottom:6px;">The Procuring Authority reserves the right to issue further Corrigendums if deemed necessary.</li>
         </ol>

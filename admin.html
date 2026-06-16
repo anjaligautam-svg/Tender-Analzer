@@ -170,12 +170,12 @@ tailwind.config = { theme: { extend: {
 const SECTIONS = [
   // group, key, title, icon, subtitle, intro
   // OVERVIEW
-  { g:'OVERVIEW', k:'dashboard', t:'Dashboard',           i:'layout-dashboard', s:'146 settings · 16 sections', intro:'A single place to choose how every part of the procurement portal behaves. Tick what matters, leave the rest with sensible defaults.' },
+  { g:'OVERVIEW', k:'dashboard', t:'Dashboard',           i:'layout-dashboard', s:'129 settings · 16 sections', intro:'A single place to choose how every part of the procurement portal behaves. Tick what matters, leave the rest with sensible defaults.' },
 
   // MODULE POLICIES
   { g:'MODULE POLICIES', k:'dpr',     t:'DPR Creation',         i:'file-text',   s:'18 settings · 5 groups',  intro:'Policies that govern Detailed Project Report creation, approval pipeline, and AA/TS lifecycle.' },
-  { g:'MODULE POLICIES', k:'tender',  t:'Tender Creation',      i:'file-edit',   s:'13 settings · 8 groups',  intro:'Defaults and rules for NIT creation, PQ/TQ libraries, pre-checks, and publish workflow.' },
-  { g:'MODULE POLICIES', k:'prebid',  t:'Pre-Bid Queries',      i:'message-square-quote', s:'15 settings · 1 group',  intro:'Query intake, AI behaviour, standard responses, corrigendum workflow.' },
+  { g:'MODULE POLICIES', k:'tender',  t:'Tender Creation',      i:'file-edit',   s:'16 settings · 8 groups',  intro:'Defaults and rules for tender creation, classification, criteria, pre-checks, and publish workflow.' },
+  { g:'MODULE POLICIES', k:'prebid',  t:'Pre-Bid Queries',      i:'message-square-quote', s:'9 settings · 1 group',  intro:'Query intake, AI behaviour, standard responses, corrigendum workflow.' },
   { g:'MODULE POLICIES', k:'eval',    t:'Bid Evaluation',       i:'gavel',       s:'28 settings · 7 groups · most important',  intro:'The densest configuration surface in the portal — PQ verdicts, TQ scoring rubric, 5 evaluation methods, reasonableness check, committee rules, financial reveal flow.' },
   { g:'MODULE POLICIES', k:'mgmt',    t:'Bid Management',       i:'briefcase',   s:'22 settings · 6 groups',  intro:'Stage gates, committee verdicts, negotiation triggers, award recommendation, LoA.' },
 
@@ -183,7 +183,7 @@ const SECTIONS = [
   { g:'CROSS-CUTTING',   k:'signatures', t:'Signatures & Letterheads', i:'pen-tool',   s:'3 libraries',   intro:'One library for every outgoing letter across all 5 modules — logos, seals, signatures, letterhead.' },
   { g:'CROSS-CUTTING',   k:'ai',         t:'AI Configuration',         i:'sparkles',   s:'6 settings',    intro:'Master prompts, tone, model, and on/off matrix. Every AI surface in every module reads from here.' },
   { g:'CROSS-CUTTING',   k:'tiers',      t:'Value-Tier Routing',       i:'layers',     s:'2 settings · used by all 5 modules', intro:'AMC approval thresholds and the per-flow chains they drive. Edit once, applies everywhere.' },
-  { g:'CROSS-CUTTING',   k:'templates',  t:'Document Templates',       i:'file-stack', s:'2 libraries',   intro:'NIT, Corrigendum, Response Sheet, NTQ letter, Clarification letter, Negotiation minutes, Award note, LoA — all here.' },
+  { g:'CROSS-CUTTING',   k:'templates',  t:'Document Templates',       i:'file-stack', s:'2 libraries',   intro:'Tender, Corrigendum, Response Sheet, NTQ letter, Clarification letter, Negotiation minutes, Award note, LoA — all here.' },
   { g:'CROSS-CUTTING',   k:'vendors',    t:'Vendor Master',            i:'store',      s:'4 settings',    intro:'Vendor registry, blacklist, MSME exemption flag, performance score model.' },
   { g:'CROSS-CUTTING',   k:'officers',   t:'Officers & Departments',   i:'users',      s:'3 settings',    intro:'Officer directory, departments, standing committees.' },
   { g:'CROSS-CUTTING',   k:'permissions',t:'Permissions',              i:'shield-check', s:'3 settings',  intro:'Per-action permission matrix, scoping, allowlists for special actions.' },
@@ -463,33 +463,19 @@ const ITEMS = [
   // 2B
   {id:'tender.committee', m:'tender', s:'2 · Role Management', p:'Core', t:'prebid-committee',
     title:'Tender Creation Role Management — members, designations & permissions',
-    why:'Role management for the tender-creation committee — who drafts the NIT, sets PQ/TQ criteria, evaluation method and EMD policy, and obtains CVC sign-off before publish, and exactly what each member may do.',
+    why:'Role management for the tender-creation committee — who drafts the tender, sets PQ/TQ criteria, evaluation method and EMD policy, and obtains CVC sign-off before publish, and exactly what each member may do.',
     def:{
       designations:[ {label:'Tender Drafter', enabled:true}, {label:'Tender Inviting Authority', enabled:true}, {label:'Technical Member', enabled:true}, {label:'Finance Member', enabled:true}, {label:'Legal Advisor', enabled:true}, {label:'Vigilance / CVC Officer', enabled:true}, {label:'Department HOD', enabled:true}, {label:'Competent Authority (per value tier)', enabled:true}, {label:'Procurement Cell Coordinator', enabled:true} ],
-      actions:[ {label:'View tender draft', enabled:true}, {label:'Create new tender', enabled:true}, {label:'Edit NIT sections', enabled:true}, {label:'Edit PQ criteria (80-60-40 rule)', enabled:true}, {label:'Edit TQ rubric (/100)', enabled:true}, {label:'Set evaluation method', enabled:true}, {label:'Set EMD parameters', enabled:true}, {label:'Set timeline / milestones', enabled:true}, {label:'Upload reference documents', enabled:true}, {label:'Apply template', enabled:true}, {label:'Clone past tender', enabled:true}, {label:'Run AI Compliance Check', enabled:true}, {label:'Submit for CVC review', enabled:true}, {label:'Sign off CVC review', enabled:true}, {label:'Publish NIT', enabled:true}, {label:'Issue corrigendum on live NIT', enabled:true} ],
-      availableActions:[ 'View tender draft', 'Create new tender', 'Edit NIT sections', 'Edit PQ criteria (80-60-40 rule)', 'Edit TQ rubric (/100)', 'Set evaluation method', 'Set EMD parameters', 'Set timeline / milestones', 'Upload reference documents', 'Apply template', 'Clone past tender', 'Run AI Compliance Check', 'Run AI Eligibility Risk Check', 'Edit AI section prompts (per tender)', 'Submit for CVC review', 'Sign off CVC review', 'Publish NIT', 'Issue corrigendum on live NIT', 'Override default evaluation method', 'Override default minimum durations', 'Override Smart-Start method restriction', 'Choose seal / signature / letterhead', 'Choose published languages', 'Withdraw tender' ],
+      actions:[ {label:'View tender draft', enabled:true}, {label:'Create new tender', enabled:true}, {label:'Edit tender sections', enabled:true}, {label:'Set evaluation method', enabled:true}, {label:'Set timeline / milestones', enabled:true}, {label:'Upload reference documents', enabled:true}, {label:'Apply template', enabled:true}, {label:'Clone past tender', enabled:true}, {label:'Run AI Compliance Check', enabled:true}, {label:'Submit for CVC review', enabled:true}, {label:'Sign off CVC review', enabled:true}, {label:'Publish tender', enabled:true}, {label:'Issue corrigendum on live tender', enabled:true} ],
+      availableActions:[ 'View tender draft', 'Create new tender', 'Edit tender sections', 'Set evaluation method', 'Set timeline / milestones', 'Upload reference documents', 'Apply template', 'Clone past tender', 'Run AI Compliance Check', 'Submit for CVC review', 'Sign off CVC review', 'Publish tender', 'Issue corrigendum on live tender', 'Override default evaluation method', 'Choose seal / signature / letterhead', 'Choose published languages', 'Withdraw tender' ],
       members:[
-        {officer:'Rajesh Kumar', designation:'Tender Drafter', permissions:{'View tender draft':true, 'Create new tender':true, 'Edit NIT sections':true, 'Edit PQ criteria (80-60-40 rule)':true, 'Edit TQ rubric (/100)':true, 'Set evaluation method':true, 'Set EMD parameters':true, 'Set timeline / milestones':true, 'Upload reference documents':true, 'Apply template':true, 'Clone past tender':true, 'Run AI Compliance Check':true, 'Submit for CVC review':false, 'Sign off CVC review':false, 'Publish NIT':false, 'Issue corrigendum on live NIT':false}},
-        {officer:'Priya Shah', designation:'Tender Inviting Authority', permissions:{'View tender draft':true, 'Create new tender':true, 'Edit NIT sections':true, 'Edit PQ criteria (80-60-40 rule)':true, 'Edit TQ rubric (/100)':true, 'Set evaluation method':true, 'Set EMD parameters':true, 'Set timeline / milestones':true, 'Upload reference documents':true, 'Apply template':true, 'Clone past tender':true, 'Run AI Compliance Check':true, 'Submit for CVC review':true, 'Sign off CVC review':false, 'Publish NIT':true, 'Issue corrigendum on live NIT':true}},
-        {officer:'Sunita Rao', designation:'Vigilance / CVC Officer', permissions:{'View tender draft':true, 'Create new tender':false, 'Edit NIT sections':false, 'Edit PQ criteria (80-60-40 rule)':false, 'Edit TQ rubric (/100)':false, 'Set evaluation method':false, 'Set EMD parameters':false, 'Set timeline / milestones':false, 'Upload reference documents':false, 'Apply template':false, 'Clone past tender':false, 'Run AI Compliance Check':false, 'Submit for CVC review':false, 'Sign off CVC review':true, 'Publish NIT':false, 'Issue corrigendum on live NIT':false}},
-        {officer:'Amit Patil', designation:'Department HOD', permissions:{'View tender draft':true, 'Create new tender':false, 'Edit NIT sections':false, 'Edit PQ criteria (80-60-40 rule)':false, 'Edit TQ rubric (/100)':false, 'Set evaluation method':false, 'Set EMD parameters':false, 'Set timeline / milestones':false, 'Upload reference documents':false, 'Apply template':false, 'Clone past tender':false, 'Run AI Compliance Check':false, 'Submit for CVC review':true, 'Sign off CVC review':false, 'Publish NIT':true, 'Issue corrigendum on live NIT':true}},
+        {officer:'Rajesh Kumar', designation:'Tender Drafter', permissions:{'View tender draft':true, 'Create new tender':true, 'Edit tender sections':true, 'Set evaluation method':true, 'Set timeline / milestones':true, 'Upload reference documents':true, 'Apply template':true, 'Clone past tender':true, 'Run AI Compliance Check':true, 'Submit for CVC review':false, 'Sign off CVC review':false, 'Publish tender':false, 'Issue corrigendum on live tender':false}},
+        {officer:'Priya Shah', designation:'Tender Inviting Authority', permissions:{'View tender draft':true, 'Create new tender':true, 'Edit tender sections':true, 'Set evaluation method':true, 'Set timeline / milestones':true, 'Upload reference documents':true, 'Apply template':true, 'Clone past tender':true, 'Run AI Compliance Check':true, 'Submit for CVC review':true, 'Sign off CVC review':false, 'Publish tender':true, 'Issue corrigendum on live tender':true}},
+        {officer:'Sunita Rao', designation:'Vigilance / CVC Officer', permissions:{'View tender draft':true, 'Create new tender':false, 'Edit tender sections':false, 'Set evaluation method':false, 'Set timeline / milestones':false, 'Upload reference documents':false, 'Apply template':false, 'Clone past tender':false, 'Run AI Compliance Check':false, 'Submit for CVC review':false, 'Sign off CVC review':true, 'Publish tender':false, 'Issue corrigendum on live tender':false}},
+        {officer:'Amit Patil', designation:'Department HOD', permissions:{'View tender draft':true, 'Create new tender':false, 'Edit tender sections':false, 'Set evaluation method':false, 'Set timeline / milestones':false, 'Upload reference documents':false, 'Apply template':false, 'Clone past tender':false, 'Run AI Compliance Check':false, 'Submit for CVC review':true, 'Sign off CVC review':false, 'Publish tender':true, 'Issue corrigendum on live tender':true}},
       ]
     }},
-  {id:'tender.smart-start', m:'tender', s:'2B · Smart Start & templates', p:'Helpful', t:'list',
-    title:'Smart Start methods enabled',
-    why:'Which tender entry points are available to officers. Toggle a method off to remove it from the Start screen.',
-    // CHANGELOG: "Template" entry mode removed — the template entry point was deleted from
-    // tender-creation.html and the admin template library was retired, so the row is gone here too.
-    def:[{label:'AI describe',enabled:true},{label:'Upload',enabled:true},{label:'Clone',enabled:true},{label:'Manual',enabled:true}]},
-  {id:'tender.starter-chips', m:'tender', s:'2B · Smart Start & templates', p:'Helpful', t:'starter-chips-grouped',
-    title:'AI describe — quick-suggestion chips',
-    why:'Chips shown on the AI describe screen, grouped by tender type. The first 5 enabled chips appear first; the rest rotate on refresh.',
-    def:[
-      {category:'Goods', chips:[{label:'Supply of laptops',enabled:true},{label:'Office furniture procurement',enabled:false},{label:'Vehicles (standard fleet)',enabled:false},{label:'Medical equipment',enabled:false}]},
-      {category:'Works', chips:[{label:'Road repair works',enabled:true},{label:'Water pipeline',enabled:true},{label:'Stormwater drainage',enabled:false},{label:'Building maintenance',enabled:false}]},
-      {category:'Services', chips:[{label:'Security services',enabled:true},{label:'Office housekeeping',enabled:true},{label:'Garbage collection',enabled:false}]},
-      {category:'Consultancy', chips:[{label:'GIS mapping consultancy',enabled:false},{label:'Architectural design',enabled:false}]},
-    ]},
+  // tender.smart-start removed (entry modes). tender.starter-chips removed (suggestion chips).
   {id:'tender.past-tender-cloning', m:'tender', s:'2B · Smart Start & templates', p:'Core', t:'past-tender-cloning',
     title:'Past tender cloning',
     why:'Upload past tenders here so they surface on the Clone screen. Each row carries a viewable tender document (PDF/Word). Edit metadata, view/replace/remove the document, or remove the tender.',
@@ -501,24 +487,19 @@ const ITEMS = [
   // 2H — AI assistance (central control + the AI items moved here)
   {id:'tender.ai-touchpoints', m:'tender', s:'2H · AI assistance', p:'Core', t:'ai-touchpoints',
     title:'AI assistance — where it’s on and off',
-    why:'One control deciding where AI participates across tender creation. The portal reads this before rendering any AI affordance: Off = the button / suggestion strip does not render at all; On-demand = no proactive popups, the AI button only; Proactive = AI may offer suggestions unprompted. The master switch suppresses everything when off — for vigilance-sensitive tenders that need a fully human-attributable drafting trail. Per-touchpoint restrictions can additionally disable AI for sensitive / vigilance-flagged tenders or above a value ceiling. Whether the two Review checks block publish is governed by Pre-publish hard gates, not here.',
+    why:'One control deciding where AI participates across tender creation. The portal reads this before rendering any AI affordance: Off = the button / suggestion strip does not render at all; On-demand = no proactive popups, the AI button only; Proactive = AI may offer suggestions unprompted. The master switch suppresses everything when off — for vigilance-sensitive tenders that need a fully human-attributable drafting trail. Per-touchpoint restrictions can additionally disable AI for sensitive / vigilance-flagged tenders or above a value ceiling. Whether the Review check blocks publish is governed by Pre-publish hard gates, not here.',
     def:{
       master:true,
       touchpoints:[
-        {id:'entry-describe',     stage:'Entry',    kind:'suggestion', mode:'proactive', smartStartRef:true, name:'AI describe entry mode',                 desc:'The “Describe what you need” option on the Start screen. Visibility is also governed by the Smart Start methods matrix — both must allow it for the option to appear.', restrict:{sensitive:false, maxValue:null}},
+        {id:'entry-describe',     stage:'Entry',    kind:'suggestion', mode:'proactive', name:'AI describe entry mode',                 desc:'The “Describe what you need” option on the Start screen.', restrict:{sensitive:false, maxValue:null}},
         {id:'entry-questionnaire',stage:'Entry',    kind:'suggestion', mode:'proactive', name:'AI follow-up questionnaire',                                 desc:'Structured follow-up questions after the describe conversation to firm up scope, budget and sector.', restrict:{sensitive:false, maxValue:null}},
         {id:'entry-autofill',     stage:'Entry',    kind:'suggestion', mode:'proactive', name:'Tender field auto-fill from describe',                       desc:'Pre-fills tender form fields (title, sector, estimated cost) from the describe conversation.', restrict:{sensitive:false, maxValue:null}},
-        {id:'draft-section',      stage:'Drafting', kind:'suggestion', mode:'ondemand', hasSections:true, name:'Per-section NIT drafting',                  desc:'AI drafts the body text of each NIT section. Expand to allow or block AI per individual section.', restrict:{sensitive:false, maxValue:null}},
         {id:'draft-scope-boq',    stage:'Drafting', kind:'suggestion', mode:'ondemand', name:'Scope of work / BOQ suggestions',                            desc:'Suggests scope statements and Bill-of-Quantities line items while drafting.', restrict:{sensitive:false, maxValue:null}},
-        {id:'draft-pq',           stage:'Drafting', kind:'suggestion', mode:'ondemand', name:'PQ criteria suggestions',                                    desc:'Proposes pre-qualification criteria from the 80-60-40 library based on tender value and sector.', restrict:{sensitive:false, maxValue:null}},
-        {id:'draft-tq',           stage:'Drafting', kind:'suggestion', mode:'ondemand', name:'TQ rubric suggestions',                                      desc:'Proposes a technical-scoring rubric (/100) for the tender.', restrict:{sensitive:false, maxValue:null}},
         {id:'draft-method',       stage:'Drafting', kind:'suggestion', mode:'ondemand', name:'Evaluation method recommendation',                           desc:'Recommends an evaluation method (L1 / QCBS / LCS / QBS / FBS) for the tender.', restrict:{sensitive:false, maxValue:null}},
-        {id:'draft-emd-timeline', stage:'Drafting', kind:'suggestion', mode:'ondemand', name:'EMD / timeline value suggestions',                          desc:'Suggests EMD amounts and milestone dates within the configured policy limits.', restrict:{sensitive:false, maxValue:null}},
+        {id:'draft-emd-timeline', stage:'Drafting', kind:'suggestion', mode:'ondemand', name:'Timeline value suggestions',                                desc:'Suggests milestone dates within the configured policy limits.', restrict:{sensitive:false, maxValue:null}},
         {id:'review-compliance',  stage:'Review',   kind:'check',      mode:'on',  name:'AI Compliance Check',                                              desc:'Runs the configured compliance rules over the draft before publish.', restrict:{sensitive:false, maxValue:null}},
-        {id:'review-eligibility', stage:'Review',   kind:'check',      mode:'on',  name:'AI Eligibility Risk Check',                                        desc:'Flags restrictive-tender risks (single-OEM, narrow turnover, thin vendor universe).', restrict:{sensitive:false, maxValue:null}},
-        {id:'review-corrigendum', stage:'Review',   kind:'suggestion', mode:'ondemand', name:'Corrigendum auto-draft suggestions',                        desc:'Drafts corrigendum text when a published NIT is amended.', restrict:{sensitive:false, maxValue:null}},
-      ],
-      sectionDrafting:{'Scope of work':true, 'Submission instructions':true, 'Eligibility (PQ)':false, 'General conditions':false}
+        {id:'review-corrigendum', stage:'Review',   kind:'suggestion', mode:'ondemand', name:'Corrigendum auto-draft suggestions',                        desc:'Drafts corrigendum text when a published tender is amended.', restrict:{sensitive:false, maxValue:null}},
+      ]
     }},
   {id:'tender.ai-questionnaire', m:'tender', s:'2H · AI assistance', p:'Core', t:'ai-questionnaire',
     title:'AI describe — structured follow-up questions',
@@ -594,10 +575,7 @@ const ITEMS = [
         {id:'ste', group:'mode',   label:'Single Tender Enquiry (STE)',     enabled:false, justify:true, justifyLocked:true},
       ],
     }},
-  {id:'tender.emd-policy', m:'tender', s:'2C · Classification & evaluation', p:'Core', t:'emd-policy',
-    title:'EMD policy',
-    why:'EMD is computed as this percentage of estimated cost; exemptions per MSME policy.',
-    def:{percent:2, msmeExempt:true}},
+  // tender.emd-policy removed.
   // 2D — the PQ/TQ heart
   {id:'tender.custom-criteria', m:'tender', s:'2D · PQ & TQ libraries (80-60-40 / TQ marks)', p:'Core', t:'criterion-builder',
     title:'Custom PQ/TQ criterion builder',
@@ -607,75 +585,23 @@ const ITEMS = [
       {id:'c-workorders', name:'Similar completed work orders', classification:'PQ', contentType:'table', maxMarks:null, description:'List of similar completed works with value, year and client.', table:{columns:[{name:'Work',type:'text',required:true},{name:'Value (₹)',type:'number',required:true},{name:'Year',type:'date',required:true},{name:'Client',type:'text',required:true}],minRows:1,maxRows:10}, numeric:null, version:1, active:true, supersedes:null},
       {id:'c-methodology', name:'Technical methodology', classification:'TQ', contentType:'text', maxMarks:40, description:'Narrative methodology assessment.', table:null, numeric:null, version:1, active:true, supersedes:null},
     ]},
-  {id:'tender.806040', m:'tender', s:'2D · PQ & TQ libraries (80-60-40 / TQ marks)', p:'Core', t:'kvlist',
-    title:'80-60-40 PQ rule',
-    why:"It's a rule, not a constant.",
-    def:[{k:'Option A: # work orders × % of EC',v:'1 × 80%'},{k:'Option B',v:'2 × 60%'},{k:'Option C',v:'3 × 40%'}]},
-  {id:'tender.tq-rubric', m:'tender', s:'2D · PQ & TQ libraries (80-60-40 / TQ marks)', p:'Core', t:'tq-rubric',
-    title:'TQ marks rubric (/100)',
-    why:'This rubric drives every TQ scoring screen in Evaluation. Single source of truth or chaos.',
-    def:{
-      groups:[
-        {id:'g-wo', name:'Work orders', criteria:[
-          {id:'r-wo80', name:'Work orders – similar (≥80% EC)', max:5, libId:null},
-          {id:'r-wo60', name:'Work orders – similar (≥60% EC)', max:5, libId:null},
-          {id:'r-woexp', name:'Work orders – sector experience', max:10, libId:null},
-        ]},
-        {id:'g-iso', name:'Certifications — ISO', criteria:[
-          {id:'r-iso9001', name:'ISO 9001', max:2, libId:null},
-          {id:'r-iso14001', name:'ISO 14001 / 45001', max:5, libId:null},
-          {id:'r-isoadd', name:'ISO additional', max:10, libId:null},
-        ]},
-        {id:'g-cmmi', name:'Certifications — CMMI', criteria:[
-          {id:'r-cmmi3', name:'CMMI Level 3', max:2, libId:null},
-          {id:'r-cmmi4', name:'CMMI Level 4', max:5, libId:null},
-          {id:'r-cmmi5', name:'CMMI Level 5', max:10, libId:null},
-        ]},
-        {id:'g-cap', name:'Capacity & approach', criteria:[
-          {id:'r-turnover', name:'Turnover (3 FY)', max:20, libId:null},
-          {id:'r-cv', name:'Key personnel CVs', max:15, libId:null},
-          {id:'r-method', name:'Methodology & approach', max:11, libId:null},
-        ]},
-      ],
-      overrides:[
-        {id:'o-it', sector:'IT Goods', rows:[{ref:'r-cmmi5', newMax:15}]},
-        {id:'o-civil', sector:'Civil Works', rows:[{ref:'r-turnover', newMax:25}]},
-        {id:'o-consult', sector:'Consultancy', rows:[{ref:'r-method', newMax:20}]},
-      ],
-    }},
-  {id:'tender.pq-by-company', m:'tender', s:'2D · PQ & TQ libraries (80-60-40 / TQ marks)', p:'Core', t:'lib',
-    title:'PQ criterion library by company type',
-    why:'Officer-added criteria with no master list = inconsistency across tenders.',
-    def:[
-      {type:'Pvt Ltd', docs:['MoA & AoA','CoI','GST','PAN','Turnover certificate (CA UAN)','Bank statement','Power of Attorney']},
-      {type:'LLP', docs:['LLP Agreement','CoI','GST','PAN','Turnover certificate (CA UAN)','Power of Attorney']},
-      {type:'Partnership', docs:['Partnership Deed','GST','PAN','Turnover certificate (CA UAN)','Authority letter']},
-      {type:'Sole Proprietor', docs:['GST','PAN','ITR (3 FY)','Turnover certificate (CA UAN)']},
-      {type:'JV', docs:['JV Agreement','Lead partner docs','Each partner docs','Liability declaration']},
-    ]},
-  // tender.pq-types-8 removed — superseded by the custom PQ/TQ criterion builder.
+  // tender.806040, tender.tq-rubric, tender.pq-by-company removed (Criterion builder supersedes the PQ/TQ libraries).
+  // Note: TQ rubric was consumed by Evaluation (eval.tq-sector-overrides) — that alias is removed; Evaluation's TQ scoring source is now an open item for a future Evaluation pass.
   {id:'tender.ai-compliance', m:'tender', s:'2H · AI assistance', p:'Helpful', t:'list',
     title:'AI Compliance Check rules',
     why:'Compliance criteria are policy, not AI defaults.',
     def:['CVC compliance present','GFR alignment','EMD matches policy','PQ not restrictive','TS sanction valid','GeM mandatory check']},
-  {id:'tender.ai-eligibility', m:'tender', s:'2H · AI assistance', p:'Helpful', t:'list',
-    title:'AI Eligibility Risk Check rules',
-    why:'Anti-restrictive-tender control; admin defines red flags.',
-    def:['Vendor universe < 5 likely qualifiers','Single OEM specification','Turnover criterion > 3× EC','Sector experience too narrow']},
+  // tender.ai-eligibility removed (eligibility risks).
   // 2E
-  // tender.milestones removed (minimum durations per milestone).
-  {id:'tender.calendar', m:'tender', s:'2E · Timeline defaults', p:'Helpful', t:'toggle',
-    title:'Working-day / holiday calendar',
-    why:'Centralised; otherwise officers count weekends wrong.',
-    def:true},
+  // tender.milestones removed (minimum durations per milestone). tender.calendar removed (working calendar).
   {id:'tender.notifications-suite', m:'tender', s:'2E · Timeline defaults', p:'Core', t:'notif-events',
     title:'Notifications, reminders & escalation',
-    why:'Organised per event — pick what happens (NIT published, Bid close approaching, Corrigendum issued…) and set its reminders, channels, recipients and escalation in one place. Replaces four separate matrices.',
+    why:'Organised per event — pick what happens (Tender published, Bid close approaching, Corrigendum issued…) and set its reminders, channels, recipients and escalation in one place. Replaces four separate matrices.',
     def:{
       channels:['Email','SMS','In-app'],
       recipientRoles:['Drafter','Tender Inviting Authority','Technical Member','Finance Member','Vigilance Observer','HOD','Procurement Cell'],
       events:[
-        {name:'NIT published',              reminders:'',              channels:{Email:true,SMS:false,'In-app':true}, recipients:['Drafter','Procurement Cell'], escalation:null},
+        {name:'Tender published',              reminders:'',              channels:{Email:true,SMS:false,'In-app':true}, recipients:['Drafter','Procurement Cell'], escalation:null},
         {name:'Bid close approaching',      reminders:'D-7, D-3, D-1', channels:{Email:true,SMS:true, 'In-app':true}, recipients:['Drafter','Procurement Cell'], escalation:null},
         {name:'Corrigendum issued',         reminders:'',              channels:{Email:true,SMS:true, 'In-app':true}, recipients:['Drafter','Vigilance Observer','Procurement Cell'], escalation:{breachHours:24, escalateTo:'Vigilance Officer'}},
         {name:'Pre-bid meeting reminder',   reminders:'D-3, D-1',      channels:{Email:true,SMS:false,'In-app':true}, recipients:['Drafter','Procurement Cell'], escalation:null},
@@ -686,13 +612,10 @@ const ITEMS = [
     }},
   // tender.milestones-tier-overrides removed (per-tier minimum duration overrides).
   // 2F
-  {id:'tender.nit-sections', m:'tender', s:'2F · Document generation & branding (NIT)', p:'Core', t:'list',
-    title:'NIT section structure (10 sections)',
-    why:'The published NIT is a legal document; structure should not vary.',
-    def:['Invitation','Scope of work','Eligibility (PQ)','Technical specs','Evaluation method','Bid security (EMD)','Submission instructions','Opening of bids','Award','General conditions']},
-  {id:'tender.languages', m:'tender', s:'2F · Document generation & branding (NIT)', p:'Helpful', t:'lang-toggles',
+  // tender.nit-sections removed (tender section structure).
+  {id:'tender.languages', m:'tender', s:'2F · Document generation & branding (tender)', p:'Helpful', t:'lang-toggles',
     title:'Languages enabled',
-    why:'Multilingual = policy choice and translation budget. Toggle the languages the NIT may be issued in; pick a default from the enabled ones.',
+    why:'Multilingual = policy choice and translation budget. Toggle the languages the tender may be issued in; pick a default from the enabled ones.',
     def:{
       languages:[
         {label:'English', enabled:true},  {label:'Hindi', enabled:true},   {label:'Marathi', enabled:true},
@@ -703,27 +626,13 @@ const ITEMS = [
       ],
       default:'English'
     }},
-  {id:'tender.ai-section-prompts', m:'tender', s:'2H · AI assistance', p:'Core', t:'section-prompts',
-    title:'AI section-edit prompts (per section)',
-    why:'Determines NIT voice per section. Section names are read-only, synced from NIT section structure — one prompt per section. A section greyed here has AI drafting switched off in “AI assistance — where it’s on and off”; this panel only sets the prompt text, never whether AI runs.',
-    def:[
-      {k:'Invitation',v:'Draft a formal Invitation for Bids in third-person Indian government English. State the procuring authority, tender ID, and a one-line scope.'},
-      {k:'Scope of work',v:'Describe the scope precisely and measurably. Avoid ambiguity. Number each deliverable. Cite GFR 2017 where relevant.'},
-      {k:'Eligibility (PQ)',v:'State PQ criteria as objective, verifiable thresholds (turnover, similar work, net worth). No subjective language.'},
-      {k:'Technical specs',v:'List minimum technical specifications as the floor, not the ceiling. Number clauses. Mark any BIS/IS standards explicitly.'},
-      {k:'Evaluation method',v:'State the evaluation method (L1/QCBS etc.), the T:F ratio if applicable, and the scoring rubric reference. Cite CVC guidelines.'},
-      {k:'Bid security (EMD)',v:'State EMD amount, form, validity, and MSME exemptions per GFR Rule 170. Formal tone.'},
-      {k:'Submission instructions',v:'Give step-by-step online submission instructions, formats, and the firm deadline. No marketing language.'},
-      {k:'Opening of bids',v:'State the multi-cover opening procedure, date, time, and venue. Reference the e-procurement portal.'},
-      {k:'Award',v:'State award criteria, intimation method, and performance security required on award. Formal third-person.'},
-      {k:'General conditions',v:'Standard GCC clauses: jurisdiction, force majeure, dispute resolution, penalty/LD. Cite GFR 2017 and CVC norms.'},
-    ]},
-  {id:'tender.mandatory-attachments', m:'tender', s:'2F · Document generation & branding (NIT)', p:'Core', t:'matrix',
+  // tender.ai-section-prompts removed (section drafting prompts).
+  {id:'tender.mandatory-attachments', m:'tender', s:'2F · Document generation & branding (tender)', p:'Core', t:'matrix',
     title:'Mandatory attachments per tender type',
     why:'Quality gate; prevents incomplete publishes.',
     def:{rows:['Goods','Works','Services','Consultancy','Engineering Goods','Mixed (Goods+Services)'],cols:['BOQ template','Drawings','Schedule of rates','Site plan','Compliance certificates','Sample specifications','Press Notice (newspaper)','Approved Makes/Suppliers list','EMD/BG format','Schedule of Quantity'],cells:{'0_0':true,'0_4':true,'0_5':true,'0_6':true,'0_8':true,'1_0':true,'1_1':true,'1_2':true,'1_3':true,'1_4':true,'1_6':true,'1_8':true,'1_9':true,'2_4':true,'2_6':true,'2_8':true,'3_4':true,'3_6':true,'3_8':true,'4_0':true,'4_4':true,'4_5':true,'4_6':true,'4_7':true,'4_8':true,'5_0':true,'5_4':true,'5_6':true,'5_8':true}}},
-  {id:'tender.per-language-templates', m:'tender', s:'2F · Document generation & branding (NIT)', p:'Helpful', t:'kvlist',
-    title:'Per-language NIT cover page overrides',
+  {id:'tender.per-language-templates', m:'tender', s:'2F · Document generation & branding (tender)', p:'Helpful', t:'kvlist',
+    title:'Per-language tender cover page overrides',
     why:'Different cover wording per language; English-default is not enough for Hindi/Marathi legal validity. Sourced from enabled languages.',
     def:[{k:'English',v:'Invitation for Bids — {tender_id}\n{sector} · Estimated cost {ec}'},{k:'Hindi',v:'निविदा आमंत्रण — {tender_id}\n{sector} · अनुमानित लागत {ec}'},{k:'Marathi',v:'निविदा आमंत्रण — {tender_id}\n{sector} · अंदाजित किंमत {ec}'}]},
   // 2G
@@ -740,10 +649,7 @@ const ITEMS = [
       {check:'AI Compliance Check passed', blocking:false, canOverride:false, overrideRoles:[]},
       {check:'AI Eligibility Risk Check reviewed', blocking:false, canOverride:false, overrideRoles:[]},
     ]},
-  {id:'tender.numbering', m:'tender', s:'2G · Review & publish', p:'Core', t:'tender-numbering',
-    title:'Tender ID format',
-    why:'Tender ID appears on every document; AMC has a house format.',
-    def:{format:'AMC/{dept}/{fy}/{seq:04}', sequence:1, resetFY:true, fyStartMonth:4}},
+  // tender.numbering removed (tender ID format).
   {id:'tender.cvc-chain', m:'tender', s:'2G · Review & publish', p:'Core', t:'chain',
     title:'CVC review committee chain',
     why:'CVC sign-off is statutory; can\'t be ad-hoc.',
@@ -757,7 +663,7 @@ const ITEMS = [
     title:'Vendor notification rules',
     why:'Transparency mandate. Vendors need to know about corrigendum / clarification / deadline change / award. (channels stored as comma-separated text.)',
     def:[
-      {event:'NIT published',template:'Tender {tender_id} has been published. Bids close {bid_close}.',recipients:'All registered',channels:'email, in-app'},
+      {event:'Tender published',template:'Tender {tender_id} has been published. Bids close {bid_close}.',recipients:'All registered',channels:'email, in-app'},
       {event:'Corrigendum issued',template:'A corrigendum has been issued for {tender_id}. Please review.',recipients:'Document downloaded',channels:'email, sms'},
       {event:'Clarification published',template:'Clarifications for {tender_id} are now available.',recipients:'Document downloaded',channels:'email'},
       {event:'Deadline changed',template:'The submission deadline for {tender_id} has changed to {bid_close}.',recipients:'All registered',channels:'email, sms'},
@@ -859,10 +765,7 @@ const ITEMS = [
       {k:'Date published',v:'true'},
       {k:'AI confidence',v:'false'},
     ]},
-  {id:'prebid.ai-threshold', m:'prebid', s:'3A · Query response drafting & approval', p:'Core', t:'percent',
-    title:'AI grouping similarity threshold',
-    why:'ML knob; not an officer setting.',
-    def:78},
+  // removed: prebid.ai-threshold (AI grouping similarity threshold)
   {id:'prebid.summary-options', m:'prebid', s:'3B · Response table (query register)', p:'Helpful', t:'kvlist',
     title:'AI summary widgets — which to show on the screen',
     why:'4 summary widgets appear on the pre-bid query screen. Admin can disable any that aren\'t useful for the org or that distract officers.',
@@ -903,14 +806,8 @@ const ITEMS = [
         {label:'Accounts Officer', enabled:false},
       ],
     }},
-  {id:'prebid.response-chain', m:'prebid', s:'3A · Query response drafting & approval', p:'Core', t:'chain',
-    title:'Response-register approval chain',
-    why:'Cross-cutting routing.',
-    def:['Drafting officer','Reviewer','Approver (by value tier)']},
-  {id:'prebid.response-chain-mandatory', m:'prebid', s:'3A · Query response drafting & approval', p:'Core', t:'list',
-    title:'Response chain — mandatory steps',
-    why:'Steps listed here cannot be skipped during routing. Steps in prebid.response-chain that are not listed here are advisory and can be bypassed by the value-tier authority. Keep this list as a subset of prebid.response-chain.',
-    def:['Reviewer','Approver (by value tier)']},
+  // removed: prebid.response-chain (Response-register approval chain)
+  // removed: prebid.response-chain-mandatory (Response chain — mandatory steps)
   {id:'prebid.corr-types', m:'prebid', s:'3C · Corrigendum', p:'Core', t:'lib',
     title:'Corrigendum types & mandatory fields',
     why:'Compliance — incomplete corrigenda are a major audit finding. The canonical corrigendum-type definitions (stage cutoffs, approval chains) live in Tender Creation › Corrigendum policy; this list governs the mandatory fields each type must carry.',
@@ -920,21 +817,12 @@ const ITEMS = [
       {type:'Timeline',  required:['New date(s)','Reason','Auto-extend?']},
       {type:'Scope',     required:['Revised BOQ ref','Reason']},
     ]},
-  {id:'prebid.corr-numbering', m:'prebid', s:'3C · Corrigendum', p:'Core', t:'text',
-    title:'Corrigendum auto-numbering format',
-    why:'Integrity.',
-    def:'{TENDER}/COR-{##}'},
+  // removed: prebid.corr-numbering (Corrigendum auto-numbering format)
   {id:'prebid.ai-amendment-push', m:'prebid', s:'3C · Corrigendum', p:'Core', t:'list',
     title:'AI Amendment Summary push policy',
     why:'Some changes legally require a corrigendum.',
     def:['BOQ quantity change → mandatory push','Bid-close date change → mandatory push','Technical specification change → mandatory push','Typo / formatting → dismissable']},
-  {id:'prebid.consultants', m:'prebid', s:'3A · Query response drafting & approval', p:'Core', t:'lib',
-    title:'Approved external consultants registry',
-    why:'Data-exposure risk; restrict who can receive.',
-    def:[
-      {name:'Mehta & Associates', email:'partners@mehtassoc.in', scope:'Water Works only'},
-      {name:'PwC India', email:'amc-projects@pwc.com', scope:'IT & Consultancy'},
-    ]},
+  // removed: prebid.consultants (Approved external consultants registry)
   {id:'prebid.response-sheet', m:'prebid', s:'3B · Response table (query register)', p:'Core', t:'template',
     title:'Pre-Bid Query Response Sheet template',
     why:'Regulated output document.',
@@ -947,10 +835,7 @@ const ITEMS = [
     title:'Anonymisation rules',
     why:'Statutory anonymisation.',
     def:['Strip vendor company name','Strip vendor representative name','Strip phone / email','Strip PAN / GST','Replace with V1, V2, V3…']},
-  {id:'prebid.permissions-link', m:'prebid', s:'3 · Role Management', p:'Core', t:'toggle',
-    title:'Per-action permissions enforced',
-    why:'Segregation of duties — managed under Cross-cutting → Permissions.',
-    def:true},
+  // removed: prebid.permissions-link (Per-action permissions enforced)
 
   /* ====== BID EVALUATION ====== */
   // 4A — PQ Evaluation
@@ -1234,7 +1119,7 @@ const ITEMS = [
   // A. Signatures & letterheads
   {id:'sig.logos', m:'signatures', s:'A · Signatures & letterheads', p:'Core', t:'logo-library',
     title:'Logo & seal library',
-    why:'Real image assets for every outgoing document. Portal reads the DEFAULT asset per usage tag: AdminState.logo("Header logo" | "Official seal" | "Watermark" | "Footer emblem") returns its image.dataUrl (or read sig.logos and pick the entry where tag matches and isDefault). Header logo → NIT cover; Official seal → LoA & signed letters.',
+    why:'Real image assets for every outgoing document. Portal reads the DEFAULT asset per usage tag: AdminState.logo("Header logo" | "Official seal" | "Watermark" | "Footer emblem") returns its image.dataUrl (or read sig.logos and pick the entry where tag matches and isDefault). Header logo → tender cover; Official seal → LoA & signed letters.',
     def:[
       sigSampleLogo('amc-logo-color','AMC Logo (Colour)','Header logo',true,200,80,'<svg xmlns="http://www.w3.org/2000/svg" width="200" height="80" viewBox="0 0 200 80"><rect width="200" height="80" rx="12" fill="#0F5EE8"/><text x="100" y="36" font-family="DM Sans,Arial,sans-serif" font-size="30" font-weight="700" fill="#ffffff" text-anchor="middle">AMC</text><text x="100" y="58" font-family="Arial,sans-serif" font-size="8.5" letter-spacing="1" fill="#cfe0ff" text-anchor="middle">AHMEDABAD MUNICIPAL CORPORATION</text></svg>'),
       sigSampleLogo('amc-logo-bw','AMC Logo (B&W)','Header logo',false,200,80,'<svg xmlns="http://www.w3.org/2000/svg" width="200" height="80" viewBox="0 0 200 80"><rect width="200" height="80" rx="12" fill="#111827"/><text x="100" y="36" font-family="DM Sans,Arial,sans-serif" font-size="30" font-weight="700" fill="#ffffff" text-anchor="middle">AMC</text><text x="100" y="58" font-family="Arial,sans-serif" font-size="8.5" letter-spacing="1" fill="#9ca3af" text-anchor="middle">AHMEDABAD MUNICIPAL CORPORATION</text></svg>'),
@@ -1271,7 +1156,7 @@ const ITEMS = [
       {key:'summary.amendment', surface:'Pre-Bid → AI Amendment Summary', prompt:'Compare the original tender document with the responses. Identify any change that materially affects the bid: BOQ quantities, technical specs, dates, financial terms. For each, classify as "must push corrigendum" or "optional".'},
       {key:'parse.bid', surface:'Bid Evaluation → AI parser', prompt:'Parse the uploaded technical bid. Extract: turnover figures (from CA-signed certificate), work orders (value + year + client), ISO certifications (number + expiry), CMMI level, personnel CVs (count + roles).'},
       {key:'draft.award', surface:'Bid Mgmt → AI draft recommendation', prompt:'Draft an Award Recommendation Note based on the evaluation matrix. Be factual. State the awarded value in both ₹ and words. Cite the evaluation method and reasonableness verdict.'},
-      {key:'edit.nit-section', surface:'Tender Creation → AI section edit', prompt:'Edit this NIT section. Use formal third-person Indian government English. Cite GFR 2017 and CVC guidelines where relevant. Keep clauses numbered.'},
+      {key:'edit.nit-section', surface:'Tender Creation → AI section edit', prompt:'Edit this tender section. Use formal third-person Indian government English. Cite GFR 2017 and CVC guidelines where relevant. Keep clauses numbered.'},
       {key:'smart-start.describe', surface:'Tender Creation → AI describe (Smart Start)', prompt:'You are a procurement assistant for the Ahmedabad Municipal Corporation, helping an officer create a tender via natural language. Begin with a warm one-line greeting using their first name. Give two concrete example inputs drawn from common AMC procurement: one goods example and one works example (e.g. "I need 200 desktop computers for AMC offices" and "We need a contractor to repair roads in Bandra"). When the officer describes what they need, extract these fields and fill the form: Tender Type, Sub-Type, Sector, Suggested Evaluation Method, Estimated Value. If any field is ambiguous, ask one clarifying follow-up before filling it. Be especially careful with Estimated Value — if not stated, ask, do not guess. Use formal Indian government English with a helpful tone. Cite the AMC value tiers when discussing thresholds.'},
     ]},
   {id:'ai.tone', m:'ai', s:'B · AI configuration', p:'Helpful', t:'select',
@@ -1320,9 +1205,9 @@ const ITEMS = [
   // D. Templates
   {id:'templates.registry', m:'templates', s:'D · Document templates', p:'Core', t:'lib',
     title:'Outgoing-document template registry',
-    why:'NIT, Corrigendum, Response Sheet, NTQ letter, Clarification letter, Negotiation minutes, Award note, LoA — all here.',
+    why:'Tender, Corrigendum, Response Sheet, NTQ letter, Clarification letter, Negotiation minutes, Award note, LoA — all here.',
     def:[
-      {doc:'NIT',                version:'v3.2', updated:'2026-04-12'},
+      {doc:'Tender',                version:'v3.2', updated:'2026-04-12'},
       {doc:'Corrigendum',        version:'v1.4', updated:'2026-03-08'},
       {doc:'Pre-Bid Response Sheet', version:'v2.0', updated:'2026-01-22'},
       {doc:'NTQ Justification Letter', version:'v1.1', updated:'2025-11-05'},
@@ -1398,7 +1283,7 @@ const ITEMS = [
       rows:['Super Admin','Technical Officer','Finance Officer','Deputy Commissioner','Accounts Officer'],
       cols:[
         'DPR · Create','DPR · Approve',
-        'Tender · Create','Tender · CVC sign-off','Tender · Publish NIT',
+        'Tender · Create','Tender · CVC sign-off','Tender · Publish',
         'Pre-Bid · View','Pre-Bid · Draft','Pre-Bid · Edit','Pre-Bid · Approve','Pre-Bid · Publish','Pre-Bid · Manage',
         'Corrigendum · View','Corrigendum · Draft','Corrigendum · Edit','Corrigendum · Approve','Corrigendum · Publish','Corrigendum · Manage',
         'Eval · Score TQ','Eval · Reveal financial bid',
@@ -1419,7 +1304,7 @@ const ITEMS = [
     title:'Notification triggers registry',
     why:'Every notable event across modules.',
     def:[
-      {event:'NIT published',      modules:'Tender → Vendors',  enabled:true},
+      {event:'Tender published',      modules:'Tender → Vendors',  enabled:true},
       {event:'Query received',     modules:'Pre-Bid → Officer', enabled:true},
       {event:'Response published', modules:'Pre-Bid → Vendor',  enabled:true},
       {event:'Corrigendum issued', modules:'Pre-Bid → Vendors', enabled:true},
@@ -1431,7 +1316,7 @@ const ITEMS = [
   {id:'notif.channels', m:'notifications', s:'H · Notifications', p:'Helpful', t:'matrix',
     title:'Channel routing per trigger',
     why:'Some events need SMS (deadline), others email is fine.',
-    def:{rows:['NIT published','Query received','Response published','Corrigendum issued','Deadline T-24h','Approval overdue','LoA issued'], cols:['Email','SMS','In-app'], cells:{}}},
+    def:{rows:['Tender published','Query received','Response published','Corrigendum issued','Deadline T-24h','Approval overdue','LoA issued'], cols:['Email','SMS','In-app'], cells:{}}},
   {id:'notif.escalation', m:'notifications', s:'H · Notifications', p:'Core', t:'list',
     title:'Escalation rules',
     why:'Compliance + SLA enforcement.',
@@ -1452,7 +1337,7 @@ const ITEMS = [
   {id:'audit.retention', m:'audit', s:'I · Audit & compliance', p:'Optional', t:'kvlist',
     title:'Document retention policy',
     why:'Aligns with state record-retention rules.',
-    def:[{k:'DPR records (years)',v:'10'},{k:'Tender / NIT (years)',v:'10'},{k:'Bid documents (years)',v:'7'},{k:'Audit logs (years)',v:'15'}]},
+    def:[{k:'DPR records (years)',v:'10'},{k:'Tender (years)',v:'10'},{k:'Bid documents (years)',v:'7'},{k:'Audit logs (years)',v:'15'}]},
   {id:'audit.health-formula', m:'audit', s:'I · Audit & compliance', p:'Helpful', t:'list',
     title:'Compliance health-score formula',
     why:'What goes into the CVC compliance score on the admin dashboard.',
@@ -1473,7 +1358,7 @@ const ITEMS = [
   {id:'sys.version-retention', m:'system', s:'J · System', p:'Optional', t:'kvlist',
     title:'Version-history retention',
     why:'Per artefact type.',
-    def:[{k:'DPR (versions)',v:'20'},{k:'NIT (versions)',v:'15'},{k:'Evaluation matrix (versions)',v:'10'}]},
+    def:[{k:'DPR (versions)',v:'20'},{k:'Tender (versions)',v:'15'},{k:'Evaluation matrix (versions)',v:'10'}]},
   {id:'sys.calendar', m:'system', s:'J · System', p:'Helpful', t:'kvlist',
     title:'Working-day & holiday calendar',
     why:'Drives every deadline computation.',
@@ -1635,19 +1520,19 @@ const CATEGORY_DESC = {
   '1E · Submission gates & policies':'Pre-AA/TS gates, estimate rate-source tolerance, budget-head validation, emergency fast-track, DPR→tender handoff and external-consultant rules.',
   // TENDER
   '2 · Role Management':'The tender-drafting committee, their designations and per-action permissions.',
-  '2B · Smart Start & templates':'How a tender is started — AI, upload, clone or manual — and the past-tender library used for cloning.',
-  '2C · Classification & evaluation':'The catalog tree, envelope/cover rules, EMD and the evaluation-method engine.',
-  '2D · PQ & TQ libraries (80-60-40 / TQ marks)':'Pre-qualification and technical-scoring criteria libraries shared with Evaluation.',
-  '2E · Timeline defaults':'The working-day calendar and the per-event notification, reminder and escalation rules.',
-  '2F · Document generation & branding (NIT)':'NIT section structure, languages, mandatory attachments and AI section prompts.',
-  '2G · Review & publish':'Pre-publish hard gates, tender numbering, the CVC review chain and publish templates.',
+  '2B · Smart Start & templates':'The past-tender library used to clone a new tender.',
+  '2C · Classification & evaluation':'The catalog tree and the evaluation-method engine.',
+  '2D · PQ & TQ libraries (80-60-40 / TQ marks)':'The custom PQ/TQ/DQ criterion builder.',
+  '2E · Timeline defaults':'The per-event notification, reminder and escalation rules.',
+  '2F · Document generation & branding (tender)':'Languages and mandatory attachments.',
+  '2G · Review & publish':'Pre-publish hard gates, the CVC review chain and publish templates.',
   '2H · AI assistance':'Where AI participates across tender creation — one master switch and a per-touchpoint Proactive / On-demand / Off control, with sensitivity restrictions.',
   // PRE-BID
   '3 · Pre-Bid Queries':'Query intake, AI behaviour, standard responses and corrigendum workflow for pre-bid queries.',
   '3 · Role Management':'Who handles pre-bid queries and exactly what each member may do.',
   '3A · Query response drafting & approval':'How responses get drafted, AI-assisted, reviewed, and approved before publishing.',
   '3B · Response table (query register)':'What the query register shows — columns, categories, anonymisation, and the AI summary widgets on the screen.',
-  '3C · Corrigendum':'When query responses become formal tender amendments — types, numbering, and AI push rules. Corrigendum behavior is governed here for all modules.',
+  '3C · Corrigendum':'When query responses become formal tender amendments — types and AI push rules. Corrigendum behavior is governed here for all modules.',
   '3D · Meeting, dates & notes':'Pre-bid meeting record, minutes template, and the query/response date windows.',
   // EVALUATION
   '4A · PQ Evaluation':'How pre-qualification verdicts are captured and what disqualifies a bidder.',
@@ -1668,7 +1553,7 @@ const CATEGORY_DESC = {
   'A · Signatures & letterheads':'One shared library of logos, seals, signatures and letterheads.',
   'B · AI configuration':'Master prompts, tone, model and the on/off matrix for every AI surface.',
   'C · Value-tier routing':'AMC approval thresholds and the chains they drive across all modules.',
-  'D · Document templates':'Every outgoing document template — NIT, corrigendum, LoA and more.',
+  'D · Document templates':'Every outgoing document template — Tender, corrigendum, LoA and more.',
   'E · Vendor master':'Vendor registry, blacklist, MSME flag and performance model.',
   'F · Officers & departments':'Officer directory, departments and standing committees.',
   'G · Permissions':'Per-action permission matrix, scoping and special-action allowlists.',
@@ -1696,7 +1581,7 @@ const ROW_META = {
   'dpr.ai-questionnaire':{t:'AI questionnaire',c:'Questions · suggestion pills · skip rules',k:['AI','describe','questionnaire','questions','pills','follow-up']},
   'dpr.ai-touchpoints':{t:'AI assistance',c:'Master switch · per-step on/off · restrictions',k:['AI','assistance','touchpoints','master']},
   'dpr.languages':{t:'Languages',c:'Enabled languages · default',k:['languages','multilingual','default']},
-  'dpr.submission-gates':{t:'Submission gates',c:'AA & TS pre-submission checks',k:['submission','gates','AA','TS','checklist','blocking']},
+  'dpr.submission-gates':{t:'Submission checklist',c:'What must be true before AA & TS submission',k:['submission','gates','AA','TS','checklist','blocking','warns','advisory']},
   'dpr.cost-basis':{t:'Cost basis',c:'Rate sources · tolerance · justification',k:['cost','estimate','rate source','tolerance','ALB']},
   'dpr.budget-heads':{t:'Budget heads',c:'Head registry · validation rule',k:['budget','head','registry','validation','balance']},
   'dpr.emergency-policy':{t:'Emergency policy',c:'Mark roles · skippable gates · post-facto',k:['emergency','fast-track','skip','justification']},
@@ -1720,12 +1605,12 @@ const ROW_META = {
   'tender.ai-eligibility':{t:'Eligibility risks',c:'AI restrictive-tender red flags',k:['AI','eligibility','risk','restrictive','red flag']},
   'tender.calendar':{t:'Working calendar',c:'Working-day & holiday toggle',k:['calendar','holiday','working day']},
   'tender.notifications-suite':{t:'Notifications',c:'Per-event reminders · channels · recipients',k:['notifications','reminders','escalation','channels']},
-  'tender.nit-sections':{t:'NIT sections',c:'NIT document section structure',k:['NIT','sections','structure','document']},
+  'tender.nit-sections':{t:'Tender sections',c:'Tender document section structure',k:['NIT','sections','structure','document']},
   'tender.languages':{t:'Languages',c:'Enabled languages · default',k:['languages','multilingual','default']},
-  'tender.ai-section-prompts':{t:'Section drafting prompts',c:'One AI instruction per NIT section',k:['AI','section','prompts','drafting','NIT']},
+  'tender.ai-section-prompts':{t:'Section drafting prompts',c:'One AI instruction per tender section',k:['AI','section','prompts','drafting','NIT']},
   'tender.mandatory-attachments':{t:'Mandatory attachments',c:'Required docs per tender type',k:['mandatory','attachments','documents']},
   'tender.per-language-templates':{t:'Language covers',c:'Cover text per enabled language',k:['language','cover','NIT','overrides']},
-  'tender.pre-publish-gates':{t:'Publish gates',c:'Blocking checks · overrides · roles',k:['pre-publish','gates','hard gates','checklist','blocking']},
+  'tender.pre-publish-gates':{t:'Publish checklist',c:'What must be true before a tender can be published',k:['pre-publish','gates','hard gates','checklist','blocking','warns','advisory']},
   'tender.numbering':{t:'Tender numbering',c:'Format string · sequence · FY reset',k:['tender ID','numbering','format','sequence']},
   'tender.cvc-chain':{t:'CVC review chain',c:'CVC sign-off approval chain',k:['CVC','review','committee','chain','approval']},
   'tender.publish-template':{t:'Publish notice',c:'Vendor notification text on publish',k:['publish','vendor','notification','template']},
@@ -1735,20 +1620,14 @@ const ROW_META = {
   'prebid.dates':{t:'Pre-bid dates',c:'Date policy · per-tender overrides',k:['pre-bid','dates','policy','overrides','schedule']},
   'prebid.sections':{t:'Query categories',c:'Query categorisation sections',k:['query','categorisation','sections','categories']},
   'prebid.response-columns':{t:'Register columns',c:'Visible columns in query register',k:['response','register','columns','table']},
-  'prebid.ai-threshold':{t:'Grouping threshold',c:'AI similarity % for grouping',k:['AI','grouping','similarity','threshold']},
   'prebid.summary-options':{t:'Summary widgets',c:'Which AI summary widgets show',k:['AI','summary','widgets','screen']},
   'prebid.std-responses':{t:'Standard responses',c:'Approved replies · categories · pending queue',k:['standard','responses','library','replies','canned']},
   'prebid.generic-presets':{t:'Generic presets',c:'Reusable generic-response presets',k:['generic','presets','responses']},
-  'prebid.response-chain':{t:'Response approval',c:'Query-response approval chain',k:['response','register','approval','chain']},
-  'prebid.response-chain-mandatory':{t:'Mandatory steps',c:'Required response-chain steps',k:['response','chain','mandatory','steps']},
   'prebid.corr-types':{t:'Corrigendum types',c:'Types & mandatory fields',k:['corrigendum','types','fields','amendment']},
-  'prebid.corr-numbering':{t:'Corrigendum numbering',c:'Auto-numbering format',k:['corrigendum','numbering','format','auto']},
   'prebid.ai-amendment-push':{t:'Amendment push',c:'AI amendment summary push policy',k:['AI','amendment','summary','push']},
-  'prebid.consultants':{t:'Approved consultants',c:'External consultant registry',k:['consultants','external','approved','registry']},
   'prebid.response-sheet':{t:'Response sheet',c:'Query response sheet template',k:['response','sheet','template','query']},
   'prebid.mom-template':{t:'Minutes template',c:'Pre-bid meeting MoM template',k:['MoM','minutes','meeting','template']},
   'prebid.anonymisation':{t:'Anonymisation',c:'Bidder anonymisation rules',k:['anonymisation','rules','anonymous']},
-  'prebid.permissions-link':{t:'Permissions toggle',c:'Per-action enforcement on/off',k:['permissions','enforced','per-action']},
   // BID EVALUATION
   'eval.committee':{t:'Role management',c:'Members matrix · designations · action permissions',k:['committee','members','designations','permissions','roles']},
   'eval.pq-vocab':{t:'PQ verdicts',c:'PQ verdict vocabulary',k:['PQ','verdict','vocabulary','pass fail']},
@@ -2048,18 +1927,20 @@ function renderPreview(item, val){
         <span class="text-ink-300">•</span>
         <span>${_pbd_locked} locked</span>
       </div>`;
-    case 'prebid-committee':
+    case 'prebid-committee': {
       if (!val || typeof val !== 'object') return '';
-      const _pbc_m = Array.isArray(val.members)      ? val.members.length : 0;
-      const _pbc_d = Array.isArray(val.designations) ? val.designations.filter(d=>d.enabled!==false).length : 0;
-      const _pbc_a = Array.isArray(val.actions)      ? val.actions.filter(a=>a.enabled!==false).length : 0;
+      const _cm = cmteNormalize(JSON.parse(JSON.stringify(val)), item.id);
+      const _roles = _cm.roles.filter(r=>r.enabled!==false).length;
+      const _ppl = new Set(); _cm.roles.forEach(r=>(r.members||[]).forEach(m=>_ppl.add(m)));
+      const _acts = (_cm.actions||[]).filter(a=>a.enabled!==false).length;
       return `<div class="flex items-center gap-3 text-[12px] text-ink-500 flex-wrap">
-        <span><strong class="text-ink-900">${_pbc_m}</strong> member${_pbc_m!==1?'s':''}</span>
+        <span><strong class="text-ink-900">${_roles}</strong> role${_roles!==1?'s':''}</span>
         <span class="text-ink-300">•</span>
-        <span><strong class="text-ink-900">${_pbc_d}</strong> designation${_pbc_d!==1?'s':''}</span>
+        <span><strong class="text-ink-900">${_ppl.size}</strong> ${_ppl.size!==1?'people':'person'}</span>
         <span class="text-ink-300">•</span>
-        <span><strong class="text-ink-900">${_pbc_a}</strong> action${_pbc_a!==1?'s':''}</span>
+        <span><strong class="text-ink-900">${_acts}</strong> action${_acts!==1?'s':''}</span>
       </div>`;
+    }
     case 'ai-touchpoints': {
       if (!val || typeof val !== 'object') return '';
       if (!val.master) return `<div class="text-[12px] text-ink-500 flex items-center gap-2"><span class="chip pri-Helpful">Master OFF</span> all AI assistance suppressed</div>`;
@@ -2549,7 +2430,7 @@ function addKvEntry(){ editingDraft = editingDraft||[]; editingDraft.push({k:'',
 /* ===== AI assistance — central touchpoint control (tender.ai-touchpoints) ===== */
 let aitUI = {restrict:{}, sectionsOpen:false};
 function aitFmtMoney(n){ n=Number(n)||0; if(!n) return ''; if(n>=10000000) return '₹'+(n/10000000).toFixed(n%10000000?2:0)+' Cr'; if(n>=100000) return '₹'+(n/100000).toFixed(n%100000?1:0)+' L'; return '₹'+n.toLocaleString('en-IN'); }
-// Section names synced (read-only) from the NIT section structure item.
+// Section names synced (read-only) from the Tender section structure item.
 function aitNitSections(){ const raw=getValue('tender.nit-sections')||[]; return (Array.isArray(raw)?raw:[]).map(normalizeListItem).filter(s=>s.enabled!==false).map(s=>s.label); }
 // One source of truth for "is AI drafting allowed for this section": the touchpoints item.
 function aitSectionDrafting(){ const v=getValue('tender.ai-touchpoints'); return (v && v.sectionDrafting) || {}; }
@@ -2585,7 +2466,7 @@ function renderAiTouchpointsAll(){
             <span class="${on?'text-ink-900':'text-ink-400 line-through'}">${escapeHtml(s)}</span>
           </label>`; }).join('')}
       </div>
-      <p class="text-[11px] text-ink-400 italic mt-1.5">Synced from NIT section structure. Turn AI off where legal wants human-only text (e.g. General conditions, Eligibility).</p>` : ''}
+      <p class="text-[11px] text-ink-400 italic mt-1.5">Synced from Tender section structure. Turn AI off where legal wants human-only text (e.g. General conditions, Eligibility).</p>` : ''}
     </div>`;
   };
 
@@ -2672,7 +2553,7 @@ function renderAiTouchpointsAll(){
   refreshIcons();
 }
 
-/* ===== AI section-edit prompts (tender.ai-section-prompts) — names synced from NIT sections ===== */
+/* ===== AI section-edit prompts (tender.ai-section-prompts) — names synced from Tender sections ===== */
 function aitAutosize(ta){ ta.style.height='auto'; const lh=parseFloat(getComputedStyle(ta).lineHeight)||18; const max=lh*10+16; ta.style.height=Math.min(ta.scrollHeight, max)+'px'; ta.style.overflowY = ta.scrollHeight>max ? 'auto' : 'hidden'; }
 function editorSectionPrompts(draft){ return `<div id="spRoot"></div>`; }
 function renderSectionPromptsAll(){
@@ -2684,7 +2565,7 @@ function renderSectionPromptsAll(){
   const aiOff = s => secDraft[s] === false;
   const have = new Set(draft.map(p => p.k));
   const rowsBySec = {}; draft.forEach(p => { rowsBySec[p.k] = p; });
-  const visible = secs.filter(s => have.has(s));        // section removed from NIT sections → row hides, data retained
+  const visible = secs.filter(s => have.has(s));        // section removed from Tender sections → row hides, data retained
   const missing = secs.filter(s => !have.has(s));       // promptless sections only
 
   root.innerHTML = `
@@ -2696,8 +2577,8 @@ function renderSectionPromptsAll(){
                <select id="spAddSel" class="inp flex-1">${missing.map(s=>`<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('')}</select>
                <button class="btn btn-primary" id="spAddBtn"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add prompt</button>
              </div>`
-          : `<div class="text-[12px] text-ink-400 italic">Every NIT section has a prompt.</div>`}
-        <p class="text-[11px] text-ink-400 mt-1.5">Section names are managed in NIT section structure and are read-only here. “Add prompt” only lists sections that don’t have one yet.</p>
+          : `<div class="text-[12px] text-ink-400 italic">Every tender section has a prompt.</div>`}
+        <p class="text-[11px] text-ink-400 mt-1.5">Section names are managed in Tender section structure and are read-only here. “Add prompt” only lists sections that don’t have one yet.</p>
       </div>
     </div>`;
 
@@ -2941,32 +2822,14 @@ function renderMarketEnquiryAll(){
 
 /* ---- submission gates: two sets (AA / TS), gate-row pattern ---- */
 let sgTab='aa';
-function editorSubmissionGates(){ return `<div id="sgWrap"></div>`; }
+function editorSubmissionGates(){ return `<div id="sgTabBar"></div><div id="sgWrap"></div>`; }
 function renderSubmissionGatesAll(){
   if(!editingDraft||typeof editingDraft!=='object'||Array.isArray(editingDraft)) editingDraft={aa:[],ts:[]};
   const d=editingDraft; d.aa=Array.isArray(d.aa)?d.aa:[]; d.ts=Array.isArray(d.ts)?d.ts:[];
-  const wrap=document.getElementById('sgWrap'); const baseRoles=pgRoles();
   const tabs=[['aa','Before AA submission'],['ts','Before TS submission']];
-  const tabBar=`<div class="flex items-center gap-1 border-b border-line mb-4">${tabs.map(([k,l])=>`<button data-sg-tab="${k}" class="px-3 py-2 text-[12.5px] font-medium border-b-2 ${sgTab===k?'border-primary text-primary':'border-transparent text-ink-500 hover:text-ink-900'}">${escapeHtml(l)}</button>`).join('')}</div>`;
-  const arr=d[sgTab];
-  const rows=arr.length?arr.map((g,i)=>{ const roles=Array.from(new Set(baseRoles.concat(g.overrideRoles||[])));
-    return `<div class="bg-white border border-line rounded-xl p-2.5 space-y-2">
-    <div class="flex items-center gap-2"><input class="inp flex-1 text-[13px]" data-sg-check="${i}" value="${escapeHtml(g.check||'')}"><button class="text-ink-400 hover:text-danger" data-sg-rm="${i}"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>
-    <div class="flex items-center gap-4 flex-wrap text-[12px]">
-      <div class="flex items-center gap-2"><button class="toggle ${g.blocking?'on':''}" data-sg-block="${i}"><span class="dot"></span></button><span>Blocking</span></div>
-      <div class="flex items-center gap-2"><button class="toggle ${g.canOverride?'on':''}" data-sg-over="${i}"><span class="dot"></span></button><span>Can override</span></div>
-    </div>
-    ${g.canOverride?`<div><div class="text-[11px] text-ink-500 mb-1">Override roles</div><div class="flex flex-wrap gap-1.5">${roles.map(rr=>{const on=(g.overrideRoles||[]).includes(rr);return `<button class="chip-input" style="cursor:pointer;${on?'background:#EFF6FF;border-color:#93C5FD;color:#0F5EE8':''}" data-sg-role="${i}|${escapeHtml(rr)}">${escapeHtml(rr)}</button>`;}).join('')}</div></div>`:''}
-  </div>`;}).join('') : '<div class="text-[12px] text-ink-400 text-center py-6 border border-dashed border-line rounded-xl">No gates in this set.</div>';
-  wrap.innerHTML=tabBar+`<div class="space-y-2">${rows}</div><button class="btn btn-primary mt-3" id="sgAdd"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add gate</button>`;
-  wrap.querySelectorAll('[data-sg-tab]').forEach(b=>b.onclick=()=>{sgTab=b.dataset.sgTab;renderSubmissionGatesAll();});
-  wrap.querySelectorAll('[data-sg-check]').forEach(inp=>inp.oninput=e=>{arr[+e.target.dataset.sgCheck].check=e.target.value;});
-  wrap.querySelectorAll('[data-sg-rm]').forEach(b=>b.onclick=()=>{arr.splice(+b.dataset.sgRm,1);renderSubmissionGatesAll();});
-  wrap.querySelectorAll('[data-sg-block]').forEach(b=>b.onclick=()=>{const g=arr[+b.dataset.sgBlock];g.blocking=!g.blocking;renderSubmissionGatesAll();});
-  wrap.querySelectorAll('[data-sg-over]').forEach(b=>b.onclick=()=>{const g=arr[+b.dataset.sgOver];g.canOverride=!g.canOverride;g.overrideRoles=g.overrideRoles||[];if(!g.canOverride)g.overrideRoles=[];renderSubmissionGatesAll();});
-  wrap.querySelectorAll('[data-sg-role]').forEach(b=>b.onclick=()=>{const [i,rr]=b.dataset.sgRole.split('|');const g=arr[+i];g.overrideRoles=g.overrideRoles||[];const k=g.overrideRoles.indexOf(rr);k>=0?g.overrideRoles.splice(k,1):g.overrideRoles.push(rr);renderSubmissionGatesAll();});
-  const add=document.getElementById('sgAdd'); if(add) add.onclick=()=>{arr.push({check:'New gate',blocking:true,canOverride:false,overrideRoles:[]});renderSubmissionGatesAll();};
-  refreshIcons();
+  document.getElementById('sgTabBar').innerHTML=`<div class="flex items-center gap-1 border-b border-line mb-4">${tabs.map(([k,l])=>`<button data-sg-tab="${k}" class="px-3 py-2 text-[12.5px] font-medium border-b-2 ${sgTab===k?'border-primary text-primary':'border-transparent text-ink-500 hover:text-ink-900'}">${escapeHtml(l)}</button>`).join('')}</div>`;
+  document.getElementById('sgTabBar').querySelectorAll('[data-sg-tab]').forEach(b=>b.onclick=()=>{sgTab=b.dataset.sgTab;renderSubmissionGatesAll();});
+  renderGateSections(d[sgTab], document.getElementById('sgWrap'), renderSubmissionGatesAll, 'sg-'+sgTab);
 }
 
 /* ---- cost basis: rate-source priority list + tolerance ---- */
@@ -3101,7 +2964,8 @@ function renderConsultantAccessAll(){
 function gemRolesList(cur){
   let roles=['DPR Coordinator','Project Engineer (Drafter)','Department HOD / Chief Engineer','Procurement Cell Coordinator','Finance Officer'];
   const com=getValue('dpr.committee');
-  if(com && Array.isArray(com.designations)) com.designations.filter(d=>d.enabled!==false).forEach(d=>{ if(d.label && !roles.includes(d.label)) roles.push(d.label); });
+  if(com && Array.isArray(com.roles)) com.roles.filter(r=>r.enabled!==false).forEach(r=>{ if(r.name && !roles.includes(r.name)) roles.push(r.name); });
+  else if(com && Array.isArray(com.designations)) com.designations.filter(d=>d.enabled!==false).forEach(d=>{ if(d.label && !roles.includes(d.label)) roles.push(d.label); });
   if(cur && !roles.includes(cur)) roles.unshift(cur);
   return roles;
 }
@@ -3191,26 +3055,54 @@ function addTier(){ editingDraft = editingDraft||[]; editingDraft.push({min:0,ma
 
 /* matrix editor */
 function renderMatrix(){
-  const m = editingDraft || {rows:[],cols:[],cells:{}};
-  m.cells = m.cells||{};
-  const html = `
+  const m = editingDraft = (editingDraft && typeof editingDraft==='object' && !Array.isArray(editingDraft)) ? editingDraft : {rows:[],cols:[],cells:{}};
+  m.rows = m.rows||[]; m.cols = m.cols||[]; m.cells = m.cells||{};
+  const wrap = document.getElementById('matrixWrap');
+  wrap.innerHTML = `
     <div class="overflow-x-auto">
       <table class="text-[12.5px] w-full">
-        <thead><tr><th class="text-left text-ink-500 font-semibold p-2"></th>${m.cols.map(c=>`<th class="text-left text-ink-500 font-semibold p-2 whitespace-nowrap">${escapeHtml(c)}</th>`).join('')}</tr></thead>
-        <tbody>${m.rows.map((r,ri)=>`<tr class="border-t border-line"><td class="p-2 font-medium text-ink-900 whitespace-nowrap">${escapeHtml(r)}</td>${m.cols.map((c,ci)=>{
+        <thead><tr><th class="text-left text-ink-500 font-semibold p-2"></th>${m.cols.map((c,ci)=>`<th class="text-left text-ink-500 font-semibold p-2 whitespace-nowrap"><span class="inline-flex items-center gap-1">${escapeHtml(c)}<button class="text-ink-300 hover:text-danger" data-mx-colrm="${ci}" title="Remove column" aria-label="Remove column"><i data-lucide="x" class="w-3 h-3"></i></button></span></th>`).join('')}</tr></thead>
+        <tbody>${m.rows.map((r,ri)=>`<tr class="border-t border-line"><td class="p-2 font-medium text-ink-900 whitespace-nowrap"><span class="inline-flex items-center gap-1">${escapeHtml(r)}<button class="text-ink-300 hover:text-danger" data-mx-rowrm="${ri}" title="Remove row" aria-label="Remove row"><i data-lucide="x" class="w-3 h-3"></i></button></span></td>${m.cols.map((c,ci)=>{
           const key = ri+'_'+ci; const on = !!m.cells[key];
           return `<td class="p-2"><button class="toggle ${on?'on':''}" data-cell="${key}" aria-pressed="${on}"><span class="dot"></span></button></td>`;
         }).join('')}</tr>`).join('')}</tbody>
       </table>
     </div>
+    <div class="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-line">
+      <input id="mxNewCol" class="inp" style="width:230px" placeholder="Add column (e.g. a mandatory attachment)…">
+      <button class="btn" id="mxAddCol"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add column</button>
+      <span class="inline-block w-px h-5 bg-line mx-1"></span>
+      <input id="mxNewRow" class="inp" style="width:200px" placeholder="Add row…">
+      <button class="btn" id="mxAddRow"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add row</button>
+    </div>
   `;
-  document.getElementById('matrixWrap').innerHTML = html;
-  document.getElementById('matrixWrap').querySelectorAll('button[data-cell]').forEach(b => b.onclick = () => {
+  wrap.querySelectorAll('button[data-cell]').forEach(b => b.onclick = () => {
     const k = b.dataset.cell;
     m.cells[k] = !m.cells[k];
     b.classList.toggle('on', m.cells[k]);
     b.setAttribute('aria-pressed', String(m.cells[k]));
   });
+  // remove a column — drop its cells and shift higher column indices down
+  wrap.querySelectorAll('[data-mx-colrm]').forEach(b => b.onclick = () => {
+    const ci = +b.dataset.mxColrm; const nc = {};
+    Object.keys(m.cells).forEach(k => { const [r,c] = k.split('_').map(Number); if (c===ci) return; nc[r+'_'+(c>ci?c-1:c)] = m.cells[k]; });
+    m.cells = nc; m.cols.splice(ci,1); renderMatrix();
+  });
+  // remove a row — drop its cells and shift higher row indices up
+  wrap.querySelectorAll('[data-mx-rowrm]').forEach(b => b.onclick = () => {
+    const ri = +b.dataset.mxRowrm; const nc = {};
+    Object.keys(m.cells).forEach(k => { const [r,c] = k.split('_').map(Number); if (r===ri) return; nc[(r>ri?r-1:r)+'_'+c] = m.cells[k]; });
+    m.cells = nc; m.rows.splice(ri,1); renderMatrix();
+  });
+  const addCol = document.getElementById('mxAddCol');
+  if (addCol) addCol.onclick = () => { const inp=document.getElementById('mxNewCol'); const v=(inp.value||'').trim(); if(!v) return; if(m.cols.includes(v)){ toast('That column already exists.'); return; } m.cols.push(v); renderMatrix(); };
+  const newCol = document.getElementById('mxNewCol');
+  if (newCol) newCol.onkeydown = e => { if(e.key==='Enter'){ e.preventDefault(); document.getElementById('mxAddCol').click(); } };
+  const addRow = document.getElementById('mxAddRow');
+  if (addRow) addRow.onclick = () => { const inp=document.getElementById('mxNewRow'); const v=(inp.value||'').trim(); if(!v) return; if(m.rows.includes(v)){ toast('That row already exists.'); return; } m.rows.push(v); renderMatrix(); };
+  const newRow = document.getElementById('mxNewRow');
+  if (newRow) newRow.onkeydown = e => { if(e.key==='Enter'){ e.preventDefault(); document.getElementById('mxAddRow').click(); } };
+  refreshIcons();
 }
 
 /* lib editor — generic key/value JSON */
@@ -3843,51 +3735,69 @@ function renderPreBidDatesAll() {
 function pbcInitials(name){ const p=(name||'').trim().split(/\s+/); const a=((p[0]||'')[0]||''); const b=((p[1]||'')[0]||''); return (a+b).toUpperCase() || (name||'?').slice(0,2).toUpperCase(); }
 function pbcAvatarColor(name){ const colors=['#0F5EE8','#10B981','#F59E0B','#8B5CF6','#EF4444','#EC4899','#0EA5E9']; let h=0; const s=name||''; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return colors[h%colors.length]; }
 
+/* Role-centric committee data model. cmteNormalize converts the legacy
+   {designations, actions, availableActions, members[]} shape (person-centric)
+   into {actions, availableActions, roles[]} (role-centric), idempotently. */
+function cmteSlug(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,24)||'role'; }
+function cmteNormalize(d, itemId){
+  if(!d || typeof d!=='object' || Array.isArray(d)) d={};
+  d.actions = (Array.isArray(d.actions)?d.actions:[]).map(normalizeListItem);
+  if(!Array.isArray(d.availableActions)){ const it=ITEMS.find(i=>i.id===(itemId||editingId)); d.availableActions = (it&&it.def&&Array.isArray(it.def.availableActions))?it.def.availableActions.slice():[]; }
+  if(Array.isArray(d.roles)){
+    d.roles.forEach((r,idx)=>{ if(!r.id) r.id='role_'+idx+'_'+cmteSlug(r.name); r.permissions=r.permissions||{}; r.members=Array.isArray(r.members)?r.members:[]; if(r.enabled==null)r.enabled=true; });
+    return d;
+  }
+  // legacy → roles: each distinct designation becomes a role carrying the
+  // union of its members' granted permissions; members drop into role.members.
+  const roles=[]; const byName={};
+  const ensure=(name,enabled)=>{ if(!byName[name]){ const r={id:'role_'+roles.length+'_'+cmteSlug(name), name, enabled:enabled!==false, permissions:{}, members:[]}; byName[name]=r; roles.push(r); } return byName[name]; };
+  (Array.isArray(d.designations)?d.designations:[]).forEach(de=>{ const lab=(de&&de.label)||de; if(lab) ensure(lab, de&&de.enabled); });
+  (Array.isArray(d.members)?d.members:[]).forEach(m=>{ const name=m.designation||'Unassigned'; const r=ensure(name,true); if(m.officer && !r.members.includes(m.officer)) r.members.push(m.officer); const perms=m.permissions||{}; Object.keys(perms).forEach(k=>{ if(perms[k]) r.permissions[k]=true; }); });
+  d.roles=roles; delete d.designations; delete d.members;
+  return d;
+}
+let pbcInviteRole = null;   // index of the role the officer-picker targets
 function editorPreBidCommittee(draft) {
   return `
     <div class="space-y-6" id="pbcContainer">
-      <!-- Section 1: Members matrix (most-touched — at top) -->
+      <!-- Section 1: Roles & permissions matrix -->
       <div>
         <div class="flex items-center justify-between mb-2">
-          <h3 class="text-[13px] font-semibold text-ink-900">Committee members &amp; permissions</h3>
-          <span class="text-[11px] text-ink-500" id="pbcMemberCount"></span>
+          <h3 class="text-[13px] font-semibold text-ink-900">Roles &amp; permissions</h3>
+          <span class="text-[11px] text-ink-500" id="pbcRoleCount"></span>
         </div>
-        <p class="text-[11.5px] text-ink-500 mb-3">Each row is a committee member. The Officer and Designation columns stay fixed while permission columns scroll. Toggle a cell to grant or revoke that action. Designations and the action columns shown here are managed in the sections below.</p>
-        <div id="pbcMembersWrap" class="overflow-x-auto -mx-1 px-1"></div>
-        <button class="btn btn-primary mt-3" id="pbcInviteBtn"><i data-lucide="user-plus" class="w-3.5 h-3.5"></i> Invite member</button>
+        <p class="text-[11.5px] text-ink-500 mb-3">Each row is a role — the single source of access. Columns are the enabled actions (managed in Actions, below). Toggle a cell to grant that action to everyone in the role. People are attached per role in the next section; someone holding two roles gets the <b>union</b> of both roles’ permissions.</p>
+        <div id="pbcMatrixWrap" class="overflow-x-auto -mx-1 px-1"></div>
+        <button class="btn btn-primary mt-3" id="pbcAddRole"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add role</button>
       </div>
 
-      <!-- Section 2: Designations -->
+      <!-- Section 2: People per role -->
       <div class="pt-4 border-t border-line">
         <div class="flex items-center justify-between mb-2">
-          <h3 class="text-[13px] font-semibold text-ink-900">Designations</h3>
-          <span class="text-[11px] text-ink-500" id="pbcDesigCount"></span>
+          <h3 class="text-[13px] font-semibold text-ink-900">People per role</h3>
+          <span class="text-[11px] text-ink-500" id="pbcPeopleCount"></span>
         </div>
-        <p class="text-[11.5px] text-ink-500 mb-3">Committee titles you can assign to members. Toggle off to keep but hide; trash icon to delete. You can add your own custom designations.</p>
-        <div id="pbcDesignations" class="space-y-1.5"></div>
-        <div class="flex items-center gap-2 pt-3 mt-2 border-t border-line">
-          <input id="pbcNewDesig" class="inp flex-1" placeholder="Add designation and press Enter…">
-          <button class="btn btn-primary" id="pbcAddDesig"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add</button>
-        </div>
+        <p class="text-[11.5px] text-ink-500 mb-3">Attach officers to a role to grant them that role’s permissions automatically. One person can hold multiple roles.</p>
+        <div id="pbcPeopleWrap" class="space-y-3"></div>
       </div>
 
-      <!-- Section 3: Actions / permissions -->
+      <!-- Section 3: Actions -->
       <div class="pt-4 border-t border-line">
         <div class="flex items-center justify-between mb-2">
-          <h3 class="text-[13px] font-semibold text-ink-900">Actions / permissions</h3>
+          <h3 class="text-[13px] font-semibold text-ink-900">Actions</h3>
           <span class="text-[11px] text-ink-500" id="pbcActionCount"></span>
         </div>
-        <p class="text-[11.5px] text-ink-500 mb-3">Actions members can be permitted to do on the pre-bid screen. Toggle an action off to remove its column from the matrix. Add more from the standard action list below.</p>
+        <p class="text-[11.5px] text-ink-500 mb-3">The actions available on this screen. Toggle an action off to remove its column from the matrix above. Add more from the standard action list below.</p>
         <div id="pbcActions" class="space-y-1.5"></div>
         <div id="pbcAddActionWrap" class="flex items-center gap-2 pt-3 mt-2 border-t border-line"></div>
       </div>
 
-      <!-- Invite-member modal -->
+      <!-- Officer-picker modal -->
       <div id="pbcInviteModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4">
         <div id="pbcInviteBackdrop" class="absolute inset-0 bg-black/40"></div>
         <div class="relative bg-white rounded-2xl shadow-lift w-[480px] max-w-full flex flex-col" style="max-height:80vh">
           <div class="px-5 py-4 border-b border-line flex items-center justify-between">
-            <div class="text-[15px] font-semibold text-ink-900">Invite committee member</div>
+            <div class="text-[15px] font-semibold text-ink-900" id="pbcInviteTitle">Add person</div>
             <button id="pbcInviteClose" class="text-ink-400 hover:text-ink-900" aria-label="Close"><i data-lucide="x" class="w-5 h-5"></i></button>
           </div>
           <div class="px-5 pt-4">
@@ -3904,174 +3814,99 @@ function editorPreBidCommittee(draft) {
 }
 
 function renderPreBidCommitteeAll() {
-  if (!editingDraft || typeof editingDraft !== 'object' || Array.isArray(editingDraft)) {
-    editingDraft = JSON.parse(JSON.stringify(ITEMS.find(i => i.id === 'prebid.committee').def));
-  }
-  editingDraft.designations = (editingDraft.designations || []).map(normalizeListItem);
-  editingDraft.actions      = (editingDraft.actions || []).map(normalizeListItem);
-  editingDraft.members      = editingDraft.members || [];
-  if (!Array.isArray(editingDraft.availableActions)) {
-    const _schemaItem = ITEMS.find(i => i.id === editingId);
-    editingDraft.availableActions = (_schemaItem && _schemaItem.def && _schemaItem.def.availableActions) || [];
-  }
-
-  // --- Section 1: Designations ---
-  const desigsEl = document.getElementById('pbcDesignations');
-  desigsEl.innerHTML = editingDraft.designations.map((d, i) => `
-    <div class="flex items-center gap-3 px-3 py-2 border border-line rounded-lg ${!d.enabled ? 'bg-surface' : 'bg-white'}">
-      <button class="toggle ${d.enabled ? 'on' : ''}" data-pbc-desig-toggle="${i}" aria-pressed="${!!d.enabled}"><span class="dot"></span></button>
-      <input type="text" class="flex-1 bg-transparent text-[13px] ${!d.enabled ? 'line-through text-ink-400' : 'text-ink-900'} focus:outline-none border-0 p-0" data-pbc-desig-label="${i}" value="${escapeHtml(d.label)}" />
-      <button data-pbc-desig-rm="${i}" class="text-ink-400 hover:text-danger transition" aria-label="Remove"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-    </div>
-  `).join('');
-  document.getElementById('pbcDesigCount').textContent = `${editingDraft.designations.filter(d=>d.enabled).length} enabled`;
-
-  desigsEl.querySelectorAll('[data-pbc-desig-toggle]').forEach(b => b.onclick = () => {
-    const i = +b.dataset.pbcDesigToggle;
-    editingDraft.designations[i].enabled = !editingDraft.designations[i].enabled;
-    renderPreBidCommitteeAll();
-  });
-  desigsEl.querySelectorAll('[data-pbc-desig-label]').forEach(inp => {
-    inp.oninput = e => { editingDraft.designations[+e.target.dataset.pbcDesigLabel].label = e.target.value; };
-  });
-  desigsEl.querySelectorAll('[data-pbc-desig-rm]').forEach(b => b.onclick = () => {
-    editingDraft.designations.splice(+b.dataset.pbcDesigRm, 1);
-    renderPreBidCommitteeAll();
-  });
-
-  const newDesigBtn = document.getElementById('pbcAddDesig');
-  const newDesigInp = document.getElementById('pbcNewDesig');
-  if (newDesigBtn && !newDesigBtn.dataset.bound) {
-    newDesigBtn.dataset.bound = '1';
-    newDesigBtn.onclick = () => {
-      const v = (newDesigInp.value || '').trim();
-      if (!v) return;
-      editingDraft.designations.push({label: v, enabled: true});
-      newDesigInp.value = '';
-      renderPreBidCommitteeAll();
-    };
-  }
-  if (newDesigInp && !newDesigInp.dataset.bound) {
-    newDesigInp.dataset.bound = '1';
-    newDesigInp.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); newDesigBtn.click(); } };
-  }
-
-  // --- Section 2: Actions (non-editable labels from master list) ---
-  const actionsEl = document.getElementById('pbcActions');
-  actionsEl.innerHTML = editingDraft.actions.map((a, i) => `
-    <div class="flex items-center gap-3 px-3 py-2 border border-line rounded-lg ${!a.enabled ? 'bg-surface' : 'bg-white'}">
-      <button class="toggle ${a.enabled ? 'on' : ''}" data-pbc-action-toggle="${i}" aria-pressed="${!!a.enabled}"><span class="dot"></span></button>
-      <div class="flex-1 text-[13px] ${!a.enabled ? 'line-through text-ink-400' : 'text-ink-900'}">${escapeHtml(a.label)}</div>
-      <button data-pbc-action-rm="${i}" class="text-ink-400 hover:text-danger transition" aria-label="Remove"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-    </div>
-  `).join('');
-  document.getElementById('pbcActionCount').textContent = `${editingDraft.actions.filter(a=>a.enabled).length} enabled`;
-
-  actionsEl.querySelectorAll('[data-pbc-action-toggle]').forEach(b => b.onclick = () => {
-    const i = +b.dataset.pbcActionToggle;
-    editingDraft.actions[i].enabled = !editingDraft.actions[i].enabled;
-    renderPreBidCommitteeAll();
-  });
-  actionsEl.querySelectorAll('[data-pbc-action-rm]').forEach(b => b.onclick = () => {
-    editingDraft.actions.splice(+b.dataset.pbcActionRm, 1);
-    renderPreBidCommitteeAll();
-  });
-
-  // Add-action: dropdown of master actions not yet present
-  const currentActionLabels = new Set(editingDraft.actions.map(a => a.label));
-  const availableActions = (editingDraft.availableActions || []).filter(a => !currentActionLabels.has(a));
-  const addActionWrap = document.getElementById('pbcAddActionWrap');
-  addActionWrap.innerHTML = availableActions.length
-    ? `<select id="pbcAddActionSelect" class="inp flex-1">${availableActions.map(a => `<option>${escapeHtml(a)}</option>`).join('')}</select>
-       <button class="btn btn-primary" id="pbcAddActionBtn"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add</button>`
-    : `<div class="text-[12px] text-ink-400 italic">All available actions are added.</div>`;
-  const addActionBtn = document.getElementById('pbcAddActionBtn');
-  if (addActionBtn) {
-    addActionBtn.onclick = () => {
-      const sel = document.getElementById('pbcAddActionSelect');
-      const v = sel && sel.value;
-      if (!v) return;
-      editingDraft.actions.push({label: v, enabled: true});
-      renderPreBidCommitteeAll();
-    };
-  }
-
-  // --- Section 3: Members matrix ---
-  const enabledActions = editingDraft.actions.filter(a => a.enabled);
-  const enabledDesigs  = editingDraft.designations.filter(d => d.enabled);
+  editingDraft = cmteNormalize(editingDraft, editingId);
+  const d = editingDraft;
+  const enabledActions = d.actions.filter(a => a.enabled);
   const store = loadStore();
   const officerDir = store['officers.directory'] || (ITEMS.find(i => i.id === 'officers.directory') || {def:[]}).def || [];
   const dirMap = {};
   officerDir.forEach(o => { const nm = o.name || o.label || ''; if (nm) dirMap[nm] = {email: o.email || '', role: o.role || ''}; });
 
-  document.getElementById('pbcMemberCount').textContent = `${editingDraft.members.length} member${editingDraft.members.length!==1?'s':''}`;
+  const peopleSet = new Set(); d.roles.forEach(r => r.members.forEach(m => peopleSet.add(m)));
+  document.getElementById('pbcRoleCount').textContent = `${d.roles.filter(r=>r.enabled!==false).length} of ${d.roles.length} role${d.roles.length!==1?'s':''} enabled`;
+  document.getElementById('pbcPeopleCount').textContent = `${peopleSet.size} ${peopleSet.size!==1?'people':'person'}`;
+  document.getElementById('pbcActionCount').textContent = `${enabledActions.length} enabled`;
 
-  const OFFW = 240, DESW = 190;
-  const stickyOff = `position:sticky;left:0;background:#fff;border-bottom:1px solid #E5E7EB;min-width:${OFFW}px`;
-  const stickyDes = `position:sticky;left:${OFFW}px;background:#fff;border-bottom:1px solid #E5E7EB;border-right:1px solid #E5E7EB;min-width:${DESW}px`;
-
-  const memWrap = document.getElementById('pbcMembersWrap');
-  if (editingDraft.members.length === 0) {
-    memWrap.innerHTML = `<div class="text-center py-8 text-ink-500 text-[13px] border border-dashed border-line rounded-xl">No members yet. Click "Invite member" below to add officers to the committee.</div>`;
+  // --- Section 1: Roles × actions matrix ---
+  const ROLEW = 240, CNTW = 96;
+  const stickyRole = `position:sticky;left:0;background:#fff;border-bottom:1px solid #E5E7EB;min-width:${ROLEW}px`;
+  const stickyCnt  = `position:sticky;left:${ROLEW}px;background:#fff;border-bottom:1px solid #E5E7EB;border-right:1px solid #E5E7EB;min-width:${CNTW}px`;
+  const mWrap = document.getElementById('pbcMatrixWrap');
+  if (!d.roles.length) {
+    mWrap.innerHTML = `<div class="text-center py-8 text-ink-500 text-[13px] border border-dashed border-line rounded-xl">No roles yet. Click "Add role" below to create one.</div>`;
   } else {
-    memWrap.innerHTML = `<table class="text-[12.5px]" style="border-collapse:separate;border-spacing:0;min-width:100%">
-        <thead>
-          <tr>
-            <th class="text-left font-semibold text-ink-500" style="${stickyOff};z-index:2;padding:8px;vertical-align:bottom">Officer</th>
-            <th class="text-left font-semibold text-ink-500" style="${stickyDes};z-index:2;padding:8px;vertical-align:bottom">Designation</th>
-            ${enabledActions.map(a => `<th style="min-width:104px;padding:8px;vertical-align:bottom;border-bottom:1px solid #E5E7EB"><div class="text-[11px] font-semibold text-ink-500 leading-tight" style="white-space:normal">${escapeHtml(a.label)}</div></th>`).join('')}
-            <th style="border-bottom:1px solid #E5E7EB;padding:8px"></th>
-          </tr>
-        </thead>
+    mWrap.innerHTML = `<table class="text-[12.5px]" style="border-collapse:separate;border-spacing:0;min-width:100%">
+        <thead><tr>
+          <th class="text-left font-semibold text-ink-500" style="${stickyRole};z-index:2;padding:8px;vertical-align:bottom">Role</th>
+          <th class="text-left font-semibold text-ink-500" style="${stickyCnt};z-index:2;padding:8px;vertical-align:bottom">People</th>
+          ${enabledActions.map(a => `<th style="min-width:104px;padding:8px;vertical-align:bottom;border-bottom:1px solid #E5E7EB"><div class="text-[11px] font-semibold text-ink-500 leading-tight" style="white-space:normal">${escapeHtml(a.label)}</div></th>`).join('')}
+          <th style="border-bottom:1px solid #E5E7EB;padding:8px"></th>
+        </tr></thead>
         <tbody>
-          ${editingDraft.members.map((m, i) => {
-            const info = dirMap[m.officer] || {email:'', role:''};
-            const av = `<div class="rounded-full flex items-center justify-center text-white font-semibold shrink-0" style="width:30px;height:30px;font-size:11px;background:${pbcAvatarColor(m.officer)}">${escapeHtml(pbcInitials(m.officer))}</div>`;
+          ${d.roles.map((r, ri) => {
+            const on = r.enabled !== false;
             return `<tr>
-              <td style="${stickyOff};z-index:1;padding:8px">
-                <div class="flex items-center gap-2.5">
-                  ${av}
-                  <div class="min-w-0">
-                    <div class="text-[13px] font-medium text-ink-900 truncate">${escapeHtml(m.officer || '—')}</div>
-                    ${info.email ? `<div class="text-[11px] text-ink-500 truncate">${escapeHtml(info.email)}</div>` : ''}
-                  </div>
+              <td style="${stickyRole};z-index:1;padding:8px">
+                <div class="flex items-center gap-2">
+                  <button class="toggle ${on?'on':''}" data-cmte-ren="${ri}" aria-pressed="${on}" title="Enable role"><span class="dot"></span></button>
+                  <input class="flex-1 bg-transparent text-[13px] font-medium ${on?'text-ink-900':'line-through text-ink-400'} focus:outline-none border-0 p-0" data-cmte-rname="${ri}" value="${escapeHtml(r.name||'')}">
                 </div>
               </td>
-              <td style="${stickyDes};z-index:1;padding:8px">
-                <select class="inp w-full" data-pbc-mem-desig="${i}">
-                  ${enabledDesigs.map(d => `<option ${d.label === m.designation ? 'selected' : ''}>${escapeHtml(d.label)}</option>`).join('')}
-                  ${(m.designation && !enabledDesigs.find(d => d.label === m.designation)) ? `<option selected>${escapeHtml(m.designation)}</option>` : ''}
-                </select>
-              </td>
-              ${enabledActions.map(a => {
-                const granted = !!(m.permissions && m.permissions[a.label]);
-                return `<td style="text-align:center;padding:8px;border-bottom:1px solid #E5E7EB"><button class="toggle ${granted ? 'on' : ''}" data-pbc-perm="${i}|${escapeHtml(a.label)}" aria-pressed="${granted}" title="${escapeHtml(a.label)}" style="margin:0 auto"><span class="dot"></span></button></td>`;
-              }).join('')}
-              <td style="text-align:center;padding:8px;border-bottom:1px solid #E5E7EB"><button data-pbc-mem-rm="${i}" class="text-ink-400 hover:text-danger" aria-label="Remove"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td>
+              <td style="${stickyCnt};z-index:1;padding:8px"><span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-surface text-ink-500 border border-line">${r.members.length} ${r.members.length===1?'person':'people'}</span></td>
+              ${enabledActions.map(a => { const g = !!(r.permissions && r.permissions[a.label]); return `<td style="text-align:center;padding:8px;border-bottom:1px solid #E5E7EB"><button class="toggle ${g?'on':''}" data-cmte-perm="${ri}|${escapeHtml(a.label)}" aria-pressed="${g}" title="${escapeHtml(a.label)}" style="margin:0 auto"><span class="dot"></span></button></td>`; }).join('')}
+              <td style="text-align:center;padding:8px;border-bottom:1px solid #E5E7EB"><button data-cmte-rrm="${ri}" class="text-ink-400 hover:text-danger" aria-label="Remove role"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td>
             </tr>`;
           }).join('')}
         </tbody>
       </table>`;
   }
+  mWrap.querySelectorAll('[data-cmte-ren]').forEach(b => b.onclick = () => { const r=d.roles[+b.dataset.cmteRen]; r.enabled = r.enabled===false; renderPreBidCommitteeAll(); });
+  mWrap.querySelectorAll('[data-cmte-rname]').forEach(inp => inp.oninput = e => { d.roles[+e.target.dataset.cmteRname].name = e.target.value; });
+  mWrap.querySelectorAll('[data-cmte-perm]').forEach(b => b.onclick = () => { const raw=b.dataset.cmtePerm; const sep=raw.indexOf('|'); const ri=+raw.slice(0,sep); const lab=raw.slice(sep+1); const r=d.roles[ri]; r.permissions=r.permissions||{}; r.permissions[lab]=!r.permissions[lab]; renderPreBidCommitteeAll(); });
+  mWrap.querySelectorAll('[data-cmte-rrm]').forEach(b => b.onclick = () => { d.roles.splice(+b.dataset.cmteRrm,1); renderPreBidCommitteeAll(); });
+  const addRole = document.getElementById('pbcAddRole');
+  if (addRole && !addRole.dataset.bound) { addRole.dataset.bound='1'; addRole.onclick = () => { d.roles.push({id:'role_'+Date.now().toString(36), name:'New role', enabled:true, permissions:{}, members:[]}); renderPreBidCommitteeAll(); }; }
 
-  memWrap.querySelectorAll('[data-pbc-mem-desig]').forEach(sel => {
-    sel.onchange = e => { editingDraft.members[+e.target.dataset.pbcMemDesig].designation = e.target.value; };
-  });
-  memWrap.querySelectorAll('[data-pbc-perm]').forEach(b => b.onclick = () => {
-    const raw = b.dataset.pbcPerm; const sep = raw.indexOf('|');
-    const i = +raw.slice(0, sep); const actionLabel = raw.slice(sep + 1);
-    if (!editingDraft.members[i].permissions) editingDraft.members[i].permissions = {};
-    editingDraft.members[i].permissions[actionLabel] = !editingDraft.members[i].permissions[actionLabel];
-    renderPreBidCommitteeAll();
-  });
-  memWrap.querySelectorAll('[data-pbc-mem-rm]').forEach(b => b.onclick = () => {
-    editingDraft.members.splice(+b.dataset.pbcMemRm, 1);
-    renderPreBidCommitteeAll();
-  });
+  // --- Section 2: People per role ---
+  const pWrap = document.getElementById('pbcPeopleWrap');
+  pWrap.innerHTML = d.roles.length ? d.roles.map((r, ri) => {
+    const memberHtml = r.members.length ? r.members.map((nm, mi) => {
+      const info = dirMap[nm] || {email:'', role:''};
+      const av = `<div class="rounded-full flex items-center justify-center text-white font-semibold shrink-0" style="width:30px;height:30px;font-size:11px;background:${pbcAvatarColor(nm)}">${escapeHtml(pbcInitials(nm))}</div>`;
+      return `<div class="flex items-center gap-2.5 px-2.5 py-1.5 border border-line rounded-lg bg-white">${av}<div class="min-w-0 flex-1"><div class="text-[13px] font-medium text-ink-900 truncate">${escapeHtml(nm)}</div>${info.email?`<div class="text-[11px] text-ink-500 truncate">${escapeHtml(info.email)}</div>`:''}</div><button data-cmte-prm="${ri}|${mi}" class="text-ink-400 hover:text-danger" aria-label="Remove from role"><i data-lucide="x" class="w-4 h-4"></i></button></div>`;
+    }).join('') : '<div class="text-[12px] text-ink-400 italic px-1">No one in this role yet.</div>';
+    return `<div class="border border-line rounded-xl p-3">
+      <div class="flex items-center justify-between mb-2">
+        <div class="text-[13px] font-semibold text-ink-900">${escapeHtml(r.name||'(unnamed role)')} <span class="text-[11px] font-normal text-ink-400">· ${r.members.length} ${r.members.length===1?'person':'people'}</span></div>
+        <button class="btn" style="padding:4px 10px" data-cmte-addp="${ri}"><i data-lucide="user-plus" class="w-3.5 h-3.5"></i> Add person</button>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">${memberHtml}</div>
+    </div>`;
+  }).join('') : '<div class="text-[12px] text-ink-400 italic">Add a role first.</div>';
+  pWrap.querySelectorAll('[data-cmte-prm]').forEach(b => b.onclick = () => { const [ri,mi]=b.dataset.cmtePrm.split('|').map(Number); d.roles[ri].members.splice(mi,1); renderPreBidCommitteeAll(); });
+  pWrap.querySelectorAll('[data-cmte-addp]').forEach(b => b.onclick = () => pbcOpenInvite(+b.dataset.cmteAddp));
 
-  // Invite-member button + modal controls (bind-once)
-  const inviteBtn = document.getElementById('pbcInviteBtn');
-  if (inviteBtn && !inviteBtn.dataset.bound) { inviteBtn.dataset.bound = '1'; inviteBtn.onclick = () => pbcOpenInvite(); }
+  // --- Section 3: Actions (enable/disable + add from master list) ---
+  const actionsEl = document.getElementById('pbcActions');
+  actionsEl.innerHTML = d.actions.map((a, i) => `
+    <div class="flex items-center gap-3 px-3 py-2 border border-line rounded-lg ${!a.enabled ? 'bg-surface' : 'bg-white'}">
+      <button class="toggle ${a.enabled ? 'on' : ''}" data-cmte-atog="${i}" aria-pressed="${!!a.enabled}"><span class="dot"></span></button>
+      <div class="flex-1 text-[13px] ${!a.enabled ? 'line-through text-ink-400' : 'text-ink-900'}">${escapeHtml(a.label)}</div>
+      <button data-cmte-arm="${i}" class="text-ink-400 hover:text-danger transition" aria-label="Remove"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+    </div>`).join('');
+  actionsEl.querySelectorAll('[data-cmte-atog]').forEach(b => b.onclick = () => { const a=d.actions[+b.dataset.cmteAtog]; a.enabled=!a.enabled; renderPreBidCommitteeAll(); });
+  actionsEl.querySelectorAll('[data-cmte-arm]').forEach(b => b.onclick = () => { d.actions.splice(+b.dataset.cmteArm,1); renderPreBidCommitteeAll(); });
+  const curLabels = new Set(d.actions.map(a => a.label));
+  const avail = (d.availableActions || []).filter(a => !curLabels.has(a));
+  const addWrap = document.getElementById('pbcAddActionWrap');
+  addWrap.innerHTML = avail.length
+    ? `<select id="pbcAddActionSelect" class="inp flex-1">${avail.map(a => `<option>${escapeHtml(a)}</option>`).join('')}</select>
+       <button class="btn btn-primary" id="pbcAddActionBtn"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add</button>`
+    : `<div class="text-[12px] text-ink-400 italic">All available actions are added.</div>`;
+  const addActionBtn = document.getElementById('pbcAddActionBtn');
+  if (addActionBtn) addActionBtn.onclick = () => { const sel=document.getElementById('pbcAddActionSelect'); const v=sel&&sel.value; if(!v) return; d.actions.push({label:v, enabled:true}); renderPreBidCommitteeAll(); };
+
+  // picker modal controls (bind-once)
   const invClose = document.getElementById('pbcInviteClose');
   if (invClose && !invClose.dataset.bound) { invClose.dataset.bound = '1'; invClose.onclick = () => pbcCloseInvite(); }
   const invBackdrop = document.getElementById('pbcInviteBackdrop');
@@ -4082,11 +3917,15 @@ function renderPreBidCommitteeAll() {
   refreshIcons();
 }
 
-/* invite-member modal (searchable officer picker for the committee) */
-function pbcOpenInvite() {
+/* searchable officer picker — scoped to one role, excludes that role's members */
+function pbcOpenInvite(roleIdx) {
+  pbcInviteRole = (roleIdx == null ? null : roleIdx);
   const modal = document.getElementById('pbcInviteModal');
   if (!modal) return;
   modal.classList.remove('hidden');
+  const role = (pbcInviteRole != null) ? editingDraft.roles[pbcInviteRole] : null;
+  const tEl = document.getElementById('pbcInviteTitle');
+  if (tEl) tEl.textContent = role ? ('Add person to “' + (role.name || 'role') + '”') : 'Add person';
   const s = document.getElementById('pbcInviteSearch');
   if (s) s.value = '';
   renderPbcInviteList();
@@ -4095,6 +3934,7 @@ function pbcOpenInvite() {
 function pbcCloseInvite() {
   const modal = document.getElementById('pbcInviteModal');
   if (modal) modal.classList.add('hidden');
+  pbcInviteRole = null;
 }
 function renderPbcInviteList() {
   const listEl = document.getElementById('pbcInviteList');
@@ -4102,30 +3942,29 @@ function renderPbcInviteList() {
   const store = loadStore();
   const officerDir = store['officers.directory'] || (ITEMS.find(i => i.id === 'officers.directory') || {def:[]}).def || [];
   const q = ((document.getElementById('pbcInviteSearch') || {}).value || '').toLowerCase();
-  const added = new Set((editingDraft.members || []).map(m => m.officer));
+  const role = (pbcInviteRole != null) ? editingDraft.roles[pbcInviteRole] : null;
+  const inRole = new Set(role ? role.members : []);
   const rows = officerDir
     .map(o => ({ name: o.name || o.label || '', email: o.email || '', role: o.role || '' }))
     .filter(o => o.name)
     .filter(o => !q || (o.name + ' ' + o.email).toLowerCase().includes(q));
   if (!rows.length) { listEl.innerHTML = `<div class="text-center py-8 text-ink-500 text-[13px]">No officers match.</div>`; refreshIcons(); return; }
   listEl.innerHTML = rows.map(o => {
-    const isAdded = added.has(o.name);
+    const isAdded = inRole.has(o.name);
     const av = `<div class="rounded-full flex items-center justify-center text-white font-semibold shrink-0" style="width:34px;height:34px;font-size:12px;background:${pbcAvatarColor(o.name)}">${escapeHtml(pbcInitials(o.name))}</div>`;
     return `<button class="w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-left ${isAdded ? 'opacity-50 cursor-not-allowed' : 'hover:bg-surface'}" ${isAdded ? 'disabled' : `data-pbc-invite="${escapeHtml(o.name)}"`}>
       ${av}
       <div class="min-w-0 flex-1">
-        <div class="text-[13px] font-medium text-ink-900 truncate">${escapeHtml(o.name)}${isAdded ? ' <span class="text-[11px] font-normal text-ink-400">· Already added</span>' : ''}</div>
+        <div class="text-[13px] font-medium text-ink-900 truncate">${escapeHtml(o.name)}${isAdded ? ' <span class="text-[11px] font-normal text-ink-400">· Already in role</span>' : ''}</div>
         <div class="text-[11.5px] text-ink-500 truncate">${escapeHtml(o.email)}${o.role ? ' · ' + escapeHtml(o.role) : ''}</div>
       </div>
     </button>`;
   }).join('');
   listEl.querySelectorAll('[data-pbc-invite]').forEach(b => b.onclick = () => {
     const name = b.dataset.pbcInvite;
-    const enabledDesigs = editingDraft.designations.filter(d => d.enabled);
-    const enabledActions = editingDraft.actions.filter(a => a.enabled);
-    const permissions = {};
-    enabledActions.forEach(a => permissions[a.label] = false);
-    editingDraft.members.push({ officer: name, designation: enabledDesigs[0] ? enabledDesigs[0].label : '', permissions });
+    if (pbcInviteRole != null && editingDraft.roles[pbcInviteRole] && !editingDraft.roles[pbcInviteRole].members.includes(name)) {
+      editingDraft.roles[pbcInviteRole].members.push(name);
+    }
     pbcCloseInvite();
     renderPreBidCommitteeAll();
   });
@@ -4439,7 +4278,7 @@ function ptcSampleDoc(idBase, title, sector, method, ec, year){
     +'<tr><th>Evaluation method</th><td>'+method+'</td></tr><tr><th>Estimated cost</th><td>'+ec+'</td></tr>'
     +'<tr><th>Award year</th><td>'+year+'</td></tr></table>'
     +'<h2>2. Scope of work</h2><p>The successful bidder shall execute the work as detailed in the schedule, in accordance with GFR 2017 and applicable CVC guidelines.</p>'
-    +'<h2>3. Eligibility (PQ)</h2><p>Bidders must meet the pre-qualification turnover and similar-work thresholds specified in the detailed NIT.</p>'
+    +'<h2>3. Eligibility (PQ)</h2><p>Bidders must meet the pre-qualification turnover and similar-work thresholds specified in the detailed tender.</p>'
     +'<h2>4. Submission</h2><p>Bids shall be submitted online on the e-procurement portal before the notified deadline. Late bids are not accepted.</p>'
     +'<p class="seal">For Ahmedabad Municipal Corporation<br>Tender Inviting Authority</p></body></html>';
   return { name:idBase+'.html', type:'text/html', kind:'sample', size:html.length, html:html };
@@ -4463,20 +4302,26 @@ function ptcViewDoc(doc){
   if(!win) toast('Allow pop-ups to view the document.');
   setTimeout(()=>{ try{ URL.revokeObjectURL(url); }catch(e){} }, 60000);
 }
-function editorPastTenderCloning(){ return `<div class="space-y-3"><p class="text-[11.5px] text-ink-500">Upload past tenders so they surface on the Clone screen. Each row carries a viewable tender document — view it, replace it, or remove it. Documents are stored locally; very large files are rejected with a message.</p><div id="ptcWrap" class="space-y-2"></div><button class="btn btn-primary" id="ptcUpload"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add past tender</button><input type="file" id="ptcFileInput" accept=".pdf,.doc,.docx,.html,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/html" class="hidden"></div>`; }
-function ptcAttachDoc(idx, file){
+function editorPastTenderCloning(){ return `
+  <div class="space-y-4">
+    <p class="text-[11.5px] text-ink-500">Upload a tender document (PDF or Word) — that’s the only thing needed at upload time. The title is taken from the filename; year, sector and status are editable in the table below and never block the upload. Stored locally; very large files are rejected with a message.</p>
+    <button class="btn btn-primary" id="ptcUpload"><i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload tender document</button>
+    <input type="file" id="ptcFileInput" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" class="hidden">
+    <div id="ptcWrap" class="overflow-x-auto -mx-1 px-1"></div>
+  </div>`; }
+function ptcTitleFromFile(name){ return String(name||'Untitled').replace(/\.[^.]+$/,'').replace(/[_]+/g,' ').trim() || 'Untitled'; }
+function ptcUploadNew(file){
   if(!file) return;
   if(file.size > PTC_MAX_BYTES){ toast('Document too large to store locally (max ~1.2 MB). Use a smaller file.'); return; }
   const r=new FileReader();
   r.onload=()=>{
-    const row=editingDraft[idx]; if(!row) return;
-    const prevDoc=row.doc, prevName=row.fileName;
-    row.doc={ name:file.name, type:file.type||'application/octet-stream', kind:'upload', size:file.size, dataUrl:r.result };
-    row.fileName=file.name;
-    // Guard against blowing the localStorage budget for this item.
+    const title=ptcTitleFromFile(file.name);
+    const row={ id:'pt_'+Date.now().toString(36), title, sector:'', status:'', awardedYear:null,
+      doc:{ name:file.name, type:file.type||'application/octet-stream', kind:'upload', size:file.size, dataUrl:r.result } };
+    editingDraft.push(row);
     let tooBig=false; try{ tooBig = JSON.stringify(editingDraft).length > PTC_STORE_BUDGET; }catch(e){ tooBig=true; }
-    if(tooBig){ row.doc=prevDoc; row.fileName=prevName; toast('Document too large to store locally — total exceeds the local limit.'); renderPastTenderCloningAll(); return; }
-    toast('Document attached'); renderPastTenderCloningAll();
+    if(tooBig){ editingDraft.pop(); toast('Document too large to store locally — total exceeds the local limit.'); renderPastTenderCloningAll(); return; }
+    toast('“'+title+'” uploaded'); renderPastTenderCloningAll();
   };
   r.onerror=()=>toast('Could not read that file.');
   r.readAsDataURL(file);
@@ -4484,54 +4329,37 @@ function ptcAttachDoc(idx, file){
 function renderPastTenderCloningAll(){
   if (!Array.isArray(editingDraft)) editingDraft = [];
   const wrap = document.getElementById('ptcWrap');
-  const statusChip=s=>{const m={Completed:'background:#F0FDF4;color:#10B981',Awarded:'background:#EFF6FF;color:#0F5EE8',Withdrawn:'background:#FEF2F2;color:#EF4444',Cancelled:'background:#FEF2F2;color:#EF4444'};return `<span class="chip" style="${m[s]||'background:#F9FAFB;color:#6B7280;border:1px solid #E5E7EB'}">${escapeHtml(s||'—')}</span>`;};
-  const badge=(t)=>`<span class="chip" style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0">${escapeHtml(t)}</span>`;
-  const docArea=(x,i)=> x.doc
-    ? `<div class="flex items-center gap-2 flex-wrap px-2.5 py-1.5 bg-surface border border-line rounded-lg">
-         <i data-lucide="paperclip" class="w-3.5 h-3.5 text-ink-400 shrink-0"></i>
-         <span class="text-[12px] text-ink-700 truncate" style="max-width:240px">${escapeHtml(x.doc.name||'document')}</span>
-         ${x.doc.kind==='sample'?'<span class="chip" style="background:#EEEDFE;color:#8B5CF6">sample</span>':''}
-         <span class="text-[11px] text-ink-400">${ptcFmtSize(x.doc.size)}</span>
-         <span class="flex-1"></span>
-         <button class="btn" style="padding:3px 9px" data-ptc-view="${i}"><i data-lucide="eye" class="w-3.5 h-3.5"></i> View document</button>
-         <button class="btn" style="padding:3px 9px" data-ptc-replace="${i}"><i data-lucide="repeat" class="w-3.5 h-3.5"></i> Replace</button>
-         <button class="text-ink-400 hover:text-danger" data-ptc-docrm="${i}" aria-label="Remove document"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-       </div>`
-    : `<div class="flex items-center gap-2 px-2.5 py-1.5 border border-dashed border-line rounded-lg">
-         <i data-lucide="file-plus" class="w-3.5 h-3.5 text-ink-400 shrink-0"></i>
-         <span class="text-[12px] text-ink-400 flex-1">No document attached</span>
-         <button class="btn btn-primary" style="padding:3px 9px" data-ptc-uprow="${i}"><i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload document</button>
-       </div>`;
-  wrap.innerHTML = editingDraft.length ? editingDraft.map((x,i)=>`<div class="bg-white border border-line rounded-xl p-3 space-y-2">
-      <div class="flex items-start justify-between gap-2">
-        <div class="min-w-0">
-          <div class="text-[13.5px] font-semibold text-ink-900 truncate">${escapeHtml(x.title||'(untitled tender)')}</div>
-          <div class="flex items-center gap-1.5 flex-wrap mt-1">${badge(x.sector||'—')}${badge(x.method||'—')}<span class="text-[11.5px] text-ink-500">${x.awardedYear?('Awarded '+x.awardedYear):''}</span>${statusChip(x.status)}</div>
-        </div>
-        <button class="text-ink-400 hover:text-danger shrink-0" data-ptc-del="${i}" aria-label="Remove tender"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-      </div>
-      ${docArea(x,i)}
-      <div class="grid grid-cols-2 gap-2 pt-1">
-        <label class="block"><span class="text-[11px] text-ink-500">Title</span><input class="inp w-full mt-0.5" data-ptc-f="${i}|title" value="${escapeHtml(x.title||'')}"></label>
-        <label class="block"><span class="text-[11px] text-ink-500">Sector</span><input class="inp w-full mt-0.5" data-ptc-f="${i}|sector" value="${escapeHtml(x.sector||'')}"></label>
-        <label class="block"><span class="text-[11px] text-ink-500">Method</span><input class="inp w-full mt-0.5" data-ptc-f="${i}|method" value="${escapeHtml(x.method||'')}"></label>
-        <label class="block"><span class="text-[11px] text-ink-500">Estimated cost (₹)</span><input type="number" class="inp w-full mt-0.5" data-ptc-n="${i}|ec" value="${x.ec!=null?x.ec:''}"></label>
-        <label class="block"><span class="text-[11px] text-ink-500">Awarded year</span><input type="number" class="inp w-full mt-0.5" data-ptc-n="${i}|awardedYear" value="${x.awardedYear!=null?x.awardedYear:''}"></label>
-        <label class="block"><span class="text-[11px] text-ink-500">Status</span><select class="inp w-full mt-0.5" data-ptc-status="${i}">${['Completed','Awarded','Withdrawn','Cancelled'].map(o=>`<option ${x.status===o?'selected':''}>${o}</option>`).join('')}</select></label>
-      </div>
-    </div>`).join('') : `<div class="text-[12px] text-ink-400 text-center py-6 border border-dashed border-line rounded-xl">No past tenders yet. Click “Add past tender” to create one.</div>`;
-  wrap.querySelectorAll('[data-ptc-del]').forEach(b=>b.onclick=()=>{ editingDraft.splice(+b.dataset.ptcDel,1); renderPastTenderCloningAll(); });
+  const STATUS = ['','Completed','Awarded','Withdrawn','Cancelled'];
+  if (!editingDraft.length) {
+    wrap.innerHTML = `<div class="text-[12px] text-ink-400 text-center py-8 border border-dashed border-line rounded-xl">No documents yet. Click “Upload tender document” to add one.</div>`;
+  } else {
+    wrap.innerHTML = `<table class="text-[12.5px]" style="border-collapse:separate;border-spacing:0;min-width:100%">
+      <thead><tr class="text-ink-500">
+        <th class="text-left font-semibold p-2">Document</th>
+        <th class="text-left font-semibold p-2" style="width:108px">Awarded year</th>
+        <th class="text-left font-semibold p-2" style="width:180px">Sector</th>
+        <th class="text-left font-semibold p-2" style="width:150px">Status</th>
+        <th class="p-2" style="width:160px"></th>
+      </tr></thead>
+      <tbody>${editingDraft.map((x,i)=>`<tr class="border-t border-line">
+        <td class="p-2"><div class="flex items-center gap-2"><i data-lucide="file-text" class="w-4 h-4 text-ink-400 shrink-0"></i><input class="inp flex-1 text-[13px] font-medium" data-ptc-f="${i}|title" value="${escapeHtml(x.title||'')}" placeholder="Untitled">${x.doc&&x.doc.kind==='sample'?'<span class="chip shrink-0" style="background:#EEEDFE;color:#8B5CF6">sample</span>':''}</div></td>
+        <td class="p-2"><input type="number" class="inp w-full" data-ptc-n="${i}|awardedYear" value="${x.awardedYear!=null?x.awardedYear:''}" placeholder="—"></td>
+        <td class="p-2"><input class="inp w-full" data-ptc-f="${i}|sector" value="${escapeHtml(x.sector||'')}" placeholder="—"></td>
+        <td class="p-2"><select class="inp w-full" data-ptc-status="${i}">${STATUS.map(o=>`<option value="${o}" ${((x.status||'')===o)?'selected':''}>${o||'—'}</option>`).join('')}</select></td>
+        <td class="p-2 text-right whitespace-nowrap">
+          ${x.doc?`<button class="btn" style="padding:3px 9px" data-ptc-view="${i}"><i data-lucide="eye" class="w-3.5 h-3.5"></i> View PDF</button>`:`<span class="text-[11px] text-ink-400">no file</span>`}
+          <button class="text-ink-400 hover:text-danger ml-1 align-middle" data-ptc-del="${i}" aria-label="Remove"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+        </td>
+      </tr>`).join('')}</tbody></table>`;
+  }
   wrap.querySelectorAll('[data-ptc-f]').forEach(inp=>inp.oninput=e=>{ const [i,f]=e.target.dataset.ptcF.split('|'); editingDraft[+i][f]=e.target.value; });
-  wrap.querySelectorAll('[data-ptc-n]').forEach(inp=>inp.onchange=e=>{ const [i,f]=e.target.dataset.ptcN.split('|'); editingDraft[+i][f]=parseInt(e.target.value,10)||0; renderPastTenderCloningAll(); });
-  wrap.querySelectorAll('[data-ptc-status]').forEach(s=>s.onchange=e=>{ editingDraft[+e.target.dataset.ptcStatus].status=e.target.value; renderPastTenderCloningAll(); });
-  wrap.querySelectorAll('[data-ptc-view]').forEach(b=>b.onclick=()=>{ ptcViewDoc(editingDraft[+b.dataset.ptcView].doc); });
-  wrap.querySelectorAll('[data-ptc-docrm]').forEach(b=>b.onclick=()=>{ editingDraft[+b.dataset.ptcDocrm].doc=null; renderPastTenderCloningAll(); });
+  wrap.querySelectorAll('[data-ptc-n]').forEach(inp=>inp.onchange=e=>{ const [i,f]=e.target.dataset.ptcN.split('|'); const v=e.target.value.trim(); editingDraft[+i][f]=(v===''?null:(parseInt(v,10)||null)); });
+  wrap.querySelectorAll('[data-ptc-status]').forEach(s=>s.onchange=e=>{ editingDraft[+e.target.dataset.ptcStatus].status=e.target.value; });
+  wrap.querySelectorAll('[data-ptc-view]').forEach(b=>b.onclick=()=>ptcViewDoc(editingDraft[+b.dataset.ptcView].doc));
+  wrap.querySelectorAll('[data-ptc-del]').forEach(b=>b.onclick=()=>{ editingDraft.splice(+b.dataset.ptcDel,1); renderPastTenderCloningAll(); });
   const fileInput=document.getElementById('ptcFileInput');
-  const triggerUpload=i=>{ ptcUploadIdx=i; if(fileInput){ fileInput.value=''; fileInput.click(); } };
-  wrap.querySelectorAll('[data-ptc-replace]').forEach(b=>b.onclick=()=>triggerUpload(+b.dataset.ptcReplace));
-  wrap.querySelectorAll('[data-ptc-uprow]').forEach(b=>b.onclick=()=>triggerUpload(+b.dataset.ptcUprow));
-  if(fileInput && !fileInput.dataset.bound){ fileInput.dataset.bound='1'; fileInput.onchange=e=>{ const f=e.target.files&&e.target.files[0]; if(f!=null && ptcUploadIdx!=null) ptcAttachDoc(ptcUploadIdx, f); ptcUploadIdx=null; }; }
-  const up=document.getElementById('ptcUpload'); if(up&&!up.dataset.bound){ up.dataset.bound='1'; up.onclick=()=>{ editingDraft.push({id:'pt_'+Date.now().toString(36),fileName:'',title:'',sector:'',method:'L1',ec:0,awardedYear:2026,status:'Completed',uploadedAt:'',doc:null}); toast('Past tender added — fill its details and attach a document'); renderPastTenderCloningAll(); }; }
+  if(fileInput && !fileInput.dataset.bound){ fileInput.dataset.bound='1'; fileInput.onchange=e=>{ const f=e.target.files&&e.target.files[0]; if(f) ptcUploadNew(f); }; }
+  const up=document.getElementById('ptcUpload'); if(up&&!up.dataset.bound){ up.dataset.bound='1'; up.onclick=()=>{ if(fileInput){ fileInput.value=''; fileInput.click(); } }; }
   refreshIcons();
 }
 
@@ -4828,26 +4656,135 @@ function renderCorrigendumPolicyAll(){
 }
 
 /* ---- pre-publish hard gates ---- */
-function editorPublishGates(){ return `<div id="pgWrap" class="space-y-2"></div><button class="btn btn-primary mt-3" id="pgAdd"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add gate</button>`; }
+/* ---- shared severity-grouped checklist renderer (publish + submission gates) ----
+   Data shape unchanged: [{check, blocking, canOverride, overrideRoles[]}].
+   The 3-way severity is derived (block/warn/off); an optional `off` flag carries
+   the Off state losslessly without restructuring the array. */
+let pgNotCheckedOpen = {};   // ns -> bool (Not-checked section collapse)
+let pgOvOpen = {};           // ns -> Set of indices (override editor open)
+let pgFocus = {};            // ns -> index to focus after re-render
+function pgSeverity(g){ return g && g.off===true ? 'off' : (g && g.blocking ? 'block' : 'warn'); }
+function pgSetSeverity(g, sev){
+  if(sev==='block'){ g.off=false; g.blocking=true; }
+  else if(sev==='warn'){ g.off=false; g.blocking=false; }
+  else { g.off=true; g.blocking=false; g.canOverride=false; g.overrideRoles=[]; }
+}
+let pgPending = {};          // ns -> {gi, sev} awaiting plain-words confirm
+// Plain-English subtitles for the official check names (copy only — not stored).
+const CHECK_SUBTITLES = {
+  'AA captured':'Administrative Approval is recorded',
+  'TS captured':'Technical Sanction is recorded',
+  'AA granted':'Administrative Approval is granted',
+  'CVC review signed off':'Vigilance review is complete',
+  'EMD policy set':'Earnest money amount is decided',
+  'Budget head verified':'Money is available under the correct budget',
+  'Evaluation method chosen':'How bids will be judged is selected',
+  'AI Compliance Check passed':'The AI compliance check passed',
+  'AI Eligibility Risk Check reviewed':'The eligibility-risk check was reviewed',
+  'Scope of work complete':'The full scope of work is written',
+  'BOQ complete':'The bill of quantities is filled in',
+  'Cost estimate with valid basis':'The cost estimate has a clear basis',
+  'Market enquiry done per rules':'Market rates were checked as required',
+  'Competent authority verified for value tier':'The right authority for this value is confirmed',
+  'GeM check done':'GeM availability was checked',
+  'AI Readiness passed':'The AI readiness check passed',
+  'Drawings attached per policy':'Required drawings are attached',
+  'Technical specifications complete':'The technical specs are fully written',
+};
+// Per-checklist wording: tender "publishes/goes out"; DPR "is sent for approval".
+function pgLabels(ns){
+  if(ns==='pg') return {
+    goOut:'before any tender can go out', mustHead:'These STOP a tender from being published',
+    mustHeadSub:'Nothing can go out until these are done.', warnHeadSub:'The officer is warned but can still publish.',
+    mustExplain:'If this isn’t ready, the Publish button stays locked.',
+    warnExplain:'The officer sees a yellow note but can still publish.',
+    offExplain:'This is ignored completely.',
+    confirmWarn:'Are you sure? Officers will be able to publish even if this isn’t done.',
+  };
+  return {
+    goOut:'before this can be sent for approval', mustHead:'These STOP a DPR from being sent for approval',
+    mustHeadSub:'Nothing can be sent for approval until these are done.', warnHeadSub:'The officer is warned but can still submit.',
+    mustExplain:'If this isn’t ready, the Submit button stays locked.',
+    warnExplain:'The officer sees a yellow note but can still submit.',
+    offExplain:'This is ignored completely.',
+    confirmWarn:'Are you sure? Officers will be able to submit even if this isn’t done.',
+  };
+}
+function pgGateRowHTML(arr, gi, ns, roles, L){
+  const g=arr[gi]; const sev=pgSeverity(g);
+  const edge = sev==='block'?'#EF4444':sev==='warn'?'#F59E0B':'#9CA3AF';
+  const lockIcon = sev==='block'?'lock':sev==='warn'?'unlock':'minus';
+  const sub = CHECK_SUBTITLES[g.check] || '';
+  const seg=(val,label,color)=>{ const on=sev===val; return `<button data-pg-sev="${ns}|${gi}|${val}" class="px-2.5 py-1 text-[11.5px] ${on?'text-white font-medium':'text-ink-500 hover:bg-surface'}" style="${on?('background:'+color):''}">${label}</button>`; };
+  const explain = sev==='block'?L.mustExplain : sev==='warn'?L.warnExplain : L.offExplain;
+  // "skip in an emergency" — only for must-be-done rows
+  let skip='';
+  if(sev==='block'){
+    const rs=g.overrideRoles||[]; const open=(pgOvOpen[ns]||new Set()).has(gi);
+    if(open){
+      skip=`<div class="mt-1.5"><div class="text-[11px] text-ink-500 mb-1">Who is allowed to skip this in an emergency?</div><div class="flex flex-wrap gap-1.5">${roles.map(r=>{const on=rs.includes(r);return `<button class="chip-input" style="cursor:pointer;${on?'background:#EFF6FF;border-color:#93C5FD;color:#0F5EE8':''}" data-pg-role="${ns}|${gi}|${escapeHtml(r)}">${escapeHtml(r)}</button>`;}).join('')}<button class="text-[11px] text-primary hover:underline ml-1" data-pg-ovdone="${ns}|${gi}">done</button></div></div>`;
+    } else {
+      const summary = rs.length ? ('Only '+rs.join(', ')+' can skip this.') : 'Nobody can skip this.';
+      skip=`<button class="mt-1 text-[11px] ${rs.length?'text-ink-500':'text-ink-400'} hover:text-primary inline-flex items-center gap-1" data-pg-ovedit="${ns}|${gi}"><i data-lucide="pencil" class="w-3 h-3"></i> ${escapeHtml(summary)}</button>`;
+    }
+  }
+  // inline plain-words confirm when downgrading a must-be-done row
+  const pend = (pgPending[ns] && pgPending[ns].gi===gi) ? pgPending[ns] : null;
+  const confirmBar = pend ? `<div class="mt-2 flex items-center gap-2 text-[12px] rounded-lg px-2.5 py-2" style="background:#FFFBEB;border:1px solid #FDE68A"><i data-lucide="alert-triangle" class="w-3.5 h-3.5" style="color:#F59E0B"></i><span class="flex-1 text-ink-700">${pend.sev==='warn'?L.confirmWarn:'Are you sure? This won’t be checked at all.'}</span><button class="btn btn-primary" style="padding:2px 10px" data-pg-yes="${ns}|${gi}">Yes</button><button class="btn" style="padding:2px 10px" data-pg-no="${ns}|${gi}">Cancel</button></div>` : '';
+  return `<div class="group bg-white border border-line rounded-xl px-3.5 py-2.5" style="border-left:3px solid ${edge}${sev==='off'?';opacity:.75':''}">
+    <div class="flex items-start gap-3">
+      <i data-lucide="${lockIcon}" class="w-4 h-4 mt-0.5 shrink-0" style="color:${edge}"></i>
+      <div class="flex-1 min-w-0">
+        <input class="w-full bg-transparent text-[13px] font-medium text-ink-900 focus:outline-none border-0 p-0" data-pg-name="${ns}|${gi}" value="${escapeHtml(g.check||'')}" placeholder="Describe in simple words what must be ready.">
+        ${sub?`<div class="text-[11.5px] text-ink-500">${escapeHtml(sub)}</div>`:''}
+      </div>
+      <div class="inline-flex rounded-lg border border-line overflow-hidden shrink-0">${seg('block','Must be done','#EF4444')}${seg('warn','Reminder only','#F59E0B')}${seg('off','Don’t check','#9CA3AF')}</div>
+      <button class="text-ink-300 hover:text-danger opacity-0 group-hover:opacity-100 transition shrink-0 mt-0.5" data-pg-rm="${ns}|${gi}" aria-label="Remove"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+    </div>
+    <div class="text-[11px] text-ink-500 mt-1 ml-7">${escapeHtml(explain)}</div>
+    ${skip?`<div class="ml-7">${skip}</div>`:''}
+    ${confirmBar}
+  </div>`;
+}
+function renderGateSections(arr, host, onChange, ns){
+  if(!Array.isArray(arr)) arr=[];
+  arr.forEach(g=>{ g.overrideRoles=g.overrideRoles||[]; });
+  const roles=pgRoles(); const L=pgLabels(ns);
+  pgOvOpen[ns]=pgOvOpen[ns]||new Set();
+  const idxBy=sev=>arr.map((g,i)=>i).filter(i=>pgSeverity(arr[i])===sev);
+  const block=idxBy('block'), warn=idxBy('warn'), off=idxBy('off');
+  const summary = `Right now, <b>${block.length}</b> thing${block.length!==1?'s':''} must be finished ${L.goOut}, and <b>${warn.length}</b> ${warn.length!==1?'are':'is'} just reminder${warn.length!==1?'s':''}.`;
+  const head=(icon,title,subtitle,count,accent)=>`<div class="mb-2"><div class="flex items-center gap-2"><i data-lucide="${icon}" class="w-4 h-4" style="color:${accent}"></i><span class="text-[12.5px] font-semibold text-ink-900">${title}</span><span class="text-[11px] font-semibold px-2 py-0.5 rounded-full" style="background:${accent}1f;color:${accent}">${count}</span></div><div class="text-[11px] text-ink-500 mt-0.5 ml-6">${subtitle}</div></div>`;
+  const list=idxs=>idxs.length?`<div class="space-y-2">${idxs.map(i=>pgGateRowHTML(arr,i,ns,roles,L)).join('')}</div>`:`<div class="text-[12px] text-ink-400 italic ml-6">None yet.</div>`;
+  const offOpen=!!pgNotCheckedOpen[ns];
+  host.innerHTML=`
+    <div class="text-[13px] text-ink-800 bg-surface border border-line rounded-xl px-3.5 py-2.5 mb-4">${summary}</div>
+    <div class="rounded-xl p-3" style="border-left:3px solid #EF4444;background:#FEF2F2">${head('lock',L.mustHead,L.mustHeadSub,block.length,'#EF4444')}${list(block)}</div>
+    <div class="rounded-xl p-3 mt-3" style="border-left:3px solid #F59E0B;background:#FFFBEB">${head('alert-triangle','These just remind the officer',L.warnHeadSub,warn.length,'#F59E0B')}${list(warn)}<div class="mt-2 ml-6"><button class="btn" data-pg-add="${ns}"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add check</button></div></div>
+    <div class="mt-3 border-t border-line pt-2">
+      <button class="inline-flex items-center gap-1 text-[12.5px] font-semibold text-ink-500" data-pg-offtoggle="${ns}"><i data-lucide="chevron-${offOpen?'down':'right'}" class="w-3.5 h-3.5"></i> Turned off <span class="text-[11px] px-2 py-0.5 rounded-full" style="background:#F3F4F6;color:#9CA3AF">${off.length}</span></button>
+      <div class="text-[11px] text-ink-400 ml-5">These aren’t checked at all.</div>
+      ${offOpen?`<div class="mt-2">${list(off)}</div>`:''}
+    </div>`;
+  host.querySelectorAll('[data-pg-name]').forEach(inp=>inp.oninput=e=>{ arr[+e.target.dataset.pgName.split('|')[1]].check=e.target.value; });
+  host.querySelectorAll('[data-pg-sev]').forEach(b=>b.onclick=()=>{ const p=b.dataset.pgSev.split('|'); const gi=+p[1], target=p[2]; const cur=pgSeverity(arr[gi]);
+    if(cur==='block' && (target==='warn'||target==='off') && target!==cur){ pgPending[ns]={gi,sev:target}; onChange(); return; }
+    pgPending[ns]=null; pgSetSeverity(arr[gi], target); onChange(); });
+  host.querySelectorAll('[data-pg-yes]').forEach(b=>b.onclick=()=>{ const gi=+b.dataset.pgYes.split('|')[1]; const p=pgPending[ns]; if(p&&p.gi===gi){ pgSetSeverity(arr[gi], p.sev); } pgPending[ns]=null; onChange(); });
+  host.querySelectorAll('[data-pg-no]').forEach(b=>b.onclick=()=>{ pgPending[ns]=null; onChange(); });
+  host.querySelectorAll('[data-pg-rm]').forEach(b=>b.onclick=()=>{ arr.splice(+b.dataset.pgRm.split('|')[1],1); pgPending[ns]=null; onChange(); });
+  host.querySelectorAll('[data-pg-ovedit]').forEach(b=>b.onclick=()=>{ pgOvOpen[ns].add(+b.dataset.pgOvedit.split('|')[1]); onChange(); });
+  host.querySelectorAll('[data-pg-ovdone]').forEach(b=>b.onclick=()=>{ pgOvOpen[ns].delete(+b.dataset.pgOvdone.split('|')[1]); onChange(); });
+  host.querySelectorAll('[data-pg-role]').forEach(b=>b.onclick=()=>{ const p=b.dataset.pgRole.split('|'); const g=arr[+p[1]]; const r=p.slice(2).join('|'); g.overrideRoles=g.overrideRoles||[]; const k=g.overrideRoles.indexOf(r); k>=0?g.overrideRoles.splice(k,1):g.overrideRoles.push(r); g.canOverride=g.overrideRoles.length>0; onChange(); });
+  host.querySelectorAll('[data-pg-add]').forEach(b=>b.onclick=()=>{ pgFocus[ns]=arr.length; arr.push({check:'', blocking:false, off:false, canOverride:false, overrideRoles:[]}); onChange(); });
+  host.querySelectorAll('[data-pg-offtoggle]').forEach(b=>b.onclick=()=>{ pgNotCheckedOpen[ns]=!pgNotCheckedOpen[ns]; onChange(); });
+  if(pgFocus[ns]!=null){ const el=host.querySelector(`[data-pg-name="${ns}|${pgFocus[ns]}"]`); if(el&&el.focus){ el.focus(); } pgFocus[ns]=null; }
+  refreshIcons();
+}
+function editorPublishGates(){ return `<div id="pgWrap"></div>`; }
 function renderPublishGatesAll(){
   if(!Array.isArray(editingDraft)) editingDraft=[];
-  const wrap=document.getElementById('pgWrap');
-  const roles=pgRoles();
-  wrap.innerHTML=editingDraft.length?editingDraft.map((g,i)=>`<div class="bg-white border border-line rounded-xl p-2.5 space-y-2">
-    <div class="flex items-center gap-2"><input class="inp flex-1 text-[13px]" data-pg-check="${i}" value="${escapeHtml(g.check||'')}"><button class="text-ink-400 hover:text-danger" data-pg-rm="${i}" aria-label="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>
-    <div class="flex items-center gap-4 flex-wrap text-[12px]">
-      <div class="flex items-center gap-2"><button class="toggle ${g.blocking?'on':''}" data-pg-block="${i}"><span class="dot"></span></button><span>Blocking</span></div>
-      <div class="flex items-center gap-2"><button class="toggle ${g.canOverride?'on':''}" data-pg-over="${i}"><span class="dot"></span></button><span>Can override</span></div>
-    </div>
-    ${g.canOverride?`<div><div class="text-[11px] text-ink-500 mb-1">Override roles</div><div class="flex flex-wrap gap-1.5">${roles.map(r=>{const on=(g.overrideRoles||[]).includes(r);return `<button class="chip-input" style="cursor:pointer;${on?'background:#EFF6FF;border-color:#93C5FD;color:#0F5EE8':''}" data-pg-role="${i}|${escapeHtml(r)}">${escapeHtml(r)}</button>`;}).join('')}</div></div>`:''}
-  </div>`).join('') : '<div class="text-[12px] text-ink-400 text-center py-6 border border-dashed border-line rounded-xl">No gates.</div>';
-  wrap.querySelectorAll('[data-pg-check]').forEach(inp=>inp.oninput=e=>{editingDraft[+e.target.dataset.pgCheck].check=e.target.value;});
-  wrap.querySelectorAll('[data-pg-rm]').forEach(b=>b.onclick=()=>{editingDraft.splice(+b.dataset.pgRm,1);renderPublishGatesAll();});
-  wrap.querySelectorAll('[data-pg-block]').forEach(b=>b.onclick=()=>{const g=editingDraft[+b.dataset.pgBlock];g.blocking=!g.blocking;renderPublishGatesAll();});
-  wrap.querySelectorAll('[data-pg-over]').forEach(b=>b.onclick=()=>{const g=editingDraft[+b.dataset.pgOver];g.canOverride=!g.canOverride;g.overrideRoles=g.overrideRoles||[];if(!g.canOverride)g.overrideRoles=[];renderPublishGatesAll();});
-  wrap.querySelectorAll('[data-pg-role]').forEach(b=>b.onclick=()=>{const [i,r]=b.dataset.pgRole.split('|');const g=editingDraft[+i];g.overrideRoles=g.overrideRoles||[];const k=g.overrideRoles.indexOf(r);k>=0?g.overrideRoles.splice(k,1):g.overrideRoles.push(r);renderPublishGatesAll();});
-  const add=document.getElementById('pgAdd');if(add&&!add.dataset.bound){add.dataset.bound='1';add.onclick=()=>{editingDraft.push({check:'New gate',blocking:true,canOverride:false,overrideRoles:[]});renderPublishGatesAll();};}
-  refreshIcons();
+  renderGateSections(editingDraft, document.getElementById('pgWrap'), renderPublishGatesAll, 'pg');
 }
 
 /* ---- withdrawal / cancellation policy ---- */
@@ -5134,7 +5071,8 @@ function tqTxtCls(t){ return t===100?'text-success':t<100?'text-warning':'text-d
 function tqFillCls(t){ return t===100?'bg-success':t<100?'bg-warning':'bg-danger'; }
 function tqDeltaText(t){ return t===100?'Balanced — totals 100':(t<100?(100-t)+' marks under — add somewhere':(t-100)+' marks over — reduce somewhere'); }
 function tqNormalize(v){
-  const def=JSON.parse(JSON.stringify(ITEMS.find(i=>i.id==='tender.tq-rubric').def));
+  const _it=ITEMS.find(i=>i.id==='tender.tq-rubric');           // item deleted — guard against crash if ever called
+  const def=_it?JSON.parse(JSON.stringify(_it.def)):{groups:[],overrides:[]};
   if(Array.isArray(v)){
     const nameToGroup={}; def.groups.forEach(g=>g.criteria.forEach(c=>{ nameToGroup[(c.name||'').toLowerCase()]=g.id; }));
     const groups=def.groups.map(g=>({id:g.id,name:g.name,criteria:[]}));
@@ -5346,19 +5284,7 @@ function upgradeLanguages(oldKv){
 }
 function runMigrations(){
   const store=loadStore();
-  // TQ rubric migration — independent guard so it runs even if the v2 flag is already set.
-  if(!store['_tq_migrated_v3']){
-    if(('tender.tq-rubric' in store) && Array.isArray(store['tender.tq-rubric'])) store['tender.tq-rubric']=tqNormalize(store['tender.tq-rubric']);
-    if('eval.tq-sector-overrides' in store){
-      const rub = (store['tender.tq-rubric'] && typeof store['tender.tq-rubric']==='object' && !Array.isArray(store['tender.tq-rubric']))
-        ? store['tender.tq-rubric'] : (store['tender.tq-rubric']=JSON.parse(JSON.stringify(ITEMS.find(i=>i.id==='tender.tq-rubric').def)));
-      rub.overrides=rub.overrides||[];
-      const old=store['eval.tq-sector-overrides'];
-      if(Array.isArray(old)) old.forEach(o=>{ const sec=o.sector||''; if(sec && !rub.overrides.find(x=>x.sector===sec)) rub.overrides.push({id:tqUid('o'),sector:sec,rows:[],legacyNote:o.override||''}); });
-    }
-    store['_tq_migrated_v3']=true;
-    saveStore(store);
-  }
+  // (TQ rubric migration retired — tender.tq-rubric was deleted; see the Tender Creation deletions guard below.)
   // Tender Creation removals + shape upgrades — independent guard (runs once regardless of v2).
   if(!store['_tender_v4']){
     ['tender.template-library','tender.pq-types-8','tender.milestones','tender.milestones-tier-overrides','tender.autosave','tender.corrigendum','tender.withdrawal-policy','tender.corrigendum-policy','tender.auto-corrigendum-triggers']
@@ -5393,6 +5319,28 @@ function runMigrations(){
     }
     ['dpr.revision-limits','dpr.priority-sla','dpr.templates','dpr.site-visit','dpr.version-limit','dpr.gem-justification'].forEach(k=>{ if(k in store) delete store[k]; });
     store['_gem_v1']=true;
+    saveStore(store);
+  }
+  // Role-centric committee: convert saved person-centric state to {roles[]}.
+  if(!store['_cmte_roles_v1']){
+    ['dpr.committee','tender.committee','prebid.committee','eval.committee','mgmt.committee'].forEach(id=>{
+      if(id in store && store[id] && typeof store[id]==='object' && !Array.isArray(store[id]) && !Array.isArray(store[id].roles)){
+        store[id]=cmteNormalize(store[id], id);
+      }
+    });
+    store['_cmte_roles_v1']=true;
+    saveStore(store);
+  }
+  // Tender Creation deletions (Pointer 2): prune saved state for removed items + the retired TQ alias source.
+  if(!store['_tender_del_v1']){
+    ['tender.smart-start','tender.starter-chips','tender.emd-policy','tender.806040','tender.tq-rubric','tender.pq-by-company','tender.calendar','tender.numbering','tender.ai-eligibility','tender.ai-section-prompts','tender.nit-sections','eval.tq-sector-overrides'].forEach(k=>{ if(k in store) delete store[k]; });
+    store['_tender_del_v1']=true;
+    saveStore(store);
+  }
+  // Pre-Bid Queries deletions: prune saved state for removed items.
+  if(!store['_prebid_del_v1']){
+    ['prebid.ai-threshold','prebid.response-chain','prebid.response-chain-mandatory','prebid.corr-numbering','prebid.consultants','prebid.permissions-link'].forEach(k=>{ if(k in store) delete store[k]; });
+    store['_prebid_del_v1']=true;
     saveStore(store);
   }
   if(store['_admin_migrated_v2']) return;

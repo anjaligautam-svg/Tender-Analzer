@@ -21,13 +21,11 @@
     'tender.notification-channels':   n => n,
     'tender.notification-recipients': n => n,
     'tender.escalation-rules':        n => n && n.events && n.events.filter(e=>e.escalation).map(e=>({event:e.name, breachHours:e.escalation.breachHours, escalateTo:e.escalation.escalateTo})),
-    // absorbed into 'tender.tq-rubric' (sector overrides tab)
-    'eval.tq-sector-overrides':          r => r && r.overrides,
+    // NOTE: 'eval.tq-sector-overrides' alias removed — tender.tq-rubric was deleted; the read now falls back.
   };
   const ALIAS_PARENT = {
     'tender.method-master':'tender.methods-suite','tender.qcbs-ratios':'tender.methods-suite',
     'tender.reminder-schedule':'tender.notifications-suite','tender.notification-channels':'tender.notifications-suite','tender.notification-recipients':'tender.notifications-suite','tender.escalation-rules':'tender.notifications-suite',
-    'eval.tq-sector-overrides':'tender.tq-rubric',
   };
 
   window.AdminState = {

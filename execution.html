@@ -4,12 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Execution — TenderAI Hub</title>
-  <meta name="description" content="Contract execution: milestones, RA bills, and extensions for awarded tenders." />
+  <meta name="description" content="Contract execution: milestones, RA bills, and analytics for awarded tenders." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script src="admin-state.js"></script>
   <script>
     tailwind.config = { theme: { extend: {
@@ -122,6 +123,16 @@
     .ex-thumb-rm:hover { color:#EF4444; }
     .ex-upzone { border:1.5px dashed #D1D5DB; border-radius:8px; padding:14px; text-align:center; background:#F9FAFB; cursor:pointer; font-size:12px; color:#6B7280; }
     .ex-upzone:hover { border-color:#0F5EE8; }
+    /* analytics chart containers (fixed height to prevent layout jump) */
+    .ex-chart-wrap { height:220px; position:relative; }
+    /* polished lifecycle timeline (analytics) */
+    .ex-tl2 { display:flex; align-items:flex-start; gap:0; }
+    .ex-tl2-node { display:flex; flex-direction:column; align-items:center; gap:6px; flex-shrink:0; min-width:104px; }
+    .ex-tl2-dot { width:14px; height:14px; border-radius:50%; background:#0F5EE8; }
+    .ex-tl2-dot.done { background:#10B981; }
+    .ex-tl2-dot.bn { box-shadow:0 0 0 4px rgba(245,158,11,0.25); }
+    .ex-tl2-leg { flex:1; height:3px; min-width:18px; background:#E5E7EB; margin-top:5.5px; border-radius:2px; }
+    .ex-tl2-tag { display:inline-flex; align-items:center; border-radius:9999px; padding:2px 9px; font-size:11px; font-weight:600; line-height:1.4; }
   </style>
 </head>
 <body class="bg-surface">
@@ -220,7 +231,7 @@
         <section id="exec-landing">
           <div class="mb-5">
             <h1 class="text-[24px] font-bold text-ink-900 leading-tight">Execution</h1>
-            <p class="text-[14px] text-ink-500 mt-1">Track milestones, RA bills, and extensions for awarded contracts.</p>
+            <p class="text-[14px] text-ink-500 mt-1">Track milestones, RA bills, and analytics for awarded contracts.</p>
           </div>
           <div id="contractList"></div>
         </section>
@@ -276,7 +287,7 @@
   function seed(tnd){
     const c = contractFor(tnd) || CONTRACTS[0];
     const dlpEnd = isoDate(addMonths(new Date(c.completion), 6));
-    const st = { _tnd:tnd, contract:{ value:c.value, commencement:c.commence, completion:c.completion, dlpEnd, eotDays:0 }, milestones:[], bills:[], eotRequests:[], activityLog:[] };
+    const st = { _tnd:tnd, contract:{ value:c.value, commencement:c.commence, completion:c.completion, dlpEnd }, milestones:[], bills:[], activityLog:[] };
     if (tnd === 'TND-2026-001'){
       st.milestones = [
         { id:'m1', name:'Site mobilisation', plannedDate:'2026-06-05', actualDate:'2026-06-03', weight:10, status:'completed', photos:[] },
@@ -386,14 +397,13 @@
 
   function renderWorkspace(){
     const c = contractFor(CUR); const st = curState();
-    const tabs = [['overview','Overview'],['milestones','Milestones'],['bills','RA Bills'],['extensions','Extensions'],['analytics','Analytics']];
+    const tabs = [['overview','Overview'],['milestones','Milestones'],['bills','RA Bills'],['analytics','Analytics']];
     const tabBar = tabs.map(([k,l]) => '<button class="ex-tab px-4 py-1.5 rounded-full text-[13px] '+(CURTAB===k?'border border-primary bg-primary text-white':'border border-line bg-white text-ink-500 hover:text-ink-900')+'" onclick="setTab(\''+k+'\')">'+l+'</button>').join('');
     let body = '';
     if (CURTAB==='overview') body = renderOverview(c, st);
     else if (CURTAB==='milestones') body = renderMilestones(c, st);
     else if (CURTAB==='bills') body = renderBills(c, st);
-    else if (CURTAB==='analytics') body = renderAnalytics(c, st);
-    else body = renderExtensions(c, st);
+    else body = renderAnalytics(c, st);
     const stt = contractStatus(st);
     document.getElementById('exec-workspace').innerHTML =
       '<button class="ex-link mb-3 inline-flex items-center gap-1" onclick="backToLanding()"><i data-lucide="arrow-left" style="width:13px;height:13px;"></i> All contracts</button>'
@@ -408,6 +418,7 @@
       + '<div class="flex items-center gap-2 mb-5 flex-wrap">'+tabBar+'</div>'
       + '<div id="exTabBody">'+body+'</div>';
     refreshIcons();
+    if (CURTAB==='analytics') renderAnalyticsCharts(st);
   }
 
   // ---- TAB: OVERVIEW ----
@@ -418,9 +429,6 @@
     const behind = (tp - phys) > 10;
     const comp=new Date(st.contract.completion);
     const dlpEnd=new Date(st.contract.dlpEnd);
-    const eotChip = st.contract.eotDays>0 ? ' <span class="ex-chip" style="background:#FFFBEB;color:#92400E;">+EoT '+st.contract.eotDays+' days</span>' : '';
-    // performance security from bidApproval/Stage 5 (best-effort read)
-    const ps = readPerfSecurity(st, value);
     const acts = (st.activityLog||[]).slice(0,5).map(a =>
       '<div style="display:flex; gap:10px; padding:8px 0; border-bottom:1px solid #F3F4F6;"><i data-lucide="'+actIcon(a.action)+'" style="width:14px;height:14px;color:#9CA3AF;flex-shrink:0;margin-top:2px;"></i>'
       + '<div style="min-width:0;"><div class="text-[13px] text-ink-900">'+esc(a.detail||a.action)+'</div><div class="text-[11px] text-ink-400">'+esc(a.officer||'')+' · '+esc(fmtDT(a.timestamp))+'</div></div></div>').join('') || '<div class="text-[12.5px] text-ink-400 italic py-3">No activity yet</div>';
@@ -439,30 +447,16 @@
       +   '<div class="ex-timeline">'
       +     tlNode('Commencement', fmtD(st.contract.commencement), 'done')
       +     '<div class="ex-tl-leg"></div>'
-      +     tlNode('Scheduled completion', fmtD(st.contract.completion)+eotChip, today()>comp?'done':'now')
+      +     tlNode('Scheduled completion', fmtD(st.contract.completion), today()>comp?'done':'now')
       +     '<div class="ex-tl-leg"></div>'
       +     tlNode('DLP end', fmtD(st.contract.dlpEnd), today()>dlpEnd?'done':'future')
       +   '</div></div>'
-      // performance security + recent activity
-      + '<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">'
-      +   '<div class="ex-card"><div class="text-[13px] font-bold text-ink-900 mb-3">Performance security</div>'
-      +     '<div class="text-[13px] text-ink-900" style="display:flex; justify-content:space-between; padding:5px 0;"><span class="text-ink-500">Amount (5%)</span><span class="font-semibold">'+fmtINR(ps.amount)+'</span></div>'
-      +     '<div class="text-[13px]" style="display:flex; justify-content:space-between; padding:5px 0;"><span class="text-ink-500">Instrument</span><span>'+esc(ps.ref)+'</span></div>'
-      +     '<div class="text-[13px]" style="display:flex; justify-content:space-between; padding:5px 0; align-items:center;"><span class="text-ink-500">Valid till</span><span>'+fmtD(ps.validity)+' '+ps.chip+'</span></div></div>'
-      +   '<div class="ex-card"><div class="text-[13px] font-bold text-ink-900 mb-2">Recent activity</div>'+acts+'</div>'
-      + '</div>';
+      // recent activity
+      + '<div class="ex-card"><div class="text-[13px] font-bold text-ink-900 mb-2">Recent activity</div>'+acts+'</div>';
   }
   function card(k,v,sub){ return '<div class="ex-card"><div class="text-[12px] text-ink-500">'+k+'</div><div class="text-[20px] font-bold text-ink-900 mt-1">'+v+'</div><div class="text-[11px] text-ink-400 mt-1.5">'+sub+'</div></div>'; }
   function tlNode(label, date, state){ const dot = state==='done'?'done':(state==='future'?'future':''); return '<div class="ex-tl-node"><div class="ex-tl-dot '+dot+'"></div><div class="text-[12px] font-semibold text-ink-900 text-center">'+label+'</div><div class="text-[11px] text-ink-500 text-center">'+date+'</div></div>'; }
-  function actIcon(a){ a=(a||'').toLowerCase(); if(a.includes('paid')||a.includes('bill')) return 'receipt'; if(a.includes('milestone')) return 'flag'; if(a.includes('eot')||a.includes('extension')) return 'calendar-plus'; if(a.includes('commenc')) return 'play'; return 'activity'; }
-  function readPerfSecurity(st, value){
-    let validity = isoDate(addMonths(new Date(st.contract.completion), 6));
-    const n=today(); const v=new Date(validity); const days=daysBetween(n,v);
-    let chip; if (n>v) chip='<span class="ex-chip" style="background:#FEF2F2;color:#991B1B;">Expired</span>';
-    else if (days<60) chip='<span class="ex-chip" style="background:#FFFBEB;color:#92400E;">'+days+' days left</span>';
-    else chip='<span class="ex-chip" style="background:#F0FDF4;color:#065F46;">'+days+' days left</span>';
-    return { amount: Math.round(value*0.05), ref:'BG-AMC-'+(CUR||'').replace(/\D/g,'').slice(-4)+'/PS', validity, chip };
-  }
+  function actIcon(a){ a=(a||'').toLowerCase(); if(a.includes('paid')||a.includes('bill')) return 'receipt'; if(a.includes('milestone')) return 'flag'; if(a.includes('commenc')) return 'play'; return 'activity'; }
 
   // ---- TAB: MILESTONES ----
   let _msExpanded = null, _msAction = null, _msAdd = false;
@@ -581,55 +575,168 @@
     });
   }
 
-  // ---- TAB: EXTENSIONS ----
-  let _eotForm=false;
-  function renderExtensions(c, st){
-    const rows=(st.eotRequests||[]).map(e=>{
-      const sp = e.status==='Approved'?{color:'green'}:(e.status==='Rejected'?{color:'red'}:{color:'gray'});
-      return '<tr><td>'+fmtD(e.requestedDate)+'</td><td>'+e.days+' days</td><td>'+esc(e.reason)+'</td><td>'+(e.withLD?'With LD':'Without LD')+'</td>'
-        + '<td><span class="ex-pill '+sp.color+'">'+esc(e.status)+'</span></td>'
-        + '<td>'+(e.approvalChain&&e.approvalChain.length?'<button class="ex-link" onclick="exTrackOpen(\'eot\',\''+e.id+'\')">Track →</button>':'<span class="text-ink-400 text-[12px]">—</span>')+'</td></tr>';
-    }).join('') || '<tr><td colspan="6" class="text-center text-ink-400 italic py-6">No extension requests yet</td></tr>';
-    const reasons=['Monsoon/weather','Site not available','Scope variation','Material shortage','Other'];
-    const form=_eotForm
-      ? '<div class="ex-inline"><div class="text-[14px] font-bold mb-3">Record EoT request</div>'
-        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'
-        +   '<div><label class="ex-lbl">Requested by vendor (date)</label><input type="date" class="ex-input" id="eotDate" value="'+isoDate(today())+'"/></div>'
-        +   '<div><label class="ex-lbl">Days requested</label><input type="number" class="ex-input" id="eotDays" min="1" placeholder="30"/></div>'
-        + '</div>'
-        + '<div style="margin-top:10px;"><label class="ex-lbl">Reason</label><select class="ex-input" id="eotReason">'+reasons.map(r=>'<option>'+r+'</option>').join('')+'</select></div>'
-        + '<div style="margin-top:10px;"><label class="ex-lbl">Details</label><textarea class="ex-input" id="eotDetails" style="min-height:60px;" placeholder="Explain the circumstances…"></textarea></div>'
-        + '<div style="margin-top:10px;"><label class="ex-lbl">Liquidated damages</label><div style="display:flex;gap:16px;font-size:13px;"><label><input type="radio" name="eotLD" value="without" checked/> Without LD</label><label><input type="radio" name="eotLD" value="with"/> With LD</label></div>'
-        +   '<div class="text-[11px] text-ink-400 mt-1">Without LD: time extended, no penalty (delay not attributable to contractor). With LD: extension granted but liquidated damages still apply.</div></div>'
-        + '<div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end;"><button class="ex-link" onclick="_eotForm=false;renderWorkspace()">Cancel</button><button class="ex-btn" onclick="eotSubmit()">Submit →</button></div></div>'
-      : '<button class="ex-btn mt-3" onclick="_eotForm=true;renderWorkspace()"><i data-lucide="plus" style="width:14px;height:14px;"></i> Record EoT request</button>';
-    return '<div class="text-[14px] font-bold text-ink-900 mb-3">Extension of Time (EoT) requests</div>'
-      + '<table class="ex-table"><thead><tr><th>Requested</th><th>Days</th><th>Reason</th><th>LD basis</th><th>Status</th><th>Action</th></tr></thead><tbody>'+rows+'</tbody></table>'+form;
-  }
-  function eotSubmit(){ const st=curState(); const days=parseInt((document.getElementById('eotDays')||{}).value||'0',10)||0; if(days<=0){ showToast('Enter days requested'); return; }
-    const eot={ id:'eot-'+Date.now().toString(36), requestedDate:(document.getElementById('eotDate')||{}).value||isoDate(today()), days, reason:(document.getElementById('eotReason')||{}).value||'Other', details:(document.getElementById('eotDetails')||{}).value||'', withLD:(document.querySelector('input[name=eotLD]:checked')||{}).value==='with', status:'Submitted', approvalChain:[] };
-    exAprOpen({ title:'Send EoT request for approval', subtitle:days+' days requested ('+(eot.withLD?'with LD':'without LD')+').',
-      pool:[ {id:'site-eng',name:'Site Engineer',desig:'Execution',required:true}, {id:'ee',name:'Executive Engineer',desig:'Technical'}, {id:'dc',name:'Sunita Rao',desig:'Deputy Commissioner'} ],
-      onConfirm:(chain)=>{ eot.approvalChain=chain; st.eotRequests=st.eotRequests||[]; st.eotRequests.push(eot); logAct(st,'EoT requested', days+' days requested — '+eot.reason); exSave(st); _eotForm=false; renderWorkspace(); showToast('EoT request submitted for approval'); }
-    });
-  }
-
   // =====================================================================
   // TAB: ANALYTICS — full-lifecycle analysis for this tender (read-only)
   // =====================================================================
   function lsGet(key){ try { const r=localStorage.getItem(key); return r?JSON.parse(r):null; } catch(e){ return null; } }
   function pct1(n){ return (Math.round(n*10)/10); }
   function emptyNote(){ return '<div style="font-size:12px;color:#9CA3AF;font-style:italic;">Data unavailable for this stage</div>'; }
-  function aBar(label, valueLabel, w, color, ariaVal){
-    w = Math.max(2, Math.min(100, Math.round(w)));
-    return '<div style="margin-bottom:11px;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span style="color:#374151;">'+label+'</span><span style="font-weight:600;color:#111827;">'+valueLabel+'</span></div>'
-      + '<div class="ex-bar" role="img" aria-label="'+esc(ariaVal||(label+': '+valueLabel))+'"><span style="width:'+w+'%;background:'+color+';"></span></div></div>';
-  }
   function secCard(title, inner){ return '<div class="ex-card" style="padding:20px 22px;margin-bottom:16px;"><div class="text-[14px] font-bold text-ink-900 mb-3">'+title+'</div>'+inner+'</div>'; }
+
+  // ---- Chart.js palette + global defaults (set once) ----
+  const BM_PALETTE = { primary:'#0F5EE8', success:'#10B981', amber:'#F59E0B', red:'#EF4444', purple:'#8B5CF6', neutral:'#E5E7EB', neutral2:'#94A3B8', axis:'#6B7280', grid:'#F3F4F6' };
+  let _bmDefaultsDone = false;
+  function bmChartDefaults(){
+    if (_bmDefaultsDone || typeof Chart === 'undefined') return;
+    _bmDefaultsDone = true;
+    Chart.defaults.font.family = '"DM Sans", system-ui, sans-serif';
+    Chart.defaults.font.size = 12;
+    Chart.defaults.color = BM_PALETTE.axis;
+    Chart.defaults.plugins.legend.labels.font = { size: 12 };
+    Chart.defaults.plugins.title.display = false;
+    Chart.defaults.animation = { duration: 600, easing: 'easeOutQuart' };
+    Chart.defaults.plugins.tooltip.backgroundColor = '#1a1a1a';
+    Chart.defaults.plugins.tooltip.titleColor = '#ffffff';
+    Chart.defaults.plugins.tooltip.bodyColor = '#ffffff';
+    Chart.defaults.plugins.tooltip.titleFont = { size: 12, weight: '600' };
+    Chart.defaults.plugins.tooltip.bodyFont = { size: 12 };
+    Chart.defaults.plugins.tooltip.padding = 10;
+    Chart.defaults.plugins.tooltip.cornerRadius = 8;
+    Chart.defaults.plugins.tooltip.displayColors = false;
+    Chart.defaults.elements.bar.borderRadius = 6;
+  }
+  function inrIN(n){ return '₹' + (Math.round(Number(n)||0)).toLocaleString('en-IN'); }
+
+  // ---- chart instance store + lazy renderer (Analytics tab) ----
+  const _charts = {};
+  let _analyticsData = null;
+  function bmDestroyCharts(){ Object.keys(_charts).forEach(k=>{ try { if(_charts[k]) _charts[k].destroy(); } catch(e){} delete _charts[k]; }); }
+  // afterDraw plugin: dashed vertical "Estimate" (EC) line on the bid-competition bar
+  const ecLinePlugin = {
+    id: 'ecLine',
+    afterDraw(chart, args, opts){
+      const ecVal = opts && opts.value; if(ecVal==null) return;
+      const xs = chart.scales.x, area = chart.chartArea; if(!xs||!area) return;
+      const px = xs.getPixelForValue(ecVal); if(!isFinite(px)) return;
+      const ctx = chart.ctx; ctx.save();
+      ctx.beginPath(); ctx.setLineDash([5,4]); ctx.lineWidth = 1.5; ctx.strokeStyle = '#94A3B8';
+      ctx.moveTo(px, area.top); ctx.lineTo(px, area.bottom); ctx.stroke();
+      ctx.setLineDash([]); ctx.fillStyle = '#6B7280'; ctx.font = '600 11px "DM Sans", sans-serif';
+      ctx.textAlign = (px > area.right - 60) ? 'right' : 'left';
+      ctx.fillText('Estimate', px + (ctx.textAlign==='right'?-5:5), area.top + 11);
+      ctx.restore();
+    }
+  };
+  // afterDraw plugin: total-in-center text for the pre-bid doughnut
+  const doughnutCenterPlugin = {
+    id: 'doughnutCenter',
+    afterDraw(chart, args, opts){
+      if(!opts || opts.total==null) return;
+      const {ctx, chartArea:area} = chart; if(!area) return;
+      const cx = (area.left + area.right)/2, cy = (area.top + area.bottom)/2;
+      ctx.save(); ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillStyle = '#111827'; ctx.font = '700 22px "DM Sans", sans-serif';
+      ctx.fillText(String(opts.total), cx, cy - 7);
+      ctx.fillStyle = '#6B7280'; ctx.font = '500 11px "DM Sans", sans-serif';
+      ctx.fillText(opts.label || 'queries', cx, cy + 12);
+      ctx.restore();
+    }
+  };
+  // inline plugin factory: ₹ value labels at the end of horizontal bars
+  function barValueLabels(values){
+    return { id:'barValueLabels', afterDatasetsDraw(chart){
+      const ctx = chart.ctx, meta = chart.getDatasetMeta(0); if(!meta) return;
+      ctx.save(); ctx.fillStyle = '#374151'; ctx.font = '600 11px "DM Sans", sans-serif'; ctx.textBaseline='middle';
+      meta.data.forEach((bar,i)=>{ if(values[i]==null) return; const x = bar.x + 6; ctx.textAlign='left'; ctx.fillText(inrIN(values[i]), x, bar.y); });
+      ctx.restore();
+    }};
+  }
+
+  function renderAnalyticsCharts(st){
+    if (typeof Chart === 'undefined' || !_analyticsData) return;
+    bmChartDefaults();
+    bmDestroyCharts();
+    const D = _analyticsData;
+    const axisGrid = { grid:{ color:BM_PALETTE.grid, drawBorder:false }, ticks:{ color:BM_PALETTE.axis } };
+    const noGrid = { grid:{ display:false, drawBorder:false }, ticks:{ color:BM_PALETTE.axis } };
+
+    // 2. Financial — horizontal bar (EC, TS, Awarded, Paid)
+    const finEl = document.getElementById('chartFinancial');
+    if (finEl && D.financial){
+      const f = D.financial;
+      _charts.financial = new Chart(finEl, {
+        type:'bar',
+        data:{ labels:f.labels, datasets:[{ data:f.values, backgroundColor:f.colors, borderRadius:6, maxBarThickness:30 }] },
+        options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
+          layout:{ padding:{ right:96 } },
+          plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:(ctx)=> ' '+inrIN(ctx.parsed.x) } } },
+          scales:{ x:Object.assign({ beginAtZero:true, ticks:{ color:BM_PALETTE.axis, callback:(v)=>'₹'+Number(v).toLocaleString('en-IN') } }, axisGrid), y:noGrid } },
+        plugins:[ barValueLabels(f.values) ]
+      });
+    }
+
+    // 3. Bid competition — horizontal bar with dashed EC "Estimate" line
+    const bidEl = document.getElementById('chartBids');
+    if (bidEl && D.bids){
+      const b = D.bids;
+      _charts.bids = new Chart(bidEl, {
+        type:'bar',
+        data:{ labels:b.labels, datasets:[{ data:b.values, backgroundColor:b.colors, borderRadius:6, maxBarThickness:26 }] },
+        options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
+          plugins:{ legend:{ display:false },
+            tooltip:{ callbacks:{ label:(ctx)=>{ const i=ctx.dataIndex; return ' '+inrIN(b.values[i])+'  ·  '+b.vsEC[i]; } } },
+            ecLine:{ value:b.ec } },
+          scales:{ x:Object.assign({ beginAtZero:true, ticks:{ color:BM_PALETTE.axis, callback:(v)=>'₹'+(Number(v)/100000).toFixed(1)+'L' } }, axisGrid), y:noGrid } },
+        plugins:[ ecLinePlugin ]
+      });
+    }
+
+    // 4. Pre-bid engagement — doughnut with center total
+    const pbEl = document.getElementById('chartPrebid');
+    if (pbEl && D.prebid){
+      const p = D.prebid;
+      _charts.prebid = new Chart(pbEl, {
+        type:'doughnut',
+        data:{ labels:p.labels, datasets:[{ data:p.values, backgroundColor:p.colors, borderWidth:0 }] },
+        options:{ responsive:true, maintainAspectRatio:false, cutout:'60%',
+          plugins:{ legend:{ position:'right', labels:{ font:{ size:12 }, boxWidth:12, padding:10 } },
+            tooltip:{ callbacks:{ label:(ctx)=> ' '+ctx.label+': '+ctx.parsed+' quer'+(ctx.parsed===1?'y':'ies') } },
+            doughnutCenter:{ total:p.total, label:'queries' } } },
+        plugins:[ doughnutCenterPlugin ]
+      });
+    }
+
+    // 6a. Execution health — two-row bullet-style bars (time vs physical, 0–100)
+    const ehEl = document.getElementById('chartHealth');
+    if (ehEl && D.health){
+      const h = D.health;
+      _charts.health = new Chart(ehEl, {
+        type:'bar',
+        data:{ labels:['Time elapsed','Physical progress'], datasets:[{ data:[h.tp,h.phys], backgroundColor:[BM_PALETTE.primary, h.variance<0?BM_PALETTE.amber:BM_PALETTE.success], borderRadius:6, maxBarThickness:22 }] },
+        options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
+          plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:(ctx)=> ' '+ctx.parsed.x+'%' } } },
+          scales:{ x:Object.assign({ beginAtZero:true, max:100, ticks:{ color:BM_PALETTE.axis, callback:(v)=>v+'%' } }, axisGrid), y:noGrid } }
+      });
+    }
+
+    // 6b. Cumulative payment progress — line (with single-bill projection)
+    const payEl = document.getElementById('chartPayment');
+    if (payEl && D.payment){
+      const pay = D.payment;
+      _charts.payment = new Chart(payEl, {
+        type:'line',
+        data:{ labels:pay.labels, datasets:pay.datasets },
+        options:{ responsive:true, maintainAspectRatio:false,
+          plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:(ctx)=> ctx.raw==null? '' : ' '+inrIN(ctx.raw) } } },
+          scales:{ x:noGrid, y:Object.assign({ beginAtZero:true, ticks:{ color:BM_PALETTE.axis, callback:(v)=>'₹'+(Number(v)/100000).toFixed(1)+'L' } }, axisGrid) } }
+      });
+    }
+  }
 
   function renderAnalytics(c, st){
     const TND = CUR;
-    // ---------- 1. Lifecycle timeline ----------
+    const DATA = {}; // chart payloads consumed lazily by renderAnalyticsCharts()
+    // ---------- 1. Lifecycle timeline (custom — kept, polished) ----------
     const STAGES = [
       { k:'DPR',              date:'2026-04-02' },
       { k:'AA / TS',          date:'2026-04-18' },
@@ -649,19 +756,19 @@
     // bottleneck = longest non-ongoing stage
     let bnIdx=-1, bnMax=-1; STAGES.forEach((s,i)=>{ if(!s.ongoing && s.days>bnMax){ bnMax=s.days; bnIdx=i; } });
     const tlNodes = STAGES.map((s,i)=>{
-      const dot = s.ongoing ? '' : 'done';
-      const daysChip = s.ongoing
-        ? '<span class="ex-chip" style="background:#EFF6FF;color:#1D4ED8;">ongoing</span>'
-        : '<span class="ex-chip" style="background:#F3F4F6;color:#6B7280;">'+s.days+'d</span>';
-      const bn = (i===bnIdx) ? ' <span class="ex-chip" style="background:#FFFBEB;color:#92400E;">Bottleneck</span>' : '';
-      return '<div class="ex-tl-node" style="min-width:104px;"><div class="ex-tl-dot '+dot+'"></div>'
+      const dot = 'ex-tl2-dot' + (s.ongoing?'':' done') + (i===bnIdx?' bn':'');
+      const daysTag = s.ongoing
+        ? '<span class="ex-tl2-tag" style="background:#EFF6FF;color:#1D4ED8;">ongoing</span>'
+        : '<span class="ex-tl2-tag" style="background:#F3F4F6;color:#6B7280;">'+s.days+'d</span>';
+      const bn = (i===bnIdx) ? ' <span class="ex-tl2-tag" style="background:#FFFBEB;color:#92400E;">Bottleneck</span>' : '';
+      return '<div class="ex-tl2-node" style="min-width:104px;"><div class="'+dot+'"></div>'
         + '<div class="text-[12px] font-semibold text-ink-900 text-center" style="line-height:1.2;">'+s.k+'</div>'
         + '<div class="text-[11px] text-ink-500 text-center">'+fmtD(s.date)+'</div>'
-        + '<div style="margin-top:2px;text-align:center;">'+daysChip+bn+'</div></div>';
-    }).join('<div class="ex-tl-leg" style="min-width:18px;"></div>');
+        + '<div style="margin-top:2px;text-align:center;">'+daysTag+bn+'</div></div>';
+    }).join('<div class="ex-tl2-leg"></div>');
     const sec1 = secCard('Lifecycle timeline',
       '<div class="text-[18px] font-bold text-ink-900 mb-4">Procurement cycle: '+cycleDays+' days from DPR to LoA</div>'
-      + '<div style="overflow-x:auto;padding-bottom:6px;"><div class="ex-timeline" role="img" aria-label="Procurement lifecycle stages" style="min-width:920px;">'+tlNodes+'</div></div>');
+      + '<div style="overflow-x:auto;padding-bottom:6px;"><div class="ex-tl2" role="img" aria-label="Procurement lifecycle stages, '+cycleDays+' days DPR to LoA, bottleneck '+(STAGES[bnIdx]?STAGES[bnIdx].k:'—')+'" style="min-width:920px;">'+tlNodes+'</div></div>');
 
     // ---------- 2. Financial analysis ----------
     const ec = 2785350, ts = 2800000;
@@ -671,11 +778,12 @@
     const savePct = ec ? pct1(savings/ec*100) : 0;
     const saveSub = savings>=0 ? '<span style="color:#10B981;">'+Math.abs(savePct)+'% below EC</span>' : '<span style="color:#EF4444;">'+Math.abs(savePct)+'% above EC</span>';
     const paidPct = awarded ? Math.round(paid/awarded*100) : 0;
-    const fmax = Math.max(ec, ts, awarded, paid, 1);
-    const finBars = aBar('Estimated cost (EC)', fmtINR(ec), ec/fmax*100, '#93C5FD')
-      + aBar('Technical Sanction (TS)', fmtINR(ts), ts/fmax*100, '#60A5FA')
-      + aBar('Awarded value', fmtINR(awarded), awarded/fmax*100, '#10B981')
-      + aBar('Paid till date', fmtINR(paid), paid/fmax*100, '#34D399');
+    DATA.financial = {
+      labels:['Estimated cost','Technical Sanction','Awarded value','Paid till date'],
+      values:[ec, ts, awarded, paid],
+      colors:[BM_PALETTE.neutral2, BM_PALETTE.neutral2, BM_PALETTE.success, BM_PALETTE.primary]
+    };
+    const finAria = 'Cost comparison: EC '+fmtINR(ec)+', TS '+fmtINR(ts)+', Awarded '+fmtINR(awarded)+', Paid '+fmtINR(paid);
     const sec2 = secCard('Financial analysis',
       '<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">'
       + card('Estimated cost', fmtINR(ec), 'From DPR / evaluation')
@@ -683,7 +791,7 @@
       + '<div class="ex-card"><div class="text-[12px] text-ink-500">Savings vs estimate</div><div class="text-[20px] font-bold text-ink-900 mt-1">'+fmtINR(Math.abs(savings))+'</div><div class="text-[11px] mt-1.5">'+saveSub+'</div></div>'
       + card('Paid till date', fmtINR(paid), paidPct+'% of contract')
       + '</div>'
-      + '<div role="img" aria-label="Cost comparison">'+finBars+'</div>');
+      + '<div class="ex-chart-wrap"><canvas id="chartFinancial" aria-label="'+esc(finAria)+'" role="img"></canvas></div>');
 
     // ---------- 3. Bid competition analysis ----------
     const VENDORS = [
@@ -699,19 +807,20 @@
     const qMin = Math.min(...quotes), qMax = Math.max(...quotes);
     const spread = pct1((qMax-qMin)/qMin*100);
     const albThreshold = ec*0.85;
-    const qBars = VENDORS.map(v=>{
+    DATA.bids = { ec, labels:[], values:[], colors:[], vsEC:[] };
+    VENDORS.forEach(v=>{
       const vs = pct1((v.quote-ec)/ec*100);
-      const vsLabel = (vs>=0?'+':'')+vs+'% vs EC';
       const alb = v.quote < albThreshold;
-      const color = v.winner ? '#10B981' : (alb ? '#EF4444' : '#93C5FD');
-      const albChip = alb ? ' <span class="ex-chip" style="background:#FEF2F2;color:#991B1B;">ALB</span>' : '';
-      const winChip = v.winner ? ' <span class="ex-chip" style="background:#F0FDF4;color:#065F46;">Winner</span>' : '';
-      return aBar(esc(v.name)+winChip+albChip, fmtINR(v.quote)+' · '+vsLabel, v.quote/qMax*100, color, v.name+' quote '+fmtINR(v.quote));
-    }).join('');
+      DATA.bids.labels.push(v.name + (v.winner?'  (Winner)':'') + (alb?'  (ALB)':''));
+      DATA.bids.values.push(v.quote);
+      DATA.bids.colors.push(v.winner ? BM_PALETTE.success : (alb ? BM_PALETTE.red : BM_PALETTE.neutral2));
+      DATA.bids.vsEC.push((vs>=0?'+':'')+vs+'% vs EC');
+    });
     let compNote;
     if (bidsReceived < 3) compNote = '<span class="ex-chip" style="background:#FFFBEB;color:#92400E;">'+bidsReceived+' bids · limited competition</span>';
     else if (spread < 5) compNote = '<span class="ex-chip" style="background:#FEF2F2;color:#991B1B;">'+bidsReceived+' bids · spread '+spread+'% · clustered quotes — review for cartel indicators</span>';
     else compNote = '<span class="ex-chip" style="background:#F0FDF4;color:#065F46;">'+bidsReceived+' bids · quote spread '+spread+'% · healthy competition</span>';
+    const bidAria = 'Vendor quotes vs estimate '+fmtINR(ec)+': '+VENDORS.map(v=>esc(v.name)+' '+fmtINR(v.quote)).join(', ');
     const sec3 = secCard('Bid competition analysis',
       '<div class="flex items-center gap-3 mb-3 flex-wrap">'
       + '<span class="ex-chip" style="background:#EFF6FF;color:#1D4ED8;">'+bidsReceived+' bids received</span>'
@@ -719,22 +828,33 @@
       + '<span class="ex-chip" style="background:#FEF2F2;color:#991B1B;">'+disq.length+' disqualified</span></div>'
       + (disq.length ? '<ul style="margin:0 0 12px;padding-left:18px;font-size:12px;color:#6B7280;">'+disq.map(d=>'<li>'+esc(d.reason)+'</li>').join('')+'</ul>' : emptyNote())
       + '<div class="text-[12px] font-semibold text-ink-700 mb-2">Quote spread</div>'
-      + '<div role="img" aria-label="Vendor quote spread">'+qBars+'</div>'
+      + '<div class="ex-chart-wrap"><canvas id="chartBids" aria-label="'+esc(bidAria)+'" role="img"></canvas></div>'
       + '<div style="margin-top:6px;">'+compNote+'</div>');
 
     // ---------- 4. Pre-bid engagement ----------
     const corrigState = lsGet('prebid_corrigendum_'+TND);
     const corrCount = corrigState && Array.isArray(corrigState.issuedCorrigenda) ? corrigState.issuedCorrigenda.length : 1;
     const totalQ = 24, answeredQ = 22, respCycle = 10;
+    // query breakdown by section/category (sums to totalQ) — drives the doughnut
+    const qCats = [
+      { label:'Technical Specs', n:7, color:BM_PALETTE.primary },
+      { label:'Eligibility / PQ', n:5, color:BM_PALETTE.success },
+      { label:'BoQ / Pricing',   n:5, color:BM_PALETTE.amber },
+      { label:'Timeline',        n:4, color:BM_PALETTE.purple },
+      { label:'Other',           n:3, color:BM_PALETTE.neutral2 },
+    ];
+    DATA.prebid = { labels:qCats.map(q=>q.label), values:qCats.map(q=>q.n), colors:qCats.map(q=>q.color), total:totalQ };
+    const pbAria = 'Pre-bid queries by category, '+totalQ+' total: '+qCats.map(q=>q.label+' '+q.n).join(', ');
     const sec4 = secCard('Pre-bid engagement',
       '<div class="flex items-center gap-3 mb-3 flex-wrap">'
       + '<span class="ex-chip" style="background:#F3F4F6;color:#374151;">'+totalQ+' total queries</span>'
       + '<span class="ex-chip" style="background:#F0FDF4;color:#065F46;">'+answeredQ+' answered</span>'
       + '<span class="ex-chip" style="background:#FFFBEB;color:#92400E;">'+corrCount+' corrigend'+(corrCount===1?'um':'a')+' issued</span>'
       + '<span class="ex-chip" style="background:#EFF6FF;color:#1D4ED8;">'+respCycle+'-day response cycle</span></div>'
-      + '<div class="text-[13px] text-ink-700">✦ 30% of queries concerned Technical Specifications — consider clearer specifications in future tenders of this category.</div>');
+      + '<div class="ex-chart-wrap" style="max-width:460px;"><canvas id="chartPrebid" aria-label="'+esc(pbAria)+'" role="img"></canvas></div>'
+      + '<div class="text-[13px] text-ink-700 mt-3">✦ 30% of queries concerned Technical Specifications — consider clearer specifications in future tenders of this category.</div>');
 
-    // ---------- 5. Evaluation integrity summary ----------
+    // ---------- 5. Evaluation integrity summary (stat cards — kept, restyled) ----------
     const clog = lsGet('criticalLog_'+TND);
     let sec5Inner;
     if (clog && Array.isArray(clog) && clog.length){
@@ -755,8 +875,30 @@
       ? '<span class="ex-chip" style="background:#F0FDF4;color:#065F46;">+'+variance+' pts ahead</span>'
       : '<span class="ex-chip" style="background:#FFFBEB;color:#92400E;">'+variance+' pts behind</span>';
     const billsPaid = (st.bills||[]).filter(b=>b.status==='Paid').length, billsTotal=(st.bills||[]).length;
-    const eotDays = st.contract.eotDays||0;
     const ldTotal = (st.bills||[]).reduce((s,b)=>s+((b.deductions&&b.deductions.ld)||0),0);
+    DATA.health = { tp, phys, variance };
+    // cumulative payment progress (line) — built from paid bills; single-point handled with dashed projection
+    const paidBills = (st.bills||[]).filter(b=>b.status==='Paid').sort((a,b)=> new Date(a.periodTo||a.periodFrom||0) - new Date(b.periodTo||b.periodFrom||0));
+    if (paidBills.length){
+      let cum=0; const labels=[], pts=[];
+      paidBills.forEach(b=>{ cum+=(b.net||0); labels.push(fmtD(b.periodTo||b.periodFrom)); pts.push(cum); });
+      const actualDs = { label:'Cumulative paid', data:pts.slice(), borderColor:BM_PALETTE.primary, backgroundColor:'rgba(15,94,232,0.08)', fill:true, tension:0.3, pointRadius:4, pointBackgroundColor:BM_PALETTE.primary, pointBorderColor:'#fff', pointBorderWidth:1.5 };
+      const datasets=[actualDs];
+      // single demo point → dashed projection from the last actual point to contract value at completion date
+      if (paidBills.length === 1){
+        const lastVal = pts[pts.length-1];
+        labels.push(fmtD(st.contract.completion));
+        actualDs.data.push(null);
+        // dashed dataset shares the last actual point (index 0) and extends to contract value (index 1)
+        const projData=[lastVal, st.contract.value];
+        datasets.push({ label:'Projected to contract value', data:projData, borderColor:BM_PALETTE.neutral2, borderDash:[6,4], fill:false, tension:0, pointRadius:[0,4], pointBackgroundColor:BM_PALETTE.neutral2, pointBorderColor:'#fff', pointBorderWidth:1.5 });
+      }
+      DATA.payment = { labels, datasets };
+    } else {
+      DATA.payment = null; // empty-state path (no paid bills) — render gray italic note, never an empty chart
+    }
+    const healthAria = 'Execution health: time elapsed '+tp+' percent, physical progress '+phys+' percent';
+    const payAria = paidBills.length ? ('Cumulative payment progress, '+fmtINR(paidBills.reduce((s,b)=>s+(b.net||0),0))+' paid across '+paidBills.length+' bill'+(paidBills.length===1?'':'s')) : 'Cumulative payment progress (no paid bills yet)';
     let proj = '';
     if (tp - phys > 10){
       const totalDays = daysBetween(st.contract.commencement, st.contract.completion);
@@ -765,27 +907,38 @@
       proj = '<div class="ex-card" style="background:#FFFBEB;border-color:#FCD34D;margin-top:12px;"><div class="text-[13px] font-bold" style="color:#92400E;">Projected completion: '+fmtD(projDate)+'</div>'
         + '<div class="text-[11px]" style="color:#92400E;">Estimate: scheduled completion + lag-proportional days ('+(tp-phys)+'-point lag × '+totalDays+' contract days).</div></div>';
     }
+    const paymentBlock = DATA.payment
+      ? '<div class="text-[12px] font-semibold text-ink-700 mt-4 mb-2">Cumulative payment progress</div><div class="ex-chart-wrap"><canvas id="chartPayment" aria-label="'+esc(payAria)+'" role="img"></canvas></div>'
+        + (paidBills.length===1 ? '<div class="text-[11px] text-ink-400 mt-1.5">Single bill so far — dashed line projects to contract value at scheduled completion.</div>' : '')
+      : '<div class="text-[12px] font-semibold text-ink-700 mt-4 mb-2">Cumulative payment progress</div>'+emptyNote();
     const sec6 = secCard('Execution health (live)',
-      '<div class="mb-2"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span style="color:#374151;">Time elapsed</span><span style="font-weight:600;">'+tp+'%</span></div><div class="ex-bar" role="img" aria-label="Time elapsed '+tp+'%"><span style="width:'+Math.max(2,tp)+'%;background:#0F5EE8;"></span></div></div>'
-      + '<div class="mb-2"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span style="color:#374151;">Physical progress</span><span style="font-weight:600;">'+phys+'% '+varChip+'</span></div><div class="ex-bar" role="img" aria-label="Physical progress '+phys+'%"><span style="width:'+Math.max(2,phys)+'%;background:'+(variance<0?'#F59E0B':'#10B981')+';"></span></div></div>'
-      + '<div class="flex items-center gap-3 mt-3 flex-wrap">'
+      '<div class="mb-1" style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:#374151;">Time elapsed <b style="color:#111827;">'+tp+'%</b> · Physical progress <b style="color:#111827;">'+phys+'%</b></span><span>'+varChip+'</span></div>'
+      + '<div class="ex-chart-wrap" style="height:130px;"><canvas id="chartHealth" aria-label="'+esc(healthAria)+'" role="img"></canvas></div>'
+      + '<div class="flex items-center gap-3 mt-2 flex-wrap">'
       + '<span class="ex-chip" style="background:#EFF6FF;color:#1D4ED8;">Bills paid '+billsPaid+' of '+billsTotal+'</span>'
-      + '<span class="ex-chip" style="background:#F3F4F6;color:#374151;">EoT days granted: '+eotDays+'</span>'
       + '<span class="ex-chip" style="background:#FEF2F2;color:#991B1B;">LD applied: '+fmtINR(ldTotal)+'</span></div>'
+      + paymentBlock
       + proj);
 
     // ---------- 7. Export ----------
     const sec7 = secCard('Export',
       '<button class="ex-btn ghost" onclick="analyticsExport()"><i data-lucide="download" style="width:14px;height:14px;"></i> Download tender analysis report (PDF)</button>');
 
+    _analyticsData = DATA; // hand off to lazy chart renderer
     return sec1 + sec2 + sec3 + sec4 + sec5 + sec6 + sec7;
   }
   function integrityGrid(logged, officers, tqEdits, pqChanges){
+    const mcard = (icon, k, v, sub, accent) => {
+      const border = accent ? 'border-color:'+accent+';' : '';
+      const vColor = accent || '#111827';
+      return '<div class="ex-card" style="'+border+'"><div style="display:flex;align-items:center;gap:7px;"><i data-lucide="'+icon+'" style="width:14px;height:14px;color:'+(accent||'#9CA3AF')+';"></i><div class="text-[12px] text-ink-500">'+k+'</div></div>'
+        + '<div class="text-[20px] font-bold mt-1" style="color:'+vColor+';">'+v+'</div><div class="text-[11px] text-ink-400 mt-1.5">'+sub+'</div></div>';
+    };
     return '<div class="grid grid-cols-2 lg:grid-cols-4 gap-3">'
-      + card('Critical actions logged', logged, 'Across evaluation stages')
-      + card('Officers involved', officers, 'Unique signatories')
-      + '<div class="ex-card"><div class="text-[12px] text-ink-500">TQ score edits after submission</div><div class="text-[20px] font-bold mt-1" style="color:'+(tqEdits>0?'#92400E':'#111827')+';">'+tqEdits+'</div><div class="text-[11px] text-ink-400 mt-1.5">'+(tqEdits>0?'Review recommended':'None')+'</div></div>'
-      + card('PQ verdict changes', pqChanges, pqChanges>0?'Post-review':'None')
+      + mcard('clipboard-list','Critical actions logged', logged, 'Across evaluation stages', null)
+      + mcard('users','Officers involved', officers, 'Unique signatories', null)
+      + mcard('pencil-line','TQ score edits after submission', tqEdits, tqEdits>0?'Review recommended':'None', tqEdits>0?'#F59E0B':null)
+      + mcard('repeat','PQ verdict changes', pqChanges, pqChanges>0?'Post-review':'None', pqChanges>0?'#EF4444':null)
       + '</div>';
   }
   function analyticsExport(){ showToast('Report downloaded'); }
@@ -826,11 +979,11 @@
   }
   function initials(n){ return String(n||'').split(/\s+/).map(w=>w[0]).filter(Boolean).slice(0,2).join('').toUpperCase(); }
 
-  // ---- tracking stepper (per bill / eot) ----
-  let _track = null; // {kind, id}
+  // ---- tracking stepper (per RA bill) ----
+  let _track = null; // {kind:'bill', id}
   function exTrackOpen(kind, id){ _track={kind,id}; exTrackRender(); requestAnimationFrame(()=>{ const c=document.querySelector('#exTrackHost .exm-card'); if(c) c.classList.add('in'); }); }
   function exTrackClose(){ const c=document.querySelector('#exTrackHost .exm-card'); if(c) c.classList.remove('in'); setTimeout(()=>{ const h=document.getElementById('exTrackHost'); if(h) h.innerHTML=''; }, 200); }
-  function trackItem(){ const st=curState(); if(_track.kind==='bill') return (st.bills||[]).find(b=>b.id===_track.id); return (st.eotRequests||[]).find(e=>e.id===_track.id); }
+  function trackItem(){ const st=curState(); return (st.bills||[]).find(b=>b.id===_track.id); }
   function exTrackRender(){ const host=document.getElementById('exTrackHost'); if(!host||!_track) return; const item=trackItem(); if(!item){ host.innerHTML=''; return; }
     const chain=item.approvalChain||[]; const sa=isSuperAdmin();
     const sbIdx=chain.findIndex(a=>a.status==='sent_back');
@@ -841,15 +994,15 @@
       else {state='locked';icon='lock';line='<div class="st-line" style="color:#9CA3AF;">In queue</div>';}
       const sim = (sa && a.status!=='approved' && a.status!=='sent_back') ? '<div style="margin-top:5px;"><button class="ex-sim" onclick="exTrackSim(\'approve\','+i+')">[Simulate: Approve]</button> <span style="color:#E5E7EB;">·</span> <button class="ex-sim" onclick="exTrackSim(\'sendback\','+i+')">[Simulate: Send back]</button></div>':'';
       return '<div class="ex-step">'+(last?'':'<div class="line'+(a.status==='approved'?' done':'')+'"></div>')+'<div class="node '+state+'"><i data-lucide="'+icon+'" style="width:14px;height:14px;"></i></div><div class="body"><div class="st-name">'+esc(a.name)+'</div><div class="st-desig">'+esc(a.designation||'')+'</div>'+line+sim+'</div></div>'; }).join('');
-    const heading=_track.kind==='bill'?('RA Bill '+item.no+' — '+fmtINR(item.net)):('EoT '+item.days+' days');
-    const statusLine=_track.kind==='bill'?('Status: '+item.status):('Status: '+item.status);
+    const heading='RA Bill '+item.no+' — '+fmtINR(item.net);
+    const statusLine='Status: '+item.status;
     host.innerHTML='<div class="exm-overlay"><div class="exm-card" role="dialog" aria-modal="true" aria-label="Approval tracking" style="width:520px;">'
       + '<div class="exm-head"><div><div class="t">'+esc(heading)+'</div><div class="s">'+esc(statusLine)+'</div></div><button class="exm-x" onclick="exTrackClose()">×</button></div>'
       + '<div class="exm-body" aria-live="polite">'+steps+'</div></div></div>';
     refreshIcons();
   }
   function exTrackRemind(btn){ btn.textContent='✓ Reminder sent'; btn.style.color='#10B981'; setTimeout(()=>{ btn.textContent='Send reminder'; btn.style.color=''; }, 2000); }
-  function exTrackSim(kind, i){ const st=curState(); const item=_track.kind==='bill'?(st.bills||[]).find(b=>b.id===_track.id):(st.eotRequests||[]).find(e=>e.id===_track.id); if(!item) return; const chain=item.approvalChain;
+  function exTrackSim(kind, i){ const st=curState(); const item=(st.bills||[]).find(b=>b.id===_track.id); if(!item) return; const chain=item.approvalChain;
     if(kind==='approve'){ chain[i].status='approved'; chain[i].approvedAt=new Date().toISOString(); const nx=chain[i+1]; if(nx&&!nx.sentAt) nx.sentAt=new Date().toISOString(); }
     else { const reason=prompt('Reason for sending back (optional):')||''; chain[i].status='sent_back'; chain[i].comment=reason.trim()||'Please revise and resubmit.'; }
     // update item status
@@ -858,15 +1011,9 @@
   }
   function updateItemStatus(st, item){
     const chain=item.approvalChain||[]; const approvedCount=chain.filter(a=>a.status==='approved').length; const all=chain.length>0&&approvedCount===chain.length; const sentBack=chain.some(a=>a.status==='sent_back');
-    if(_track.kind==='bill'){
-      let s; if(sentBack) s='Submitted'; else if(all) s='Paid'; else if(approvedCount>=2) s='Sanctioned'; else if(approvedCount>=1) s='Verified'; else s='Submitted';
-      const was=item.status; item.status=s;
-      if(s==='Paid' && was!=='Paid'){ logAct(st,'Bill paid','RA Bill '+item.no+' paid — '+fmtINR(item.net)); showToast('RA Bill '+item.no+' paid · paid-till-date updated'); }
-    } else {
-      if(all){ item.status='Approved';
-        if(!item._applied){ item._applied=true; const newComp=isoDate(addDays(new Date(st.contract.completion), item.days)); st.contract.completion=newComp; st.contract.dlpEnd=isoDate(addMonths(new Date(newComp),6)); st.contract.eotDays=(st.contract.eotDays||0)+item.days; logAct(st,'EoT approved', item.days+' days approved — completion now '+fmtD(newComp)); showToast('EoT approved — completion extended by '+item.days+' days'); }
-      } else if(chain.some(a=>a.status==='sent_back')) item.status='Submitted'; else item.status='Submitted';
-    }
+    let s; if(sentBack) s='Submitted'; else if(all) s='Paid'; else if(approvedCount>=2) s='Sanctioned'; else if(approvedCount>=1) s='Verified'; else s='Submitted';
+    const was=item.status; item.status=s;
+    if(s==='Paid' && was!=='Paid'){ logAct(st,'Bill paid','RA Bill '+item.no+' paid — '+fmtINR(item.net)); showToast('RA Bill '+item.no+' paid · paid-till-date updated'); }
   }
 
   // ---- boot ----

@@ -2503,7 +2503,7 @@
         <div>To,<br>The Commissioner / Tender Inviting Authority,<br>Ahmedabad Municipal Corporation,<br>Ahmedabad – 380001.</div>
         <div style="margin-top:12px;"><strong>Subject:</strong> Submission of Technical Bid for "${esc(tName)}" – Tender No. ${esc(tRef)}.</div>
         <div style="margin-top:12px;">Sir/Madam,</div>
-        <div style="margin-top:8px;">With reference to the above-cited Notice Inviting Tender (NIT), we, ${esc(profile.legal)}, hereby submit our Technical Bid for the subject tender.</div>
+        <div style="margin-top:8px;">With reference to the above-cited tender document, we, ${esc(profile.legal)}, hereby submit our Technical Bid for the subject tender.</div>
         <div style="margin-top:8px;">We have read and understood all the terms, conditions, and specifications contained in the Tender Document and confirm our acceptance of the same without any reservation.</div>
         <div style="margin-top:10px;">We confirm that:</div>
         <ol class="bd-num">
@@ -5083,7 +5083,9 @@ Date: ${esc(fmtDateShort(today))}`;
     // F3 (reasonableness) unlocks only when the NATIVE method reaches Phase 3 (winner revealed)
     const f3unlocked = !f2locked && nativeMethodPhase() === 3;
     const f3exp = EVAL.finExpanded === 'f3' && f3unlocked;
-    wrap.innerHTML = finCard('f1','01','Upload Financial Bids', f1StatusPill(), f1exp, false, f1Body())
+    const finRestartBar = `<div style="display:flex; justify-content:flex-end; margin-bottom:10px;"><button type="button" id="finRestartBtn" onclick="restartFinancialPreview()" aria-label="Restart and replay the Financial Evaluation flow from the beginning" title="Restart and replay this flow from the beginning" style="background:#EFF6FF; border:1px solid #BFDBFE; color:#0C447C; font-size:12px; line-height:1; cursor:pointer; padding:6px 11px; border-radius:7px; display:inline-flex; align-items:center; gap:5px;"><i data-lucide="rotate-ccw" style="width:13px; height:13px;"></i>Restart financial evaluation</button></div>`;
+    wrap.innerHTML = finRestartBar
+                   + finCard('f1','01','Upload Financial Bids', f1StatusPill(), f1exp, false, f1Body())
                    + finCard('f2','02','Financial Evaluation',   f2StatusPill(), f2exp, f2locked, f2locked ? '' : f2Body())
                    + (f3unlocked ? finCard('f3','03','Reasonableness Check', f3StatusPill(), f3exp, false, f3Body()) : '');
     refreshIcons();
@@ -8513,37 +8515,66 @@ Date: ${esc(fmtDateShort(today))}`;
   // beginning, so the whole flow can be walked from scratch. Preserves the append-only
   // audit log (criticalLog_<TND>) and the SHARED amount-masking reveal state
   // (winnerReveal_<TND>, also read by Bid Comparison + Bid Management).
+  function _evalTnd(){
+    return (EVAL && EVAL.tnd) || new URLSearchParams(location.search).get('tender') || 'TND-2026-001';
+  }
+  // Shared clearer for the evaluation flow state — used by both restart entry points.
+  // PRESERVES criticalLog_<tnd> (audit log). winnerReveal_<tnd> is left to the callers:
+  // the generic Restart flow keeps it (shared masking with Bid Management); the financial
+  // replay clears it separately so the reveal step can be watched again.
+  function _evalClearProgress(tnd){
+    try {
+      localStorage.removeItem('eval_' + tnd);                 // bids, matrix (PQ/TQ verdicts+scores), committee, signoffs, conflicts
+      localStorage.removeItem('pqEval_' + tnd);               // PQ auto-save snapshot
+      localStorage.removeItem('tqEval_' + tnd);               // TQ auto-save snapshot
+      localStorage.removeItem('presentations_notes_' + tnd);  // TQ presentation notes
+      localStorage.removeItem('comparison_' + tnd);           // Bid Comparison tab state
+      ['L1','QCBS','LCS','QBS','FBS'].forEach(function(m){     // financial F1/F2/F3 phase state per method
+        localStorage.removeItem('finEval_' + tnd + '_' + m);
+      });
+    } catch(e){}
+  }
   function restartFlow(){
-    const tnd = (EVAL && EVAL.tnd)
-      || new URLSearchParams(location.search).get('tender')
-      || 'TND-2026-001';
+    const tnd = _evalTnd();
     const ok = window.confirm('Restart Bid Evaluation for ' + tnd + ' from the beginning?\n\n'
       + 'This clears saved progress for this tender (PQ/TQ scores, verdicts, financial evaluation phases, and sign-off). '
       + 'The audit log is preserved.');
     if (!ok) return;
-    try {
-      // Core evaluation state: bids, matrix (PQ/TQ verdicts+scores), committee, signoffs, conflicts, etc.
-      localStorage.removeItem('eval_' + tnd);
-      // PQ / TQ auto-save snapshots (verdicts, comments, confidence, scores)
-      localStorage.removeItem('pqEval_' + tnd);
-      localStorage.removeItem('tqEval_' + tnd);
-      // TQ presentation notes
-      localStorage.removeItem('presentations_notes_' + tnd);
-      // Bid Comparison tab state
-      localStorage.removeItem('comparison_' + tnd);
-      // Financial F1/F2/F3 phase state — one key per evaluation method
-      ['L1','QCBS','LCS','QBS','FBS'].forEach(function(m){
-        localStorage.removeItem('finEval_' + tnd + '_' + m);
-      });
-      // PRESERVED (do NOT remove): criticalLog_<tnd> (audit) and winnerReveal_<tnd> (shared masking).
-    } catch(e){}
+    _evalClearProgress(tnd);
+    // PRESERVED: winnerReveal_<tnd> (shared masking with Bid Management) — not cleared here.
     location.reload();
   }
   window.restartFlow = restartFlow;
 
+  // Designer replay: reset the whole evaluation page AND re-mask the quoted amounts, then
+  // land back on the Financial Evaluation view so the F1 → F2 → F3 flow can be watched from
+  // the start, repeatedly. Re-masking removes the shared winnerReveal_<tnd> key, which also
+  // re-masks this tender's amounts in Bid Management — intended, for a clean replay.
+  function restartFinancialPreview(){
+    const tnd = _evalTnd();
+    const ok = window.confirm('Replay the Financial Evaluation flow from the beginning for ' + tnd + '?\n\n'
+      + 'This resets the evaluation (PQ/TQ scores, verdicts, financial phases, sign-off) and re-masks the quoted amounts '
+      + 'so you can watch the reveal again. The audit log is preserved.');
+    if (!ok) return;
+    _evalClearProgress(tnd);
+    try { localStorage.removeItem('winnerReveal_' + tnd); } catch(e){}  // re-mask amounts for a true replay
+    try { sessionStorage.setItem('evalReplayFinancial', '1'); } catch(e){}
+    location.reload();
+  }
+  window.restartFinancialPreview = restartFinancialPreview;
+
   (function boot(){
     const tnd = new URLSearchParams(location.search).get('tender');
-    if (tnd){ openWorkspace(tnd); } else { renderEvalList(); }
+    if (tnd){
+      openWorkspace(tnd);
+      // Designer replay: after a financial restart, land back on the Financial Evaluation view.
+      try {
+        if (sessionStorage.getItem('evalReplayFinancial') === '1'){
+          sessionStorage.removeItem('evalReplayFinancial');
+          if (typeof setStageTab === 'function') setStageTab('financial', true);
+        }
+      } catch(e){}
+    } else { renderEvalList(); }
     refreshIcons();
     if (typeof initSurveillanceLayer === 'function') initSurveillanceLayer();
   })();

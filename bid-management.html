@@ -2216,12 +2216,21 @@
   // (merges the old Reasonableness + Committee Review output: the committee's review
   //  IS the evaluation report + recommendation. Committee recommends; CA awards.)
   // ============================================================================
-  // Per-vendor reveal state for the comparative statement. Persisted to
-  // PA.comparative.revealedVendors. Reuses the same two-click reveal interaction
-  // as the evaluation masking pattern (pending → confirm → reveal + log).
+  // Per-vendor reveal state for the comparative statement. Stored PER SESSION ONLY in
+  // sessionStorage (evalReportRevealed_<TND-ID>): a new browser session re-masks every
+  // amount on first view, while within a session reveals persist across tab switches.
+  // Deliberately NOT localStorage — on-screen masking is shoulder-surfing protection,
+  // not durable state. Reuses the existing two-click reveal interaction (pending →
+  // confirm → reveal + log). Masked by default regardless of DESIGN_REVIEW_MODE.
+  function bmEvalRevealKey(){ return 'evalReportRevealed_' + ((BM && BM.tnd) ? BM.tnd : ''); }
+  function bmEvalRevealedList(){
+    try { const r = sessionStorage.getItem(bmEvalRevealKey()); const a = r ? JSON.parse(r) : []; return Array.isArray(a) ? a : []; } catch(e){ return []; }
+  }
+  function bmEvalRevealedAdd(vendor){
+    try { const list = bmEvalRevealedList(); if (!list.includes(vendor)){ list.push(vendor); sessionStorage.setItem(bmEvalRevealKey(), JSON.stringify(list)); } } catch(e){}
+  }
   function bmCompIsRevealed(vendor){
-    if (DESIGN_REVIEW_MODE && !_drmForceMasked) return true; // review-mode bypass
-    return !!(PA && PA.comparative && (PA.comparative.revealedVendors||[]).includes(vendor));
+    return bmEvalRevealedList().includes(vendor);
   }
   let _bmCompPending = null, _bmCompTimer = null;
   function bmCompReveal(vendor){
@@ -2235,13 +2244,36 @@
       return;
     }
     clearTimeout(_bmCompTimer); _bmCompTimer = null; _bmCompPending = null;
-    if (!PA.comparative) PA.comparative = { revealedVendors:[] };
-    if (!PA.comparative.revealedVendors.includes(vendor)) PA.comparative.revealedVendors.push(vendor);
-    savePA();
+    bmEvalRevealedAdd(vendor);
     logCriticalAction(BM.tnd, { touchpointId:2, action:'amount_revealed', category:'financial',
       description:"Viewed " + vendor + "'s quoted amount (comparative statement)",
-      page:'bid-management', section:'Comparative statement', vendorName:vendor });
+      page:'bid-management', section:'Evaluation Report', vendorName:vendor });
     renderStageBody();
+  }
+  // Editable disqualification reasons for the comparative statement. Persisted to
+  // PA.comparative.reasons[vendor] (durable — it is part of the official evaluation
+  // record). Editable inline ONLY for disqualified rows; clearing to empty reverts to
+  // the recorded/demo default.
+  let _bmReasonEdit = null;
+  function bmReasonGet(vendor, fallback){
+    try { if (PA && PA.comparative && PA.comparative.reasons && PA.comparative.reasons[vendor] != null) return PA.comparative.reasons[vendor]; } catch(e){}
+    return fallback;
+  }
+  function bmReasonEditStart(vendor){
+    _bmReasonEdit = vendor; renderStageBody();
+    setTimeout(() => { const t = document.getElementById('bmReasonInput'); if (t){ t.focus(); try { t.setSelectionRange(t.value.length, t.value.length); } catch(e){} } }, 0);
+  }
+  function bmReasonCancel(){ _bmReasonEdit = null; renderStageBody(); }
+  function bmReasonSave(vendor){
+    const t = document.getElementById('bmReasonInput');
+    const val = t ? t.value.trim() : '';
+    if (!PA.comparative) PA.comparative = { revealedVendors:[] };
+    if (!PA.comparative.reasons) PA.comparative.reasons = {};
+    if (val) PA.comparative.reasons[vendor] = val; else delete PA.comparative.reasons[vendor];
+    savePA();
+    if (BM && BM.tnd) logCriticalAction(BM.tnd, { touchpointId:2, action:'reason_edited', category:'evaluation',
+      description:"Edited disqualification reason for " + vendor, page:'bid-management', section:'Evaluation Report', vendorName:vendor, detail: val });
+    _bmReasonEdit = null; showToast('Reason updated'); renderStageBody();
   }
   function comparativeStatementHTML(t){
     const pool = paVendorPool(BM.tnd);
@@ -2279,16 +2311,30 @@
       if (pqFail) statusCell = '<span class="pill-red">Disqualified — Technical</span>';
       else if (finDisq) statusCell = '<span class="pill-red">Disqualified — Financial</span>';
       else statusCell = `<span class="pill-green">Qualified</span>${rank===1?' <span class="pill-blue" style="margin-left:4px;">L1</span>':''}`;
-      // REASON — disqualified rows show recorded/demo reason (1 line + tooltip); — for qualified.
-      const reasonText = disq ? demoReason(v) : '';
-      const reasonCell = reasonText
-        ? `<span style="color:#991B1B; font-size:12px; display:inline-block; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:bottom;" title="${esc(reasonText)}">${esc(reasonText)}</span>`
-        : '<span style="color:#9CA3AF;">—</span>';
+      // REASON — disqualified rows show the recorded/demo reason, editable inline
+      // (persisted to PA.comparative.reasons); — for qualified rows.
+      let reasonCell;
+      if (disq){
+        const reasonText = bmReasonGet(v.name, demoReason(v));
+        if (_bmReasonEdit === v.name){
+          reasonCell = `<div style="display:flex; flex-direction:column; gap:6px; min-width:210px;">
+            <textarea id="bmReasonInput" rows="2" aria-label="Disqualification reason for ${esc(v.name)}" style="width:100%; min-width:210px; font-size:12px; line-height:1.4; border:1px solid #0F5EE8; border-radius:6px; padding:6px 8px; resize:vertical; font-family:inherit; color:#111827; background:#F8FBFF;">${esc(reasonText)}</textarea>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <button type="button" onclick="bmReasonSave('${esc(v.name)}')" style="background:#0F5EE8; color:#fff; border:none; border-radius:6px; padding:4px 14px; font-size:12px; cursor:pointer;">Save</button>
+              <button type="button" onclick="bmReasonCancel()" style="background:transparent; border:none; color:#6B7280; font-size:12px; cursor:pointer; padding:4px;">Cancel</button>
+            </div>
+          </div>`;
+        } else {
+          reasonCell = `<span style="color:#991B1B; font-size:12px; display:inline-block; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle;" title="${esc(reasonText)}">${esc(reasonText)}</span><button type="button" onclick="bmReasonEditStart('${esc(v.name)}')" aria-label="Edit disqualification reason for ${esc(v.name)}" title="Edit reason" style="background:transparent; border:none; cursor:pointer; padding:2px 4px; margin-left:2px; vertical-align:middle; color:#9CA3AF;"><i data-lucide="pencil" style="width:12px;height:12px;"></i></button>`;
+        }
+      } else {
+        reasonCell = '<span style="color:#9CA3AF;">—</span>';
+      }
       return `<tr class="${rank===1?'rank-1':''} ${disq?'disq':''}">
         <td><strong style="color:#111827;">${esc(v.name)}</strong></td>
         <td>${pqPill}</td>
         <td>${tqCell}</td>
-        <td>${amtCell}</td>
+        <td aria-live="polite">${amtCell}</td>
         <td>${rankCell}</td>
         <td>${statusCell}</td>
         <td>${reasonCell}</td>
