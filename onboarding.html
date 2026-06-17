@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Set up your organisation — TenderAI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+/* Design tokens — copied verbatim from admin.html <head> so the wizard and the
+   admin panel render identically. Source: admin.html lines 13-25. */
+tailwind.config = { theme: { extend: {
+  fontFamily: { sans: ['"DM Sans"','system-ui','sans-serif'], mono:['"JetBrains Mono"','monospace'] },
+  colors: {
+    primary:{DEFAULT:'#0F5EE8',light:'#EFF6FF',border:'#93C5FD'},
+    success:{DEFAULT:'#10B981',light:'#F0FDF4'},
+    warning:{DEFAULT:'#F59E0B',light:'#FFFBEB'},
+    danger:{DEFAULT:'#EF4444',light:'#FEF2F2'},
+    purple:{DEFAULT:'#8B5CF6',light:'#EEEDFE'},
+    ink:{900:'#111827',500:'#6B7280',400:'#9CA3AF'},
+    line:'#E5E7EB', surface:'#F9FAFB',
+  },
+  boxShadow:{ soft:'0 1px 3px rgba(0,0,0,0.08)', lift:'0 4px 12px rgba(0,0,0,0.12)' },
+}}};
+</script>
+<style>
+  html,body{font-family:'DM Sans',system-ui,sans-serif;color:#111827;background:#F9FAFB}
+  *:focus-visible{outline:2px solid #0F5EE8;outline-offset:2px;border-radius:4px}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:#E5E7EB;border-radius:8px}
+  ::-webkit-scrollbar-thumb:hover{background:#D1D5DB}
+  ::-webkit-scrollbar-track{background:transparent}
+  .no-scrollbar{scrollbar-width:none}.no-scrollbar::-webkit-scrollbar{display:none}
+  .inp{background:white;border:1px solid #E5E7EB;border-radius:8px;padding:8px 11px;font-size:13.5px;color:#111827;width:100%}
+  .inp:focus{outline:none;border-color:#0F5EE8;box-shadow:0 0 0 3px rgba(15,94,232,.15)}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;font-size:13.5px;border-radius:8px;border:1px solid #E5E7EB;background:white;color:#111827;cursor:pointer;font-weight:500}
+  .btn:hover{background:#F9FAFB}
+  .btn-primary{background:#0F5EE8;color:white;border-color:#0F5EE8}
+  .btn-primary:hover{background:#0D4FC2}
+  .btn-ghost{border-color:transparent;background:transparent;color:#6B7280}
+  .btn-ghost:hover{background:#F3F4F6;color:#111827}
+  .btn-danger{background:#FEF2F2;color:#EF4444;border-color:#FECACA}
+  .btn-danger:hover{background:#FECACA}
+  .toggle{position:relative;width:38px;height:22px;background:#E5E7EB;border-radius:9999px;cursor:pointer;transition:background .15s;flex:none}
+  .toggle .dot{position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:9999px;background:white;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:left .15s}
+  .toggle.on{background:#10B981}.toggle.on .dot{left:18px}
+  .chip-input{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:9999px;font-size:12px;background:#F3F4F6;color:#111827;border:1px solid #E5E7EB}
+  .chip-input button{color:#9CA3AF}.chip-input button:hover{color:#EF4444}
+  .card{background:white;border:1px solid #E5E7EB;border-radius:14px}
+  .toast{transform:translateY(80px);opacity:0;transition:transform .3s cubic-bezier(.2,.7,.2,1),opacity .25s ease}
+  .toast.show{transform:translateY(0);opacity:1}
+  label.fld{display:block}
+  label.fld>span{display:block;font-size:12.5px;font-weight:600;color:#374151;margin-bottom:5px}
+  .step-dot{transition:all .15s ease}
+  .using-defaults-pill{background:#FFFBEB;color:#B45309;border:1px solid #FDE68A}
+  @media (max-width:900px){ #wizRail{display:none} #mobileStepper{display:flex} }
+  @media (min-width:901px){ #mobileStepper{display:none} }
+</style>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+
+  <!-- ================= LEFT RAIL ================= -->
+  <aside id="wizRail" class="w-[280px] shrink-0 bg-white border-r border-line flex flex-col">
+    <div class="px-5 pt-5 pb-4 border-b border-line">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-[15px]">T</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-[15px] font-semibold text-ink-900 leading-tight">TenderAI</div>
+          <div class="text-[11px] text-ink-500 leading-tight">Organisation setup</div>
+        </div>
+        <button onclick="restartWizard()" title="Clear everything and start from the beginning" class="btn btn-ghost !px-2 !py-1.5 text-[12px]"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Start over</button>
+      </div>
+      <!-- completeness meter -->
+      <div class="mt-4">
+        <div class="flex items-center justify-between text-[11.5px] text-ink-500 mb-1.5">
+          <span id="meterLabel">Setup 0% complete</span>
+          <span id="meterCount" class="font-medium text-ink-900"></span>
+        </div>
+        <div class="h-2 rounded-full bg-line overflow-hidden">
+          <div id="meterBar" class="h-full bg-success rounded-full transition-all duration-300" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+    <nav id="railSteps" class="flex-1 px-3 py-4 space-y-1 overflow-y-auto no-scrollbar"></nav>
+    <div class="border-t border-line px-4 py-3">
+      <a href="admin.html" class="btn btn-ghost w-full justify-center"><i data-lucide="arrow-left" class="w-4 h-4"></i> Exit to admin panel</a>
+    </div>
+  </aside>
+
+  <!-- ================= MAIN ================= -->
+  <div class="flex-1 flex flex-col min-w-0">
+    <!-- mobile top stepper -->
+    <div id="mobileStepper" class="bg-white border-b border-line px-4 py-3 items-center gap-3 sticky top-0 z-20">
+      <a href="admin.html" class="text-ink-500"><i data-lucide="arrow-left" class="w-5 h-5"></i></a>
+      <div class="flex-1 min-w-0">
+        <div id="mStepTitle" class="text-[14px] font-semibold text-ink-900 truncate"></div>
+        <div class="h-1.5 mt-1 rounded-full bg-line overflow-hidden"><div id="mMeterBar" class="h-full bg-success rounded-full" style="width:0%"></div></div>
+      </div>
+      <button onclick="restartWizard()" title="Start over" class="text-ink-500 hover:text-danger"><i data-lucide="rotate-ccw" class="w-5 h-5"></i></button>
+    </div>
+
+    <div id="resumeBanner" class="hidden mx-auto w-full max-w-3xl px-6 pt-5">
+      <div class="card px-4 py-3 flex items-center gap-3 bg-primary-light border-primary-border">
+        <i data-lucide="bookmark" class="w-4 h-4 text-primary"></i>
+        <div class="text-[13px] text-ink-900 flex-1">Welcome back — pick up where you left off.</div>
+        <button onclick="dismissResume()" class="text-ink-400 hover:text-ink-900"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+    </div>
+
+    <main id="wizMain" class="flex-1 overflow-y-auto"></main>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-ink-900 text-white text-[13px] px-4 py-3 rounded-xl shadow-lift inline-flex items-center gap-2.5">
+  <i data-lucide="check-circle-2" class="w-4 h-4 text-success"></i>
+  <span id="toastMsg">Saved</span>
+</div>
+
+<!-- hidden file inputs reused by upload editors -->
+<input type="file" id="hiddenFile" class="hidden" />
+
+<script>
+/* =========================================================================
+   ONBOARDING WIZARD — onboarding.html
+   Stands up an organisation instance for the super admin.
+   - Works against a private working store `onboarding_state_v1`.
+   - Auto-saves after every change. Nothing touches the live officer side
+     until "Publish setup", which commits into `admin_state_v1` — the exact
+     same store + same value shapes admin.html reads/edits.
+   - Editors below are faithful mirrors of admin.html's editors (which are
+     closure-scoped inside one large file and cannot be imported directly).
+     Each mirror writes the identical data shape; source lines noted inline.
+   ========================================================================= */
+
+const WS_KEY    = 'onboarding_state_v1';   // wizard working area (private)
+const STORE_KEY = 'admin_state_v1';        // live admin store (committed on publish)
+const LOG_KEY   = 'admin_log_v1';          // admin activity trail
+const LIVE_FLAG = 'system.go-live';        // officer-side access switch (set on publish)
+
+/* ---- tiny helpers (mirror admin.html: escapeHtml ln, refreshIcons ln) ---- */
+function escapeHtml(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function refreshIcons(){ if(window.lucide) lucide.createIcons(); }
+function $(sel,root){ return (root||document).querySelector(sel); }
+function $all(sel,root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
+let _toastT=null;
+function toast(msg){ const t=$('#toast'); $('#toastMsg').textContent=msg||'Saved'; t.classList.add('show'); clearTimeout(_toastT); _toastT=setTimeout(()=>t.classList.remove('show'),1600); }
+function uid(p){ return (p||'id_')+Math.random().toString(36).slice(2,9); }
+function fmtINR(n){ if(n==null||n==='') return '—'; const s=String(Math.round(n)); const last3=s.slice(-3); const rest=s.slice(0,-3); return '₹'+(rest?rest.replace(/\B(?=(\d{2})+(?!\d))/g,',')+',':'')+last3; }
+
+/* size guards — mirror admin.html logo library (LL_MAX_BYTES / LL_BUDGET). */
+const LL_MAX_BYTES = 307200;    // ~300 KB per image
+const LL_BUDGET    = 4500000;   // ~4.5 MB total per asset library
+const DOC_MAX_BYTES = 1500000;  // ~1.5 MB per document
+const DOC_BUDGET    = 6000000;  // ~6 MB total per document library
+
+/* =========================================================================
+   DEFAULTS — verbatim from admin.html item `def:` literals so the wizard is
+   confirm-first: a sensible rulebook is pre-filled, the admin edits deltas.
+   ========================================================================= */
+function defTiers(){ return [
+  {min:0,max:500000,auth:'HOD'},
+  {min:500000,max:2500000,auth:'Deputy Commissioner'},
+  {min:2500000,max:5000000,auth:'Commissioner'},
+  {min:5000000,max:null,auth:'State Government'},
+]; }
+function defLanguages(){ return {
+  languages:[
+    {label:'English', enabled:true},  {label:'Hindi', enabled:true},   {label:'Marathi', enabled:true},
+    {label:'Gujarati', enabled:false},{label:'Bengali', enabled:false},{label:'Tamil', enabled:false},
+    {label:'Telugu', enabled:false},  {label:'Kannada', enabled:false},{label:'Malayalam', enabled:false},
+    {label:'Odia', enabled:false},    {label:'Punjabi', enabled:false},{label:'Urdu', enabled:false},
+    {label:'Assamese', enabled:false},
+  ], default:'English'
+}; }
+function defMethods(){ return { methods:[
+  {id:'l1',  group:'method', label:'L1 (Lowest Cost)',                enabled:true},
+  {id:'qcbs',group:'method', label:'QCBS',                            enabled:true, ratios:['90:10','80:20','70:30','60:40'], allowedRatios:['90:10','80:20','70:30','60:40'], defaultRatio:'70:30'},
+  {id:'lcs', group:'method', label:'LCS',                             enabled:true, techCutoff:60},
+  {id:'qbs', group:'method', label:'QBS',                             enabled:true},
+  {id:'fbs', group:'method', label:'FBS',                             enabled:false},
+  {id:'sss', group:'method', label:'SSS (Single Source Selection)',   enabled:false, justify:true, justifyLocked:true},
+  {id:'ote', group:'mode',   label:'Open Tender Enquiry (OTE)',       enabled:true,  mandatoryAbove:2500000},
+  {id:'lte', group:'mode',   label:'Limited Tender Enquiry (LTE)',    enabled:true,  allowedUpto:2500000},
+  {id:'ste', group:'mode',   label:'Single Tender Enquiry (STE)',     enabled:false, justify:true, justifyLocked:true},
+]}; }
+function defGates(){ return [
+  {check:'AA captured', blocking:true, canOverride:false, overrideRoles:[]},
+  {check:'TS captured', blocking:true, canOverride:false, overrideRoles:[]},
+  {check:'Budget head verified', blocking:true, canOverride:true, overrideRoles:['HOD','Commissioner']},
+  {check:'CVC review signed off', blocking:true, canOverride:false, overrideRoles:[]},
+  {check:'EMD policy set', blocking:true, canOverride:true, overrideRoles:['HOD']},
+  {check:'Evaluation method chosen', blocking:true, canOverride:false, overrideRoles:[]},
+  {check:'AI Compliance Check passed', blocking:false, canOverride:false, overrideRoles:[]},
+  {check:'AI Eligibility Risk Check reviewed', blocking:false, canOverride:false, overrideRoles:[]},
+]; }
+/* The 13 tender committee actions (admin.html tender.committee def) used as the
+   permission checklist; admin backfills each module's real availableActions on read. */
+const TENDER_ACTIONS = ['View tender draft','Create new tender','Edit tender sections','Set evaluation method','Set timeline / milestones','Upload reference documents','Apply template','Clone past tender','Run AI Compliance Check','Submit for CVC review','Sign off CVC review','Publish tender','Issue corrigendum on live tender'];
+function starterRoles(){ return [
+  {id:uid('role_'), name:'Tender Drafter',            enabled:true, permissions:{'View tender draft':true,'Create new tender':true,'Edit tender sections':true}, members:[]},
+  {id:uid('role_'), name:'Tender Inviting Authority', enabled:true, permissions:{'Set evaluation method':true,'Submit for CVC review':true,'Publish tender':true}, members:[]},
+  {id:uid('role_'), name:'Technical Member',          enabled:true, permissions:{'View tender draft':true,'Edit tender sections':true}, members:[]},
+  {id:uid('role_'), name:'Finance Member',            enabled:true, permissions:{'View tender draft':true}, members:[]},
+  {id:uid('role_'), name:'Vigilance / CVC Officer',   enabled:true, permissions:{'View tender draft':true,'Sign off CVC review':true}, members:[]},
+]; }
+function defOfficers(){ return [
+  {name:'Rajesh Kumar', role:'Super Admin',         email:'rajesh.kumar@amc.gov.in', dept:'Procurement',        status:'Active'},
+  {name:'Priya Shah',   role:'Technical Officer',   email:'priya.shah@amc.gov.in',   dept:'Engineering',        status:'Active'},
+  {name:'Amit Patil',   role:'Finance Officer',     email:'amit.patil@amc.gov.in',   dept:'Finance',            status:'Active'},
+  {name:'Sunita Rao',   role:'Deputy Commissioner', email:'sunita.rao@amc.gov.in',   dept:'Commissioner Office', status:'Active'},
+  {name:'Ravi Mehta',   role:'Accounts Officer',    email:'ravi.mehta@amc.gov.in',   dept:'Accounts',           status:'Active'},
+]; }
+function defDepartments(){ return [
+  {id:uid('dep_'), name:'Engineering', sectors:['Roads & Bridges','Buildings'], head:'Priya Shah'},
+  {id:uid('dep_'), name:'Health',      sectors:['Hospitals','Sanitation'],      head:''},
+  {id:uid('dep_'), name:'Water',       sectors:['Water Works','Drainage'],      head:''},
+  {id:uid('dep_'), name:'IT',          sectors:['IT & Consultancy'],            head:''},
+]; }
+const SECTOR_CHOICES = ['Roads & Bridges','Buildings','Water Works','Drainage','Hospitals','Sanitation','Solid Waste','IT & Consultancy','Electrical','Parks & Gardens','Transport','Street Lighting'];
+
+/* =========================================================================
+   STEP DEFINITIONS
+   ========================================================================= */
+const STEPS = [
+  {n:0, title:'Welcome',              icon:'hand',          sub:'What this is, and your account'},
+  {n:1, title:'Organisation',         icon:'building-2',    sub:'Name, place, languages'},
+  {n:2, title:'Branding & documents', icon:'image',         sub:'Logos, letterhead, standard files'},
+  {n:3, title:'Departments',          icon:'network',       sub:'Teams and who approves'},
+  {n:4, title:'Money levels',         icon:'layers',        sub:'Who signs off at each amount'},
+  {n:5, title:'People & roles',       icon:'users',         sub:'Add officers, set what they can do'},
+  {n:6, title:'Module rules',         icon:'sliders-horizontal', sub:'A few go-live decisions'},
+  {n:7, title:'Review & go live',     icon:'rocket',        sub:'Check, then turn it on'},
+];
+
+/* =========================================================================
+   WORKING STATE
+   ========================================================================= */
+let WS = null;
+function freshWS(){
+  return {
+    meta:{ currentStep:0, stepState:{}, sampleLoaded:false, published:false, lastSaved:null,
+           superAdmin:{ name:'', email:'' } },
+    values:{
+      'org.identity':{ name:'', type:'Municipal Corporation', state:'', city:'', address:'',
+                       fyStartMonth:'April', currency:'INR (₹)', orgCode:'', emdPercent:2, gemEnabled:true,
+                       prebidResponseDays:7 },
+      'org.departments': defDepartments(),
+      'sig.logos': [],            // start empty — admin keeps its own seeded samples until publish merges
+      'sig.letterhead': null,
+      'org.bidding-docs': [],
+      'org.reference-library': [],
+      'tiers.def': defTiers(),
+      'tender.methods-suite': defMethods(),
+      'tender.languages': defLanguages(),
+      'officers.directory': defOfficers(),
+      'tender.committee': { roles: starterRoles(), actions:[] },
+      'prebid.committee':{ roles: starterRoles(), actions:[] },
+      'eval.committee':  { roles: starterRoles(), actions:[] },
+      'dpr.committee':   { roles: starterRoles(), actions:[] },
+      'mgmt.committee':  { roles: starterRoles(), actions:[] },
+      'tender.pre-publish-gates': defGates(),
+    }
+  };
+}
+function loadWS(){
+  try{ const raw=localStorage.getItem(WS_KEY); if(raw){ const p=JSON.parse(raw); if(p&&p.values&&p.meta) return p; } }catch(e){}
+  return freshWS();
+}
+function saveWS(){ WS.meta.lastSaved=Date.now(); try{ localStorage.setItem(WS_KEY, JSON.stringify(WS)); }catch(e){ toast('Could not save — storage full'); } }
+function autosave(){ saveWS(); renderMeter(); }
+function val(id){ return WS.values[id]; }
+
+/* =========================================================================
+   COMPLETENESS METER + RAIL
+   ========================================================================= */
+function doneCount(){ let d=0; for(let i=0;i<=7;i++){ if(WS.meta.stepState[i]==='done') d++; } return d; }
+function renderMeter(){
+  const d=doneCount(); const pct=Math.round(d/8*100);
+  $('#meterBar').style.width=pct+'%';
+  $('#mMeterBar').style.width=pct+'%';
+  $('#meterLabel').textContent='Setup '+pct+'% complete';
+  $('#meterCount').textContent=d+' of 8';
+}
+function railIcon(state){
+  if(state==='done')    return '<span class="w-6 h-6 rounded-full bg-success text-white flex items-center justify-center"><i data-lucide="check" class="w-3.5 h-3.5"></i></span>';
+  if(state==='skipped') return '<span class="w-6 h-6 rounded-full bg-warning/15 text-warning border border-warning/40 flex items-center justify-center"><i data-lucide="minus" class="w-3.5 h-3.5"></i></span>';
+  return '<span class="w-6 h-6 rounded-full border border-line text-ink-400 flex items-center justify-center text-[11px] font-semibold">{n}</span>';
+}
+function renderRail(){
+  const host=$('#railSteps');
+  host.innerHTML = STEPS.map(s=>{
+    const state=WS.meta.stepState[s.n]||'todo';
+    const active = s.n===WS.meta.currentStep;
+    const icon = railIcon(state).replace('{n}', s.n===0?'·':s.n);
+    return `<button data-go="${s.n}" class="w-full text-left flex items-start gap-3 px-3 py-2.5 rounded-lg ${active?'bg-primary-light':'hover:bg-surface'}">
+      ${icon}
+      <span class="min-w-0 flex-1">
+        <span class="flex items-center gap-2">
+          <span class="text-[13.5px] font-${active?'semibold':'medium'} text-ink-900 truncate">${escapeHtml(s.title)}</span>
+          ${state==='skipped'?'<span class="text-[10px] px-1.5 py-0.5 rounded-full using-defaults-pill">using defaults</span>':''}
+        </span>
+        <span class="block text-[11.5px] text-ink-500 leading-snug">${escapeHtml(s.sub)}</span>
+      </span>
+    </button>`;
+  }).join('');
+  $all('[data-go]',host).forEach(b=> b.addEventListener('click',()=>goStep(+b.dataset.go)));
+  refreshIcons();
+}
+
+/* =========================================================================
+   NAVIGATION
+   ========================================================================= */
+function goStep(n){
+  n=Math.max(0,Math.min(7,n));
+  WS.meta.currentStep=n; saveWS();
+  renderRail(); renderMeter();
+  const main=$('#wizMain'); main.scrollTop=0;
+  STEP_RENDERERS[n](main);
+  $('#mStepTitle').textContent='Step '+n+' · '+STEPS[n].title;
+  refreshIcons();
+}
+function markStep(n,state){ WS.meta.stepState[n]=state; autosave(); renderRail(); }
+function completeStep(n){ markStep(n,'done'); goStep(Math.min(7,n+1)); }
+function skipStep(n){ if(!WS.meta.stepState[n] || WS.meta.stepState[n]==='todo') WS.meta.stepState[n]='skipped'; autosave(); renderRail(); goStep(Math.min(7,n+1)); }
+function dismissResume(){ $('#resumeBanner').classList.add('hidden'); }
+/* Start over — wipe the wizard's working data and begin from Step 0.
+   Only clears `onboarding_state_v1`; the live admin store is left untouched. */
+function restartWizard(){
+  if(!confirm('Start over?\n\nThis clears everything you have entered here and begins from the first step. Your live admin settings are not affected.')) return;
+  try{ localStorage.removeItem(WS_KEY); }catch(e){}
+  WS = freshWS();
+  saveWS();
+  _csvRows=null;
+  $('#resumeBanner').classList.add('hidden');
+  renderRail(); renderMeter();
+  goStep(0);
+  toast('Cleared — starting fresh');
+}
+
+/* shell for a step page: header + body + footer nav */
+function stepShell(n, bodyHTML, opts){
+  opts=opts||{};
+  const s=STEPS[n];
+  const showSkip = n>0 && n<7 && opts.skippable!==false;
+  return `<div class="mx-auto w-full max-w-3xl px-6 py-8">
+    <div class="flex items-center gap-2 text-[12px] text-ink-500 mb-1">Step ${n} of 7</div>
+    <h1 class="text-[24px] font-bold text-ink-900 leading-tight">${escapeHtml(s.title)}</h1>
+    <p class="text-[14px] text-ink-500 mt-1.5 leading-snug">${opts.lead||''}</p>
+    <div class="mt-6 space-y-5">${bodyHTML}</div>
+    <div class="mt-8 flex items-center justify-between gap-3 border-t border-line pt-5">
+      <button class="btn btn-ghost" ${n===0?'disabled style="opacity:.4"':''} onclick="goStep(${n-1})"><i data-lucide="arrow-left" class="w-4 h-4"></i> Back</button>
+      <div class="flex items-center gap-2">
+        ${showSkip?`<button class="btn" onclick="skipStep(${n})">Skip for now — use defaults</button>`:''}
+        ${n<7?`<button class="btn btn-primary" onclick="completeStep(${n})">${opts.nextLabel||'Save & continue'} <i data-lucide="arrow-right" class="w-4 h-4"></i></button>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* =========================================================================
+   REUSABLE MINI-EDITORS (faithful mirrors of admin.html editors)
+   Each renders into a host element and calls autosave() on change.
+   ========================================================================= */
+
+/* ---- language toggles — mirror admin.html tender.languages (lang-toggles) ---- */
+function langToggles(host, obj){
+  const render=()=>{
+    host.innerHTML = `<div class="flex flex-wrap gap-2">`+ obj.languages.map((l,i)=>
+      `<button data-lang="${i}" class="chip-input ${l.enabled?'!bg-primary-light !border-primary-border':''}">
+        <span class="${l.enabled?'text-primary font-semibold':''}">${escapeHtml(l.label)}</span>
+        ${l.enabled?'<i data-lucide="check" class="w-3 h-3 text-primary"></i>':''}
+      </button>`).join('') + `</div>
+      <div class="mt-3 text-[12.5px] text-ink-500">Default language:
+        <select id="langDefault" class="inp inline-block w-auto ml-1">${obj.languages.filter(l=>l.enabled).map(l=>`<option ${obj.default===l.label?'selected':''}>${escapeHtml(l.label)}</option>`).join('')}</select>
+      </div>`;
+    $all('[data-lang]',host).forEach(b=>b.addEventListener('click',()=>{ const l=obj.languages[+b.dataset.lang]; l.enabled=!l.enabled; if(!l.enabled&&obj.default===l.label){ const first=obj.languages.find(x=>x.enabled); obj.default=first?first.label:''; } autosave(); render(); }));
+    const sel=$('#langDefault',host); if(sel) sel.addEventListener('change',()=>{ obj.default=sel.value; autosave(); });
+    refreshIcons();
+  };
+  render();
+}
+
+/* ---- value tiers — mirror admin.html tiers.def (tiers) ---- */
+function tiersEditor(host, arr){
+  const render=()=>{
+    host.innerHTML = `<div class="space-y-2">`+ arr.map((t,i)=>
+      `<div class="flex items-center gap-2 flex-wrap">
+        <span class="text-[12px] text-ink-500 w-10">From</span>
+        <input class="inp w-32" type="number" data-tmin="${i}" value="${t.min}">
+        <span class="text-[12px] text-ink-500">up to</span>
+        <input class="inp w-32" type="number" data-tmax="${i}" value="${t.max==null?'':t.max}" placeholder="no limit">
+        <span class="text-[12px] text-ink-500">approved by</span>
+        <input class="inp flex-1 min-w-[160px]" data-tauth="${i}" value="${escapeHtml(t.auth)}">
+        <button class="text-ink-400 hover:text-danger" data-tdel="${i}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+      </div>
+      <div class="text-[11.5px] text-ink-400 pl-12">${fmtINR(t.min)} – ${t.max==null?'and above':fmtINR(t.max)} → ${escapeHtml(t.auth)}</div>`).join('')
+      + `</div><button class="btn mt-3" data-tadd><i data-lucide="plus" class="w-4 h-4"></i> Add money level</button>`;
+    $all('[data-tmin]',host).forEach(el=>el.addEventListener('input',()=>{ arr[+el.dataset.tmin].min=el.value===''?0:+el.value; autosave(); }));
+    $all('[data-tmax]',host).forEach(el=>el.addEventListener('input',()=>{ arr[+el.dataset.tmax].max=el.value===''?null:+el.value; autosave(); }));
+    $all('[data-tauth]',host).forEach(el=>el.addEventListener('input',()=>{ arr[+el.dataset.tauth].auth=el.value; autosave(); }));
+    $all('[data-tdel]',host).forEach(b=>b.addEventListener('click',()=>{ arr.splice(+b.dataset.tdel,1); autosave(); render(); }));
+    $('[data-tadd]',host).addEventListener('click',()=>{ const last=arr[arr.length-1]; arr.push({min:last?(last.max||last.min):0,max:null,auth:''}); autosave(); render(); });
+    refreshIcons();
+  };
+  render();
+}
+
+/* ---- asset library (logos / seals) — mirror admin.html sig.logos ---- */
+function readImage(file, cb){
+  if(file.size>LL_MAX_BYTES){ toast('That image is larger than 300 KB — please use a smaller file.'); return; }
+  const r=new FileReader();
+  r.onload=()=>{ const dataUrl=r.result; const img=new Image();
+    img.onload=()=>cb({name:file.name, type:file.type, dataUrl, width:img.naturalWidth||null, height:img.naturalHeight||null, size:file.size});
+    img.onerror=()=>cb({name:file.name, type:file.type, dataUrl, width:null, height:null, size:file.size});
+    img.src=dataUrl; };
+  r.readAsDataURL(file);
+}
+function libBytes(arr){ try{ return JSON.stringify(arr).length; }catch(e){ return 0; } }
+const LOGO_TAGS=['Header logo','Official seal','Watermark','Footer emblem','DPR header logo','DPR cover seal'];
+function logoLibrary(host, arr){
+  const render=()=>{
+    host.innerHTML = `<div class="grid grid-cols-2 sm:grid-cols-3 gap-3">`+ arr.map((a,i)=>
+      `<div class="card p-3">
+        <div class="h-16 flex items-center justify-center bg-surface rounded-lg mb-2 overflow-hidden">
+          ${a.image&&a.image.dataUrl?`<img src="${a.image.dataUrl}" alt="${escapeHtml(a.name)}" class="max-h-14 max-w-full object-contain">`:'<i data-lucide="image-off" class="w-5 h-5 text-ink-400"></i>'}
+        </div>
+        <input class="inp text-[12.5px] mb-1.5" data-lname="${i}" value="${escapeHtml(a.name)}">
+        <select class="inp text-[12px] mb-2" data-ltag="${i}">${LOGO_TAGS.map(t=>`<option ${a.tag===t?'selected':''}>${t}</option>`).join('')}</select>
+        <div class="flex items-center justify-between">
+          <label class="flex items-center gap-1.5 text-[11.5px] text-ink-500 cursor-pointer"><input type="radio" name="ldef_${escapeHtml(a.tag)}" ${a.isDefault?'checked':''} data-ldef="${i}"> Default</label>
+          <button class="text-ink-400 hover:text-danger" data-ldel="${i}"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+        </div>
+      </div>`).join('') + `</div>
+      <button class="btn mt-3" data-ladd><i data-lucide="upload" class="w-4 h-4"></i> Upload logo or seal</button>
+      <span class="text-[11.5px] text-ink-400 ml-2">PNG, JPG or SVG · up to 300 KB each</span>`;
+    $all('[data-lname]',host).forEach(el=>el.addEventListener('input',()=>{ arr[+el.dataset.lname].name=el.value; autosave(); }));
+    $all('[data-ltag]',host).forEach(el=>el.addEventListener('change',()=>{ arr[+el.dataset.ltag].tag=el.value; autosave(); render(); }));
+    $all('[data-ldef]',host).forEach(el=>el.addEventListener('change',()=>{ const idx=+el.dataset.ldef; const tag=arr[idx].tag; arr.forEach(a=>{ if(a.tag===tag) a.isDefault=false; }); arr[idx].isDefault=true; autosave(); }));
+    $all('[data-ldel]',host).forEach(b=>b.addEventListener('click',()=>{ arr.splice(+b.dataset.ldel,1); autosave(); render(); }));
+    $('[data-ladd]',host).addEventListener('click',()=>{
+      const fi=$('#hiddenFile'); fi.value=''; fi.accept='image/png,image/jpeg,image/svg+xml';
+      fi.onchange=()=>{ const f=fi.files[0]; if(!f) return; readImage(f,img=>{
+        const next=arr.concat([{}]); if(libBytes(next)+img.dataUrl.length>LL_BUDGET){ toast('This library is getting full — remove an item first.'); return; }
+        const tagHas=arr.some(a=>a.tag==='Header logo');
+        arr.push({id:uid('logo_'), name:f.name.replace(/\.[^.]+$/,''), tag:'Header logo', isDefault:!tagHas, seeded:false, image:img}); autosave(); render(); }); };
+      fi.click();
+    });
+    refreshIcons();
+  };
+  render();
+}
+
+/* ---- single letterhead asset ---- */
+function letterheadEditor(host, key){
+  const render=()=>{
+    const a=val(key);
+    host.innerHTML = a && a.image ?
+      `<div class="card p-3 flex items-center gap-3">
+        <div class="w-20 h-14 flex items-center justify-center bg-surface rounded-lg overflow-hidden">${a.image.dataUrl?`<img src="${a.image.dataUrl}" class="max-h-12 max-w-full object-contain">`:''}</div>
+        <div class="flex-1 min-w-0"><div class="text-[13px] font-medium text-ink-900 truncate">${escapeHtml(a.name||'Letterhead')}</div><div class="text-[11.5px] text-ink-500">Default letterhead / cover page</div></div>
+        <button class="btn btn-danger" data-lhdel><i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Remove</button>
+      </div>` :
+      `<button class="btn" data-lhadd><i data-lucide="upload" class="w-4 h-4"></i> Upload letterhead / cover page</button>`;
+    const add=$('[data-lhadd]',host); if(add) add.addEventListener('click',()=>{ const fi=$('#hiddenFile'); fi.value=''; fi.accept='image/png,image/jpeg,image/svg+xml'; fi.onchange=()=>{ const f=fi.files[0]; if(!f) return; readImage(f,img=>{ WS.values[key]={id:uid('lh_'), name:f.name.replace(/\.[^.]+$/,''), tag:'Letterhead', isDefault:true, seeded:false, image:img}; autosave(); render(); }); }; fi.click(); });
+    const del=$('[data-lhdel]',host); if(del) del.addEventListener('click',()=>{ WS.values[key]=null; autosave(); render(); });
+    refreshIcons();
+  };
+  render();
+}
+
+/* ---- document library (bidding docs / circulars) ---- */
+function readDoc(file, cb){
+  if(file.size>DOC_MAX_BYTES){ toast('That file is larger than 1.5 MB — please use a smaller file.'); return; }
+  const r=new FileReader(); r.onload=()=>cb({name:file.name, type:file.type, dataUrl:r.result, size:file.size}); r.readAsDataURL(file);
+}
+function docLibrary(host, arr, emptyHint){
+  const render=()=>{
+    host.innerHTML = (arr.length? `<div class="space-y-2">`+ arr.map((d,i)=>
+      `<div class="card p-3 flex items-center gap-3">
+        <i data-lucide="file-text" class="w-5 h-5 text-primary shrink-0"></i>
+        <input class="inp flex-1" data-dname="${i}" value="${escapeHtml(d.name)}">
+        <a class="btn" href="${d.file&&d.file.dataUrl?d.file.dataUrl:'#'}" target="_blank" rel="noopener">View</a>
+        <button class="text-ink-400 hover:text-danger" data-ddel="${i}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+      </div>`).join('')+`</div>` : `<div class="text-[13px] text-ink-400 italic">${escapeHtml(emptyHint||'No documents yet.')}</div>`)
+      + `<button class="btn mt-3" data-dadd><i data-lucide="upload" class="w-4 h-4"></i> Upload document</button>
+         <span class="text-[11.5px] text-ink-400 ml-2">PDF, DOC or image · up to 1.5 MB each</span>`;
+    $all('[data-dname]',host).forEach(el=>el.addEventListener('input',()=>{ arr[+el.dataset.dname].name=el.value; autosave(); }));
+    $all('[data-ddel]',host).forEach(b=>b.addEventListener('click',()=>{ arr.splice(+b.dataset.ddel,1); autosave(); render(); }));
+    $('[data-dadd]',host).addEventListener('click',()=>{ const fi=$('#hiddenFile'); fi.value=''; fi.accept='.pdf,.doc,.docx,image/*'; fi.onchange=()=>{ const f=fi.files[0]; if(!f) return; readDoc(f,file=>{ const next=arr.concat([{}]); if(libBytes(next)+file.dataUrl.length>DOC_BUDGET){ toast('This library is getting full — remove a file first.'); return; } arr.push({id:uid('doc_'), name:f.name.replace(/\.[^.]+$/,''), file}); autosave(); render(); }); }; fi.click(); });
+    refreshIcons();
+  };
+  render();
+}
+
+/* ---- role-centric role management — mirror admin.html *.committee (role-centric) ---- */
+function rolesEditor(host, committee){
+  committee.roles = committee.roles || [];
+  const officerNames=()=> val('officers.directory').map(o=>o.name);
+  const render=()=>{
+    host.innerHTML = `<div class="space-y-3">`+ committee.roles.map((r,ri)=>{
+      const permsOn=Object.keys(r.permissions||{}).filter(k=>r.permissions[k]).length;
+      return `<div class="card p-4">
+        <div class="flex items-center gap-3">
+          <button data-renb="${ri}" class="toggle ${r.enabled?'on':''}"><span class="dot"></span></button>
+          <input class="inp flex-1 font-medium" data-rname="${ri}" value="${escapeHtml(r.name)}">
+          <button class="text-ink-400 hover:text-danger" data-rdel="${ri}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+        </div>
+        <div class="mt-3">
+          <div class="text-[12px] font-semibold text-ink-500 mb-1.5">People in this role</div>
+          <div class="flex flex-wrap gap-1.5 items-center">
+            ${(r.members||[]).map((m,mi)=>`<span class="chip-input">${escapeHtml(m)} <button data-rmem="${ri}" data-mi="${mi}">×</button></span>`).join('')||'<span class="text-[12px] text-ink-400 italic">No one yet</span>'}
+            <select class="inp w-auto text-[12px]" data-radd="${ri}">
+              <option value="">+ Add person…</option>
+              ${officerNames().filter(n=>!(r.members||[]).includes(n)).map(n=>`<option>${escapeHtml(n)}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <details class="mt-3">
+          <summary class="text-[12px] font-semibold text-primary cursor-pointer">What this role can do (${permsOn} selected)</summary>
+          <div class="grid sm:grid-cols-2 gap-1.5 mt-2">
+            ${TENDER_ACTIONS.map(a=>`<label class="flex items-center gap-2 text-[12.5px] text-ink-900"><input type="checkbox" data-rperm="${ri}" data-act="${escapeHtml(a)}" ${r.permissions&&r.permissions[a]?'checked':''}> ${escapeHtml(a)}</label>`).join('')}
+          </div>
+        </details>
+      </div>`;
+    }).join('') + `</div><button class="btn mt-3" data-rnew><i data-lucide="plus" class="w-4 h-4"></i> Add role</button>`;
+    $all('[data-renb]',host).forEach(b=>b.addEventListener('click',()=>{ const r=committee.roles[+b.dataset.renb]; r.enabled=!r.enabled; autosave(); render(); }));
+    $all('[data-rname]',host).forEach(el=>el.addEventListener('input',()=>{ committee.roles[+el.dataset.rname].name=el.value; autosave(); }));
+    $all('[data-rdel]',host).forEach(b=>b.addEventListener('click',()=>{ committee.roles.splice(+b.dataset.rdel,1); autosave(); render(); }));
+    $all('[data-rmem]',host).forEach(b=>b.addEventListener('click',()=>{ committee.roles[+b.dataset.rmem].members.splice(+b.dataset.mi,1); autosave(); render(); }));
+    $all('[data-radd]',host).forEach(sel=>sel.addEventListener('change',()=>{ if(!sel.value) return; const r=committee.roles[+sel.dataset.radd]; r.members=r.members||[]; if(!r.members.includes(sel.value)) r.members.push(sel.value); autosave(); render(); }));
+    $all('[data-rperm]',host).forEach(cb=>cb.addEventListener('change',()=>{ const r=committee.roles[+cb.dataset.rperm]; r.permissions=r.permissions||{}; if(cb.checked) r.permissions[cb.dataset.act]=true; else delete r.permissions[cb.dataset.act]; autosave(); }));
+    $('[data-rnew]',host).addEventListener('click',()=>{ committee.roles.push({id:uid('role_'), name:'New role', enabled:true, permissions:{}, members:[]}); autosave(); render(); });
+    refreshIcons();
+  };
+  render();
+}
+
+/* ---- evaluation methods — mirror admin.html tender.methods-suite ---- */
+function methodsEditor(host, obj){
+  const render=()=>{
+    const grp=(g,title)=>`<div class="text-[12px] font-semibold text-ink-500 mt-3 mb-1.5">${title}</div>`+
+      obj.methods.filter(m=>m.group===g).map(m=>{
+        const i=obj.methods.indexOf(m);
+        return `<div class="flex items-center gap-3 py-1.5">
+          <button data-menb="${i}" class="toggle ${m.enabled?'on':''}"><span class="dot"></span></button>
+          <span class="text-[13.5px] flex-1">${escapeHtml(m.label)}</span>
+          ${m.id==='qcbs'?`<select class="inp w-auto text-[12px]" data-mratio="${i}">${m.allowedRatios.map(rr=>`<option ${m.defaultRatio===rr?'selected':''}>${rr}</option>`).join('')}</select>`:''}
+          ${m.mandatoryAbove!=null?`<span class="text-[11.5px] text-ink-400">required above ${fmtINR(m.mandatoryAbove)}</span>`:''}
+          ${m.allowedUpto!=null?`<span class="text-[11.5px] text-ink-400">up to ${fmtINR(m.allowedUpto)}</span>`:''}
+          ${m.justifyLocked?`<span class="text-[11.5px] text-warning">needs written reason</span>`:''}
+        </div>`;
+      }).join('');
+    host.innerHTML = grp('method','Evaluation methods') + grp('mode','Procurement modes');
+    $all('[data-menb]',host).forEach(b=>b.addEventListener('click',()=>{ const m=obj.methods[+b.dataset.menb]; m.enabled=!m.enabled; autosave(); render(); }));
+    $all('[data-mratio]',host).forEach(sel=>sel.addEventListener('change',()=>{ obj.methods[+sel.dataset.mratio].defaultRatio=sel.value; autosave(); }));
+    refreshIcons();
+  };
+  render();
+}
+
+/* ---- publish checklist — mirror admin.html tender.pre-publish-gates (plain 3-way) ---- */
+function gatesEditor(host, arr){
+  const sevOf=(g)=> g.off===true?'off':(g.blocking?'block':'warn');
+  const setSev=(g,s)=>{ if(s==='block'){g.blocking=true;g.off=false;} else if(s==='warn'){g.blocking=false;g.off=false;} else {g.off=true;g.blocking=false;g.canOverride=false;g.overrideRoles=[];} };
+  const render=()=>{
+    host.innerHTML = `<div class="space-y-2">`+ arr.map((g,i)=>{
+      const sev=sevOf(g);
+      const edge = sev==='block'?'#EF4444':(sev==='warn'?'#F59E0B':'#9CA3AF');
+      return `<div class="card p-3 flex items-center gap-3" style="border-left:4px solid ${edge}">
+        <input class="inp flex-1" data-gname="${i}" value="${escapeHtml(g.check)}">
+        <select class="inp w-auto text-[12.5px]" data-gsev="${i}">
+          <option value="block" ${sev==='block'?'selected':''}>Must be done</option>
+          <option value="warn" ${sev==='warn'?'selected':''}>Reminder only</option>
+          <option value="off" ${sev==='off'?'selected':''}>Don't check</option>
+        </select>
+        <button class="text-ink-400 hover:text-danger" data-gdel="${i}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+      </div>`;
+    }).join('') + `</div><button class="btn mt-3" data-gadd><i data-lucide="plus" class="w-4 h-4"></i> Add check</button>`;
+    $all('[data-gname]',host).forEach(el=>el.addEventListener('input',()=>{ arr[+el.dataset.gname].check=el.value; autosave(); }));
+    $all('[data-gsev]',host).forEach(sel=>sel.addEventListener('change',()=>{ setSev(arr[+sel.dataset.gsev], sel.value); autosave(); render(); }));
+    $all('[data-gdel]',host).forEach(b=>b.addEventListener('click',()=>{ arr.splice(+b.dataset.gdel,1); autosave(); render(); }));
+    $('[data-gadd]',host).addEventListener('click',()=>{ arr.push({check:'New check', blocking:false, off:false, canOverride:false, overrideRoles:[]}); autosave(); render(); });
+    refreshIcons();
+  };
+  render();
+}
+
+/* =========================================================================
+   STEP RENDERERS
+   ========================================================================= */
+const STEP_RENDERERS = {};
+
+/* ---------- Step 0 — Welcome ---------- */
+STEP_RENDERERS[0]=function(main){
+  const sa=WS.meta.superAdmin;
+  const body = `
+    <div class="card p-5 bg-primary-light border-primary-border">
+      <div class="flex items-start gap-3">
+        <i data-lucide="shield-check" class="w-5 h-5 text-primary mt-0.5"></i>
+        <div>
+          <div class="text-[15px] font-bold text-ink-900">Nothing you set up here reaches your officers until you finish and click Publish.</div>
+          <p class="text-[13px] text-ink-700 mt-1">Take your time. Everything saves on its own, you can do the steps in any order, and you can close this and come back later.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card p-5">
+      <div class="text-[14px] font-semibold text-ink-900 mb-2">What happens here</div>
+      <ul class="text-[13.5px] text-ink-700 space-y-1.5">
+        <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-success mt-0.5"></i> You'll set up your organisation, people, and the basic rules.</li>
+        <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-success mt-0.5"></i> It takes about 30–40 minutes, in any order — finish later anytime.</li>
+        <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-success mt-0.5"></i> Sensible defaults are already filled in. You mostly just confirm.</li>
+      </ul>
+    </div>
+
+    <div class="card p-5">
+      <div class="text-[14px] font-semibold text-ink-900 mb-1">Your account</div>
+      <p class="text-[12.5px] text-ink-500 mb-3">You are the first person on the system — the super admin. Departments and other officers come later.</p>
+      <div class="grid sm:grid-cols-2 gap-3">
+        <label class="fld"><span>Your name</span><input id="saName" class="inp" value="${escapeHtml(sa.name)}" placeholder="e.g. Rajesh Kumar"></label>
+        <label class="fld"><span>Official email</span><input id="saEmail" class="inp" type="email" value="${escapeHtml(sa.email)}" placeholder="name@org.gov.in"></label>
+      </div>
+    </div>
+
+    <div class="card p-5">
+      <div class="flex items-center gap-3">
+        <button id="sampleToggle" class="toggle ${WS.meta.sampleLoaded?'on':''}"><span class="dot"></span></button>
+        <div class="flex-1">
+          <div class="text-[14px] font-medium text-ink-900">Load sample data to explore</div>
+          <div class="text-[12.5px] text-ink-500">Adds a few example officers and departments so you can look around. You can wipe this in one click before going live — it never mixes with your real records.</div>
+        </div>
+      </div>
+      <div id="sampleWipeWrap" class="mt-3 ${WS.meta.sampleLoaded?'':'hidden'}">
+        <button id="sampleWipe" class="btn btn-danger"><i data-lucide="eraser" class="w-3.5 h-3.5"></i> Wipe sample data</button>
+      </div>
+    </div>`;
+  main.innerHTML = stepShell(0, body, {lead:'A quick setup so the portal works the way your organisation does. Let\'s begin.', skippable:false, nextLabel:'Start setup'});
+  $('#saName').addEventListener('input',e=>{ sa.name=e.target.value; autosave(); });
+  $('#saEmail').addEventListener('input',e=>{ sa.email=e.target.value; autosave(); });
+  $('#sampleToggle').addEventListener('click',()=>{ WS.meta.sampleLoaded?wipeSample():loadSample(); goStep(0); });
+  const sw=$('#sampleWipe'); if(sw) sw.addEventListener('click',()=>{ wipeSample(); toast('Sample data wiped'); goStep(0); });
+  refreshIcons();
+};
+
+/* ---------- Step 1 — Organisation identity ---------- */
+STEP_RENDERERS[1]=function(main){
+  const o=val('org.identity');
+  const months=['April','May','June','July','August','September','October','November','December','January','February','March'];
+  const types=['Municipal Corporation','PSU','Department','Other'];
+  const body = `
+    <div class="card p-5 space-y-3">
+      <div class="grid sm:grid-cols-2 gap-3">
+        <label class="fld"><span>Organisation name</span><input id="oName" class="inp" value="${escapeHtml(o.name)}" placeholder="e.g. Ahmedabad Municipal Corporation"></label>
+        <label class="fld"><span>Type</span><select id="oType" class="inp">${types.map(t=>`<option ${o.type===t?'selected':''}>${t}</option>`).join('')}</select></label>
+        <label class="fld"><span>State</span><input id="oState" class="inp" value="${escapeHtml(o.state)}" placeholder="e.g. Gujarat"></label>
+        <label class="fld"><span>City</span><input id="oCity" class="inp" value="${escapeHtml(o.city)}" placeholder="e.g. Ahmedabad"></label>
+      </div>
+      <label class="fld"><span>Official address</span><textarea id="oAddr" class="inp" rows="2" placeholder="Street, area, PIN">${escapeHtml(o.address)}</textarea></label>
+      <label class="fld"><span>Short code for tender numbers</span><input id="oCode" class="inp w-40" value="${escapeHtml(o.orgCode)}" placeholder="e.g. AMC"></label>
+    </div>
+    <div class="card p-5">
+      <div class="text-[14px] font-semibold text-ink-900 mb-3">Money & calendar</div>
+      <div class="grid sm:grid-cols-2 gap-3">
+        <label class="fld"><span>Financial year starts in</span><select id="oFY" class="inp">${months.map(m=>`<option ${o.fyStartMonth===m?'selected':''}>${m}</option>`).join('')}</select></label>
+        <label class="fld"><span>Currency shown to officers</span><input id="oCur" class="inp" value="${escapeHtml(o.currency)}"></label>
+      </div>
+    </div>
+    <div class="card p-5">
+      <div class="text-[14px] font-semibold text-ink-900 mb-1">Languages</div>
+      <p class="text-[12.5px] text-ink-500 mb-3">Tap a language to turn it on or off. These appear on the letterhead, tender footers, and documents.</p>
+      <div id="langHost"></div>
+    </div>
+    <p class="text-[12.5px] text-ink-400">These details seed your letterhead, tender footers, and the tender-numbering code.</p>`;
+  main.innerHTML = stepShell(1, body, {lead:'Tell us who you are. This goes on every document officers produce.'});
+  const bind=(id,key)=>{ $(id).addEventListener('input',e=>{ o[key]=e.target.value; autosave(); }); };
+  bind('#oName','name'); bind('#oState','state'); bind('#oCity','city'); bind('#oAddr','address'); bind('#oCode','orgCode'); bind('#oCur','currency');
+  $('#oType').addEventListener('change',e=>{ o.type=e.target.value; autosave(); });
+  $('#oFY').addEventListener('change',e=>{ o.fyStartMonth=e.target.value; autosave(); });
+  langToggles($('#langHost'), val('tender.languages'));
+  refreshIcons();
+};
+
+/* ---------- Step 2 — Branding & documents ---------- */
+STEP_RENDERERS[2]=function(main){
+  const body = `
+    <div class="card p-5">
+      <div class="text-[14px] font-semibold text-ink-900 mb-1">Logos & seals</div>
+      <p class="text-[12.5px] text-ink-500 mb-3">Upload your logo, official seal, and any emblems. Mark one as the default for each use.</p>
+      <div id="logoHost"></div>
+    </div>
+    <div class="card p-5">
+      <div class="text-[14px] font-semibold text-ink-900 mb-1">Letterhead / cover page</div>
+      <p class="text-[12.5px] text-ink-500 mb-3">The default page design documents start from.</p>
+      <div id="lhHost"></div>
+    </div>
+    <div class="card p-5">
+      <div class="text-[14px] font-semibold text-ink-900 mb-1">Standard bidding documents</div>
+      <p class="text-[12.5px] text-ink-500 mb-3">Boilerplate officers start from — GCC, special conditions, EMD bank-guarantee format, and similar.</p>
+      <div id="bidHost"></div>
+    </div>
+    <div class="card p-5">
+      <div class="text-[14px] font-semibold text-ink-900 mb-1">Reference circulars & policies</div>
+      <p class="text-[12.5px] text-ink-500 mb-3">Read-only documents officers can look up while they work.</p>
+      <div id="refHost"></div>
+    </div>`;
+  main.innerHTML = stepShell(2, body, {lead:'Upload the files that make documents look official. All of this is optional and editable later.'});
+  logoLibrary($('#logoHost'), val('sig.logos'));
+  letterheadEditor($('#lhHost'), 'sig.letterhead');
+  docLibrary($('#bidHost'), val('org.bidding-docs'), 'No standard documents yet.');
+  docLibrary($('#refHost'), val('org.reference-library'), 'No reference documents yet.');
+  refreshIcons();
+};
+
+/* ---------- Step 3 — Departments ---------- */
+STEP_RENDERERS[3]=function(main){
+  const deps=val('org.departments');
+  const officerNames=val('officers.directory').map(o=>o.name);
+  const renderList=(host)=>{
+    host.innerHTML = deps.map((d,i)=>`
+      <div class="card p-4">
+        <div class="flex items-center gap-3">
+          <i data-lucide="building" class="w-4 h-4 text-primary"></i>
+          <input class="inp flex-1 font-medium" data-dpname="${i}" value="${escapeHtml(d.name)}">
+          <button class="text-ink-400 hover:text-danger" data-dpdel="${i}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+        </div>
+        <div class="mt-3">
+          <div class="text-[12px] font-semibold text-ink-500 mb-1.5">Areas it handles</div>
+          <div class="flex flex-wrap gap-1.5 items-center">
+            ${(d.sectors||[]).map((s,si)=>`<span class="chip-input">${escapeHtml(s)} <button data-dpsecdel="${i}" data-si="${si}">×</button></span>`).join('')}
+            <select class="inp w-auto text-[12px]" data-dpsecadd="${i}"><option value="">+ Add area…</option>${SECTOR_CHOICES.filter(s=>!(d.sectors||[]).includes(s)).map(s=>`<option>${escapeHtml(s)}</option>`).join('')}</select>
+          </div>
+        </div>
+        <div class="mt-3">
+          <label class="fld"><span>Who heads this department</span>
+            <select class="inp" data-dphead="${i}"><option value="">— not set —</option>${officerNames.map(n=>`<option ${d.head===n?'selected':''}>${escapeHtml(n)}</option>`).join('')}</select>
+          </label>
+        </div>
+      </div>`).join('') + `<button class="btn" data-dpadd><i data-lucide="plus" class="w-4 h-4"></i> Add department</button>`;
+    $all('[data-dpname]',host).forEach(el=>el.addEventListener('input',()=>{ deps[+el.dataset.dpname].name=el.value; autosave(); }));
+    $all('[data-dpdel]',host).forEach(b=>b.addEventListener('click',()=>{ deps.splice(+b.dataset.dpdel,1); autosave(); renderList(host); refreshIcons(); }));
+    $all('[data-dpsecdel]',host).forEach(b=>b.addEventListener('click',()=>{ deps[+b.dataset.dpsecdel].sectors.splice(+b.dataset.si,1); autosave(); renderList(host); refreshIcons(); }));
+    $all('[data-dpsecadd]',host).forEach(sel=>sel.addEventListener('change',()=>{ if(!sel.value) return; const d=deps[+sel.dataset.dpsecadd]; d.sectors=d.sectors||[]; d.sectors.push(sel.value); autosave(); renderList(host); refreshIcons(); }));
+    $all('[data-dphead]',host).forEach(sel=>sel.addEventListener('change',()=>{ deps[+sel.dataset.dphead].head=sel.value; autosave(); }));
+    $('[data-dpadd]',host).addEventListener('click',()=>{ deps.push({id:uid('dep_'), name:'New department', sectors:[], head:''}); autosave(); renderList(host); refreshIcons(); });
+    refreshIcons();
+  };
+  main.innerHTML = stepShell(3, `<div class="card p-5 bg-surface text-[13px] text-ink-700">Add the departments in your organisation. For each, say which areas they handle and who leads them.</div><div id="depList" class="space-y-3"></div>`, {lead:'These are the teams that raise tenders. Other steps refer back to them.'});
+  renderList($('#depList'));
+  refreshIcons();
+};
+
+/* ---------- Step 4 — Value tiers & authority ---------- */
+STEP_RENDERERS[4]=function(main){
+  const o=val('org.identity');
+  const body = `
+    <div class="card p-5">
+      <div class="flex items-center justify-between mb-1"><div class="text-[14px] font-semibold text-ink-900">Who approves at each money level</div><span class="text-[11.5px] using-defaults-pill px-2 py-0.5 rounded-full">GFR default — change only if your org differs</span></div>
+      <p class="text-[12.5px] text-ink-500 mb-3">Set the rupee bands and who signs off in each. These drive every approval chain in the portal.</p>
+      <div id="tiersHost"></div>
+    </div>
+    <div class="card p-5">
+      <div class="text-[14px] font-semibold text-ink-900 mb-3">Procurement rules</div>
+      <div class="flex items-center gap-3 mb-3">
+        <button id="gemToggle" class="toggle ${o.gemEnabled?'on':''}"><span class="dot"></span></button>
+        <div><div class="text-[13.5px] font-medium text-ink-900">Allow GeM (Government e-Marketplace) buying</div><div class="text-[12px] text-ink-500">GFR default — on.</div></div>
+      </div>
+      <div id="modeHost"></div>
+      <p class="text-[12px] text-ink-400 mt-3">These mode thresholds follow GFR. Open Tender is required above the threshold; Limited Tender is allowed below it.</p>
+    </div>`;
+  main.innerHTML = stepShell(4, body, {lead:'The amounts that decide who must approve a tender. Pre-filled with the standard GFR rules.'});
+  tiersEditor($('#tiersHost'), val('tiers.def'));
+  methodsEditor($('#modeHost'), val('tender.methods-suite'));   // shows modes too
+  $('#gemToggle').addEventListener('click',()=>{ o.gemEnabled=!o.gemEnabled; autosave(); goStep(4); });
+  refreshIcons();
+};
+
+/* ---------- Step 5 — People & roles ---------- */
+let _csvRows=null;   // staged CSV import (preview-and-fix)
+STEP_RENDERERS[5]=function(main){
+  const body = `
+    <div class="card p-5">
+      <div class="flex items-center justify-between mb-3"><div class="text-[14px] font-semibold text-ink-900">Officers</div>
+        <button id="csvOpen" class="btn"><i data-lucide="upload" class="w-4 h-4"></i> Import a list</button></div>
+      <div id="offHost"></div>
+    </div>
+    <div id="csvWrap" class="hidden card p-5 bg-surface">
+      <div class="text-[14px] font-semibold text-ink-900 mb-1">Paste or upload a list of officers</div>
+      <p class="text-[12.5px] text-ink-500 mb-2">One per line: <code class="text-[11.5px]">Name, email, department, designation</code>. You'll get to check everything before it's added.</p>
+      <textarea id="csvText" class="inp font-mono text-[12px]" rows="5" placeholder="Anita Desai, anita@org.gov.in, Engineering, Technical Officer"></textarea>
+      <div class="flex gap-2 mt-2"><button id="csvFile" class="btn"><i data-lucide="file-up" class="w-4 h-4"></i> Upload .csv</button><button id="csvPreview" class="btn btn-primary">Preview</button><button id="csvCancel" class="btn btn-ghost">Cancel</button></div>
+      <div id="csvGrid" class="mt-3"></div>
+    </div>
+    <div class="card p-5">
+      <div class="text-[14px] font-semibold text-ink-900 mb-1">Roles & what they can do</div>
+      <p class="text-[12.5px] text-ink-500 mb-3">A role is a job (like "Tender Drafter"). Give each role its permissions, then add people to it. One person can hold more than one role.</p>
+      <div class="flex gap-1.5 mb-3 flex-wrap" id="modTabs"></div>
+      <div id="rolesHost"></div>
+      <p class="text-[12px] text-ink-400 mt-3">Tip: the same person can be in roles across different modules.</p>
+    </div>`;
+  main.innerHTML = stepShell(5, body, {lead:'Add the people who use the portal and decide what each role is allowed to do.'});
+  renderOfficers($('#offHost'));
+  // module tabs for role management
+  const mods=[['tender','Tender'],['prebid','Pre-Bid'],['eval','Evaluation'],['dpr','DPR'],['mgmt','Management']];
+  let activeMod = (STEP_RENDERERS[5]._mod)||'tender';
+  const tabHost=$('#modTabs');
+  const drawTabs=()=>{ tabHost.innerHTML=mods.map(([k,l])=>`<button data-mod="${k}" class="btn ${activeMod===k?'btn-primary':''}">${l}</button>`).join(''); $all('[data-mod]',tabHost).forEach(b=>b.addEventListener('click',()=>{ activeMod=b.dataset.mod; STEP_RENDERERS[5]._mod=activeMod; drawTabs(); rolesEditor($('#rolesHost'), val(activeMod+'.committee')); })); };
+  drawTabs();
+  rolesEditor($('#rolesHost'), val(activeMod+'.committee'));
+  // CSV import wiring
+  $('#csvOpen').addEventListener('click',()=>{ $('#csvWrap').classList.toggle('hidden'); });
+  $('#csvCancel').addEventListener('click',()=>{ $('#csvWrap').classList.add('hidden'); _csvRows=null; $('#csvGrid').innerHTML=''; });
+  $('#csvFile').addEventListener('click',()=>{ const fi=$('#hiddenFile'); fi.value=''; fi.accept='.csv,text/csv'; fi.onchange=()=>{ const f=fi.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ $('#csvText').value=r.result; }; r.readAsText(f); }; fi.click(); });
+  $('#csvPreview').addEventListener('click',()=>previewCsv());
+  refreshIcons();
+};
+function renderOfficers(host){
+  const offs=val('officers.directory');
+  host.innerHTML = `<div class="overflow-x-auto"><table class="w-full text-[13px]"><thead><tr class="text-left text-ink-500 border-b border-line">
+    <th class="py-2 pr-2 font-medium">Name</th><th class="py-2 px-2 font-medium">Email</th><th class="py-2 px-2 font-medium">Department</th><th class="py-2 px-2 font-medium">Designation</th><th class="py-2 px-2 font-medium">Status</th><th></th></tr></thead><tbody>`+
+    offs.map((o,i)=>`<tr class="border-b border-line ${o.__sample?'bg-warning/5':''}">
+      <td class="py-1.5 pr-2"><input class="inp" data-ofn="${i}" value="${escapeHtml(o.name)}">${o.__sample?'<span class="text-[10px] text-warning ml-1">sample</span>':''}</td>
+      <td class="py-1.5 px-2"><input class="inp" data-ofe="${i}" value="${escapeHtml(o.email)}"></td>
+      <td class="py-1.5 px-2"><input class="inp" data-ofd="${i}" value="${escapeHtml(o.dept)}"></td>
+      <td class="py-1.5 px-2"><input class="inp" data-ofr="${i}" value="${escapeHtml(o.role)}"></td>
+      <td class="py-1.5 px-2"><span class="text-[11.5px] px-2 py-0.5 rounded-full ${o.status==='Active'?'bg-success-light text-success':'bg-warning-light text-warning'}">${escapeHtml(o.status||'Active')}</span></td>
+      <td class="py-1.5 px-1 whitespace-nowrap">
+        ${o.status!=='Active'?`<button class="btn !py-1 !px-2 text-[11.5px]" data-ofinv="${i}">Invite</button>`:''}
+        <button class="text-ink-400 hover:text-danger" data-ofdel="${i}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+      </td></tr>`).join('')+`</tbody></table></div>
+    <button class="btn mt-3" data-ofadd><i data-lucide="user-plus" class="w-4 h-4"></i> Add officer</button>`;
+  const bind=(attr,key)=>$all('['+attr+']',host).forEach(el=>el.addEventListener('input',()=>{ offs[+el.getAttribute(attr)][key]=el.value; autosave(); }));
+  bind('data-ofn','name'); bind('data-ofe','email'); bind('data-ofd','dept'); bind('data-ofr','role');
+  $all('[data-ofinv]',host).forEach(b=>b.addEventListener('click',()=>{ offs[+b.dataset.ofinv].status='Invited'; autosave(); renderOfficers(host); toast('Marked as invited (no email sent)'); }));
+  $all('[data-ofdel]',host).forEach(b=>b.addEventListener('click',()=>{ offs.splice(+b.dataset.ofdel,1); autosave(); renderOfficers(host); }));
+  $('[data-ofadd]',host).addEventListener('click',()=>{ offs.push({name:'', role:'', email:'', dept:'', status:'Invited'}); autosave(); renderOfficers(host); });
+  refreshIcons();
+}
+function previewCsv(){
+  const lines=$('#csvText').value.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+  _csvRows = lines.map(l=>{ const p=l.split(',').map(x=>x.trim()); return {name:p[0]||'', email:p[1]||'', dept:p[2]||'', role:p[3]||'Officer'}; });
+  const grid=$('#csvGrid');
+  if(!_csvRows.length){ grid.innerHTML='<div class="text-[12.5px] text-ink-400 italic">Nothing to preview yet.</div>'; return; }
+  grid.innerHTML = `<div class="text-[12.5px] text-ink-500 mb-2">Check and fix, then add. Rows with a missing email are flagged.</div>
+    <div class="overflow-x-auto"><table class="w-full text-[12.5px]"><thead><tr class="text-left text-ink-500"><th class="py-1 pr-2">Name</th><th class="py-1 px-2">Email</th><th class="py-1 px-2">Department</th><th class="py-1 px-2">Designation</th><th></th></tr></thead><tbody>`+
+    _csvRows.map((r,i)=>`<tr class="${!r.email?'bg-danger-light':''}">
+      <td class="py-1 pr-2"><input class="inp" data-cn="${i}" value="${escapeHtml(r.name)}"></td>
+      <td class="py-1 px-2"><input class="inp" data-ce="${i}" value="${escapeHtml(r.email)}"></td>
+      <td class="py-1 px-2"><input class="inp" data-cd="${i}" value="${escapeHtml(r.dept)}"></td>
+      <td class="py-1 px-2"><input class="inp" data-cr="${i}" value="${escapeHtml(r.role)}"></td>
+      <td class="py-1 px-1"><button class="text-ink-400 hover:text-danger" data-cx="${i}"><i data-lucide="x" class="w-4 h-4"></i></button></td>
+    </tr>`).join('')+`</tbody></table></div>
+    <div class="flex gap-2 mt-3"><button id="csvCommit" class="btn btn-primary">Add ${_csvRows.length} officers</button></div>`;
+  const b=(attr,key)=>$all('['+attr+']',grid).forEach(el=>el.addEventListener('input',()=>{ _csvRows[+el.getAttribute(attr)][key]=el.value; }));
+  b('data-cn','name'); b('data-ce','email'); b('data-cd','dept'); b('data-cr','role');
+  $all('[data-cx]',grid).forEach(x=>x.addEventListener('click',()=>{ _csvRows.splice(+x.dataset.cx,1); previewCsv(); }));
+  $('#csvCommit').addEventListener('click',()=>{ const offs=val('officers.directory'); _csvRows.filter(r=>r.name).forEach(r=>offs.push({name:r.name, role:r.role||'Officer', email:r.email, dept:r.dept, status:'Invited'})); autosave(); _csvRows=null; $('#csvText').value=''; $('#csvWrap').classList.add('hidden'); goStep(5); toast('Officers added'); });
+  refreshIcons();
+}
+
+/* ---------- Step 6 — Module rules quick-config ---------- */
+STEP_RENDERERS[6]=function(main){
+  const o=val('org.identity');
+  const note='Set now or keep the default — you can change all of this later in the admin panel.';
+  const body = `
+    <div class="card p-5">
+      <div class="text-[14px] font-semibold text-ink-900 flex items-center gap-2"><i data-lucide="file-edit" class="w-4 h-4 text-primary"></i> Tender</div>
+      <p class="text-[12px] text-ink-400 mb-3">${note}</p>
+      <div class="grid sm:grid-cols-2 gap-3 mb-4">
+        <label class="fld"><span>Default EMD (earnest money) %</span><input id="qEmd" class="inp w-32" type="number" step="0.5" value="${o.emdPercent}"></label>
+      </div>
+      <div class="text-[12.5px] font-semibold text-ink-500 mb-1">Which evaluation methods officers can use</div>
+      <div id="qMethods" class="mb-4"></div>
+      <div class="text-[12.5px] font-semibold text-ink-500 mb-1">Publish checklist — what must be done before a tender goes out</div>
+      <div id="qGates"></div>
+    </div>
+    <div class="card p-5">
+      <div class="text-[14px] font-semibold text-ink-900 flex items-center gap-2"><i data-lucide="message-square-quote" class="w-4 h-4 text-primary"></i> Pre-Bid</div>
+      <p class="text-[12px] text-ink-400 mb-3">${note}</p>
+      <label class="fld max-w-[260px]"><span>Days vendors get to ask questions</span><input id="qPrebid" class="inp w-32" type="number" value="${o.prebidResponseDays}"></label>
+    </div>
+    <div class="card p-5">
+      <div class="text-[14px] font-semibold text-ink-900 flex items-center gap-2"><i data-lucide="gavel" class="w-4 h-4 text-primary"></i> Evaluation, DPR & Management</div>
+      <p class="text-[12.5px] text-ink-500 mt-1">These use the same methods and roles you set above. Everything else keeps sensible defaults you can refine later in the admin panel.</p>
+    </div>`;
+  main.innerHTML = stepShell(6, body, {lead:'Just the decisions worth making before you go live. Everything else inherits a default.'});
+  $('#qEmd').addEventListener('input',e=>{ o.emdPercent=e.target.value===''?0:+e.target.value; autosave(); });
+  $('#qPrebid').addEventListener('input',e=>{ o.prebidResponseDays=e.target.value===''?0:+e.target.value; autosave(); });
+  methodsEditor($('#qMethods'), val('tender.methods-suite'));
+  gatesEditor($('#qGates'), val('tender.pre-publish-gates'));
+  refreshIcons();
+};
+
+/* ---------- Step 7 — Review & go live ---------- */
+STEP_RENDERERS[7]=function(main){
+  if(WS.meta.published){ return renderPublished(main); }
+  const o=val('org.identity');
+  const offs=val('officers.directory');
+  const deps=val('org.departments');
+  const methods=val('tender.methods-suite').methods.filter(m=>m.enabled&&m.group==='method').map(m=>m.label.replace(/ \(.*\)/,''));
+  const roleCount=val('tender.committee').roles.filter(r=>r.enabled).length;
+  const docCount=val('org.bidding-docs').length+val('org.reference-library').length+(val('sig.letterhead')?1:0);
+  const gatesMust=val('tender.pre-publish-gates').filter(g=>g.blocking&&g.off!==true).length;
+  const summary = `${escapeHtml(o.name||'Your organisation')}${o.type?', '+escapeHtml(o.type):''}${o.state?' in '+escapeHtml(o.state):''}. `+
+    `${deps.length} department${deps.length===1?'':'s'}, ${offs.length} officer${offs.length===1?'':'s'} across ${roleCount} role${roleCount===1?'':'s'}. `+
+    `Default EMD ${o.emdPercent}%. Methods: ${methods.join(', ')||'none chosen'}. `+
+    `${docCount} document${docCount===1?'':'s'} uploaded. ${gatesMust} publish check${gatesMust===1?'':'s'} must be done.`;
+
+  const checklist = STEPS.slice(0,8).map(s=>{
+    const st=WS.meta.stepState[s.n]||'todo';
+    const tag = st==='done'?'<span class="text-[11.5px] px-2 py-0.5 rounded-full bg-success-light text-success">Done</span>'
+             : st==='skipped'?'<span class="text-[11.5px] px-2 py-0.5 rounded-full using-defaults-pill">Using defaults</span>'
+             : '<span class="text-[11.5px] px-2 py-0.5 rounded-full bg-surface text-ink-500 border border-line">Not started</span>';
+    const flag = (st!=='done' && (s.n===1||s.n===4||s.n===5)) ? '<span class="text-[11.5px] text-warning ml-2">recommended before go-live</span>':'';
+    return `<div class="flex items-center gap-3 py-2 border-b border-line last:border-0">
+      <div class="flex-1"><button class="text-[13.5px] text-ink-900 hover:text-primary text-left" onclick="goStep(${s.n})">${escapeHtml(s.title)}</button>${flag}</div>${tag}</div>`;
+  }).join('');
+
+  const roleOpts = val('tender.committee').roles.map((r,i)=>`<option value="${i}">${escapeHtml(r.name)}</option>`).join('');
+
+  const body = `
+    <div class="card p-5 bg-primary-light border-primary-border">
+      <div class="text-[13px] font-semibold text-primary mb-1">In plain words</div>
+      <p class="text-[14.5px] text-ink-900 leading-relaxed">${escapeHtml(summary)}</p>
+    </div>
+    <div class="card p-5">
+      <div class="text-[14px] font-semibold text-ink-900 mb-2">Readiness checklist</div>
+      ${checklist}
+    </div>
+    <div class="card p-5">
+      <div class="text-[14px] font-semibold text-ink-900 mb-1">See what a role can do</div>
+      <p class="text-[12.5px] text-ink-500 mb-3">Pick a role to preview exactly what those officers will be able to do — so you trust what you granted.</p>
+      <select id="previewRole" class="inp w-auto mb-3">${roleOpts}</select>
+      <div id="previewOut" class="text-[13px]"></div>
+    </div>
+    <div class="card p-5 border-primary-border">
+      <div class="text-[15px] font-bold text-ink-900 mb-1">Turn on access for your officers</div>
+      <p class="text-[13px] text-ink-700 mb-4">This turns on access for your officers. You can keep editing everything in the admin panel afterwards. Nothing was visible to them until now.</p>
+      <button id="publishBtn" class="btn btn-primary !py-2.5 !px-5 text-[14px]"><i data-lucide="rocket" class="w-4 h-4"></i> Publish setup</button>
+    </div>`;
+  main.innerHTML = stepShell(7, body, {lead:'A last look before you go live. Nothing here is mandatory — but a couple of things are worth finishing.'});
+  const drawPreview=()=>{ const r=val('tender.committee').roles[+$('#previewRole').value]; if(!r){ $('#previewOut').innerHTML=''; return; } const on=Object.keys(r.permissions||{}).filter(k=>r.permissions[k]); $('#previewOut').innerHTML = `<div class="text-[12.5px] text-ink-500 mb-1">${escapeHtml(r.name)} — ${(r.members||[]).length} ${ (r.members||[]).length===1?'person':'people'}</div>`+ (on.length? `<ul class="space-y-1">`+on.map(a=>`<li class="flex gap-2 text-ink-900"><i data-lucide="check" class="w-4 h-4 text-success"></i> ${escapeHtml(a)}</li>`).join('')+`</ul>` : '<div class="text-ink-400 italic">This role has no permissions yet.</div>'); refreshIcons(); };
+  $('#previewRole').addEventListener('change',drawPreview); drawPreview();
+  $('#publishBtn').addEventListener('click',doPublish);
+  refreshIcons();
+};
+function renderPublished(main){
+  const body = `
+    <div class="card p-6 text-center bg-success-light border-success">
+      <div class="w-12 h-12 rounded-full bg-success text-white flex items-center justify-center mx-auto mb-3"><i data-lucide="check" class="w-6 h-6"></i></div>
+      <div class="text-[18px] font-bold text-ink-900">Your portal is live</div>
+      <p class="text-[13.5px] text-ink-700 mt-1.5 max-w-md mx-auto">Officers now have access. You can keep editing everything in the admin panel, and come back to add a department or more officers anytime.</p>
+      <div class="flex items-center justify-center gap-2 mt-5">
+        <a href="admin.html" class="btn btn-primary">Open admin panel</a>
+        <button class="btn" onclick="goStep(3)">Add a department</button>
+        <button class="btn" onclick="goStep(5)">Add officers</button>
+      </div>
+    </div>`;
+  main.innerHTML = stepShell(7, body, {lead:'Setup published.'});
+  refreshIcons();
+}
+
+/* =========================================================================
+   SAMPLE DATA — tagged __sample so it never contaminates real records.
+   ========================================================================= */
+function loadSample(){
+  WS.meta.sampleLoaded=true;
+  const offs=val('officers.directory');
+  [ {name:'Sample · Anita Desai', role:'Technical Officer', email:'anita.sample@example.gov.in', dept:'Engineering', status:'Active'},
+    {name:'Sample · Vikram Joshi', role:'Finance Officer', email:'vikram.sample@example.gov.in', dept:'Finance', status:'Invited'},
+  ].forEach(o=>{ o.__sample=true; offs.push(o); });
+  const deps=val('org.departments'); deps.push({id:uid('dep_'), name:'Sample · Roads', sectors:['Roads & Bridges'], head:'', __sample:true});
+  autosave();
+}
+function wipeSample(){
+  WS.values['officers.directory']=val('officers.directory').filter(o=>!o.__sample);
+  WS.values['org.departments']=val('org.departments').filter(d=>!d.__sample);
+  WS.meta.sampleLoaded=false;
+  autosave();
+}
+
+/* =========================================================================
+   PUBLISH — commit working store into admin_state_v1 (same shapes).
+   ========================================================================= */
+function loadStore(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY)||'{}'); }catch(e){ return {}; } }
+function saveStore(s){ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }   // mirror admin.html saveStore
+function loadLog(){ try{ return JSON.parse(localStorage.getItem(LOG_KEY)||'[]'); }catch(e){ return []; } }
+function saveLog(l){ localStorage.setItem(LOG_KEY, JSON.stringify(l.slice(0,200))); }
+
+function doPublish(){
+  if(!confirm('Publish setup?\n\nThis turns on access for your officers. You can keep editing everything in the admin panel afterwards.')) return;
+  const store=loadStore();
+  // commit each working value into the live admin store, same keys + shapes.
+  Object.keys(WS.values).forEach(k=>{ const v=WS.values[k]; if(v!=null) store[k]=JSON.parse(JSON.stringify(v)); });
+  // officer-side access switch
+  store[LIVE_FLAG]=true;
+  store['system.setup-complete']=true;
+  saveStore(store);
+  // activity-trail entry (admin.html log shape)
+  try{ const log=loadLog(); log.unshift({ id:'system.go-live', title:'Organisation setup published', who:WS.meta.superAdmin.name||'Super Admin', when:Date.now(), preview:'officer access turned on' }); saveLog(log); }catch(e){}
+  WS.meta.published=true;
+  // mark all steps done for the meter
+  for(let i=0;i<=7;i++){ if(WS.meta.stepState[i]!=='skipped') WS.meta.stepState[i]='done'; }
+  saveWS(); renderRail(); renderMeter();
+  toast('Published — officers now have access');
+  goStep(7);
+}
+
+/* =========================================================================
+   BOOT
+   ========================================================================= */
+(function init(){
+  WS=loadWS();
+  // resume banner if there is prior progress
+  const touched = Object.keys(WS.meta.stepState||{}).length>0 || WS.meta.lastSaved;
+  // deep-link ?step=N
+  let startStep = WS.meta.currentStep||0;
+  try{ const q=new URLSearchParams(location.search); if(q.has('step')){ const s=parseInt(q.get('step'),10); if(s>=0&&s<=7) startStep=s; } }catch(e){}
+  if(touched && startStep!==0 && !WS.meta.published){ $('#resumeBanner').classList.remove('hidden'); }
+  renderRail(); renderMeter();
+  goStep(startStep);
+  refreshIcons();
+})();
+</script>
+</body>
+</html>

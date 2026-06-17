@@ -1080,11 +1080,15 @@
                   <div class="sub">Upload the pre-bid meeting MOM to auto-match answers to queries</div>
                 </div>
               </div>
-              <div id="momUploadActions">
-                <button id="momUploadBtn" type="button" class="pb-mom-btn" onclick="document.getElementById('momFileInput').click()" aria-label="Upload Minutes of Meeting document">
-                  <i data-lucide="upload" style="width:13px; height:13px;"></i> Upload MOM
-                </button>
-                <input id="momFileInput" type="file" accept=".pdf,.doc,.docx" style="display:none;" onchange="momOnFileChosen(event)"/>
+              <div style="display:inline-flex; align-items:center; gap:8px;">
+                <!-- bpKit: MOM blueprint trigger (sibling of #momUploadActions so it survives upload-state re-renders; target = the Meeting & Notes editor body) -->
+                <button type="button" class="bp-trigger" data-bp-doctype="MOM" data-bp-docname="Minutes of Meeting" data-bp-target="#notesDoc" aria-label="View blueprint checklist for Minutes of Meeting"><i data-lucide="clipboard-check" class="bp-tg-ic"></i><span>📋 View blueprint</span></button>
+                <div id="momUploadActions" style="display:inline-flex; align-items:center; gap:8px;">
+                  <button id="momUploadBtn" type="button" class="pb-mom-btn" onclick="document.getElementById('momFileInput').click()" aria-label="Upload Minutes of Meeting document">
+                    <i data-lucide="upload" style="width:13px; height:13px;"></i> Upload MOM
+                  </button>
+                  <input id="momFileInput" type="file" accept=".pdf,.doc,.docx" style="display:none;" onchange="momOnFileChosen(event)"/>
+                </div>
               </div>
             </div>
           </div>
@@ -1433,6 +1437,8 @@
                   <p class="text-[12px] text-ink-500 mt-0.5">Official record of all queries received and responses drafted. Filter by clicking any column header.</p>
                 </div>
                 <div class="flex items-center gap-2">
+                  <!-- bpKit: Query_Response_Sheet blueprint trigger (response register is a structured table; data-bp-target scores completeness against the register body) -->
+                  <button type="button" class="bp-trigger" data-bp-doctype="Query_Response_Sheet" data-bp-docname="Query Response Sheet" data-bp-target="#docTableBody" aria-label="View blueprint checklist for Query Response Sheet"><i data-lucide="clipboard-check" class="bp-tg-ic"></i><span>📋 View blueprint</span></button>
                   <button class="px-3 py-2 rounded-lg border border-line text-[12.5px] text-ink-900 hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Download Register (PDF)</button>
                   <button id="approvalSendBtn" onclick="approvalStartConfirm()" class="approval-send-btn"><i data-lucide="send" class="w-3.5 h-3.5"></i> Send for approval →</button>
                   <button id="publishAllBtn" onclick="publishAllApproved()" class="px-3 py-2 rounded-lg bg-primary text-white text-[12.5px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5 shadow-soft">Publish All Drafts <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
@@ -2314,6 +2320,21 @@
     p.classList.remove('open');
     p.setAttribute('aria-hidden', 'true');
   }
+
+  // bpKit one-panel-at-a-time: close THIS page's open side panels when the blueprint panel opens.
+  window.bpCloseOtherPanels = function(){
+    try {
+      // Standard Responses library
+      const sr = document.getElementById('stdResponsesPanel');
+      if (sr && sr.classList.contains('open') && typeof closeStandardResponsesPanel === 'function') closeStandardResponsesPanel();
+      // MOM extracted Q&As
+      const mp = document.getElementById('momPanel');
+      if (mp && mp.classList.contains('open') && typeof closeMomPanel === 'function') closeMomPanel();
+      // Corrigendum preview slide-in
+      const cp = document.getElementById('corrigPanel');
+      if (cp && !cp.classList.contains('hidden') && typeof closeCorrigendumPreviewPanel === 'function') closeCorrigendumPreviewPanel();
+    } catch(e){}
+  };
   function momRenderPairs(){
     const wrap = document.getElementById('momPanelList'); if (!wrap) return;
     const d = momLoadData(); const pairs = (d && d.pairs) || [];
@@ -3132,6 +3153,7 @@
     if (name === 'mn') { mnInit(); }
     if (name === 'docs') { renderDocsTable(); if (typeof renderApprovalUI === 'function') renderApprovalUI(); }
     if (name === 'corrigendum') renderCorrigendum();
+    if (window.bpKit) try { bpKit.refreshBadges(); } catch(e){} // bpKit: re-sync amber badges as surfaces become visible
     refreshIcons();
   }
   function refreshCorrigendumTabBadge(){
@@ -4583,6 +4605,7 @@
     if (editorId) q.response = _getEditorContent(editorId);
     q.status = (q.response && q.response.trim() && q.response !== '<br>') ? 'draft' : 'unanswered';
     recountFilters();
+    if (window.bpKit) try { bpKit.refreshBadges(); } catch(e){} // bpKit: register content changed → re-sync Query_Response_Sheet badge
     showToast('Draft saved');
   }
   function sendForApproval(qid, editorId){
@@ -5295,6 +5318,7 @@
 
     body.innerHTML = rows.map((q, i) => docRowHTML(q, i)).join('')
       || `<tr><td colspan="9" style="padding:32px; text-align:center; font-size:13px; color:#9CA3AF; font-style:italic;">No queries match these filters</td></tr>`;
+    if (window.bpKit) try { bpKit.refreshBadges(); } catch(e){} // bpKit: register table rendered → re-sync Query_Response_Sheet badge
     refreshIcons();
   }
   // === QUERY DATE — sort state and helpers ===
@@ -6924,9 +6948,13 @@
           <h1 class="corrig-page-title">Issue Corrigendum</h1>
           <p class="corrig-page-sub">Formal amendment to a published tender. All downloading vendors will be notified.</p>
         </div>
-        <button type="button" id="corrigGenBtn" class="corrig-generate-btn" onclick="corrigGenerateDraft()" aria-label="Generate corrigendum details from pushed points">
-          <i data-lucide="sparkles" style="width:13px; height:13px;"></i> ✦ Generate Corrigendum
-        </button>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <!-- bpKit: Corrigendum blueprint trigger (target = amendment details editor) -->
+          <button type="button" class="bp-trigger" data-bp-doctype="Corrigendum" data-bp-docname="Corrigendum" data-bp-target="#corrigFieldDetails" aria-label="View blueprint checklist for Corrigendum"><i data-lucide="clipboard-check" class="bp-tg-ic"></i><span>📋 View blueprint</span></button>
+          <button type="button" id="corrigGenBtn" class="corrig-generate-btn" onclick="corrigGenerateDraft()" aria-label="Generate corrigendum details from pushed points">
+            <i data-lucide="sparkles" style="width:13px; height:13px;"></i> ✦ Generate Corrigendum
+          </button>
+        </div>
       </div>
 
       <div style="margin-top:18px;" class="corrig-form-card">
@@ -6960,6 +6988,7 @@
             </div>
             <div id="corrigFieldDetails" contenteditable="true" aria-required="true" data-placeholder="Describe what is being changed, what it was, and what it is now..." oninput="corrigSetField('details', this.innerHTML)">${d.details}</div>
           </div>
+          <div id="corrigGroundNote">${(d.details && d.details.trim() && window.bpKit && bpKit.groundingNote('Corrigendum')) ? '<span class="bp-ground-note">' + bpKit.groundingNote('Corrigendum') + '</span>' : ''}</div>
           <button type="button" class="corrig-regen-hl" onclick="corrigRegenHighlights()"><i data-lucide="refresh-cw" style="width:10px; height:10px;"></i> Regenerate highlights</button>
         </div>
 
@@ -7027,7 +7056,9 @@
       const d = _corrigPendingDraft;
       const pushed = CORRIGENDUM_PENDING.filter(p => d.pushedPointIds.indexOf(p.id) >= 0);
       // 1. Concatenate amendment details from pushed points — with key-term highlighting (C4)
-      const detailsHTML = pushed.map((p, i) => '<p>' + (i+1) + '. [' + esc(p.type) + '] ' + highlightKeyTerms(esc(p.summary)) + '</p>').join('');
+      let detailsHTML = pushed.map((p, i) => '<p>' + (i+1) + '. [' + esc(p.type) + '] ' + highlightKeyTerms(esc(p.summary)) + '</p>').join('');
+      // bpKit: ground the generated draft so every required Corrigendum blueprint section appears
+      if (window.bpKit) detailsHTML = bpKit.ground('Corrigendum', detailsHTML);
       d.details = detailsHTML;
       // 2. Auto-select reason from most common type
       d.reason = deriveCorrigReason(pushed);
@@ -7038,6 +7069,7 @@
         secs.forEach(s => { d.affectedSections[s] = true; });
       });
       renderIssueCorrigendumForm();
+      if (window.bpKit) bpKit.refreshBadges(); // bpKit: re-sync amber unmet-required badge after generate
       showToast('Corrigendum draft generated from ' + pushed.length + ' pushed point' + (pushed.length===1?'':'s'));
     }, 800);
   }
@@ -8212,6 +8244,497 @@
     if (e.target.id === 'issueCorrigendumModal') closeIssueCorrigendumForm();
   });
 </script>
+
+<!-- ============================================================================
+     BLUEPRINT CHECKLIST KIT (bpKit) — Phase 1 reference component
+     Paste BOTH blocks below VERBATIM into any portal page, AFTER the Tailwind +
+     Lucide CDN scripts load and BEFORE the page's main closing </script>/</body>.
+     The two blocks are page-agnostic: they reference NOTHING page-specific.
+     Only the per-surface trigger wiring (triggerHTML + ground/groundingNote calls
+     + window.bpCloseOtherPanels) differs between pages. See GUIDE.md.
+     ============================================================================ -->
+
+<style id="bp-styles">
+  /* ---- Blueprint Kit — all selectors namespaced bp-* to avoid page collisions ---- */
+  .bp-trigger{display:inline-flex;align-items:center;gap:6px;border:1px solid #E5E7EB;border-radius:7px;padding:6px 12px;font-size:12px;color:#374151;background:#fff;cursor:pointer;font-family:inherit;line-height:1.2;transition:border-color 150ms ease,color 150ms ease;}
+  .bp-trigger:hover{border-color:#0F5EE8;color:#0F5EE8;}
+  .bp-trigger:focus-visible{outline:2px solid #0F5EE8;outline-offset:2px;}
+  .bp-trigger .bp-tg-ic{width:14px;height:14px;flex-shrink:0;}
+  .bp-trigger .bp-pill{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 5px;border-radius:9px;background:#FEF3C7;color:#92400E;font-size:10px;font-weight:700;line-height:1;}
+
+  /* one shared right-side slide-in panel */
+  .bp-panel{position:fixed;top:0;right:0;bottom:0;width:380px;max-width:100vw;background:#fff;border-left:1px solid #E5E7EB;box-shadow:-4px 0 24px rgba(0,0,0,0.12);z-index:600;display:flex;flex-direction:column;transform:translateX(100%);transition:transform 280ms cubic-bezier(.2,.7,.2,1);font-family:'DM Sans',system-ui,sans-serif;}
+  .bp-panel.bp-open{transform:translateX(0);}
+  .bp-head{flex-shrink:0;padding:14px 16px;border-bottom:1px solid #E5E7EB;background:#F9FAFB;}
+  .bp-head-row{display:flex;align-items:center;gap:8px;}
+  .bp-head-ic{width:16px;height:16px;color:#0F5EE8;flex-shrink:0;}
+  .bp-head-title{font-size:14px;font-weight:700;color:#111827;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .bp-close{flex-shrink:0;width:26px;height:26px;border:none;background:transparent;color:#6B7280;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:background 150ms ease,color 150ms ease;}
+  .bp-close:hover{background:#E5E7EB;color:#111827;}
+  .bp-close i{width:16px;height:16px;}
+  .bp-desc{font-size:12px;color:#6B7280;margin-top:6px;line-height:1.5;}
+  .bp-source{display:inline-flex;align-items:center;gap:4px;margin-top:8px;padding:2px 8px;border-radius:20px;background:#EEF2FF;color:#3730A3;font-size:10px;font-weight:600;}
+
+  .bp-body{flex:1;overflow-y:auto;padding:14px;}
+  .bp-sec{border:1px solid #E5E7EB;border-radius:10px;padding:14px;margin-bottom:10px;}
+  .bp-sec-head{display:flex;align-items:flex-start;gap:8px;}
+  .bp-sec-ic{width:16px;height:16px;flex-shrink:0;margin-top:1px;}
+  .bp-sec-ic.bp-ok{color:#16A34A;}
+  .bp-sec-ic.bp-miss{color:#D97706;}
+  .bp-sec-ic.bp-opt{color:#9CA3AF;}
+  .bp-sec-title{flex:1;font-size:13px;font-weight:700;color:#111827;line-height:1.4;}
+  .bp-tag{flex-shrink:0;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;line-height:1.3;}
+  .bp-tag-req{background:#FEE2E2;color:#B91C1C;}
+  .bp-tag-opt{background:#F3F4F6;color:#6B7280;}
+  .bp-note{display:flex;gap:7px;margin-top:10px;padding:9px 11px;background:#FFFBEB;border-radius:8px;}
+  .bp-note-ic{width:12px;height:12px;color:#D97706;flex-shrink:0;margin-top:2px;}
+  .bp-note-body{flex:1;min-width:0;}
+  .bp-note-label{font-size:10px;font-weight:700;color:#B45309;text-transform:uppercase;letter-spacing:.03em;margin-bottom:2px;}
+  .bp-note-text{font-size:12px;color:#92400E;line-height:1.5;}
+  .bp-points{list-style:none;margin:10px 0 0;padding:0;}
+  .bp-pt{display:flex;align-items:flex-start;gap:7px;padding:3px 0;}
+  .bp-pt-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:6px;background:#D1D5DB;}
+  .bp-pt-dot.bp-ok{background:#16A34A;}
+  .bp-pt-text{flex:1;font-size:12px;color:#374151;line-height:1.5;}
+  .bp-pt-req{flex-shrink:0;font-size:10px;font-weight:700;color:#B91C1C;}
+
+  .bp-empty{padding:28px 18px;text-align:center;color:#6B7280;}
+  .bp-empty-ic{width:30px;height:30px;color:#D1D5DB;margin:0 auto 10px;display:block;}
+  .bp-empty-t{font-size:13px;line-height:1.6;}
+
+  .bp-foot{flex-shrink:0;border-top:1px solid #E5E7EB;padding:13px 16px;background:#F9FAFB;}
+  .bp-foot-sum{font-size:12px;color:#374151;margin-bottom:8px;font-weight:600;}
+  .bp-prog{height:6px;border-radius:6px;background:#E5E7EB;overflow:hidden;margin-bottom:12px;}
+  .bp-prog-bar{height:100%;background:#0F5EE8;border-radius:6px;transition:width 280ms ease;width:0;}
+  .bp-outline-btn{width:100%;background:#0F5EE8;color:#fff;border:none;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:inherit;transition:background 150ms ease;}
+  .bp-outline-btn:hover{background:#0D4FC4;}
+  .bp-outline-btn i{width:14px;height:14px;}
+
+  /* grounding note shown under a draft editor */
+  .bp-ground-note{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:11px;color:#3730A3;font-style:italic;}
+
+  /* self-contained toast (used only if the host page has no showToast) */
+  .bp-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#111827;color:#fff;padding:11px 18px;border-radius:10px;font-size:13px;font-family:'DM Sans',system-ui,sans-serif;box-shadow:0 4px 16px rgba(0,0,0,0.25);z-index:700;opacity:0;transition:opacity 200ms ease,transform 200ms ease;pointer-events:none;}
+  .bp-toast.bp-show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+
+<script id="bp-component">
+/* ============================================================================
+   bpKit — read-only Blueprint Checklist consumer.
+   Reads admin-defined blueprints from localStorage['docBlueprints'] (keyed by
+   docType). The portal NEVER edits blueprints. Self-contained: creates its own
+   panel on first use, namespaced bp-* CSS, exposes window.bpKit + two standalone
+   functions (getBlueprint, blueprintGroundingText).
+   ============================================================================ */
+
+/* ---- DATA CONTRACT reader (use EXACTLY this) ---- */
+function getBlueprint(docType){ const all = JSON.parse(localStorage.getItem('docBlueprints')||'{}'); return all[docType] || null; }
+
+/* ---- LLM grounding source text (structured text from sections/guidance/points) ---- */
+function blueprintGroundingText(docType){
+  const bp = getBlueprint(docType);
+  if (!bp) return '';
+  const lines = [];
+  lines.push('DOCUMENT BLUEPRINT — ' + (bp.docType || docType));
+  if (bp.description) lines.push(bp.description);
+  lines.push('');
+  (bp.sections || []).forEach(function(sec, i){
+    lines.push((i + 1) + '. ' + (sec.title || '') + (sec.required ? '  [REQUIRED]' : '  [optional]'));
+    if (sec.guidance) lines.push('   Senior officer guidance: ' + sec.guidance);
+    (sec.points || []).forEach(function(pt){
+      lines.push('   - ' + (pt.text || '') + (pt.required ? '  (required)' : ''));
+    });
+    lines.push('');
+  });
+  return lines.join('\n').trim();
+}
+
+(function(){
+  'use strict';
+
+  /* ---------- tiny internal helpers ---------- */
+  function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+  function icons(){ if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons(); }
+  function toast(msg){
+    // Prefer the host page's toast if present, so messaging stays consistent.
+    if (typeof window.showToast === 'function'){ try { window.showToast(msg); return; } catch(e){} }
+    var t = document.getElementById('bp-toast');
+    if (!t){ t = document.createElement('div'); t.id = 'bp-toast'; t.className = 'bp-toast'; document.body.appendChild(t); }
+    t.textContent = msg; t.classList.add('bp-show');
+    clearTimeout(t._bpT); t._bpT = setTimeout(function(){ t.classList.remove('bp-show'); }, 2600);
+  }
+  // Lower-cased, punctuation-stripped tokens for the naive keyword match.
+  function tokenize(s){
+    return String(s || '').toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(function(w){ return w.length > 3; });
+  }
+  function normText(s){ return String(s || '').toLowerCase().replace(/\s+/g,' '); }
+
+  /* ---------- completeness heuristic (advisory only — NEVER a hard gate) ---------- */
+  // A section/point is "addressed" if its title or a couple of its key terms
+  // appear in the draft (case-insensitive substring / simple keyword match).
+  function sectionAddressed(title, draftNorm, draftTokens){
+    var t = normText(title);
+    if (!t) return false;
+    if (draftNorm.indexOf(t) !== -1) return true;                 // whole title appears
+    var keys = tokenize(title);
+    if (!keys.length) return false;
+    var hits = 0;
+    for (var i = 0; i < keys.length; i++){ if (draftTokens.indexOf(keys[i]) !== -1) hits++; }
+    // require the majority of distinctive terms (min 2, or all if fewer than 2)
+    var need = Math.max(1, Math.min(2, keys.length));
+    return hits >= need;
+  }
+
+  function readTarget(opts){
+    // Returns the draft text to score against: explicit text wins, else read the
+    // target element's innerText/textContent.
+    if (opts && typeof opts.text === 'string') return opts.text;
+    var sel = opts && opts.target;
+    if (sel){
+      var el = (typeof sel === 'string') ? document.querySelector(sel) : sel;
+      if (el) return (el.innerText || el.textContent || '');
+    }
+    return '';
+  }
+
+  function completeness(docType, draftText){
+    var bp = getBlueprint(docType);
+    var out = { addressedSections: new Set(), addressedPoints: 0, requiredTotal: 0, requiredAddressed: 0, unmetRequired: 0, hasBlueprint: !!bp };
+    if (!bp) return out;
+    var draftNorm = normText(draftText);
+    var draftTokens = tokenize(draftText);
+    (bp.sections || []).forEach(function(sec, si){
+      var addr = sectionAddressed(sec.title, draftNorm, draftTokens);
+      if (addr) out.addressedSections.add(sec.id != null ? sec.id : si);
+      if (sec.required){
+        out.requiredTotal++;
+        if (addr) out.requiredAddressed++; else out.unmetRequired++;
+      }
+      (sec.points || []).forEach(function(pt){
+        var paddr = sectionAddressed(pt.text, draftNorm, draftTokens);
+        if (paddr) out.addressedPoints++;
+        if (pt.required){
+          out.requiredTotal++;
+          if (paddr) out.requiredAddressed++; else out.unmetRequired++;
+        }
+      });
+    });
+    return out;
+  }
+
+  /* ---------- TRIGGER BUTTON ---------- */
+  // opts: { target: '<css-selector of draft editor>' } (optional)
+  function triggerHTML(docType, docName, opts){
+    opts = opts || {};
+    var name = docName || docType || 'document';
+    var draftText = readTarget(opts);
+    var c = completeness(docType, draftText);
+    var pill = (c.hasBlueprint && c.unmetRequired > 0)
+      ? '<span class="bp-pill" aria-hidden="true">' + c.unmetRequired + '</span>' : '';
+    var dataTarget = opts.target ? ' data-bp-target="' + esc(opts.target) + '"' : '';
+    return '<button type="button" class="bp-trigger" '
+      + 'data-bp-doctype="' + esc(docType) + '" '
+      + 'data-bp-docname="' + esc(name) + '"' + dataTarget + ' '
+      + 'aria-label="View blueprint checklist for ' + esc(name) + '">'
+      + '<i data-lucide="clipboard-check" class="bp-tg-ic"></i>'
+      + '<span>📋 View blueprint</span>' + pill + '</button>';
+  }
+
+  /* ---------- PANEL (one shared element) ---------- */
+  var panelEl = null, activeDocType = null, activeOpts = null, lastTrigger = null;
+
+  function ensurePanel(){
+    if (panelEl) return panelEl;
+    panelEl = document.createElement('aside');
+    panelEl.id = 'bp-panel';
+    panelEl.className = 'bp-panel';
+    panelEl.setAttribute('role', 'dialog');
+    panelEl.setAttribute('aria-label', 'Blueprint checklist');
+    panelEl.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(panelEl);
+    return panelEl;
+  }
+
+  function sourceChip(src){
+    if (src === 'manual') return '<span class="bp-source"><i data-lucide="building-2" style="width:11px;height:11px;"></i> Org standard</span>';
+    if (src === 'parsed') return '<span class="bp-source"><i data-lucide="file-text" style="width:11px;height:11px;"></i> From sample doc</span>';
+    return '';
+  }
+
+  function sectionCardHTML(sec, addressed){
+    var req = !!sec.required;
+    var icCls, icName;
+    if (addressed){ icCls = 'bp-ok'; icName = 'check-circle-2'; }
+    else if (req){ icCls = 'bp-miss'; icName = 'alert-circle'; }
+    else { icCls = 'bp-opt'; icName = 'circle'; }
+    var tag = req ? '<span class="bp-tag bp-tag-req">Required</span>' : '<span class="bp-tag bp-tag-opt">Optional</span>';
+    var note = sec.guidance
+      ? '<div class="bp-note"><i data-lucide="lightbulb" class="bp-note-ic"></i><div class="bp-note-body">'
+        + '<div class="bp-note-label">Senior’s note</div><div class="bp-note-text">' + esc(sec.guidance) + '</div></div></div>'
+      : '';
+    var pts = '';
+    if (sec.points && sec.points.length){
+      pts = '<ul class="bp-points">' + sec.points.map(function(pt){
+        var paddr = pt._addressed;
+        return '<li class="bp-pt"><span class="bp-pt-dot' + (paddr ? ' bp-ok' : '') + '"></span>'
+          + '<span class="bp-pt-text">' + esc(pt.text) + '</span>'
+          + (pt.required ? '<span class="bp-pt-req">required</span>' : '') + '</li>';
+      }).join('') + '</ul>';
+    }
+    return '<div class="bp-sec">'
+      + '<div class="bp-sec-head"><i data-lucide="' + icName + '" class="bp-sec-ic ' + icCls + '"></i>'
+      + '<span class="bp-sec-title">' + esc(sec.title) + '</span>' + tag + '</div>'
+      + note + pts + '</div>';
+  }
+
+  function renderPanel(docType, docName, opts){
+    var p = ensurePanel();
+    var bp = getBlueprint(docType);
+    var name = docName || docType || 'document';
+
+    if (!bp){
+      p.innerHTML =
+        '<div class="bp-head"><div class="bp-head-row">'
+        + '<i data-lucide="clipboard-check" class="bp-head-ic"></i>'
+        + '<span class="bp-head-title">' + esc(name) + ' — Blueprint</span>'
+        + '<button type="button" class="bp-close" aria-label="Close blueprint panel"><i data-lucide="x"></i></button>'
+        + '</div></div>'
+        + '<div class="bp-body"><div class="bp-empty">'
+        + '<i data-lucide="clipboard-list" class="bp-empty-ic"></i>'
+        + '<div class="bp-empty-t">No blueprint configured for this document yet.<br>Ask your admin to set one up.</div>'
+        + '</div></div>';
+      wirePanelChrome();
+      icons();
+      return;
+    }
+
+    // compute completeness + per-point flags
+    var draftText = readTarget(opts);
+    var c = completeness(docType, draftText);
+    var sections = (bp.sections || []).map(function(sec, si){
+      var addr = c.addressedSections.has(sec.id != null ? sec.id : si);
+      var draftNorm = normText(draftText), draftTokens = tokenize(draftText);
+      (sec.points || []).forEach(function(pt){ pt._addressed = sectionAddressed(pt.text, draftNorm, draftTokens); });
+      return sectionCardHTML(sec, addr);
+    }).join('');
+
+    var pct = c.requiredTotal ? Math.round((c.requiredAddressed / c.requiredTotal) * 100) : 100;
+
+    p.innerHTML =
+      '<div class="bp-head"><div class="bp-head-row">'
+      + '<i data-lucide="clipboard-check" class="bp-head-ic"></i>'
+      + '<span class="bp-head-title">' + esc(name) + ' — Blueprint</span>'
+      + '<button type="button" class="bp-close" aria-label="Close blueprint panel"><i data-lucide="x"></i></button>'
+      + '</div>'
+      + (bp.description ? '<div class="bp-desc">' + esc(bp.description) + '</div>' : '')
+      + sourceChip(bp.source)
+      + '</div>'
+      + '<div class="bp-body">' + sections + '</div>'
+      + '<div class="bp-foot">'
+      + '<div class="bp-foot-sum" aria-live="polite">' + c.requiredAddressed + ' of ' + c.requiredTotal + ' required items addressed</div>'
+      + '<div class="bp-prog"><div class="bp-prog-bar" style="width:' + pct + '%;"></div></div>'
+      + '<button type="button" class="bp-outline-btn" data-bp-outline><i data-lucide="list"></i> Use as draft outline</button>'
+      + '</div>';
+    wirePanelChrome();
+    icons();
+  }
+
+  function wirePanelChrome(){
+    var p = panelEl; if (!p) return;
+    var close = p.querySelector('.bp-close');
+    if (close) close.addEventListener('click', closePanel);
+    var ob = p.querySelector('[data-bp-outline]');
+    if (ob) ob.addEventListener('click', function(){
+      var tgt = (activeOpts && activeOpts.target) || null;
+      useAsOutline(activeDocType, tgt);
+    });
+  }
+
+  function onKeydown(e){ if (e.key === 'Escape' && panelEl && panelEl.classList.contains('bp-open')) closePanel(); }
+
+  function open(docType, docName, opts){
+    opts = opts || {};
+    // ONE-PANEL-AT-A-TIME: close any other side panels the page knows about.
+    try {
+      if (typeof opts.closeOthers === 'function') opts.closeOthers();
+      else if (typeof window.bpCloseOtherPanels === 'function') window.bpCloseOtherPanels();
+    } catch(e){}
+    activeDocType = docType; activeOpts = opts;
+    lastTrigger = (opts.trigger) ||
+      document.querySelector('.bp-trigger[data-bp-doctype="' + (window.CSS && CSS.escape ? CSS.escape(docType) : docType) + '"]');
+    renderPanel(docType, docName, opts);
+    ensurePanel();
+    panelEl.setAttribute('aria-hidden', 'false');
+    requestAnimationFrame(function(){ panelEl.classList.add('bp-open'); });
+    document.addEventListener('keydown', onKeydown);
+    setTimeout(function(){ var c = panelEl.querySelector('.bp-close'); if (c) try { c.focus(); } catch(e){} }, 120);
+  }
+
+  function close(){ closePanel(); }
+  function closePanel(){
+    if (!panelEl) return;
+    panelEl.classList.remove('bp-open');
+    panelEl.setAttribute('aria-hidden', 'true');
+    document.removeEventListener('keydown', onKeydown);
+    if (lastTrigger) try { lastTrigger.focus(); } catch(e){}
+  }
+
+  /* ---------- refresh all trigger badges on the page ---------- */
+  function refreshBadges(){
+    document.querySelectorAll('.bp-trigger[data-bp-doctype]').forEach(function(btn){
+      var dt = btn.getAttribute('data-bp-doctype');
+      var sel = btn.getAttribute('data-bp-target');
+      var txt = '';
+      if (sel){ var el = document.querySelector(sel); if (el) txt = (el.innerText || el.textContent || ''); }
+      var c = completeness(dt, txt);
+      var existing = btn.querySelector('.bp-pill');
+      if (c.hasBlueprint && c.unmetRequired > 0){
+        if (existing) existing.textContent = c.unmetRequired;
+        else { var s = document.createElement('span'); s.className = 'bp-pill'; s.setAttribute('aria-hidden','true'); s.textContent = c.unmetRequired; btn.appendChild(s); }
+      } else if (existing){ existing.remove(); }
+    });
+  }
+
+  /* ---------- USE AS DRAFT OUTLINE ---------- */
+  function useAsOutline(docType, targetSelector){
+    var bp = getBlueprint(docType);
+    if (!bp){ toast('No blueprint to use as outline'); return; }
+    var sel = targetSelector || (activeOpts && activeOpts.target);
+    var el = sel ? (typeof sel === 'string' ? document.querySelector(sel) : sel) : null;
+    if (!el){ toast('No draft editor to insert into'); return; }
+    var existing = (el.innerText || el.textContent || '').trim();
+    if (existing){
+      if (!window.confirm('Replace current draft with blueprint outline?')) return;
+    }
+    var html = (bp.sections || []).filter(function(s){ return s.required || true; }).map(function(sec){
+      var h = '<h4 style="font-size:13px;font-weight:700;color:#111827;margin:14px 0 4px;">' + esc(sec.title)
+        + (sec.required ? '' : ' <span style="font-size:11px;font-weight:500;color:#9CA3AF;">(optional)</span>') + '</h4>';
+      var g = sec.guidance
+        ? '<p style="font-size:12px;color:#9CA3AF;font-style:italic;margin:0 0 6px;">' + esc(sec.guidance) + '</p>'
+        : '<p style="font-size:12px;color:#9CA3AF;font-style:italic;margin:0 0 6px;">…</p>';
+      return h + g;
+    }).join('');
+    el.innerHTML = html;
+    el.classList.remove('empty-ph');
+    // notify host listeners (Draft Kit auto-save listens on 'input')
+    try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch(e){}
+    toast('Outline inserted from blueprint');
+    refreshBadges();
+    // keep an open panel's footer/badges in sync
+    if (panelEl && panelEl.classList.contains('bp-open') && activeDocType === docType){
+      renderPanel(activeDocType, (activeOpts && activeOpts.docName) || docType, activeOpts);
+    }
+  }
+
+  /* ---------- LLM GROUNDING ---------- */
+  // Guarantees every required blueprint section title appears as a heading in the
+  // generated HTML; slots existing template text under matching sections and adds
+  // a neutral placeholder under any required section the template didn't cover.
+  function ground(docType, generatedHtml){
+    var bp = getBlueprint(docType);
+    if (!bp) return generatedHtml;
+    var html = generatedHtml || '';
+    var lowHtml = normText(html.replace(/<[^>]+>/g,' '));
+    var lowTokens = tokenize(html.replace(/<[^>]+>/g,' '));
+    var out = [];
+    (bp.sections || []).forEach(function(sec){
+      if (!sec.required && !(sec.points && sec.points.length)) { /* still include optional headings below */ }
+      out.push('<h4 style="font-size:13px;font-weight:700;color:#111827;margin:14px 0 6px;">' + esc(sec.title) + '</h4>');
+      var covered = sectionAddressed(sec.title, lowHtml, lowTokens);
+      if (covered){
+        // Pull a relevant slice of the original template by locating the title.
+        var slice = extractSlice(html, sec.title);
+        out.push(slice || '<p style="font-size:13px;color:#374151;line-height:1.7;">[See drafted content above for this section.]</p>');
+      } else if (sec.required){
+        out.push('<p style="font-size:13px;color:#9CA3AF;line-height:1.7;font-style:italic;">[To be completed per blueprint guidance: '
+          + esc(sec.guidance || sec.title) + ']</p>');
+      } else {
+        out.push('<p style="font-size:13px;color:#9CA3AF;line-height:1.7;font-style:italic;">[Optional — add if applicable.]</p>');
+      }
+    });
+    // Preserve any leading template content (e.g. a salutation) that precedes the
+    // first matched section, so generated boilerplate isn't lost.
+    var lead = leadingContent(html, bp.sections || []);
+    return (lead ? lead : '') + out.join('\n');
+  }
+
+  // Naive: find the title in the html and return the paragraph(s) that follow it,
+  // up to the next heading. Falls back to '' if not locatable.
+  function extractSlice(html, title){
+    try {
+      var tmp = document.createElement('div'); tmp.innerHTML = html;
+      var walker = tmp.querySelectorAll('*');
+      var titleNorm = normText(title);
+      for (var i = 0; i < walker.length; i++){
+        var node = walker[i];
+        if (normText(node.textContent).indexOf(titleNorm) !== -1 && node.children.length === 0){
+          // collect following siblings until next heading-ish element
+          var parts = [], n = node.nextElementSibling;
+          while (n && !/^H[1-6]$/.test(n.tagName)){ parts.push(n.outerHTML); n = n.nextElementSibling; }
+          if (parts.length) return parts.join('');
+        }
+      }
+    } catch(e){}
+    return '';
+  }
+  function leadingContent(html, sections){
+    try {
+      var tmp = document.createElement('div'); tmp.innerHTML = html;
+      var firstIdx = -1, kids = tmp.children;
+      for (var s = 0; s < sections.length; s++){
+        var tn = normText(sections[s].title);
+        for (var i = 0; i < kids.length; i++){
+          if (normText(kids[i].textContent).indexOf(tn) !== -1){ if (firstIdx === -1 || i < firstIdx) firstIdx = i; }
+        }
+      }
+      if (firstIdx > 0){ var lead = []; for (var j = 0; j < firstIdx; j++) lead.push(kids[j].outerHTML); return lead.join(''); }
+    } catch(e){}
+    return '';
+  }
+
+  function groundingNote(docType){
+    var bp = getBlueprint(docType);
+    if (!bp) return '';
+    var reqCount = (bp.sections || []).filter(function(s){ return s.required; }).length;
+    return '✦ Generated to match the ' + docType + ' blueprint (' + reqCount + ' required section' + (reqCount === 1 ? '' : 's') + ')';
+  }
+
+  /* ---------- declarative click delegation (data-bp-* triggers) ---------- */
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest ? e.target.closest('.bp-trigger[data-bp-doctype]') : null;
+    if (!btn) return;
+    e.preventDefault();
+    var dt = btn.getAttribute('data-bp-doctype');
+    var dn = btn.getAttribute('data-bp-docname') || dt;
+    var tgt = btn.getAttribute('data-bp-target') || null;
+    open(dt, dn, { target: tgt, docName: dn, trigger: btn });
+  });
+
+  /* ---------- public API ---------- */
+  window.bpKit = {
+    triggerHTML: triggerHTML,
+    open: open,
+    close: close,
+    completeness: completeness,
+    refreshBadges: refreshBadges,
+    useAsOutline: useAsOutline,
+    ground: ground,
+    groundingNote: groundingNote,
+    getBlueprint: getBlueprint
+  };
+})();
+</script>
+
+<!-- ===== bpKit per-surface bootstrap (NOT part of the component) ===== -->
+<script>
+  (function(){
+    function syncBP(){ if (window.bpKit) try { window.bpKit.refreshBadges(); } catch(e){} }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', syncBP);
+    else syncBP();
+    setTimeout(syncBP, 300); // re-sync if kits mount on a deferred stage render
+  })();
+</script>
+
 <!-- ============ Standard Responses side panel (Change 3) ============ -->
 <aside id="stdResponsesPanel" role="dialog" aria-modal="false" aria-label="Standard Responses library" aria-hidden="true">
   <div class="pb-stdr-header">

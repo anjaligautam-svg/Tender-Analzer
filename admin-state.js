@@ -16,16 +16,17 @@
     // resolved against 'tender.methods-suite' (Evaluation methods & procurement modes)
     'tender.method-master':        m => m && m.methods,
     'tender.qcbs-ratios':          m => { const q = m && Array.isArray(m.methods) && m.methods.find(x => x.id === 'qcbs'); return q ? (q.allowedRatios || q.ratios) : undefined; },
-    // merged into 'tender.notifications-suite' (Notifications, reminders & escalation)
-    'tender.reminder-schedule':       n => n && n.events && n.events.map(e => ({k:e.name, v:e.reminders||''})),
-    'tender.notification-channels':   n => n,
-    'tender.notification-recipients': n => n,
-    'tender.escalation-rules':        n => n && n.events && n.events.filter(e=>e.escalation).map(e=>({event:e.name, breachHours:e.escalation.breachHours, escalateTo:e.escalation.escalateTo})),
+    // canonical flat sector list — sectors now live under their department in 'officers.depts'.
+    'officers.sectors':            d => { if (d && Array.isArray(d.departments)) { const s = []; d.departments.forEach(dep => (dep.sectors||[]).forEach(x => { if (x && s.indexOf(x) < 0) s.push(x); })); return s; } return undefined; },
+    // NOTE: the four internal-alert aliases (reminder-schedule, notification-channels,
+    // notification-recipients, escalation-rules) were removed — 'tender.notifications-suite'
+    // is now the vendor-facing "Vendor notice on publish" item, not internal per-event
+    // reminders/escalation. Internal alerts are no longer configured in the admin panel.
     // NOTE: 'eval.tq-sector-overrides' alias removed — tender.tq-rubric was deleted; the read now falls back.
   };
   const ALIAS_PARENT = {
     'tender.method-master':'tender.methods-suite','tender.qcbs-ratios':'tender.methods-suite',
-    'tender.reminder-schedule':'tender.notifications-suite','tender.notification-channels':'tender.notifications-suite','tender.notification-recipients':'tender.notifications-suite','tender.escalation-rules':'tender.notifications-suite',
+    'officers.sectors':'officers.depts',
   };
 
   window.AdminState = {
