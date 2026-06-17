@@ -12,6 +12,24 @@
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="admin-state.js"></script>
   <script>
+    // Early shim so cost-field readers never throw before the cost-denomination
+    // component (loaded later in the document) installs the full implementation.
+    // Reads the absolute rupee `.value` stored on tenderDraft (source of truth);
+    // tolerates legacy plain-number cost fields too.
+    window.tenderDraft = window.tenderDraft || {};
+    if (typeof window.costAbs !== 'function'){
+      window.__COST_KEY_MAP = { fEstCost:'estimatedCost', fTenderFee:'tenderFee', fProcFee:'processingFee', fEMD:'emd', tsValue:'tsValue' };
+      window.costAbs = function(idOrKey){
+        var key = window.__COST_KEY_MAP[idOrKey] || idOrKey;
+        var rec = window.tenderDraft && window.tenderDraft[key];
+        if (rec == null) return 0;
+        if (typeof rec === 'number') return rec;
+        if (typeof rec === 'object' && isFinite(rec.value)) return rec.value;
+        return 0;
+      };
+    }
+  </script>
+  <script>
     tailwind.config = {
       theme: {
         extend: {
@@ -125,6 +143,23 @@
       100% { background: white; }
     }
     .recalc-flash { animation: recalc-flash .3s ease-out; }
+
+    /* Auto-recalculated date-field highlight pulse (600ms) */
+    @keyframes recalc-pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(37,99,235,.45); background: #DBEAFE; }
+      60%  { box-shadow: 0 0 0 4px rgba(37,99,235,.10); background: #EFF6FF; }
+      100% { box-shadow: 0 0 0 0 rgba(37,99,235,0); background: #fff; }
+    }
+    .recalc-pulse { animation: recalc-pulse .6s ease-out; }
+
+    /* Anchor-change recalculation prompt (slide-in) */
+    @keyframes tl-prompt-in {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    #timelineRecalcPrompt { animation: tl-prompt-in .2s ease-out; }
+    /* Red out-of-order suffix on the relationship label */
+    .offset-label .order-suffix { color: #DC2626; font-weight: 600; }
 
     /* Read-only assigned section */
     fieldset.is-readonly { opacity: .6; pointer-events: none; }
@@ -293,9 +328,110 @@
     .ta-ai-sparkle { border:1px solid #BFDBFE; border-radius:6px; padding:3px 10px; font-size:11px; color:#0F5EE8; background:white; cursor:pointer; display:inline-flex; align-items:center; gap:4px; font-weight:600; }
     .ta-ai-sparkle:hover { background:#EFF6FF; }
 
+    /* ====== AI Eligibility Risk Check — actionable rows ====== */
+    .risk-row { display:flex; align-items:flex-start; gap:12px; padding:12px 14px; border-radius:10px; background:#fff; margin-bottom:8px; transition: background .15s ease, opacity .25s ease, transform .25s ease; }
+    .risk-row:hover { background:#F9FAFB; }
+    .risk-row.sev-high   { border-left:3px solid #EF4444; }
+    .risk-row.sev-medium { border-left:3px solid #F59E0B; }
+    .risk-row.sev-info   { border-left:3px solid #0F5EE8; }
+    .risk-row.resolved   { border-left-color:#10B981; }
+    .risk-row .risk-msg  { font-size:13px; color:#111827; line-height:1.45; }
+    .risk-row.resolved .risk-msg { text-decoration:line-through; color:#9CA3AF; }
+    .risk-row .risk-norm { font-size:11px; color:#9CA3AF; margin-top:2px; }
+    .risk-row .risk-actions { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+    .risk-fix-btn { display:inline-flex; align-items:center; gap:4px; background:#0F5EE8; color:#fff; border:none; border-radius:7px; padding:5px 11px; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; transition:background .15s ease; }
+    .risk-fix-btn:hover { background:#0B4FCA; }
+    .risk-apply-btn { display:inline-flex; align-items:center; gap:4px; background:#fff; color:#0F5EE8; border:1px solid #93C5FD; border-radius:7px; padding:5px 11px; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; transition:background .15s ease, border-color .15s ease; }
+    .risk-apply-btn:hover { background:#EFF6FF; border-color:#0F5EE8; }
+    .risk-resolved-tag { display:inline-flex; align-items:center; gap:4px; background:#F0FDF4; color:#065F46; border-radius:20px; padding:3px 10px; font-size:11px; font-weight:700; white-space:nowrap; }
+    .risk-track-tag { display:inline-flex; align-items:center; gap:4px; background:#fff; border:1px solid #FCD34D; color:#92400E; border-radius:20px; padding:2px 9px; font-size:10.5px; font-weight:600; }
+
+    /* Anchored field warning (in normal flow, scrolls with page) */
+    .risk-anchored { border-radius:8px; padding:8px 12px; margin-top:10px; font-size:12px; display:flex; align-items:flex-start; gap:8px; line-height:1.5; }
+    .risk-anchored.sev-high   { background:#FEF2F2; border:1px solid #FCA5A5; color:#7F1D1D; }
+    .risk-anchored.sev-medium { background:#FFF7ED; border:1px solid #FDBA74; color:#7C2D12; }
+    .risk-anchored .risk-anchored-ic { flex-shrink:0; margin-top:1px; }
+    .risk-anchored.sev-high   .risk-anchored-ic { color:#EF4444; }
+    .risk-anchored.sev-medium .risk-anchored-ic { color:#F59E0B; }
+    .risk-anchored-body { flex:1; min-width:0; }
+    .risk-anchored-norm { font-size:11px; opacity:.8; margin-top:2px; }
+    .risk-anchored-acts { display:flex; align-items:center; gap:12px; margin-top:7px; flex-wrap:wrap; }
+    .risk-anchored-apply { background:#0F5EE8; color:#fff; border:none; border-radius:6px; padding:4px 10px; font-size:11px; font-weight:600; cursor:pointer; }
+    .risk-anchored-apply:hover { background:#0B4FCA; }
+    .risk-anchored-back { background:transparent; border:none; color:inherit; font-size:11px; font-weight:600; cursor:pointer; text-decoration:underline; padding:0; }
+    .risk-anchored-fixed { display:inline-flex; align-items:center; gap:4px; background:#F0FDF4; border:1px solid #6EE7B7; color:#065F46; border-radius:8px; padding:8px 12px; margin-top:10px; font-size:12px; font-weight:600; }
+    @keyframes risk-field-pulse { 0% { box-shadow:0 0 0 0 rgba(239,68,68,.0); } 25% { box-shadow:0 0 0 3px rgba(239,68,68,.5); } 100% { box-shadow:0 0 0 0 rgba(239,68,68,0); } }
+    .risk-field-pulse { animation: risk-field-pulse .6s ease-out 1; }
+    @keyframes risk-field-pulse-amber { 0% { box-shadow:0 0 0 0 rgba(245,158,11,.0); } 25% { box-shadow:0 0 0 3px rgba(245,158,11,.55); } 100% { box-shadow:0 0 0 0 rgba(245,158,11,0); } }
+    .risk-field-pulse-amber { animation: risk-field-pulse-amber .6s ease-out 1; }
+    @keyframes risk-fixed-flash { 0% { background:#D1FAE5; } 100% { background:transparent; } }
+    .risk-fixed-flash { animation: risk-fixed-flash .8s ease-out 1; }
+
     @media (prefers-reduced-motion: reduce) {
       * { transition: none !important; animation: none !important; }
     }
+
+    /* ============ STEP 5 — AI GENERATION EXPERIENCE ============ */
+    /* Skeleton shimmer (disabled under prefers-reduced-motion by the global rule) */
+    @keyframes ag-shimmer { 0% { background-position: -480px 0; } 100% { background-position: 480px 0; } }
+    .ag-sk { background: #EEF1F5; border-radius: 6px; }
+    .ag-sk.shim {
+      background-image: linear-gradient(90deg, #EEF1F5 0px, #F6F8FB 120px, #EEF1F5 240px);
+      background-size: 480px 100%;
+      animation: ag-shimmer 1.25s linear infinite;
+    }
+    .ag-sk-line { height: 11px; margin: 8px 0; }
+    .ag-sk-h    { height: 15px; width: 46%; margin: 0 0 12px; }
+    /* Section reveal (real content sliding/fading in) */
+    @keyframes ag-reveal { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .ag-reveal { animation: ag-reveal .3s ease-out both; }
+    /* Active card subtle blue pulse */
+    @keyframes ag-active-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(15,94,232,.10); } 50% { box-shadow: 0 0 0 4px rgba(15,94,232,.07); } }
+    .ag-doc-card.active { border-color:#BFDBFE; animation: ag-active-pulse 1.6s ease-in-out infinite; }
+    .ag-doc-card { border:1px solid #EEF1F5; border-radius:10px; padding:16px 18px; margin-bottom:14px; background:#fff; }
+    .ag-doc-card h4 { font-size:13.5px; font-weight:700; color:#111827; text-transform:uppercase; letter-spacing:.02em; margin:0 0 8px; padding-bottom:6px; border-bottom:1px solid #EEF1F5; }
+    .ag-doc-card.active h4 { color:#0F5EE8; }
+    .ag-doc-card .ag-body { font-size:12.5px; color:#374151; line-height:1.6; }
+    .ag-doc-card .ag-body p { margin:0 0 6px; }
+    .ag-doc-card .ag-body ul { list-style:disc; padding-left:18px; margin:4px 0 6px; }
+    .ag-doc-card .ag-body table { width:100%; border-collapse:collapse; margin-top:6px; font-size:11.5px; }
+    .ag-doc-card .ag-body table th { background:#F9FAFB; text-align:left; padding:4px 8px; color:#6B7280; font-weight:600; font-size:10.5px; text-transform:uppercase; letter-spacing:.02em; border:1px solid #EEF1F5; }
+    .ag-doc-card .ag-body table td { padding:4px 8px; border:1px solid #EEF1F5; }
+    .ag-doc-card .ag-body table td.r, .ag-doc-card .ag-body table th.r { text-align:right; }
+    /* Typing caret on the heading of the currently-generating card */
+    .ag-typing::after { content:'▌'; color:#0F5EE8; margin-left:1px; animation: ag-caret 1s steps(1) infinite; }
+    @keyframes ag-caret { 0%,50% { opacity:1; } 51%,100% { opacity:0; } }
+    /* Part divider in the checklist */
+    .ag-part-hd { display:flex; align-items:center; gap:8px; font-size:10.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#9CA3AF; margin:14px 0 6px; padding-top:10px; border-top:1px solid #F1F3F6; }
+    .ag-part-hd:first-child { border-top:none; padding-top:0; margin-top:2px; }
+    .ag-part-hd .ag-part-done { display:none; align-items:center; gap:3px; color:#10B981; font-weight:600; }
+    .ag-part-hd.done .ag-part-done { display:inline-flex; }
+    /* Checklist row */
+    .ag-row { display:flex; align-items:center; gap:10px; padding:7px 9px; border-radius:8px; border-left:3px solid transparent; transition: background .2s ease, border-color .2s ease; }
+    .ag-row.active { background:#EFF6FF; border-left-color:#0F5EE8; }
+    .ag-row .ag-ic { width:18px; height:18px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+    .ag-row .ag-name { flex:1; font-size:12.5px; color:#374151; min-width:0; }
+    .ag-row.done .ag-name { color:#111827; }
+    .ag-row .ag-mini { width:46px; flex-shrink:0; text-align:right; font-size:10.5px; color:#9CA3AF; font-variant-numeric:tabular-nums; }
+    .ag-row .ag-minibar { width:42px; height:4px; border-radius:3px; background:#EEF1F5; overflow:hidden; flex-shrink:0; }
+    .ag-row .ag-minibar > span { display:block; height:100%; width:0; background:#0F5EE8; border-radius:3px; transition:width .12s linear; }
+    .ag-row.done .ag-minibar > span { background:#10B981; }
+    /* Pending dot / spinner / done check */
+    .ag-dot { width:14px; height:14px; border-radius:50%; border:1.5px solid #CBD2DC; box-sizing:border-box; }
+    .ag-spin { width:15px; height:15px; border-radius:50%; border:2px solid #DCE6FA; border-top-color:#0F5EE8; animation: spin .8s linear infinite; }
+    .ag-check { color:#10B981; }
+    .ag-check.pop { animation: success-pop .45s cubic-bezier(.2,.7,.2,1.3); }
+    /* Overall ring */
+    .ag-ring-wrap { position:relative; width:128px; height:128px; }
+    .ag-ring-num { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+    .ag-ring-num .n { font-size:30px; font-weight:800; color:#0F5EE8; line-height:1; font-variant-numeric:tabular-nums; }
+    .ag-ring-num .l { font-size:10px; color:#9CA3AF; margin-top:2px; text-transform:uppercase; letter-spacing:.05em; }
+    /* Demo controls */
+    .ag-demo-btn { border:1px solid #E5E7EB; background:#fff; color:#6B7280; font-size:11px; border-radius:8px; padding:5px 10px; display:inline-flex; align-items:center; gap:5px; cursor:pointer; transition: background .15s ease, color .15s ease; }
+    .ag-demo-btn:hover { background:#F9FAFB; color:#111827; }
+    .ag-demo-btn.on { border-color:#93C5FD; background:#EFF6FF; color:#0F5EE8; }
+    /* Success ribbon */
+    .ag-ribbon { animation: ag-reveal .35s ease-out both; }
 
     /* ======================= CUSTOM SECTIONS ======================= */
     .ta-cs-host { margin-top: 0; }
@@ -1289,11 +1425,11 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
-                  <div>
+                  <div id="anchor-emd" data-risk-host="emd">
                     <label for="fEMD" class="block text-[13px] font-medium text-ink-900 mb-1.5">EMD Amount (₹) <span class="text-danger" aria-hidden="true">✱</span></label>
                     <div class="relative">
                       <span class="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500 text-[13.5px]">₹</span>
-                      <input id="fEMD" type="number" min="0" placeholder="0" class="field pl-7" aria-required="true" oninput="onEmdChange(); validateStep1();" aria-describedby="emdHelp" />
+                      <input id="fEMD" type="number" min="0" placeholder="0" class="field pl-7" aria-required="true" oninput="onEmdChange(); validateStep1(); riskOnFieldEdit('emd');" aria-describedby="emdHelp" />
                     </div>
                     <div id="emdHelp" role="alert" class="hidden mt-1.5 text-[12px] text-warning inline-flex items-center gap-1"><i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> <span id="emdHelpText">CVC recommends minimum 2% EMD.</span></div>
                   </div>
@@ -1455,7 +1591,7 @@
                   <h2 class="text-[15px] font-bold text-ink-900 pb-2 border-b border-line mb-1">Pre-Qualification Criteria</h2>
                   <p class="text-[12px] text-ink-500 mb-4">Financial and organisational requirements. Vendors must meet ALL of these to be eligible.</p>
                   <div id="pqCardsList" class="space-y-2.5">
-                    <div class="bg-white border border-line rounded-[10px] p-4" data-criterion-card data-standard="Annual Turnover">
+                    <div id="anchor-turnover" data-risk-host="turnover" class="bg-white border border-line rounded-[10px] p-4" data-criterion-card data-standard="Annual Turnover">
                       <div class="flex items-start justify-between gap-3 flex-wrap">
                         <div class="flex-1 min-w-0">
                           <div class="text-[14px] font-bold text-ink-900">Minimum Annual Turnover</div>
@@ -1464,7 +1600,7 @@
                         <div class="flex items-center gap-2">
                           <div class="relative">
                             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500 text-[13.5px]">₹</span>
-                            <input id="pqTurnover" type="text" value="22,50,000" class="field pl-7 w-44" oninput="checkTurnover(this.value)" />
+                            <input id="pqTurnover" type="text" value="22,50,000" class="field pl-7 w-44" oninput="checkTurnover(this.value); riskOnFieldEdit('turnover');" />
                           </div>
                           <button aria-label="Remove criterion" onclick="removeCriterion(this,true,'Annual Turnover')" class="text-ink-400 hover:text-danger w-8 h-8 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4"></i></button>
                         </div>
@@ -1472,7 +1608,7 @@
                       <div class="mt-2.5 text-[11px] italic text-ink-500">AI suggestion: minimum 50% of estimated tender value for Works tenders</div>
                     </div>
 
-                    <div class="bg-white border border-line rounded-[10px] p-4" data-criterion-card data-standard="Similar Work Experience">
+                    <div id="anchor-similar" data-risk-host="similar" class="bg-white border border-line rounded-[10px] p-4" data-criterion-card data-standard="Similar Work Experience">
                       <div class="flex items-start justify-between gap-3 flex-wrap">
                         <div class="flex-1 min-w-0">
                           <div class="text-[14px] font-bold text-ink-900">Similar Work Experience</div>
@@ -1485,7 +1621,7 @@
                           <label class="block text-[12px] text-ink-500 mb-1">Minimum value per work (₹)</label>
                           <div class="relative">
                             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500 text-[13.5px]">₹</span>
-                            <input type="text" value="18,00,000" class="field pl-7" />
+                            <input id="pqSimilarVal" type="text" value="18,00,000" class="field pl-7" oninput="riskOnFieldEdit('similar');" />
                           </div>
                         </div>
                         <div>
@@ -1514,14 +1650,14 @@
                       <div class="mt-2.5 text-[11px] italic text-ink-500">AI suggestion: minimum 3 years for tender value under ₹2 Crore</div>
                     </div>
 
-                    <div class="bg-white border border-line rounded-[10px] p-4" data-criterion-card>
+                    <div id="anchor-networth" data-risk-host="networth" class="bg-white border border-line rounded-[10px] p-4" data-criterion-card>
                       <div class="flex items-start justify-between gap-3 flex-wrap">
                         <div class="flex-1 min-w-0">
                           <div class="text-[14px] font-bold text-ink-900">Positive Net Worth</div>
                           <div class="text-[12px] text-ink-500 mt-0.5">Net worth must be positive as per latest audited balance sheet</div>
                         </div>
                         <div class="flex items-center gap-3">
-                          <label class="toggle"><input type="checkbox" checked /><span class="slider"></span></label>
+                          <label class="toggle"><input id="pqNetWorth" type="checkbox" checked onchange="riskOnFieldEdit('networth');" /><span class="slider"></span></label>
                           <button aria-label="Remove criterion" onclick="removeCriterion(this,false)" class="text-ink-400 hover:text-danger w-8 h-8 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4"></i></button>
                         </div>
                       </div>
@@ -1567,7 +1703,7 @@
                       <div id="brandAlert-equip" role="alert" class="hidden mt-2 bg-danger-light border border-danger/40 rounded-lg px-3 py-2 text-[12px] text-danger inline-flex items-start gap-1.5"><i data-lucide="alert-octagon" class="w-3.5 h-3.5 shrink-0 mt-0.5"></i> <span class="text"></span></div>
                     </div>
 
-                    <div class="bg-white border border-line rounded-[10px] p-4" data-criterion-card>
+                    <div id="anchor-registrations" data-risk-host="registrations" class="bg-white border border-line rounded-[10px] p-4" data-criterion-card>
                       <div class="flex items-start justify-between gap-3 flex-wrap mb-3">
                         <div>
                           <div class="text-[14px] font-bold text-ink-900">Certifications &amp; Registrations</div>
@@ -1577,7 +1713,8 @@
                       <div class="space-y-2 text-[13px]">
                         <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked class="accent-primary"> Registered with Maharashtra PWD / CPWD</label>
                         <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked class="accent-primary"> Valid GST Registration</label>
-                        <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="accent-primary"> ISO 9001:2015 Certification</label>
+                        <label id="anchor-iso" data-risk-host="iso" class="flex items-center gap-2 cursor-pointer"><input id="tqIsoMandatory" type="checkbox" class="accent-primary" onchange="riskOnFieldEdit('iso');"> ISO 9001:2015 Certification</label>
+                        <label class="flex items-center gap-2 cursor-pointer"><input id="regEpf" type="checkbox" class="accent-primary" onchange="riskOnFieldEdit('registrations');"> EPF &amp; ESIC Registration</label>
                         <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="accent-primary"> NSIC Registration</label>
                       </div>
                     </div>
@@ -1587,23 +1724,45 @@
                 </section>
               </fieldset>
 
-              <!-- Section C: AI Risk Flags -->
-              <section class="mb-6">
-                <div role="region" aria-live="polite" aria-label="AI Eligibility Risk Check" class="bg-warning-light border border-warning/40 rounded-xl p-4">
-                  <div class="flex items-center gap-2 mb-2.5">
-                    <div class="w-7 h-7 rounded-lg bg-warning/20 text-warning flex items-center justify-center"><i data-lucide="shield-alert" class="w-4 h-4"></i></div>
+              <!-- Section C: AI Eligibility Risk Check (actionable, deep-linked) -->
+              <section class="mb-6" id="riskCheckSection">
+                <div role="region" aria-label="AI Eligibility Risk Check" class="bg-warning-light border border-warning/40 rounded-xl p-4">
+                  <div class="flex items-center gap-2 mb-1">
+                    <div class="w-7 h-7 rounded-lg bg-warning/20 text-warning flex items-center justify-center shrink-0"><i data-lucide="shield-alert" class="w-4 h-4"></i></div>
                     <h3 class="text-[13px] font-bold text-[#92400E]">AI Eligibility Risk Check</h3>
-                    <span id="step2CritCount" aria-live="polite" class="ml-auto text-[11.5px] text-[#92400E]">4 PQ criteria · 3 TQ criteria defined</span>
+                    <span id="riskSeverityCounts" class="ml-auto text-[11.5px] text-[#92400E]"></span>
+                    <button type="button" id="riskRestartBtn" onclick="riskRestartFlow()" aria-label="Reset the risk check and replay the fix flow from the beginning" title="Reset risks to replay the deep-link fix flow" style="display:inline-flex; align-items:center; gap:4px; font-size:11px; color:#6B7280; background:#fff; border:1px solid #E5E7EB; border-radius:6px; padding:4px 9px; cursor:pointer;"><i data-lucide="refresh-cw" style="width:12px;height:12px;"></i>Restart</button>
                   </div>
-                  <ul class="space-y-1.5 text-[13px] text-ink-900">
-                    <li class="inline-flex items-center gap-2"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-success"></i> Turnover requirement (50% of tender value) — within CVC recommended range</li><br/>
-                    <li class="inline-flex items-center gap-2"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-success"></i> Similar work experience — standard for this sector and value</li><br/>
-                    <li class="inline-flex items-center gap-2"><i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-warning"></i> Equipment list: 'Concrete Mixer' is a common brand-neutral term — acceptable</li><br/>
-                    <li class="inline-flex items-center gap-2 text-ink-500"><span class="w-3.5 h-3.5 rounded-full border border-ink-400 inline-block"></span> Certification requirements — pending review</li>
-                  </ul>
-                  <div id="turnoverWarn" role="alert" class="hidden mt-3 bg-white border border-warning/60 rounded-lg p-3 text-[12.5px] text-ink-900 inline-flex items-start gap-1.5">
-                    <i data-lucide="alert-triangle" class="w-4 h-4 text-warning shrink-0 mt-0.5"></i>
-                    <span>Turnover threshold exceeds 100% of tender value. This may restrict competition below the minimum 3-bidder requirement. CVC guideline: max 50–100% of tender value.</span>
+                  <!-- Criteria-defined count (kept for parity with prior copy) -->
+                  <div id="step2CritCount" aria-live="polite" class="text-[11px] text-[#92400E]/80 mb-2 pl-9">4 PQ criteria · 3 TQ criteria defined</div>
+
+                  <!-- Resolution progress -->
+                  <div class="pl-9 mb-2.5">
+                    <div class="flex items-center justify-between mb-1">
+                      <span id="riskResolvedLabel" aria-live="polite" class="text-[11.5px] font-semibold text-[#92400E]">0 of 0 risks resolved</span>
+                    </div>
+                    <div class="h-1.5 w-full rounded-full bg-warning/15 overflow-hidden">
+                      <div id="riskProgressBar" class="h-full rounded-full bg-success transition-[width] duration-300" style="width:0%"></div>
+                    </div>
+                  </div>
+
+                  <!-- TRACKS row -->
+                  <div id="riskTracksRow" class="pl-9 mb-3 flex items-center gap-1.5 flex-wrap"></div>
+
+                  <!-- Success ribbon (hidden until all resolvable risks pass) -->
+                  <div id="riskSuccessRibbon" class="hidden mb-3 bg-success-light border border-success/40 rounded-lg px-3.5 py-2.5 flex items-center gap-2 text-[12.5px] font-semibold text-[#065F46]">
+                    <i data-lucide="circle-check" class="w-4 h-4 text-success shrink-0"></i> All eligibility risks addressed
+                  </div>
+
+                  <!-- Risk rows (rendered by renderRiskCheck) -->
+                  <div id="riskRows" class="space-y-2"></div>
+
+                  <!-- Informational notes expander -->
+                  <div id="riskInfoWrap" class="hidden mt-1">
+                    <button type="button" id="riskInfoToggle" onclick="toggleRiskInfo()" aria-expanded="false" class="text-[12px] text-[#92400E] font-medium inline-flex items-center gap-1 hover:underline">
+                      <span id="riskInfoToggleLabel">0 informational notes</span> <i data-lucide="chevron-down" class="w-3.5 h-3.5" id="riskInfoChevron"></i>
+                    </button>
+                    <div id="riskInfoRows" class="hidden mt-2 space-y-2"></div>
                   </div>
                 </div>
               </section>
@@ -1929,6 +2088,18 @@
                 <section class="mb-9">
                   <h2 class="text-[15px] font-bold text-ink-900 pb-2 border-b border-line mb-5">Tender Timeline</h2>
 
+                  <!-- Anchor-change recalculation prompt (injected at top of timeline) -->
+                  <div id="timelineRecalcPrompt" role="status" aria-live="polite" class="hidden mb-3 flex items-start gap-2.5" style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px; padding:12px 16px;">
+                    <i data-lucide="calendar" class="w-4 h-4 shrink-0 mt-0.5" style="color:#2563EB;"></i>
+                    <div class="flex-1 min-w-0">
+                      <p id="timelineRecalcMsg" class="text-[12.5px] text-ink-900">Publication date changed.</p>
+                      <div class="mt-2 flex items-center gap-3">
+                        <button type="button" onclick="autoRecalcTimeline()" class="px-3 py-1.5 rounded-lg bg-primary text-white text-[12.5px] font-medium hover:bg-primary/90">Auto-recalculate all dates</button>
+                        <button type="button" onclick="dismissRecalcPrompt()" class="text-[12.5px] text-ink-500 hover:text-ink-900">I'll adjust manually</button>
+                      </div>
+                    </div>
+                  </div>
+
                   <div class="space-y-3">
                     <!-- Each row: dot + name + date + offset + lock -->
                     <div class="timeline-row flex items-center gap-3 bg-white border border-line rounded-[10px] p-3.5" data-id="pub" data-offset="0" data-locked="true">
@@ -2072,7 +2243,24 @@
             <div class="text-[12.5px] text-ink-500 hidden md:block">Step 4 of 7 — Dates &amp; Timeline</div>
             <div class="flex items-center gap-2">
               <button onclick="saveAndExit()" class="px-3.5 py-2 rounded-lg border border-line text-[13px] text-ink-500 hover:text-ink-900 hover:bg-surface">Save as Draft</button>
-              <a href="#step5" class="px-4 py-2.5 rounded-lg bg-primary text-white text-[13.5px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5 shadow-soft">Continue to AI Generation <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
+              <a href="#step5" id="step4ContinueBtn" onclick="tlConfirmContinue(event)" class="px-4 py-2.5 rounded-lg bg-primary text-white text-[13.5px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5 shadow-soft">Continue to AI Generation <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
+            </div>
+          </div>
+
+          <!-- Non-blocking out-of-order confirm (Continue to AI Generation) -->
+          <div id="tlContinueModal" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background:rgba(17,24,39,.45);">
+            <div role="alertdialog" aria-modal="true" aria-labelledby="tlContinueMsg" class="bg-white rounded-xl shadow-xl border border-line w-[420px] max-w-[90vw] p-5">
+              <div class="flex items-start gap-3">
+                <i data-lucide="alert-triangle" class="w-5 h-5 text-warning shrink-0 mt-0.5"></i>
+                <div class="flex-1">
+                  <p id="tlContinueMsg" class="text-[14px] font-semibold text-ink-900">Timeline dates are out of order. Continue anyway?</p>
+                  <p class="mt-1 text-[12.5px] text-ink-500">You can review and fix them now, or continue and adjust later.</p>
+                </div>
+              </div>
+              <div class="mt-4 flex items-center justify-end gap-2">
+                <button type="button" onclick="tlReviewDates()" class="px-3.5 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface">Review dates</button>
+                <button type="button" onclick="tlContinueAnyway()" class="px-4 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90">Continue</button>
+              </div>
             </div>
           </div>
         </section>
@@ -2100,7 +2288,82 @@
             <div class="md:hidden mt-3 text-[12.5px] text-ink-500">Step 5 of 7 — AI Generation</div>
           </div>
 
-          <div class="px-6 lg:px-10 pt-8 pb-32">
+          <!-- ===== AI GENERATION EXPERIENCE (timed; wraps the existing completion) ===== -->
+          <div id="step5GenView" class="px-6 lg:px-10 pt-8 pb-32">
+            <div class="max-w-[1200px] mx-auto">
+              <div class="flex items-start justify-between gap-3 mb-5 flex-wrap">
+                <div>
+                  <h1 class="text-[20px] font-bold text-ink-900">Step 5: AI Document Generation</h1>
+                  <p class="text-[14px] text-ink-500 mt-1">Generating your complete tender document, section by section, from the information you provided.</p>
+                </div>
+                <div class="flex items-center gap-2 mt-1">
+                  <button id="agFastToggle" type="button" onclick="agToggleFast()" class="ag-demo-btn" title="Demo control — run the same sequence faster" aria-pressed="false"><i data-lucide="fast-forward" class="w-3 h-3"></i> Fast</button>
+                  <button id="agReplayBtn" type="button" onclick="agReplay()" class="ag-demo-btn" title="Demo control — replay the generation animation"><i data-lucide="refresh-cw" class="w-3 h-3"></i> Replay generation</button>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 lg:grid-cols-[40%_1fr] gap-6">
+                <!-- LEFT: progress tracker -->
+                <div class="space-y-5">
+                  <!-- Overall progress card -->
+                  <div class="bg-white border border-line rounded-2xl p-5 flex flex-col items-center text-center">
+                    <div class="ag-ring-wrap">
+                      <svg viewBox="0 0 128 128" width="128" height="128" aria-hidden="true">
+                        <circle cx="64" cy="64" r="56" fill="none" stroke="#EEF1F5" stroke-width="10"></circle>
+                        <circle id="agRing" cx="64" cy="64" r="56" fill="none" stroke="#0F5EE8" stroke-width="10" stroke-linecap="round"
+                                stroke-dasharray="351.86" stroke-dashoffset="351.86" transform="rotate(-90 64 64)" style="transition: stroke-dashoffset .15s linear;"></circle>
+                      </svg>
+                      <div class="ag-ring-num">
+                        <span class="n" id="agOverallNum" aria-live="polite" aria-label="Overall progress">0%</span>
+                        <span class="l">Complete</span>
+                      </div>
+                    </div>
+                    <div class="text-[13.5px] font-semibold text-ink-900 mt-3">Generating tender document…</div>
+                    <div class="text-[12px] text-ink-500 mt-1 min-h-[18px]" id="agActivity" aria-live="polite">Initialising…</div>
+                    <div class="flex items-center gap-2 mt-3 text-[11.5px] text-ink-400">
+                      <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                      <span id="agElapsed" style="font-variant-numeric:tabular-nums;">0:00</span>
+                      <span>· est. ~1 min</span>
+                    </div>
+                  </div>
+
+                  <!-- Section checklist -->
+                  <div class="bg-white border border-line rounded-2xl p-4">
+                    <div class="flex items-center justify-between mb-2 px-1">
+                      <h3 class="text-[13px] font-bold text-ink-900">Sections</h3>
+                      <span class="text-[11px] text-ink-500" id="agSecCount">0 / 20</span>
+                    </div>
+                    <div id="agChecklist" role="list" aria-label="Tender document sections" class="max-h-[420px] overflow-y-auto pr-1"></div>
+                  </div>
+                </div>
+
+                <!-- RIGHT: live document skeleton preview -->
+                <div class="bg-white border border-line rounded-2xl overflow-hidden">
+                  <div class="bg-surface border-b border-line px-5 py-3 flex items-center gap-2">
+                    <i data-lucide="file-text" class="w-4 h-4 text-ink-500"></i>
+                    <span class="text-[12.5px] text-ink-500">Live document — TND-2026-010</span>
+                  </div>
+                  <div id="agCanvas" class="p-6 max-h-[640px] overflow-y-auto" style="font-family: 'DM Sans', system-ui, sans-serif;"></div>
+                </div>
+              </div>
+
+              <!-- Success ribbon (revealed on completion) -->
+              <div id="agSuccess" class="ag-ribbon hidden mt-6 bg-white border border-success/40 rounded-2xl px-5 py-4 flex items-center gap-4 flex-wrap" style="background:#F0FDF4;" role="status">
+                <div class="w-10 h-10 rounded-full bg-success text-white flex items-center justify-center shrink-0"><i data-lucide="check" class="w-5 h-5"></i></div>
+                <div class="flex-1 min-w-0">
+                  <div class="text-[14.5px] font-bold text-ink-900" id="agSuccessLine">Tender document generated · 20 sections · ~12 pages</div>
+                  <div class="text-[12px] text-ink-500 mt-0.5">All sections drafted from your inputs. Review and continue to CVC Review.</div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button type="button" onclick="agPreviewFullDoc()" class="px-3.5 py-2 rounded-lg border border-line text-[12.5px] text-ink-900 hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="file-text" class="w-3.5 h-3.5"></i> Preview full document</button>
+                  <button type="button" onclick="agContinueToCvc()" class="px-4 py-2.5 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5 shadow-soft">Continue to CVC Review <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== EXISTING COMPLETED-DOCUMENT VIEW (shown once generation finishes) ===== -->
+          <div id="step5RealContent" class="px-6 lg:px-10 pt-8 pb-32 hidden">
             <div class="max-w-[1200px] mx-auto">
               <div class="flex items-start justify-between gap-3 mb-5 flex-wrap">
                 <div>
@@ -2254,7 +2517,7 @@
             </div>
           </div>
 
-          <div class="fixed bottom-0 left-[244px] right-0 border-t border-line bg-white px-8 py-3.5 flex items-center justify-between z-20">
+          <div id="step5Footer" class="fixed bottom-0 left-[244px] right-0 border-t border-line bg-white px-8 py-3.5 flex items-center justify-between z-20 hidden">
             <a href="#step4" class="text-[13px] text-ink-500 hover:text-ink-900 inline-flex items-center gap-1.5"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back to Dates &amp; Timeline</a>
             <div class="text-[12.5px] text-ink-500 hidden md:block">Step 5 of 7 — AI Generation</div>
             <div class="flex items-center gap-2">
@@ -2816,6 +3079,23 @@
     <span id="toastMsg">Done</span>
   </div>
 
+  <!-- Unresolved-Risk Publish Confirmation (non-blocking) -->
+  <div id="riskPublishConfirm" class="hidden fixed inset-0 z-50 bg-ink-900/40 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-lift" role="alertdialog" aria-labelledby="riskPublishConfirmTitle">
+      <div class="flex items-start gap-3">
+        <div class="w-10 h-10 rounded-full bg-warning-light text-warning flex items-center justify-center shrink-0"><i data-lucide="shield-alert" class="w-5 h-5"></i></div>
+        <div>
+          <h3 id="riskPublishConfirmTitle" class="text-[16px] font-semibold text-ink-900">Unresolved eligibility risks</h3>
+          <p id="riskPublishConfirmText" class="text-[13.5px] text-ink-500 mt-1">Publish with unresolved eligibility risks? These may attract audit objections.</p>
+        </div>
+      </div>
+      <div class="mt-5 flex justify-end gap-2">
+        <button onclick="riskReviewFromPublish()" class="px-3.5 py-2 rounded-lg border border-line text-[13px] text-ink-900 hover:bg-surface inline-flex items-center gap-1.5"><i data-lucide="list-checks" class="w-3.5 h-3.5"></i> Review risks</button>
+        <button onclick="riskPublishAnyway()" class="px-3.5 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90">Publish anyway</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Publish Confirmation Modal -->
   <div id="publishModal" class="hidden fixed inset-0 z-50 bg-ink-900/40 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-lift">
@@ -2839,19 +3119,99 @@
   <script>
     function refreshIcons(){ if (window.lucide) lucide.createIcons(); }
 
+    /* =====================================================================
+       DESIGN REVIEW MODE (additive, fully reversible)
+       When true, the officer can move FORWARD freely anywhere in the
+       creation flow: no disabled Continue/Proceed buttons, no nav-blocking
+       validation, no "continue anyway?" / "publish with N unresolved?"
+       interrupting confirms, and every step in the top indicator is directly
+       clickable. ALL inline warnings/validation UI still render — only the
+       BLOCKING/INTERRUPTING behaviour is bypassed. Set to false to restore
+       production gating exactly (no gating logic is deleted, only bypassed).
+       ===================================================================== */
+    const DESIGN_REVIEW_MODE = true; // set false to restore production gating
+
+    // Map indicator position (0-based) -> step hash. Every step view renders a
+    // 7-item <ol> stepper (Classification … Publish) whose circles are static
+    // <span>s. Under DESIGN_REVIEW_MODE we make each circle a jump target.
+    const DRM_STEP_HASHES = ['#step1','#step2','#step3','#step4','#step5','#step6','#step7'];
+
+    // Force-enable any forward-nav button: strip the disabled attr/aria and the
+    // blocking utility classes so validation-toggled buttons become clickable.
+    function drmEnable(btn){
+      if (!btn) return;
+      btn.removeAttribute('disabled');
+      btn.removeAttribute('aria-disabled');
+      btn.classList.remove('opacity-50','cursor-not-allowed','pointer-events-none');
+    }
+
+    // Single DRY unlock pass — called from setView after each render and once on
+    // load. No-op (and fully reversible) when DESIGN_REVIEW_MODE is false.
+    function drmUnlockNav(){
+      if (!DESIGN_REVIEW_MODE) return;
+      // 1) Known forward-nav buttons that validation toggles disabled.
+      ['step1Continue','committeeContinueBtn','step6Continue','sendCvcBtn'].forEach(id => drmEnable(document.getElementById(id)));
+      // 2) Any other Continue/Proceed forward-nav control by id convention.
+      document.querySelectorAll('[id$="Continue"],[id$="ContinueBtn"],[id$="ContinueLink"]').forEach(el => {
+        drmEnable(el);
+        if (el.dataset) el.dataset.ok = '1';      // step2 link uses data-ok to gate
+        el.style.opacity = '';
+        el.style.pointerEvents = '';
+      });
+      // 3) Make every step-indicator circle directly clickable to jump there.
+      document.querySelectorAll('#view-step1, #view-step2, #view-step3, #view-step4, #view-step5, #view-step6, #view-step7').forEach(view => {
+        if (view.classList.contains('hidden')) return; // only the active stepper
+        const circles = view.querySelectorAll('ol[role="list"] > li > span:first-child');
+        circles.forEach((span, i) => {
+          const hash = DRM_STEP_HASHES[i];
+          if (!hash || span.dataset.drmClickable) return;
+          span.dataset.drmClickable = '1';
+          span.style.cursor = 'pointer';
+          span.setAttribute('role','link');
+          span.setAttribute('tabindex','0');
+          span.setAttribute('title','Jump to ' + hash.slice(1));
+          const go = () => { location.hash = hash; };
+          span.addEventListener('click', go);
+          span.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); go(); } });
+        });
+      });
+      // 4) Step 5: surface an always-available "Continue to CVC Review" path so
+      //    the officer can reach Step 6 mid-generation (never trapped ~60s).
+      const gen = document.getElementById('step5GenView');
+      if (gen && !document.getElementById('drmStep5Continue')){
+        const host = gen.querySelector('.max-w-\\[1200px\\]') || gen.firstElementChild || gen;
+        const bar = document.createElement('div');
+        bar.className = 'flex justify-end mt-4';
+        bar.innerHTML = '<button type="button" id="drmStep5Continue" onclick="agContinueToCvc()" class="px-4 py-2.5 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5 shadow-soft">Continue to CVC Review <i data-lucide="arrow-right" class="w-4 h-4"></i></button>';
+        host.appendChild(bar);
+        refreshIcons();
+      }
+    }
+
     // ================= ROUTER =================
     const views = ['start','describe','upload','clone','precheck','step1','step2','step3','step4','step5','step6','step7','corrigendum'];
     const STEP_VIEWS = ['step1','step2','step3','step4','step5','step6','step7'];
+    let _prevView = null;
     function setView(name){
+      // Leaving Step 5 → hard-stop the AI-generation controller so no timer/rAF
+      // leaks and fires after the step unmounts.
+      if (_prevView === 'step5' && name !== 'step5' && typeof agStop === 'function') { try { agStop(); } catch(e){} }
       views.forEach(v => document.getElementById('view-'+v).classList.toggle('hidden', v !== name));
       // Step1-Step7 use blue header
       const isStep = STEP_VIEWS.includes(name);
       document.getElementById('topnavMain').classList.toggle('hidden', isStep);
       document.getElementById('blueHeader').classList.toggle('hidden', !isStep);
       if (name === 'step2' && typeof initStep2Personnel === 'function') initStep2Personnel();
+      if (name === 'step2' && typeof renderRiskCheck === 'function') renderRiskCheck();
       window.scrollTo({ top: 0 });
       refreshIcons();
       if (window.bpKit) try { window.bpKit.refreshBadges(); } catch(e){}  // bpKit: sync blueprint badges when a view (e.g. corrigendum) is shown
+      // Entering Step 5 → (re)start the timed AI-generation experience fresh.
+      if (name === 'step5' && typeof agStart === 'function') { try { agStart(); } catch(e){} }
+      // DESIGN_REVIEW_MODE: after every step render, force-enable forward nav and
+      // make the step indicator fully clickable. No-op when the flag is false.
+      if (DESIGN_REVIEW_MODE) { try { drmUnlockNav(); } catch(e){} }
+      _prevView = name;
     }
     let step2PersonnelInited = false;
     function initStep2Personnel(){
@@ -2893,7 +3253,14 @@
         const lockField = (id, val, ro=true) => { const el = document.getElementById(id); if (el){ el.value = val; if (ro) el.readOnly = true; else el.disabled = true; el.classList.add('bg-surface','text-ink-500','cursor-not-allowed'); } };
         lockField('aaNumber',   data.aa);
         lockField('tsNumber',   data.ts);
-        lockField('tsValue',    data.tsValue);
+        // TS Value is a cost field — set the ABSOLUTE rupee amount through the
+        // denomination component (keeps {amount,denomination,value} in sync), then lock.
+        if (typeof setCostFieldAbsolute === 'function') setCostFieldAbsolute('tsValue', data.tsValue);
+        else { const tv = document.getElementById('tsValue'); if (tv) tv.value = data.tsValue; }
+        const tvEl = document.getElementById('tsValue');
+        if (tvEl){ tvEl.readOnly = true; tvEl.classList.add('bg-surface','text-ink-500','cursor-not-allowed');
+          const tvRow = tvEl.closest('.cost-field-row'); const tvSel = tvRow ? tvRow.querySelector('.cost-denom-select') : null;
+          if (tvSel){ tvSel.disabled = true; tvSel.classList.add('bg-surface','text-ink-500','cursor-not-allowed'); } }
         lockField('aaAuthority',data.authority, false);
         if (typeof updatePrecheck === 'function') updatePrecheck();
         refreshIcons();
@@ -3306,13 +3673,13 @@
     }
 
     function onEstCostChange(){
-      const v = parseFloat(document.getElementById('fEstCost').value || 0);
+      const v = costAbs('fEstCost'); // absolute rupees (source of truth)
       document.getElementById('feeTip').classList.toggle('hidden', !v);
       onEmdChange();
     }
     function onEmdChange(){
-      const cost = parseFloat(document.getElementById('fEstCost').value || 0);
-      const emd  = parseFloat(document.getElementById('fEMD').value || 0);
+      const cost = costAbs('fEstCost');
+      const emd  = costAbs('fEMD');
       const help = document.getElementById('emdHelp');
       const helpText = document.getElementById('emdHelpText');
       if (cost > 0 && emd > 0){
@@ -3335,8 +3702,8 @@
     // Compliance live
     function refreshCompliance(){
       const t = document.getElementById('fType').value;
-      const cost = parseFloat(document.getElementById('fEstCost').value || 0);
-      const emd  = parseFloat(document.getElementById('fEMD').value || 0);
+      const cost = costAbs('fEstCost'); // absolute rupees (source of truth)
+      const emd  = costAbs('fEMD');
       const items = [];
       if (t) items.push({ s:'ok', t: `Tender type selected — ${t}` });
       else   items.push({ s:'pending', t: `Tender type — pending` });
@@ -3394,6 +3761,9 @@
         delete btn.dataset.pulsed;
       }
       refreshCompliance();
+      // DESIGN_REVIEW_MODE: Step 1 → 2 is never blocked, so keep Continue enabled
+      // even when required fields are incomplete. (Step 1 hints still render.)
+      if (DESIGN_REVIEW_MODE) drmEnable(btn);
     }
     function continueToStep2(){
       location.hash = '#step2';
@@ -3476,7 +3846,6 @@
         { id:'networth',   name:'Net Worth',              icon:'trending-up',  desc:'Positive net worth requirement' },
         { id:'capital',    name:'Paid-up Capital',        icon:'landmark',     desc:'Minimum registered capital' },
         { id:'litigation', name:'Litigation History',     icon:'scale',        desc:'No pending litigation requirement' },
-        { id:'iso',        name:'ISO / Certification',    icon:'award',        desc:'Specific certification required' },
         { id:'custom',     name:'Custom',                 icon:'edit-3',       desc:'Define your own criterion' },
       ],
       tq: [
@@ -3485,6 +3854,7 @@
         { id:'certs',     name:'Certifications & Registrations', icon:'badge-check',     desc:'Required licences or registrations' },
         { id:'qms',       name:'Quality Management System',      icon:'clipboard-check', desc:'ISO or equivalent quality certification' },
         { id:'refs',      name:'Past Project References',        icon:'folder',          desc:'Specific project types in portfolio' },
+        { id:'solvency',  name:'Solvency Certificate',           icon:'file-check',      desc:'Bank solvency certificate of required value' },
         { id:'customtq',  name:'Custom TQ',                      icon:'edit-3',          desc:'Define your own technical requirement' },
       ],
     };
@@ -3495,23 +3865,41 @@
       const zone = document.getElementById(scope+'SelectorZone');
       const btn  = document.getElementById(scope+'AddBtn');
       const types = CRITERION_TYPES[scope];
+      // Six uniform standard cards + one full-width "custom" card.
+      const customIds = ['custom','customtq'];
+      const standardTypes = types.filter(t => !customIds.includes(t.id));
+      const customType = types.find(t => customIds.includes(t.id));
       criterionSel[scope].type = null;
+      const standardCards = standardTypes.map(t => `
+              <div onclick="pickCriterionType('${scope}','${t.id}')" tabindex="0" role="button"
+                style="background:white; border:1px solid #E5E7EB; border-radius:8px; padding:12px 14px; cursor:pointer; transition:all 150ms ease;"
+                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pickCriterionType('${scope}','${t.id}');}"
+                onmouseover="this.style.borderColor='#0F5EE8'; this.style.background='#F8FBFF';"
+                onmouseout="this.style.borderColor='#E5E7EB'; this.style.background='white';">
+                <div class="flex items-center gap-2"><i data-lucide="${t.icon}" class="w-5 h-5 text-primary"></i><span class="text-[13px] font-bold text-ink-900">${t.name}</span></div>
+                <div class="text-[11px] text-ink-500 mt-1">${t.desc}</div>
+              </div>`).join('');
+      const customCard = customType ? `
+              <div onclick="pickCriterionType('${scope}','${customType.id}')" tabindex="0" role="button"
+                style="grid-column:1 / -1; background:#F8FBFF; border:1.5px dashed #0F5EE8; border-radius:8px; padding:14px 16px; cursor:pointer; transition:all 150ms ease; display:flex; align-items:center; gap:12px;"
+                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pickCriterionType('${scope}','${customType.id}');}"
+                onmouseover="this.style.background='#EFF6FF';"
+                onmouseout="this.style.background='#F8FBFF';">
+                <div style="width:32px; height:32px; border-radius:8px; background:#EFF6FF; color:#0F5EE8; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><i data-lucide="plus" class="w-4 h-4"></i></div>
+                <div>
+                  <div class="text-[13px] font-bold text-ink-900">Add custom criterion</div>
+                  <div class="text-[11px] text-ink-500 mt-0.5">Define your own PQ/TQ criterion not listed above</div>
+                </div>
+              </div>` : '';
       zone.innerHTML = `
         <div style="background:#F8FBFF; border:1px dashed #93C5FD; border-radius:10px; padding:18px 20px; margin-top:12px;">
           <div class="flex items-center justify-between">
             <div class="text-[13px] font-bold text-ink-900">Choose criterion type</div>
             <button onclick="closeCriterionSelector('${scope}')" aria-label="Close" class="text-ink-400 hover:text-ink-900 text-[18px] leading-none">×</button>
           </div>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px;">
-            ${types.map(t => `
-              <div onclick="pickCriterionType('${scope}','${t.id}')" tabindex="0" role="button"
-                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pickCriterionType('${scope}','${t.id}');}"
-                style="background:white; border:1px solid #E5E7EB; border-radius:8px; padding:12px 14px; cursor:pointer; transition:all 150ms;"
-                onmouseover="this.style.borderColor='#0F5EE8'; this.style.background='#F8FBFF';"
-                onmouseout="this.style.borderColor='#E5E7EB'; this.style.background='white';">
-                <div class="flex items-center gap-2"><i data-lucide="${t.icon}" class="w-5 h-5 text-primary"></i><span class="text-[13px] font-bold text-ink-900">${t.name}</span></div>
-                <div class="text-[11px] text-ink-500 mt-1">${t.desc}</div>
-              </div>`).join('')}
+          <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:12px;">
+            ${standardCards}
+            ${customCard}
           </div>
         </div>`;
       zone.style.maxHeight = '600px';
@@ -3583,14 +3971,6 @@
             ${aiHint('Standard CVC requirement for all government tenders')}`;
           case 'capital': return fieldHTML('Minimum paid-up capital (₹)', `<div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500 text-[13.5px]">₹</span><input id="cf-amt" type="text" class="field pl-7" placeholder="10,00,000"/></div>`);
           case 'litigation': return `<label class="flex items-center gap-3 text-[13px] text-ink-900"><label class="toggle"><input id="cf-toggle" type="checkbox" checked/><span class="slider"></span></label> Bidder should not have any pending litigation that adversely affects financial position</label>`;
-          case 'iso': return `
-            <div id="cf-isoRows">
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 cf-iso-row">
-                ${fieldHTML('Certification name', `<input class="field cf-iso-name" type="text" placeholder="e.g. ISO 9001:2015, BIS certification, NSIC registration"/>`)}
-                ${fieldHTML('Issuing authority', `<input class="field cf-iso-auth" type="text" placeholder="e.g. Bureau of Indian Standards"/>`)}
-              </div>
-            </div>
-            <button onclick="addIsoRow()" class="text-[12px] text-primary hover:underline">+ Add another certification</button>`;
           case 'custom': return `
             ${fieldHTML('Criterion name', `<input id="cf-name" type="text" class="field" placeholder="e.g. Minimum fleet size"/>`)}
             ${fieldHTML('Description', `<textarea id="cf-desc" rows="3" class="field" placeholder="Describe the requirement in detail..."></textarea>`)}
@@ -3625,6 +4005,10 @@
               ${fieldHTML('Minimum number of such projects', `<input id="cf-count" type="number" class="field" placeholder="2"/>`)}
             </div>
             <div class="flex items-center gap-2"><span class="text-[12px] text-ink-500">In last</span><select id="cf-period" class="field !w-32"><option>3 years</option><option>5 years</option><option>7 years</option><option>10 years</option></select></div>`;
+          case 'solvency': return `
+            ${fieldHTML('Minimum solvency value (₹)', `<div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500 text-[13.5px]">₹</span><input id="cf-amt" type="text" class="field pl-7" placeholder="18,00,000"/></div>`)}
+            <label class="flex items-center gap-2 text-[13px] text-ink-900"><input id="cf-solvBank" type="checkbox" checked class="accent-primary"> Solvency certificate must be issued by a scheduled / nationalised bank</label>
+            ${aiHint('typically 40% of estimated tender value, issued within the last 12 months')}`;
           case 'customtq': return `
             ${fieldHTML('Criterion name', `<input id="cf-name" type="text" class="field" placeholder="e.g. Minimum testing lab capacity"/>`)}
             ${fieldHTML('Description', `<textarea id="cf-desc" rows="3" class="field" placeholder="Describe the requirement in detail..."></textarea>`)}
@@ -3633,14 +4017,6 @@
         }
       }
       return '';
-    }
-    function addIsoRow(){
-      const wrap = document.getElementById('cf-isoRows');
-      if (!wrap) return;
-      const row = document.createElement('div');
-      row.className = 'grid grid-cols-1 sm:grid-cols-2 gap-3 cf-iso-row mt-1';
-      row.innerHTML = `${fieldHTML('Certification name', `<input class="field cf-iso-name" type="text" placeholder="e.g. ISO 14001"/>`)}${fieldHTML('Issuing authority', `<input class="field cf-iso-auth" type="text" placeholder="Issuing body"/>`)}`;
-      wrap.appendChild(row);
     }
     function addCustomCertRow(){
       const wrap = document.getElementById('cf-certs');
@@ -3694,14 +4070,6 @@
         else if (typeId === 'networth'){ summary = (document.getElementById('cf-toggle')||{}).checked ? 'Bidder must have positive net worth as per latest audited balance sheet.' : 'Net worth requirement disabled.'; }
         else if (typeId === 'capital'){ if(!required(['cf-amt'])) return; summary = `Minimum paid-up capital ₹${val('cf-amt')}.`; }
         else if (typeId === 'litigation'){ summary = 'Bidder must have no pending litigation that adversely affects financial position.'; }
-        else if (typeId === 'iso'){
-          const certs = [...document.querySelectorAll('.cf-iso-row')].map(r => {
-            const n = r.querySelector('.cf-iso-name').value.trim(), a = r.querySelector('.cf-iso-auth').value.trim();
-            return n ? (n + (a?` (${a})`:'')) : '';
-          }).filter(Boolean);
-          if (!certs.length){ const fn = document.querySelector('.cf-iso-name'); if(fn) fn.classList.add('invalid'); return; }
-          summary = 'Required: ' + certs.join('; ') + '.';
-        }
         else if (typeId === 'custom'){ if(!required(['cf-name'])) return; name = val('cf-name'); summary = `${val('cf-desc')||''} ${val('cf-thresh')?('Threshold: '+val('cf-thresh')):''} ${val('cf-unit')?('('+val('cf-unit')+')'):''}`.trim(); }
         commitCriterionCard('pq', name, t.name, summary);
       } else {
@@ -3725,6 +4093,11 @@
           if(!required(['cf-nature'])) return;
           summary = `${val('cf-count')||'1'} ${val('cf-nature')} project(s) worth ₹${val('cf-val')||'—'}+ in last ${val('cf-period')}.`;
           commitCriterionCard('tq', 'Past Project References', 'Past Project References', summary);
+        } else if (typeId === 'solvency'){
+          if(!required(['cf-amt'])) return;
+          const bankReq = (document.getElementById('cf-solvBank')||{}).checked;
+          summary = `Bank solvency certificate for a minimum value of ₹${val('cf-amt')}${bankReq ? ', issued by a scheduled / nationalised bank' : ''}.`;
+          commitCriterionCard('tq', 'Solvency Certificate', 'Solvency Certificate', summary);
         } else if (typeId === 'customtq'){
           if(!required(['cf-name'])) return; name = val('cf-name');
           summary = `${val('cf-desc')||''} ${val('cf-thresh')?('Threshold: '+val('cf-thresh')):''} ${val('cf-unit')?('('+val('cf-unit')+')'):''}`.trim();
@@ -3862,8 +4235,11 @@
         link.style.opacity = ok ? '1' : '0.5';
         link.style.pointerEvents = ok ? '' : 'auto';
       }
+      if (typeof renderRiskCheck === 'function') renderRiskCheck();
     }
     function step2Guard(e){
+      // DESIGN_REVIEW_MODE: never block forward navigation (Step 2 → 3).
+      if (DESIGN_REVIEW_MODE) return true;
       const link = document.getElementById('step2ContinueLink');
       if (link && link.dataset.ok === '0'){
         e.preventDefault();
@@ -3872,6 +4248,404 @@
       }
       return true;
     }
+
+    /* =====================================================================
+       AI ELIGIBILITY RISK CHECK — structured, deep-linked, auto-resolving
+       Each risk: { id, severity, track, message, norm, step, anchorId,
+                    check:()=>true-if-still-a-problem, suggestedFix|null }
+       check() reads the LIVE tenderDraft (cost via absolute costAbs/.value)
+       and real entered values; thresholds derive from real data, not constants.
+       Resolution is automatic: a risk is "resolved" when its check() passes.
+       No mandatory gates — the officer may publish with unresolved risks.
+       ===================================================================== */
+    // Estimated cost in absolute rupees — source of truth, with the same
+    // seeded-demo fallback used elsewhere (e.g. recalcBoq STEP1_EST) so the
+    // checks work whether the officer came via Step 1 or started in Step 2.
+    function riskEstCost(){ return costAbs('fEstCost') || 4500000; }
+    // Parse a rupee text input ("22,50,000") to an absolute number.
+    function riskParseRupees(v){ return parseFloat(String(v == null ? '' : v).replace(/[,₹\s]/g,'')) || 0; }
+    function riskFieldVal(id){ const el = document.getElementById(id); return el ? riskParseRupees(el.value) : 0; }
+    function riskFmt(n){ return '₹' + Math.round(n).toLocaleString('en-IN'); }
+    function riskPct(part, whole){ return whole > 0 ? (part / whole) * 100 : 0; }
+
+    // The risk catalogue. Messages, norms, track tags, icons and severity
+    // colours reuse the existing Risk-Check / compliance language.
+    const RISK_DEFS = [
+      {
+        id:'emd', severity:'medium', track:'Financial', step:'step1', anchorId:'anchor-emd',
+        norm:'CVC guideline — EMD 2%–3% of estimated cost',
+        message(){
+          const est = riskEstCost(), emd = costAbs('fEMD');
+          const p = riskPct(emd, est);
+          return `EMD is ${p.toFixed(1)}% of estimate — norm is 2–3% of estimated cost.`;
+        },
+        anchorMessage(){
+          const est = riskEstCost(), emd = costAbs('fEMD');
+          const p = riskPct(emd, est);
+          if (emd <= 0) return `EMD is not set — norm is 2–3% of the estimated cost (${riskFmt(est)}).`;
+          return `EMD is ${p.toFixed(1)}% of estimate (${riskFmt(emd)} of ${riskFmt(est)}) — norm is 2–3%.`;
+        },
+        check(){ const est = riskEstCost(); const emd = costAbs('fEMD'); const p = riskPct(emd, est); return !(p >= 2 && p <= 3); },
+        suggestedFix:{
+          label:'Set EMD to 2% of estimate',
+          apply(){ const est = riskEstCost(); const target = Math.round(est * 0.02);
+            if (typeof setCostFieldAbsolute === 'function') setCostFieldAbsolute('fEMD', target);
+            else { window.tenderDraft.emd = { amount:target/100000, denomination:'lakhs', value:target }; }
+            if (typeof onEmdChange === 'function') try { onEmdChange(); } catch(e){}
+          }
+        }
+      },
+      {
+        id:'turnover', severity:'high', track:'Eligibility', step:'step2', anchorId:'anchor-turnover',
+        norm:'CVC 9.17.6.9 — turnover ≤ 30% of estimated cost (restrictive above)',
+        message(){ const est = riskEstCost(); const t = riskFieldVal('pqTurnover'); return `Turnover requirement is ${riskPct(t,est).toFixed(0)}% of estimate — above ~30% restricts competition.`; },
+        anchorMessage(){ const est = riskEstCost(); const t = riskFieldVal('pqTurnover'); return `Turnover requirement is ${riskFmt(t)} — ${riskPct(t,est).toFixed(0)}% of the estimate (${riskFmt(est)}). CVC caps this at ~30%.`; },
+        check(){ const est = riskEstCost(); const t = riskFieldVal('pqTurnover'); return riskPct(t, est) > 30 + 0.5; },
+        suggestedFix:{
+          label:'Set turnover to 30% of estimate',
+          apply(){ const est = riskEstCost(); const target = Math.round(est * 0.30);
+            const el = document.getElementById('pqTurnover'); if (el){ el.value = target.toLocaleString('en-IN'); if (typeof checkTurnover === 'function') try { checkTurnover(el.value); } catch(e){} }
+          }
+        }
+      },
+      {
+        id:'similar', severity:'high', track:'Eligibility', step:'step2', anchorId:'anchor-similar',
+        norm:'CVC 9.17.6.9 — similar-work value within 40%–80% of estimate',
+        message(){ const est = riskEstCost(); const s = riskFieldVal('pqSimilarVal'); return `Similar-work value is ${riskPct(s,est).toFixed(0)}% of estimate — outside the 40–80% band.`; },
+        anchorMessage(){ const est = riskEstCost(); const s = riskFieldVal('pqSimilarVal'); return `Similar-work value is ${riskFmt(s)} — ${riskPct(s,est).toFixed(0)}% of the estimate (${riskFmt(est)}). Norm band is 40–80%.`; },
+        check(){ const est = riskEstCost(); const s = riskFieldVal('pqSimilarVal'); const p = riskPct(s, est); return !(p >= 40 - 0.5 && p <= 80 + 0.5); },
+        suggestedFix:{
+          label:'Set similar-work to 60% of estimate',
+          apply(){ const est = riskEstCost(); const target = Math.round(est * 0.60);
+            const el = document.getElementById('pqSimilarVal'); if (el){ el.value = target.toLocaleString('en-IN'); }
+          }
+        }
+      },
+      {
+        id:'registrations', severity:'medium', track:'Compliance', step:'step2', anchorId:'anchor-registrations',
+        norm:'EPF & ESIC registration — statutory for Works contracts',
+        message(){ return `EPF / ESIC registration not required — statutory for Works contracts.`; },
+        anchorMessage(){ return `EPF & ESIC registration is not checked. It is a statutory requirement for Works contracts and should be mandatory.`; },
+        check(){ const el = document.getElementById('regEpf'); return !(el && el.checked); },
+        suggestedFix:{
+          label:'Require EPF & ESIC registration',
+          apply(){ const el = document.getElementById('regEpf'); if (el && !el.checked){ el.checked = true; } }
+        }
+      },
+      {
+        id:'iso', severity:'medium', track:'Technical', step:'step2', anchorId:'anchor-iso',
+        norm:'CVC 9.17.6.9(iii) — ISO/standards must not be mandatory',
+        message(){ return `ISO 9001:2015 set as a mandatory requirement — contradicts CVC 9.17.6.9(iii).`; },
+        anchorMessage(){ return `ISO 9001:2015 is marked mandatory. Per CVC 9.17.6.9(iii), ISO/standards may not be used as a mandatory qualification — make it preferential or remove it.`; },
+        check(){ const el = document.getElementById('tqIsoMandatory'); return !!(el && el.checked); },
+        suggestedFix:{
+          label:'Make ISO 9001 non-mandatory',
+          apply(){ const el = document.getElementById('tqIsoMandatory'); if (el && el.checked){ el.checked = false; } }
+        }
+      },
+      {
+        id:'networth', severity:'medium', track:'Financial', step:'step2', anchorId:'anchor-networth',
+        norm:'Standard CVC safeguard — positive net worth',
+        message(){ return `Positive net-worth safeguard is switched off — standard CVC requirement.`; },
+        anchorMessage(){ return `The positive net-worth safeguard is OFF. CVC recommends requiring a positive net worth as per the latest audited balance sheet.`; },
+        check(){ const el = document.getElementById('pqNetWorth'); return !(el && el.checked); },
+        suggestedFix:{
+          label:'Enable net-worth safeguard',
+          apply(){ const el = document.getElementById('pqNetWorth'); if (el && !el.checked){ el.checked = true; } }
+        }
+      },
+      // ---- Informational notes (never count toward resolution) ----
+      {
+        id:'info-equip', severity:'info', track:'Technical', step:'step2', anchorId:null,
+        norm:'Equipment specified in brand-neutral terms',
+        message(){ return `Equipment list: 'Concrete Mixer' is a brand-neutral term — acceptable.`; },
+        check(){ return false; }, suggestedFix:null
+      },
+      {
+        id:'info-method', severity:'info', track:'Procurement', step:'step1', anchorId:null,
+        norm:'GFR Rule 160 — open tender method',
+        message(){ return `Open Tender with L1 is standard for civil works in Maharashtra — compliant.`; },
+        check(){ return false; }, suggestedFix:null
+      }
+    ];
+
+    // Severity → icon (existing Lucide set) + label/order.
+    const RISK_SEV = {
+      high:   { icon:'alert-triangle', rank:0, label:'high' },
+      medium: { icon:'alert-triangle', rank:1, label:'medium' },
+      info:   { icon:'info',           rank:2, label:'info' }
+    };
+    function riskIsResolvable(r){ return r.severity === 'high' || r.severity === 'medium'; }
+
+    // Track of which risk ids currently have an anchored field warning shown.
+    const riskActiveAnchors = new Set();
+
+    // ---- Render the end-of-flow Risk Check panel ----
+    function renderRiskCheck(){
+      const rowsHost = document.getElementById('riskRows');
+      if (!rowsHost) return; // panel not in DOM (e.g. other view) — nothing to do
+      const infoHost = document.getElementById('riskInfoRows');
+      const infoWrap = document.getElementById('riskInfoWrap');
+
+      // Evaluate current state.
+      const evaluated = RISK_DEFS.map(r => ({ def:r, problem: !!r.check() }));
+      const resolvable = evaluated.filter(e => riskIsResolvable(e.def));
+      const total = resolvable.length;
+      const resolved = resolvable.filter(e => !e.problem).length;
+      const highCount = evaluated.filter(e => e.def.severity === 'high' && e.problem).length;
+      const medCount  = evaluated.filter(e => e.def.severity === 'medium' && e.problem).length;
+
+      // Severity counts header (reuse warning palette).
+      const counts = document.getElementById('riskSeverityCounts');
+      if (counts) counts.textContent = `${highCount} high · ${medCount} medium`;
+
+      // Resolution progress.
+      const pct = total ? Math.round((resolved/total)*100) : 100;
+      const bar = document.getElementById('riskProgressBar'); if (bar) bar.style.width = pct + '%';
+      const lbl = document.getElementById('riskResolvedLabel'); if (lbl) lbl.textContent = `${resolved} of ${total} risks resolved`;
+
+      // Success ribbon when every resolvable risk passes.
+      const ribbon = document.getElementById('riskSuccessRibbon');
+      if (ribbon) ribbon.classList.toggle('hidden', !(total > 0 && resolved === total));
+
+      // TRACKS row — distinct tracks present.
+      const tracksRow = document.getElementById('riskTracksRow');
+      if (tracksRow){
+        const tracks = Array.from(new Set(RISK_DEFS.map(r => r.track)));
+        tracksRow.innerHTML = `<span class="text-[10.5px] font-bold uppercase tracking-wide text-[#92400E]/70 mr-1">Tracks</span>` +
+          tracks.map(t => `<span class="risk-track-tag">${t}</span>`).join('');
+      }
+
+      // Sort: unresolved first, then severity high→medium→info; resolved sink below.
+      const ordered = evaluated.slice().sort((a,b) => {
+        if (a.problem !== b.problem) return a.problem ? -1 : 1;          // unresolved first
+        const ra = RISK_SEV[a.def.severity].rank, rb = RISK_SEV[b.def.severity].rank;
+        return ra - rb;
+      });
+
+      const mainRows = ordered.filter(e => e.def.severity !== 'info');
+      const infoRows = ordered.filter(e => e.def.severity === 'info');
+
+      rowsHost.innerHTML = mainRows.map(e => riskRowHTML(e)).join('');
+
+      // Informational notes under an expander.
+      if (infoHost && infoWrap){
+        if (infoRows.length){
+          infoWrap.classList.remove('hidden');
+          infoHost.innerHTML = infoRows.map(e => riskRowHTML(e)).join('');
+          const il = document.getElementById('riskInfoToggleLabel');
+          if (il) il.textContent = `${infoRows.length} informational note${infoRows.length === 1 ? '' : 's'}`;
+        } else {
+          infoWrap.classList.add('hidden');
+          infoHost.innerHTML = '';
+        }
+      }
+
+      // Refresh any open anchored warnings so their text/severity stays in sync,
+      // and auto-clear ones whose risk now passes.
+      riskRefreshAnchors();
+      refreshIcons();
+    }
+
+    function riskRowHTML(e){
+      const r = e.def, sev = r.severity, resolved = !e.problem && riskIsResolvable(r);
+      const msg = typeof r.message === 'function' ? r.message() : r.message;
+      if (resolved){
+        return `<div class="risk-row sev-${sev} resolved" data-risk-id="${r.id}">
+          <i data-lucide="circle-check" class="w-4 h-4 text-success shrink-0 mt-0.5"></i>
+          <div class="flex-1 min-w-0"><div class="risk-msg">${msg}</div><div class="risk-norm">${r.norm}</div></div>
+          <div class="risk-actions"><span class="risk-resolved-tag"><i data-lucide="check" class="w-3 h-3"></i> Resolved</span></div>
+        </div>`;
+      }
+      const sevColor = sev === 'high' ? 'text-danger' : sev === 'medium' ? 'text-warning' : 'text-primary';
+      let actions = '';
+      if (riskIsResolvable(r)){
+        actions += `<button type="button" class="risk-fix-btn" aria-label="Go to and fix: ${msg.replace(/"/g,'&quot;')}" onclick="riskDeepLink('${r.id}')">Fix <i data-lucide="arrow-right" class="w-3 h-3"></i></button>`;
+        if (r.suggestedFix) actions += `<button type="button" class="risk-apply-btn" onclick="riskApplySuggestion('${r.id}')">Apply suggestion</button>`;
+      }
+      return `<div class="risk-row sev-${sev}" data-risk-id="${r.id}">
+        <i data-lucide="${RISK_SEV[sev].icon}" class="w-4 h-4 ${sevColor} shrink-0 mt-0.5"></i>
+        <div class="flex-1 min-w-0"><div class="risk-msg">${msg}</div><div class="risk-norm">${r.norm}</div></div>
+        <div class="risk-actions">${actions}</div>
+      </div>`;
+    }
+
+    function toggleRiskInfo(){
+      const rows = document.getElementById('riskInfoRows');
+      const btn = document.getElementById('riskInfoToggle');
+      const chev = document.getElementById('riskInfoChevron');
+      if (!rows || !btn) return;
+      const open = rows.classList.toggle('hidden') === false;
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (chev) chev.style.transform = open ? 'rotate(180deg)' : '';
+    }
+
+    function riskById(id){ return RISK_DEFS.find(r => r.id === id); }
+
+    // ---- Apply a suggested fix in place (no navigation), then re-run ----
+    function riskApplySuggestion(id){
+      const r = riskById(id);
+      if (!r || !r.suggestedFix) return;
+      try { r.suggestedFix.apply(); } catch(e){}
+      renderRiskCheck();
+      // If this field carries an anchored warning, refresh/clear it too.
+      riskRefreshAnchors();
+      if (!r.check()) showToast('Suggestion applied — risk resolved');
+      else showToast('Suggestion applied');
+    }
+
+    // ---- Deep-link: navigate to the risk's step, scroll + focus the field,
+    //      pulse it, and attach a persistent anchored warning. ----
+    function riskDeepLink(id){
+      const r = riskById(id);
+      if (!r || !r.anchorId) return;
+      const go = () => {
+        const host = document.getElementById(r.anchorId);
+        if (!host) return;
+        riskShowAnchor(id);
+        const focusEl = host.matches('input,select,textarea') ? host : host.querySelector('input,select,textarea');
+        try { host.scrollIntoView({ behavior:'smooth', block:'center' }); } catch(e){ host.scrollIntoView(); }
+        // pulse the field (or host) once
+        const pulseTarget = focusEl || host;
+        const pulseCls = r.severity === 'high' ? 'risk-field-pulse' : 'risk-field-pulse-amber';
+        pulseTarget.classList.remove(pulseCls); void pulseTarget.offsetWidth; pulseTarget.classList.add(pulseCls);
+        setTimeout(() => pulseTarget.classList.remove(pulseCls), 700);
+        if (focusEl) setTimeout(() => { try { focusEl.focus({ preventScroll:true }); } catch(e){ focusEl.focus(); } }, 320);
+      };
+      const targetHash = '#' + r.step;
+      if (location.hash !== targetHash){
+        location.hash = targetHash;          // triggers routeFromHash → setView
+        setTimeout(go, 120);                  // let the view switch settle
+      } else {
+        go();
+      }
+    }
+
+    // ---- Anchored field warning (in normal flow, scrolls with the page) ----
+    function riskShowAnchor(id){
+      const r = riskById(id);
+      if (!r || !r.anchorId) return;
+      const host = document.getElementById(r.anchorId);
+      if (!host) return;
+      riskActiveAnchors.add(id);
+      let box = host.querySelector(':scope > .risk-anchored[data-anchor-for="'+id+'"]')
+             || document.querySelector('.risk-anchored[data-anchor-for="'+id+'"]');
+      const sev = r.severity;
+      const msg = typeof r.anchorMessage === 'function' ? r.anchorMessage() : (typeof r.message === 'function' ? r.message() : r.message);
+      const applyBtn = r.suggestedFix ? `<button type="button" class="risk-anchored-apply" onclick="riskApplyFromAnchor('${id}')">${r.suggestedFix.label}</button>` : '';
+      const html = `
+        <i data-lucide="alert-circle" class="w-4 h-4 risk-anchored-ic"></i>
+        <div class="risk-anchored-body">
+          <div class="risk-anchored-msg">${msg}</div>
+          <div class="risk-anchored-norm">${r.norm}</div>
+          <div class="risk-anchored-acts">${applyBtn}<button type="button" class="risk-anchored-back" onclick="riskBackToCheck()">← Back to risk check</button></div>
+        </div>`;
+      if (!box){
+        box = document.createElement('div');
+        box.setAttribute('data-anchor-for', id);
+        box.setAttribute('role', 'alert');
+        box.setAttribute('aria-live', 'polite');
+        host.appendChild(box);
+      }
+      box.className = 'risk-anchored sev-' + sev;
+      box.innerHTML = html;
+      refreshIcons();
+    }
+
+    function riskApplyFromAnchor(id){
+      const r = riskById(id);
+      if (!r || !r.suggestedFix) return;
+      try { r.suggestedFix.apply(); } catch(e){}
+      riskOnFieldEdit(id);           // re-evaluate + clear anchor if now compliant
+    }
+
+    // Re-sync every open anchored warning to current state; auto-dismiss the
+    // ones whose risk now passes (with a green flash + "Fixed ✓").
+    function riskRefreshAnchors(){
+      Array.from(riskActiveAnchors).forEach(id => {
+        const r = riskById(id);
+        if (!r) { riskActiveAnchors.delete(id); return; }
+        if (!r.check()) riskClearAnchor(id, true);   // resolved → dismiss
+        else riskShowAnchor(id);                     // still a problem → refresh text
+      });
+    }
+
+    function riskClearAnchor(id, animate){
+      const r = riskById(id);
+      const host = r && r.anchorId ? document.getElementById(r.anchorId) : null;
+      const box = host ? host.querySelector('.risk-anchored[data-anchor-for="'+id+'"]') : document.querySelector('.risk-anchored[data-anchor-for="'+id+'"]');
+      riskActiveAnchors.delete(id);
+      if (!box) return;
+      if (animate){
+        // Replace with a brief "Fixed ✓" confirmation, then remove after 2s.
+        box.className = 'risk-anchored-fixed risk-fixed-flash';
+        box.removeAttribute('role');
+        box.innerHTML = `<i data-lucide="circle-check" class="w-4 h-4 text-success"></i> Fixed ✓`;
+        refreshIcons();
+        // flash the field green too
+        const fld = host ? (host.matches('input,select,textarea') ? host : host.querySelector('input,select,textarea')) : null;
+        if (fld){ fld.classList.add('risk-fixed-flash'); setTimeout(() => fld.classList.remove('risk-fixed-flash'), 800); }
+        setTimeout(() => { if (box && box.parentNode) box.parentNode.removeChild(box); }, 2000);
+      } else {
+        if (box.parentNode) box.parentNode.removeChild(box);
+      }
+    }
+
+    // Returns the officer to the end-of-flow Risk Check list (Step 2 panel).
+    function riskBackToCheck(){
+      const targetHash = '#step2';
+      const scrollToPanel = () => {
+        const sec = document.getElementById('riskCheckSection');
+        if (sec) { try { sec.scrollIntoView({ behavior:'smooth', block:'center' }); } catch(e){ sec.scrollIntoView(); } }
+        renderRiskCheck();
+      };
+      if (location.hash !== targetHash){ location.hash = targetHash; setTimeout(scrollToPanel, 140); }
+      else scrollToPanel();
+    }
+
+    // Called from a risk-referenced field's oninput/onchange. Re-evaluates,
+    // re-renders the panel, and clears/refreshes that field's anchored warning.
+    function riskOnFieldEdit(id){
+      const r = riskById(id);
+      if (r){
+        if (riskActiveAnchors.has(id)){
+          if (!r.check()) riskClearAnchor(id, true);
+          else riskShowAnchor(id);
+        }
+      }
+      renderRiskCheck();
+    }
+
+    // Design-preview replay: reset every risk-referenced field back to a non-compliant
+    // demo value so all risks re-appear unresolved, clear any open anchored warnings, and
+    // re-render the panel — lets the team re-watch the Fix → / Apply-suggestion flow again.
+    function riskRestartFlow(){
+      const est = (typeof riskEstCost === 'function' ? riskEstCost() : 0) || 4500000;
+      // EMD ~1.1% of estimate (below the 2–3% norm)
+      try {
+        const emdTarget = Math.round(est * 0.011);
+        if (typeof setCostFieldAbsolute === 'function') setCostFieldAbsolute('fEMD', emdTarget);
+        else if (window.tenderDraft) window.tenderDraft.emd = { amount:emdTarget/100000, denomination:'lakhs', value:emdTarget };
+        if (typeof onEmdChange === 'function') onEmdChange();
+      } catch(e){}
+      // Turnover ~50% of estimate (above the ~30% cap)
+      try { const el = document.getElementById('pqTurnover'); if (el){ el.value = Math.round(est * 0.50).toLocaleString('en-IN'); if (typeof checkTurnover === 'function') checkTurnover(el.value); } } catch(e){}
+      // Similar-work ~100% of estimate (above the 40–80% band)
+      try { const el = document.getElementById('pqSimilarVal'); if (el){ el.value = Math.round(est * 1.0).toLocaleString('en-IN'); } } catch(e){}
+      // Statutory EPF/ESIC registration unchecked
+      try { const el = document.getElementById('regEpf'); if (el) el.checked = false; } catch(e){}
+      // ISO marked mandatory (contradicts CVC)
+      try { const el = document.getElementById('tqIsoMandatory'); if (el) el.checked = true; } catch(e){}
+      // Net-worth safeguard off
+      try { const el = document.getElementById('pqNetWorth'); if (el) el.checked = false; } catch(e){}
+      // Clear any open anchored field warnings (remove outright — we are re-introducing problems, not fixing).
+      try { Array.from(riskActiveAnchors).forEach(id => riskClearAnchor(id, false)); } catch(e){}
+      renderRiskCheck();
+      const sec = document.getElementById('riskCheckSection');
+      if (sec){ try { sec.scrollIntoView({ behavior:'smooth', block:'center' }); } catch(e){ sec.scrollIntoView(); } }
+      if (typeof showToast === 'function') showToast('Risk check reset — all risks restored for replay');
+    }
+    window.riskRestartFlow = riskRestartFlow;
 
     // ================= STEP 2 — KEY TECHNICAL PERSONNEL =================
     const PERSONNEL_GROUPS = {
@@ -4151,13 +4925,14 @@
       document.getElementById('boqSubtotal').textContent = subtotal.toLocaleString('en-IN');
       document.getElementById('boqContingencyAmt').textContent = conAmt.toLocaleString('en-IN');
       document.getElementById('boqTotal').textContent = '₹' + total.toLocaleString('en-IN');
-      // Mismatch with Step 1 estimated cost (4500000)
-      const STEP1_EST = 4500000;
+      // Mismatch with Step 1 estimated cost — read the absolute rupee `.value`
+      // (source of truth); fall back to the seeded demo estimate when unset.
+      const STEP1_EST = costAbs('fEstCost') || 4500000;
       const diffPct = Math.abs(total - STEP1_EST) / STEP1_EST * 100;
       const m = document.getElementById('boqMismatch');
       if (diffPct > 10){
         m.classList.remove('hidden');
-        document.getElementById('boqMismatchText').innerHTML = `BOQ total (₹${total.toLocaleString('en-IN')}) differs from estimated cost in Step 1 (₹45,00,000) by more than 10%. Please reconcile.`;
+        document.getElementById('boqMismatchText').innerHTML = `BOQ total (₹${total.toLocaleString('en-IN')}) differs from estimated cost in Step 1 (₹${Math.round(STEP1_EST).toLocaleString('en-IN')}) by more than 10%. Please reconcile.`;
       } else m.classList.add('hidden');
     }
     function addBoqRow(){
@@ -4200,9 +4975,175 @@
     // ================= STEP 4 — Dates & Timeline =================
     function fmtDate(d){ return d.toISOString().slice(0,10); }
     function addDays(base, days){ const d = new Date(base); d.setDate(d.getDate()+days); return d; }
-    function recomputeDependentDates(){
+    // Display formatter: DD MMM YYYY (e.g. "08 May 2026") — matches existing draft style.
+    const TL_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    function fmtDateDMY(d){
+      if (!(d instanceof Date) || isNaN(d)) return '';
+      return String(d.getDate()).padStart(2,'0') + ' ' + TL_MONTHS[d.getMonth()] + ' ' + d.getFullYear();
+    }
+    function tlAnchorName(){ return 'publication'; }
+    // Plain-language relationship label from a row's stored intended offset (never signed math).
+    function tlRelationText(offset){
+      const n = parseInt(offset, 10) || 0;
+      if (n === 0) return 'same day as ' + tlAnchorName();
+      if (n > 0)   return n + ' day' + (n === 1 ? '' : 's') + ' after ' + tlAnchorName();
+      return Math.abs(n) + ' day' + (Math.abs(n) === 1 ? '' : 's') + ' before ' + tlAnchorName();
+    }
+    // Cache each dependent row's original (valid-state) dot colour class so we only override on violation.
+    let _tlDotBaseline = null;
+    function tlCaptureDotBaselines(){
+      if (_tlDotBaseline) return;
+      _tlDotBaseline = {};
+      document.querySelectorAll('#view-step4 .timeline-row').forEach(row => {
+        const dot = row.querySelector('span.rounded-full');
+        const cls = ['bg-primary','bg-warning','bg-danger','bg-success'].find(c => dot && dot.classList.contains(c));
+        _tlDotBaseline[row.dataset.id] = cls || 'bg-warning';
+      });
+    }
+    // Ensure each dependent row has an inline order-violation warning sibling (reuses bidDeadlineAlert style).
+    function tlEnsureRowWarnings(){
+      document.querySelectorAll('#view-step4 .timeline-row').forEach(row => {
+        const id = row.dataset.id;
+        if (id === 'pub') return;
+        if (row.dataset.warnReady) return;
+        const warn = document.createElement('div');
+        warn.className = 'tl-order-warn hidden bg-danger-light border border-danger/40 rounded-lg px-3.5 py-2.5 ml-6 -mt-1 flex items-start gap-2';
+        warn.dataset.for = id;
+        warn.setAttribute('role','alert');
+        warn.innerHTML = '<i data-lucide="alert-triangle" class="w-4 h-4 text-danger shrink-0 mt-0.5"></i>'
+          + '<div class="text-[12.5px] text-ink-900 flex-1"><span class="tl-warn-msg"></span> '
+          + '<button type="button" class="tl-row-reset ml-1 text-primary hover:underline"></button></div>';
+        // Insert immediately after the row (or after the existing bidDeadlineAlert for the bid row).
+        let after = row;
+        if (id === 'bid'){ const ba = document.getElementById('bidDeadlineAlert'); if (ba) after = ba; }
+        after.insertAdjacentElement('afterend', warn);
+        row.dataset.warnReady = '1';
+      });
+    }
+    // The chronological predecessor for order-checking = previous dependent row (in document order) that has a date.
+    function tlPredecessor(row){
+      let prev = row.previousElementSibling;
+      while (prev){
+        if (prev.classList && prev.classList.contains('timeline-row')){
+          const inp = prev.querySelector('.dt-input') || (prev.dataset.id === 'pub' ? document.getElementById('dtPub') : null);
+          if (inp && inp.value) return prev;
+        }
+        prev = prev.previousElementSibling;
+      }
+      return null;
+    }
+    function tlRowDateVal(row){
+      if (row.dataset.id === 'pub') return document.getElementById('dtPub').value;
+      const inp = row.querySelector('.dt-input');
+      return inp ? inp.value : null;
+    }
+    // Human-readable name of a timeline row (the bold title div), e.g. "Pre-Bid Meeting Date".
+    function tlRowName(row){
+      const title = row.querySelector('.flex-1 .font-semibold');
+      return title ? title.textContent.trim() : '';
+    }
+    // Render labels + status (dots, suffixes, inline warnings, per-row reset) for every dependent row.
+    // Returns the list of out-of-order row ids.
+    function tlRenderStatus(){
+      tlCaptureDotBaselines();
+      tlEnsureRowWarnings();
+      const pubVal = document.getElementById('dtPub').value;
+      const out = [];
+      document.querySelectorAll('#view-step4 .timeline-row').forEach(row => {
+        const id = row.dataset.id;
+        if (id === 'pub') return;
+        const offset = parseInt(row.dataset.offset, 10);
+        const label = row.querySelector('.offset-label');
+        const dot = row.querySelector('span.rounded-full');
+        const myVal = tlRowDateVal(row);
+        const pred = tlPredecessor(row);
+        const predVal = pred ? tlRowDateVal(pred) : null;
+        const predName = pred ? tlRowName(pred) : '';
+        const outOfOrder = !!(myVal && predVal && new Date(myVal) < new Date(predVal));
+        if (outOfOrder) out.push(id);
+        // Neutral plain-language rule text (never signed numbers).
+        const ruleText = tlRelationText(offset);
+        if (label){
+          label.innerHTML = ruleText + (outOfOrder ? ' <span class="order-suffix">· &#9888; currently out of order</span>' : '');
+          if (outOfOrder) label.setAttribute('aria-live','polite'); else label.removeAttribute('aria-live');
+        }
+        // Dot: red on violation, otherwise restore the row's original (existing-logic) colour.
+        if (dot){
+          ['bg-primary','bg-warning','bg-danger','bg-success'].forEach(c => dot.classList.remove(c));
+          dot.classList.add(outOfOrder ? 'bg-danger' : (_tlDotBaseline[id] || 'bg-warning'));
+        }
+        // Inline order-violation warning + per-row reset link.
+        const warn = document.querySelector(`.tl-order-warn[data-for="${id}"]`);
+        if (warn){
+          const msg = warn.querySelector('.tl-warn-msg');
+          const reset = warn.querySelector('.tl-row-reset');
+          if (outOfOrder){
+            if (msg && predName) msg.textContent = 'Must be on or after ' + predName + '.';
+            else if (msg) msg.textContent = 'This date is out of order.';
+            if (reset){
+              const rel = tlRelationText(offset);
+              reset.textContent = 'Reset to ' + rel;
+              reset.setAttribute('aria-label', 'Reset ' + (row.querySelector('.text-\\[13\\.5px\\]')?.textContent || 'this date').trim() + ' to ' + rel);
+              reset.onclick = () => tlResetRow(id);
+            }
+            warn.classList.remove('hidden');
+          } else {
+            warn.classList.add('hidden');
+          }
+        }
+      });
+      refreshIcons();
+      return out;
+    }
+    function tlOutOfOrderIds(){
+      const pubVal = document.getElementById('dtPub').value;
+      const out = [];
+      document.querySelectorAll('#view-step4 .timeline-row').forEach(row => {
+        if (row.dataset.id === 'pub') return;
+        const myVal = tlRowDateVal(row);
+        const pred = tlPredecessor(row);
+        const predVal = pred ? tlRowDateVal(pred) : null;
+        if (myVal && predVal && new Date(myVal) < new Date(predVal)) out.push(row.dataset.id);
+      });
+      return out;
+    }
+    // Reset a single row from the CURRENT anchor (newPub + intended offset), then re-validate.
+    function tlResetRow(id){
       const pubVal = document.getElementById('dtPub').value;
       if (!pubVal) return;
+      const row = document.querySelector(`#view-step4 .timeline-row[data-id="${id}"]`);
+      if (!row) return;
+      const inp = row.querySelector('.dt-input');
+      const offset = parseInt(row.dataset.offset, 10);
+      if (inp){
+        inp.value = fmtDate(addDays(new Date(pubVal), offset));
+        row.dataset.locked = 'locked';
+        inp.classList.remove('recalc-pulse'); void inp.offsetWidth; inp.classList.add('recalc-pulse');
+      }
+      checkBidDeadline();
+      checkShortTimeline();
+      tlRenderStatus();
+      tlRefreshRecalcPrompt();
+    }
+    // Anchor tracking for delta-based recalculation.
+    let _tlLastPub = null;
+    function tlRefreshRecalcPrompt(){
+      const prompt = document.getElementById('timelineRecalcPrompt');
+      const msg = document.getElementById('timelineRecalcMsg');
+      if (!prompt) return;
+      const bad = tlOutOfOrderIds();
+      if (bad.length && _tlAnchorMoved){
+        if (msg) msg.textContent = 'Publication date changed. ' + bad.length + ' dependent date' + (bad.length === 1 ? ' is' : 's are') + ' now out of order.';
+        prompt.classList.remove('hidden');
+      } else {
+        prompt.classList.add('hidden');
+        if (!bad.length) _tlAnchorMoved = false;
+      }
+    }
+    let _tlAnchorMoved = false;
+    function recomputeDependentDates(){
+      const pubVal = document.getElementById('dtPub').value;
+      if (!pubVal){ tlRenderStatus(); return; }
       const pub = new Date(pubVal);
       document.querySelectorAll('#view-step4 .timeline-row').forEach(row => {
         if (row.dataset.id === 'pub') return;
@@ -4217,8 +5158,43 @@
       });
       checkBidDeadline();
       checkShortTimeline();
+      tlRenderStatus();
+      _tlLastPub = pubVal;
     }
-    function updateTimeline(){ recomputeDependentDates(); }
+    // Called when the anchor (publication) date changes — shift locked rows, detect new out-of-order, prompt.
+    function updateTimeline(){
+      const pubVal = document.getElementById('dtPub').value;
+      _tlAnchorMoved = !!(_tlLastPub && pubVal && _tlLastPub !== pubVal);
+      recomputeDependentDates();
+      tlRefreshRecalcPrompt();
+    }
+    // Auto-recalculate: snap EVERY dependent row to (anchor + its intended offset).
+    // This preserves each row's intended offset relationship (does NOT flatten), with a 600ms pulse per field.
+    function autoRecalcTimeline(){
+      const pubVal = document.getElementById('dtPub').value;
+      if (!pubVal) return;
+      const pub = new Date(pubVal);
+      document.querySelectorAll('#view-step4 .timeline-row').forEach(row => {
+        if (row.dataset.id === 'pub') return;
+        const offset = parseInt(row.dataset.offset, 10);
+        const inp = row.querySelector('.dt-input');
+        if (inp){
+          inp.value = fmtDate(addDays(pub, offset));
+          row.dataset.locked = 'locked';
+          inp.classList.remove('recalc-pulse'); void inp.offsetWidth; inp.classList.add('recalc-pulse');
+        }
+      });
+      _tlAnchorMoved = false;
+      checkBidDeadline();
+      checkShortTimeline();
+      tlRenderStatus();
+      tlRefreshRecalcPrompt();
+    }
+    function dismissRecalcPrompt(){
+      _tlAnchorMoved = false;
+      const p = document.getElementById('timelineRecalcPrompt');
+      if (p) p.classList.add('hidden');
+    }
     function checkBidDeadline(){
       const pubVal = document.getElementById('dtPub').value;
       const bidInp = document.querySelector('#view-step4 .timeline-row[data-id="bid"] .dt-input');
@@ -4273,8 +5249,38 @@
       document.querySelectorAll('#view-step4 .dt-input').forEach(inp => {
         inp.addEventListener('input', () => {
           inp.closest('.timeline-row').dataset.locked = 'unlocked';
+          tlRenderStatus();      // re-validate order, flip dot/suffix/inline warning live
+          tlRefreshRecalcPrompt();
         });
       });
+    }
+
+    // Non-blocking confirm at "Continue to AI Generation" when dates are out of order.
+    function tlConfirmContinue(ev){
+      // DESIGN_REVIEW_MODE: proceed to Step 5 without the "dates out of order —
+      // continue anyway?" confirm. (The red out-of-order suffixes still render.)
+      if (DESIGN_REVIEW_MODE){ ev.preventDefault(); location.hash = '#step5'; return; }
+      const bad = tlOutOfOrderIds();
+      if (!bad.length) return; // valid → let the link navigate normally
+      ev.preventDefault();
+      const modal = document.getElementById('tlContinueModal');
+      const msg = document.getElementById('tlContinueMsg');
+      if (msg) msg.textContent = bad.length + ' timeline date' + (bad.length === 1 ? ' is' : 's are') + ' out of order. Continue anyway?';
+      if (modal) modal.classList.remove('hidden');
+    }
+    function tlContinueAnyway(){
+      const modal = document.getElementById('tlContinueModal');
+      if (modal) modal.classList.add('hidden');
+      location.hash = '#step5';
+    }
+    function tlReviewDates(){
+      const modal = document.getElementById('tlContinueModal');
+      if (modal) modal.classList.add('hidden');
+      const bad = tlOutOfOrderIds();
+      if (bad.length){
+        const row = document.querySelector(`#view-step4 .timeline-row[data-id="${bad[0]}"]`);
+        if (row) row.scrollIntoView({ behavior:'smooth', block:'center' });
+      }
     }
 
     // ================= STEP 5 =================
@@ -4297,6 +5303,390 @@
       });
       document.getElementById('gccPanel').classList.toggle('hidden', which !== 'gcc');
       document.getElementById('sccPanel').classList.toggle('hidden', which !== 'scc');
+    }
+
+    /* =====================================================================
+       STEP 5 — AI GENERATION EXPERIENCE (timed, ~60s; fast mode ~10s)
+       A single controller animates 20 sections (5 parts) one-by-one:
+       per-section mini bar, duration-weighted overall %, checklist ticks,
+       skeleton→real preview reveal. The end state is identical to today —
+       on finish we reveal the existing completed-document view + footer and
+       show a success ribbon whose CTAs reuse the existing outcome
+       (#step6 for CVC Review, openDraftPanel() for the Check Draft preview).
+       Full timer cleanup runs on replay AND on leaving Step 5.
+       ===================================================================== */
+
+    // --- realistic preview content pulled from the live tenderDraft / form ---
+    function agReadDraft(){
+      const v = (id) => { const el = document.getElementById(id); return el ? (el.value || '').trim() : ''; };
+      const tlDate = (id) => {
+        const raw = document.querySelector('.timeline-row[data-id="'+id+'"] .dt-input');
+        if (!raw || !raw.value) return '';
+        try { return new Date(raw.value).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }); } catch(e){ return ''; }
+      };
+      const pubEl = document.getElementById('dtPub');
+      let dpub = '';
+      if (pubEl && pubEl.value){ try { dpub = new Date(pubEl.value).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }); } catch(e){} }
+      const rupee = (id) => {
+        const abs = (typeof window.costAbs === 'function') ? window.costAbs(id) : 0;
+        if (!abs) return '';
+        return (typeof window.fmtINRWords === 'function') ? window.fmtINRWords(abs) : ('₹' + Number(abs).toLocaleString('en-IN'));
+      };
+      const scopeEl = document.getElementById('scopeEditor');
+      const scope = scopeEl ? (scopeEl.value || scopeEl.textContent || '').trim() : '';
+      return {
+        title:    v('projTitle'),
+        estCost:  rupee('fEstCost'),
+        emd:      rupee('fEMD'),
+        fee:      rupee('fTenderFee'),
+        emdValid: v('fEmdValid'),
+        period:   v('fPeriod'),
+        scope:    scope,
+        dpub: dpub, dprebid: tlDate('prebid'), dbid: tlDate('bid'), dopen: tlDate('open'), deval: tlDate('eval'),
+        boqTotal: (document.getElementById('boqTotal')?.textContent || '').trim()
+      };
+    }
+    function agEsc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    // generic placeholder used only where a field is empty
+    function agPH(t){ return '<span style="color:#9CA3AF;">'+agEsc(t)+'</span>'; }
+
+    // --- the 20 sections (5 parts). durationMs sums to ~60000ms (organic, not uniform) ---
+    function agSections(){
+      const d = agReadDraft();
+      const title   = d.title   ? agEsc(d.title)   : agPH('[work title — from Step 1]');
+      const estCost = d.estCost ? agEsc(d.estCost) : agPH('[estimated cost — from Step 3]');
+      const emd     = d.emd     ? agEsc(d.emd)     : agPH('[EMD — from Step 1]');
+      const fee     = d.fee     ? agEsc(d.fee)     : agPH('[tender fee]');
+      const emdValid= d.emdValid? agEsc(d.emdValid)+' days' : agPH('[validity]');
+      const period  = d.period  ? agEsc(d.period)  : agPH('[completion period — from Step 3]');
+      const scope   = d.scope   ? agEsc(d.scope)   : agPH('[scope of work not yet defined — complete Step 3 to populate this section]');
+      const boqTotal= d.boqTotal? agEsc(d.boqTotal): agPH('[BOQ total]');
+      const dpub    = d.dpub    ? agEsc(d.dpub)    : agPH('[publication date — Step 4]');
+      const dprebid = d.dprebid ? agEsc(d.dprebid) : agPH('[pre-bid date — Step 4]');
+      const dbid    = d.dbid    ? agEsc(d.dbid)    : agPH('[bid submission deadline — Step 4]');
+      const dopen   = d.dopen   ? agEsc(d.dopen)   : agPH('[bid opening — Step 4]');
+      const deval   = d.deval   ? agEsc(d.deval)   : agPH('[evaluation target — Step 4]');
+      const P = (label) => ({ skel:[14,10,11] }); // default skeleton shape factory placeholder
+      return [
+        // Part 1 — NIT
+        { part:'Part 1 — Notice Inviting Tender', name:'Tender reference & title', dur:1600,
+          html:'<p><strong>Tender No.:</strong> TND-2026-010/AMC/2026-27</p><p><strong>Name of Work:</strong> '+title+'</p><p>Sealed online tenders are invited on behalf of the Ahmedabad Municipal Corporation for the work described herein.</p>' },
+        { part:'Part 1 — Notice Inviting Tender', name:'Issuing authority & contact', dur:1500,
+          html:'<p><strong>Issuing Authority:</strong> Ahmedabad Municipal Corporation, Public Works Department.</p><p><strong>Mode of Tender:</strong> e-Tender (Online) via the Government eProcurement Portal. Queries to the Office of the Executive Engineer during working hours.</p>' },
+        { part:'Part 1 — Notice Inviting Tender', name:'Scope of work & deliverables', dur:5200,
+          html:'<p>'+scope+'</p><p>All works shall conform to MoRTH/PWD specifications and relevant IS codes. Completion period: '+period+'.</p>' },
+        { part:'Part 1 — Notice Inviting Tender', name:'Estimated value & budget head', dur:2600,
+          html:'<table><tbody><tr><td>Estimated Cost</td><td class="r">'+estCost+'</td></tr><tr><td>Budget Head</td><td class="r">Capital Works — PWD 2026-27</td></tr><tr><td>BOQ Total</td><td class="r">'+boqTotal+'</td></tr></tbody></table>' },
+        { part:'Part 1 — Notice Inviting Tender', name:'Tender fee & EMD details', dur:2700,
+          html:'<table><tbody><tr><td>Tender Fee (non-refundable)</td><td class="r">'+fee+'</td></tr><tr><td>Earnest Money Deposit (EMD)</td><td class="r">'+emd+'</td></tr><tr><td>EMD Validity</td><td class="r">'+emdValid+' beyond bid validity</td></tr></tbody></table>' },
+        { part:'Part 1 — Notice Inviting Tender', name:'Critical dates & timeline', dur:3000,
+          html:'<table><thead><tr><th>Event</th><th>Date</th></tr></thead><tbody><tr><td>Publication</td><td>'+dpub+'</td></tr><tr><td>Pre-bid meeting</td><td>'+dprebid+'</td></tr><tr><td>Bid submission deadline</td><td>'+dbid+'</td></tr><tr><td>Bid opening</td><td>'+dopen+'</td></tr><tr><td>Evaluation target</td><td>'+deval+'</td></tr></tbody></table>' },
+        // Part 2 — ITB
+        { part:'Part 2 — Instructions to Bidders', name:'Eligibility criteria (PQ)', dur:3600,
+          html:'<ul><li>Average annual turnover meeting the threshold over the last 3 financial years (CA-certified).</li><li>At least one similar completed work of the prescribed value in the last 5 years.</li><li>Minimum years in business with positive net worth.</li></ul>' },
+        { part:'Part 2 — Instructions to Bidders', name:'Technical qualification criteria (TQ)', dur:3000,
+          html:'<ul><li>Valid registration with Maharashtra PWD / CPWD or equivalent.</li><li>Valid GST registration certificate.</li><li>Adequate plant, machinery and technical personnel.</li></ul>' },
+        { part:'Part 2 — Instructions to Bidders', name:'Bid submission instructions', dur:2600,
+          html:'<p>Bids shall be submitted online in two envelopes — Technical and Financial — duly digitally signed. Physical EMD/instruments, where applicable, must reach the office before the deadline.</p>' },
+        { part:'Part 2 — Instructions to Bidders', name:'Bid opening & evaluation method', dur:2400,
+          html:'<p>Technical bids will be opened first; financial bids of technically qualified bidders thereafter. Evaluation method: L1 (Lowest Cost). The Employer reserves the right to reject any or all bids.</p>' },
+        // Part 3 — Schedule / Technical
+        { part:'Part 3 — Schedule / Technical', name:'Bill of Quantities (BOQ)', dur:5400,
+          html:'<table><thead><tr><th>Item</th><th class="r">Qty</th><th class="r">Rate</th><th class="r">Amount</th></tr></thead><tbody><tr><td>Excavation in hard soil (Cum)</td><td class="r">250</td><td class="r">185</td><td class="r">46,250</td></tr><tr><td>Bitumen VG-30 (MT)</td><td class="r">45</td><td class="r">52,000</td><td class="r">23,40,000</td></tr><tr><td>Concrete M20 (Cum)</td><td class="r">30</td><td class="r">6,500</td><td class="r">1,95,000</td></tr><tr><td><strong>Total Estimated Value</strong></td><td class="r"></td><td class="r"></td><td class="r"><strong>'+boqTotal+'</strong></td></tr></tbody></table>' },
+        { part:'Part 3 — Schedule / Technical', name:'Technical specifications', dur:5000,
+          html:'<p>All materials and workmanship shall conform to the latest MoRTH/PWD specifications and applicable IS codes. Bituminous mixes shall use VG-30 grade as per IRC:111. Mandatory quality tests and acceptance criteria shall apply at each stage.</p>' },
+        { part:'Part 3 — Schedule / Technical', name:'Drawings & annexures', dur:2200,
+          html:'<p>Reference drawings, soil/feasibility reports and site plans form part of this tender and are available with the Schedule. Annexures A–D are appended.</p>' },
+        // Part 4 — Conditions of Contract
+        { part:'Part 4 — Conditions of Contract', name:'General Conditions of Contract (GCC)', dur:5200,
+          html:'<p><strong>1. Definitions.</strong> "Employer" means the Ahmedabad Municipal Corporation; "Contractor" means the successful bidder.</p><p><strong>2. Scope.</strong> The Contractor shall execute the Works per the BOQ, drawings and specifications.</p><p><strong>3. Time.</strong> Time is the essence of the contract.</p>' },
+        { part:'Part 4 — Conditions of Contract', name:'Special Conditions of Contract (SCC)', dur:3200,
+          html:'<p><strong>SC-1.</strong> Bituminous mixes shall use VG-30 grade (IRC:111).</p><p><strong>SC-2.</strong> Site working hours 7 AM – 7 PM; no night work without written approval.</p><p><strong>SC-3.</strong> Approved traffic diversion plan required before commencement.</p>' },
+        { part:'Part 4 — Conditions of Contract', name:'Performance security & warranty', dur:2600,
+          html:'<p>Performance Security of 5% of contract value shall be furnished as Bank Guarantee/DD valid up to 60 days beyond the Defects Liability Period. DLP: 12 months from the completion certificate.</p>' },
+        { part:'Part 4 — Conditions of Contract', name:'Payment terms & milestones', dur:2600,
+          html:'<p>Running Account bills shall be paid against measured and certified work. Statutory deductions and retention shall apply per PWD norms. Final bill on issuance of the completion certificate.</p>' },
+        // Part 5 — Forms & Declarations
+        { part:'Part 5 — Forms & Declarations', name:'Bid submission forms', dur:1900,
+          html:'<p>Form A — Bid Letter; Form B — Price Schedule; Form C — Bid Security Declaration. Bidders shall complete and digitally sign all forms.</p>' },
+        { part:'Part 5 — Forms & Declarations', name:'Eligibility declarations', dur:1700,
+          html:'<p>Self-declarations of eligibility, non-blacklisting and conformity with PQ/TQ criteria, supported by the prescribed documentary evidence.</p>' },
+        { part:'Part 5 — Forms & Declarations', name:'Integrity pact & undertakings', dur:1500,
+          html:'<p>Integrity Pact and anti-collusion undertaking to be executed by the bidder and the Employer, binding for the duration of the contract.</p>' }
+      ];
+    }
+
+    // --- controller state ---
+    let agState = null; // { sections, idx, raf, timer, startTs, secStartTs, baseOffset, fast, done }
+    const AG_RING_CIRC = 351.86; // 2*pi*56
+
+    function agFastFromUrl(){
+      try { return new URLSearchParams((location.hash.split('?')[1] || '')).get('fast') === '1'
+                 || new URLSearchParams(location.search).get('fast') === '1'; } catch(e){ return false; }
+    }
+
+    // Hard stop: clear every timer/rAF so nothing fires after the step unmounts or on replay.
+    function agStop(){
+      if (!agState) return;
+      if (agState.raf) cancelAnimationFrame(agState.raf);
+      if (agState.timer) clearTimeout(agState.timer);
+      if (agState.tick) clearInterval(agState.tick);
+      agState.raf = agState.timer = agState.tick = null;
+    }
+
+    function agBuildChecklist(sections){
+      const list = document.getElementById('agChecklist');
+      if (!list) return;
+      let html = '';
+      let lastPart = null;
+      sections.forEach((s, i) => {
+        if (s.part !== lastPart){
+          html += '<div class="ag-part-hd" data-part="'+agEsc(s.part)+'"><span class="ag-part-label">'+agEsc(s.part)+'</span>'
+               +  '<span class="ag-part-done"><i data-lucide="check" class="w-3 h-3"></i> Part complete</span></div>';
+          lastPart = s.part;
+        }
+        html += '<div class="ag-row" data-i="'+i+'" role="listitem" aria-label="'+agEsc(s.name)+' — pending">'
+             +    '<span class="ag-ic"><span class="ag-dot"></span></span>'
+             +    '<span class="ag-name">'+agEsc(s.name)+'</span>'
+             +    '<span class="ag-minibar"><span></span></span>'
+             +    '<span class="ag-mini">0%</span>'
+             +  '</div>';
+      });
+      list.innerHTML = html;
+    }
+
+    function agBuildCanvas(sections){
+      const c = document.getElementById('agCanvas');
+      if (!c) return;
+      let html = '';
+      sections.forEach((s, i) => {
+        html += '<div class="ag-doc-card" data-card="'+i+'" data-name="'+agEsc(s.name)+'">'
+             +    '<div class="ag-sk ag-sk-h shim"></div>'
+             +    '<div class="ag-skwrap">'
+             +      '<div class="ag-sk ag-sk-line shim" style="width:96%"></div>'
+             +      '<div class="ag-sk ag-sk-line shim" style="width:88%"></div>'
+             +      '<div class="ag-sk ag-sk-line shim" style="width:72%"></div>'
+             +    '</div>'
+             +  '</div>';
+      });
+      c.innerHTML = html;
+    }
+
+    function agSetOverall(pct){
+      pct = Math.max(0, Math.min(100, pct));
+      const r = Math.round(pct);
+      const num = document.getElementById('agOverallNum');
+      if (num) num.textContent = r + '%';
+      const ring = document.getElementById('agRing');
+      if (ring) ring.style.strokeDashoffset = (AG_RING_CIRC * (1 - pct/100)).toFixed(2);
+    }
+
+    function agSetElapsed(ms){
+      const el = document.getElementById('agElapsed');
+      if (!el) return;
+      const total = Math.floor(ms/1000);
+      const m = Math.floor(total/60), sec = total % 60;
+      el.textContent = m + ':' + (sec < 10 ? '0' : '') + sec;
+    }
+
+    // Reset the gen view to the pre-run state (used by start + replay).
+    function agResetView(sections){
+      agBuildChecklist(sections);
+      agBuildCanvas(sections);
+      agSetOverall(0);
+      agSetElapsed(0);
+      const cnt = document.getElementById('agSecCount'); if (cnt) cnt.textContent = '0 / ' + sections.length;
+      const act = document.getElementById('agActivity'); if (act) act.textContent = 'Initialising…';
+      const succ = document.getElementById('agSuccess'); if (succ) succ.classList.add('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // Begin (or restart) the timed generation sequence.
+    function agStart(){
+      const view = document.getElementById('step5GenView');
+      if (!view) return;
+      agStop();
+      // ensure the gen view is shown and the completed view/footer are hidden during the run
+      const real = document.getElementById('step5RealContent'); if (real) real.classList.add('hidden');
+      const footer = document.getElementById('step5Footer'); if (footer) footer.classList.add('hidden');
+      view.classList.remove('hidden');
+
+      const sections = agSections();
+      const fast = agFastFromUrl() || (agState && agState.fast) || false;
+      const scale = fast ? (10000 / sections.reduce((a,s)=>a+s.dur,0)) : 1; // fast ≈ 10s total
+      const totalDur = sections.reduce((a,s)=>a + s.dur*scale, 0);
+
+      agResetView(sections);
+      const fastBtn = document.getElementById('agFastToggle');
+      if (fastBtn){ fastBtn.classList.toggle('on', !!fast); fastBtn.setAttribute('aria-pressed', fast ? 'true' : 'false'); }
+
+      agState = { sections, scale, totalDur, idx:-1, raf:null, timer:null, tick:null,
+                  startTs: performance.now(), elapsedBefore:0, fast, done:false };
+
+      // elapsed timer (independent of rAF so it keeps ticking smoothly)
+      agState.tick = setInterval(() => {
+        if (!agState || agState.done) return;
+        agSetElapsed(performance.now() - agState.startTs);
+      }, 250);
+
+      agAdvance(0);
+    }
+
+    const AG_ACTIVITY = {
+      'Tender reference & title':'Drafting tender reference…',
+      'Issuing authority & contact':'Identifying issuing authority…',
+      'Scope of work & deliverables':'Drafting scope of work…',
+      'Estimated value & budget head':'Computing estimated value…',
+      'Tender fee & EMD details':'Computing EMD clauses…',
+      'Critical dates & timeline':'Structuring the timeline…',
+      'Eligibility criteria (PQ)':'Structuring eligibility criteria…',
+      'Technical qualification criteria (TQ)':'Structuring technical criteria…',
+      'Bid submission instructions':'Writing submission instructions…',
+      'Bid opening & evaluation method':'Defining evaluation method…',
+      'Bill of Quantities (BOQ)':'Assembling Bill of Quantities…',
+      'Technical specifications':'Drafting technical specifications…',
+      'Drawings & annexures':'Attaching drawings & annexures…',
+      'General Conditions of Contract (GCC)':'Drafting GCC clauses…',
+      'Special Conditions of Contract (SCC)':'Drafting SCC clauses…',
+      'Performance security & warranty':'Writing performance security…',
+      'Payment terms & milestones':'Defining payment milestones…',
+      'Bid submission forms':'Generating bid forms…',
+      'Eligibility declarations':'Generating declarations…',
+      'Integrity pact & undertakings':'Finalising integrity pact…'
+    };
+
+    // Advance to section `i`: animate its mini-bar + the cumulative overall %,
+    // then mark it done (tick pop + real content reveal) and chain to the next.
+    function agAdvance(i){
+      if (!agState) return;
+      const S = agState.sections;
+      if (i >= S.length){ agComplete(); return; }
+      agState.idx = i;
+      const sec = S[i];
+      const durMs = sec.dur * agState.scale;
+      const baseOffset = S.slice(0, i).reduce((a,s)=>a + s.dur*agState.scale, 0); // ms of prior sections
+
+      // checklist: mark active
+      const row = document.querySelector('#agChecklist .ag-row[data-i="'+i+'"]');
+      if (row){
+        row.classList.add('active');
+        row.setAttribute('aria-label', sec.name + ' — generating');
+        const ic = row.querySelector('.ag-ic');
+        if (ic) ic.innerHTML = '<span class="ag-spin"></span>';
+        row.scrollIntoView({ block:'nearest' });
+      }
+      // canvas: mark active card, blue pulse + typing heading
+      const card = document.querySelector('#agCanvas .ag-doc-card[data-card="'+i+'"]');
+      if (card){
+        card.classList.add('active');
+        const h = card.querySelector('.ag-sk-h');
+        if (h){ const span = document.createElement('div'); span.className='ag-typing'; span.style.cssText='font-size:13.5px;font-weight:700;color:#0F5EE8;text-transform:uppercase;letter-spacing:.02em;margin-bottom:8px;'; span.textContent=sec.name; h.replaceWith(span); }
+        card.scrollIntoView({ block:'nearest' });
+      }
+      const act = document.getElementById('agActivity');
+      if (act) act.textContent = AG_ACTIVITY[sec.name] || ('Drafting ' + sec.name.toLowerCase() + '…');
+
+      const t0 = performance.now();
+      const step = () => {
+        if (!agState) return;
+        const dt = performance.now() - t0;
+        const frac = durMs > 0 ? Math.min(1, dt / durMs) : 1;
+        // per-section mini bar
+        if (row){
+          const bar = row.querySelector('.ag-minibar > span');
+          const mini = row.querySelector('.ag-mini');
+          if (bar) bar.style.width = Math.round(frac*100) + '%';
+          if (mini) mini.textContent = Math.round(frac*100) + '%';
+        }
+        // overall = (prior + this section's progress) / total
+        agSetOverall(((baseOffset + frac*durMs) / agState.totalDur) * 100);
+        if (frac < 1){ agState.raf = requestAnimationFrame(step); }
+        else { agFinishSection(i); }
+      };
+      agState.raf = requestAnimationFrame(step);
+    }
+
+    function agFinishSection(i){
+      if (!agState) return;
+      const S = agState.sections;
+      const sec = S[i];
+      const row = document.querySelector('#agChecklist .ag-row[data-i="'+i+'"]');
+      if (row){
+        row.classList.remove('active'); row.classList.add('done');
+        row.setAttribute('aria-label', sec.name + ' — done');
+        const ic = row.querySelector('.ag-ic');
+        if (ic) ic.innerHTML = '<i data-lucide="check-circle-2" class="w-[16px] h-[16px] ag-check pop"></i>';
+        const bar = row.querySelector('.ag-minibar > span'); if (bar) bar.style.width = '100%';
+        const mini = row.querySelector('.ag-mini'); if (mini){ mini.textContent = ''; }
+      }
+      // reveal real content in the canvas
+      const card = document.querySelector('#agCanvas .ag-doc-card[data-card="'+i+'"]');
+      if (card){
+        card.classList.remove('active');
+        card.innerHTML = '<h4>'+agEsc(sec.name)+'</h4><div class="ag-body ag-reveal">'+sec.html+'</div>';
+      }
+      // section count
+      const cnt = document.getElementById('agSecCount'); if (cnt) cnt.textContent = (i+1) + ' / ' + S.length;
+      // Part-complete check: if next section is a different part (or last), mark this part header done
+      const isLastOfPart = (i === S.length-1) || (S[i+1].part !== sec.part);
+      if (isLastOfPart){
+        const hd = Array.from(document.querySelectorAll('#agChecklist .ag-part-hd')).find(h => h.dataset.part === sec.part);
+        if (hd) hd.classList.add('done');
+      }
+      if (window.lucide) lucide.createIcons();
+      // chain to the next section after a short, natural beat
+      const gap = agState.fast ? 30 : 110;
+      agState.timer = setTimeout(() => { if (agState) agAdvance(i+1); }, gap);
+    }
+
+    function agComplete(){
+      if (!agState) return;
+      agState.done = true;
+      agStop();
+      agSetOverall(100);
+      agSetElapsed(agState.totalDur);
+      const act = document.getElementById('agActivity'); if (act) act.textContent = 'Document ready.';
+      const cnt = document.getElementById('agSecCount'); if (cnt) cnt.textContent = agState.sections.length + ' / ' + agState.sections.length;
+      // success ribbon
+      const pages = 12; // representative page count
+      const line = document.getElementById('agSuccessLine');
+      if (line) line.textContent = 'Tender document generated · ' + agState.sections.length + ' sections · ~' + pages + ' pages';
+      const succ = document.getElementById('agSuccess'); if (succ) succ.classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // --- demo controls ---
+    function agReplay(){
+      // reset to pending + skeletons and replay from 0% (preserving current fast preference)
+      const keepFast = (agState && agState.fast) || agFastFromUrl();
+      agStop();
+      agState = { fast: keepFast }; // seed fast preference for agStart
+      agStart();
+    }
+    function agToggleFast(){
+      const cur = (agState && agState.fast) || false;
+      agStop();
+      agState = { fast: !cur };
+      agStart();
+    }
+
+    // --- end-of-run outcome: identical to today's completion ---
+    // Reveal the existing completed-document view + footer (so Check Draft, Edit
+    // links and downstream all work exactly as before), then navigate / preview.
+    function agRevealCompleted(){
+      const gen  = document.getElementById('step5GenView');   if (gen)  gen.classList.add('hidden');
+      const real = document.getElementById('step5RealContent'); if (real) real.classList.remove('hidden');
+      const footer = document.getElementById('step5Footer');  if (footer) footer.classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
+    function agContinueToCvc(){
+      agStop();
+      agRevealCompleted();           // make the real Step 5 doc available, same as today
+      location.hash = '#step6';      // identical outcome to "Send for CVC Review →"
+    }
+    function agPreviewFullDoc(){
+      agRevealCompleted();
+      if (typeof window.openDraftPanel === 'function') window.openDraftPanel(); // existing Check Draft panel
     }
 
     // ================= STEP 6 — CVC Review (two-phase) =================
@@ -4343,6 +5733,8 @@
           delete sendBtn.dataset.pulsed;
         }
       }
+      // DESIGN_REVIEW_MODE: re-enable any forward-nav this just disabled.
+      if (DESIGN_REVIEW_MODE) { try { drmUnlockNav(); } catch(e){} }
     }
     function confirmAllCvc(){
       document.querySelectorAll('#cvcList .cvc-check').forEach(c => c.checked = true);
@@ -4409,6 +5801,9 @@
         if (remEl) remEl.textContent = `${remaining} more approval${remaining > 1 ? 's' : ''} needed`;
       }
       refreshIcons();
+      // DESIGN_REVIEW_MODE: keep Proceed-to-Publish reachable even with pending
+      // approvals (re-enable committeeContinueBtn + step6Continue).
+      if (DESIGN_REVIEW_MODE) { try { drmUnlockNav(); } catch(e){} }
     }
     function sendCommitteeReminder(i){
       const m = COMMITTEE[i];
@@ -4426,13 +5821,52 @@
       if (!btn) return;
       btn.classList.add('opacity-50','cursor-not-allowed','pointer-events-none');
       btn.setAttribute('aria-disabled','true');
+      // DESIGN_REVIEW_MODE: forward nav must stay reachable regardless of phase.
+      if (DESIGN_REVIEW_MODE) { try { drmUnlockNav(); } catch(e){} }
     }
     function goToPublish(){ location.hash = '#step7'; }
 
     // ================= STEP 7 — Publish =================
     function toggleManualEmails(){ document.getElementById('manualEmails').classList.toggle('hidden'); }
-    function openPublishConfirm(){ document.getElementById('publishModal').classList.remove('hidden'); refreshIcons(); }
+    // Count unresolved high/medium eligibility risks (info notes never count).
+    function riskUnresolvedCount(){
+      if (typeof RISK_DEFS === 'undefined') return 0;
+      return RISK_DEFS.filter(r => (r.severity === 'high' || r.severity === 'medium') && r.check()).length;
+    }
+    function openPublishConfirm(){
+      // DESIGN_REVIEW_MODE: skip the "Publish with N unresolved risk(s)?" confirm
+      // and go straight to the publish modal. (Risk Check rows still render.)
+      if (DESIGN_REVIEW_MODE){ document.getElementById('publishModal').classList.remove('hidden'); refreshIcons(); return; }
+      // Non-blocking eligibility-risk gate: warn (never hard-block) if unresolved
+      // high/medium risks remain. Officer can review or publish anyway.
+      const n = riskUnresolvedCount();
+      if (n > 0){
+        const box = document.getElementById('riskPublishConfirm');
+        const txt = document.getElementById('riskPublishConfirmText');
+        if (box && txt){
+          txt.textContent = `Publish with ${n} unresolved eligibility risk${n === 1 ? '' : 's'}? These may attract audit objections.`;
+          box.classList.remove('hidden');
+          refreshIcons();
+          return;
+        }
+      }
+      document.getElementById('publishModal').classList.remove('hidden');
+      refreshIcons();
+    }
     function closePublishConfirm(){ document.getElementById('publishModal').classList.add('hidden'); }
+    function closeRiskPublishConfirm(){ const b = document.getElementById('riskPublishConfirm'); if (b) b.classList.add('hidden'); }
+    // "Review risks" — jump to the end-of-flow Risk Check list (Step 2 panel).
+    function riskReviewFromPublish(){
+      closeRiskPublishConfirm();
+      if (typeof riskBackToCheck === 'function') riskBackToCheck();
+      else location.hash = '#step2';
+    }
+    // "Publish anyway" — proceed to the normal publish confirmation modal.
+    function riskPublishAnyway(){
+      closeRiskPublishConfirm();
+      document.getElementById('publishModal').classList.remove('hidden');
+      refreshIcons();
+    }
     function confirmPublish(){
       closePublishConfirm();
       document.getElementById('step7Content').classList.add('hidden');
@@ -5095,6 +6529,9 @@
     // ================= INIT =================
     renderLogoCards();
     routeFromHash();
+    // DESIGN_REVIEW_MODE: unlock forward nav once on load (routeFromHash already
+    // calls setView→drmUnlockNav, but this guarantees it for any entry view).
+    if (DESIGN_REVIEW_MODE) { try { drmUnlockNav(); } catch(e){} }
     refreshCompliance();
     bindLockButtons();
     recomputeDependentDates();
@@ -5239,6 +6676,9 @@
       function txt(id){ const el = document.getElementById(id); return el ? (el.textContent || '').trim() : ''; }
       function selOpt(id){ const el = document.getElementById(id); if (!el) return ''; const o = el.options ? el.options[el.selectedIndex] : null; return o ? o.text : ''; }
       function fmtINR(s){ if (!s) return ''; const n = parseFloat(String(s).replace(/[,₹\s]/g,'')) || 0; if (!n) return s; return '₹' + n.toLocaleString('en-IN'); }
+      // Figures + amount-in-words for cost fields in the NIT, e.g.
+      // "₹27,85,000 (Rupees Twenty Seven Lakh Eighty Five Thousand only)".
+      function fmtINRW(s){ if (s === '' || s == null) return ''; const n = parseFloat(String(s).replace(/[,₹\s]/g,'')) || 0; if (!n) return fmtINR(s); return (typeof window.fmtINRWords === 'function') ? window.fmtINRWords(n) : fmtINR(n); }
       const prettyMethod = window.prettyMethod || function(v){ return ({open:'Open Tender',limited:'Limited',single:'Single / Nomination',twobid:'Two Bid',rate:'Rate Contract',reverse:'Reverse Auction'})[v] || v; };
       const prettyEval = window.prettyEval || function(v){ return ({l1:'L1 (Lowest Cost)',qcbs:'QCBS',lcs:'LCS',qbs:'QBS',fbs:'FBS'})[v] || v; };
 
@@ -5248,17 +6688,19 @@
           tSubType:     val('fSubType'),
           tSector:      val('fSector'),
           tPeriod:      val('fPeriod'),
-          tEstCost:     val('fEstCost'),
-          tEMD:         val('fEMD'),
-          tFee:         val('fTenderFee'),
-          tProcFee:     val('fProcFee'),
+          // Cost fields: store the ABSOLUTE rupee `.value` (source of truth) so the
+          // document renders the real amount regardless of the entry denomination.
+          tEstCost:     costAbs('fEstCost') || '',
+          tEMD:         costAbs('fEMD') || '',
+          tFee:         costAbs('fTenderFee') || '',
+          tProcFee:     costAbs('fProcFee') || '',
           tEmdValid:    val('fEmdValid'),
           tTenderValid: val('fTenderValid'),
           tMethod:      typeof selectedMethod !== 'undefined' ? selectedMethod : null,
           tEval:        typeof selectedEval   !== 'undefined' ? selectedEval   : null,
           tAaNum:       val('aaNumber'),
           tTsNum:       val('tsNumber'),
-          tTsValue:     val('tsValue'),
+          tTsValue:     costAbs('tsValue') || '',
           tProjTitle:   val('projTitle'),
           tScope:       txt('scopeEditor'),
         };
@@ -5371,10 +6813,10 @@
               ${infoRow('Sector',                 'fSector',       d.tSector)}
               ${infoRow('Department',             '__dept',        'Ahmedabad Municipal Corporation')}
               ${infoRow('Financial Year',         '__fy',          'FY 2026-27')}
-              ${infoRow('Estimated Cost',         'fEstCost',      d.tEstCost ? fmtINR(d.tEstCost) : '')}
-              ${infoRow('Tender Fee',             'fTenderFee',    d.tFee ? fmtINR(d.tFee) : '')}
-              ${infoRow('Processing Fee',         'fProcFee',      d.tProcFee ? fmtINR(d.tProcFee) : '')}
-              ${infoRow('EMD Amount',             'fEMD',          d.tEMD ? fmtINR(d.tEMD) : '')}
+              ${infoRow('Estimated Cost',         'fEstCost',      d.tEstCost ? fmtINRW(d.tEstCost) : '')}
+              ${infoRow('Tender Fee',             'fTenderFee',    d.tFee ? fmtINRW(d.tFee) : '')}
+              ${infoRow('Processing Fee',         'fProcFee',      d.tProcFee ? fmtINRW(d.tProcFee) : '')}
+              ${infoRow('EMD Amount',             'fEMD',          d.tEMD ? fmtINRW(d.tEMD) : '')}
               ${infoRow('EMD Validity (days)',    'fEmdValid',     d.tEmdValid ? `${d.tEmdValid} days` : '')}
               ${infoRow('Tender Validity (days)', 'fTenderValid',  d.tTenderValid ? `${d.tTenderValid} days` : '')}
               ${infoRow('Work Completion Period', 'fPeriod',       d.tPeriod)}
@@ -5394,7 +6836,7 @@
               ${infoRow('AA Date',                     '__aaDate',    '', 'amber')}
               ${infoRow('Technical Sanction No.',      'tsNumber',    d.tTsNum, 'amber')}
               ${infoRow('TS Issuing Authority',        '__tsAuth',    d.tTsNum ? 'Chief Engineer, AMC' : '', 'amber')}
-              ${infoRow('TS Value',                    'tsValue',     d.tTsValue ? fmtINR(d.tTsValue) : '', 'amber')}
+              ${infoRow('TS Value',                    'tsValue',     d.tTsValue ? fmtINRW(d.tTsValue) : '', 'amber')}
               ${infoRow('Budget Head',                 '__budgetHead','', 'amber')}
               ${infoRow('GeM Checked',                 '__gem',       'Yes — Not available on GeM')}
             </div>
@@ -5468,7 +6910,7 @@
             <p class="nit-para" data-field="__gcc_validity">The tender shall remain valid for a period of <strong>${d.tTenderValid || '[X]'} days</strong> from the last date of submission of bids. The bidder shall not be entitled to revoke or cancel the tender or to vary any of the terms and conditions thereof during the validity period.</p>
 
             <div class="nit-subhead spaced">7.3 Earnest Money Deposit (EMD)</div>
-            <p class="nit-para" data-field="__gcc_emd">The bidder shall deposit an Earnest Money Deposit (EMD) of <strong>${d.tEMD ? fmtINR(d.tEMD) : '₹[amount]'}</strong> in the form of Online Payment / Demand Draft / Bank Guarantee. The EMD shall remain valid for a period of <strong>${d.tEmdValid || '[X]'} days</strong> beyond the tender validity period. The EMD of the successful bidder shall be converted to Security Deposit or refunded after execution of the agreement.</p>
+            <p class="nit-para" data-field="__gcc_emd">The bidder shall deposit an Earnest Money Deposit (EMD) of <strong>${d.tEMD ? fmtINRW(d.tEMD) : '₹[amount]'}</strong> in the form of Online Payment / Demand Draft / Bank Guarantee. The EMD shall remain valid for a period of <strong>${d.tEmdValid || '[X]'} days</strong> beyond the tender validity period. The EMD of the successful bidder shall be converted to Security Deposit or refunded after execution of the agreement.</p>
 
             <div class="nit-subhead spaced">7.4 Performance Security</div>
             <p class="nit-para">The successful bidder shall be required to furnish a Performance Security of <strong>5% (Five percent)</strong> of the contract value within <strong>15 (fifteen) days</strong> of issue of Letter of Acceptance (LoA). The Performance Security shall remain valid for the entire duration of the contract plus the Defect Liability Period.</p>
@@ -6645,6 +8087,210 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
+</script>
+
+<!-- ===== Cost Field + Denomination component (reusable; additive) =====
+     Wraps every rupee-amount input (Estimated Cost, Tender Fee, Processing Fee,
+     EMD Amount, TS Value) into a number + denomination pair. The number input
+     keeps its existing id and oninput handlers; the officer types a value in the
+     chosen denomination (Thousands / Lakhs / Crores) and the absolute rupee
+     amount (`.value`) is stored on window.tenderDraft as the source of truth.
+     Downstream reads use window.costAbs(idOrKey). -->
+<style id="cost-denom-styles">
+  .cost-field-row { display:flex; align-items:flex-start; gap:8px; }
+  .cost-field-row .cost-num-wrap { flex:1; min-width:0; }
+  .cost-denom-select { width:120px; flex-shrink:0; border:1px solid #D1D5DB; border-radius:8px; padding:10px 8px; font-size:14px; background:white; color:#111827; transition:all .15s ease; cursor:pointer; }
+  .cost-denom-select:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 3px rgba(15,94,232,0.1); }
+  .cost-denom-help { font-size:11px; color:#6B7280; margin-top:4px; min-height:14px; }
+</style>
+<script>
+  (function(){
+    'use strict';
+    // inputId -> { key: tenderDraft property, label: human label for aria + helper }
+    var COST_FIELDS = {
+      fEstCost:   { key:'estimatedCost', label:'Estimated Cost' },
+      fTenderFee: { key:'tenderFee',     label:'Tender Fee' },
+      fProcFee:   { key:'processingFee', label:'Processing Fee' },
+      fEMD:       { key:'emd',           label:'EMD Amount' },
+      tsValue:    { key:'tsValue',       label:'TS Value' },
+    };
+    var DENOM_FACTOR = { thousands:1000, lakhs:100000, crores:10000000 };
+    function idToKey(id){ return COST_FIELDS[id] ? COST_FIELDS[id].key : id; }
+
+    window.tenderDraft = window.tenderDraft || {};
+
+    function fmtAbs(n){ return '₹' + Math.round(n).toLocaleString('en-IN'); }
+
+    // Compute absolute rupees from a raw amount + denomination, rounded to whole rupees.
+    function computeValue(amount, denom){
+      var f = DENOM_FACTOR[denom] || DENOM_FACTOR.lakhs;
+      var a = parseFloat(amount);
+      if (!isFinite(a)) return 0;
+      return Math.round(a * f);
+    }
+
+    // SOURCE OF TRUTH READER — every downstream calc/validation/render uses this.
+    // Accepts an input id (e.g. 'fEstCost') or a tenderDraft key (e.g. 'estimatedCost').
+    window.costAbs = function(idOrKey){
+      var key = COST_FIELDS[idOrKey] ? COST_FIELDS[idOrKey].key : idOrKey;
+      var rec = window.tenderDraft && window.tenderDraft[key];
+      if (rec == null) return 0;
+      if (typeof rec === 'number') return rec;                 // legacy plain absolute number
+      if (typeof rec === 'object' && isFinite(rec.value)) return rec.value;
+      return 0;
+    };
+
+    function store(id, amount, denom){
+      var key = idToKey(id);
+      var amt = (amount === '' || amount == null || !isFinite(parseFloat(amount))) ? null : parseFloat(amount);
+      var value = amt == null ? 0 : computeValue(amt, denom);
+      window.tenderDraft[key] = { amount: amt, denomination: denom, value: value };
+      return value;
+    }
+
+    // Re-run the existing downstream handlers tied to a given field so that all
+    // dependent calculations, validation, and compliance refresh off `.value`.
+    function fireDownstream(id){
+      try {
+        if (id === 'fEstCost' && typeof window.onEstCostChange === 'function') window.onEstCostChange();
+        if (id === 'fEMD'     && typeof window.onEmdChange     === 'function') window.onEmdChange();
+        if ((id === 'fEstCost' || id === 'fEMD') && typeof window.recalcBoq === 'function') window.recalcBoq();
+        if (COST_FIELDS[id] && id !== 'tsValue' && typeof window.validateStep1 === 'function') window.validateStep1();
+        if (id === 'tsValue' && typeof window.updatePrecheck === 'function') window.updatePrecheck();
+      } catch(e){ /* keep UI resilient */ }
+    }
+
+    function updateHelper(helper, value){
+      helper.textContent = '= ' + fmtAbs(value || 0);
+    }
+
+    function mountCostField(input){
+      if (!input || input.dataset.costMounted) return;
+      var id = input.id;
+      var meta = COST_FIELDS[id]; if (!meta) return;
+      // The static markup is: <div class="relative"><span>₹</span><input ...></div>
+      var relWrap = input.closest('.relative');
+      var host = relWrap ? relWrap.parentNode : input.parentNode;
+      if (!relWrap){ // be defensive if markup differs — wrap the bare input
+        relWrap = document.createElement('div'); relWrap.className = 'relative';
+        input.parentNode.insertBefore(relWrap, input); relWrap.appendChild(input);
+        host = relWrap.parentNode;
+      }
+
+      // Build flex row: [ relWrap (number, flex:1) ] [ select (120px) ]
+      var row = document.createElement('div'); row.className = 'cost-field-row';
+      var numWrap = document.createElement('div'); numWrap.className = 'cost-num-wrap';
+      host.insertBefore(row, relWrap);
+      numWrap.appendChild(relWrap);
+      row.appendChild(numWrap);
+
+      var sel = document.createElement('select');
+      sel.className = 'cost-denom-select';
+      sel.setAttribute('aria-label', 'Denomination for ' + meta.label);
+      sel.innerHTML = '<option value="thousands">Thousands</option>'
+                    + '<option value="lakhs">Lakhs</option>'
+                    + '<option value="crores">Crores</option>';
+      sel.value = 'lakhs'; // default
+      row.appendChild(sel);
+
+      var helper = document.createElement('div');
+      helper.className = 'cost-denom-help';
+      helper.setAttribute('aria-live', 'polite');
+      host.insertBefore(helper, row.nextSibling);
+
+      input.dataset.costMounted = '1';
+
+      // ---- Backward compatibility / hydration from stored tenderDraft ----
+      var rec = window.tenderDraft[meta.key];
+      if (typeof rec === 'number' && isFinite(rec)){
+        // Legacy plain absolute rupees: show in Lakhs, keep value == original number.
+        sel.value = 'lakhs';
+        input.value = (rec / DENOM_FACTOR.lakhs);
+        window.tenderDraft[meta.key] = { amount: parseFloat(input.value), denomination:'lakhs', value: rec };
+      } else if (rec && typeof rec === 'object'){
+        sel.value = DENOM_FACTOR[rec.denomination] ? rec.denomination : 'lakhs';
+        input.value = (rec.amount == null ? '' : rec.amount);
+      } else if (input.value !== '' && isFinite(parseFloat(input.value))){
+        // A pre-existing raw value already in the markup — store at current denom.
+        store(id, input.value, sel.value);
+      }
+      updateHelper(helper, window.costAbs(id));
+
+      // ---- Live updates on BOTH number input and denomination change ----
+      input.addEventListener('input', function(){
+        var v = store(id, input.value, sel.value);
+        updateHelper(helper, v);
+        // note: existing inline oninput handlers already ran for this input;
+        // we only need to refresh helper + storage here (no double-fire).
+      });
+      sel.addEventListener('change', function(){
+        var v = store(id, input.value, sel.value);
+        updateHelper(helper, v);
+        fireDownstream(id); // denomination change must re-run dependent calcs
+      });
+    }
+
+    // Programmatic absolute-rupee setter (used by DPR prefill etc.) — keeps the
+    // raw input + denomination + helper + storage consistent for a known amount.
+    window.setCostFieldAbsolute = function(id, absRupees){
+      var input = document.getElementById(id);
+      var meta = COST_FIELDS[id];
+      if (!input || !meta) return;
+      var abs = parseFloat(absRupees) || 0;
+      var row = input.closest('.cost-field-row');
+      var sel = row ? row.querySelector('.cost-denom-select') : null;
+      // Prefer Lakhs for display unless the value divides cleanly into Crores.
+      var denom = 'lakhs';
+      if (abs !== 0 && abs % DENOM_FACTOR.crores === 0) denom = 'crores';
+      if (sel) sel.value = denom;
+      input.value = abs / DENOM_FACTOR[denom];
+      window.tenderDraft[meta.key] = { amount: parseFloat(input.value), denomination: denom, value: Math.round(abs) };
+      var host = sel ? sel.closest('.cost-field-row').parentNode : input.parentNode;
+      var helper = host ? host.querySelector('.cost-denom-help') : null;
+      if (helper) updateHelper(helper, window.costAbs(id));
+    };
+
+    function mountAll(){
+      Object.keys(COST_FIELDS).forEach(function(id){
+        var el = document.getElementById(id);
+        if (el) mountCostField(el);
+      });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountAll);
+    else mountAll();
+
+    // ---- Number → words (Indian system) for the draft document ----
+    window.numberToWordsINR = function(num){
+      num = Math.round(parseFloat(num) || 0);
+      if (num === 0) return 'Zero';
+      var ones = ['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+      var tens = ['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+      function twoDigit(n){
+        if (n < 20) return ones[n];
+        return tens[Math.floor(n/10)] + (n%10 ? ' ' + ones[n%10] : '');
+      }
+      function threeDigit(n){
+        var h = Math.floor(n/100), r = n%100;
+        return (h ? ones[h] + ' Hundred' + (r ? ' ' : '') : '') + (r ? twoDigit(r) : '');
+      }
+      var parts = [];
+      var crore = Math.floor(num / 10000000); num %= 10000000;
+      var lakh  = Math.floor(num / 100000);   num %= 100000;
+      var thou  = Math.floor(num / 1000);      num %= 1000;
+      var hund  = num;
+      if (crore) parts.push(threeDigit(crore) + ' Crore');
+      if (lakh)  parts.push(twoDigit(lakh) + ' Lakh');
+      if (thou)  parts.push(twoDigit(thou) + ' Thousand');
+      if (hund)  parts.push(threeDigit(hund));
+      return parts.join(' ').replace(/\s+/g, ' ').trim();
+    };
+    // Returns "₹27,85,000 (Rupees Twenty Seven Lakh Eighty Five Thousand only)"
+    window.fmtINRWords = function(absRupees){
+      var n = Math.round(parseFloat(absRupees) || 0);
+      if (!n) return '';
+      return '₹' + n.toLocaleString('en-IN') + ' (Rupees ' + window.numberToWordsINR(n) + ' only)';
+    };
+  })();
 </script>
 
 <!-- ===== Blueprint Kit (bpKit) — pasted byte-identical from /tmp/blueprint-kit/component.html ===== -->
