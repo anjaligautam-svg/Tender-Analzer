@@ -224,6 +224,26 @@
     .draft-doc-body .doc-footer-r .seal-small { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid #9CA3AF; background: #F9FAFB; font-size: 7px; color: #9CA3AF; display: flex; align-items: center; justify-content: center; margin: 4px auto 0; letter-spacing: 0.1em; font-weight: 600; }
     .draft-doc-body .doc-footer-r .seal-label { font-size: 12px; color: #6B7280; }
     .draft-doc-body .doc-watermark { font-size: 11px; color: #9CA3AF; font-style: italic; text-align: center; margin-top: 16px; font-family: 'DM Sans', system-ui, sans-serif; }
+    /* Table of Contents — rendered at the very top of the draft document AND in the Step 5 preview card.
+       The heading reuses the serif/uppercase .nit-section h3 document style. */
+    .doc-toc { margin-bottom: 30px; }
+    .doc-toc h3 { font-size: 13.5px; font-weight: 700; color: #111827; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #D1D5DB; padding-bottom: 6px; margin: 0 0 14px; font-family: 'DM Sans', system-ui, sans-serif; text-align: center; }
+    .doc-toc-list { font-family: 'DM Sans', system-ui, sans-serif; font-size: 12.5px; }
+    .doc-toc-part { font-weight: 700; color: #111827; text-transform: uppercase; letter-spacing: 0.03em; font-size: 11.5px; margin: 14px 0 6px; }
+    .doc-toc-part:first-child { margin-top: 0; }
+    .doc-toc-row { display: flex; align-items: flex-end; gap: 6px; margin: 0 0 7px; line-height: 1.5; }
+    .doc-toc-row .toc-label { color: #1f2937; flex: 0 1 auto; }
+    .doc-toc-row .toc-leader { flex: 1 1 auto; border-bottom: 1px dotted #9CA3AF; transform: translateY(-3px); min-width: 18px; }
+    .doc-toc-row .toc-page { color: #374151; font-variant-numeric: tabular-nums; flex: 0 0 auto; }
+    /* Toggle switch (iOS-style) — used by the Table-of-Contents option and other .toggle inputs on this page */
+    .toggle { position: relative; display: inline-block; width: 38px; height: 22px; flex-shrink: 0; }
+    .toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
+    .toggle .slider { position: absolute; inset: 0; cursor: pointer; background: #CBD5E1; border-radius: 999px; transition: background .15s ease; }
+    .toggle .slider::before { content: ""; position: absolute; height: 16px; width: 16px; left: 3px; top: 3px; background: #fff; border-radius: 50%; box-shadow: 0 1px 2px rgba(0,0,0,0.2); transition: transform .15s ease; }
+    .toggle input:checked + .slider { background: #0F5EE8; }
+    .toggle input:checked + .slider::before { transform: translateX(16px); }
+    .toggle input:focus-visible + .slider { box-shadow: 0 0 0 3px rgba(15,94,232,0.25); }
+    .toggle input:disabled + .slider { cursor: not-allowed; opacity: 0.55; }
     .sel-dialogue-arrow { position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 6px solid white; filter: drop-shadow(0 1px 0 #E5E7EB); }
     #selDialogue.flip .sel-dialogue-arrow { top: -6px; bottom: auto; transform: translateX(-50%) rotate(180deg); }
     .sync-indicator { transition: opacity .25s ease; }
@@ -566,6 +586,126 @@
     .ta-cs-insert-pop { position:absolute; top:16px; left:12px; z-index:60; background:#fff; border:1px solid #E5E7EB; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.1); padding:6px; min-width:220px; }
     .ta-cs-insert-pop button { display:flex; align-items:center; gap:8px; width:100%; padding:8px 14px; border-radius:6px; font-size:13px; color:#374151; cursor:pointer; background:transparent; border:none; text-align:left; }
     .ta-cs-insert-pop button:hover, .ta-cs-insert-pop button:focus-visible { background:#F3F4F6; outline:none; }
+
+    /* ============================================================
+       STEP 5 — CVC REVIEW (offline chatbot → actionable pointers)
+       Reuses: risk-check actionable-row pattern, taCs editor blocks,
+       the .dot typing animation, the nit-section document styles.
+       ============================================================ */
+    .cvc-wrap { margin-top: 28px; }
+    .cvc-grid { display:grid; grid-template-columns: 1fr; gap:20px; }
+    @media (min-width:1024px){ .cvc-grid { grid-template-columns: 1fr 1fr; align-items:start; } }
+    .cvc-card { background:#fff; border:1px solid #E5E7EB; border-radius:16px; display:flex; flex-direction:column; overflow:hidden; }
+    .cvc-card-hd { padding:16px 20px; border-bottom:1px solid #E5E7EB; }
+    .cvc-card-hd .t1 { font-size:15px; font-weight:700; color:#111827; display:flex; align-items:center; gap:8px; }
+    .cvc-note { font-size:12px; color:#6B7280; margin-top:6px; line-height:1.55; }
+
+    /* conversation area */
+    .cvc-thread { padding:18px 20px; min-height:220px; max-height:360px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; }
+    .cvc-empty { text-align:center; padding:24px 12px; }
+    .cvc-empty .ic { width:44px; height:44px; border-radius:12px; background:#EFF6FF; color:#0F5EE8; display:inline-flex; align-items:center; justify-content:center; }
+    .cvc-empty .h { font-size:13.5px; font-weight:600; color:#111827; margin-top:10px; }
+    .cvc-empty .s { font-size:12px; color:#6B7280; margin-top:4px; max-width:340px; margin-left:auto; margin-right:auto; line-height:1.55; }
+    .cvc-chips { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:14px; }
+    .cvc-chip { border:1px solid #D1D5DB; border-radius:20px; padding:6px 13px; font-size:12.5px; color:#111827; background:#fff; cursor:pointer; transition:all .15s ease; display:inline-flex; align-items:center; gap:6px; }
+    .cvc-chip:hover { border-color:#0F5EE8; color:#0F5EE8; background:#F8FAFF; }
+    .cvc-msg { display:flex; gap:9px; max-width:88%; animation: cvc-msg-in 280ms ease both; }
+    @keyframes cvc-msg-in { from { opacity:0; transform:translateY(6px);} to { opacity:1; transform:translateY(0);} }
+    .cvc-msg.officer { align-self:flex-end; flex-direction:row-reverse; }
+    .cvc-msg .av { width:28px; height:28px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; }
+    .cvc-msg.officer .av { background:#0F5EE8; color:#fff; }
+    .cvc-msg.assistant .av { background:#F3F4F6; color:#6B7280; }
+    .cvc-bubble { border-radius:14px; padding:10px 13px; font-size:13px; line-height:1.55; }
+    .cvc-msg.officer .cvc-bubble { background:#0F5EE8; color:#fff; border-top-right-radius:4px; }
+    .cvc-msg.assistant .cvc-bubble { background:#F3F4F6; color:#111827; border-top-left-radius:4px; }
+    .cvc-bubble .file-att { display:flex; align-items:center; gap:7px; font-size:12px; opacity:.95; margin-top:6px; padding-top:6px; border-top:1px solid rgba(255,255,255,.25); }
+    .cvc-analysing { display:inline-flex; align-items:center; gap:8px; font-size:12.5px; color:#6B7280; }
+
+    /* composer / input bar */
+    .cvc-composer { border-top:1px solid #E5E7EB; padding:12px 14px; }
+    .cvc-filechip { display:inline-flex; align-items:center; gap:8px; background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:5px 10px; font-size:12px; color:#0C447C; margin-bottom:8px; }
+    .cvc-filechip .rm { color:#6B7280; cursor:pointer; display:inline-flex; }
+    .cvc-filechip .rm:hover { color:#EF4444; }
+    .cvc-inputrow { display:flex; align-items:flex-end; gap:8px; }
+    .cvc-textarea { flex:1; border:1px solid #D1D5DB; border-radius:10px; padding:9px 12px; font-size:13px; line-height:1.5; resize:none; min-height:42px; max-height:140px; outline:none; font-family:inherit; color:#111827; transition:border-color .15s ease, box-shadow .15s ease; }
+    .cvc-textarea:focus { border-color:#0F5EE8; box-shadow:0 0 0 3px rgba(15,94,232,.1); }
+    .cvc-iconbtn { width:38px; height:38px; border-radius:9px; border:1px solid #D1D5DB; background:#fff; color:#6B7280; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s ease; }
+    .cvc-iconbtn:hover { border-color:#0F5EE8; color:#0F5EE8; background:#F8FAFF; }
+    .cvc-iconbtn.recording { border-color:#EF4444; color:#EF4444; background:#FEF2F2; }
+    .cvc-send { background:#0F5EE8; color:#fff; border:none; border-radius:9px; padding:0 16px; height:38px; font-size:13px; font-weight:600; cursor:pointer; flex-shrink:0; display:inline-flex; align-items:center; gap:6px; transition:background .15s ease; }
+    .cvc-send:hover { background:#0d52cc; }
+    .cvc-send:disabled { background:#E5E7EB; color:#9CA3AF; cursor:not-allowed; }
+    .cvc-listening { display:flex; align-items:center; gap:8px; font-size:12.5px; color:#EF4444; padding:6px 2px 2px; }
+    .cvc-rec-dot { width:9px; height:9px; border-radius:50%; background:#EF4444; animation: cvc-rec 1s ease-in-out infinite; }
+    @keyframes cvc-rec { 0%,100% { opacity:1; transform:scale(1);} 50% { opacity:.35; transform:scale(.8);} }
+
+    /* pointer list — mirrors the risk-check resolution UX */
+    .cvc-pointers { padding:16px 20px; }
+    .cvc-ptr-head { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+    .cvc-ptr-counts { font-size:12.5px; font-weight:600; color:#374151; }
+    .cvc-ptr-counts b { color:#0F5EE8; }
+    .cvc-progress-track { height:7px; background:#EEF1F5; border-radius:6px; overflow:hidden; margin:8px 0 4px; }
+    .cvc-progress-bar { height:100%; background:#10B981; border-radius:6px; width:0; transition: width 300ms ease; }
+    .cvc-progress-label { font-size:11.5px; font-weight:600; color:#065F46; }
+    .cvc-group-label { font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#9CA3AF; margin:14px 0 8px; }
+    .cvc-row { display:flex; gap:10px; align-items:flex-start; padding:11px 13px; border:1px solid #E5E7EB; border-radius:10px; margin-bottom:8px; background:#fff; transition: background .25s ease, border-color .25s ease, opacity .25s ease; }
+    .cvc-row.sev-change { border-left:3px solid #EF4444; }
+    .cvc-row.sev-suggestion { border-left:3px solid #0F5EE8; }
+    .cvc-row.sev-ok { border-left:3px solid #10B981; }
+    .cvc-row.resolved { background:#F0FDF4; border-color:rgba(16,185,129,.35); }
+    .cvc-row.resolved .cvc-msg-txt { color:#065F46; }
+    .cvc-row .cvc-row-body { flex:1; min-width:0; }
+    .cvc-msg-txt { font-size:13px; color:#111827; font-weight:500; line-height:1.45; }
+    .cvc-row-norm { font-size:11.5px; color:#6B7280; margin-top:3px; }
+    .cvc-row-acts { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+    .cvc-fix-btn { display:inline-flex; align-items:center; gap:5px; background:#fff; border:1px solid #0F5EE8; color:#0F5EE8; border-radius:7px; padding:5px 11px; font-size:12px; font-weight:600; cursor:pointer; transition:all .15s ease; }
+    .cvc-fix-btn:hover { background:#0F5EE8; color:#fff; }
+    .cvc-resolved-tag { display:inline-flex; align-items:center; gap:4px; font-size:11.5px; font-weight:600; color:#10B981; }
+    .cvc-okgroup-toggle { background:transparent; border:none; color:#6B7280; font-size:12px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; padding:6px 0; }
+    .cvc-okgroup-toggle:hover { color:#111827; }
+    .cvc-row.just-resolved { animation: cvc-resolve 250ms ease both; }
+    @keyframes cvc-resolve { 0% { background:#fff;} 100% { background:#F0FDF4;} }
+
+    /* regenerate CTA + inline confirm (non-blocking) */
+    .cvc-regen-wrap { margin-top:8px; padding-top:14px; border-top:1px solid #F3F4F6; }
+    .cvc-regen-btn { width:100%; background:#0F5EE8; color:#fff; border:none; border-radius:10px; padding:11px 16px; font-size:13.5px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:7px; transition:background .15s ease; }
+    .cvc-regen-btn:hover { background:#0d52cc; }
+    .cvc-regen-confirm { border:1px solid #BFDBFE; background:#F8FBFF; border-radius:10px; padding:14px 16px; }
+    .cvc-regen-confirm .q { font-size:13px; color:#111827; }
+    .cvc-regen-confirm .acts { display:flex; gap:8px; margin-top:12px; justify-content:flex-end; }
+    .cvc-regen-confirm .acts .yes { background:#0F5EE8; color:#fff; border:none; border-radius:8px; padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer; }
+    .cvc-regen-confirm .acts .no { background:transparent; border:1px solid #D1D5DB; color:#374151; border-radius:8px; padding:8px 16px; font-size:13px; cursor:pointer; }
+
+    /* right-side live document (deep-link target) */
+    .cvc-doc-card { background:#fff; border:1px solid #E5E7EB; border-radius:16px; overflow:hidden; position:sticky; top:16px; }
+    .cvc-doc-bar { background:#F9FAFB; border-bottom:1px solid #E5E7EB; padding:11px 18px; display:flex; align-items:center; gap:8px; }
+    .cvc-doc-bar .lbl { font-size:12.5px; color:#6B7280; }
+    .cvc-doc-bar .back { margin-left:auto; font-size:12px; color:#0F5EE8; cursor:pointer; display:none; align-items:center; gap:4px; background:transparent; border:none; }
+    .cvc-doc-bar .back:hover { text-decoration:underline; }
+    .cvc-doc { padding:22px 26px; max-height:640px; overflow-y:auto; font-family:'DM Sans', system-ui, sans-serif; }
+    .cvc-doc .nit-section { margin-bottom:24px; position:relative; scroll-margin-top:12px; border-radius:8px; }
+    .cvc-doc .nit-section h3 { font-size:13.5px; font-weight:700; color:#111827; text-transform:uppercase; letter-spacing:.02em; padding-bottom:6px; border-bottom:1px solid #E5E7EB; margin-bottom:10px; }
+    .cvc-doc .nit-section p, .cvc-doc .nit-section .nit-para { font-size:13px; color:#374151; line-height:1.6; margin:6px 0; }
+    .cvc-doc .nit-section ul, .cvc-doc .nit-section ol { font-size:13px; color:#374151; line-height:1.6; padding-left:22px; margin:6px 0; }
+    .cvc-doc .nit-section ul { list-style:disc; } .cvc-doc .nit-section ol { list-style:decimal; }
+    .cvc-doc table { width:100%; border-collapse:collapse; margin:8px 0; font-size:12.5px; }
+    .cvc-doc table td, .cvc-doc table th { border:1px solid #E5E7EB; padding:6px 9px; text-align:left; }
+    .cvc-doc table th { background:#F9FAFB; font-weight:600; }
+    .cvc-doc table td.r, .cvc-doc table th.r { text-align:right; }
+    .cvc-doc .cs-doc-table { width:100%; border-collapse:collapse; margin:8px 0; }
+    .cvc-doc .cs-doc-table td, .cvc-doc .cs-doc-table th { border:1px solid #D1D5DB; padding:6px 10px; font-size:12.5px; }
+    .cvc-doc .cs-doc-table th { background:#F9FAFB; font-weight:600; }
+    .cvc-doc .cs-doc-file { font-size:12.5px; display:flex; align-items:center; gap:6px; margin:4px 0; color:#374151; }
+    .cvc-doc .formal-list { list-style:decimal; }
+    .cvc-doc-hl { animation: cvc-doc-hl 600ms ease; }
+    @keyframes cvc-doc-hl { 0% { box-shadow:0 0 0 0 rgba(15,94,232,0); background:rgba(15,94,232,0);} 30% { box-shadow:0 0 0 3px rgba(15,94,232,.35); background:rgba(15,94,232,.06);} 100% { box-shadow:0 0 0 0 rgba(15,94,232,0); background:rgba(15,94,232,0);} }
+    /* inline-edit affordance on a CVC doc section */
+    .cvc-doc .nit-section.cvc-editing { box-shadow:0 0 0 2px #10B981; background:rgba(16,185,129,.02); padding:12px; }
+    .cvc-sec-actions { display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
+    .cvc-sec-actions button { display:inline-flex; align-items:center; gap:5px; font-size:11.5px; color:#374151; background:#fff; border:1px solid #E5E7EB; border-radius:7px; padding:5px 10px; cursor:pointer; transition:all .15s ease; }
+    .cvc-sec-actions button:hover { border-color:#0F5EE8; color:#0F5EE8; }
+    .cvc-sec-editbox { border:1px solid #D1D5DB; border-radius:8px; padding:10px 12px; font-size:13px; line-height:1.6; color:#111827; outline:none; margin-top:8px; min-height:60px; }
+    .cvc-sec-editbox:focus { border-color:#10B981; box-shadow:0 0 0 3px rgba(16,185,129,.12); }
   </style>
 </head>
 <body class="min-h-screen">
@@ -1225,7 +1365,7 @@
               <li class="step-line"></li>
               <li class="flex items-center gap-2"><span class="w-7 h-7 rounded-full bg-line text-ink-500 text-[12px] font-bold flex items-center justify-center">5</span><span class="text-[12.5px] text-ink-500">AI Generation</span></li>
               <li class="step-line"></li>
-              <li class="flex items-center gap-2"><span class="w-7 h-7 rounded-full bg-line text-ink-500 text-[12px] font-bold flex items-center justify-center">6</span><span class="text-[12.5px] text-ink-500">CVC Review</span></li>
+              <li class="flex items-center gap-2"><span class="w-7 h-7 rounded-full bg-line text-ink-500 text-[12px] font-bold flex items-center justify-center">6</span><span class="text-[12.5px] text-ink-500">Version History</span></li>
               <li class="step-line"></li>
               <li class="flex items-center gap-2"><span class="w-7 h-7 rounded-full bg-line text-ink-500 text-[12px] font-bold flex items-center justify-center">7</span><span class="text-[12.5px] text-ink-500">Publish</span></li>
             </ol>
@@ -1536,7 +1676,7 @@
               <li class="step-line"></li>
               <li class="flex items-center gap-2"><span class="w-7 h-7 rounded-full bg-line text-ink-500 text-[12px] font-bold flex items-center justify-center">5</span><span class="text-[12.5px] text-ink-500">AI Generation</span></li>
               <li class="step-line"></li>
-              <li class="flex items-center gap-2"><span class="w-7 h-7 rounded-full bg-line text-ink-500 text-[12px] font-bold flex items-center justify-center">6</span><span class="text-[12.5px] text-ink-500">CVC Review</span></li>
+              <li class="flex items-center gap-2"><span class="w-7 h-7 rounded-full bg-line text-ink-500 text-[12px] font-bold flex items-center justify-center">6</span><span class="text-[12.5px] text-ink-500">Version History</span></li>
               <li class="step-line"></li>
               <li class="flex items-center gap-2"><span class="w-7 h-7 rounded-full bg-line text-ink-500 text-[12px] font-bold flex items-center justify-center">7</span><span class="text-[12.5px] text-ink-500">Publish</span></li>
             </ol>
@@ -1795,7 +1935,7 @@
               <li class="step-line"></li>
               <li class="flex items-center gap-2"><span class="w-7 h-7 rounded-full bg-line text-ink-500 text-[12px] font-bold flex items-center justify-center">5</span><span class="text-[12.5px] text-ink-500">AI Generation</span></li>
               <li class="step-line"></li>
-              <li class="flex items-center gap-2"><span class="w-7 h-7 rounded-full bg-line text-ink-500 text-[12px] font-bold flex items-center justify-center">6</span><span class="text-[12.5px] text-ink-500">CVC Review</span></li>
+              <li class="flex items-center gap-2"><span class="w-7 h-7 rounded-full bg-line text-ink-500 text-[12px] font-bold flex items-center justify-center">6</span><span class="text-[12.5px] text-ink-500">Version History</span></li>
               <li class="step-line"></li>
               <li class="flex items-center gap-2"><span class="w-7 h-7 rounded-full bg-line text-ink-500 text-[12px] font-bold flex items-center justify-center">7</span><span class="text-[12.5px] text-ink-500">Publish</span></li>
             </ol>
@@ -2037,7 +2177,7 @@
               <li class="step-line"></li>
               <li class="flex items-center gap-2"><span class="w-7 h-7 rounded-full bg-line text-ink-500 text-[12px] font-bold flex items-center justify-center">5</span><span class="text-[12.5px] text-ink-500">AI Generation</span></li>
               <li class="step-line"></li>
-              <li class="flex items-center gap-2"><span class="w-7 h-7 rounded-full bg-line text-ink-500 text-[12px] font-bold flex items-center justify-center">6</span><span class="text-[12.5px] text-ink-500">CVC Review</span></li>
+              <li class="flex items-center gap-2"><span class="w-7 h-7 rounded-full bg-line text-ink-500 text-[12px] font-bold flex items-center justify-center">6</span><span class="text-[12.5px] text-ink-500">Version History</span></li>
               <li class="step-line"></li>
               <li class="flex items-center gap-2"><span class="w-7 h-7 rounded-full bg-line text-ink-500 text-[12px] font-bold flex items-center justify-center">7</span><span class="text-[12.5px] text-ink-500">Publish</span></li>
             </ol>
@@ -2281,7 +2421,7 @@
               <li class="step-line done"></li>
               <li class="flex items-center gap-2"><span aria-current="step" class="w-7 h-7 rounded-full bg-primary text-white text-[12px] font-bold flex items-center justify-center">5</span><span class="text-[12.5px] font-semibold text-ink-900">AI Generation</span></li>
               <li class="step-line"></li>
-              <li class="flex items-center gap-2"><span class="w-7 h-7 rounded-full bg-line text-ink-500 text-[12px] font-bold flex items-center justify-center">6</span><span class="text-[12.5px] text-ink-500">CVC Review</span></li>
+              <li class="flex items-center gap-2"><span class="w-7 h-7 rounded-full bg-line text-ink-500 text-[12px] font-bold flex items-center justify-center">6</span><span class="text-[12.5px] text-ink-500">Version History</span></li>
               <li class="step-line"></li>
               <li class="flex items-center gap-2"><span class="w-7 h-7 rounded-full bg-line text-ink-500 text-[12px] font-bold flex items-center justify-center">7</span><span class="text-[12.5px] text-ink-500">Publish</span></li>
             </ol>
@@ -2291,6 +2431,7 @@
           <!-- ===== AI GENERATION EXPERIENCE (timed; wraps the existing completion) ===== -->
           <div id="step5GenView" class="px-6 lg:px-10 pt-8 pb-32">
             <div class="max-w-[1200px] mx-auto">
+              <div style="display:flex; justify-content:flex-end; margin-bottom:10px;"><button type="button" id="drmStep5RestartBtn" onclick="if(window.cvc&&cvc.restartFlow)cvc.restartFlow()" aria-label="Restart the AI Generation flow from the beginning for design review" title="Design review: reset generation, CVC review and versions to the beginning" style="display:inline-flex; align-items:center; gap:5px; font-size:12px; line-height:1; color:#0C447C; background:#EFF6FF; border:1px solid #BFDBFE; border-radius:7px; padding:6px 11px; cursor:pointer;"><i data-lucide="rotate-ccw" style="width:13px; height:13px;"></i>Restart flow</button></div>
               <div class="flex items-start justify-between gap-3 mb-5 flex-wrap">
                 <div>
                   <h1 class="text-[20px] font-bold text-ink-900">Step 5: AI Document Generation</h1>
@@ -2300,6 +2441,18 @@
                   <button id="agFastToggle" type="button" onclick="agToggleFast()" class="ag-demo-btn" title="Demo control — run the same sequence faster" aria-pressed="false"><i data-lucide="fast-forward" class="w-3 h-3"></i> Fast</button>
                   <button id="agReplayBtn" type="button" onclick="agReplay()" class="ag-demo-btn" title="Demo control — replay the generation animation"><i data-lucide="refresh-cw" class="w-3 h-3"></i> Replay generation</button>
                 </div>
+              </div>
+
+              <!-- Document options: Table of Contents toggle (before generation is triggered) -->
+              <div id="tocOptionRow" style="display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 16px; background:#F9FAFB; border:1px solid #E5E7EB; border-radius:10px; margin-bottom:16px;">
+                <div style="display:flex; align-items:flex-start; gap:10px; min-width:0;">
+                  <i data-lucide="list-ordered" style="width:16px; height:16px; color:#0F5EE8; flex-shrink:0; margin-top:1px;"></i>
+                  <div style="min-width:0;">
+                    <div style="font-size:13px; font-weight:700; color:#111827;">Include Table of Contents</div>
+                    <div style="font-size:12px; color:#6B7280; margin-top:2px;">Adds an index of all sections with page references at the start of the document. Recommended for documents over 20 pages.</div>
+                  </div>
+                </div>
+                <label class="toggle" id="tocToggleWrap" title=""><input id="tocToggle" type="checkbox" checked aria-label="Include table of contents in the tender document" onchange="agOnTocToggle(this)"/><span class="slider"></span></label>
               </div>
 
               <div class="grid grid-cols-1 lg:grid-cols-[40%_1fr] gap-6">
@@ -2331,7 +2484,7 @@
                   <div class="bg-white border border-line rounded-2xl p-4">
                     <div class="flex items-center justify-between mb-2 px-1">
                       <h3 class="text-[13px] font-bold text-ink-900">Sections</h3>
-                      <span class="text-[11px] text-ink-500" id="agSecCount">0 / 20</span>
+                      <span class="text-[11px] text-ink-500" id="agSecCount" aria-live="polite">0 / 20</span>
                     </div>
                     <div id="agChecklist" role="list" aria-label="Tender document sections" class="max-h-[420px] overflow-y-auto pr-1"></div>
                   </div>
@@ -2359,6 +2512,83 @@
                   <button type="button" onclick="agContinueToCvc()" class="px-4 py-2.5 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5 shadow-soft">Continue to CVC Review <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
                 </div>
               </div>
+
+              <!-- ============ CVC REVIEW (offline) — chatbot → actionable fixes ============ -->
+              <div class="cvc-wrap" id="cvcWrap">
+                <div class="flex items-center gap-2 mb-1">
+                  <i data-lucide="message-square-text" class="w-[18px] h-[18px] text-primary"></i>
+                  <h2 class="text-[17px] font-bold text-ink-900">CVC Review</h2>
+                </div>
+                <p class="cvc-note" style="margin-bottom:16px;">CVC review happens offline across reviewing officers. Enter their feedback here — as text, an uploaded note, or dictation — and the assistant will turn it into actionable fixes.</p>
+
+                <div class="cvc-grid">
+                  <!-- LEFT: chatbot + pointers + regenerate -->
+                  <div class="cvc-card">
+                    <div class="cvc-card-hd">
+                      <div class="t1"><i data-lucide="bot" class="w-[18px] h-[18px] text-primary"></i> Review assistant</div>
+                      <div class="cvc-note">Paste reviewer comments, upload the CVC note, or dictate feedback. Nothing is sent — this stays on your draft.</div>
+                    </div>
+
+                    <!-- conversation area -->
+                    <div id="cvcThread" class="cvc-thread" role="log" aria-label="CVC review conversation"></div>
+                    <div id="cvcAssistantLive" class="sr-only" aria-live="polite"></div>
+
+                    <!-- composer / input bar -->
+                    <div class="cvc-composer">
+                      <div id="cvcFileChipWrap"></div>
+                      <div id="cvcListening" class="cvc-listening" style="display:none;" aria-live="polite"><span class="cvc-rec-dot"></span> Listening… <span class="text-ink-400" style="font-size:11.5px;">(mock dictation — speak the reviewer's comments)</span></div>
+                      <div class="cvc-inputrow">
+                        <button type="button" id="cvcAttachBtn" class="cvc-iconbtn" title="Attach review document" aria-label="Attach review document (PDF, DOCX, image)" onclick="cvc.attachClick()"><i data-lucide="paperclip" class="w-4 h-4"></i></button>
+                        <button type="button" id="cvcMicBtn" class="cvc-iconbtn" title="Dictate feedback" aria-label="Dictate feedback (mock)" aria-pressed="false" onclick="cvc.toggleMic()"><i data-lucide="mic" class="w-4 h-4"></i></button>
+                        <input type="file" id="cvcFileInput" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" style="display:none;" onchange="cvc.onFilePick(this)" />
+                        <textarea id="cvcInput" class="cvc-textarea" rows="1" placeholder="Type the reviewing officer's feedback…" aria-label="Reviewing officer feedback" oninput="cvc.onInput(this)" onkeydown="cvc.onKey(event)"></textarea>
+                        <button type="button" id="cvcSendBtn" class="cvc-send" onclick="cvc.send()" disabled>Send <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+                      </div>
+                    </div>
+
+                    <!-- actionable pointers (mirrors risk-check resolution UX) -->
+                    <div id="cvcPointers" class="cvc-pointers" style="display:none;">
+                      <div class="cvc-ptr-head">
+                        <div class="t1" style="font-size:13.5px; font-weight:700; color:#111827; display:flex; align-items:center; gap:7px;"><i data-lucide="list-checks" class="w-4 h-4 text-primary"></i> Reviewer points</div>
+                        <div class="cvc-ptr-counts" id="cvcPtrCounts" aria-live="polite"></div>
+                      </div>
+                      <div class="cvc-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="cvcProgressTrack"><div class="cvc-progress-bar" id="cvcProgressBar"></div></div>
+                      <div class="cvc-progress-label" id="cvcProgressLabel" aria-live="polite">0 of 0 changes resolved</div>
+                      <div id="cvcPtrChanges"></div>
+                      <div id="cvcPtrSuggestions"></div>
+                      <div id="cvcPtrOkWrap" style="display:none;">
+                        <button type="button" class="cvc-okgroup-toggle" id="cvcOkToggle" aria-expanded="false" onclick="cvc.toggleOk()"><i data-lucide="chevron-down" id="cvcOkChevron" class="w-3.5 h-3.5"></i> <span id="cvcOkLabel">0 approved items</span></button>
+                        <div id="cvcPtrOk" style="display:none;"></div>
+                      </div>
+
+                      <!-- regenerate CTA / inline confirm (non-blocking) -->
+                      <div class="cvc-regen-wrap">
+                        <div id="cvcRegenCtaWrap">
+                          <button type="button" class="cvc-regen-btn" id="cvcRegenBtn" onclick="cvc.regenStart()"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Regenerate tender document <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+                        </div>
+                        <div id="cvcRegenConfirm" class="cvc-regen-confirm" style="display:none;" role="dialog" aria-label="Confirm regeneration">
+                          <div class="q" id="cvcRegenConfirmQ">Regenerate the tender with the applied changes? This creates a new version.</div>
+                          <div class="acts">
+                            <button type="button" class="no" onclick="cvc.regenCancel()">Cancel</button>
+                            <button type="button" class="yes" onclick="cvc.regenConfirm()">Regenerate</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- RIGHT: live document (deep-link target for Fix →) -->
+                  <div class="cvc-doc-card">
+                    <div class="cvc-doc-bar">
+                      <i data-lucide="file-text" class="w-4 h-4 text-ink-500"></i>
+                      <span class="lbl">Live document — TND-2026-010</span>
+                      <button type="button" class="back" id="cvcDocBack" onclick="cvc.backToReview()"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back to CVC review</button>
+                    </div>
+                    <div id="cvcDoc" class="cvc-doc"></div>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
 
@@ -2543,283 +2773,85 @@
               <li class="step-line done"></li>
               <li class="flex items-center gap-2"><span class="w-7 h-7 rounded-full bg-success text-white flex items-center justify-center"><i data-lucide="check" class="w-3.5 h-3.5"></i></span><span class="text-[12.5px] text-ink-500">AI Generation</span></li>
               <li class="step-line done"></li>
-              <li class="flex items-center gap-2"><span aria-current="step" class="w-7 h-7 rounded-full bg-primary text-white text-[12px] font-bold flex items-center justify-center">6</span><span class="text-[12.5px] font-semibold text-ink-900">CVC Review</span></li>
+              <li class="flex items-center gap-2"><span aria-current="step" class="w-7 h-7 rounded-full bg-primary text-white text-[12px] font-bold flex items-center justify-center">6</span><span class="text-[12.5px] font-semibold text-ink-900">Version History</span></li>
               <li class="step-line"></li>
               <li class="flex items-center gap-2"><span class="w-7 h-7 rounded-full bg-line text-ink-500 text-[12px] font-bold flex items-center justify-center">7</span><span class="text-[12.5px] text-ink-500">Publish</span></li>
             </ol>
-            <div class="md:hidden mt-3 text-[12.5px] text-ink-500">Step 6 of 7 — CVC Review</div>
+            <div class="md:hidden mt-3 text-[12.5px] text-ink-500">Step 6 of 7 — Version History</div>
           </div>
 
           <div class="px-6 lg:px-10 pt-8 pb-32">
-            <div class="max-w-[860px] mx-auto">
+            <div class="max-w-[1040px] mx-auto">
 
               <div class="flex items-start justify-between gap-3 mb-5">
                 <div>
-                  <h1 class="text-[20px] font-bold text-ink-900">Step 6: CVC Review</h1>
-                  <p class="text-[14px] text-ink-500 mt-1">The Central Vigilance Commission review is conducted by the CVC department. Send this tender for their review and wait for their clearance before proceeding.</p>
+                  <h1 class="text-[20px] font-bold text-ink-900">Step 6: Version History</h1>
+                  <p class="text-[14px] text-ink-500 mt-1">Every AI generation of this tender is recorded as a version. Review past versions, compare against the latest, and mark the final reviewed version for publication. Earlier versions always remain on record.</p>
                 </div>
                 <div class="text-[12px] text-ink-500 inline-flex items-center gap-1.5 mt-2"><i data-lucide="cloud-check" class="w-3.5 h-3.5"></i> Draft saved 2 min ago</div>
               </div>
 
-              <!-- ============ PHASE A — Send for CVC Review ============ -->
-              <div id="cvcPhaseA">
-              <!-- Tender summary card (read-only) -->
-              <section class="mb-7 bg-white border border-line rounded-xl p-6">
-                <div class="text-[11.5px] uppercase tracking-wider text-ink-400 font-semibold mb-3">Tender Summary</div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-[13px]">
-                  <div class="flex justify-between border-b border-line/60 pb-1.5"><span class="text-ink-500">Tender Type</span><span class="text-ink-900 font-medium">Works — Road Works</span></div>
-                  <div class="flex justify-between border-b border-line/60 pb-1.5"><span class="text-ink-500">Sector</span><span class="text-ink-900 font-medium">Infrastructure</span></div>
-                  <div class="flex justify-between border-b border-line/60 pb-1.5"><span class="text-ink-500">Estimated Cost</span><span class="text-ink-900 font-medium">₹45,00,000</span></div>
-                  <div class="flex justify-between border-b border-line/60 pb-1.5"><span class="text-ink-500">Procurement Method</span><span class="text-ink-900 font-medium">Open Tender</span></div>
-                  <div class="flex justify-between border-b border-line/60 pb-1.5"><span class="text-ink-500">BOQ Items</span><span class="text-ink-900 font-medium">4 items (₹27,28,268)</span></div>
-                  <div class="flex justify-between border-b border-line/60 pb-1.5"><span class="text-ink-500">Bid Deadline</span><span class="text-ink-900 font-medium">7 June 2026</span></div>
-                  <div class="flex justify-between"><span class="text-ink-500">Logos Uploaded</span><span class="text-ink-900 font-medium">2 (Maharashtra Seal, AMC)</span></div>
-                  <div class="flex justify-between"><span class="text-ink-500">Document Language</span><span class="text-ink-900 font-medium">English</span></div>
+              <!-- ============ FINAL-VERSION BANNER (shown once a version is marked final) ============ -->
+              <div id="vhFinalBanner" class="hidden mb-5 rounded-xl px-5 py-4 flex items-center gap-3" style="background:#F0FDF4; border:1px solid #BBF7D0;" role="status" aria-live="polite">
+                <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style="background:#10B981; color:white;"><i data-lucide="badge-check" class="w-5 h-5"></i></div>
+                <div class="flex-1 min-w-0">
+                  <div class="text-[14px] font-semibold" style="color:#065F46;"><span id="vhFinalBannerText">v—</span> is marked final for publication</div>
+                  <div class="text-[12px] text-ink-500 mt-0.5">All other versions are superseded but remain viewable and downloadable for audit.</div>
                 </div>
-              </section>
+                <a href="#step7" onclick="vhProceedToPublish(event)" class="px-4 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5 shadow-soft whitespace-nowrap">Proceed to publish <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
+              </div>
 
-              <!-- Submission Checklist -->
-              <section class="mb-9">
-                <div class="flex items-center justify-between flex-wrap gap-3 pb-2 border-b border-line mb-2">
+              <!-- ============ VERSION HISTORY TABLE ============ -->
+              <section class="mb-6 bg-white border border-line rounded-xl overflow-hidden">
+                <div class="flex items-center justify-between flex-wrap gap-2 px-5 py-3.5 border-b border-line">
                   <div>
-                    <h2 class="text-[15px] font-bold text-ink-900">Submission Checklist</h2>
-                    <p class="text-[12px] text-ink-500 mt-0.5">Pre-flight check before sending for CVC review. Confirm each item.</p>
+                    <h2 class="text-[15px] font-bold text-ink-900">Tender Version History</h2>
+                    <p class="text-[12px] text-ink-500 mt-0.5">Append-only record. Marking a version final supersedes earlier ones but never deletes them.</p>
                   </div>
-                  <button onclick="confirmAllCvc()" class="px-3 py-1.5 rounded-lg border border-line text-[12.5px] text-ink-500 hover:text-ink-900 hover:bg-surface">Confirm All</button>
+                  <div class="text-[12px] text-ink-500 inline-flex items-center gap-1.5"><i data-lucide="history" class="w-3.5 h-3.5"></i> <span id="vhCountLabel">0 versions</span></div>
                 </div>
-
-                <div class="mt-4 mb-4 flex items-center gap-3">
-                  <div class="flex-1 h-2 bg-line rounded-full overflow-hidden" role="progressbar" aria-valuemin="0" aria-valuemax="10" id="cvcProgressBar"><div id="cvcProgressFill" class="h-full bg-primary rounded-full transition-all" style="width: 0%;"></div></div>
-                  <div class="text-[12.5px] text-ink-500"><span id="cvcCount">0</span> of 10 items confirmed</div>
+                <div id="vhLive" class="sr-only" aria-live="polite"></div>
+                <div class="overflow-x-auto">
+                  <table class="w-full text-[13px]" id="vhTable">
+                    <thead>
+                      <tr class="text-left text-[11px] uppercase tracking-wider text-ink-400 font-semibold border-b border-line bg-surface/60">
+                        <th class="px-5 py-2.5 whitespace-nowrap">Version</th>
+                        <th class="px-4 py-2.5 whitespace-nowrap">Generated On</th>
+                        <th class="px-4 py-2.5 whitespace-nowrap">Status</th>
+                        <th class="px-4 py-2.5 whitespace-nowrap">CVC Review</th>
+                        <th class="px-4 py-2.5 whitespace-nowrap min-w-[220px]">Notes</th>
+                        <th class="px-5 py-2.5 whitespace-nowrap text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="vhTableBody"><!-- rendered by versionHistory controller --></tbody>
+                  </table>
                 </div>
-
-                <ul id="cvcList" class="space-y-2 text-[13.5px]">
-                  <li><label class="flex items-start gap-3 p-3 border border-line rounded-[10px] hover:bg-surface cursor-pointer">
-                    <input type="checkbox" class="cvc-check accent-primary mt-0.5" onchange="updateCvcProgress()">
-                    <div class="flex-1"><div class="text-ink-900">Administrative Approval (AA) obtained</div><div class="text-[11.5px] text-ink-500 font-mono mt-0.5">AA/2025-26/PWD/0892</div></div>
-                    <i data-lucide="check-circle-2" class="w-4 h-4 text-success cvc-status hidden"></i>
-                  </label></li>
-                  <li><label class="flex items-start gap-3 p-3 border border-line rounded-[10px] hover:bg-surface cursor-pointer">
-                    <input type="checkbox" class="cvc-check accent-primary mt-0.5" onchange="updateCvcProgress()">
-                    <div class="flex-1"><div class="text-ink-900">Technical Sanction (TS) obtained</div><div class="text-[11.5px] text-ink-500 font-mono mt-0.5">TS/CE/2025/4421</div></div>
-                    <i data-lucide="check-circle-2" class="w-4 h-4 text-success cvc-status hidden"></i>
-                  </label></li>
-                  <li><label class="flex items-start gap-3 p-3 border border-line rounded-[10px] hover:bg-surface cursor-pointer">
-                    <input type="checkbox" class="cvc-check accent-primary mt-0.5" onchange="updateCvcProgress()">
-                    <div class="flex-1"><div class="text-ink-900">Budget allocation confirmed</div><div class="text-[11.5px] text-ink-500 mt-0.5">Budget head: PWD/Roads/2026-27 — ₹45,00,000</div></div>
-                    <i data-lucide="check-circle-2" class="w-4 h-4 text-success cvc-status hidden"></i>
-                  </label></li>
-                  <li><label class="flex items-start gap-3 p-3 border border-line rounded-[10px] hover:bg-surface cursor-pointer">
-                    <input type="checkbox" class="cvc-check accent-primary mt-0.5" onchange="updateCvcProgress()">
-                    <div class="flex-1"><div class="text-ink-900">GeM availability checked</div><div class="text-[11.5px] text-ink-500 mt-0.5">Not available on GeM (per pre-check)</div></div>
-                    <i data-lucide="check-circle-2" class="w-4 h-4 text-success cvc-status hidden"></i>
-                  </label></li>
-                  <li><label class="flex items-start gap-3 p-3 border border-line rounded-[10px] hover:bg-surface cursor-pointer">
-                    <input type="checkbox" class="cvc-check accent-primary mt-0.5" onchange="updateCvcProgress()">
-                    <div class="flex-1"><div class="text-ink-900">EMD is minimum 2% of estimated cost</div><div class="text-[11.5px] text-success mt-0.5">₹90,000 / ₹45,00,000 = 2.0% ✓</div></div>
-                    <i data-lucide="check-circle-2" class="w-4 h-4 text-success cvc-status hidden"></i>
-                  </label></li>
-                  <li><label class="flex items-start gap-3 p-3 border border-line rounded-[10px] hover:bg-surface cursor-pointer">
-                    <input type="checkbox" class="cvc-check accent-primary mt-0.5" onchange="updateCvcProgress()">
-                    <div class="flex-1"><div class="text-ink-900">Tender timeline meets GFR minimum days</div><div class="text-[11.5px] text-success mt-0.5">30 days from publication to bid submission ✓</div></div>
-                    <i data-lucide="check-circle-2" class="w-4 h-4 text-success cvc-status hidden"></i>
-                  </label></li>
-                  <li><label class="flex items-start gap-3 p-3 border border-line rounded-[10px] hover:bg-surface cursor-pointer">
-                    <input type="checkbox" class="cvc-check accent-primary mt-0.5" onchange="updateCvcProgress()">
-                    <div class="flex-1"><div class="text-ink-900">PQ/TQ criteria reviewed for restrictiveness</div><a href="#step2" class="text-[11.5px] text-primary hover:underline mt-0.5 inline-block">Open Step 2 →</a></div>
-                    <i data-lucide="check-circle-2" class="w-4 h-4 text-success cvc-status hidden"></i>
-                  </label></li>
-                  <li><label class="flex items-start gap-3 p-3 border border-line rounded-[10px] hover:bg-surface cursor-pointer">
-                    <input type="checkbox" class="cvc-check accent-primary mt-0.5" onchange="updateCvcProgress()">
-                    <div class="flex-1"><div class="text-ink-900">BOQ rates verified against DSR</div><a href="#step3" class="text-[11.5px] text-primary hover:underline mt-0.5 inline-block">Open Step 3 →</a></div>
-                    <i data-lucide="check-circle-2" class="w-4 h-4 text-success cvc-status hidden"></i>
-                  </label></li>
-                  <li><label class="flex items-start gap-3 p-3 border border-line rounded-[10px] hover:bg-surface cursor-pointer">
-                    <input type="checkbox" class="cvc-check accent-primary mt-0.5" onchange="updateCvcProgress()">
-                    <div class="flex-1"><div class="text-ink-900">No brand-specific language in specifications</div><div class="text-[11.5px] text-success mt-0.5">AI scan: 0 brand mentions found</div></div>
-                    <i data-lucide="check-circle-2" class="w-4 h-4 text-success cvc-status hidden"></i>
-                  </label></li>
-                  <li><label class="flex items-start gap-3 p-3 border border-line rounded-[10px] hover:bg-surface cursor-pointer">
-                    <input type="checkbox" class="cvc-check accent-primary mt-0.5" onchange="updateCvcProgress()">
-                    <div class="flex-1"><div class="text-ink-900">GCC/SCC clauses reviewed</div><a href="#step5" class="text-[11.5px] text-primary hover:underline mt-0.5 inline-block">Open Step 5 →</a></div>
-                    <i data-lucide="check-circle-2" class="w-4 h-4 text-success cvc-status hidden"></i>
-                  </label></li>
-                </ul>
-
-                <div id="cvcGate" role="alert" class="mt-4 bg-danger-light border border-danger/40 rounded-lg px-4 py-3 flex items-start gap-2">
-                  <i data-lucide="lock" class="w-4 h-4 text-danger shrink-0 mt-0.5"></i>
-                  <p class="text-[13px] text-ink-900"><strong>Send is locked</strong> until all 10 checklist items are confirmed.</p>
+                <!-- Empty state -->
+                <div id="vhEmpty" class="hidden px-6 py-12 text-center">
+                  <div class="inline-flex items-center justify-center w-11 h-11 rounded-full bg-primary-light text-primary mb-3"><i data-lucide="file-clock" class="w-5 h-5"></i></div>
+                  <div class="text-[14px] font-semibold text-ink-900">No versions yet</div>
+                  <p class="text-[12.5px] text-ink-500 mt-1 max-w-sm mx-auto">Generate the tender on the AI Generation step to record the first version here.</p>
+                  <a href="#step5" class="mt-4 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-line text-[12.5px] text-ink-900 hover:bg-surface"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Go to AI Generation</a>
                 </div>
               </section>
 
-              <!-- Send for CVC Review -->
-              <section class="mb-2 text-center">
-                <button onclick="openSendCvcConfirm()" id="sendCvcBtn" disabled aria-disabled="true" class="opacity-50 cursor-not-allowed inline-flex items-center justify-center gap-2 bg-primary text-white hover:bg-primary/90 shadow-soft" style="border-radius: 10px; padding: 14px 32px; font-size: 16px; font-weight: 600;">
-                  Send for CVC Review <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                </button>
-                <div class="text-[13px] text-ink-500 mt-3 max-w-md mx-auto">The CVC department will be notified automatically. You will receive a notification when review is complete.</div>
-              </section>
-              </div><!-- /cvcPhaseA -->
-
-              <!-- ============ PHASE PENDING — Awaiting CVC review ============ -->
-              <div id="cvcPhasePending" class="hidden">
-                <section class="bg-white border border-line rounded-2xl p-10 text-center">
-                  <div class="inline-flex items-center justify-center w-12 h-12 rounded-full mb-4" style="border: 3px solid #EFF6FF; border-top-color: #0F5EE8; animation: spin 1.2s linear infinite;"></div>
-                  <h2 class="text-[18px] font-bold text-ink-900">Sent for CVC Review</h2>
-                  <div class="text-[13px] text-ink-500 mt-1.5"><span id="cvcSentTimestamp">Submitted on May 12, 2026 at 2:34 PM</span></div>
-                  <div class="text-[12px] text-ink-500 mt-1 font-mono">Reference: CVC-REV-2026-TND-010</div>
-                  <div role="status" class="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-lg" style="background:#FFFBEB; border:1px solid #FCD34D;">
-                    <i data-lucide="clock" class="w-4 h-4" style="color:#92400E;"></i>
-                    <span class="text-[13px] font-medium" style="color:#92400E;">Typical review time: 3–5 working days</span>
-                  </div>
-                  <p class="text-[13px] text-ink-500 mt-4">You will be notified when the review is complete.</p>
-                  <div class="mt-6 pt-5 border-t border-line">
-                    <button onclick="simulateCvcCleared()" class="text-[11px] hover:underline" style="color: #9CA3AF;">Simulate CVC clearance (for testing)</button>
-                  </div>
-                </section>
+              <!-- legend -->
+              <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11.5px] text-ink-500 mb-2">
+                <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background:#9CA3AF;"></span> Draft</span>
+                <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background:#F59E0B;"></span> Under CVC review</span>
+                <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background:#0F5EE8;"></span> Revised</span>
+                <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background:#10B981;"></span> Approved / Published</span>
               </div>
 
-              <!-- ============ PHASE B — CVC Cleared + Committee ============ -->
-              <div id="cvcPhaseB" class="hidden">
-                <!-- Green success header -->
-                <div role="status" class="rounded-xl p-6 mb-6" style="background:#F0FDF4; border:1px solid #BBF7D0;">
-                  <div class="flex items-start gap-4">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background:#10B981; color:white;"><i data-lucide="check" class="w-6 h-6"></i></div>
-                    <div class="flex-1">
-                      <h2 class="text-[20px] font-bold" style="color:#065F46;">CVC Review Cleared</h2>
-                      <div class="text-[13px] text-ink-500 mt-1">Cleared by: <strong class="text-ink-900">CVC Department</strong></div>
-                      <div class="text-[13px] text-ink-500">Cleared on: <strong class="text-ink-900">May 15, 2026</strong></div>
-                      <div class="text-[13px] text-ink-500 font-mono">Reference: CVC-REV-2026-TND-010</div>
-                      <a href="#" class="mt-2 inline-flex items-center gap-1 text-[13px] text-primary hover:underline"><i data-lucide="file-text" class="w-3.5 h-3.5"></i> View CVC Clearance Certificate</a>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Drafting Committee Approval -->
-                <section class="mb-6">
-                  <div class="pb-2 border-b border-line mb-1">
-                    <h2 class="text-[15px] font-bold text-ink-900">Drafting Committee Approval</h2>
-                  </div>
-                  <p class="text-[12px] text-ink-500 mb-4">CVC clearance obtained. Now get sign-off from all members of the drafting committee before publishing.</p>
-                  <div id="committeeList" class="space-y-2.5"></div>
-                  <div class="mt-4">
-                    <div class="flex items-center justify-between mb-1.5">
-                      <div class="text-[12.5px] text-ink-500"><span id="commApprovedCount">2</span> of 4 committee members have approved</div>
-                    </div>
-                    <div class="h-1.5 rounded-full overflow-hidden" style="background: #E5E7EB;"><div id="commProgressBar" class="h-full bg-primary transition-all" style="width: 50%;"></div></div>
-                  </div>
-                  <div class="mt-5 flex flex-col items-end gap-1.5">
-                    <button onclick="goToPublish()" id="committeeContinueBtn" disabled aria-disabled="true" class="opacity-50 cursor-not-allowed pointer-events-none px-4 py-2.5 rounded-lg bg-primary text-white text-[13.5px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5 shadow-soft">Proceed to Publish <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
-                    <div id="committeeRemaining" class="text-[12px] text-ink-500">2 more approvals needed</div>
-                    <button onclick="simulateAllApprovals()" class="text-[11px] hover:underline mt-1" style="color: #9CA3AF;">Simulate all approvals (for testing)</button>
-                  </div>
-                </section>
-              </div>
-
-              <!-- (Section B & C removed — replaced by phase B above) -->
-              <!-- Hidden anchor to preserve below: --><section class="hidden"><!-- Removed: Approval Chain -->
-              <section class="mb-9">
-                <h2 class="text-[15px] font-bold text-ink-900 pb-2 border-b border-line mb-5">Internal Approval Chain</h2>
-                <p class="text-[12px] text-ink-500 -mt-3 mb-5">Tender value ₹45L → 4-step chain: Officer → Technical → Finance → HOD</p>
-
-                <!-- Visual chain -->
-                <div class="bg-white border border-line rounded-[10px] p-5">
-                  <div class="grid grid-cols-4 gap-2 relative">
-                    <div class="absolute top-6 left-[12.5%] right-[12.5%] h-0.5 bg-line z-0"></div>
-                    <div class="absolute top-6 left-[12.5%] h-0.5 bg-primary z-0" id="chainFill" style="width: 0%; transition: width .35s ease;"></div>
-
-                    <div class="flex flex-col items-center text-center relative z-10" data-node="0">
-                      <span class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold text-[12px] ring-4 ring-white">RK</span>
-                      <div class="mt-2 text-[12.5px] font-medium text-ink-900">Rajesh Kumar</div>
-                      <div class="text-[11px] text-ink-500">Officer</div>
-                      <span class="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-success-light text-success text-[10.5px] font-semibold"><i data-lucide="check" class="w-3 h-3"></i> Submitted</span>
-                    </div>
-
-                    <div class="flex flex-col items-center text-center relative z-10" data-node="1">
-                      <span class="w-12 h-12 rounded-full bg-line text-ink-500 flex items-center justify-center font-bold text-[12px] ring-4 ring-white" id="node1Avatar">PS</span>
-                      <select class="mt-2 text-[12.5px] font-medium text-ink-900 border border-line rounded px-2 py-1 bg-white" id="approver1">
-                        <option>Priya Shah</option><option>Vikram Naik</option><option>Anita Joshi</option>
-                      </select>
-                      <div class="text-[11px] text-ink-500">Technical Officer</div>
-                      <span class="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-ink-400/15 text-ink-500 text-[10.5px] font-semibold node-status">Pending</span>
-                    </div>
-
-                    <div class="flex flex-col items-center text-center relative z-10" data-node="2">
-                      <span class="w-12 h-12 rounded-full bg-line text-ink-500 flex items-center justify-center font-bold text-[12px] ring-4 ring-white">AP</span>
-                      <select class="mt-2 text-[12.5px] font-medium text-ink-900 border border-line rounded px-2 py-1 bg-white">
-                        <option>Amit Patil</option><option>Suresh Kale</option>
-                      </select>
-                      <div class="text-[11px] text-ink-500">Finance Officer</div>
-                      <span class="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-ink-400/15 text-ink-500 text-[10.5px] font-semibold node-status">Pending</span>
-                    </div>
-
-                    <div class="flex flex-col items-center text-center relative z-10" data-node="3">
-                      <span class="w-12 h-12 rounded-full bg-line text-ink-500 flex items-center justify-center font-bold text-[12px] ring-4 ring-white">SM</span>
-                      <select class="mt-2 text-[12.5px] font-medium text-ink-900 border border-line rounded px-2 py-1 bg-white">
-                        <option>Sunil Mehta</option><option>Ravi Iyer</option>
-                      </select>
-                      <div class="text-[11px] text-ink-500">HOD</div>
-                      <span class="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-ink-400/15 text-ink-500 text-[10.5px] font-semibold node-status">Pending</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="mt-5">
-                  <label class="block text-[13px] font-medium text-ink-900 mb-1.5">Add Note for Approvers</label>
-                  <textarea rows="3" placeholder="Add any context or instructions for the approval chain…" class="field" id="approverNote"></textarea>
-                </div>
-
-                <button onclick="sendForApprovalChain()" id="sendApprovalBtn" class="mt-4 w-full px-4 py-3 rounded-lg bg-primary text-white text-[14px] font-medium hover:bg-primary/90 inline-flex items-center justify-center gap-1.5 shadow-soft">
-                  Send for Approval <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                </button>
-
-                <!-- Status cards (after sending) -->
-                <div id="approvalStatusCards" class="hidden mt-5 space-y-2.5"></div>
-
-                <!-- Reminder escalation -->
-                <div id="approvalEscalation" role="alert" class="hidden mt-3 bg-warning-light border border-warning/40 rounded-lg p-4 flex items-start gap-2">
-                  <i data-lucide="alert-triangle" class="w-4 h-4 text-warning shrink-0 mt-0.5"></i>
-                  <div class="flex-1">
-                    <p class="text-[12.5px] text-ink-900">Technical Officer hasn't reviewed in 3 days. Send a reminder or escalate to HOD.</p>
-                    <div class="mt-2 flex items-center gap-2">
-                      <button class="px-3 py-1.5 rounded-lg border border-warning text-warning text-[12px] font-medium hover:bg-warning/10">Send Reminder</button>
-                      <button class="px-3 py-1.5 rounded-lg border border-danger text-danger text-[12px] font-medium hover:bg-danger-light">Escalate to HOD</button>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              <!-- Section C: Version History -->
-              <section class="mb-6">
-                <button onclick="toggleVersionHistory()" class="w-full flex items-center justify-between pb-2 border-b border-line">
-                  <h2 class="text-[15px] font-bold text-ink-900">Tender Version History</h2>
-                  <i data-lucide="chevron-down" id="vhChevron" class="w-4 h-4 text-ink-400"></i>
-                </button>
-                <div id="vhBody" class="hidden mt-4 space-y-2">
-                  <div class="flex items-start gap-3 p-3 bg-white border border-line rounded-[10px]">
-                    <div class="w-7 h-7 rounded-full bg-ink-400/15 text-ink-500 text-[11px] font-bold flex items-center justify-center shrink-0">v1.0</div>
-                    <div class="flex-1"><div class="text-[13.5px] text-ink-900 font-medium">Draft created</div><div class="text-[11.5px] text-ink-500">May 5, 2026 • Rajesh Kumar</div></div>
-                  </div>
-                  <div class="flex items-start gap-3 p-3 bg-white border border-line rounded-[10px]">
-                    <div class="w-7 h-7 rounded-full bg-ink-400/15 text-ink-500 text-[11px] font-bold flex items-center justify-center shrink-0">v1.1</div>
-                    <div class="flex-1"><div class="text-[13.5px] text-ink-900 font-medium">BOQ updated (4 items)</div><div class="text-[11.5px] text-ink-500">May 6, 2026 • Rajesh Kumar</div></div>
-                  </div>
-                  <div class="flex items-start gap-3 p-3 bg-white border border-line rounded-[10px]">
-                    <div class="w-7 h-7 rounded-full bg-ink-400/15 text-ink-500 text-[11px] font-bold flex items-center justify-center shrink-0">v1.2</div>
-                    <div class="flex-1 flex items-center justify-between gap-3 flex-wrap"><div><div class="text-[13.5px] text-ink-900 font-medium">PQ criteria revised</div><div class="text-[11.5px] text-ink-500">May 7, 2026 • Rajesh Kumar</div></div><a href="#" class="text-[12px] text-primary hover:underline">View diff →</a></div>
-                  </div>
-                </div>
-              </section>
-              </section><!-- /hidden legacy approval chain + version history -->
             </div>
           </div>
 
           <div class="fixed bottom-0 left-[244px] right-0 border-t border-line bg-white px-8 py-3.5 flex items-center justify-between z-20">
             <a href="#step5" class="text-[13px] text-ink-500 hover:text-ink-900 inline-flex items-center gap-1.5"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back to AI Generation</a>
-            <div class="text-[12.5px] text-ink-500 hidden md:block">Step 6 of 7 — CVC Review</div>
+            <div class="text-[12.5px] text-ink-500 hidden md:block">Step 6 of 7 — Version History</div>
             <div class="flex items-center gap-2">
               <button onclick="saveAndExit()" class="px-3.5 py-2 rounded-lg border border-line text-[13px] text-ink-500 hover:text-ink-900 hover:bg-surface">Save as Draft</button>
-              <a href="#step7" id="step6Continue" aria-disabled="true" class="opacity-50 cursor-not-allowed pointer-events-none px-4 py-2.5 rounded-lg bg-primary text-white text-[13.5px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5 shadow-soft" data-step6-label><span id="step6CtaLabel">Waiting for CVC Review</span> <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
+              <a href="#step7" id="step6Continue" aria-disabled="true" class="opacity-50 cursor-not-allowed pointer-events-none px-4 py-2.5 rounded-lg bg-primary text-white text-[13.5px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5 shadow-soft" data-step6-label><span id="step6CtaLabel">Proceed to Publish</span> <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
             </div>
           </div>
         </section>
@@ -2956,7 +2988,7 @@
           </div>
 
           <div id="step7Footer" class="fixed bottom-0 left-[244px] right-0 border-t border-line bg-white px-8 py-3.5 flex items-center justify-between z-20">
-            <a href="#step6" class="text-[13px] text-ink-500 hover:text-ink-900 inline-flex items-center gap-1.5"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back to CVC Review</a>
+            <a href="#step6" class="text-[13px] text-ink-500 hover:text-ink-900 inline-flex items-center gap-1.5"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back to Version History</a>
             <div class="text-[12.5px] text-ink-500 hidden md:block">Step 7 of 7 — Publish</div>
             <div class="flex items-center gap-2">
               <button onclick="saveAndExit()" class="px-3.5 py-2 rounded-lg border border-line text-[13px] text-ink-500 hover:text-ink-900 hover:bg-surface">Save as Draft</button>
@@ -3113,6 +3145,44 @@
     </div>
   </div>
 
+  <!-- ===== VERSION SNAPSHOT VIEWER (read-only document preview) ===== -->
+  <div id="vhSnapModal" class="hidden fixed inset-0 z-50 bg-ink-900/40 flex items-center justify-center p-4" onclick="if(event.target===this)vhCloseSnap()">
+    <div class="bg-white rounded-2xl w-full max-w-[820px] max-h-[88vh] flex flex-col shadow-lift overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="vhSnapTitle">
+      <div class="flex items-center gap-3 px-5 py-3.5 border-b border-line bg-surface">
+        <i data-lucide="file-text" class="w-4 h-4 text-ink-500"></i>
+        <div class="flex-1 min-w-0">
+          <div id="vhSnapTitle" class="text-[14px] font-semibold text-ink-900">Tender document — <span id="vhSnapVer">v1</span></div>
+          <div id="vhSnapMeta" class="text-[11.5px] text-ink-500">Read-only snapshot</div>
+        </div>
+        <span class="text-[10.5px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full bg-ink-400/15 text-ink-500">Read-only</span>
+        <button onclick="vhCloseSnap()" aria-label="Close" class="w-8 h-8 rounded-lg hover:bg-line/60 inline-flex items-center justify-center text-ink-500"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <div class="cvc-doc" id="vhSnapDoc" style="max-height:none; position:static;"><!-- snapshot html injected --></div>
+      <div class="px-5 py-3 border-t border-line flex justify-between items-center bg-surface">
+        <button onclick="vhDownloadFromSnap()" class="px-3 py-1.5 rounded-lg border border-line text-[12.5px] text-ink-900 hover:bg-white inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Download PDF</button>
+        <button onclick="vhCloseSnap()" class="px-3.5 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== COMPARE-WITH-LATEST (lightweight diff summary) ===== -->
+  <div id="vhCompareModal" class="hidden fixed inset-0 z-50 bg-ink-900/40 flex items-center justify-center p-4" onclick="if(event.target===this)vhCloseCompare()">
+    <div class="bg-white rounded-2xl w-full max-w-[680px] max-h-[88vh] flex flex-col shadow-lift overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="vhCmpTitle">
+      <div class="flex items-center gap-3 px-5 py-3.5 border-b border-line bg-surface">
+        <i data-lucide="git-compare" class="w-4 h-4 text-ink-500"></i>
+        <div class="flex-1 min-w-0">
+          <div id="vhCmpTitle" class="text-[14px] font-semibold text-ink-900">Compare <span id="vhCmpVer">v1</span> with latest</div>
+          <div id="vhCmpMeta" class="text-[11.5px] text-ink-500">Change summary</div>
+        </div>
+        <button onclick="vhCloseCompare()" aria-label="Close" class="w-8 h-8 rounded-lg hover:bg-line/60 inline-flex items-center justify-center text-ink-500"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <div class="p-5 overflow-y-auto" id="vhCmpBody"><!-- diff summary injected --></div>
+      <div class="px-5 py-3 border-t border-line flex justify-end bg-surface">
+        <button onclick="vhCloseCompare()" class="px-3.5 py-2 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ============================================================= -->
   <!-- SCRIPTS                                                          -->
   <!-- ============================================================= -->
@@ -3150,7 +3220,7 @@
     function drmUnlockNav(){
       if (!DESIGN_REVIEW_MODE) return;
       // 1) Known forward-nav buttons that validation toggles disabled.
-      ['step1Continue','committeeContinueBtn','step6Continue','sendCvcBtn'].forEach(id => drmEnable(document.getElementById(id)));
+      ['step1Continue','step6Continue'].forEach(id => drmEnable(document.getElementById(id)));
       // 2) Any other Continue/Proceed forward-nav control by id convention.
       document.querySelectorAll('[id$="Continue"],[id$="ContinueBtn"],[id$="ContinueLink"]').forEach(el => {
         drmEnable(el);
@@ -3206,7 +3276,8 @@
       window.scrollTo({ top: 0 });
       refreshIcons();
       if (window.bpKit) try { window.bpKit.refreshBadges(); } catch(e){}  // bpKit: sync blueprint badges when a view (e.g. corrigendum) is shown
-      // Entering Step 5 → (re)start the timed AI-generation experience fresh.
+      // Entering Step 5 → reflect the saved ToC preference on the toggle, then (re)start generation fresh.
+      if (name === 'step5' && typeof agSyncTocToggle === 'function') { try { agSyncTocToggle(); } catch(e){} }
       if (name === 'step5' && typeof agStart === 'function') { try { agStart(); } catch(e){} }
       // DESIGN_REVIEW_MODE: after every step render, force-enable forward nav and
       // make the step indicator fully clickable. No-op when the flag is false.
@@ -5316,6 +5387,50 @@
        Full timer cleanup runs on replay AND on leaving Step 5.
        ===================================================================== */
 
+    // ===== Table of Contents option (Step 5) =====
+    // Single source of truth: tenderDraft.includeTableOfContents (boolean, default true).
+    // Persisted to its own localStorage key so the preference survives a reload.
+    const TOC_LS_KEY = 'taIncludeToc_TND-2026-010';
+    function tocEnabled(){
+      window.tenderDraft = window.tenderDraft || {};
+      if (typeof window.tenderDraft.includeTableOfContents !== 'boolean'){
+        let stored = null;
+        try { const r = localStorage.getItem(TOC_LS_KEY); if (r !== null) stored = (r === 'true'); } catch(e){}
+        window.tenderDraft.includeTableOfContents = (stored === null) ? true : stored;
+      }
+      return window.tenderDraft.includeTableOfContents;
+    }
+    function tocSetEnabled(on){
+      window.tenderDraft = window.tenderDraft || {};
+      window.tenderDraft.includeTableOfContents = !!on;
+      try { localStorage.setItem(TOC_LS_KEY, on ? 'true' : 'false'); } catch(e){}
+    }
+    // Reflect the stored preference onto the Step 5 toggle (called on step entry).
+    function agSyncTocToggle(){
+      const t = document.getElementById('tocToggle');
+      if (t) t.checked = tocEnabled();
+    }
+    // Enable/disable the toggle during a run (locked while generating).
+    function agSetTocToggleLocked(locked){
+      const t = document.getElementById('tocToggle');
+      const wrap = document.getElementById('tocToggleWrap');
+      if (t) t.disabled = !!locked;
+      if (wrap) wrap.title = locked ? 'Replay generation to change this' : '';
+    }
+    // User flips the toggle (only possible before generation starts).
+    function agOnTocToggle(el){
+      tocSetEnabled(el.checked);
+      // refresh the right-column preview + Check Draft so the ToC appears/disappears immediately
+      if (typeof window.renderDraftDoc === 'function' && window.draftPanelOpen){ try { window.renderDraftDoc(); } catch(e){} }
+    }
+    // The Table-of-Contents generation section (Part 1, first). Shared shape with every other section.
+    function agTocSection(){
+      return { part:'Part 1 — Notice Inviting Tender', name:'Table of Contents', dur:1500, isToc:true,
+               html: agTocDocHtml('preview') };
+    }
+    // Exposed so renderDraftDoc (different script scope) can render the same ToC in the Check Draft doc.
+    window.tocEnabled = tocEnabled;
+
     // --- realistic preview content pulled from the live tenderDraft / form ---
     function agReadDraft(){
       const v = (id) => { const el = document.getElementById(id); return el ? (el.value || '').trim() : ''; };
@@ -5350,8 +5465,8 @@
     // generic placeholder used only where a field is empty
     function agPH(t){ return '<span style="color:#9CA3AF;">'+agEsc(t)+'</span>'; }
 
-    // --- the 20 sections (5 parts). durationMs sums to ~60000ms (organic, not uniform) ---
-    function agSections(){
+    // --- the 20 base sections (5 parts). durationMs sums to ~60000ms (organic, not uniform) ---
+    function agBaseSections(){
       const d = agReadDraft();
       const title   = d.title   ? agEsc(d.title)   : agPH('[work title — from Step 1]');
       const estCost = d.estCost ? agEsc(d.estCost) : agPH('[estimated cost — from Step 3]');
@@ -5415,6 +5530,55 @@
           html:'<p>Integrity Pact and anti-collusion undertaking to be executed by the bidder and the Employer, binding for the duration of the contract.</p>' }
       ];
     }
+
+    // The sequence the controller drives: the 20 base sections, optionally prefixed
+    // with a Table of Contents as the FIRST section (Part 1) when the toggle is ON.
+    function agSections(){
+      const base = agBaseSections();
+      return tocEnabled() ? [agTocSection()].concat(base) : base;
+    }
+
+    // Build a rendered Table-of-Contents index (parts + sections, dotted leaders,
+    // sequential page-number placeholders). `mode`:
+    //   'preview' → for the right-column generation card (derives from agBaseSections + custom sections)
+    //   element   → walk the live draft-doc DOM so it reflects the CURRENT structure (incl. custom sections)
+    function agTocDocHtml(mode){
+      let entries = []; // { part, label }  (label already escaped/plain)
+      if (mode && mode.querySelectorAll){
+        // Walk the rendered document: each .nit-section h3 is one TOC line.
+        const headerH2 = mode.querySelector('.doc-header h2');
+        let part = headerH2 ? (headerH2.textContent || '').trim() : 'Notice Inviting Tender';
+        mode.querySelectorAll('.nit-section > h3').forEach(h3 => {
+          const label = (h3.textContent || '').trim().replace(/\s+/g, ' ');
+          if (label) entries.push({ part: part, label: label });
+        });
+      } else {
+        // 'preview' — derive from the base section list + any custom sections.
+        const base = agBaseSections();
+        base.forEach(s => entries.push({ part: s.part.replace(/^Part \d+ — /, ''), label: s.name }));
+        // include custom sections (best-effort append; the Check Draft ToC reflects exact anchored order)
+        try {
+          const cs = (window.tenderDraft && Array.isArray(window.tenderDraft.customSections)) ? window.tenderDraft.customSections : [];
+          cs.forEach(c => entries.push({ part: 'Annexures & Custom Sections', label: (c.title || 'Custom Section') }));
+        } catch(e){}
+      }
+      if (!entries.length) return '<div class="doc-toc-list"></div>';
+      let html = '';
+      let lastPart = null;
+      let page = 1;
+      entries.forEach((e, i) => {
+        if (e.part !== lastPart){
+          html += '<div class="doc-toc-part">' + agEsc(e.part) + '</div>';
+          lastPart = e.part;
+        }
+        page += (i === 0 ? 0 : (i % 2 === 0 ? 2 : 1)); // demo page numbers from section order
+        html += '<div class="doc-toc-row"><span class="toc-label">' + agEsc(e.label) + '</span>'
+              + '<span class="toc-leader" aria-hidden="true"></span>'
+              + '<span class="toc-page">' + (page + 1) + '</span></div>';
+      });
+      return '<div class="doc-toc"><h3>Table of Contents</h3><div class="doc-toc-list">' + html + '</div></div>';
+    }
+    window.agTocDocHtml = agTocDocHtml;
 
     // --- controller state ---
     let agState = null; // { sections, idx, raf, timer, startTs, secStartTs, baseOffset, fast, done }
@@ -5517,6 +5681,7 @@
       const totalDur = sections.reduce((a,s)=>a + s.dur*scale, 0);
 
       agResetView(sections);
+      agSetTocToggleLocked(true); // lock the ToC toggle while a run is in progress (Replay re-enables it)
       const fastBtn = document.getElementById('agFastToggle');
       if (fastBtn){ fastBtn.classList.toggle('on', !!fast); fastBtn.setAttribute('aria-pressed', fast ? 'true' : 'false'); }
 
@@ -5533,6 +5698,7 @@
     }
 
     const AG_ACTIVITY = {
+      'Table of Contents':'Building table of contents…',
       'Tender reference & title':'Drafting tender reference…',
       'Issuing authority & contact':'Identifying issuing authority…',
       'Scope of work & deliverables':'Drafting scope of work…',
@@ -5652,6 +5818,7 @@
       const line = document.getElementById('agSuccessLine');
       if (line) line.textContent = 'Tender document generated · ' + agState.sections.length + ' sections · ~' + pages + ' pages';
       const succ = document.getElementById('agSuccess'); if (succ) succ.classList.remove('hidden');
+      agSetTocToggleLocked(false); // run finished — allow changing the ToC option before a replay
       if (window.lucide) lucide.createIcons();
     }
 
@@ -5689,141 +5856,13 @@
       if (typeof window.openDraftPanel === 'function') window.openDraftPanel(); // existing Check Draft panel
     }
 
-    // ================= STEP 6 — CVC Review (two-phase) =================
-    let cvcPhase = 'a'; // 'a' | 'pending' | 'b'
-    const COMMITTEE = [
-      { name: 'Priya Shah',   role: 'Technical Officer',  initials: 'PS', approved: true,  on: 'May 15, 2026' },
-      { name: 'Amit Patil',   role: 'Finance Officer',    initials: 'AP', approved: false, on: '' },
-      { name: 'Sunita Rao',   role: 'Deputy Commissioner',initials: 'SR', approved: false, on: '' },
-      { name: 'Rajesh Kumar', role: 'Super Admin (you)',  initials: 'RK', approved: true,  on: 'May 14, 2026' },
-    ];
-
-    function setCvcPhase(phase){
-      cvcPhase = phase;
-      document.getElementById('cvcPhaseA').classList.toggle('hidden', phase !== 'a');
-      document.getElementById('cvcPhasePending').classList.toggle('hidden', phase !== 'pending');
-      document.getElementById('cvcPhaseB').classList.toggle('hidden', phase !== 'b');
-      const label = document.getElementById('step6CtaLabel');
-      if (phase === 'a')        label.textContent = 'Complete checklist first';
-      else if (phase === 'pending') label.textContent = 'Waiting for CVC Review';
-      else                       label.textContent = 'Proceed to Publish';
-      if (phase === 'b') renderCommittee();
-      updateStep6Continue();
-      refreshIcons();
-    }
-
-    function updateCvcProgress(){
-      const checks = document.querySelectorAll('#cvcList .cvc-check');
-      const checked = Array.from(checks).filter(c => c.checked);
-      checks.forEach(c => { c.closest('label').querySelector('.cvc-status').classList.toggle('hidden', !c.checked); });
-      const n = checked.length;
-      document.getElementById('cvcCount').textContent = n;
-      document.getElementById('cvcProgressFill').style.width = (n*10) + '%';
-      document.getElementById('cvcGate').classList.toggle('hidden', n === 10);
-      const sendBtn = document.getElementById('sendCvcBtn');
-      if (sendBtn){
-        if (n === 10){
-          sendBtn.disabled = false; sendBtn.removeAttribute('aria-disabled');
-          sendBtn.classList.remove('opacity-50','cursor-not-allowed');
-          if (!sendBtn.dataset.pulsed){ sendBtn.classList.add('pulse-once'); sendBtn.dataset.pulsed = '1'; }
-        } else {
-          sendBtn.disabled = true; sendBtn.setAttribute('aria-disabled','true');
-          sendBtn.classList.add('opacity-50','cursor-not-allowed');
-          sendBtn.classList.remove('pulse-once');
-          delete sendBtn.dataset.pulsed;
-        }
-      }
-      // DESIGN_REVIEW_MODE: re-enable any forward-nav this just disabled.
-      if (DESIGN_REVIEW_MODE) { try { drmUnlockNav(); } catch(e){} }
-    }
-    function confirmAllCvc(){
-      document.querySelectorAll('#cvcList .cvc-check').forEach(c => c.checked = true);
-      updateCvcProgress();
-    }
-
-    function openSendCvcConfirm(){
-      openConfirm({
-        title: 'Send TND-2026-010 for CVC Review?',
-        body: 'This will notify the CVC department. You will not be able to make changes to the tender document while review is pending.',
-        icon: 'send', iconBg: 'bg-primary-light text-primary',
-        actionLabel: 'Send for Review',
-        action: () => {
-          setCvcPhase('pending');
-          const now = new Date().toLocaleString('en-IN', { day:'numeric', month:'long', year:'numeric', hour:'numeric', minute:'2-digit' });
-          const ts = document.getElementById('cvcSentTimestamp');
-          if (ts) ts.textContent = 'Submitted on ' + now;
-          showToast('Sent for CVC Review — reference CVC-REV-2026-TND-010');
-        }
-      });
-    }
-    function simulateCvcCleared(){
-      setCvcPhase('b');
-      showToast('CVC clearance received');
-    }
-
-    function renderCommittee(){
-      const wrap = document.getElementById('committeeList');
-      if (!wrap) return;
-      wrap.innerHTML = COMMITTEE.map((m, i) => {
-        const pill = m.approved
-          ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-success-light text-success text-[11.5px] font-semibold"><i data-lucide="check" class="w-3 h-3"></i> Approved</span><span class="text-[11px] text-ink-500 ml-2">${m.on}</span>`
-          : `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-warning-light text-warning text-[11.5px] font-semibold"><i data-lucide="clock" class="w-3 h-3"></i> Pending</span>
-             <button onclick="sendCommitteeReminder(${i})" class="ml-2 px-2.5 py-1 rounded-lg border border-warning text-warning text-[11.5px] font-medium hover:bg-warning/10 inline-flex items-center gap-1"><i data-lucide="bell" class="w-3 h-3"></i> Send Reminder</button>`;
-        return `<div class="bg-white border border-line rounded-[10px] p-4 flex items-center gap-3">
-          <div class="w-9 h-9 rounded-full flex items-center justify-center text-[12px] font-bold shrink-0" style="background:#EFF6FF; color:#0F5EE8;">${m.initials}</div>
-          <div class="flex-1 min-w-0">
-            <div class="text-[14px] font-medium text-ink-900 truncate">${m.name}</div>
-            <div class="text-[12px] text-ink-500">${m.role}</div>
-          </div>
-          <div class="flex items-center">${pill}</div>
-        </div>`;
-      }).join('');
-      const approved = COMMITTEE.filter(m => m.approved).length;
-      const remaining = COMMITTEE.length - approved;
-      document.getElementById('commApprovedCount').textContent = approved;
-      document.getElementById('commProgressBar').style.width = ((approved / COMMITTEE.length) * 100) + '%';
-      const btn = document.getElementById('committeeContinueBtn');
-      const remEl = document.getElementById('committeeRemaining');
-      if (remaining === 0){
-        btn.classList.remove('opacity-50','cursor-not-allowed','pointer-events-none');
-        btn.removeAttribute('aria-disabled');
-        btn.innerHTML = 'All approved — Proceed to Publish <i data-lucide="arrow-right" class="w-4 h-4"></i>';
-        btn.style.boxShadow = '0 0 0 3px rgba(16,185,129,0.2)';
-        if (remEl) remEl.textContent = 'All committee members have approved';
-        // Also unlock the sticky footer CTA
-        const sf = document.getElementById('step6Continue');
-        sf.classList.remove('opacity-50','cursor-not-allowed','pointer-events-none');
-        sf.removeAttribute('aria-disabled');
-        document.getElementById('step6CtaLabel').textContent = 'Proceed to Publish';
-      } else {
-        btn.classList.add('opacity-50','cursor-not-allowed','pointer-events-none');
-        btn.setAttribute('aria-disabled','true');
-        if (remEl) remEl.textContent = `${remaining} more approval${remaining > 1 ? 's' : ''} needed`;
-      }
-      refreshIcons();
-      // DESIGN_REVIEW_MODE: keep Proceed-to-Publish reachable even with pending
-      // approvals (re-enable committeeContinueBtn + step6Continue).
-      if (DESIGN_REVIEW_MODE) { try { drmUnlockNav(); } catch(e){} }
-    }
-    function sendCommitteeReminder(i){
-      const m = COMMITTEE[i];
-      showToast('Reminder sent to ' + m.name);
-    }
-    function simulateAllApprovals(){
-      const today = new Date().toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
-      COMMITTEE.forEach(m => { if (!m.approved){ m.approved = true; m.on = today; }});
-      renderCommittee();
-      showToast('All committee approvals received');
-    }
-    function updateStep6Continue(){
-      // Phase-aware sticky footer CTA
-      const btn = document.getElementById('step6Continue');
-      if (!btn) return;
-      btn.classList.add('opacity-50','cursor-not-allowed','pointer-events-none');
-      btn.setAttribute('aria-disabled','true');
-      // DESIGN_REVIEW_MODE: forward nav must stay reachable regardless of phase.
-      if (DESIGN_REVIEW_MODE) { try { drmUnlockNav(); } catch(e){} }
-    }
+    // ================= STEP 6 — Version History =================
+    // The old two-phase "CVC Review" surface (checklist → send → committee
+    // approval) was removed in Phase B. Step 6 is now the Version History tab,
+    // implemented in the self-contained versionHistory controller (see the
+    // <script> block lower in this file). The sticky-footer CTA (#step6Continue
+    // / #step6CtaLabel) and goToPublish() are preserved below so the publish
+    // path is unaffected; under DESIGN_REVIEW_MODE forward nav stays reachable.
     function goToPublish(){ location.hash = '#step7'; }
 
     // ================= STEP 7 — Publish =================
@@ -6982,6 +7021,12 @@
         `;
         draftDoc.innerHTML = html;
         if (typeof taCsInjectIntoDoc === 'function') taCsInjectIntoDoc(draftDoc);
+        // Table of Contents (conditional): rendered AFTER custom sections are injected so the
+        // index reflects the current document structure incl. custom sections at anchored positions.
+        draftDoc.querySelectorAll('.doc-toc').forEach(n => n.remove());
+        if (typeof window.tocEnabled === 'function' && window.tocEnabled() && typeof window.agTocDocHtml === 'function'){
+          draftDoc.insertAdjacentHTML('afterbegin', window.agTocDocHtml(draftDoc));
+        }
         const pct = computePct(d);
         document.getElementById('draftPct').textContent = pct;
         document.getElementById('draftPctBar').style.width = pct + '%';
@@ -7517,6 +7562,8 @@
   let _dragSecId = null;     // section being dragged
   let _dragListCtx = null;   // {sectionId, blockId, idx}
   let _editing = null;       // inline doc editor: {mode:'new'|'edit', sec, snapshot, hostEl, discardConfirm}
+  let _externalSec = null;   // caller-owned working section (Step-5 CVC inline editor)
+  let _extRenderCb = null;   // re-render callback for the external editor host
 
   function uid(p){ return p + '-' + Date.now().toString(36) + Math.floor(Math.random()*1e4).toString(36); }
   function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
@@ -7541,7 +7588,7 @@
     if (typeof window.renderDraftDoc === 'function' && window.draftPanelOpen){ try { window.renderDraftDoc(); } catch(e){} }
   }
   function stepSections(n){ return state().filter(s => s.step === n).sort((a,b) => (a.order||0) - (b.order||0)); }
-  function findSec(id){ if (_editing && _editing.sec && _editing.sec.id === id) return _editing.sec; return state().find(s => s.id === id); }
+  function findSec(id){ if (_editing && _editing.sec && _editing.sec.id === id) return _editing.sec; if (api && api._externalSec && api._externalSec.id === id) return api._externalSec; return state().find(s => s.id === id); }
   function findBlock(sec, bid){ return (sec.blocks||[]).find(b => b.id === bid); }
 
   // ---------- AI assist (rules-based) ----------
@@ -7586,6 +7633,7 @@
     // The custom-section feature now lives in the Check Draft document panel.
     // '__inline' routes all editor re-renders to the in-document inline editor.
     if (n === '__inline'){ renderInlineEditor(); return; }
+    if (n === '__cvc'){ api._extRerender(); return; }   // Step-5 CVC inline editor owns its own host
     const host = document.querySelector('.ta-cs-host[data-cs-step="'+n+'"]');
     if (!host) return;
     // Render existing custom-section cards only (the step-level "Add custom section"
@@ -7911,6 +7959,21 @@
   // ---------- public API (taCs.*) ----------
   const api = {
     add(n){ const s = newSection(n); state().push(s); save(); renderStep(n); },
+    // ----- additive reuse surface (used by the Step-5 CVC inline editor) -----
+    // Render the SAME text/list/table/file block editor (incl. the type picker +
+    // "Add another content block") for a caller-owned working section into `host`.
+    // The working section is NOT in tenderDraft.customSections; the caller owns its
+    // lifecycle and persistence. Returns nothing; re-call to re-render after edits.
+    get _externalSec(){ return _externalSec; },
+    set _externalSec(v){ _externalSec = v; },
+    get _extRenderCb(){ return _extRenderCb; },
+    set _extRenderCb(fn){ _extRenderCb = fn; },
+    renderBlocksInto(host, sec){ if (!host || !sec) return; _externalSec = sec; host.innerHTML = (sec.blocks||[]).map(b => blockHTML(sec, b)).join('') + '<button class="ta-cs-addblock" onclick="taCs._extAddBlock()"><i data-lucide="plus" style="width:12px;height:12px;"></i> Add another content block</button>'; icons(); },
+    _extAddBlock(){ if (_externalSec){ _externalSec.blocks.push(newBlock('text')); api._extRerender(); } },
+    _extRerender(){ if (_externalSec && typeof _extRenderCb === 'function') _extRenderCb(); },
+    newSection(step){ return newSection(step); },
+    newBlock(type){ return newBlock(type); },
+    secHasContent(sec){ return secHasContent(sec); },
     // ----- relocated inline-editor entry points (called from the document action bar) -----
     openInsert(secEl){ openInsert(secEl); },
     editCustom(secEl){ beginEdit(secEl.getAttribute('data-cs-doc')); },
@@ -8084,6 +8147,1015 @@
       const orig = window.setView;
       window.setView = function(name){ const r = orig.apply(this, arguments); try { afterView(name); } catch(e){} return r; };
     }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>
+
+<!-- ======================================================================
+     STEP 5 — CVC REVIEW (offline chatbot → actionable fixes → regenerate)
+     PHASE A of the offline-CVC-review workflow. Self-contained; reuses:
+       • the risk-check actionable-pointer pattern (icon + message + norm +
+         "Fix →" + resolution progress bar + sink-resolved sort);
+       • the taCs custom-section editor blocks + the inline add-section flow
+         (position popover → dashed editor card → Save/Discard);
+       • the document model written by Check Draft (tenderDraft.customSections)
+         + agBaseSections() for the built-in NIT sections;
+       • the ~60s generation experience (agStart / fast toggle) for regenerate.
+     Everything is offline & non-blocking. Persists to per-tender LS keys.
+     ====================================================================== -->
+<script>
+(function(){
+  "use strict";
+  const TND = 'TND-2026-010';
+  const LS_CVC = 'taCvcReview_' + TND;
+  const LS_VER = 'taVersions_' + TND;
+  let _started = false;           // becomes true once Step 5 generation has run once (v1 seed)
+  let _editSecKey = null;         // doc section currently in inline-edit mode
+  let _addEditor = null;          // {sec, hostEl, anchorKey, position, pointerId, discardConfirm}
+  let _insertPop = null;
+  let _pendingFixPointer = null;  // pointer id whose Fix → opened the current edit/add
+
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+  function uid(p){ return p + '-' + Date.now().toString(36) + Math.floor(Math.random()*1e4).toString(36); }
+  function icons(){ if (window.lucide) try { lucide.createIcons(); } catch(e){} }
+  function toast(m){ if (typeof window.showToast === 'function') try { window.showToast(m); } catch(e){} }
+  function el(id){ return document.getElementById(id); }
+
+  // ---------- state ----------
+  function draft(){ window.tenderDraft = window.tenderDraft || {}; return window.tenderDraft; }
+  function review(){ const d = draft(); if (!d.cvcReview || typeof d.cvcReview !== 'object'){ d.cvcReview = { thread:[], pointers:[], okCollapsed:true }; } if (!Array.isArray(d.cvcReview.thread)) d.cvcReview.thread = []; if (!Array.isArray(d.cvcReview.pointers)) d.cvcReview.pointers = []; return d.cvcReview; }
+  function versions(){ const d = draft(); if (!Array.isArray(d.versions)) d.versions = []; return d.versions; }
+
+  function persist(){
+    try { localStorage.setItem(LS_CVC, JSON.stringify(review())); } catch(e){}
+  }
+  function persistVersions(){
+    try { localStorage.setItem(LS_VER, JSON.stringify(versions())); } catch(e){}
+  }
+  function hydrate(){
+    const d = draft();
+    try { const r = localStorage.getItem(LS_CVC); if (r){ const o = JSON.parse(r); if (o && typeof o === 'object'){ d.cvcReview = Object.assign({ thread:[], pointers:[], okCollapsed:true }, o); } } } catch(e){}
+    try { const v = localStorage.getItem(LS_VER); if (v){ const a = JSON.parse(v); if (Array.isArray(a)) d.versions = a; } } catch(e){}
+    if (versions().length) _started = true;   // a prior session already seeded v1
+  }
+
+  // ===================================================================
+  // LIVE DOCUMENT (right column) — built from agBaseSections() + customs
+  // ===================================================================
+  // The built-in NIT sections shown for review. Each maps generation parts to
+  // a stable key + a keyword set used by the rules-based pointer parser.
+  const DOC_SECTIONS = [
+    { key:'header',      title:'Notice Inviting Tender',          kw:['nit','notice','title','reference'] },
+    { key:'scope',       title:'Scope of Work',                   kw:['scope','road marking','marking','deliverable','work description'] },
+    { key:'financial',   title:'Estimated Value, Fee & EMD',      kw:['emd','earnest','fee','budget','value','estimate'] },
+    { key:'timeline',    title:'Critical Dates & Timeline',       kw:['delivery','timeline','date','completion','period','schedule','time'] },
+    { key:'eligibility', title:'Eligibility (PQ) & Technical (TQ)',kw:['eligibility','turnover','similar','networth','net worth','epf','esic','registration','pq','tq','qualification'] },
+    { key:'boq',         title:'Bill of Quantities (BOQ)',        kw:['boq','quantity','quantities','rate','bill'] },
+    { key:'conditions',  title:'Conditions of Contract (GCC/SCC)',kw:['penalty','ld','liquidated','condition','security','warranty','payment','defect','clause'] },
+    { key:'forms',       title:'Forms & Declarations',            kw:['form','declaration','integrity','undertaking'] }
+  ];
+
+  // Build the document body HTML for a built-in section by deriving from the
+  // generation's section list (same content source) so the doc reflects inputs.
+  function builtinBodyHTML(key){
+    let base = [];
+    try { if (typeof window.agBaseSections === 'function') base = window.agBaseSections(); } catch(e){}
+    const byName = {};
+    base.forEach(s => { byName[s.name] = s.html; });
+    const pick = (names) => names.map(n => byName[n] || '').filter(Boolean).join('');
+    if (key === 'header')      return pick(['Tender reference & title','Issuing authority & contact']) || '<p>Notice Inviting Tender — Ahmedabad Municipal Corporation.</p>';
+    if (key === 'scope')       return pick(['Scope of work & deliverables']) || '<p>[Scope of work]</p>';
+    if (key === 'financial')   return pick(['Estimated value & budget head','Tender fee & EMD details']) || '<p>[Estimated value, fee & EMD]</p>';
+    if (key === 'timeline')    return pick(['Critical dates & timeline']) || '<p>[Critical dates]</p>';
+    if (key === 'eligibility') return pick(['Eligibility criteria (PQ)','Technical qualification criteria (TQ)']) || '<ul><li>[Eligibility criteria]</li></ul>';
+    if (key === 'boq')         return pick(['Bill of Quantities (BOQ)','Technical specifications']) || '<p>[Bill of Quantities]</p>';
+    if (key === 'conditions')  return pick(['General Conditions of Contract (GCC)','Special Conditions of Contract (SCC)','Performance security & warranty','Payment terms & milestones']) || '<p>[Conditions of contract]</p>';
+    if (key === 'forms')       return pick(['Bid submission forms','Eligibility declarations','Integrity pact & undertakings']) || '<p>[Forms & declarations]</p>';
+    return '';
+  }
+
+  // Render the live doc: built-in sections (stable data-sec-id/data-sec-key)
+  // then inject custom sections via the SHARED taCs injector (same model as
+  // Check Draft). Custom sections anchored to data-sec-id appear in place.
+  function renderDoc(){
+    const doc = el('cvcDoc');
+    if (!doc) return;
+    let html = '';
+    DOC_SECTIONS.forEach((s, i) => {
+      html += '<section class="nit-section" data-sec-id="section-'+(i+1)+'" data-sec-key="'+s.key+'">'
+            + '<h3>'+(i+1)+'. '+esc(s.title)+'</h3>'
+            + '<div class="cvc-sec-body">'+builtinBodyHTML(s.key)+'</div>'
+            + '</section>';
+    });
+    html += '<div class="doc-footer" style="display:none;"></div>'; // injector anchor for orphan customs
+    doc.innerHTML = html;
+    // Inject custom sections using the shared model/injector (same as Check Draft).
+    if (typeof window.taCsInjectIntoDoc === 'function'){ try { window.taCsInjectIntoDoc(doc); } catch(e){} }
+    // Tag any injected custom sections with our key scheme for deep-link/anchoring.
+    doc.querySelectorAll('.nit-section.custom').forEach(sec => { if (!sec.getAttribute('data-sec-key')) sec.setAttribute('data-sec-key', 'custom:' + sec.getAttribute('data-cs-doc')); });
+    icons();
+  }
+
+  function sectionElByKey(key){ const doc = el('cvcDoc'); return doc ? doc.querySelector('[data-sec-key="'+CSS.escape(key)+'"]') : null; }
+
+  // ===================================================================
+  // CHANGE 1 — CHATBOT (thread, composer, attach, mock dictation)
+  // ===================================================================
+  let _pendingFile = null;   // {name} attached but not yet sent
+  let _recording = false;
+  let _recTimer = null;
+
+  function renderThread(){
+    const host = el('cvcThread');
+    if (!host) return;
+    const r = review();
+    if (!r.thread.length){
+      host.innerHTML = ''
+        + '<div class="cvc-empty">'
+        +   '<span class="ic"><i data-lucide="messages-square" class="w-5 h-5"></i></span>'
+        +   '<div class="h">Capture the reviewing officers\' feedback</div>'
+        +   '<div class="s">CVC review is done offline. Paste their comments, upload the signed note, or dictate — the assistant turns it into fixes you can apply to the draft.</div>'
+        +   '<div class="cvc-chips">'
+        +     '<button type="button" class="cvc-chip" onclick="cvc.example(\'paste\')"><i data-lucide="clipboard-list" class="w-3.5 h-3.5"></i> Paste reviewer comments</button>'
+        +     '<button type="button" class="cvc-chip" onclick="cvc.example(\'upload\')"><i data-lucide="file-up" class="w-3.5 h-3.5"></i> Upload CVC note</button>'
+        +     '<button type="button" class="cvc-chip" onclick="cvc.example(\'dictate\')"><i data-lucide="mic" class="w-3.5 h-3.5"></i> Dictate feedback</button>'
+        +   '</div>'
+        + '</div>';
+      icons();
+      return;
+    }
+    host.innerHTML = r.thread.map(m => {
+      if (m.role === 'officer'){
+        const fileLine = m.file ? '<div class="file-att"><i data-lucide="paperclip" class="w-3.5 h-3.5"></i> '+esc(m.file)+'</div>' : '';
+        return '<div class="cvc-msg officer"><div class="av">RO</div><div class="cvc-bubble">'+(m.text?esc(m.text):'<em>Review document attached</em>')+fileLine+'</div></div>';
+      }
+      if (m.role === 'analysing'){
+        return '<div class="cvc-msg assistant" data-analysing="1"><div class="av"><i data-lucide="bot" class="w-3.5 h-3.5"></i></div><div class="cvc-bubble"><span class="cvc-analysing">Analysing the review<span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div></div>';
+      }
+      return '<div class="cvc-msg assistant"><div class="av"><i data-lucide="bot" class="w-3.5 h-3.5"></i></div><div class="cvc-bubble">'+esc(m.text)+'</div></div>';
+    }).join('');
+    host.scrollTop = host.scrollHeight;
+    icons();
+  }
+
+  function onInput(ta){
+    ta.style.height = 'auto';
+    ta.style.height = Math.min(140, ta.scrollHeight) + 'px';
+    syncSendEnabled();
+  }
+  function syncSendEnabled(){
+    const ta = el('cvcInput'), btn = el('cvcSendBtn');
+    if (!ta || !btn) return;
+    btn.disabled = !(ta.value.trim().length > 0 || _pendingFile);
+  }
+  function onKey(e){
+    if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); send(); }
+  }
+
+  function attachClick(){ const fi = el('cvcFileInput'); if (fi) fi.click(); }
+  function onFilePick(input){
+    const f = input.files && input.files[0];
+    input.value = '';
+    if (!f) return;
+    _pendingFile = { name: f.name };   // simulated parse — we never read contents
+    renderFileChip();
+    syncSendEnabled();
+  }
+  function renderFileChip(){
+    const wrap = el('cvcFileChipWrap');
+    if (!wrap) return;
+    if (!_pendingFile){ wrap.innerHTML = ''; return; }
+    wrap.innerHTML = '<span class="cvc-filechip"><i data-lucide="file" class="w-3.5 h-3.5"></i> '+esc(_pendingFile.name)+' <span class="rm" role="button" tabindex="0" aria-label="Remove attachment" onclick="cvc.clearFile()"><i data-lucide="x" class="w-3.5 h-3.5"></i></span></span>';
+    icons();
+  }
+  function clearFile(){ _pendingFile = null; renderFileChip(); syncSendEnabled(); }
+
+  // mock dictation: pulsing state, then drop a realistic transcript into the input
+  const MOCK_TRANSCRIPTS = [
+    'The committee reviewed the draft. EMD looks a bit low against the estimate, please revise it upward. Add EPF and ESIC to the mandatory registrations. The scope is ambiguous on the road-marking item — clarify the extent. The completion period of twelve months seems tight for this work, reconsider. Eligibility turnover and the BOQ are fine.',
+    'Reviewing officer notes: penalty / LD clause should be capped clearly. Earnest money percentage is below norm. The delivery timeline needs a second look. Scope and eligibility criteria are acceptable as drafted.'
+  ];
+  function toggleMic(){
+    const btn = el('cvcMicBtn'), banner = el('cvcListening');
+    if (!_recording){
+      _recording = true;
+      if (btn){ btn.classList.add('recording'); btn.setAttribute('aria-pressed','true'); }
+      if (banner) banner.style.display = 'flex';
+    } else {
+      _recording = false;
+      if (btn){ btn.classList.remove('recording'); btn.setAttribute('aria-pressed','false'); }
+      if (banner) banner.style.display = 'none';
+      const ta = el('cvcInput');
+      if (ta){
+        const t = MOCK_TRANSCRIPTS[Math.floor(Math.random()*MOCK_TRANSCRIPTS.length)];
+        ta.value = (ta.value ? ta.value.trim() + ' ' : '') + t;
+        onInput(ta);
+        ta.focus();
+      }
+      toast('Dictation captured (mock) — review and send');
+    }
+  }
+
+  // example chips
+  const SAMPLE_REVIEW = 'CVC review observations:\n1. EMD percentage appears below the prescribed norm — please revise upward.\n2. EPF and ESIC registration are not listed as mandatory — add them.\n3. Scope is ambiguous on the road-marking item — clarify the extent and specification.\n4. Completion period of 12 months is too tight for this quantum of work — reconsider the timeline.\n5. Eligibility turnover criteria are appropriate.\n6. BOQ rates are in order and acceptable.';
+  function example(kind){
+    const ta = el('cvcInput');
+    if (kind === 'upload'){ _pendingFile = { name: 'CVC-Review-Note-TND-2026-010.pdf' }; renderFileChip(); }
+    if (kind === 'dictate'){ toggleMic(); setTimeout(toggleMic, 650); return; }  // demo: open + auto-stop fills transcript
+    if (ta && kind !== 'upload'){ ta.value = SAMPLE_REVIEW; onInput(ta); ta.focus(); }
+    else if (ta){ ta.value = ''; onInput(ta); }
+    syncSendEnabled();
+  }
+
+  function send(){
+    const ta = el('cvcInput');
+    const text = ta ? ta.value.trim() : '';
+    const file = _pendingFile ? _pendingFile.name : null;
+    if (!text && !file) return;
+    const r = review();
+    r.thread.push({ role:'officer', text:text, file:file, at: Date.now() });
+    if (ta){ ta.value = ''; onInput(ta); }
+    clearFile();
+    syncSendEnabled();
+    persist();
+    renderThread();
+    // analysing indicator (animated dots), then assistant reply (Change 2)
+    r.thread.push({ role:'analysing' });
+    renderThread();
+    const delay = 800 + Math.floor(Math.random()*400);
+    setTimeout(() => {
+      const rr = review();
+      const idx = rr.thread.findIndex(m => m.role === 'analysing');
+      if (idx >= 0) rr.thread.splice(idx, 1);
+      analyseReview(text, file);
+    }, delay);
+  }
+
+  // ===================================================================
+  // CHANGE 2 — ASSISTANT REPLY = ACTIONABLE FIX POINTERS (rules-based)
+  // ===================================================================
+  // Concern keyword → {section key, change message, norm}. Matched concerns
+  // become 'change' pointers; explicit approvals → 'ok'; ambiguous → 'suggestion'.
+  const CONCERN_RULES = [
+    { test:/\b(emd|earnest)\b/i,                              key:'financial',   message:'EMD percentage appears below the prescribed norm — revise upward.',          norm:'CVC guideline — EMD 2%–3% of estimated cost' },
+    { test:/\b(epf|esic|registration)\b/i,                   key:'eligibility', message:'Add EPF / ESIC to the mandatory registrations.',                              norm:'EPF & ESIC registration — statutory for Works contracts' },
+    { test:/\b(scope|road[- ]?marking|marking|ambiguous)\b/i, key:'scope',       message:'Scope is ambiguous on the road-marking item — clarify the extent.',            norm:'Scope must be unambiguous and measurable' },
+    { test:/\b(completion|period|timeline|delivery|too tight|deadline|duration)\b/i, key:'timeline', message:'Completion period is too tight — reconsider the timeline.',         norm:'Timeline must be realistic for the quantum of work' },
+    { test:/\b(penalty|ld|liquidated)\b/i,                   key:'conditions',  message:'Liquidated-damages / penalty clause should be capped clearly.',                norm:'GCC — LD capped at 5% of contract value' },
+    { test:/\b(turnover)\b/i,                                 key:'eligibility', message:'Turnover requirement should stay within the CVC competition cap.',             norm:'CVC 9.17.6.9 — turnover ≤ 30% of estimate' }
+  ];
+  // explicit approvals (officer says these are fine/acceptable/in order)
+  const APPROVE_RULES = [
+    { test:/\b(turnover|eligibility)\b[^.]*\b(fine|appropriate|acceptable|in order|ok|okay|no change)\b/i, key:'eligibility', message:'Eligibility / turnover criteria — approved.' },
+    { test:/\b(boq|rates?|bill of quantit)\b[^.]*\b(fine|appropriate|acceptable|in order|ok|okay|no change)\b/i, key:'boq', message:'BOQ rates — approved, in order.' },
+    { test:/\b(scope|eligibility)\b[^.]*\b(acceptable as drafted|acceptable)\b/i, key:'scope', message:'Scope wording — accepted as drafted.' }
+  ];
+
+  function buildPointers(text){
+    const out = [];
+    const t = text || '';
+    const seen = {};
+    CONCERN_RULES.forEach(rule => {
+      if (rule.test.test(t) && !seen['c:'+rule.message]){
+        seen['c:'+rule.message] = 1;
+        out.push({ id: uid('cvcptr'), severity:'change', message: rule.message, norm: rule.norm, section: rule.key, anchorId: rule.key, status:'open' });
+      }
+    });
+    APPROVE_RULES.forEach(rule => {
+      if (rule.test.test(t) && !seen['a:'+rule.message]){
+        seen['a:'+rule.message] = 1;
+        out.push({ id: uid('cvcptr'), severity:'ok', message: rule.message, norm:'No change required', section: rule.key, anchorId: rule.key, status:'resolved' });
+      }
+    });
+    return out;
+  }
+
+  // If parsing finds little (short/empty/file-only review), fall back to a
+  // realistic demo seed so the offline flow always has 4–6 actionable pointers.
+  function demoSeed(){
+    return [
+      { id: uid('cvcptr'), severity:'change', message:'EMD percentage below norm — revise upward.',                 norm:'CVC guideline — EMD 2%–3% of estimated cost',        section:'financial',   anchorId:'financial',   status:'open' },
+      { id: uid('cvcptr'), severity:'change', message:'Add EPF / ESIC to mandatory registrations.',                 norm:'EPF & ESIC registration — statutory for Works',       section:'eligibility', anchorId:'eligibility', status:'open' },
+      { id: uid('cvcptr'), severity:'change', message:'Scope ambiguous on road markings — clarify the extent.',     norm:'Scope must be unambiguous and measurable',            section:'scope',       anchorId:'scope',       status:'open' },
+      { id: uid('cvcptr'), severity:'change', message:'Completion period too tight — reconsider the timeline.',     norm:'Timeline must be realistic for the quantum of work',  section:'timeline',    anchorId:'timeline',    status:'open' },
+      { id: uid('cvcptr'), severity:'suggestion', message:'Consider an explicit LD cap in the conditions.',         norm:'GCC — LD capped at 5% of contract value',             section:'conditions',  anchorId:'conditions',  status:'open' },
+      { id: uid('cvcptr'), severity:'ok', message:'Eligibility / turnover criteria — approved.',                    norm:'No change required',                                  section:'eligibility', anchorId:'eligibility', status:'resolved' },
+      { id: uid('cvcptr'), severity:'ok', message:'BOQ rates — approved, in order.',                                norm:'No change required',                                  section:'boq',         anchorId:'boq',         status:'resolved' }
+    ];
+  }
+
+  function analyseReview(text, file){
+    const r = review();
+    let pointers = buildPointers(text);
+    const changeCount = pointers.filter(p => p.severity === 'change').length;
+    // fall back to demo seed for thin/empty/file-only input
+    if (changeCount < 2){ pointers = demoSeed(); }
+    // Merge: keep existing resolved pointers' status if the same section/message recurs.
+    r.pointers = pointers;
+    const nChange = pointers.filter(p => p.severity==='change').length;
+    const nOk = pointers.filter(p => p.severity==='ok').length;
+    const reply = 'I read the review and turned it into ' + nChange + ' change' + (nChange===1?'':'s') + ' to make' + (nOk?(' (' + nOk + ' item' + (nOk===1?'':'s') + ' approved with no change)'):'') + '. Use “Fix →” on each to jump to the section and apply it, then regenerate the document.';
+    r.thread.push({ role:'assistant', text: reply });
+    persist();
+    renderThread();
+    const live = el('cvcAssistantLive'); if (live) live.textContent = reply;
+    renderPointers();
+    const pe = el('cvcPointers'); if (pe){ pe.style.display = 'block'; pe.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
+  }
+
+  function pointerRowHTML(p){
+    if (p.status === 'resolved' && p.severity === 'change'){
+      return '<div class="cvc-row sev-change resolved" data-ptr="'+p.id+'">'
+        +    '<i data-lucide="circle-check" class="w-4 h-4 text-success shrink-0" style="margin-top:1px;"></i>'
+        +    '<div class="cvc-row-body"><div class="cvc-msg-txt">'+esc(p.message)+'</div><div class="cvc-row-norm">'+esc(p.norm)+'</div></div>'
+        +    '<div class="cvc-row-acts"><span class="cvc-resolved-tag"><i data-lucide="check" class="w-3 h-3"></i> Resolved</span></div>'
+        +    '</div>';
+    }
+    if (p.severity === 'ok'){
+      return '<div class="cvc-row sev-ok" data-ptr="'+p.id+'">'
+        +    '<i data-lucide="circle-check" class="w-4 h-4 text-success shrink-0" style="margin-top:1px;"></i>'
+        +    '<div class="cvc-row-body"><div class="cvc-msg-txt">'+esc(p.message)+'</div><div class="cvc-row-norm">'+esc(p.norm)+'</div></div>'
+        +    '<div class="cvc-row-acts"><span class="cvc-resolved-tag">Approved</span></div>'
+        +    '</div>';
+    }
+    const ic = p.severity === 'change' ? 'alert-triangle' : 'info';
+    const col = p.severity === 'change' ? 'text-danger' : 'text-primary';
+    return '<div class="cvc-row sev-'+p.severity+'" data-ptr="'+p.id+'">'
+      +    '<i data-lucide="'+ic+'" class="w-4 h-4 '+col+' shrink-0" style="margin-top:1px;"></i>'
+      +    '<div class="cvc-row-body"><div class="cvc-msg-txt">'+esc(p.message)+'</div><div class="cvc-row-norm">'+esc(p.norm)+'</div></div>'
+      +    '<div class="cvc-row-acts"><button type="button" class="cvc-fix-btn" aria-label="Fix: '+esc(p.message)+'" onclick="cvc.fix(\''+p.id+'\')">Fix <i data-lucide="arrow-right" class="w-3 h-3"></i></button></div>'
+      +    '</div>';
+  }
+
+  function renderPointers(){
+    const r = review();
+    const ps = r.pointers;
+    const changes = ps.filter(p => p.severity === 'change');
+    const suggestions = ps.filter(p => p.severity === 'suggestion');
+    const oks = ps.filter(p => p.severity === 'ok');
+    // sort: open above resolved within the changes group
+    const sortRows = (arr) => arr.slice().sort((a,b) => {
+      const ar = a.status === 'resolved' ? 1 : 0, br = b.status === 'resolved' ? 1 : 0;
+      return ar - br;
+    });
+    const totalChanges = changes.length;
+    const resolved = changes.filter(p => p.status === 'resolved').length;
+    const approved = oks.length;
+
+    const counts = el('cvcPtrCounts');
+    if (counts) counts.innerHTML = '<b>'+totalChanges+'</b> change'+(totalChanges===1?'':'s')+' requested · <b>'+approved+'</b> approved';
+
+    const pct = totalChanges ? Math.round((resolved/totalChanges)*100) : 100;
+    const bar = el('cvcProgressBar'); if (bar) bar.style.width = pct + '%';
+    const track = el('cvcProgressTrack'); if (track) track.setAttribute('aria-valuenow', String(pct));
+    const lbl = el('cvcProgressLabel'); if (lbl) lbl.textContent = resolved + ' of ' + totalChanges + ' changes resolved';
+
+    const cHost = el('cvcPtrChanges');
+    if (cHost){
+      cHost.innerHTML = totalChanges
+        ? '<div class="cvc-group-label">Changes required</div>' + sortRows(changes).map(pointerRowHTML).join('')
+        : '';
+    }
+    const sHost = el('cvcPtrSuggestions');
+    if (sHost){
+      sHost.innerHTML = suggestions.length
+        ? '<div class="cvc-group-label">Suggestions</div>' + suggestions.map(pointerRowHTML).join('')
+        : '';
+    }
+    const okWrap = el('cvcPtrOkWrap'), okHost = el('cvcPtrOk');
+    if (okWrap && okHost){
+      if (approved){
+        okWrap.style.display = 'block';
+        el('cvcOkLabel').textContent = approved + ' approved item' + (approved===1?'':'s');
+        okHost.innerHTML = oks.map(pointerRowHTML).join('');
+        const collapsed = review().okCollapsed !== false;
+        okHost.style.display = collapsed ? 'none' : 'block';
+        const chev = el('cvcOkChevron'); if (chev) chev.style.transform = collapsed ? '' : 'rotate(180deg)';
+        const tg = el('cvcOkToggle'); if (tg) tg.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      } else {
+        okWrap.style.display = 'none';
+      }
+    }
+    icons();
+  }
+
+  function toggleOk(){ const r = review(); const currentlyCollapsed = r.okCollapsed !== false; r.okCollapsed = !currentlyCollapsed; persist(); renderPointers(); }
+
+  // ===================================================================
+  // CHANGE 3 — "FIX →" DEEP-LINK + INLINE EDIT (reuse taCs add-section)
+  // ===================================================================
+  function pointerById(id){ return review().pointers.find(p => p.id === id); }
+
+  function fix(id){
+    const p = pointerById(id);
+    if (!p) return;
+    _pendingFixPointer = id;
+    closeInsertPopover(false);
+    const sec = sectionElByKey(p.anchorId);
+    if (!sec) return;
+    // scroll + 600ms highlight pulse
+    try { sec.scrollIntoView({ behavior:'smooth', block:'center' }); } catch(e){ sec.scrollIntoView(); }
+    sec.classList.remove('cvc-doc-hl'); void sec.offsetWidth; sec.classList.add('cvc-doc-hl');
+    setTimeout(() => sec.classList.remove('cvc-doc-hl'), 620);
+    enterSectionEdit(sec);
+    const back = el('cvcDocBack'); if (back) back.style.display = 'inline-flex';
+  }
+
+  // Inline edit on a built-in section: make the body editable AND expose the
+  // taCs add-section flow (above/below). Saving auto-resolves the pointer.
+  function enterSectionEdit(sec){
+    // exit any other editing section first
+    if (_editSecKey && _editSecKey !== sec.getAttribute('data-sec-key')){ exitSectionEdit(); }
+    _editSecKey = sec.getAttribute('data-sec-key');
+    if (sec.querySelector('.cvc-sec-actions')) return; // already editing
+    sec.classList.add('cvc-editing');
+    const isCustom = sec.classList.contains('custom');
+    // body becomes editable (reuses the Check-Draft section-edit affordance)
+    const body = sec.querySelector('.cvc-sec-body');
+    if (body && !isCustom){ body.setAttribute('contenteditable','true'); body.classList.add('cvc-sec-editbox'); }
+    const bar = document.createElement('div');
+    bar.className = 'cvc-sec-actions';
+    bar.setAttribute('contenteditable','false');
+    bar.innerHTML = (isCustom
+        ? '<button type="button" data-a="editcustom"><i data-lucide="pencil" class="w-3 h-3"></i> Edit section</button>'
+        : '<button type="button" data-a="edit"><i data-lucide="pencil" class="w-3 h-3"></i> Edit content</button>')
+      + '<button type="button" data-a="add"><i data-lucide="plus" class="w-3 h-3"></i> Add section</button>'
+      + '<button type="button" data-a="done"><i data-lucide="check" class="w-3 h-3"></i> Done — apply fix</button>';
+    sec.appendChild(bar);
+    bar.querySelectorAll('button').forEach(b => b.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const a = b.getAttribute('data-a');
+      if (a === 'add') openInsert(sec);
+      else if (a === 'editcustom'){ if (window.taCs) try { window.taCs.editCustom(sec); } catch(e2){} }
+      else if (a === 'edit'){ const bd = sec.querySelector('.cvc-sec-body'); if (bd){ bd.focus(); } }
+      else if (a === 'done'){ commitSectionEdit(sec); }
+    }));
+    icons();
+    if (body && !isCustom) setTimeout(() => body.focus(), 60);
+  }
+
+  function exitSectionEdit(){
+    const doc = el('cvcDoc'); if (!doc) return;
+    doc.querySelectorAll('.nit-section.cvc-editing').forEach(sec => {
+      sec.classList.remove('cvc-editing');
+      const body = sec.querySelector('.cvc-sec-body');
+      if (body){ body.removeAttribute('contenteditable'); body.classList.remove('cvc-sec-editbox'); }
+      const bar = sec.querySelector('.cvc-sec-actions'); if (bar) bar.remove();
+    });
+    _editSecKey = null;
+  }
+
+  function commitSectionEdit(sec){
+    sec.classList.remove('cvc-editing');
+    const body = sec.querySelector('.cvc-sec-body');
+    if (body){ body.removeAttribute('contenteditable'); body.classList.remove('cvc-sec-editbox'); }
+    const bar = sec.querySelector('.cvc-sec-actions'); if (bar) bar.remove();
+    _editSecKey = null;
+    if (_pendingFixPointer){ resolvePointer(_pendingFixPointer); _pendingFixPointer = null; }
+    toast('Change applied to the draft');
+  }
+
+  // ----- "+ Add section" — IDENTICAL taCs insertion flow (popover → dashed editor) -----
+  function _popOutside(e){ if (_insertPop && !_insertPop.contains(e.target)) closeInsertPopover(true); }
+  function _popKey(e){ if (e.key === 'Escape'){ e.preventDefault(); closeInsertPopover(true); } }
+  function closeInsertPopover(refocus){
+    if (!_insertPop) return;
+    _insertPop.remove(); _insertPop = null;
+    document.removeEventListener('mousedown', _popOutside, true);
+    document.removeEventListener('keydown', _popKey, true);
+  }
+  function openInsert(secEl){
+    closeInsertPopover(false);
+    const anchorKey = secEl.getAttribute('data-sec-key');
+    const title = (secEl.querySelector('h3') ? secEl.querySelector('h3').textContent : 'section').trim();
+    const pop = document.createElement('div');
+    pop.className = 'ta-cs-insert-pop';
+    pop.setAttribute('role','dialog');
+    pop.setAttribute('aria-label','Insert custom section relative to ' + title);
+    pop.innerHTML = '<button type="button" data-pos="above"><i data-lucide="arrow-up" style="width:13px;height:13px;"></i> Insert above this section</button>'
+      + '<button type="button" data-pos="below"><i data-lucide="arrow-down" style="width:13px;height:13px;"></i> Insert below this section</button>';
+    secEl.appendChild(pop);
+    _insertPop = pop;
+    pop.querySelectorAll('button').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); const pos = b.getAttribute('data-pos'); closeInsertPopover(false); beginAdd(secEl, pos); }));
+    icons();
+    setTimeout(() => { const f = pop.querySelector('button'); if (f) f.focus(); }, 0);
+    setTimeout(() => { document.addEventListener('mousedown', _popOutside, true); document.addEventListener('keydown', _popKey, true); }, 0);
+  }
+
+  // Dashed editor card — reuses the taCs block editor (renderBlocksInto) and the
+  // ta-cs-inline visual. On Save, the section is committed to customSections via
+  // the shared model and re-injected by renderDoc().
+  function beginAdd(anchorEl, position){
+    if (_addEditor) discardAdd(true);
+    const anchorKey = anchorEl.getAttribute('data-sec-key');
+    const anchorSecId = anchorEl.getAttribute('data-sec-id') || anchorEl.getAttribute('data-cs-doc');
+    const sec = (window.taCs && window.taCs.newSection) ? window.taCs.newSection('__cvc') : { id:uid('custom'), step:'__cvc', title:'', collapsed:false, blocks:[{id:uid('block'),type:'text',content:''}] };
+    sec.step = '__cvc';
+    const host = document.createElement('div');
+    host.className = 'ta-cs-inline';
+    if (position === 'above') anchorEl.parentNode.insertBefore(host, anchorEl);
+    else anchorEl.parentNode.insertBefore(host, anchorEl.nextSibling);
+    _addEditor = { sec, hostEl: host, anchorSecId, position, discardConfirm:false };
+    // route taCs block re-renders back to us
+    if (window.taCs){ window.taCs._externalSec = sec; window.taCs._extRenderCb = renderAddEditor; }
+    // keep Save's enabled-state in sync as the officer edits ANY block (text/list/table/file),
+    // mirroring how the taCs inline editor wires updateSaveState to host 'input'.
+    host.addEventListener('input', updateAddSave);
+    renderAddEditor();
+    requestAnimationFrame(() => host.classList.add('show'));
+    setTimeout(() => { const ti = host.querySelector('.ta-cs-title-in'); if (ti) ti.focus(); }, 60);
+  }
+  function renderAddEditor(){
+    if (!_addEditor) return;
+    const sec = _addEditor.sec, host = _addEditor.hostEl;
+    let disc;
+    if (_addEditor.discardConfirm) disc = '<span class="ta-cs-inline-discwrap">Discard this section?<button type="button" class="yes" onclick="cvc.discardAddConfirm()">Yes</button><button type="button" class="no" onclick="cvc.discardAddCancel()">No</button></span>';
+    else disc = '<button type="button" class="ta-cs-inline-cancel" onclick="cvc.discardAddStart()">Discard</button>';
+    host.innerHTML = '<div class="ta-cs-inline-label">NEW CUSTOM SECTION</div>'
+      + '<div class="ta-cs-card"><div class="ta-cs-head"><input class="ta-cs-title-in" type="text" value="'+esc(sec.title)+'" placeholder="Section title (e.g. Road Marking Specification, LD Cap...)" oninput="cvc.addTitle(this.value)" aria-label="Section title" /></div>'
+      + '<div id="cvcAddBlocks"></div></div>'
+      + '<div class="ta-cs-inline-footer">'+disc
+      + '<button type="button" class="ta-cs-inline-save" id="cvcAddSave" onclick="cvc.saveAdd()">Save section</button></div>';
+    const blockHost = host.querySelector('#cvcAddBlocks');
+    if (blockHost && window.taCs && window.taCs.renderBlocksInto){ window.taCs.renderBlocksInto(blockHost, sec); }
+    updateAddSave();
+    icons();
+  }
+  function addValid(){ const s = _addEditor && _addEditor.sec; if (!s) return false; const hasContent = window.taCs && window.taCs.secHasContent ? window.taCs.secHasContent(s) : true; return String(s.title||'').trim().length >= 2 && hasContent; }
+  function updateAddSave(){ const b = el('cvcAddSave'); if (b) b.disabled = !addValid(); }
+  function addTitle(v){ if (_addEditor){ _addEditor.sec.title = v; updateAddSave(); } }
+  function discardAddStart(){ if (_addEditor){ _addEditor.discardConfirm = true; renderAddEditor(); } }
+  function discardAddCancel(){ if (_addEditor){ _addEditor.discardConfirm = false; renderAddEditor(); } }
+  function discardAddConfirm(){ discardAdd(true); }
+  function discardAdd(silent){
+    if (!_addEditor) return;
+    if (_addEditor.hostEl && _addEditor.hostEl.parentNode) _addEditor.hostEl.parentNode.removeChild(_addEditor.hostEl);
+    if (window.taCs){ window.taCs._externalSec = null; window.taCs._extRenderCb = null; }
+    _addEditor = null;
+  }
+  function saveAdd(){
+    if (!_addEditor || !addValid()) return;
+    const sec = _addEditor.sec;
+    const host = _addEditor.hostEl;
+    host.classList.add('committing');
+    // commit into the SHARED model (tenderDraft.customSections) so it persists
+    // and shows in Check Draft too. Anchor to the doc section via taCs schema.
+    delete sec.step; delete sec.stepLabel;
+    sec.anchorSectionId = _addEditor.anchorSecId;
+    sec.position = _addEditor.position;
+    sec.order = 0;
+    draft(); window.tenderDraft.customSections = window.tenderDraft.customSections || [];
+    window.tenderDraft.customSections.push(sec);
+    try { localStorage.setItem('taCustomSections_' + TND, JSON.stringify(window.tenderDraft.customSections)); } catch(e){}
+    if (window.taCs){ window.taCs._externalSec = null; window.taCs._extRenderCb = null; }
+    const ptr = _pendingFixPointer;
+    _addEditor = null;
+    setTimeout(() => {
+      renderDoc();
+      // keep edit affordance off; resolve the pointer that triggered this add
+      if (ptr){ resolvePointer(ptr); _pendingFixPointer = null; }
+      if (typeof window.renderDraftDoc === 'function' && window.draftPanelOpen){ try { window.renderDraftDoc(); } catch(e){} }
+      toast('Custom section added — change applied');
+    }, 300);
+  }
+
+  function backToReview(){
+    exitSectionEdit();
+    discardAdd(true);
+    closeInsertPopover(false);
+    const back = el('cvcDocBack'); if (back) back.style.display = 'none';
+    const pe = el('cvcPointers'); if (pe) pe.scrollIntoView({ behavior:'smooth', block:'nearest' });
+    // focus the first open Fix button for keyboard users
+    setTimeout(() => { const f = document.querySelector('#cvcPtrChanges .cvc-fix-btn'); if (f) f.focus(); }, 200);
+  }
+
+  // ----- auto-resolve (advisory; never a hard gate) -----
+  function resolvePointer(id){
+    const p = pointerById(id);
+    if (!p || p.status === 'resolved') { renderPointers(); return; }
+    p.status = 'resolved';
+    persist();
+    renderPointers();
+    // 250ms resolve animation on the row, then it sinks below open ones
+    const row = document.querySelector('#cvcPtrChanges .cvc-row[data-ptr="'+id+'"]');
+    if (row){ row.classList.add('just-resolved'); setTimeout(() => { renderPointers(); }, 260); }
+    const live = el('cvcAssistantLive');
+    const r = review();
+    const remaining = r.pointers.filter(x => x.severity==='change' && x.status!=='resolved').length;
+    if (live) live.textContent = remaining ? (remaining + ' change' + (remaining===1?'':'s') + ' remaining.') : 'All requested changes resolved. You can regenerate the document.';
+  }
+
+  // ===================================================================
+  // CHANGE 4 — REGENERATE TENDER DOCUMENT (new version)
+  // ===================================================================
+  function appliedChangeCount(){ return review().pointers.filter(p => p.severity==='change' && p.status==='resolved').length; }
+  function regenStart(){
+    const n = appliedChangeCount();
+    const q = el('cvcRegenConfirmQ');
+    if (q) q.textContent = 'Regenerate the tender with ' + n + ' applied change' + (n===1?'':'s') + '? This creates a new version.';
+    const cta = el('cvcRegenCtaWrap'), cf = el('cvcRegenConfirm');
+    if (cta) cta.style.display = 'none';
+    if (cf){ cf.style.display = 'block'; const y = cf.querySelector('.yes'); if (y) setTimeout(() => y.focus(), 0); }
+  }
+  function regenCancel(){ const cta = el('cvcRegenCtaWrap'), cf = el('cvcRegenConfirm'); if (cf) cf.style.display = 'none'; if (cta) cta.style.display = 'block'; }
+  function regenConfirm(){
+    regenCancel();
+    // Reuse the EXISTING ~60s generation experience. agStart() shows the gen view;
+    // we hook completion via a one-shot wrapper around agComplete.
+    const chanN = review().pointers.filter(p => p.severity==='change').length;
+    const okN = review().pointers.filter(p => p.severity==='ok').length;
+    onGenerationComplete(() => recordVersion('v', 'Revised', { changes: chanN, approved: okN }));
+    if (typeof window.agReplay === 'function'){ try { window.agReplay(); } catch(e){ if (window.agStart) window.agStart(); } }
+    else if (typeof window.agStart === 'function'){ try { window.agStart(); } catch(e){} }
+    // scroll to the generation progress so the run is visible
+    const gv = el('step5GenView'); const ring = document.getElementById('agOverallNum');
+    if (ring) try { ring.scrollIntoView({ behavior:'smooth', block:'center' }); } catch(e){}
+    toast('Regenerating tender document…');
+  }
+
+  // One-shot completion hook: wrap window.agComplete so we fire `cb` once after
+  // the generation animation finishes, then restore the original.
+  function onGenerationComplete(cb){
+    if (typeof window.agComplete !== 'function'){ setTimeout(cb, 50); return; }
+    const orig = window.agComplete;
+    window.agComplete = function(){ const r = orig.apply(this, arguments); window.agComplete = orig; try { cb(); } catch(e){} return r; };
+  }
+
+  // Snapshot the current live document content (built-ins + injected customs).
+  function documentSnapshot(){
+    renderDoc(); // ensure fresh
+    const doc = el('cvcDoc');
+    if (!doc) return '';
+    const clone = doc.cloneNode(true);
+    clone.querySelectorAll('.cvc-sec-actions, .ta-cs-insert-pop, .ta-cs-inline, .doc-footer').forEach(n => n.remove());
+    return clone.innerHTML;
+  }
+
+  // Append a version with the EXACT schema Phase B's Version History consumes.
+  function recordVersion(prefix, status, cvcSummary){
+    const arr = versions();
+    const num = arr.length + 1;
+    const r = review();
+    const appliedFixes = r.pointers.filter(p => p.severity==='change' && p.status==='resolved').map(p => p.message);
+    const notes = appliedFixes.length ? ('Applied from CVC review: ' + appliedFixes.join('; ')) : 'Regenerated from CVC review.';
+    const entry = {
+      version: prefix + num,
+      generatedAt: new Date().toLocaleString('en-IN', { day:'numeric', month:'short', year:'numeric', hour:'numeric', minute:'2-digit' }),
+      status: status,
+      cvcSummary: { changes: (cvcSummary && cvcSummary.changes) || 0, approved: (cvcSummary && cvcSummary.approved) || 0 },
+      notes: notes,
+      documentSnapshot: documentSnapshot(),
+      signedOff: false
+    };
+    arr.push(entry);
+    persistVersions();
+    toast('New version saved — ' + entry.version);
+    return entry;
+  }
+
+  // Seed v1 the first time Step-5 generation completes (so history isn't empty).
+  function seedV1IfNeeded(){
+    if (_started) return;
+    _started = true;
+    if (versions().length) return;
+    const r = review();
+    recordVersion('v', 'Draft', { changes: r.pointers.filter(p=>p.severity==='change').length, approved: r.pointers.filter(p=>p.severity==='ok').length });
+    // v1's status reads as "Draft / Under CVC review"; mark accordingly.
+    const v1 = versions()[0]; if (v1){ v1.status = 'Under CVC review'; persistVersions(); }
+  }
+
+  // ===================================================================
+  // init / wiring
+  // ===================================================================
+  function mount(){
+    if (!el('cvcWrap')) return;
+    renderThread();
+    renderDoc();
+    if (review().pointers.length){ const pe = el('cvcPointers'); if (pe) pe.style.display = 'block'; renderPointers(); }
+    syncSendEnabled();
+    icons();
+  }
+
+  // Design-review restart: reset the ENTIRE Step-5 flow to the very beginning —
+  // no CVC feedback entered, no pointers, no versions — then replay the generation
+  // from 0%. Clears only Step-5/CVC/version state (NOT Steps 1–4 or custom sections).
+  function restartFlow(){
+    const d = draft();
+    d.cvcReview = { thread:[], pointers:[], okCollapsed:true };
+    d.versions = [];
+    try { delete d.finalVersion; } catch(e){}
+    _started = false;
+    _editSecKey = null; _addEditor = null; _insertPop = null; _pendingFixPointer = null;
+    try { localStorage.removeItem(LS_CVC); localStorage.removeItem(LS_VER); localStorage.removeItem('taFinalVersion_' + TND); } catch(e){}
+    try { const pe = el('cvcPointers'); if (pe) pe.style.display = 'none'; } catch(e){}
+    try { mount(); } catch(e){}                                  // CVC chatbot → empty state, fresh live doc
+    try { if (window.versionHistory && typeof window.versionHistory.render === 'function') window.versionHistory.render(); } catch(e){}
+    try { if (typeof window.agReplay === 'function') window.agReplay(); } catch(e){}   // generation → beginning
+    toast('AI Generation flow reset to the beginning');
+  }
+
+  // public API
+  window.cvc = {
+    send, onInput, onKey, attachClick, onFilePick, clearFile, toggleMic, example,
+    fix, backToReview, toggleOk,
+    addTitle, saveAdd, discardAddStart, discardAddCancel, discardAddConfirm,
+    regenStart, regenCancel, regenConfirm, restartFlow,
+    _mount: mount, _seedV1: seedV1IfNeeded, _renderDoc: renderDoc
+  };
+
+  function init(){
+    hydrate();
+    // Seed v1 when the initial Step-5 generation finishes; re-arm on each entry
+    // to Step 5 if no version exists yet.
+    const armSeed = () => { if (!versions().length) onGenerationComplete(seedV1IfNeeded); };
+    // Wrap setView so we (re)mount whenever Step 5 is shown.
+    if (typeof window.setView === 'function'){
+      const orig = window.setView;
+      window.setView = function(name){
+        const res = orig.apply(this, arguments);
+        if (name === 'step5'){ try { armSeed(); setTimeout(mount, 0); } catch(e){} }
+        return res;
+      };
+    }
+    // If we're already on Step 5 at load, mount + arm now.
+    if (location.hash.indexOf('step5') >= 0){ armSeed(); setTimeout(mount, 60); }
+    // Always mount once DOM is ready (panel lives in the Step 5 view markup).
+    setTimeout(mount, 120);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>
+
+<!-- ======================================================================
+     STEP 6 — VERSION HISTORY (Phase B, Changes 5 & 6)
+     Replaces the old two-phase "CVC Review" surface. Consumes the append-only
+     tenderDraft.versions[] hydrated by the Step-5 CVC controller (Phase A) and
+     persisted at taVersions_TND-2026-010. This module only READS the history
+     and WRITES BACK status / notes / signedOff + the chosen finalVersion — it
+     never re-seeds or destructively migrates (audit-safe, append-only).
+     Reuses the .cvc-doc document-preview styling for read-only "View".
+     ====================================================================== -->
+<script>
+(function(){
+  "use strict";
+  const TND = 'TND-2026-010';
+  const LS_VER   = 'taVersions_' + TND;
+  const LS_FINAL = 'taFinalVersion_' + TND;
+
+  function draft(){ window.tenderDraft = window.tenderDraft || {}; return window.tenderDraft; }
+  function versions(){ const d = draft(); if (!Array.isArray(d.versions)) d.versions = []; return d.versions; }
+  function el(id){ return document.getElementById(id); }
+  function icons(){ if (window.lucide) try { lucide.createIcons(); } catch(e){} }
+  function toast(m){ if (typeof window.showToast === 'function') try { window.showToast(m); } catch(e){} }
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+  function announce(msg){ const live = el('vhLive'); if (live){ live.textContent = ''; setTimeout(() => { live.textContent = msg; }, 30); } }
+
+  // ---------- persistence (write-back only; hydration is Phase A's job) ----------
+  // Pull any history Phase A persisted but hasn't mirrored onto tenderDraft yet
+  // (e.g. when this page is opened directly at #step6).
+  function ensureHydrated(){
+    const d = draft();
+    if (!Array.isArray(d.versions) || !d.versions.length){
+      try { const v = localStorage.getItem(LS_VER); if (v){ const a = JSON.parse(v); if (Array.isArray(a)) d.versions = a; } } catch(e){}
+    }
+    if (d.finalVersion == null){
+      try { const f = localStorage.getItem(LS_FINAL); if (f) d.finalVersion = f; } catch(e){}
+    }
+    // Re-derive finalVersion from any signed-off entry if the pointer is missing.
+    if (d.finalVersion == null){ const signed = versions().find(v => v && v.signedOff); if (signed) d.finalVersion = signed.version; }
+  }
+  function persistVersions(){ try { localStorage.setItem(LS_VER, JSON.stringify(versions())); } catch(e){} }
+  function persistFinal(){ const d = draft(); try { if (d.finalVersion) localStorage.setItem(LS_FINAL, d.finalVersion); else localStorage.removeItem(LS_FINAL); } catch(e){} }
+
+  // ---------- status model ----------
+  // Rank used to decide "Revised or later" (mark-final eligibility) + ordering.
+  const STATUS_RANK = { 'Draft':0, 'Under CVC review':1, 'Revised':2, 'Approved for publish':3, 'Published':4 };
+  function rank(s){ return STATUS_RANK[s] != null ? STATUS_RANK[s] : 0; }
+  function isFinalEligible(v){ return rank(v.status) >= STATUS_RANK['Revised']; }
+
+  // Pill classes by status value (reusing the page's pill utility look).
+  function statusPill(status){
+    const map = {
+      'Draft':                { cls:'bg-ink-400/15 text-ink-500',  ic:'circle-dashed' },
+      'Under CVC review':     { cls:'bg-warning-light text-warning', ic:'clock' },
+      'Revised':              { cls:'bg-primary-light text-primary', ic:'pencil' },
+      'Approved for publish': { cls:'bg-success-light text-success', ic:'check-circle-2' },
+      'Published':            { cls:'text-white', ic:'check', solid:true }
+    };
+    const m = map[status] || map['Draft'];
+    const style = m.solid ? ' style="background:#10B981;"' : '';
+    return '<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold whitespace-nowrap '+m.cls+'"'+style+'><i data-lucide="'+m.ic+'" class="w-3 h-3"></i> '+esc(status)+'</span>';
+  }
+
+  // ---------- render ----------
+  function render(){
+    ensureHydrated();
+    const body = el('vhTableBody');
+    if (!body) return;
+    const arr = versions();
+    const d = draft();
+    const finalVer = d.finalVersion || null;
+    const latest = arr.length ? arr[arr.length - 1].version : null;
+
+    // count label
+    const cl = el('vhCountLabel'); if (cl) cl.textContent = arr.length + ' version' + (arr.length === 1 ? '' : 's');
+
+    // empty state
+    const emptyEl = el('vhEmpty'), tableEl = el('vhTable');
+    if (!arr.length){
+      if (emptyEl) emptyEl.classList.remove('hidden');
+      if (tableEl) tableEl.classList.add('hidden');
+      body.innerHTML = '';
+      updateBanner();
+      icons();
+      return;
+    }
+    if (emptyEl) emptyEl.classList.add('hidden');
+    if (tableEl) tableEl.classList.remove('hidden');
+
+    body.innerHTML = arr.map((v, i) => {
+      const isLatest = v.version === latest;
+      const isFinal  = finalVer && v.version === finalVer;
+      const superseded = finalVer && !isFinal;
+      const ts = (v.generatedAt || '—');
+      const cvc = (v.cvcSummary && (v.cvcSummary.changes || v.cvcSummary.approved))
+        ? (v.cvcSummary.changes + ' change' + (v.cvcSummary.changes === 1 ? '' : 's') + ' · ' + v.cvcSummary.approved + ' approved')
+        : '—';
+
+      // VERSION cell: bold, highlight latest + final/superseded tags
+      let verCell = '<div class="flex items-center gap-2">'
+        + '<span class="font-bold '+(isLatest?'text-primary':'text-ink-900')+'">'+esc(v.version)+'</span>'
+        + (isLatest ? '<span class="text-[9.5px] uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded bg-primary-light text-primary">Latest</span>' : '')
+        + (isFinal ? '<span class="vh-final-badge inline-flex items-center gap-1 text-[9.5px] uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded bg-success-light text-success"><i data-lucide="badge-check" class="w-3 h-3"></i> Final</span>' : '')
+        + (superseded ? '<span class="text-[9.5px] uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded bg-ink-400/15 text-ink-400">Superseded</span>' : '')
+        + '</div>';
+
+      // ACTION cell (compact labels; full intent in title/aria-label)
+      const actBtn = (label, full, ic, fn) => '<button type="button" onclick="'+fn+'" title="'+full+'" aria-label="'+full+' '+esc(v.version)+'" class="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-line text-[11.5px] text-ink-900 hover:bg-surface whitespace-nowrap"><i data-lucide="'+ic+'" class="w-3 h-3"></i> '+label+'</button>';
+      let actions = actBtn('View', 'View document', 'eye', 'vhView('+i+')')
+        + actBtn('Download', 'Download PDF', 'download', 'vhDownload('+i+')');
+      if (!isFinal){
+        actions += actBtn('Compare', 'Compare with latest', 'git-compare', 'vhCompare('+i+')');
+        if (isFinalEligible(v)){
+          actions += '<button type="button" onclick="vhMarkFinal('+i+')" title="Mark as final for publish" aria-label="Mark '+esc(v.version)+' as final for publish" class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11.5px] font-medium text-white bg-primary hover:bg-primary/90 whitespace-nowrap"><i data-lucide="badge-check" class="w-3 h-3"></i> Mark as final</button>';
+        }
+      }
+
+      const rowCls = 'border-b border-line/70 align-top '
+        + (isFinal ? 'bg-success-light/40 ' : (isLatest ? 'bg-primary-light/30 ' : ''))
+        + (superseded ? 'opacity-80' : '');
+
+      return '<tr class="'+rowCls+'" data-vh-row="'+i+'">'
+        + '<td class="px-5 py-3">'+verCell+'</td>'
+        + '<td class="px-4 py-3 text-ink-500 whitespace-nowrap">'+esc(ts)+'</td>'
+        + '<td class="px-4 py-3">'+statusPill(v.status)+'</td>'
+        + '<td class="px-4 py-3 text-ink-500 whitespace-nowrap">'+esc(cvc)+'</td>'
+        + '<td class="px-4 py-3">'
+          + '<input type="text" value="'+esc(v.notes||'')+'" placeholder="Add a note…" aria-label="Notes for '+esc(v.version)+'" '
+          + 'onchange="vhEditNote('+i+', this.value)" '
+          + 'class="w-full min-w-[170px] bg-transparent border border-transparent hover:border-line focus:border-primary rounded-md px-2 py-1 text-[12.5px] text-ink-900 focus:outline-none focus:ring-2 focus:ring-primary/15 transition-colors" />'
+        + '</td>'
+        + '<td class="px-5 py-3"><div class="flex flex-wrap items-center justify-end gap-1.5 max-w-[210px] ml-auto">'+actions+'</div></td>'
+        + '</tr>';
+    }).join('');
+
+    updateBanner();
+    icons();
+  }
+
+  function updateBanner(){
+    const d = draft();
+    const banner = el('vhFinalBanner');
+    if (!banner) return;
+    if (d.finalVersion){
+      const t = el('vhFinalBannerText'); if (t) t.textContent = d.finalVersion;
+      banner.classList.remove('hidden');
+    } else {
+      banner.classList.add('hidden');
+    }
+  }
+
+  // ---------- actions ----------
+  function vhEditNote(i, val){
+    const arr = versions(); if (!arr[i]) return;
+    arr[i].notes = val;
+    persistVersions();
+  }
+
+  // VIEW — open the version's documentSnapshot read-only (reuses .cvc-doc look).
+  let _viewIdx = null;
+  function vhView(i){
+    const arr = versions(); const v = arr[i]; if (!v) return;
+    _viewIdx = i;
+    const doc = el('vhSnapDoc');
+    if (doc) doc.innerHTML = v.documentSnapshot || '<p class="text-ink-500">No snapshot was captured for this version.</p>';
+    const ver = el('vhSnapVer'); if (ver) ver.textContent = v.version;
+    const meta = el('vhSnapMeta'); if (meta) meta.textContent = 'Generated ' + (v.generatedAt || '—') + ' · ' + v.status;
+    const modal = el('vhSnapModal'); if (modal){ modal.classList.remove('hidden'); modal.scrollTop = 0; }
+    if (doc) doc.scrollTop = 0;
+    icons();
+  }
+  function vhCloseSnap(){ const m = el('vhSnapModal'); if (m) m.classList.add('hidden'); }
+  function vhDownloadFromSnap(){ if (_viewIdx != null) vhDownload(_viewIdx); }
+
+  // DOWNLOAD — mock; always available per row.
+  function vhDownload(i){ const v = versions()[i]; if (!v) return; toast(v.version + ' downloaded'); }
+
+  // COMPARE WITH LATEST — lightweight change summary (section-count + status +
+  // notes diff). Keeps it simple & offline; no heavy text-diff.
+  function sectionCount(html){
+    if (!html) return 0;
+    try { const t = document.createElement('div'); t.innerHTML = html; return t.querySelectorAll('.nit-section').length; }
+    catch(e){ return 0; }
+  }
+  function vhCompare(i){
+    const arr = versions(); const v = arr[i]; if (!v) return;
+    const latest = arr[arr.length - 1];
+    const ttlV = el('vhCmpVer'); if (ttlV) ttlV.textContent = v.version;
+    const meta = el('vhCmpMeta'); if (meta) meta.textContent = 'Comparing ' + v.version + ' against ' + latest.version + ' (latest)';
+    const scV = sectionCount(v.documentSnapshot), scL = sectionCount(latest.documentSnapshot);
+    const secDelta = scL - scV;
+    const secLine = secDelta === 0
+      ? 'Same number of sections (' + scL + ').'
+      : (Math.abs(secDelta) + ' section' + (Math.abs(secDelta) === 1 ? '' : 's') + (secDelta > 0 ? ' added' : ' removed') + ' (' + scV + ' → ' + scL + ').');
+    const statusLine = v.status === latest.status ? ('No status change (' + esc(v.status) + ').') : (esc(v.status) + ' → ' + esc(latest.status) + '.');
+    const cvcV = v.cvcSummary || {changes:0,approved:0}, cvcL = latest.cvcSummary || {changes:0,approved:0};
+    const cvcLine = (cvcV.changes||0) + '/' + (cvcV.approved||0) + ' → ' + (cvcL.changes||0) + '/' + (cvcL.approved||0) + ' (changes / approved).';
+    const sameNotes = (v.notes||'') === (latest.notes||'');
+
+    const row = (ic, label, val) => '<div class="flex items-start gap-3 py-2.5 border-b border-line/70 last:border-0">'
+      + '<div class="w-7 h-7 rounded-lg bg-surface text-ink-500 flex items-center justify-center shrink-0"><i data-lucide="'+ic+'" class="w-3.5 h-3.5"></i></div>'
+      + '<div class="flex-1 min-w-0"><div class="text-[12px] uppercase tracking-wider text-ink-400 font-semibold">'+label+'</div><div class="text-[13px] text-ink-900 mt-0.5">'+val+'</div></div></div>';
+
+    let html = '<div class="rounded-lg border border-line overflow-hidden">'
+      + row('layout-list', 'Sections', secLine)
+      + row('activity', 'Status', statusLine)
+      + row('shield-check', 'CVC review', cvcLine)
+      + row('sticky-note', 'Notes', sameNotes ? 'Notes unchanged.' : ('<div class="text-ink-500">' + esc(v.version) + ': </div>' + (v.notes ? esc(v.notes) : '<em class="text-ink-400">—</em>') + '<div class="text-ink-500 mt-1">' + esc(latest.version) + ': </div>' + (latest.notes ? esc(latest.notes) : '<em class="text-ink-400">—</em>')))
+      + '</div>'
+      + '<p class="text-[11.5px] text-ink-400 mt-3">This is a lightweight summary. Use <strong>View</strong> on either version to read the full document.</p>';
+    if (v.version === latest.version) html = '<p class="text-[13px] text-ink-500">This is the latest version — nothing to compare against.</p>';
+    const bodyEl = el('vhCmpBody'); if (bodyEl) bodyEl.innerHTML = html;
+    const modal = el('vhCompareModal'); if (modal) modal.classList.remove('hidden');
+    icons();
+  }
+  function vhCloseCompare(){ const m = el('vhCompareModal'); if (m) m.classList.add('hidden'); }
+
+  // MARK FINAL FOR PUBLISH (Change 6) — non-blocking confirm.
+  function vhMarkFinal(i){
+    const arr = versions(); const v = arr[i]; if (!v) return;
+    if (!isFinalEligible(v)){ toast('Only Revised or later versions can be marked final'); return; }
+    const ok = window.confirm('Mark ' + v.version + ' as the final reviewed version for publication?\n\nEarlier versions remain on record.');
+    if (!ok) return;
+    const d = draft();
+    // chosen version → Approved for publish + signedOff; all others lose sign-off.
+    arr.forEach(x => { x.signedOff = false; });
+    v.status = 'Approved for publish';
+    v.signedOff = true;
+    d.finalVersion = v.version;
+    persistVersions();
+    persistFinal();
+    render();
+    enableForwardNav();
+    announce(v.version + ' marked final for publication. All other versions superseded but retained for audit.');
+    toast(v.version + ' marked final for publication');
+  }
+
+  // The final-version banner CTA + footer CTA both route to publish.
+  function vhProceedToPublish(ev){ if (ev) ev.preventDefault(); if (typeof window.goToPublish === 'function') window.goToPublish(); else location.hash = '#step7'; }
+
+  // Keep the sticky-footer Proceed-to-Publish reachable from the Version History
+  // tab (publish path preserved; under DESIGN_REVIEW_MODE this is also forced).
+  function enableForwardNav(){
+    const btn = el('step6Continue');
+    if (btn){ btn.classList.remove('opacity-50','cursor-not-allowed','pointer-events-none'); btn.removeAttribute('aria-disabled'); }
+    const lbl = el('step6CtaLabel'); if (lbl) lbl.textContent = 'Proceed to Publish';
+  }
+
+  // expose handlers used by inline onclick / onchange
+  window.vhView = vhView; window.vhCloseSnap = vhCloseSnap; window.vhDownloadFromSnap = vhDownloadFromSnap;
+  window.vhDownload = vhDownload; window.vhCompare = vhCompare; window.vhCloseCompare = vhCloseCompare;
+  window.vhEditNote = vhEditNote; window.vhMarkFinal = vhMarkFinal; window.vhProceedToPublish = vhProceedToPublish;
+  window.versionHistory = { render: render };
+
+  // ---------- init / wiring ----------
+  function onEnterStep6(){ ensureHydrated(); render(); enableForwardNav(); }
+  function init(){
+    ensureHydrated();
+    // (Re)render whenever Step 6 is shown — wrap setView like the Phase-A module.
+    if (typeof window.setView === 'function'){
+      const orig = window.setView;
+      window.setView = function(name){
+        const res = orig.apply(this, arguments);
+        if (name === 'step6'){ try { setTimeout(onEnterStep6, 0); } catch(e){} }
+        return res;
+      };
+    }
+    // Close modals on Escape.
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape'){ vhCloseSnap(); vhCloseCompare(); } });
+    // If we land directly on Step 6, render now.
+    if (location.hash.indexOf('step6') >= 0){ setTimeout(onEnterStep6, 80); }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
