@@ -706,6 +706,82 @@
     .cvc-sec-actions button:hover { border-color:#0F5EE8; color:#0F5EE8; }
     .cvc-sec-editbox { border:1px solid #D1D5DB; border-radius:8px; padding:10px 12px; font-size:13px; line-height:1.6; color:#111827; outline:none; margin-top:8px; min-height:60px; }
     .cvc-sec-editbox:focus { border-color:#10B981; box-shadow:0 0 0 3px rgba(16,185,129,.12); }
+
+    /* ============================================================
+       STEP 5 — SINGLE EDITABLE TENDER DOCUMENT (taDoc)
+       One source-of-truth NIT. Reuses .draft-doc-body document styling,
+       the Check-Draft .section-action-bar ribbon + the taCs editor blocks.
+       Pointers (CVC Pre-Check + CVC chatbot) deep-link into this doc.
+       ============================================================ */
+    .ta-single-doc { font-family:'DM Sans', system-ui, sans-serif; }
+    /* the single doc is always interactive (no edit-mode gate); hover surfaces the ribbon */
+    .ta-single-doc .nit-section { transition: box-shadow 150ms ease, background 150ms ease, padding 150ms ease; border-radius:8px; position:relative; scroll-margin-top:16px; }
+    .ta-single-doc .nit-section:hover { box-shadow:0 0 0 2px #0F5EE8; background:rgba(15,94,232,0.02); padding:12px; }
+    .ta-single-doc .nit-section.section-active { box-shadow:0 0 0 2px #0F5EE8; background:rgba(15,94,232,0.02); padding:12px; }
+    .ta-single-doc .nit-section.section-editing { box-shadow:0 0 0 2px #10B981; background:rgba(16,185,129,0.02); padding:12px; }
+    /* 600ms deep-link highlight */
+    .ta-single-doc .nit-section.ta-doc-hl { animation: ta-doc-hl 600ms ease; }
+    @keyframes ta-doc-hl { 0% { box-shadow:0 0 0 0 rgba(15,94,232,0); background:rgba(15,94,232,0);} 30% { box-shadow:0 0 0 3px rgba(15,94,232,.35); background:rgba(15,94,232,.06);} 100% { box-shadow:0 0 0 0 rgba(15,94,232,0); background:rgba(15,94,232,0);} }
+    /* 300ms success flash (Change 4) */
+    .ta-single-doc .nit-section.ta-doc-success { animation: ta-doc-success 300ms ease; }
+    @keyframes ta-doc-success { 0% { background:rgba(16,185,129,0);} 45% { background:rgba(16,185,129,.16);} 100% { background:rgba(16,185,129,0);} }
+    /* inline success / saved / undo badges */
+    .ta-doc-badge { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700; border-radius:20px; padding:3px 10px; margin-left:8px; vertical-align:middle; animation: ta-badge-in 200ms ease both; }
+    .ta-doc-badge.ai { background:#EFF6FF; color:#0F5EE8; border:1px solid #BFDBFE; }
+    .ta-doc-badge.saved { background:#F0FDF4; color:#10B981; border:1px solid rgba(16,185,129,.4); }
+    @keyframes ta-badge-in { from { opacity:0; transform:translateY(-3px);} to { opacity:1; transform:translateY(0);} }
+    .ta-doc-undo { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:600; color:#6B7280; background:transparent; border:none; cursor:pointer; margin-left:8px; vertical-align:middle; }
+    .ta-doc-undo:hover { color:#0F5EE8; text-decoration:underline; }
+    /* the editable body when a built-in section is being edited inline */
+    .ta-single-doc .ta-doc-editbox { border:1px solid #D1D5DB; border-radius:8px; padding:10px 12px; font-size:13px; line-height:1.6; color:#111827; outline:none; margin-top:8px; min-height:60px; background:#fff; }
+    .ta-single-doc .ta-doc-editbox:focus { border-color:#10B981; box-shadow:0 0 0 3px rgba(16,185,129,.12); }
+    /* reuse the same ribbon visual as Check Draft (.section-action-bar / .section-done-link already defined above) */
+    .ta-single-doc .section-done-link { background:transparent; border:none; }
+    /* a moved/grabbed section */
+    .ta-single-doc .nit-section[draggable="true"] { cursor:grab; }
+    .ta-single-doc .nit-section.ta-doc-dragover { box-shadow: 0 -3px 0 0 #0F5EE8; }
+
+    /* ----- CVC PRE-CHECK (predictive pointers below the single doc) ----- */
+    .ta-precheck { margin-top:24px; background:#fff; border:1px solid #E5E7EB; border-radius:16px; overflow:hidden; }
+    .ta-precheck-hd { padding:16px 20px; border-bottom:1px solid #E5E7EB; }
+    .ta-precheck-hd .t1 { font-size:15px; font-weight:700; color:#111827; display:flex; align-items:center; gap:8px; }
+    .ta-precheck-hd .sub { font-size:12px; color:#6B7280; margin-top:5px; line-height:1.5; }
+    .ta-precheck-counts { font-size:12.5px; font-weight:600; color:#374151; margin-top:10px; }
+    .ta-precheck-counts b { color:#0F5EE8; }
+    .ta-precheck-counts b.bad { color:#EF4444; }
+    .ta-precheck-track { height:7px; background:#EEF1F5; border-radius:6px; overflow:hidden; margin:8px 0 2px; }
+    .ta-precheck-bar { height:100%; background:#10B981; border-radius:6px; width:0; transition: width 300ms ease; }
+    .ta-precheck-body { padding:14px 20px 18px; }
+    /* reuse the cvc-row pointer styling (already defined) inside the pre-check */
+    .ta-precheck .cvc-group-label { margin-top:10px; }
+    .ta-precheck-okgroup-toggle { background:transparent; border:none; color:#6B7280; font-size:12px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; padding:8px 0 2px; }
+    .ta-precheck-okgroup-toggle:hover { color:#111827; }
+
+    /* ----- CROSS-REFERENCE PROPAGATION PROMPT (Change 6) ----- */
+    .ta-prop-overlay { position:fixed; inset:0; background:rgba(17,24,39,.32); z-index:560; display:flex; align-items:center; justify-content:center; padding:24px; animation: ta-prop-fade 180ms ease both; }
+    @keyframes ta-prop-fade { from { opacity:0;} to { opacity:1;} }
+    .ta-prop { background:#fff; border-radius:16px; max-width:560px; width:100%; max-height:84vh; display:flex; flex-direction:column; box-shadow:0 20px 50px rgba(0,0,0,.25); animation: ta-prop-pop 200ms ease both; }
+    @keyframes ta-prop-pop { from { opacity:0; transform:translateY(10px) scale(.98);} to { opacity:1; transform:translateY(0) scale(1);} }
+    .ta-prop-hd { padding:18px 22px 14px; border-bottom:1px solid #F3F4F6; }
+    .ta-prop-hd .t1 { font-size:15.5px; font-weight:700; color:#111827; display:flex; align-items:center; gap:8px; }
+    .ta-prop-hd .s1 { font-size:12.5px; color:#6B7280; margin-top:6px; line-height:1.5; }
+    .ta-prop-hd .s1 b { color:#0F5EE8; }
+    .ta-prop-list { padding:8px 22px; overflow-y:auto; }
+    .ta-prop-occ { display:flex; align-items:flex-start; gap:11px; padding:11px 0; border-bottom:1px solid #F3F4F6; }
+    .ta-prop-occ:last-child { border-bottom:none; }
+    .ta-prop-occ input[type="checkbox"] { margin-top:2px; width:16px; height:16px; flex-shrink:0; accent-color:#0F5EE8; cursor:pointer; }
+    .ta-prop-occ .occ-body { flex:1; min-width:0; }
+    .ta-prop-occ .occ-sec { font-size:12.5px; font-weight:700; color:#111827; }
+    .ta-prop-occ .occ-snip { font-size:12px; color:#6B7280; margin-top:3px; line-height:1.5; }
+    .ta-prop-occ .occ-snip mark { background:#FEF3C7; color:#92400E; border-radius:3px; padding:0 3px; font-weight:600; }
+    .ta-prop-occ .occ-view { font-size:11.5px; color:#0F5EE8; background:transparent; border:none; cursor:pointer; flex-shrink:0; display:inline-flex; align-items:center; gap:3px; margin-top:1px; }
+    .ta-prop-occ .occ-view:hover { text-decoration:underline; }
+    .ta-prop-ft { padding:14px 22px 18px; border-top:1px solid #F3F4F6; display:flex; align-items:center; justify-content:flex-end; gap:10px; }
+    .ta-prop-ft .skip { background:transparent; border:1px solid #D1D5DB; color:#374151; border-radius:8px; padding:9px 16px; font-size:13px; cursor:pointer; }
+    .ta-prop-ft .skip:hover { background:#F9FAFB; }
+    .ta-prop-ft .apply { background:#0F5EE8; color:#fff; border:none; border-radius:8px; padding:9px 18px; font-size:13px; font-weight:700; cursor:pointer; }
+    .ta-prop-ft .apply:hover { background:#0d52cc; }
+    .ta-prop-occ.occ-updated { animation: ta-doc-success 600ms ease; border-radius:6px; }
   </style>
 </head>
 <body class="min-h-screen">
@@ -2513,86 +2589,10 @@
                 </div>
               </div>
 
-              <!-- ============ CVC REVIEW (offline) — chatbot → actionable fixes ============ -->
-              <div class="cvc-wrap" id="cvcWrap">
-                <div class="flex items-center gap-2 mb-1">
-                  <i data-lucide="message-square-text" class="w-[18px] h-[18px] text-primary"></i>
-                  <h2 class="text-[17px] font-bold text-ink-900">CVC Review</h2>
-                </div>
-                <p class="cvc-note" style="margin-bottom:16px;">CVC review happens offline across reviewing officers. Enter their feedback here — as text, an uploaded note, or dictation — and the assistant will turn it into actionable fixes.</p>
-
-                <div class="cvc-grid">
-                  <!-- LEFT: chatbot + pointers + regenerate -->
-                  <div class="cvc-card">
-                    <div class="cvc-card-hd">
-                      <div class="t1"><i data-lucide="bot" class="w-[18px] h-[18px] text-primary"></i> Review assistant</div>
-                      <div class="cvc-note">Paste reviewer comments, upload the CVC note, or dictate feedback. Nothing is sent — this stays on your draft.</div>
-                    </div>
-
-                    <!-- conversation area -->
-                    <div id="cvcThread" class="cvc-thread" role="log" aria-label="CVC review conversation"></div>
-                    <div id="cvcAssistantLive" class="sr-only" aria-live="polite"></div>
-
-                    <!-- composer / input bar -->
-                    <div class="cvc-composer">
-                      <div id="cvcFileChipWrap"></div>
-                      <div id="cvcListening" class="cvc-listening" style="display:none;" aria-live="polite"><span class="cvc-rec-dot"></span> Listening… <span class="text-ink-400" style="font-size:11.5px;">(mock dictation — speak the reviewer's comments)</span></div>
-                      <div class="cvc-inputrow">
-                        <button type="button" id="cvcAttachBtn" class="cvc-iconbtn" title="Attach review document" aria-label="Attach review document (PDF, DOCX, image)" onclick="cvc.attachClick()"><i data-lucide="paperclip" class="w-4 h-4"></i></button>
-                        <button type="button" id="cvcMicBtn" class="cvc-iconbtn" title="Dictate feedback" aria-label="Dictate feedback (mock)" aria-pressed="false" onclick="cvc.toggleMic()"><i data-lucide="mic" class="w-4 h-4"></i></button>
-                        <input type="file" id="cvcFileInput" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" style="display:none;" onchange="cvc.onFilePick(this)" />
-                        <textarea id="cvcInput" class="cvc-textarea" rows="1" placeholder="Type the reviewing officer's feedback…" aria-label="Reviewing officer feedback" oninput="cvc.onInput(this)" onkeydown="cvc.onKey(event)"></textarea>
-                        <button type="button" id="cvcSendBtn" class="cvc-send" onclick="cvc.send()" disabled>Send <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
-                      </div>
-                    </div>
-
-                    <!-- actionable pointers (mirrors risk-check resolution UX) -->
-                    <div id="cvcPointers" class="cvc-pointers" style="display:none;">
-                      <div class="cvc-ptr-head">
-                        <div class="t1" style="font-size:13.5px; font-weight:700; color:#111827; display:flex; align-items:center; gap:7px;"><i data-lucide="list-checks" class="w-4 h-4 text-primary"></i> Reviewer points</div>
-                        <div class="cvc-ptr-counts" id="cvcPtrCounts" aria-live="polite"></div>
-                      </div>
-                      <div class="cvc-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="cvcProgressTrack"><div class="cvc-progress-bar" id="cvcProgressBar"></div></div>
-                      <div class="cvc-progress-label" id="cvcProgressLabel" aria-live="polite">0 of 0 changes resolved</div>
-                      <div id="cvcPtrChanges"></div>
-                      <div id="cvcPtrSuggestions"></div>
-                      <div id="cvcPtrOkWrap" style="display:none;">
-                        <button type="button" class="cvc-okgroup-toggle" id="cvcOkToggle" aria-expanded="false" onclick="cvc.toggleOk()"><i data-lucide="chevron-down" id="cvcOkChevron" class="w-3.5 h-3.5"></i> <span id="cvcOkLabel">0 approved items</span></button>
-                        <div id="cvcPtrOk" style="display:none;"></div>
-                      </div>
-
-                      <!-- regenerate CTA / inline confirm (non-blocking) -->
-                      <div class="cvc-regen-wrap">
-                        <div id="cvcRegenCtaWrap">
-                          <button type="button" class="cvc-regen-btn" id="cvcRegenBtn" onclick="cvc.regenStart()"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Regenerate tender document <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
-                        </div>
-                        <div id="cvcRegenConfirm" class="cvc-regen-confirm" style="display:none;" role="dialog" aria-label="Confirm regeneration">
-                          <div class="q" id="cvcRegenConfirmQ">Regenerate the tender with the applied changes? This creates a new version.</div>
-                          <div class="acts">
-                            <button type="button" class="no" onclick="cvc.regenCancel()">Cancel</button>
-                            <button type="button" class="yes" onclick="cvc.regenConfirm()">Regenerate</button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- RIGHT: live document (deep-link target for Fix →) -->
-                  <div class="cvc-doc-card">
-                    <div class="cvc-doc-bar">
-                      <i data-lucide="file-text" class="w-4 h-4 text-ink-500"></i>
-                      <span class="lbl">Live document — TND-2026-010</span>
-                      <button type="button" class="back" id="cvcDocBack" onclick="cvc.backToReview()"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back to CVC review</button>
-                    </div>
-                    <div id="cvcDoc" class="cvc-doc"></div>
-                  </div>
-                </div>
-              </div>
-
             </div>
           </div>
 
-          <!-- ===== EXISTING COMPLETED-DOCUMENT VIEW (shown once generation finishes) ===== -->
+          <!-- ===== COMPLETED-DOCUMENT VIEW: single editable tender + CVC Pre-Check + CVC review ===== -->
           <div id="step5RealContent" class="px-6 lg:px-10 pt-8 pb-32 hidden">
             <div class="max-w-[1200px] mx-auto">
               <div class="flex items-start justify-between gap-3 mb-5 flex-wrap">
@@ -2606,141 +2606,95 @@
                 </div>
               </div>
 
-              <div class="grid grid-cols-1 lg:grid-cols-[55%_1fr] gap-6">
-                <!-- LEFT: Document preview -->
-                <div class="bg-white border border-line rounded-2xl overflow-hidden">
-                  <div class="bg-surface border-b border-line px-5 py-3 flex items-center gap-2">
-                    <i data-lucide="file-text" class="w-4 h-4 text-ink-500"></i>
-                    <span class="text-[12.5px] text-ink-500">Document preview — TND-2026-010</span>
-                  </div>
-                  <div class="p-8 max-h-[680px] overflow-y-auto" style="font-family: 'DM Sans', serif;">
-                    <!-- Letterhead -->
-                    <div class="flex items-center gap-4 pb-5 border-b border-line">
-                      <div class="w-16 h-16 rounded-full bg-surface border-2 border-ink-400 flex items-center justify-center text-[10px] text-ink-500 text-center leading-tight">Govt.<br/>Seal</div>
-                      <div>
-                        <div class="text-[16px] font-bold text-ink-900 uppercase tracking-wide">Ahmedabad Municipal Corporation</div>
-                        <div class="text-[12px] text-ink-500">Public Works Department</div>
-                      </div>
-                    </div>
-                    <h2 class="text-center text-[18px] font-bold text-ink-900 mt-5 uppercase">Notice Inviting Tender</h2>
-                    <div class="text-center text-[13px] text-ink-500 mt-1">TND-2026-010 • Issued: 8 May 2026</div>
-
-                    <div class="mt-6 group relative">
-                      <h3 class="text-[14px] font-bold text-ink-900 uppercase tracking-wide pb-1.5 border-b border-line">1. Basic Details</h3>
-                      <a href="#step1" class="absolute top-0 right-0 opacity-0 group-hover:opacity-100 text-[11px] text-primary inline-flex items-center gap-1"><i data-lucide="pencil" class="w-3 h-3"></i> Edit</a>
-                      <table class="w-full text-[13px] mt-2"><tbody>
-                        <tr><td class="py-1 text-ink-500 w-1/3">Tender Type</td><td class="py-1 text-ink-900">Works — Road Works</td></tr>
-                        <tr><td class="py-1 text-ink-500">Sector</td><td class="py-1 text-ink-900">Infrastructure</td></tr>
-                        <tr><td class="py-1 text-ink-500">Procurement Method</td><td class="py-1 text-ink-900">Open Tender</td></tr>
-                        <tr><td class="py-1 text-ink-500">Evaluation Method</td><td class="py-1 text-ink-900">L1 (Lowest Cost)</td></tr>
-                        <tr><td class="py-1 text-ink-500">Estimated Cost</td><td class="py-1 text-ink-900 font-medium">₹45,00,000</td></tr>
-                        <tr><td class="py-1 text-ink-500">EMD</td><td class="py-1 text-ink-900">₹90,000 (2%)</td></tr>
-                      </tbody></table>
-                    </div>
-
-                    <div class="mt-6 group relative">
-                      <h3 class="text-[14px] font-bold text-ink-900 uppercase tracking-wide pb-1.5 border-b border-line">2. Scope of Work</h3>
-                      <a href="#step3" class="absolute top-0 right-0 opacity-0 group-hover:opacity-100 text-[11px] text-primary inline-flex items-center gap-1"><i data-lucide="pencil" class="w-3 h-3"></i> Edit</a>
-                      <p class="text-[13px] text-ink-900 mt-2 leading-relaxed">Repair and resurfacing of internal roads in Bandra West Zone 4, including excavation of damaged surface, laying of bitumen base course (VG-30 grade), kerb concreting (M20 grade) and earthwork compaction. Works to be completed within 12 months from work order. All materials must conform to MoRTH and PWD specifications.</p>
-                    </div>
-
-                    <div class="mt-6 group relative">
-                      <h3 class="text-[14px] font-bold text-ink-900 uppercase tracking-wide pb-1.5 border-b border-line">3. Eligibility (PQ)</h3>
-                      <a href="#step2" class="absolute top-0 right-0 opacity-0 group-hover:opacity-100 text-[11px] text-primary inline-flex items-center gap-1"><i data-lucide="pencil" class="w-3 h-3"></i> Edit</a>
-                      <ul class="list-disc list-inside text-[13px] text-ink-900 mt-2 space-y-1">
-                        <li>Average annual turnover ≥ ₹22,50,000 over last 3 financial years.</li>
-                        <li>At least 1 similar work worth ≥ ₹18,00,000 in last 5 years.</li>
-                        <li>Minimum 3 years in business with positive net worth.</li>
-                      </ul>
-                    </div>
-
-                    <div class="mt-6 group relative">
-                      <h3 class="text-[14px] font-bold text-ink-900 uppercase tracking-wide pb-1.5 border-b border-line">4. Bill of Quantities (Summary)</h3>
-                      <a href="#step3" class="absolute top-0 right-0 opacity-0 group-hover:opacity-100 text-[11px] text-primary inline-flex items-center gap-1"><i data-lucide="pencil" class="w-3 h-3"></i> Edit</a>
-                      <table class="w-full text-[13px] mt-2 border border-line">
-                        <thead class="bg-surface text-[10.5px] uppercase tracking-wide text-ink-500"><tr><th class="text-left px-2 py-1.5">Item</th><th class="text-right px-2 py-1.5">Qty</th><th class="text-right px-2 py-1.5">Rate</th><th class="text-right px-2 py-1.5">Amount</th></tr></thead>
-                        <tbody class="divide-y divide-line">
-                          <tr><td class="px-2 py-1.5">Excavation in hard soil (Cum)</td><td class="px-2 py-1.5 text-right">250</td><td class="px-2 py-1.5 text-right">185</td><td class="px-2 py-1.5 text-right">46,250</td></tr>
-                          <tr><td class="px-2 py-1.5">Bitumen VG-30 (MT)</td><td class="px-2 py-1.5 text-right">45</td><td class="px-2 py-1.5 text-right">52,000</td><td class="px-2 py-1.5 text-right">23,40,000</td></tr>
-                          <tr><td class="px-2 py-1.5">Concrete M20 (Cum)</td><td class="px-2 py-1.5 text-right">30</td><td class="px-2 py-1.5 text-right">6,500</td><td class="px-2 py-1.5 text-right">1,95,000</td></tr>
-                          <tr><td class="px-2 py-1.5">Earthwork compaction (Cum)</td><td class="px-2 py-1.5 text-right">180</td><td class="px-2 py-1.5 text-right">95</td><td class="px-2 py-1.5 text-right">17,100</td></tr>
-                          <tr class="bg-surface font-semibold"><td class="px-2 py-1.5" colspan="3">Total (incl. 5% contingency)</td><td class="px-2 py-1.5 text-right">₹27,28,268</td></tr>
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <div class="mt-6 group relative">
-                      <h3 class="text-[14px] font-bold text-ink-900 uppercase tracking-wide pb-1.5 border-b border-line">5. Key Dates</h3>
-                      <a href="#step4" class="absolute top-0 right-0 opacity-0 group-hover:opacity-100 text-[11px] text-primary inline-flex items-center gap-1"><i data-lucide="pencil" class="w-3 h-3"></i> Edit</a>
-                      <table class="w-full text-[13px] mt-2"><tbody>
-                        <tr><td class="py-1 text-ink-500 w-1/2">Publication</td><td class="py-1 text-ink-900">8 May 2026</td></tr>
-                        <tr><td class="py-1 text-ink-500">Pre-Bid Meeting</td><td class="py-1 text-ink-900">15 May 2026</td></tr>
-                        <tr><td class="py-1 text-ink-500">Bid Submission Deadline</td><td class="py-1 text-ink-900">7 June 2026, 5:00 PM</td></tr>
-                        <tr><td class="py-1 text-ink-500">Financial Bid Opening</td><td class="py-1 text-ink-900">10 June 2026</td></tr>
-                        <tr><td class="py-1 text-ink-500">Evaluation Target</td><td class="py-1 text-ink-900">24 June 2026</td></tr>
-                      </tbody></table>
-                    </div>
-
-                    <div class="mt-6">
-                      <h3 class="text-[14px] font-bold text-ink-900 uppercase tracking-wide pb-1.5 border-b border-line">6. General Terms</h3>
-                      <p class="text-[13px] text-ink-500 mt-2 italic">Standard MPWD terms apply. See full GCC/SCC in the document download.</p>
-                    </div>
-                  </div>
+              <!-- SINGLE EDITABLE TENDER DOCUMENT (source of truth) -->
+              <div class="bg-white border border-line rounded-2xl overflow-hidden">
+                <div class="bg-surface border-b border-line px-5 py-3 flex items-center gap-2 flex-wrap">
+                  <i data-lucide="file-text" class="w-4 h-4 text-ink-500"></i>
+                  <span class="text-[12.5px] text-ink-500">Tender document — TND-2026-010</span>
+                  <span class="text-[11px] text-ink-400 ml-1 hidden sm:inline">Hover a section to edit, rewrite, move, remove or add. Edits stay in sync with Check Draft.</span>
+                  <button type="button" id="taDocBack" onclick="taDoc.exitEdit(true)" class="ml-auto text-[12px] text-primary hidden items-center gap-1.5 hover:underline"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Done editing</button>
                 </div>
+                <!-- single document; reuses the Check Draft document styling (.draft-doc-body) -->
+                <div id="taSingleDoc" class="ta-single-doc draft-doc-body p-8 lg:p-10 max-h-[760px] overflow-y-auto"></div>
+              </div>
 
-                <!-- RIGHT: Checklist -->
-                <div class="bg-white border border-line rounded-2xl p-5">
-                  <h3 class="text-[15px] font-bold text-ink-900">Document Checklist</h3>
-                  <p class="text-[12px] text-ink-500 mt-0.5 mb-4">10 of 12 sections complete</p>
-                  <div class="h-2 bg-line rounded-full overflow-hidden mb-4" role="progressbar" aria-valuenow="83" aria-valuemin="0" aria-valuemax="100">
-                    <div class="h-full bg-primary rounded-full" style="width: 83%;"></div>
+              <!-- CVC PRE-CHECK (predictive — surfaces issues a CVC reviewer is likely to raise) -->
+              <div class="ta-precheck" id="taPreCheck">
+                <div class="ta-precheck-hd">
+                  <div class="t1"><i data-lucide="shield-check" class="w-[18px] h-[18px] text-primary"></i> CVC Pre-Check</div>
+                  <div class="sub">Predictive review — these are the points a CVC reviewer is likely to raise on this draft, before the offline review. Fix them now to avoid objections later. Advisory only; you can still proceed.</div>
+                  <div class="ta-precheck-counts" id="taPreCheckCounts" aria-live="polite"></div>
+                  <div class="ta-precheck-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="taPreCheckTrack"><div class="ta-precheck-bar" id="taPreCheckBar"></div></div>
+                </div>
+                <div class="ta-precheck-body">
+                  <div id="taPreCheckLive" class="sr-only" aria-live="polite"></div>
+                  <div id="taPreCheckChanges"></div>
+                  <div id="taPreCheckOkWrap" style="display:none;">
+                    <button type="button" class="ta-precheck-okgroup-toggle" id="taPreCheckOkToggle" aria-expanded="false" onclick="taDoc.togglePreCheckOk()"><i data-lucide="chevron-down" id="taPreCheckOkChevron" class="w-3.5 h-3.5"></i> <span id="taPreCheckOkLabel">0 checks passed</span></button>
+                    <div id="taPreCheckOk" style="display:none;"></div>
                   </div>
-                  <ul class="space-y-2 text-[13px]">
-                    <li class="flex items-start gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-success shrink-0 mt-0.5"></i><div><div class="text-ink-900 font-medium">Tender Header</div><div class="text-[11.5px] text-ink-500">Generated</div></div></li>
-                    <li class="flex items-start gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-success shrink-0 mt-0.5"></i><div><div class="text-ink-900 font-medium">Basic Classification</div><div class="text-[11.5px] text-ink-500">From Step 1</div></div></li>
-                    <li class="flex items-start gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-success shrink-0 mt-0.5"></i><div><div class="text-ink-900 font-medium">Procurement Method</div><div class="text-[11.5px] text-ink-500">Open Tender, L1</div></div></li>
-                    <li class="flex items-start gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-success shrink-0 mt-0.5"></i><div><div class="text-ink-900 font-medium">Financial Details</div><div class="text-[11.5px] text-ink-500">EMD ₹90,000, Fee ₹1,000</div></div></li>
-                    <li class="flex items-start gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-success shrink-0 mt-0.5"></i><div><div class="text-ink-900 font-medium">PQ Criteria</div><div class="text-[11.5px] text-ink-500">4 criteria defined</div></div></li>
-                    <li class="flex items-start gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-success shrink-0 mt-0.5"></i><div><div class="text-ink-900 font-medium">TQ Criteria</div><div class="text-[11.5px] text-ink-500">3 criteria defined</div></div></li>
-                    <li class="flex items-start gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-success shrink-0 mt-0.5"></i><div><div class="text-ink-900 font-medium">Scope of Work</div><div class="text-[11.5px] text-ink-500">340 words</div></div></li>
-                    <li class="flex items-start gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-success shrink-0 mt-0.5"></i><div><div class="text-ink-900 font-medium">BOQ</div><div class="text-[11.5px] text-ink-500">4 line items, ₹27,28,268</div></div></li>
-                    <li class="flex items-start gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-success shrink-0 mt-0.5"></i><div><div class="text-ink-900 font-medium">Key Dates</div><div class="text-[11.5px] text-ink-500">Publication to evaluation: 47 days</div></div></li>
-                    <li class="flex items-start gap-2"><i data-lucide="alert-triangle" class="w-4 h-4 text-warning shrink-0 mt-0.5"></i><div><div class="text-ink-900 font-medium">General Conditions (GCC)</div><div class="text-[11.5px] text-warning">Using standard template — review recommended</div></div></li>
-                    <li class="flex items-start gap-2"><i data-lucide="alert-triangle" class="w-4 h-4 text-warning shrink-0 mt-0.5"></i><div><div class="text-ink-900 font-medium">Special Conditions (SCC)</div><div class="text-[11.5px] text-warning">AI-drafted — review before publishing</div></div></li>
-                    <li class="flex items-start gap-2"><span class="w-4 h-4 rounded-full border border-ink-400 inline-block shrink-0 mt-0.5"></span><div><div class="text-ink-500 font-medium">Drawings</div><div class="text-[11.5px] text-ink-500">2 documents attached</div></div></li>
-                  </ul>
-                  <button class="mt-4 w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary-border text-[12.5px] text-primary hover:bg-primary-light"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Regenerate Document</button>
                 </div>
               </div>
 
-              <!-- GCC / SCC -->
-              <div class="mt-6 bg-white border border-line rounded-2xl">
-                <button onclick="toggleGccScc()" class="w-full text-left px-5 py-4 flex items-center justify-between hover:bg-surface rounded-2xl">
-                  <div>
-                    <div class="text-[15px] font-bold text-ink-900">General &amp; Special Conditions</div>
-                    <div class="text-[12px] text-ink-500 mt-0.5">Editable boilerplate — expand to review</div>
+              <!-- ============ CVC REVIEW (offline) — chatbot → actionable fixes into the SAME single doc ============ -->
+              <div class="cvc-wrap" id="cvcWrap">
+                <div class="flex items-center gap-2 mb-1">
+                  <i data-lucide="message-square-text" class="w-[18px] h-[18px] text-primary"></i>
+                  <h2 class="text-[17px] font-bold text-ink-900">CVC Review</h2>
+                </div>
+                <p class="cvc-note" style="margin-bottom:16px;">CVC review happens offline across reviewing officers. Enter their feedback here — as text, an uploaded note, or dictation — and the assistant turns it into actionable fixes that deep-link into the document above.</p>
+
+                <div class="cvc-card">
+                  <div class="cvc-card-hd">
+                    <div class="t1"><i data-lucide="bot" class="w-[18px] h-[18px] text-primary"></i> Review assistant</div>
+                    <div class="cvc-note">Paste reviewer comments, upload the CVC note, or dictate feedback. Nothing is sent — this stays on your draft.</div>
                   </div>
-                  <i data-lucide="chevron-down" id="gccScChevron" class="w-4 h-4 text-ink-400"></i>
-                </button>
-                <div id="gccScBody" class="hidden border-t border-line p-5">
-                  <div role="alert" class="bg-warning-light border border-warning/40 rounded-lg px-3.5 py-2.5 mb-4 flex items-start gap-2">
-                    <i data-lucide="alert-triangle" class="w-4 h-4 text-warning shrink-0 mt-0.5"></i>
-                    <p class="text-[12.5px] text-ink-900">These conditions are AI-generated from standard Maharashtra PWD templates. Have them reviewed by your legal officer in the next step.</p>
+
+                  <!-- conversation area -->
+                  <div id="cvcThread" class="cvc-thread" role="log" aria-label="CVC review conversation"></div>
+                  <div id="cvcAssistantLive" class="sr-only" aria-live="polite"></div>
+
+                  <!-- composer / input bar -->
+                  <div class="cvc-composer">
+                    <div id="cvcFileChipWrap"></div>
+                    <div id="cvcListening" class="cvc-listening" style="display:none;" aria-live="polite"><span class="cvc-rec-dot"></span> Listening… <span class="text-ink-400" style="font-size:11.5px;">(mock dictation — speak the reviewer's comments)</span></div>
+                    <div class="cvc-inputrow">
+                      <button type="button" id="cvcAttachBtn" class="cvc-iconbtn" title="Attach review document" aria-label="Attach review document (PDF, DOCX, image)" onclick="cvc.attachClick()"><i data-lucide="paperclip" class="w-4 h-4"></i></button>
+                      <button type="button" id="cvcMicBtn" class="cvc-iconbtn" title="Dictate feedback" aria-label="Dictate feedback (mock)" aria-pressed="false" onclick="cvc.toggleMic()"><i data-lucide="mic" class="w-4 h-4"></i></button>
+                      <input type="file" id="cvcFileInput" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" style="display:none;" onchange="cvc.onFilePick(this)" />
+                      <textarea id="cvcInput" class="cvc-textarea" rows="1" placeholder="Type the reviewing officer's feedback…" aria-label="Reviewing officer feedback" oninput="cvc.onInput(this)" onkeydown="cvc.onKey(event)"></textarea>
+                      <button type="button" id="cvcSendBtn" class="cvc-send" onclick="cvc.send()" disabled>Send <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+                    </div>
                   </div>
-                  <div role="tablist" class="flex gap-2 mb-3">
-                    <button role="tab" aria-selected="true" data-gtab="gcc" onclick="switchGccScc('gcc')" class="gcc-tab px-3 py-1.5 rounded-full text-[12.5px] bg-primary text-white">GCC</button>
-                    <button role="tab" aria-selected="false" data-gtab="scc" onclick="switchGccScc('scc')" class="gcc-tab px-3 py-1.5 rounded-full text-[12.5px] bg-white border border-line text-ink-500 hover:text-ink-900">SCC</button>
-                  </div>
-                  <div id="gccPanel" class="border border-line rounded-lg p-4 text-[13px] text-ink-900 leading-relaxed" contenteditable="true">
-                    <p><strong>1. Definitions.</strong> "Employer" means the Ahmedabad Municipal Corporation; "Contractor" means the bidder whose tender is accepted; "Engineer" means the officer-in-charge designated in writing.</p>
-                    <p class="mt-2"><strong>2. Scope.</strong> The Contractor shall execute the Works in accordance with the BOQ, drawings and specifications attached.</p>
-                    <p class="mt-2"><strong>3. Performance Security.</strong> 5% of contract value as Bank Guarantee or DD valid up to 60 days beyond DLP.</p>
-                    <p class="mt-2"><strong>4. Defects Liability Period.</strong> 12 months from project completion certificate.</p>
-                  </div>
-                  <div id="sccPanel" class="hidden border border-line rounded-lg p-4 text-[13px] text-ink-900 leading-relaxed" contenteditable="true">
-                    <p><strong>SC-1.</strong> All bituminous mixes shall use VG-30 grade as per IRC:111-2009.</p>
-                    <p class="mt-2"><strong>SC-2.</strong> Site working hours: 7 AM – 7 PM, no night work without written approval.</p>
-                    <p class="mt-2"><strong>SC-3.</strong> Traffic diversion plan to be submitted and approved before commencement.</p>
+
+                  <!-- actionable pointers (mirrors risk-check resolution UX) -->
+                  <div id="cvcPointers" class="cvc-pointers" style="display:none;">
+                    <div class="cvc-ptr-head">
+                      <div class="t1" style="font-size:13.5px; font-weight:700; color:#111827; display:flex; align-items:center; gap:7px;"><i data-lucide="list-checks" class="w-4 h-4 text-primary"></i> Reviewer points</div>
+                      <div class="cvc-ptr-counts" id="cvcPtrCounts" aria-live="polite"></div>
+                    </div>
+                    <div class="cvc-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="cvcProgressTrack"><div class="cvc-progress-bar" id="cvcProgressBar"></div></div>
+                    <div class="cvc-progress-label" id="cvcProgressLabel" aria-live="polite">0 of 0 changes resolved</div>
+                    <div id="cvcPtrChanges"></div>
+                    <div id="cvcPtrSuggestions"></div>
+                    <div id="cvcPtrOkWrap" style="display:none;">
+                      <button type="button" class="cvc-okgroup-toggle" id="cvcOkToggle" aria-expanded="false" onclick="cvc.toggleOk()"><i data-lucide="chevron-down" id="cvcOkChevron" class="w-3.5 h-3.5"></i> <span id="cvcOkLabel">0 approved items</span></button>
+                      <div id="cvcPtrOk" style="display:none;"></div>
+                    </div>
+
+                    <!-- regenerate CTA / inline confirm (non-blocking) -->
+                    <div class="cvc-regen-wrap">
+                      <div id="cvcRegenCtaWrap">
+                        <button type="button" class="cvc-regen-btn" id="cvcRegenBtn" onclick="cvc.regenStart()"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Regenerate tender document <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+                      </div>
+                      <div id="cvcRegenConfirm" class="cvc-regen-confirm" style="display:none;" role="dialog" aria-label="Confirm regeneration">
+                        <div class="q" id="cvcRegenConfirmQ">Regenerate the tender with the applied changes? This creates a new version.</div>
+                        <div class="acts">
+                          <button type="button" class="no" onclick="cvc.regenCancel()">Cancel</button>
+                          <button type="button" class="yes" onclick="cvc.regenConfirm()">Regenerate</button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -7633,7 +7587,7 @@
     // The custom-section feature now lives in the Check Draft document panel.
     // '__inline' routes all editor re-renders to the in-document inline editor.
     if (n === '__inline'){ renderInlineEditor(); return; }
-    if (n === '__cvc'){ api._extRerender(); return; }   // Step-5 CVC inline editor owns its own host
+    if (n === '__cvc' || n === '__tadoc'){ api._extRerender(); return; }   // Step-5 external inline editors (single-doc add-section) own their own host
     const host = document.querySelector('.ta-cs-host[data-cs-step="'+n+'"]');
     if (!host) return;
     // Render existing custom-section cards only (the step-level "Add custom section"
@@ -8164,6 +8118,985 @@
        • the ~60s generation experience (agStart / fast toggle) for regenerate.
      Everything is offline & non-blocking. Persists to per-tender LS keys.
      ====================================================================== -->
+
+<!-- ======================================================================
+     STEP 5 — SINGLE EDITABLE TENDER DOCUMENT (taDoc) + CVC PRE-CHECK
+     One source-of-truth NIT in #taSingleDoc. Reuses:
+       • the Check-Draft document styling (.draft-doc-body / .nit-section);
+       • the Check-Draft section action ribbon (.section-action-bar) + the
+         taCs custom-section editor (text/list/table/file, popover→dashed
+         card→Save/Discard) writing to tenderDraft.customSections;
+       • the risk-check actionable-pointer pattern for the predictive CVC
+         Pre-Check below the document.
+     Both the CVC chatbot's "Fix →" and the Pre-Check's "Fix →" deep-link into
+     THIS one document. Changes 2–6 (genuine doc, pre-check, success states,
+     per-section undo/history, cross-reference propagation) live here.
+     ====================================================================== -->
+<script>
+(function(){
+  "use strict";
+  const TND = 'TND-2026-010';
+  const LS_HIST = 'taSectionHistory_' + TND;   // per-section undo history
+
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+  function uid(p){ return p + '-' + Date.now().toString(36) + Math.floor(Math.random()*1e4).toString(36); }
+  function icons(){ if (window.lucide) try { lucide.createIcons(); } catch(e){} }
+  function toast(m){ if (typeof window.showToast === 'function') try { window.showToast(m); } catch(e){} }
+  function el(id){ return document.getElementById(id); }
+  function draft(){ window.tenderDraft = window.tenderDraft || {}; return window.tenderDraft; }
+  function DRM(){ return (typeof window.DESIGN_REVIEW_MODE !== 'undefined') ? window.DESIGN_REVIEW_MODE : true; }
+
+  // ---------- cost / field reads (absolute .value is the source of truth) ----------
+  function costAbs(id){ return (typeof window.costAbs === 'function') ? (window.costAbs(id) || 0) : 0; }
+  function rupeeWords(id){ const abs = costAbs(id); if (!abs) return ''; return (typeof window.fmtINRWords === 'function') ? window.fmtINRWords(abs) : ('₹' + Number(abs).toLocaleString('en-IN')); }
+  function rupeeFmt(n){ return '₹' + Math.round(n||0).toLocaleString('en-IN'); }
+  function fieldVal(id){ const e = el(id); return e ? (e.value || '').trim() : ''; }
+  function fieldNum(id){ const e = el(id); return e ? (parseFloat(String(e.value||'').replace(/[,₹\s]/g,''))||0) : 0; }
+  function tlDate(id){ const raw = document.querySelector('.timeline-row[data-id="'+id+'"] .dt-input'); if (!raw || !raw.value) return ''; try { return new Date(raw.value).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }); } catch(e){ return ''; } }
+  function pubDate(){ const e = el('dtPub'); if (!e || !e.value) return ''; try { return new Date(e.value).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }); } catch(e){ return ''; } }
+  function scopeText(){ const e = el('scopeEditor'); return e ? (e.value || e.textContent || '').trim() : ''; }
+  function ph(t){ return '<span class="ta-doc-ph" style="color:#9CA3AF; font-style:italic;">'+esc(t)+'</span>'; }
+  function estCostAbs(){ return costAbs('fEstCost') || 4500000; }
+
+  // ===================================================================
+  // DOCUMENT MODEL — 8 keyed built-in sections matching the CVC/pre-check keys.
+  // Bodies are realistic NIT phrasing derived from the live tenderDraft values.
+  // Each section carries data-sec-id="section-N" + data-sec-key for deep-links.
+  // ===================================================================
+  function boqTableHTML(){
+    const rows = Array.from(document.querySelectorAll('#boqRows tr'));
+    const est = estCostAbs();
+    if (!rows.length){
+      // realistic default BOQ derived from the estimate (proportional demo lines)
+      return '<table class="boq-table"><thead><tr><th>S.No.</th><th>Description of Item</th><th class="tx-c">Unit</th><th class="tx-r">Qty</th><th class="tx-r">Rate (₹)</th><th class="tx-r">Amount (₹)</th></tr></thead>'
+        + '<tbody>'
+        + '<tr><td class="tx-c">1</td><td>Excavation in hard soil</td><td class="tx-c">Cum</td><td class="tx-r">250</td><td class="tx-r">185</td><td class="tx-r">46,250</td></tr>'
+        + '<tr><td class="tx-c">2</td><td>Bituminous base course, VG-30 grade</td><td class="tx-c">MT</td><td class="tx-r">45</td><td class="tx-r">52,000</td><td class="tx-r">23,40,000</td></tr>'
+        + '<tr><td class="tx-c">3</td><td>Cement concrete M20 for kerb</td><td class="tx-c">Cum</td><td class="tx-r">30</td><td class="tx-r">6,500</td><td class="tx-r">1,95,000</td></tr>'
+        + '<tr><td class="tx-c">4</td><td>Earthwork compaction</td><td class="tx-c">Cum</td><td class="tx-r">180</td><td class="tx-r">95</td><td class="tx-r">17,100</td></tr>'
+        + '</tbody>'
+        + '<tfoot><tr><td colspan="5" class="tx-r">Total Estimated Value</td><td class="tx-r"><strong>'+rupeeFmt(est)+'</strong></td></tr></tfoot></table>';
+    }
+    const items = rows.map((r, i) => {
+      const inp = r.querySelectorAll('input');
+      const desc = (inp[0] && inp[0].value) || '';
+      const unit = (inp[1] && inp[1].value) || '';
+      const qty  = parseFloat((inp[2] && inp[2].value) || 0) || 0;
+      const rate = parseFloat((inp[3] && inp[3].value) || 0) || 0;
+      const amt  = qty * rate;
+      return '<tr><td class="tx-c">'+(i+1)+'</td><td>'+esc(desc)+'</td><td class="tx-c">'+esc(unit)+'</td><td class="tx-r">'+qty.toLocaleString('en-IN')+'</td><td class="tx-r">'+rate.toLocaleString('en-IN')+'</td><td class="tx-r">'+amt.toLocaleString('en-IN')+'</td></tr>';
+    }).join('');
+    const total = (el('boqTotal') && el('boqTotal').textContent || '').trim() || rupeeFmt(est);
+    return '<table class="boq-table"><thead><tr><th>S.No.</th><th>Description of Item</th><th class="tx-c">Unit</th><th class="tx-r">Qty</th><th class="tx-r">Rate (₹)</th><th class="tx-r">Amount (₹)</th></tr></thead>'
+      + '<tbody>'+items+'</tbody>'
+      + '<tfoot><tr><td colspan="5" class="tx-r">Total Estimated Value</td><td class="tx-r"><strong>'+esc(total)+'</strong></td></tr></tfoot></table>';
+  }
+
+  // Each section: { key, title, body() } — body returns the inner HTML.
+  function sectionDefs(){
+    const d = {
+      title:    fieldVal('projTitle'),
+      estCost:  rupeeWords('fEstCost'),
+      emd:      rupeeWords('fEMD'),
+      fee:      rupeeWords('fTenderFee'),
+      emdValid: fieldVal('fEmdValid'),
+      tenderValid: fieldVal('fTenderValid'),
+      period:   fieldVal('fPeriod'),
+      scope:    scopeText(),
+      dpub: pubDate(), dprebid: tlDate('prebid'), dbid: tlDate('bid'), dopen: tlDate('open'), deval: tlDate('eval')
+    };
+    const est = estCostAbs();
+    const turnover = fieldNum('pqTurnover') || Math.round(est * 0.5);
+    const similar  = fieldNum('pqSimilarVal') || Math.round(est * 0.4);
+    const epf = !!(el('regEpf') && el('regEpf').checked);
+    const isoMand = !!(el('tqIsoMandatory') && el('tqIsoMandatory').checked);
+    return [
+      { key:'header', title:'Notice Inviting Tender', body(){
+        return '<p class="nit-para"><strong>Tender No.:</strong> TND-2026-010/AMC/2026-27</p>'
+          + '<p class="nit-para"><strong>Name of Work:</strong> '+(d.title ? esc(d.title) : ph('[work title — complete Step 1]'))+'</p>'
+          + '<p class="nit-para"><strong>Issuing Authority:</strong> Ahmedabad Municipal Corporation, Public Works Department.</p>'
+          + '<p class="nit-para"><strong>Mode of Tender:</strong> e-Tender (Online) via the Maharashtra Government eProcurement Portal. Sealed online tenders are invited on behalf of the Commissioner, Ahmedabad Municipal Corporation, for the work described herein. Queries to the Office of the Executive Engineer during working hours.</p>';
+      }},
+      { key:'scope', title:'Scope of Work', body(){
+        return '<div class="nit-subhead">Brief Description of Work</div>'
+          + (d.scope ? '<p class="nit-para">'+esc(d.scope)+'</p>' : ph('[scope of work not yet defined — complete Step 3: Project &amp; BOQ to populate this section]'))
+          + '<p class="nit-para">All works shall conform to MoRTH / PWD specifications and the relevant IS codes. The work shall be completed within '+(d.period ? '<strong>'+esc(d.period)+'</strong>' : ph('[completion period — Step 3]'))+' from the date of the work order.</p>';
+      }},
+      { key:'financial', title:'Estimated Value, Fee & EMD', body(){
+        return '<table class="boq-table"><tbody>'
+          + '<tr><td>Estimated Cost (put-to-tender)</td><td class="tx-r">'+(d.estCost ? esc(d.estCost) : ph('[estimated cost — Step 3]'))+'</td></tr>'
+          + '<tr><td>Budget Head</td><td class="tx-r">Capital Works — PWD 2026-27</td></tr>'
+          + '<tr><td>Tender Fee (non-refundable)</td><td class="tx-r">'+(d.fee ? esc(d.fee) : ph('[tender fee]'))+'</td></tr>'
+          + '<tr><td>Earnest Money Deposit (EMD)</td><td class="tx-r">'+(d.emd ? esc(d.emd) : ph('[EMD — Step 1]'))+'</td></tr>'
+          + '<tr><td>EMD Validity</td><td class="tx-r">'+(d.emdValid ? esc(d.emdValid)+' days beyond bid validity' : ph('[validity]'))+'</td></tr>'
+          + '</tbody></table>'
+          + '<p class="nit-para">The EMD shall be furnished by online payment / Demand Draft / Bank Guarantee and shall remain valid as stated above. The EMD of the successful bidder shall be converted to Security Deposit or refunded after execution of the agreement.</p>';
+      }},
+      { key:'timeline', title:'Critical Dates & Timeline', body(){
+        const r = (lbl, v) => '<tr><td>'+lbl+'</td><td class="tx-r">'+(v ? esc(v) : ph('[Step 4]'))+'</td></tr>';
+        return '<table class="boq-table"><thead><tr><th>Event</th><th class="tx-r">Date</th></tr></thead><tbody>'
+          + r('Publication', d.dpub)
+          + r('Pre-bid meeting', d.dprebid)
+          + r('Bid submission deadline', d.dbid)
+          + r('Bid opening', d.dopen)
+          + r('Evaluation target', d.deval)
+          + '</tbody></table>'
+          + '<p class="nit-para">Time is the essence of the contract. Bids received after the submission deadline shall not be entertained.</p>';
+      }},
+      { key:'eligibility', title:'Eligibility (PQ) & Technical (TQ)', body(){
+        let html = '<div class="nit-subhead">Pre-Qualification (PQ) Criteria</div><ol class="formal-list">'
+          + '<li><strong>Average Annual Turnover:</strong> The bidder shall have a minimum average annual turnover of <strong>'+rupeeFmt(turnover)+'</strong> over the last three consecutive financial years (FY 2022-23, FY 2023-24, FY 2024-25), duly certified by a Chartered Accountant.</li>'
+          + '<li><strong>Similar Work Experience:</strong> The bidder shall have successfully completed at least one similar work of value not less than <strong>'+rupeeFmt(similar)+'</strong> during the last five years ending on the last date of bid submission.</li>'
+          + '<li><strong>Years in Business:</strong> A minimum of three years in existence with a positive net worth as per the latest audited balance sheet.</li>'
+          + '</ol>';
+        html += '<div class="nit-subhead spaced">Technical Qualification (TQ) Criteria</div><ol class="formal-list">'
+          + '<li>Valid registration with Maharashtra PWD / CPWD or an equivalent authority.</li>'
+          + '<li>Valid GST registration certificate.</li>';
+        html += '<li>Statutory registrations: '+(epf ? '<strong>EPF &amp; ESIC registration (mandatory)</strong>' : ph('[EPF &amp; ESIC not currently marked mandatory — Step 2]'))+'.</li>';
+        if (isoMand) html += '<li><strong>ISO 9001:2015 certification — mandatory.</strong></li>';
+        html += '</ol>';
+        return html;
+      }},
+      { key:'boq', title:'Bill of Quantities (BOQ)', body(){
+        return '<p class="nit-para">The Bill of Quantities shall be as per the Schedule of Quantities. Bidders shall quote rates for each item; rates shall be inclusive of all taxes, duties and levies unless otherwise stated. All materials and workmanship shall conform to the latest MoRTH / PWD specifications and applicable IS codes.</p>'
+          + boqTableHTML();
+      }},
+      { key:'conditions', title:'Conditions of Contract (GCC/SCC)', body(){
+        const emdAbs = costAbs('fEMD');
+        const emdClause = emdAbs ? rupeeFmt(emdAbs) : '₹[amount]';
+        return '<div class="nit-subhead">General Conditions</div>'
+          + '<p class="nit-para"><strong>1. Definitions.</strong> "Employer" means the Ahmedabad Municipal Corporation; "Contractor" means the successful bidder; "Engineer" means the officer-in-charge designated in writing.</p>'
+          + '<p class="nit-para"><strong>2. Earnest Money Deposit.</strong> The bidder shall deposit an EMD of <strong>'+emdClause+'</strong> as stated in the financial details. The EMD of the successful bidder shall be converted to Security Deposit or refunded after execution of the agreement.</p>'
+          + '<p class="nit-para"><strong>3. Performance Security.</strong> The successful bidder shall furnish Performance Security of 5% of the contract value as Bank Guarantee / DD valid up to 60 days beyond the Defects Liability Period.</p>'
+          + '<p class="nit-para"><strong>4. Liquidated Damages.</strong> LD @ 0.5% of the contract value per week of delay, subject to a maximum of 5% of the contract value.</p>'
+          + '<p class="nit-para"><strong>5. Defects Liability Period.</strong> 12 (twelve) months from the date of the completion certificate.</p>'
+          + '<div class="nit-subhead spaced">Special Conditions</div>'
+          + '<p class="nit-para"><strong>SC-1.</strong> Bituminous mixes shall use VG-30 grade as per IRC:111. <strong>SC-2.</strong> Site working hours 7 AM – 7 PM; no night work without written approval. <strong>SC-3.</strong> An approved traffic diversion plan is required before commencement.</p>';
+      }},
+      { key:'forms', title:'Forms & Declarations', body(){
+        return '<ol class="formal-list">'
+          + '<li><strong>Form A — Bid Letter;</strong> Form B — Price Schedule; Form C — Bid Security Declaration. Bidders shall complete and digitally sign all forms.</li>'
+          + '<li><strong>Eligibility Declarations:</strong> Self-declarations of eligibility, non-blacklisting and conformity with the PQ/TQ criteria, supported by documentary evidence.</li>'
+          + '<li><strong>Integrity Pact &amp; Undertaking:</strong> An Integrity Pact and anti-collusion undertaking to be executed by the bidder and the Employer, binding for the duration of the contract.</li>'
+          + '</ol>';
+      }}
+    ];
+  }
+
+  // ===================================================================
+  // RENDER the single document into #taSingleDoc.
+  // ===================================================================
+  function docEl(){ return el('taSingleDoc'); }
+  function docHeaderHTML(){
+    return '<div class="doc-header">'
+      + '<div class="doc-seal" aria-hidden="true">SEAL</div>'
+      + '<div class="doc-govt">Ahmedabad Municipal Corporation<br/>Public Works Department</div>'
+      + '<div class="doc-rule-double"></div>'
+      + '<h2>Notice Inviting Tender</h2>'
+      + '<div class="doc-nit-no"><strong>Tender No.:</strong> TND-2026-010/AMC/2026-27</div>'
+      + '</div>';
+  }
+  function docFooterHTML(){
+    return '<div class="doc-footer"><div class="doc-footer-l"><div><strong>Signature of Authorized Officer</strong></div>'
+      + '<div class="desig">[Name &amp; Designation]</div><div>Ahmedabad Municipal Corporation</div><div>Date: ___________</div></div>'
+      + '<div class="doc-footer-r"><div class="seal-label">Official Seal</div><div class="seal-small" aria-hidden="true">SEAL</div></div></div>'
+      + '<div class="doc-watermark">This is a system-generated draft. Final document subject to review and approval.</div>';
+  }
+
+  function render(){
+    const doc = docEl();
+    if (!doc) return;
+    // close any open editor cleanly before re-render
+    exitEdit(false);
+    closeInsertPopover(false);
+    const defs = sectionDefs();
+    let html = docHeaderHTML();
+    defs.forEach((s, i) => {
+      html += '<section class="nit-section" data-sec-id="section-'+(i+1)+'" data-sec-key="'+s.key+'">'
+        + '<h3>'+(i+1)+'. '+esc(s.title)+'</h3>'
+        + '<div class="ta-doc-body">'+s.body()+'</div>'
+        + '</section>';
+    });
+    html += docFooterHTML();
+    doc.innerHTML = html;
+    // inject custom sections via the SHARED taCs injector (same model as Check Draft)
+    if (typeof window.taCsInjectIntoDoc === 'function'){ try { window.taCsInjectIntoDoc(doc); } catch(e){} }
+    // optional Table of Contents at the very top (reflects the structure, incl. customs)
+    doc.querySelectorAll('.doc-toc').forEach(n => n.remove());
+    if (typeof window.tocEnabled === 'function' && window.tocEnabled() && typeof window.agTocDocHtml === 'function'){
+      try { doc.insertAdjacentHTML('afterbegin', window.agTocDocHtml(doc)); } catch(e){}
+    }
+    wireSections();
+    icons();
+  }
+
+  // ===================================================================
+  // SECTION ACTION RIBBON (reuses the Check-Draft .section-action-bar visual)
+  // ===================================================================
+  let _activeSec = null;     // the section whose ribbon is shown
+  let _editSec = null;       // the section in inline-edit mode
+  let _editPreSnapshot = null; // body HTML captured at edit-start (for change detection)
+  let _pendingFix = null;    // { source, pointerId, onResolve, secKey } for the active fix
+  let _addEditor = null;     // { sec, hostEl, anchorSecId, position, discardConfirm, pendingFix }
+  let _insertPop = null;
+
+  function wireSections(){
+    const doc = docEl();
+    if (!doc) return;
+    doc.querySelectorAll('.nit-section').forEach(sec => {
+      if (sec.dataset.taWired === '1') return;
+      sec.dataset.taWired = '1';
+      sec.addEventListener('click', (e) => {
+        if (e.target.closest('.section-action-bar') || e.target.closest('.section-mini-toolbar') || e.target.closest('.section-done-link') || e.target.closest('.ta-cs-inline') || e.target.closest('.ta-cs-insert-pop')) return;
+        const selTxt = window.getSelection ? String(window.getSelection()) : '';
+        if (selTxt.trim().length) return;       // text selection takes priority
+        if (sec.classList.contains('section-editing')) return;
+        activate(sec);
+      });
+      sec.addEventListener('mouseenter', () => { if (!_editSec) showRibbon(sec); });
+      sec.addEventListener('mouseleave', () => { if (sec !== _activeSec && sec !== _editSec) removeRibbon(sec); });
+    });
+  }
+
+  function activate(sec){
+    if (_editSec && _editSec !== sec) exitEdit(true);
+    if (_activeSec && _activeSec !== sec) removeRibbon(_activeSec);
+    _activeSec = sec;
+    sec.classList.add('section-active');
+    showRibbon(sec);
+  }
+  function showRibbon(sec){
+    if (sec.querySelector('.section-action-bar')) return;
+    const isCustom = sec.classList.contains('custom');
+    const secTitle = (sec.querySelector('h3') ? sec.querySelector('h3').textContent : 'section').trim();
+    const bar = document.createElement('div');
+    bar.className = 'section-action-bar';
+    bar.contentEditable = 'false';
+    bar.innerHTML = ''
+      + '<button type="button" data-act="edit"><i data-lucide="pencil" class="w-3 h-3"></i> Edit section</button>'
+      + '<button type="button" data-act="ai"><i data-lucide="sparkles" class="w-3 h-3"></i> AI rewrite</button>'
+      + '<button type="button" data-act="move"><i data-lucide="arrow-up-down" class="w-3 h-3"></i> Move</button>'
+      + '<button type="button" data-act="remove"><i data-lucide="trash-2" class="w-3 h-3"></i> Remove</button>'
+      + '<button type="button" data-act="add" aria-label="Add custom section relative to '+secTitle.replace(/"/g,'&quot;')+'"><i data-lucide="plus" class="w-3 h-3"></i> Add section</button>';
+    sec.appendChild(bar);
+    bar.querySelectorAll('button').forEach(b => b.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const a = b.getAttribute('data-act');
+      if (a === 'edit'){ if (isCustom && window.taCs){ try { window.taCs.editCustom(sec); } catch(e2){} } else enterEdit(sec); }
+      else if (a === 'ai') aiRewrite(sec);
+      else if (a === 'move') startMove(sec);
+      else if (a === 'remove'){ if (isCustom){ confirmRemoveCustom(sec, bar); } else clearSection(sec); }
+      else if (a === 'add'){ openInsert(sec); }
+    }));
+    icons();
+  }
+  function removeRibbon(sec){
+    if (!sec) return;
+    if (sec.classList.contains('section-editing')) return;
+    sec.classList.remove('section-active');
+    const bar = sec.querySelector('.section-action-bar'); if (bar) bar.remove();
+    if (_activeSec === sec) _activeSec = null;
+  }
+
+  // ----- inline EDIT (built-in section body becomes contenteditable) -----
+  function enterEdit(sec){
+    if (_editSec && _editSec !== sec) exitEdit(true);
+    _editSec = sec;
+    _editPreSnapshot = secBodyHTML(sec);
+    sec.classList.add('section-editing');
+    const body = sec.querySelector('.ta-doc-body');
+    if (body){ body.setAttribute('contenteditable','true'); body.classList.add('ta-doc-editbox'); }
+    // mini formatting toolbar (reuses the Check-Draft .section-mini-toolbar look)
+    if (!sec.querySelector('.section-mini-toolbar')){
+      const tb = document.createElement('div');
+      tb.className = 'section-mini-toolbar';
+      tb.contentEditable = 'false';
+      tb.innerHTML = ''
+        + '<button type="button" onmousedown="event.preventDefault(); document.execCommand(\'bold\')" aria-label="Bold"><i data-lucide="bold" class="w-3.5 h-3.5"></i></button>'
+        + '<button type="button" onmousedown="event.preventDefault(); document.execCommand(\'italic\')" aria-label="Italic"><i data-lucide="italic" class="w-3.5 h-3.5"></i></button>'
+        + '<button type="button" onmousedown="event.preventDefault(); document.execCommand(\'insertUnorderedList\')" aria-label="Bullet list"><i data-lucide="list" class="w-3.5 h-3.5"></i></button>'
+        + '<button type="button" onmousedown="event.preventDefault(); document.execCommand(\'insertOrderedList\')" aria-label="Numbered list"><i data-lucide="list-ordered" class="w-3.5 h-3.5"></i></button>';
+      sec.appendChild(tb);
+    }
+    if (!sec.querySelector('.section-done-link')){
+      const done = document.createElement('button');
+      done.type = 'button'; done.className = 'section-done-link'; done.contentEditable = 'false';
+      done.textContent = 'Save section';
+      done.addEventListener('click', (e) => { e.stopPropagation(); saveEdit(sec); });
+      sec.appendChild(done);
+    }
+    const back = el('taDocBack'); if (back){ back.classList.remove('hidden'); back.classList.add('inline-flex'); }
+    icons();
+    if (body) setTimeout(() => body.focus(), 60);
+  }
+  function secBodyHTML(sec){ const b = sec.querySelector('.ta-doc-body'); return b ? b.innerHTML : ''; }
+
+  // exitEdit(commit): commit=true keeps any typed content; commit=false reverts to snapshot.
+  function exitEdit(commit){
+    const doc = docEl(); if (!doc) return;
+    doc.querySelectorAll('.nit-section.section-editing').forEach(sec => {
+      const body = sec.querySelector('.ta-doc-body');
+      if (body){
+        if (commit === false && _editSec === sec && _editPreSnapshot != null) body.innerHTML = _editPreSnapshot;
+        body.removeAttribute('contenteditable'); body.classList.remove('ta-doc-editbox');
+      }
+      sec.classList.remove('section-editing');
+      const tb = sec.querySelector('.section-mini-toolbar'); if (tb) tb.remove();
+      const dn = sec.querySelector('.section-done-link'); if (dn) dn.remove();
+      removeRibbon(sec);
+    });
+    _editSec = null; _editPreSnapshot = null;
+    if (commit === true){ _pendingFix = null; }
+    const back = el('taDocBack'); if (back){ back.classList.add('hidden'); back.classList.remove('inline-flex'); }
+  }
+
+  // Manual save (Change 4 + 5 + 6): snapshot prior → flash green + "✓ Saved" badge,
+  // record undo history, resolve the originating pointer if its check now passes,
+  // then run cross-reference propagation on any edited values.
+  function saveEdit(sec){
+    const key = sec.getAttribute('data-sec-key');
+    const before = _editPreSnapshot;
+    const after = secBodyHTML(sec);
+    exitEdit(true);
+    if (after !== before){
+      pushHistory(key, before);
+      flashSection(sec, 'saved');
+      syncCheckDraft();
+      // resolve originating pointer (if any) when its predicate now passes
+      maybeResolvePending(key);
+      refreshPreCheck();
+      // Change 6 — controlled cross-reference propagation
+      detectPropagation(sec, before, after);
+    } else {
+      // no content change but the fix may still be considered "addressed" via add/edit
+      maybeResolvePending(key);
+    }
+    toast('Section saved');
+  }
+
+  // ----- AI rewrite (Change 4): mock rewrite → flash + "✦ Updated by AI" + resolve -----
+  function aiRewrite(sec){
+    const key = sec.getAttribute('data-sec-key');
+    const before = secBodyHTML(sec);
+    toast('AI rewriting section…');
+    const body = sec.querySelector('.ta-doc-body');
+    if (body) body.style.opacity = '0.55';
+    setTimeout(() => {
+      if (body){
+        body.style.opacity = '';
+        // light, realistic touch-up: append a clarifying clause (mock AI improvement)
+        const note = aiClauseFor(key);
+        if (note && body.querySelector('ol.formal-list')){ body.querySelector('ol.formal-list').insertAdjacentHTML('beforeend', '<li>'+note+'</li>'); }
+        else if (note){ body.insertAdjacentHTML('beforeend', '<p class="nit-para">'+note+'</p>'); }
+      }
+      pushHistory(key, before);
+      flashSection(sec, 'ai');
+      syncCheckDraft();
+      maybeResolvePending(key);
+      refreshPreCheck();
+      toast('Section rewritten by AI — review changes');
+    }, 1100);
+  }
+  function aiClauseFor(key){
+    const map = {
+      scope: 'For the avoidance of doubt, the extent, location and measurable quantities of every work item (including road-marking) shall be as specified in the BOQ and drawings, leaving no ambiguity.',
+      financial: 'The Earnest Money Deposit has been set within the prescribed band of 2%–3% of the estimated cost in line with CVC guidance.',
+      timeline: 'The completion period has been reviewed against the quantum of work and provides a realistic schedule for execution.',
+      eligibility: 'EPF and ESIC registration are required as mandatory statutory registrations for this Works contract.',
+      conditions: 'The Liquidated-Damages clause is expressly capped at 5% of the contract value.',
+      forms: 'An Integrity Pact shall be executed by both parties prior to award.'
+    };
+    return map[key] || 'This section has been clarified and tightened for compliance.';
+  }
+
+  // ----- Move (drag to reorder) -----
+  function startMove(sec){
+    const doc = docEl(); if (!doc) return;
+    const isCustom = sec.classList.contains('custom');
+    sec.setAttribute('draggable','true');
+    const onStart = (e) => { if (e.dataTransfer) e.dataTransfer.effectAllowed='move'; sec.style.opacity='0.6'; };
+    const onEnd = () => {
+      sec.style.opacity=''; sec.removeAttribute('draggable');
+      sec.removeEventListener('dragstart', onStart); sec.removeEventListener('dragend', onEnd);
+      doc.querySelectorAll('.ta-doc-dragover').forEach(n => n.classList.remove('ta-doc-dragover'));
+      if (isCustom && window.taCs){ try { window.taCs.syncAnchorFromDom(sec); } catch(e){} }
+      removeRibbon(sec);
+      toast('Section order updated');
+    };
+    sec.addEventListener('dragstart', onStart);
+    sec.addEventListener('dragend', onEnd);
+    doc.querySelectorAll('.nit-section').forEach(other => {
+      if (other === sec) return;
+      other.addEventListener('dragover', (e) => { e.preventDefault(); other.classList.add('ta-doc-dragover'); }, { once:false });
+      other.addEventListener('dragleave', () => other.classList.remove('ta-doc-dragover'), { once:false });
+      other.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const rect = other.getBoundingClientRect();
+        const before = e.clientY < rect.top + rect.height/2;
+        other.parentElement.insertBefore(sec, before ? other : other.nextSibling);
+        other.classList.remove('ta-doc-dragover');
+      }, { once:true });
+    });
+    toast('Drag the section to its new position');
+  }
+
+  // ----- Clear (built-in section) -----
+  function clearSection(sec){
+    const key = sec.getAttribute('data-sec-key');
+    const before = secBodyHTML(sec);
+    const body = sec.querySelector('.ta-doc-body');
+    if (body){ body.innerHTML = '<div class="draft-placeholder-amber">[Section cleared — content will need to be regenerated]</div>'; }
+    pushHistory(key, before);
+    flashSection(sec, 'saved');
+    syncCheckDraft();
+    removeRibbon(sec);
+    toast('Section cleared');
+  }
+  // ----- Remove (custom section) — inline confirm in the ribbon -----
+  function confirmRemoveCustom(sec, bar){
+    if (!bar) return;
+    bar.innerHTML = '<span style="font-size:12px;">Delete this custom section?</span>'
+      + '<button type="button" data-del="yes" style="color:#fff;font-weight:600;">Delete</button>'
+      + '<button type="button" data-del="no">Cancel</button>';
+    const y = bar.querySelector('[data-del="yes"]'), n = bar.querySelector('[data-del="no"]');
+    if (y) y.addEventListener('click', (e) => { e.stopPropagation(); if (window.taCs){ try { window.taCs.deleteCustom(sec); } catch(e2){} } render(); });
+    if (n) n.addEventListener('click', (e) => { e.stopPropagation(); removeRibbon(sec); });
+  }
+
+  // ===================================================================
+  // "+ Add section" — reuse the taCs editor (popover → dashed card → Save)
+  // ===================================================================
+  function _popOutside(e){ if (_insertPop && !_insertPop.contains(e.target)) closeInsertPopover(true); }
+  function _popKey(e){ if (e.key === 'Escape'){ e.preventDefault(); closeInsertPopover(true); } }
+  function closeInsertPopover(){
+    if (!_insertPop) return;
+    _insertPop.remove(); _insertPop = null;
+    document.removeEventListener('mousedown', _popOutside, true);
+    document.removeEventListener('keydown', _popKey, true);
+  }
+  function openInsert(secEl){
+    closeInsertPopover();
+    const title = (secEl.querySelector('h3') ? secEl.querySelector('h3').textContent : 'section').trim();
+    const pop = document.createElement('div');
+    pop.className = 'ta-cs-insert-pop';
+    pop.setAttribute('role','dialog');
+    pop.setAttribute('aria-label','Insert custom section relative to ' + title);
+    pop.innerHTML = '<button type="button" data-pos="above"><i data-lucide="arrow-up" style="width:13px;height:13px;"></i> Insert above this section</button>'
+      + '<button type="button" data-pos="below"><i data-lucide="arrow-down" style="width:13px;height:13px;"></i> Insert below this section</button>';
+    secEl.appendChild(pop);
+    _insertPop = pop;
+    pop.querySelectorAll('button').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); const pos = b.getAttribute('data-pos'); closeInsertPopover(); beginAdd(secEl, pos); }));
+    icons();
+    setTimeout(() => { const f = pop.querySelector('button'); if (f) f.focus(); }, 0);
+    setTimeout(() => { document.addEventListener('mousedown', _popOutside, true); document.addEventListener('keydown', _popKey, true); }, 0);
+  }
+  function beginAdd(anchorEl, position){
+    if (_addEditor) discardAdd();
+    const anchorSecId = anchorEl.getAttribute('data-sec-id') || anchorEl.getAttribute('data-cs-doc');
+    const sec = (window.taCs && window.taCs.newSection) ? window.taCs.newSection('__tadoc') : { id:uid('custom'), step:'__tadoc', title:'', collapsed:false, blocks:[{id:uid('block'),type:'text',content:''}] };
+    sec.step = '__tadoc';
+    const host = document.createElement('div');
+    host.className = 'ta-cs-inline';
+    if (position === 'above') anchorEl.parentNode.insertBefore(host, anchorEl);
+    else anchorEl.parentNode.insertBefore(host, anchorEl.nextSibling);
+    _addEditor = { sec, hostEl: host, anchorSecId, position, discardConfirm:false, pendingFix: _pendingFix };
+    if (window.taCs){ window.taCs._externalSec = sec; window.taCs._extRenderCb = renderAddEditor; }
+    host.addEventListener('input', updateAddSave);
+    renderAddEditor();
+    requestAnimationFrame(() => host.classList.add('show'));
+    setTimeout(() => { const ti = host.querySelector('.ta-cs-title-in'); if (ti) ti.focus(); }, 60);
+  }
+  function renderAddEditor(){
+    if (!_addEditor) return;
+    const sec = _addEditor.sec, host = _addEditor.hostEl;
+    let disc;
+    if (_addEditor.discardConfirm) disc = '<span class="ta-cs-inline-discwrap">Discard this section?<button type="button" class="yes" onclick="taDoc.discardAddConfirm()">Yes</button><button type="button" class="no" onclick="taDoc.discardAddCancel()">No</button></span>';
+    else disc = '<button type="button" class="ta-cs-inline-cancel" onclick="taDoc.discardAddStart()">Discard</button>';
+    host.innerHTML = '<div class="ta-cs-inline-label">NEW CUSTOM SECTION</div>'
+      + '<div class="ta-cs-card"><div class="ta-cs-head"><input class="ta-cs-title-in" type="text" value="'+esc(sec.title)+'" placeholder="Section title (e.g. Road Marking Specification, LD Cap...)" oninput="taDoc.addTitle(this.value)" aria-label="Section title" /></div>'
+      + '<div id="taDocAddBlocks"></div></div>'
+      + '<div class="ta-cs-inline-footer">'+disc
+      + '<button type="button" class="ta-cs-inline-save" id="taDocAddSave" onclick="taDoc.saveAdd()">Save section</button></div>';
+    const blockHost = host.querySelector('#taDocAddBlocks');
+    if (blockHost && window.taCs && window.taCs.renderBlocksInto){ window.taCs.renderBlocksInto(blockHost, sec); }
+    updateAddSave();
+    icons();
+  }
+  function addValid(){ const s = _addEditor && _addEditor.sec; if (!s) return false; const hasContent = window.taCs && window.taCs.secHasContent ? window.taCs.secHasContent(s) : true; return String(s.title||'').trim().length >= 2 && hasContent; }
+  function updateAddSave(){ const b = el('taDocAddSave'); if (b) b.disabled = !addValid(); }
+  function discardAdd(){
+    if (!_addEditor) return;
+    if (_addEditor.hostEl && _addEditor.hostEl.parentNode) _addEditor.hostEl.parentNode.removeChild(_addEditor.hostEl);
+    if (window.taCs){ window.taCs._externalSec = null; window.taCs._extRenderCb = null; }
+    _addEditor = null;
+  }
+  function saveAdd(){
+    if (!_addEditor || !addValid()) return;
+    const sec = _addEditor.sec, host = _addEditor.hostEl;
+    const pending = _addEditor.pendingFix;
+    host.classList.add('committing');
+    delete sec.step; delete sec.stepLabel;
+    sec.anchorSectionId = _addEditor.anchorSecId;
+    sec.position = _addEditor.position;
+    sec.order = 0;
+    draft(); window.tenderDraft.customSections = window.tenderDraft.customSections || [];
+    window.tenderDraft.customSections.push(sec);
+    try { localStorage.setItem('taCustomSections_' + TND, JSON.stringify(window.tenderDraft.customSections)); } catch(e){}
+    if (window.taCs){ window.taCs._externalSec = null; window.taCs._extRenderCb = null; }
+    _addEditor = null;
+    setTimeout(() => {
+      render();
+      syncCheckDraft();
+      // a fix that was satisfied by adding a section resolves now
+      if (pending && pending.onResolve){ try { pending.onResolve(); } catch(e){} }
+      _pendingFix = null;
+      // flash the just-added custom section
+      const added = docEl() && docEl().querySelector('[data-cs-doc="'+sec.id+'"]');
+      if (added) flashSection(added, 'saved');
+      toast('Custom section added — change applied');
+    }, 300);
+  }
+
+  // ===================================================================
+  // SUCCESS STATES (Change 4) — green flash + inline badge (2s)
+  // ===================================================================
+  function flashSection(sec, kind){
+    if (!sec) return;
+    sec.classList.remove('ta-doc-success'); void sec.offsetWidth; sec.classList.add('ta-doc-success');
+    setTimeout(() => sec.classList.remove('ta-doc-success'), 320);
+    const h3 = sec.querySelector('h3');
+    if (h3){
+      h3.querySelectorAll('.ta-doc-badge').forEach(n => n.remove());
+      const badge = document.createElement('span');
+      badge.className = 'ta-doc-badge ' + (kind === 'ai' ? 'ai' : 'saved');
+      badge.setAttribute('role','status'); badge.setAttribute('aria-live','polite');
+      badge.innerHTML = kind === 'ai'
+        ? '<i data-lucide="sparkles" style="width:11px;height:11px;"></i> Updated by AI'
+        : '<i data-lucide="check" style="width:11px;height:11px;"></i> Saved';
+      h3.appendChild(badge);
+      icons();
+      setTimeout(() => { if (badge.parentNode) badge.remove(); }, 2000);
+    }
+    renderUndoAffordance(sec);
+  }
+
+  // ===================================================================
+  // PER-SECTION UNDO / RESTORE (Change 5) — history persisted per section key
+  // ===================================================================
+  function history(){ const d = draft(); if (!d.sectionHistory || typeof d.sectionHistory !== 'object') d.sectionHistory = {}; return d.sectionHistory; }
+  function persistHistory(){ try { localStorage.setItem(LS_HIST, JSON.stringify(history())); } catch(e){} }
+  function hydrateHistory(){ const d = draft(); try { const r = localStorage.getItem(LS_HIST); if (r){ const o = JSON.parse(r); if (o && typeof o === 'object') d.sectionHistory = o; } } catch(e){} }
+  function pushHistory(key, beforeHTML){
+    if (!key) return;
+    const h = history();
+    if (!Array.isArray(h[key])) h[key] = [];
+    h[key].push({ html: beforeHTML, at: Date.now() });
+    if (h[key].length > 10) h[key] = h[key].slice(-10);   // keep a short stack (≥ last 3)
+    persistHistory();
+  }
+  function hasHistory(key){ const h = history(); return Array.isArray(h[key]) && h[key].length > 0; }
+  function renderUndoAffordance(sec){
+    const key = sec.getAttribute('data-sec-key');
+    const h3 = sec.querySelector('h3');
+    if (!h3) return;
+    h3.querySelectorAll('.ta-doc-undo').forEach(n => n.remove());
+    if (!key || !hasHistory(key)) return;
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'ta-doc-undo';
+    btn.setAttribute('aria-label','Undo last change to this section');
+    btn.innerHTML = '<i data-lucide="undo-2" style="width:11px;height:11px;"></i> Undo';
+    btn.addEventListener('click', (e) => { e.stopPropagation(); undo(key); });
+    h3.appendChild(btn);
+    icons();
+  }
+  function undo(key){
+    const h = history();
+    if (!Array.isArray(h[key]) || !h[key].length) return;
+    const sec = sectionByKey(key);
+    if (!sec){ return; }
+    const body = sec.querySelector('.ta-doc-body');
+    const prev = h[key].pop();
+    persistHistory();
+    if (body && prev){ body.innerHTML = prev.html; }
+    // highlight the restored section briefly
+    sec.classList.remove('ta-doc-hl'); void sec.offsetWidth; sec.classList.add('ta-doc-hl');
+    setTimeout(() => sec.classList.remove('ta-doc-hl'), 620);
+    syncCheckDraft();
+    // re-evaluate the related pointer's open/resolved state after the undo
+    refreshPreCheck();
+    renderUndoAffordance(sec);
+    toast('Reverted to the previous version');
+  }
+  // expose undo affordances on every section that has history (after a render)
+  function decorateUndo(){ const doc = docEl(); if (!doc) return; doc.querySelectorAll('.nit-section').forEach(renderUndoAffordance); }
+  function clearHistory(){ const d = draft(); d.sectionHistory = {}; try { localStorage.removeItem(LS_HIST); } catch(e){} }
+
+  // ===================================================================
+  // DEEP-LINK "FIX →" — used by BOTH the CVC chatbot and the CVC Pre-Check.
+  // Scroll + 600ms highlight + inline edit on the target section in the SINGLE doc.
+  // ===================================================================
+  function sectionByKey(key){ const doc = docEl(); if (!doc || !key) return null; try { return doc.querySelector('[data-sec-key="'+(window.CSS && CSS.escape ? CSS.escape(key) : key)+'"]'); } catch(e){ return doc.querySelector('[data-sec-key="'+key+'"]'); } }
+  function fix(key, opts){
+    const sec = sectionByKey(key);
+    _pendingFix = Object.assign({ secKey: key }, opts || {});
+    if (!sec) return;
+    try { sec.scrollIntoView({ behavior:'smooth', block:'center' }); } catch(e){ sec.scrollIntoView(); }
+    sec.classList.remove('ta-doc-hl'); void sec.offsetWidth; sec.classList.add('ta-doc-hl');
+    setTimeout(() => sec.classList.remove('ta-doc-hl'), 620);
+    activate(sec);
+    enterEdit(sec);
+  }
+  // resolve the pending fix's pointer if its rule now passes (advisory).
+  function maybeResolvePending(key){
+    if (!_pendingFix || _pendingFix.secKey !== key) return;
+    const pending = _pendingFix;
+    // For CVC chatbot pointers we resolve on any committed edit (the officer applied the fix).
+    // For Pre-Check pointers we only resolve when the underlying rule now passes.
+    if (pending.source === 'precheck'){
+      const stillFailing = preCheckRuleFails(pending.checkId);
+      if (!stillFailing && pending.onResolve){ try { pending.onResolve(); } catch(e){} _pendingFix = null; }
+    } else if (pending.onResolve){
+      try { pending.onResolve(); } catch(e){} _pendingFix = null;
+    }
+  }
+
+  function syncCheckDraft(){ if (typeof window.renderDraftDoc === 'function' && window.draftPanelOpen){ try { window.renderDraftDoc(); } catch(e){} } }
+
+  // ===================================================================
+  // CHANGE 6 — CROSS-REFERENCE PROPAGATION (one value, many places)
+  // After a section save, look for OLD value tokens that changed and offer to
+  // propagate the change to OTHER sections where the same full token appears.
+  // SAFETY: only WHOLE formatted tokens are matched (never substrings).
+  // ===================================================================
+  // Build the set of "interesting" formatted value tokens currently in tenderDraft.
+  function valueTokens(){
+    const toks = [];
+    const add = (s) => { s = String(s||'').trim(); if (s && s.length >= 2) toks.push(s); };
+    const estA = costAbs('fEstCost'), emdA = costAbs('fEMD');
+    if (estA){ add(rupeeFmt(estA)); }
+    if (emdA){ add(rupeeFmt(emdA)); }
+    const turn = fieldNum('pqTurnover'); if (turn) add(rupeeFmt(turn));
+    const sim = fieldNum('pqSimilarVal'); if (sim) add(rupeeFmt(sim));
+    const period = fieldVal('fPeriod'); if (period) add(period);
+    [pubDate(), tlDate('prebid'), tlDate('bid'), tlDate('open'), tlDate('eval')].forEach(add);
+    // unique
+    return Array.from(new Set(toks));
+  }
+  // Escape a token for use in a whole-token regex; \b doesn't work around ₹/commas,
+  // so we guard with non-token boundaries (digit/letter) on both sides.
+  function tokenRegex(tok){
+    const e = tok.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // negative lookbehind/lookahead on digits and rupee/comma so "₹10" won't match inside "₹10,00,000"
+    return new RegExp('(?<![\\d])' + e + '(?![\\d,])', 'g');
+  }
+  // Compare before/after of the edited section to find which token(s) changed value.
+  function detectPropagation(editedSec, beforeHTML, afterHTML){
+    const beforeTxt = htmlToText(beforeHTML);
+    const afterTxt = htmlToText(afterHTML);
+    // candidate: a token that WAS present in the edited section before, and is NOT
+    // present after (i.e. the officer changed it), AND still appears elsewhere.
+    const before = new Set();
+    valueTokensFromText(beforeTxt).forEach(t => before.add(t));
+    const after = new Set();
+    valueTokensFromText(afterTxt).forEach(t => after.add(t));
+    let oldTok = null;
+    before.forEach(t => { if (!after.has(t) && oldTok == null) oldTok = t; });
+    if (!oldTok) return;                 // nothing recognizable changed
+    // find what it became: a NEW token present after but not before (best-effort)
+    let newTok = null;
+    after.forEach(t => { if (!before.has(t) && newTok == null) newTok = t; });
+    // scan OTHER sections for the OLD token (whole-token only)
+    const doc = docEl(); if (!doc) return;
+    const occ = [];
+    doc.querySelectorAll('.nit-section').forEach(sec => {
+      if (sec === editedSec) return;
+      const body = sec.querySelector('.ta-doc-body') || sec;
+      const txt = body.textContent || '';
+      if (tokenRegex(oldTok).test(txt)){
+        const secTitle = (sec.querySelector('h3') ? sec.querySelector('h3').textContent : 'Section').trim().replace(/\s*(Updated by AI|Saved|Undo)\s*$/,'');
+        occ.push({ sec, secTitle, snippet: snippetAround(txt, oldTok) });
+      }
+    });
+    if (occ.length >= 1){
+      // 2+ places total (edited + at least one other) → offer controlled propagation
+      openPropagation(oldTok, newTok, occ);
+    }
+  }
+  function htmlToText(html){ const t = document.createElement('div'); t.innerHTML = html || ''; return t.textContent || ''; }
+  function valueTokensFromText(txt){
+    const out = [];
+    // ₹ amounts (Indian grouping), e.g. ₹45,00,000
+    (txt.match(/₹\s?[\d,]+/g) || []).forEach(m => out.push(m.replace(/\s/g,'')));
+    // "12 months" / "180 days" style periods
+    (txt.match(/\b\d+\s*(months?|days?|weeks?|years?)\b/gi) || []).forEach(m => out.push(m.replace(/\s+/g,' ').trim()));
+    // long dates e.g. 8 May 2026
+    (txt.match(/\b\d{1,2}\s+[A-Z][a-z]+\s+\d{4}\b/g) || []).forEach(m => out.push(m));
+    return Array.from(new Set(out));
+  }
+  function snippetAround(txt, tok){
+    const i = txt.indexOf(tok);
+    if (i < 0) return esc(txt.slice(0, 80));
+    const start = Math.max(0, i - 36), end = Math.min(txt.length, i + tok.length + 36);
+    const pre = (start>0?'…':'') + txt.slice(start, i);
+    const post = txt.slice(i + tok.length, end) + (end<txt.length?'…':'');
+    return esc(pre) + '<mark>' + esc(tok) + '</mark>' + esc(post);
+  }
+
+  let _prop = null;  // { oldTok, newTok, occ:[{sec,secTitle,snippet}], overlay }
+  function openPropagation(oldTok, newTok, occ){
+    closePropagation();
+    const overlay = document.createElement('div');
+    overlay.className = 'ta-prop-overlay';
+    const n = occ.length;
+    const newLine = newTok ? (' to <b>' + esc(newTok) + '</b>') : '';
+    overlay.innerHTML = ''
+      + '<div class="ta-prop" role="dialog" aria-modal="true" aria-label="Review and update related values" aria-live="polite">'
+      +   '<div class="ta-prop-hd"><div class="t1"><i data-lucide="git-compare" class="w-[18px] h-[18px] text-primary"></i> Update related values?</div>'
+      +     '<div class="s1">You changed <b>'+esc(oldTok)+'</b>'+newLine+'. This value also appears in <b>'+n+'</b> other section'+(n===1?'':'s')+'. Review and update '+(n===1?'it':'them')+'?</div></div>'
+      +   '<div class="ta-prop-list" id="taPropList"></div>'
+      +   '<div class="ta-prop-ft"><button type="button" class="skip" onclick="taDoc.propSkip()">Skip — change only this section</button>'
+      +     '<button type="button" class="apply" id="taPropApply" onclick="taDoc.propApply()">Update '+n+' place'+(n===1?'':'s')+'</button></div>'
+      + '</div>';
+    document.body.appendChild(overlay);
+    _prop = { oldTok, newTok, occ, overlay };
+    const list = overlay.querySelector('#taPropList');
+    list.innerHTML = occ.map((o, i) =>
+      '<div class="ta-prop-occ" data-occ="'+i+'">'
+      + '<input type="checkbox" checked aria-label="Update '+esc(o.secTitle)+'" id="taPropChk'+i+'" />'
+      + '<div class="occ-body"><div class="occ-sec">'+esc(o.secTitle)+'</div><div class="occ-snip">'+o.snippet+'</div></div>'
+      + '<button type="button" class="occ-view" onclick="taDoc.propView('+i+')"><i data-lucide="eye" style="width:12px;height:12px;"></i> View</button>'
+      + '</div>'
+    ).join('');
+    icons();
+    // keyboard: Esc closes (=skip)
+    overlay._key = (e) => { if (e.key === 'Escape'){ e.preventDefault(); propSkip(); } };
+    document.addEventListener('keydown', overlay._key, true);
+    setTimeout(() => { const a = overlay.querySelector('#taPropApply'); if (a) a.focus(); }, 30);
+  }
+  function closePropagation(){
+    if (!_prop) return;
+    if (_prop.overlay){ if (_prop.overlay._key) document.removeEventListener('keydown', _prop.overlay._key, true); if (_prop.overlay.parentNode) _prop.overlay.parentNode.removeChild(_prop.overlay); }
+    _prop = null;
+  }
+  function propView(i){
+    if (!_prop || !_prop.occ[i]) return;
+    const sec = _prop.occ[i].sec;
+    try { sec.scrollIntoView({ behavior:'smooth', block:'center' }); } catch(e){}
+    sec.classList.remove('ta-doc-hl'); void sec.offsetWidth; sec.classList.add('ta-doc-hl');
+    setTimeout(() => sec.classList.remove('ta-doc-hl'), 620);
+  }
+  function propSkip(){ closePropagation(); toast('Only this section was changed'); }
+  function propApply(){
+    if (!_prop) return;
+    const { oldTok, newTok, occ, overlay } = _prop;
+    if (!newTok){ closePropagation(); toast('No replacement value detected — nothing propagated'); return; }
+    let count = 0;
+    occ.forEach((o, i) => {
+      const chk = overlay.querySelector('#taPropChk'+i);
+      if (!chk || !chk.checked) return;
+      const body = o.sec.querySelector('.ta-doc-body') || o.sec;
+      const key = o.sec.getAttribute('data-sec-key');
+      const before = body.innerHTML;
+      // replace WHOLE token occurrences only (never substrings) in text nodes
+      replaceTokenInElement(body, oldTok, newTok);
+      if (body.innerHTML !== before){
+        if (key) pushHistory(key, before);
+        count++;
+        const row = overlay.querySelector('[data-occ="'+i+'"]');
+        if (row){ row.classList.add('occ-updated'); }
+        o.sec.classList.remove('ta-doc-success'); void o.sec.offsetWidth; o.sec.classList.add('ta-doc-success');
+        setTimeout(() => o.sec.classList.remove('ta-doc-success'), 320);
+        renderUndoAffordance(o.sec);
+      }
+    });
+    syncCheckDraft();
+    refreshPreCheck();
+    setTimeout(() => { closePropagation(); toast('Updated in ' + count + ' section' + (count===1?'':'s')); }, 420);
+  }
+  // Replace whole-token occurrences in the text nodes of an element (DOM-safe; no substring collisions).
+  function replaceTokenInElement(root, oldTok, newTok){
+    const re = tokenRegex(oldTok);
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    const nodes = [];
+    let node; while ((node = walker.nextNode())) nodes.push(node);
+    nodes.forEach(tn => { re.lastIndex = 0; if (re.test(tn.nodeValue)){ re.lastIndex = 0; tn.nodeValue = tn.nodeValue.replace(re, newTok); } });
+  }
+
+  // ===================================================================
+  // CHANGE 3 — CVC PRE-CHECK (predictive, rules-based, actionable pointers)
+  // ===================================================================
+  // Each rule: { id, key (target section), severity, message(), norm, fails(), passMsg }
+  function preCheckDefs(){
+    const est = estCostAbs();
+    return [
+      { id:'emd', key:'financial', severity:'change', norm:'CVC guideline — EMD 2%–3% of estimated cost',
+        fails(){ const emd = costAbs('fEMD'); const p = est>0 ? (emd/est)*100 : 0; return !(p >= 2 && p <= 3); },
+        message(){ const emd = costAbs('fEMD'); const p = est>0 ? (emd/est)*100 : 0; if (emd<=0) return 'EMD is not set — CVC norm is 2–3% of the estimated cost ('+rupeeFmt(est)+').'; return 'EMD is '+p.toFixed(1)+'% of the estimate ('+rupeeFmt(emd)+' of '+rupeeFmt(est)+') — outside the 2–3% norm.'; },
+        passMsg:'EMD is within the 2–3% norm.' },
+      { id:'turnover', key:'eligibility', severity:'change', norm:'CVC 9.17.6.9 — turnover ≤ 30% of estimated cost',
+        fails(){ const t = fieldNum('pqTurnover'); return est>0 && (t/est)*100 > 30.5; },
+        message(){ const t = fieldNum('pqTurnover'); const p = est>0 ? (t/est)*100 : 0; return 'Turnover requirement is '+p.toFixed(0)+'% of the estimate — above the ~30% ceiling restricts competition.'; },
+        passMsg:'Turnover requirement is within the ~30% ceiling.' },
+      { id:'similar', key:'eligibility', severity:'change', norm:'CVC 9.17.6.9 — similar-work value 40%–80% of estimate',
+        fails(){ const s = fieldNum('pqSimilarVal'); if (!s) return false; const p = (s/est)*100; return !(p >= 39.5 && p <= 80.5); },
+        message(){ const s = fieldNum('pqSimilarVal'); const p = est>0 ? (s/est)*100 : 0; return 'Similar-work value is '+p.toFixed(0)+'% of the estimate — outside the 40–80% band.'; },
+        passMsg:'Similar-work value is within the 40–80% band.' },
+      { id:'epf', key:'eligibility', severity:'change', norm:'EPF & ESIC registration — statutory for Works contracts',
+        fails(){ const e = el('regEpf'); return !(e && e.checked); },
+        message(){ return 'EPF / ESIC registration is not marked mandatory — it is statutory for Works contracts.'; },
+        passMsg:'EPF / ESIC registration is required.' },
+      { id:'iso', key:'eligibility', severity:'change', norm:'CVC 9.17.6.9(iii) — ISO/standards must not be mandatory',
+        fails(){ const e = el('tqIsoMandatory'); return !!(e && e.checked); },
+        message(){ return 'ISO 9001:2015 is set as a mandatory TQ requirement — contradicts CVC 9.17.6.9(iii).'; },
+        passMsg:'No standard is wrongly set as a mandatory qualification.' },
+      { id:'scope', key:'scope', severity:'change', norm:'Scope must be unambiguous and measurable',
+        fails(){ const s = scopeText(); return s.length > 0 && s.length < 120; },
+        message(){ const s = scopeText(); if (!s) return 'Scope of work is empty — a CVC reviewer will flag an undefined scope.'; return 'Scope of work is very brief ('+s.length+' chars) — likely to be flagged as ambiguous. Clarify the extent and measurable quantities.'; },
+        passMsg:'Scope of work is sufficiently detailed.' },
+      { id:'timeline', key:'timeline', severity:'change', norm:'Timeline must be realistic for the quantum of work',
+        fails(){ const m = (fieldVal('fPeriod')||'').match(/(\d+)\s*month/i); if (!m) return false; return parseInt(m[1],10) <= 3; },
+        message(){ return 'The completion period is very compressed for this quantum of work — reconsider to avoid an objection.'; },
+        passMsg:'Completion period is realistic for the work.' },
+      { id:'integrity', key:'forms', severity:'change', norm:'Integrity Pact — required above prescribed thresholds',
+        fails(){ const sec = sectionByKey('forms'); if (!sec) return false; const t = (sec.textContent||'').toLowerCase(); return t.indexOf('integrity') < 0; },
+        message(){ return 'No Integrity Pact is present in the Forms & Declarations — CVC expects one for tenders of this value.'; },
+        passMsg:'An Integrity Pact is included.' }
+    ];
+  }
+  let _preCheckOkCollapsed = true;
+  function preCheckRuleFails(id){ const def = preCheckDefs().find(r => r.id === id); if (!def) return false; try { return !!def.fails(); } catch(e){ return false; } }
+
+  function ptrRowHTML(p){
+    if (p.resolved){
+      return '<div class="cvc-row sev-change resolved" data-pre="'+p.id+'">'
+        + '<i data-lucide="circle-check" class="w-4 h-4 text-success shrink-0" style="margin-top:1px;"></i>'
+        + '<div class="cvc-row-body"><div class="cvc-msg-txt">'+esc(p.message)+'</div><div class="cvc-row-norm">'+esc(p.norm)+'</div></div>'
+        + '<div class="cvc-row-acts"><span class="cvc-resolved-tag"><i data-lucide="check" class="w-3 h-3"></i> Resolved</span></div></div>';
+    }
+    if (p.ok){
+      return '<div class="cvc-row sev-ok" data-pre="'+p.id+'">'
+        + '<i data-lucide="circle-check" class="w-4 h-4 text-success shrink-0" style="margin-top:1px;"></i>'
+        + '<div class="cvc-row-body"><div class="cvc-msg-txt">'+esc(p.message)+'</div><div class="cvc-row-norm">'+esc(p.norm)+'</div></div>'
+        + '<div class="cvc-row-acts"><span class="cvc-resolved-tag">Passed</span></div></div>';
+    }
+    return '<div class="cvc-row sev-change" data-pre="'+p.id+'">'
+      + '<i data-lucide="alert-triangle" class="w-4 h-4 text-danger shrink-0" style="margin-top:1px;"></i>'
+      + '<div class="cvc-row-body"><div class="cvc-msg-txt">'+esc(p.message)+'</div><div class="cvc-row-norm">'+esc(p.norm)+'</div></div>'
+      + '<div class="cvc-row-acts"><button type="button" class="cvc-fix-btn" aria-label="Fix: '+esc(p.message)+'" onclick="taDoc.preCheckFix(\''+p.id+'\')">Fix <i data-lucide="arrow-right" class="w-3 h-3"></i></button></div></div>';
+  }
+
+  function refreshPreCheck(){
+    const host = el('taPreCheck');
+    if (!host) return;
+    const defs = preCheckDefs();
+    const items = defs.map(def => {
+      let failing = false; try { failing = !!def.fails(); } catch(e){ failing = false; }
+      let msg = def.passMsg; try { msg = failing ? def.message() : def.passMsg; } catch(e){}
+      return { id:def.id, key:def.key, norm:def.norm, message:msg, failing, ok:!failing, resolved:false };
+    });
+    const issues = items.filter(i => i.failing);
+    const passed = items.filter(i => !i.failing);
+    const total = items.length;
+    const counts = el('taPreCheckCounts');
+    if (counts) counts.innerHTML = '<b class="bad">'+issues.length+'</b> potential CVC issue'+(issues.length===1?'':'s')+' · <b>'+passed.length+'</b> check'+(passed.length===1?'':'s')+' passed';
+    const pct = total ? Math.round((passed.length/total)*100) : 100;
+    const bar = el('taPreCheckBar'); if (bar) bar.style.width = pct + '%';
+    const track = el('taPreCheckTrack'); if (track) track.setAttribute('aria-valuenow', String(pct));
+    const live = el('taPreCheckLive'); if (live) live.textContent = issues.length ? (issues.length + ' potential CVC issue' + (issues.length===1?'':'s') + ' to address.') : 'No potential CVC issues — all predictive checks passed.';
+    const cHost = el('taPreCheckChanges');
+    if (cHost){ cHost.innerHTML = issues.length ? ('<div class="cvc-group-label">Likely CVC objections</div>' + issues.map(ptrRowHTML).join('')) : '<div class="cvc-row sev-ok"><i data-lucide="shield-check" class="w-4 h-4 text-success shrink-0" style="margin-top:1px;"></i><div class="cvc-row-body"><div class="cvc-msg-txt">No predictive CVC issues found.</div><div class="cvc-row-norm">This draft is unlikely to attract the common CVC objections.</div></div></div>'; }
+    const okWrap = el('taPreCheckOkWrap'), okHost = el('taPreCheckOk');
+    if (okWrap && okHost){
+      if (passed.length){
+        okWrap.style.display = 'block';
+        const lbl = el('taPreCheckOkLabel'); if (lbl) lbl.textContent = passed.length + ' check' + (passed.length===1?'':'s') + ' passed';
+        okHost.innerHTML = passed.map(p => ptrRowHTML(Object.assign({}, p, { ok:true }))).join('');
+        okHost.style.display = _preCheckOkCollapsed ? 'none' : 'block';
+        const chev = el('taPreCheckOkChevron'); if (chev) chev.style.transform = _preCheckOkCollapsed ? '' : 'rotate(180deg)';
+        const tg = el('taPreCheckOkToggle'); if (tg) tg.setAttribute('aria-expanded', _preCheckOkCollapsed ? 'false' : 'true');
+      } else { okWrap.style.display = 'none'; }
+    }
+    icons();
+  }
+  function togglePreCheckOk(){ _preCheckOkCollapsed = !_preCheckOkCollapsed; refreshPreCheck(); }
+  function preCheckFix(id){
+    const def = preCheckDefs().find(r => r.id === id);
+    if (!def) return;
+    fix(def.key, {
+      source: 'precheck',
+      checkId: id,
+      onResolve: () => {
+        // mark the row resolved with the 250ms resolve animation, then re-evaluate
+        const row = document.querySelector('#taPreCheck .cvc-row[data-pre="'+id+'"]');
+        if (row){ row.classList.add('just-resolved'); }
+        setTimeout(refreshPreCheck, 260);
+      }
+    });
+  }
+
+  // ===================================================================
+  // SNAPSHOT (Version History) — clone the single doc minus editing chrome.
+  // ===================================================================
+  function snapshot(){
+    const doc = docEl();
+    if (!doc) return '';
+    render();   // ensure fresh, no open editors
+    const clone = doc.cloneNode(true);
+    clone.querySelectorAll('.section-action-bar, .section-mini-toolbar, .section-done-link, .ta-cs-insert-pop, .ta-cs-inline, .ta-doc-badge, .ta-doc-undo').forEach(n => n.remove());
+    clone.querySelectorAll('.nit-section').forEach(s => { s.classList.remove('section-active','section-editing','ta-doc-hl','ta-doc-success'); });
+    return clone.innerHTML;
+  }
+
+  // ===================================================================
+  // PUBLIC API
+  // ===================================================================
+  window.taDoc = {
+    render,
+    fix,
+    snapshot,
+    clearHistory,
+    exitEdit,
+    refreshPreCheck,
+    preCheckFix, togglePreCheckOk,
+    // add-section editor (taCs reuse) callbacks
+    addTitle(v){ if (_addEditor){ _addEditor.sec.title = v; updateAddSave(); } },
+    saveAdd,
+    discardAddStart(){ if (_addEditor){ _addEditor.discardConfirm = true; renderAddEditor(); } },
+    discardAddCancel(){ if (_addEditor){ _addEditor.discardConfirm = false; renderAddEditor(); } },
+    discardAddConfirm(){ discardAdd(); },
+    // propagation callbacks
+    propApply, propSkip, propView
+  };
+
+  // ===================================================================
+  // MOUNT / WIRING — render whenever Step 5's completed view is available.
+  // ===================================================================
+  function mount(){
+    if (!el('taSingleDoc')) return;
+    hydrateHistory();
+    render();
+    decorateUndo();
+    refreshPreCheck();
+    icons();
+  }
+  function init(){
+    hydrateHistory();
+    if (typeof window.setView === 'function'){
+      const orig = window.setView;
+      window.setView = function(name){ const r = orig.apply(this, arguments); if (name === 'step5'){ try { setTimeout(mount, 30); } catch(e){} } return r; };
+    }
+    // re-render the single doc when the generation completes (reveal of #step5RealContent)
+    if (typeof window.agComplete === 'function'){
+      const origC = window.agComplete;
+      window.agComplete = function(){ const r = origC.apply(this, arguments); try { setTimeout(mount, 40); } catch(e){} return r; };
+    }
+    if (location.hash.indexOf('step5') >= 0){ setTimeout(mount, 80); }
+    setTimeout(mount, 140);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>
+
 <script>
 (function(){
   "use strict";
@@ -8201,63 +9134,25 @@
   }
 
   // ===================================================================
-  // LIVE DOCUMENT (right column) — built from agBaseSections() + customs
+  // SINGLE DOCUMENT — owned by the taDoc controller (no separate #cvcDoc)
   // ===================================================================
-  // The built-in NIT sections shown for review. Each maps generation parts to
-  // a stable key + a keyword set used by the rules-based pointer parser.
+  // The CVC pointer parser still keys concerns to stable section keys; those
+  // keys are the SAME data-sec-key the single document carries, so "Fix →"
+  // deep-links into the one shared document. Rendering + inline edit live in
+  // window.taDoc; this module only references it.
   const DOC_SECTIONS = [
-    { key:'header',      title:'Notice Inviting Tender',          kw:['nit','notice','title','reference'] },
-    { key:'scope',       title:'Scope of Work',                   kw:['scope','road marking','marking','deliverable','work description'] },
-    { key:'financial',   title:'Estimated Value, Fee & EMD',      kw:['emd','earnest','fee','budget','value','estimate'] },
-    { key:'timeline',    title:'Critical Dates & Timeline',       kw:['delivery','timeline','date','completion','period','schedule','time'] },
-    { key:'eligibility', title:'Eligibility (PQ) & Technical (TQ)',kw:['eligibility','turnover','similar','networth','net worth','epf','esic','registration','pq','tq','qualification'] },
-    { key:'boq',         title:'Bill of Quantities (BOQ)',        kw:['boq','quantity','quantities','rate','bill'] },
-    { key:'conditions',  title:'Conditions of Contract (GCC/SCC)',kw:['penalty','ld','liquidated','condition','security','warranty','payment','defect','clause'] },
-    { key:'forms',       title:'Forms & Declarations',            kw:['form','declaration','integrity','undertaking'] }
+    { key:'header',      title:'Notice Inviting Tender' },
+    { key:'scope',       title:'Scope of Work' },
+    { key:'financial',   title:'Estimated Value, Fee & EMD' },
+    { key:'timeline',    title:'Critical Dates & Timeline' },
+    { key:'eligibility', title:'Eligibility (PQ) & Technical (TQ)' },
+    { key:'boq',         title:'Bill of Quantities (BOQ)' },
+    { key:'conditions',  title:'Conditions of Contract (GCC/SCC)' },
+    { key:'forms',       title:'Forms & Declarations' }
   ];
 
-  // Build the document body HTML for a built-in section by deriving from the
-  // generation's section list (same content source) so the doc reflects inputs.
-  function builtinBodyHTML(key){
-    let base = [];
-    try { if (typeof window.agBaseSections === 'function') base = window.agBaseSections(); } catch(e){}
-    const byName = {};
-    base.forEach(s => { byName[s.name] = s.html; });
-    const pick = (names) => names.map(n => byName[n] || '').filter(Boolean).join('');
-    if (key === 'header')      return pick(['Tender reference & title','Issuing authority & contact']) || '<p>Notice Inviting Tender — Ahmedabad Municipal Corporation.</p>';
-    if (key === 'scope')       return pick(['Scope of work & deliverables']) || '<p>[Scope of work]</p>';
-    if (key === 'financial')   return pick(['Estimated value & budget head','Tender fee & EMD details']) || '<p>[Estimated value, fee & EMD]</p>';
-    if (key === 'timeline')    return pick(['Critical dates & timeline']) || '<p>[Critical dates]</p>';
-    if (key === 'eligibility') return pick(['Eligibility criteria (PQ)','Technical qualification criteria (TQ)']) || '<ul><li>[Eligibility criteria]</li></ul>';
-    if (key === 'boq')         return pick(['Bill of Quantities (BOQ)','Technical specifications']) || '<p>[Bill of Quantities]</p>';
-    if (key === 'conditions')  return pick(['General Conditions of Contract (GCC)','Special Conditions of Contract (SCC)','Performance security & warranty','Payment terms & milestones']) || '<p>[Conditions of contract]</p>';
-    if (key === 'forms')       return pick(['Bid submission forms','Eligibility declarations','Integrity pact & undertakings']) || '<p>[Forms & declarations]</p>';
-    return '';
-  }
-
-  // Render the live doc: built-in sections (stable data-sec-id/data-sec-key)
-  // then inject custom sections via the SHARED taCs injector (same model as
-  // Check Draft). Custom sections anchored to data-sec-id appear in place.
-  function renderDoc(){
-    const doc = el('cvcDoc');
-    if (!doc) return;
-    let html = '';
-    DOC_SECTIONS.forEach((s, i) => {
-      html += '<section class="nit-section" data-sec-id="section-'+(i+1)+'" data-sec-key="'+s.key+'">'
-            + '<h3>'+(i+1)+'. '+esc(s.title)+'</h3>'
-            + '<div class="cvc-sec-body">'+builtinBodyHTML(s.key)+'</div>'
-            + '</section>';
-    });
-    html += '<div class="doc-footer" style="display:none;"></div>'; // injector anchor for orphan customs
-    doc.innerHTML = html;
-    // Inject custom sections using the shared model/injector (same as Check Draft).
-    if (typeof window.taCsInjectIntoDoc === 'function'){ try { window.taCsInjectIntoDoc(doc); } catch(e){} }
-    // Tag any injected custom sections with our key scheme for deep-link/anchoring.
-    doc.querySelectorAll('.nit-section.custom').forEach(sec => { if (!sec.getAttribute('data-sec-key')) sec.setAttribute('data-sec-key', 'custom:' + sec.getAttribute('data-cs-doc')); });
-    icons();
-  }
-
-  function sectionElByKey(key){ const doc = el('cvcDoc'); return doc ? doc.querySelector('[data-sec-key="'+CSS.escape(key)+'"]') : null; }
+  // Render delegates to the single-document controller (the source of truth).
+  function renderDoc(){ if (window.taDoc && typeof window.taDoc.render === 'function'){ try { window.taDoc.render(); } catch(e){} } }
 
   // ===================================================================
   // CHANGE 1 — CHATBOT (thread, composer, attach, mock dictation)
@@ -8547,188 +9442,24 @@
   // ===================================================================
   function pointerById(id){ return review().pointers.find(p => p.id === id); }
 
+  // Fix → deep-links into the SINGLE shared document (window.taDoc). taDoc scrolls
+  // to + 600ms-highlights the section, puts it into inline edit, and calls our
+  // callback to resolve the pointer once the edit (content edit / AI rewrite /
+  // add-section / manual save) commits and its check now passes.
   function fix(id){
     const p = pointerById(id);
     if (!p) return;
     _pendingFixPointer = id;
-    closeInsertPopover(false);
-    const sec = sectionElByKey(p.anchorId);
-    if (!sec) return;
-    // scroll + 600ms highlight pulse
-    try { sec.scrollIntoView({ behavior:'smooth', block:'center' }); } catch(e){ sec.scrollIntoView(); }
-    sec.classList.remove('cvc-doc-hl'); void sec.offsetWidth; sec.classList.add('cvc-doc-hl');
-    setTimeout(() => sec.classList.remove('cvc-doc-hl'), 620);
-    enterSectionEdit(sec);
-    const back = el('cvcDocBack'); if (back) back.style.display = 'inline-flex';
+    if (window.taDoc && typeof window.taDoc.fix === 'function'){
+      window.taDoc.fix(p.anchorId, {
+        source: 'cvc',
+        pointerId: id,
+        onResolve: () => { resolvePointer(id); _pendingFixPointer = null; }
+      });
+    }
   }
-
-  // Inline edit on a built-in section: make the body editable AND expose the
-  // taCs add-section flow (above/below). Saving auto-resolves the pointer.
-  function enterSectionEdit(sec){
-    // exit any other editing section first
-    if (_editSecKey && _editSecKey !== sec.getAttribute('data-sec-key')){ exitSectionEdit(); }
-    _editSecKey = sec.getAttribute('data-sec-key');
-    if (sec.querySelector('.cvc-sec-actions')) return; // already editing
-    sec.classList.add('cvc-editing');
-    const isCustom = sec.classList.contains('custom');
-    // body becomes editable (reuses the Check-Draft section-edit affordance)
-    const body = sec.querySelector('.cvc-sec-body');
-    if (body && !isCustom){ body.setAttribute('contenteditable','true'); body.classList.add('cvc-sec-editbox'); }
-    const bar = document.createElement('div');
-    bar.className = 'cvc-sec-actions';
-    bar.setAttribute('contenteditable','false');
-    bar.innerHTML = (isCustom
-        ? '<button type="button" data-a="editcustom"><i data-lucide="pencil" class="w-3 h-3"></i> Edit section</button>'
-        : '<button type="button" data-a="edit"><i data-lucide="pencil" class="w-3 h-3"></i> Edit content</button>')
-      + '<button type="button" data-a="add"><i data-lucide="plus" class="w-3 h-3"></i> Add section</button>'
-      + '<button type="button" data-a="done"><i data-lucide="check" class="w-3 h-3"></i> Done — apply fix</button>';
-    sec.appendChild(bar);
-    bar.querySelectorAll('button').forEach(b => b.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const a = b.getAttribute('data-a');
-      if (a === 'add') openInsert(sec);
-      else if (a === 'editcustom'){ if (window.taCs) try { window.taCs.editCustom(sec); } catch(e2){} }
-      else if (a === 'edit'){ const bd = sec.querySelector('.cvc-sec-body'); if (bd){ bd.focus(); } }
-      else if (a === 'done'){ commitSectionEdit(sec); }
-    }));
-    icons();
-    if (body && !isCustom) setTimeout(() => body.focus(), 60);
-  }
-
-  function exitSectionEdit(){
-    const doc = el('cvcDoc'); if (!doc) return;
-    doc.querySelectorAll('.nit-section.cvc-editing').forEach(sec => {
-      sec.classList.remove('cvc-editing');
-      const body = sec.querySelector('.cvc-sec-body');
-      if (body){ body.removeAttribute('contenteditable'); body.classList.remove('cvc-sec-editbox'); }
-      const bar = sec.querySelector('.cvc-sec-actions'); if (bar) bar.remove();
-    });
-    _editSecKey = null;
-  }
-
-  function commitSectionEdit(sec){
-    sec.classList.remove('cvc-editing');
-    const body = sec.querySelector('.cvc-sec-body');
-    if (body){ body.removeAttribute('contenteditable'); body.classList.remove('cvc-sec-editbox'); }
-    const bar = sec.querySelector('.cvc-sec-actions'); if (bar) bar.remove();
-    _editSecKey = null;
-    if (_pendingFixPointer){ resolvePointer(_pendingFixPointer); _pendingFixPointer = null; }
-    toast('Change applied to the draft');
-  }
-
-  // ----- "+ Add section" — IDENTICAL taCs insertion flow (popover → dashed editor) -----
-  function _popOutside(e){ if (_insertPop && !_insertPop.contains(e.target)) closeInsertPopover(true); }
-  function _popKey(e){ if (e.key === 'Escape'){ e.preventDefault(); closeInsertPopover(true); } }
-  function closeInsertPopover(refocus){
-    if (!_insertPop) return;
-    _insertPop.remove(); _insertPop = null;
-    document.removeEventListener('mousedown', _popOutside, true);
-    document.removeEventListener('keydown', _popKey, true);
-  }
-  function openInsert(secEl){
-    closeInsertPopover(false);
-    const anchorKey = secEl.getAttribute('data-sec-key');
-    const title = (secEl.querySelector('h3') ? secEl.querySelector('h3').textContent : 'section').trim();
-    const pop = document.createElement('div');
-    pop.className = 'ta-cs-insert-pop';
-    pop.setAttribute('role','dialog');
-    pop.setAttribute('aria-label','Insert custom section relative to ' + title);
-    pop.innerHTML = '<button type="button" data-pos="above"><i data-lucide="arrow-up" style="width:13px;height:13px;"></i> Insert above this section</button>'
-      + '<button type="button" data-pos="below"><i data-lucide="arrow-down" style="width:13px;height:13px;"></i> Insert below this section</button>';
-    secEl.appendChild(pop);
-    _insertPop = pop;
-    pop.querySelectorAll('button').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); const pos = b.getAttribute('data-pos'); closeInsertPopover(false); beginAdd(secEl, pos); }));
-    icons();
-    setTimeout(() => { const f = pop.querySelector('button'); if (f) f.focus(); }, 0);
-    setTimeout(() => { document.addEventListener('mousedown', _popOutside, true); document.addEventListener('keydown', _popKey, true); }, 0);
-  }
-
-  // Dashed editor card — reuses the taCs block editor (renderBlocksInto) and the
-  // ta-cs-inline visual. On Save, the section is committed to customSections via
-  // the shared model and re-injected by renderDoc().
-  function beginAdd(anchorEl, position){
-    if (_addEditor) discardAdd(true);
-    const anchorKey = anchorEl.getAttribute('data-sec-key');
-    const anchorSecId = anchorEl.getAttribute('data-sec-id') || anchorEl.getAttribute('data-cs-doc');
-    const sec = (window.taCs && window.taCs.newSection) ? window.taCs.newSection('__cvc') : { id:uid('custom'), step:'__cvc', title:'', collapsed:false, blocks:[{id:uid('block'),type:'text',content:''}] };
-    sec.step = '__cvc';
-    const host = document.createElement('div');
-    host.className = 'ta-cs-inline';
-    if (position === 'above') anchorEl.parentNode.insertBefore(host, anchorEl);
-    else anchorEl.parentNode.insertBefore(host, anchorEl.nextSibling);
-    _addEditor = { sec, hostEl: host, anchorSecId, position, discardConfirm:false };
-    // route taCs block re-renders back to us
-    if (window.taCs){ window.taCs._externalSec = sec; window.taCs._extRenderCb = renderAddEditor; }
-    // keep Save's enabled-state in sync as the officer edits ANY block (text/list/table/file),
-    // mirroring how the taCs inline editor wires updateSaveState to host 'input'.
-    host.addEventListener('input', updateAddSave);
-    renderAddEditor();
-    requestAnimationFrame(() => host.classList.add('show'));
-    setTimeout(() => { const ti = host.querySelector('.ta-cs-title-in'); if (ti) ti.focus(); }, 60);
-  }
-  function renderAddEditor(){
-    if (!_addEditor) return;
-    const sec = _addEditor.sec, host = _addEditor.hostEl;
-    let disc;
-    if (_addEditor.discardConfirm) disc = '<span class="ta-cs-inline-discwrap">Discard this section?<button type="button" class="yes" onclick="cvc.discardAddConfirm()">Yes</button><button type="button" class="no" onclick="cvc.discardAddCancel()">No</button></span>';
-    else disc = '<button type="button" class="ta-cs-inline-cancel" onclick="cvc.discardAddStart()">Discard</button>';
-    host.innerHTML = '<div class="ta-cs-inline-label">NEW CUSTOM SECTION</div>'
-      + '<div class="ta-cs-card"><div class="ta-cs-head"><input class="ta-cs-title-in" type="text" value="'+esc(sec.title)+'" placeholder="Section title (e.g. Road Marking Specification, LD Cap...)" oninput="cvc.addTitle(this.value)" aria-label="Section title" /></div>'
-      + '<div id="cvcAddBlocks"></div></div>'
-      + '<div class="ta-cs-inline-footer">'+disc
-      + '<button type="button" class="ta-cs-inline-save" id="cvcAddSave" onclick="cvc.saveAdd()">Save section</button></div>';
-    const blockHost = host.querySelector('#cvcAddBlocks');
-    if (blockHost && window.taCs && window.taCs.renderBlocksInto){ window.taCs.renderBlocksInto(blockHost, sec); }
-    updateAddSave();
-    icons();
-  }
-  function addValid(){ const s = _addEditor && _addEditor.sec; if (!s) return false; const hasContent = window.taCs && window.taCs.secHasContent ? window.taCs.secHasContent(s) : true; return String(s.title||'').trim().length >= 2 && hasContent; }
-  function updateAddSave(){ const b = el('cvcAddSave'); if (b) b.disabled = !addValid(); }
-  function addTitle(v){ if (_addEditor){ _addEditor.sec.title = v; updateAddSave(); } }
-  function discardAddStart(){ if (_addEditor){ _addEditor.discardConfirm = true; renderAddEditor(); } }
-  function discardAddCancel(){ if (_addEditor){ _addEditor.discardConfirm = false; renderAddEditor(); } }
-  function discardAddConfirm(){ discardAdd(true); }
-  function discardAdd(silent){
-    if (!_addEditor) return;
-    if (_addEditor.hostEl && _addEditor.hostEl.parentNode) _addEditor.hostEl.parentNode.removeChild(_addEditor.hostEl);
-    if (window.taCs){ window.taCs._externalSec = null; window.taCs._extRenderCb = null; }
-    _addEditor = null;
-  }
-  function saveAdd(){
-    if (!_addEditor || !addValid()) return;
-    const sec = _addEditor.sec;
-    const host = _addEditor.hostEl;
-    host.classList.add('committing');
-    // commit into the SHARED model (tenderDraft.customSections) so it persists
-    // and shows in Check Draft too. Anchor to the doc section via taCs schema.
-    delete sec.step; delete sec.stepLabel;
-    sec.anchorSectionId = _addEditor.anchorSecId;
-    sec.position = _addEditor.position;
-    sec.order = 0;
-    draft(); window.tenderDraft.customSections = window.tenderDraft.customSections || [];
-    window.tenderDraft.customSections.push(sec);
-    try { localStorage.setItem('taCustomSections_' + TND, JSON.stringify(window.tenderDraft.customSections)); } catch(e){}
-    if (window.taCs){ window.taCs._externalSec = null; window.taCs._extRenderCb = null; }
-    const ptr = _pendingFixPointer;
-    _addEditor = null;
-    setTimeout(() => {
-      renderDoc();
-      // keep edit affordance off; resolve the pointer that triggered this add
-      if (ptr){ resolvePointer(ptr); _pendingFixPointer = null; }
-      if (typeof window.renderDraftDoc === 'function' && window.draftPanelOpen){ try { window.renderDraftDoc(); } catch(e){} }
-      toast('Custom section added — change applied');
-    }, 300);
-  }
-
-  function backToReview(){
-    exitSectionEdit();
-    discardAdd(true);
-    closeInsertPopover(false);
-    const back = el('cvcDocBack'); if (back) back.style.display = 'none';
-    const pe = el('cvcPointers'); if (pe) pe.scrollIntoView({ behavior:'smooth', block:'nearest' });
-    // focus the first open Fix button for keyboard users
-    setTimeout(() => { const f = document.querySelector('#cvcPtrChanges .cvc-fix-btn'); if (f) f.focus(); }, 200);
-  }
+  // exposed so taDoc can resolve a CVC pointer after a successful edit
+  function resolveBySource(pointerId){ if (pointerId) resolvePointer(pointerId); }
 
   // ----- auto-resolve (advisory; never a hard gate) -----
   function resolvePointer(id){
@@ -8782,14 +9513,11 @@
     window.agComplete = function(){ const r = orig.apply(this, arguments); window.agComplete = orig; try { cb(); } catch(e){} return r; };
   }
 
-  // Snapshot the current live document content (built-ins + injected customs).
+  // Snapshot the current single document content (built-ins + injected customs)
+  // for Version History. Delegates to the single-document controller.
   function documentSnapshot(){
-    renderDoc(); // ensure fresh
-    const doc = el('cvcDoc');
-    if (!doc) return '';
-    const clone = doc.cloneNode(true);
-    clone.querySelectorAll('.cvc-sec-actions, .ta-cs-insert-pop, .ta-cs-inline, .doc-footer').forEach(n => n.remove());
-    return clone.innerHTML;
+    if (window.taDoc && typeof window.taDoc.snapshot === 'function'){ try { return window.taDoc.snapshot(); } catch(e){} }
+    return '';
   }
 
   // Append a version with the EXACT schema Phase B's Version History consumes.
@@ -8831,7 +9559,7 @@
   function mount(){
     if (!el('cvcWrap')) return;
     renderThread();
-    renderDoc();
+    renderDoc();   // ensure the single document is rendered (delegates to taDoc)
     if (review().pointers.length){ const pe = el('cvcPointers'); if (pe) pe.style.display = 'block'; renderPointers(); }
     syncSendEnabled();
     icons();
@@ -8839,7 +9567,8 @@
 
   // Design-review restart: reset the ENTIRE Step-5 flow to the very beginning —
   // no CVC feedback entered, no pointers, no versions — then replay the generation
-  // from 0%. Clears only Step-5/CVC/version state (NOT Steps 1–4 or custom sections).
+  // from 0%. Clears only Step-5/CVC/version/section-history state (NOT Steps 1–4
+  // or custom sections).
   function restartFlow(){
     const d = draft();
     d.cvcReview = { thread:[], pointers:[], okCollapsed:true };
@@ -8849,7 +9578,10 @@
     _editSecKey = null; _addEditor = null; _insertPop = null; _pendingFixPointer = null;
     try { localStorage.removeItem(LS_CVC); localStorage.removeItem(LS_VER); localStorage.removeItem('taFinalVersion_' + TND); } catch(e){}
     try { const pe = el('cvcPointers'); if (pe) pe.style.display = 'none'; } catch(e){}
-    try { mount(); } catch(e){}                                  // CVC chatbot → empty state, fresh live doc
+    // also clear the single document's per-section undo history for a clean replay
+    try { if (window.taDoc && typeof window.taDoc.clearHistory === 'function') window.taDoc.clearHistory(); } catch(e){}
+    try { mount(); } catch(e){}                                  // CVC chatbot → empty state, fresh single doc
+    try { if (window.taDoc && typeof window.taDoc.render === 'function') window.taDoc.render(); } catch(e){}
     try { if (window.versionHistory && typeof window.versionHistory.render === 'function') window.versionHistory.render(); } catch(e){}
     try { if (typeof window.agReplay === 'function') window.agReplay(); } catch(e){}   // generation → beginning
     toast('AI Generation flow reset to the beginning');
@@ -8858,8 +9590,7 @@
   // public API
   window.cvc = {
     send, onInput, onKey, attachClick, onFilePick, clearFile, toggleMic, example,
-    fix, backToReview, toggleOk,
-    addTitle, saveAdd, discardAddStart, discardAddCancel, discardAddConfirm,
+    fix, toggleOk, resolveBySource,
     regenStart, regenCancel, regenConfirm, restartFlow,
     _mount: mount, _seedV1: seedV1IfNeeded, _renderDoc: renderDoc
   };
