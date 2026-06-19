@@ -739,8 +739,30 @@
     .cvc-sum-acts { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-top:14px; padding-top:12px; border-top:1px solid #DBEAFE; }
     .cvc-sum-confirm { background:#0F5EE8; color:#fff; border:none; border-radius:9px; padding:9px 16px; font-size:13px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
     .cvc-sum-confirm:hover { background:#0d52cc; }
+    .cvc-sum-confirm:disabled { background:#E5E7EB; color:#9CA3AF; cursor:not-allowed; }
     .cvc-sum-keep { background:transparent; border:none; color:#6B7280; font-size:12.5px; font-weight:600; cursor:pointer; }
     .cvc-sum-keep:hover { color:#111827; text-decoration:underline; }
+    /* Change 6 — rich summary items (checkbox + expandable occurrences) */
+    .cvc-sum-item { display:flex; align-items:flex-start; gap:8px; }
+    .cvc-sum-item.dropped .cvc-sum-label { text-decoration:line-through; color:#9CA3AF; }
+    .cvc-sum-chk { margin-top:3px; accent-color:#0F5EE8; flex-shrink:0; }
+    .cvc-sum-body { flex:1; min-width:0; }
+    .cvc-sum-line { font-size:12.5px; color:#111827; line-height:1.5; }
+    .cvc-sum-num { font-weight:700; color:#6B7280; }
+    .cvc-sum-label { font-weight:600; }
+    .cvc-sum-count { color:#6B7280; }
+    .cvc-sum-expand { background:transparent; border:none; color:#0F5EE8; font-size:11.5px; font-weight:600; cursor:pointer; padding:0 2px; }
+    .cvc-sum-expand:hover { text-decoration:underline; }
+    .cvc-occ { margin:5px 0 2px; padding:6px 8px; background:#fff; border:1px solid #E5E7EB; border-radius:8px; display:flex; flex-direction:column; gap:4px; }
+    .cvc-occ-row { display:flex; align-items:center; gap:8px; font-size:11.5px; }
+    .cvc-occ-sec { font-weight:700; color:#111827; flex-shrink:0; }
+    .cvc-occ-snip { color:#6B7280; min-width:0; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .cvc-occ-snip mark { background:#FEF3C7; color:#92400E; border-radius:3px; padding:0 3px; font-weight:600; }
+    .cvc-occ-view { margin-left:auto; background:transparent; border:1px solid #BFDBFE; color:#0F5EE8; border-radius:6px; padding:2px 8px; font-size:11px; font-weight:600; cursor:pointer; flex-shrink:0; }
+    .cvc-occ-view:hover { background:#EFF6FF; }
+    .cvc-sum-total { margin-top:10px; font-size:12px; color:#374151; }
+    .cvc-applied { display:flex; align-items:center; gap:7px; font-size:12px; font-weight:600; color:#065F46; background:#F0FDF4; border:1px solid #BBF7D0; border-radius:9px; padding:8px 12px; margin:4px 0; }
+    .cvc-applied i { color:#10B981; }
 
     /* regenerate CTA + inline confirm (non-blocking) */
     .cvc-regen-wrap { margin-top:8px; padding-top:14px; border-top:1px solid #F3F4F6; }
@@ -9259,6 +9281,24 @@
   }
   // Flash a section green by key (used when a non-value change is applied).
   function flashByKey(key, kind){ const sec = sectionByKey(key); if (sec){ try { sec.scrollIntoView({behavior:'smooth',block:'center'}); } catch(e){} flashSection(sec, kind || 'saved'); syncCheckDraft(); refreshPreCheck(); } return !!sec; }
+  // Change 6 — fix-all helpers: silent replace + lightweight staggered flash (no scroll/badge),
+  // and a scroll+highlight used by the summary card's "View" links.
+  function replaceTokenSilent(oldTok, newTok, secKeys){
+    const doc = docEl(); if (!doc || !oldTok || !newTok) return 0;
+    let count = 0;
+    doc.querySelectorAll('.nit-section').forEach(sec => {
+      const key = sec.getAttribute('data-sec-key');
+      if (Array.isArray(secKeys) && secKeys.length && secKeys.indexOf(key) < 0) return;
+      const body = sec.querySelector('.ta-doc-body') || sec;
+      const before = body.innerHTML;
+      replaceTokenInElement(body, oldTok, newTok);
+      if (body.innerHTML !== before){ if (key) pushHistory(key, before); count++; }
+    });
+    if (count){ syncCheckDraft(); }
+    return count;
+  }
+  function flashByKeySimple(key){ const sec = sectionByKey(key); if (sec){ sec.classList.remove('ta-doc-success'); void sec.offsetWidth; sec.classList.add('ta-doc-success'); setTimeout(() => sec.classList.remove('ta-doc-success'), 320); } return !!sec; }
+  function highlightByKey(key){ const sec = sectionByKey(key); if (!sec) return false; try { sec.scrollIntoView({ behavior:'smooth', block:'center' }); } catch(e){} sec.classList.remove('ta-doc-hl'); void sec.offsetWidth; sec.classList.add('ta-doc-hl'); setTimeout(() => sec.classList.remove('ta-doc-hl'), 620); return true; }
 
   // ===================================================================
   // PUBLIC API
@@ -9271,6 +9311,7 @@
     exitEdit,
     toggleEdit, setEditMode,
     findOccurrences, applyTokenChange, flashByKey,
+    replaceTokenSilent, flashByKeySimple, highlightByKey,
     refreshPreCheck,
     preCheckFix, togglePreCheckOk,
     // add-section editor (taCs reuse) callbacks
@@ -9403,12 +9444,19 @@
       if (m.role === 'analysing'){
         return '<div class="cvc-msg assistant" data-analysing="1"><div class="av"><i data-lucide="bot" class="w-3.5 h-3.5"></i></div><div class="cvc-bubble"><span class="cvc-analysing">Thinking<span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div></div>';
       }
+      if (m.role === 'applied'){
+        return '<div class="cvc-applied" role="status"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> '+esc(m.text)+'</div>';
+      }
       return '<div class="cvc-msg assistant"><div class="av"><i data-lucide="bot" class="w-3.5 h-3.5"></i></div><div class="cvc-bubble">'+esc(m.text)+'</div></div>';
     }).join('');
     // Trailing LIVE interaction (always reflects current conversation state).
     const c = convo();
-    if (c.phase === 'scope' && c.current) html += scopeChipsHTML(c.current);
+    if (c.phase === 'demo-q1') html += demoQ1HTML();
+    else if (c.phase === 'demo-list' && c.demoOp) html += demoListHTML(c.demoOp);
+    else if (c.phase === 'demo-offer') html += demoOfferHTML();
+    else if (c.phase === 'scope' && c.current) html += scopeChipsHTML(c.current);
     else if (c.phase === 'pick' && c.current) html += pickerHTML(c.current);
+    else if (c.phase === 'offer-summary' && c.pending.length) html += offerSummaryHTML(c.pending);
     else if (c.phase === 'summary' && c.pending.length) html += summaryHTML(c.pending);
     host.innerHTML = html;
     host.scrollTop = host.scrollHeight;
@@ -9499,6 +9547,130 @@
     draft().refineThread = r.thread;   // expose the conversation per the spec
     return r.convo;
   }
+
+  // ===================================================================
+  // CHANGE 6 — seed a realistic mock conversation for demo realism.
+  // The exchange is scripted, but the change ops carry REAL section keys +
+  // (where present) real occurrences from cross-ref detection, so the summary
+  // and the single fix-all apply work for genuine input too.
+  // ===================================================================
+  // The single change driving the demo — bitumen VG-10 → VG-30 across 7 real
+  // section keys (Scope + 6 others). occ[0] is the Scope occurrence the officer
+  // named first; occ[1..6] are the "6 other places". Snippets show VG-10 in context.
+  function buildBitumenOp(){
+    const occDefs = [
+      { secKey:'scope',       secTitle:'Scope of Work',                  snippet:'…hot-mix surfacing using <mark>VG-10</mark> grade bitumen…' },
+      { secKey:'boq',         secTitle:'BOQ — Item 2',                   snippet:'Bitumen <mark>VG-10</mark> laying … 45 MT' },
+      { secKey:'conditions',  secTitle:'Technical Specifications',       snippet:'…bituminous macadam using <mark>VG-10</mark> grade…' },
+      { secKey:'eligibility', secTitle:'Eligibility / experience note',  snippet:'…supply of <mark>VG-10</mark> bitumen…' },
+      { secKey:'conditions',  secTitle:'Special Conditions',             snippet:'…<mark>VG-10</mark> as per IS 73…' },
+      { secKey:'forms',       secTitle:'Quality assurance clause',       snippet:'…<mark>VG-10</mark> sampling and testing…' },
+      { secKey:'forms',       secTitle:'Annexure B — material schedule', snippet:'<mark>VG-10</mark>' }
+    ];
+    return { id:uid('op'), type:'term', label:'Bitumen grade VG-10 → VG-30',
+             oldTok:'VG-10', newTok:'VG-30',
+             secKeys: occDefs.map(o => o.secKey),
+             occ: occDefs.map(o => ({ secKey:o.secKey, secTitle:o.secTitle, snippet:o.snippet })),
+             _checked:true, scope:'all' };
+  }
+  // Seed the scripted demo opening (turns 1–4). The officer then STEPS THROUGH
+  // via the quick-reply chips (turns 5–10), ending at the live summary card.
+  function seedDemoConversation(){
+    const r = review();
+    if (r.thread.length) return;          // never overwrite a real / in-progress conversation
+    const push = (role, text) => r.thread.push({ role:role, text:text });
+    push('officer',  'I want to make some changes to the tender.');
+    push('assistant',"Sure — tell me what you'd like to change. You can mention a value, a clause, a date, or a whole section, and I'll find it in the document.");
+    push('officer',  'The bitumen grade should be VG-30, not VG-10.');
+    push('assistant',"Found it. “VG-10” currently appears in the Scope of Work. But this change also affects 6 other places in the document where the bitumen grade is referenced. Do you want to change it in those 6 places too?");
+    const c = convo();
+    c.demoOp = buildBitumenOp(); c.pending = []; c.queue = []; c.current = null; c.phase = 'demo-q1';
+    persist();
+  }
+  // backward-compatible alias (mount calls this name)
+  function seedMockConversation(){ seedDemoConversation(); }
+
+  // ----- demo step handlers (each posts the chip text + advances to the next turn) -----
+  function demoOp(){ return convo().demoOp; }
+  function demoShow6(){
+    const r = review();
+    r.thread.push({ role:'officer', text:'Show me the 6 places' });
+    r.thread.push({ role:'assistant', text:'Here are the 6 other places “VG-10” is referenced. Untick any you want to leave unchanged.' });
+    convo().phase = 'demo-list'; persist(); renderThread(); scrollThread();
+  }
+  function demoChangeAll(){
+    const r = review(); const c = convo();
+    r.thread.push({ role:'officer', text:'Yes, change all' });
+    c.demoOp.secKeys = c.demoOp.occ.map(o => o.secKey);
+    r.thread.push({ role:'assistant', text:'Done — I’ll update VG-10 → VG-30 across all 7 locations (Scope + 6 others). Anything else, or shall I summarise the changes?' });
+    c.phase = 'demo-offer'; persist(); renderThread(); scrollThread();
+  }
+  function demoJustOne(){
+    const r = review(); const c = convo();
+    r.thread.push({ role:'officer', text:'No, just this one' });
+    c.demoOp.occ = [c.demoOp.occ[0]]; c.demoOp.secKeys = ['scope'];
+    r.thread.push({ role:'assistant', text:'Understood — I’ll change it only in the Scope of Work. Anything else, or shall I summarise the changes?' });
+    c.phase = 'demo-offer'; persist(); renderThread(); scrollThread();
+  }
+  function demoFixAll(){
+    const r = review(); const c = convo();
+    r.thread.push({ role:'officer', text:'Yes, fix all' });
+    c.demoOp.secKeys = c.demoOp.occ.map(o => o.secKey);   // all 7
+    r.thread.push({ role:'assistant', text:'Done — I’ll update VG-10 → VG-30 across all 7 locations (Scope + 6 others). Anything else, or shall I summarise the changes?' });
+    c.phase = 'demo-offer'; persist(); renderThread(); scrollThread();
+  }
+  function demoFixSelected(){
+    const host = el('cvcThread'); if (!host) return;
+    const checkedIdx = Array.from(host.querySelectorAll('.cvc-demo-chk:checked')).map(x => parseInt(x.value, 10));
+    const c = convo();
+    const keep = [0].concat(checkedIdx).sort((a,b)=>a-b);   // always include Scope (occ[0])
+    c.demoOp.occ = c.demoOp.occ.filter((o, i) => keep.indexOf(i) >= 0);
+    c.demoOp.secKeys = c.demoOp.occ.map(o => o.secKey);
+    const n = c.demoOp.occ.length;
+    const r = review();
+    r.thread.push({ role:'officer', text:'Fix only selected (' + checkedIdx.length + ' of 6)' });
+    r.thread.push({ role:'assistant', text:'Done — I’ll update VG-10 → VG-30 across ' + n + ' location' + (n===1?'':'s') + '. Anything else, or shall I summarise the changes?' });
+    c.phase = 'demo-offer'; persist(); renderThread(); scrollThread();
+  }
+  function demoSummarise(){
+    const c = convo();
+    review().thread.push({ role:'officer', text:'Summarise the changes' });
+    if (c.demoOp && c.pending.indexOf(c.demoOp) < 0) c.pending.push(c.demoOp);
+    c.phase = 'summary'; persist(); renderThread(); scrollThread();
+  }
+  // ----- demo live-interaction renderers -----
+  function demoQ1HTML(){
+    return '<div class="cvc-msg assistant"><div class="av"><i data-lucide="bot" class="w-3.5 h-3.5"></i></div><div class="cvc-bubble">'
+      + '<div class="cvc-quick" role="group" aria-label="Change in the other places too?">'
+      + '<button type="button" class="cvc-chip primary" onclick="cvc.demoShow6()">Show me the 6 places</button>'
+      + '<button type="button" class="cvc-chip" onclick="cvc.demoChangeAll()">Yes, change all</button>'
+      + '<button type="button" class="cvc-chip" onclick="cvc.demoJustOne()">No, just this one</button>'
+      + '</div></div></div>';
+  }
+  function demoListHTML(op){
+    const others = op.occ.slice(1);   // occ[0] is Scope (already named); show the 6 others
+    const rows = others.map((o, i) => {
+      const idx = i + 1;              // index into op.occ
+      return '<label class="cvc-pick-row"><input type="checkbox" class="cvc-demo-chk" value="' + idx + '" checked aria-label="Change in ' + esc(o.secTitle) + '" /> '
+        + '<span class="cvc-pick-sec">' + esc(o.secTitle) + '</span> <span class="cvc-pick-snip">' + o.snippet + '</span>'
+        + '<button type="button" class="cvc-occ-view" onclick="cvc.viewOcc(\'' + op.id + '\',' + idx + ')">View</button></label>';
+    }).join('');
+    return '<div class="cvc-msg assistant"><div class="av"><i data-lucide="bot" class="w-3.5 h-3.5"></i></div><div class="cvc-bubble" style="max-width:100%;">'
+      + '<div style="font-size:12.5px; font-weight:600; margin-bottom:8px;">“VG-10” — 6 other places:</div>'
+      + '<div class="cvc-pick">' + rows + '</div>'
+      + '<div class="cvc-quick" style="margin-top:10px;">'
+      + '<button type="button" class="cvc-chip primary" onclick="cvc.demoFixAll()">Yes, fix all</button>'
+      + '<button type="button" class="cvc-chip" onclick="cvc.demoFixSelected()">Fix only selected</button>'
+      + '</div></div></div>';
+  }
+  function demoOfferHTML(){
+    return '<div class="cvc-msg assistant"><div class="av"><i data-lucide="bot" class="w-3.5 h-3.5"></i></div><div class="cvc-bubble">'
+      + '<div class="cvc-quick" role="group" aria-label="Continue or summarise">'
+      + '<button type="button" class="cvc-chip primary" onclick="cvc.demoSummarise()">Summarise the changes</button>'
+      + '<button type="button" class="cvc-chip" onclick="cvc.oneMore()">One more change</button>'
+      + '</div></div></div>';
+  }
+
   function send(){
     const ta = el('cvcInput');
     const text = ta ? ta.value.trim() : '';
@@ -9646,14 +9818,17 @@
         return;
       }
       if (op.type==='value'||op.type==='term'){ op.scope='all'; op.secKeys=(op.occ||[]).map(o=>o.secKey); }
+      else if (op.type==='concern' && !op.secKeys){ op.secKeys=[op.secKey]; op.occ = op.occ || [{ secKey:op.secKey, secTitle:sectionTitleByKey(op.secKey), snippet:'' }]; }
+      if (op._checked === undefined) op._checked = true;
       c.pending.push(op);
     }
-    c.current=null; c.phase='summary';
+    c.current=null; c.phase='offer-summary';
     persist(); renderThread(); scrollThread();
   }
   function reply(action){
     const c = convo(); const op = c.current; if (!op) return;
     const r = review();
+    op._checked = true;
     if (action==='all'){
       r.thread.push({ role:'officer', text:'Change all '+op.occ.length });
       op.scope='all'; op.secKeys=op.occ.map(o=>o.secKey);
@@ -9661,7 +9836,7 @@
       persist(); renderThread(); processQueue();
     } else if (action==='one'){
       r.thread.push({ role:'officer', text:'Just this one' });
-      op.scope='one'; op.secKeys=[op.occ[0].secKey];
+      op.scope='one'; op.secKeys=[op.occ[0].secKey]; op.occ=[op.occ[0]];
       c.pending.push(op); c.current=null; c.phase='idle';
       persist(); renderThread(); processQueue();
     } else if (action==='pick'){
@@ -9675,26 +9850,74 @@
     const checked = Array.from(host.querySelectorAll('.cvc-pick-chk:checked')).map(x=>x.value);
     if (!checked.length){ toast('Select at least one place, or choose “Just this one”.'); return; }
     review().thread.push({ role:'officer', text:'Selected '+checked.length+' place'+(checked.length===1?'':'s') });
-    op.scope='pick'; op.secKeys=checked;
+    op.scope='pick'; op.secKeys=checked; op.occ=(op.occ||[]).filter(o=>checked.indexOf(o.secKey)>=0); op._checked=true;
     c.pending.push(op); c.current=null; c.phase='idle';
     persist(); renderThread(); processQueue();
   }
+  // Summary-card interactions (Change 6).
+  function opById(id){ const c = convo(); if (c.demoOp && c.demoOp.id === id) return c.demoOp; return c.pending.find(o => o.id === id); }
+  function toggleSummaryItem(id, checked){ const op = opById(id); if (op){ op._checked = !!checked; persist(); renderThread(); } }
+  function toggleOcc(btn){ const wrap = btn.closest('.cvc-sum-item'); if (!wrap) return; const occ = wrap.querySelector('.cvc-occ'); if (!occ) return; const open = occ.style.display === 'none'; occ.style.display = open ? 'block' : 'none'; btn.setAttribute('aria-expanded', open ? 'true' : 'false'); btn.textContent = open ? 'Hide' : 'View'; }
+  function viewOcc(id, j){ const op = opById(id); if (!op || !op.occ || !op.occ[j]) return; const key = op.occ[j].secKey; if (window.taDoc && window.taDoc.highlightByKey) window.taDoc.highlightByKey(key); }
+  function summarise(){ const c = convo(); if (!c.pending.length) return; review().thread.push({ role:'officer', text:'Summarise the changes' }); c.phase='summary'; persist(); renderThread(); scrollThread(); }
+  function oneMore(){ const c = convo(); if (c.demoOp && c.pending.indexOf(c.demoOp) < 0){ c.pending.push(c.demoOp); c.demoOp = null; } review().thread.push({ role:'officer', text:'One more change' }); review().thread.push({ role:'assistant', text:'Sure — what else would you like to change?' }); c.phase='idle'; persist(); renderThread(); const ta=el('cvcInput'); if(ta) ta.focus(); }
+
+  // Format as DD MMM YYYY · HH:MM (24-hour), per the product's date convention.
+  function nowStamp(){
+    try {
+      const d = (window.NOW_OVERRIDE ? new Date(window.NOW_OVERRIDE) : new Date());
+      const mon = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];
+      const p2 = n => (n<10?'0':'') + n;
+      return p2(d.getDate()) + ' ' + mon + ' ' + d.getFullYear() + ' · ' + p2(d.getHours()) + ':' + p2(d.getMinutes());
+    } catch(e){ return '08 May 2026 · 14:32'; }
+  }
+  // Single fix-all: apply every CHECKED change across all its locations at once,
+  // with staggered green flashes + progress toasts, then auto-resolve + collapse to a record.
   function confirmApply(){
     const c = convo();
-    if (!c.pending.length) return;
-    let count = 0;
-    c.pending.forEach(op => {
-      if (op.type==='value'||op.type==='term'){ count += (window.taDoc && window.taDoc.applyTokenChange) ? (window.taDoc.applyTokenChange(op.oldTok, op.newTok, op.secKeys)||0) : 0; }
-      else if (op.type==='concern'){ if (window.taDoc && window.taDoc.flashByKey && window.taDoc.flashByKey(op.secKey,'saved')) count++; }
+    const checked = c.pending.filter(op => op._checked !== false);
+    if (!checked.length){ toast('Select at least one change to apply.'); return; }
+    // collect every (op, secKey) location
+    const locs = [];
+    checked.forEach(op => (op.secKeys && op.secKeys.length ? op.secKeys : [op.secKey]).forEach(k => { if (k) locs.push({ op, key:k }); }));
+    const total = locs.length, nChanges = checked.length;
+
+    toast('Applying ' + nChanges + ' change' + (nChanges===1?'':'s') + ' across ' + total + ' location' + (total===1?'':'s') + '…');
+
+    // perform the real mutations silently (form fields + whole-token replacements)
+    checked.forEach(op => {
+      try {
+        if (op.formField && isFinite(op.formAbs) && typeof window.setCostFieldAbsolute === 'function'){
+          window.setCostFieldAbsolute(op.formField, op.formAbs);
+          if (op.formField === 'fEMD' && typeof window.onEmdChange === 'function') window.onEmdChange();
+        }
+        if ((op.type==='value'||op.type==='term') && op.oldTok && op.newTok && window.taDoc && window.taDoc.replaceTokenSilent){
+          window.taDoc.replaceTokenSilent(op.oldTok, op.newTok, op.secKeys);
+        }
+      } catch(e){}
     });
-    const r = review();
-    r.thread.push({ role:'assistant', text:'Applied '+count+' change'+(count===1?'':'s')+' to the document. Anything else to refine?' });
-    c.pending=[]; c.queue=[]; c.current=null; c.phase='idle';
+    // re-render the document so form-driven sections reflect the new values, then stagger the flashes
+    try { if (window.taDoc && window.taDoc.render) window.taDoc.render(); } catch(e){}
+    // flash each TOUCHED section once, in sequence (a value can sit in 1 section in >1 location)
+    const flashKeys = []; locs.forEach(l => { if (flashKeys.indexOf(l.key) < 0) flashKeys.push(l.key); });
+    flashKeys.forEach((k, i) => setTimeout(() => { if (window.taDoc && window.taDoc.flashByKeySimple) window.taDoc.flashByKeySimple(k); }, i * 300));
+
+    const live = el('cvcAssistantLive');
+    setTimeout(() => {
+      toast('✓ ' + total + ' location' + (total===1?'':'s') + ' updated');
+      if (live) live.textContent = total + ' locations updated across ' + nChanges + ' change' + (nChanges===1?'':'s') + '.';
+      // auto-resolve risk / pre-check items whose checks now pass
+      try { if (typeof window.renderAllRiskPanels === 'function') window.renderAllRiskPanels(); } catch(e){}
+      try { if (window.taDoc && window.taDoc.refreshPreCheck) window.taDoc.refreshPreCheck(); } catch(e){}
+    }, flashKeys.length * 300 + 220);
+
+    // collapse the summary into a compact applied record; reset for the next request
+    const stamp = nowStamp();
+    review().thread.push({ role:'applied', text:'Applied — ' + stamp + ' · ' + total + ' location' + (total===1?'':'s') + ' updated' });
+    c.pending = []; c.queue = []; c.current = null; c.demoOp = null; c.phase = 'idle';
     persist(); renderThread(); scrollThread();
-    toast(count+' change'+(count===1?'':'s')+' applied');
-    const live = el('cvcAssistantLive'); if (live) live.textContent = count+' change'+(count===1?'':'s')+' applied to the document.';
   }
-  function keepEditing(){ const c=convo(); c.phase='idle'; persist(); renderThread(); const ta=el('cvcInput'); if(ta) ta.focus(); }
+  function keepEditing(){ const c=convo(); c.phase = c.pending.length ? 'offer-summary' : 'idle'; persist(); renderThread(); const ta=el('cvcInput'); if(ta) ta.focus(); }
 
   // ----- live interaction renderers (chips / picker / summary) -----
   function scopeChipsHTML(op){
@@ -9714,20 +9937,48 @@
       + '<div class="cvc-quick" style="margin-top:10px;"><button type="button" class="cvc-chip primary" onclick="cvc.usePicked()">Use selected</button></div>'
       + '</div></div>';
   }
+  // "Anything else, or shall I summarise?" step — collects more changes before the summary.
+  function offerSummaryHTML(pending){
+    const n = pending.length;
+    return '<div class="cvc-msg assistant"><div class="av"><i data-lucide="bot" class="w-3.5 h-3.5"></i></div><div class="cvc-bubble">'
+      + '<div style="font-size:12.5px; margin-bottom:8px;">That’s ' + n + ' change' + (n===1?'':'s') + ' captured. Anything else, or shall I summarise?</div>'
+      + '<div class="cvc-quick" role="group" aria-label="Continue or summarise">'
+      + '<button type="button" class="cvc-chip primary" onclick="cvc.summarise()">Summarise the changes</button>'
+      + '<button type="button" class="cvc-chip" onclick="cvc.oneMore()">One more change</button>'
+      + '</div></div></div>';
+  }
+  // The AI summary card — every agreed change with its scope, expandable occurrences,
+  // a per-change checkbox, and ONE "Confirm & fix all (N locations)" gate (Change 6).
+  function opLocationCount(op){ return (op.secKeys && op.secKeys.length) ? op.secKeys.length : 1; }
   function summaryHTML(pending){
-    const items = pending.map(op => {
-      let where;
-      if (op.type==='concern') where = sectionTitleByKey(op.secKey);
-      else if (op.scope==='all') where = 'all '+(op.occ?op.occ.length:op.secKeys.length)+' places';
-      else if (op.scope==='one') where = '1 place';
-      else where = op.secKeys.length+' selected place'+(op.secKeys.length===1?'':'s');
-      return '<li><i data-lucide="check" class="w-3.5 h-3.5"></i> <span>'+esc(op.label)+' <span class="cvc-sum-where">— '+esc(where)+'</span></span></li>';
+    let totalLoc = 0, totalChanges = 0;
+    const items = pending.map((op, idx) => {
+      const checked = op._checked !== false;
+      const n = opLocationCount(op);
+      if (checked){ totalLoc += n; totalChanges += 1; }
+      const occ = (op.occ && op.occ.length) ? op.occ : (op.secKeys||[]).map(k => ({ secKey:k, secTitle:sectionTitleByKey(k), snippet:'' }));
+      const secNames = occ.map(o => o.secTitle);
+      const occRows = occ.map((o, j) =>
+        '<div class="cvc-occ-row"><span class="cvc-occ-sec">' + esc(o.secTitle) + '</span>'
+        + (o.snippet ? '<span class="cvc-occ-snip">' + o.snippet + '</span>' : '')
+        + '<button type="button" class="cvc-occ-view" onclick="cvc.viewOcc(\'' + op.id + '\',' + j + ')">View</button></div>'
+      ).join('');
+      return '<li class="cvc-sum-item' + (checked?'':' dropped') + '">'
+        + '<input type="checkbox" class="cvc-sum-chk" ' + (checked?'checked':'') + ' aria-label="Include change: ' + esc(op.label) + '" onchange="cvc.toggleSummaryItem(\'' + op.id + '\', this.checked)" />'
+        + '<div class="cvc-sum-body">'
+        +   '<div class="cvc-sum-line"><span class="cvc-sum-num">' + (idx+1) + '.</span> <span class="cvc-sum-label">' + esc(op.label) + '</span>'
+        +     ' <span class="cvc-sum-count">· ' + n + ' place' + (n===1?'':'s') + (secNames.length ? ' (' + esc(secNames.join(', ')) + ')' : '') + '</span>'
+        +     ' <button type="button" class="cvc-sum-expand" aria-expanded="false" onclick="cvc.toggleOcc(this)">View</button></div>'
+        +   '<div class="cvc-occ" style="display:none;">' + occRows + '</div>'
+        + '</div></li>';
     }).join('');
+    const totalLine = '<div class="cvc-sum-total">Total: <b>' + totalChanges + '</b> change' + (totalChanges===1?'':'s') + ' across <b>' + totalLoc + '</b> location' + (totalLoc===1?'':'s') + '</div>';
     return '<div class="cvc-msg assistant"><div class="av"><i data-lucide="bot" class="w-3.5 h-3.5"></i></div><div class="cvc-bubble" style="max-width:100%;">'
-      + '<div class="cvc-summary" role="group" aria-label="Changes to apply">'
-      + '<div class="cvc-sum-hd"><i data-lucide="list-checks" class="w-4 h-4 text-primary"></i> Ready to apply '+pending.length+' change'+(pending.length===1?'':'s')+'</div>'
-      + '<ul class="cvc-sum-list">'+items+'</ul>'
-      + '<div class="cvc-sum-acts"><button type="button" class="cvc-sum-confirm" onclick="cvc.confirmApply()">Confirm &amp; apply to document <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>'
+      + '<div class="cvc-summary" role="group" aria-label="Summary of changes to apply">'
+      + '<div class="cvc-sum-hd"><i data-lucide="list-checks" class="w-4 h-4 text-primary"></i> Summary of changes — review before applying</div>'
+      + '<ul class="cvc-sum-list">' + items + '</ul>'
+      + totalLine
+      + '<div class="cvc-sum-acts"><button type="button" class="cvc-sum-confirm" ' + (totalChanges?'':'disabled') + ' onclick="cvc.confirmApply()">Confirm all fixes (' + totalLoc + ' location' + (totalLoc===1?'':'s') + ') <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>'
       + '<button type="button" class="cvc-sum-keep" onclick="cvc.keepEditing()">Keep editing</button></div>'
       + '</div></div></div>';
   }
@@ -9858,8 +10109,9 @@
   function mount(){
     if (!el('cvcWrap')) return;
     convo();                 // ensure conversation state + refineThread alias exist
+    try { renderDoc(); } catch(e){}      // render the doc first so seeded cross-ref detection has content
+    try { seedMockConversation(); } catch(e){}   // Change 6 — seed the demo conversation on an empty thread
     renderThread();
-    renderDoc();             // ensure the single document is rendered (delegates to taDoc)
     const pe = el('cvcPointers'); if (pe) pe.style.display = 'none';   // legacy pointer panel removed on this screen
     syncSendEnabled();
     icons();
@@ -9891,6 +10143,8 @@
   window.cvc = {
     send, onInput, onKey, attachClick, onFilePick, clearFile, toggleMic, example,
     reply, usePicked, confirmApply, keepEditing,
+    toggleSummaryItem, toggleOcc, viewOcc, summarise, oneMore,
+    demoShow6, demoChangeAll, demoJustOne, demoFixAll, demoFixSelected, demoSummarise,
     fix, toggleOk, resolveBySource,
     regenStart, regenCancel, regenConfirm, restartFlow,
     _mount: mount, _seedV1: seedV1IfNeeded, _renderDoc: renderDoc
