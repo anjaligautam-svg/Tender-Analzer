@@ -2724,7 +2724,9 @@
 
                 <div class="cvc-card">
                   <div class="cvc-card-hd">
-                    <div class="t1"><i data-lucide="bot" class="w-[18px] h-[18px] text-primary"></i> Refine assistant</div>
+                    <div class="t1" style="justify-content:space-between;"><span style="display:inline-flex; align-items:center; gap:8px;"><i data-lucide="bot" class="w-[18px] h-[18px] text-primary"></i> Refine assistant</span>
+                      <button type="button" id="cvcResetDemo" onclick="cvc.resetDemo()" title="Reset the conversation and replay the seeded demo" style="display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:600; color:#6B7280; background:#fff; border:1px solid #E5E7EB; border-radius:7px; padding:5px 10px; cursor:pointer;"><i data-lucide="rotate-ccw" style="width:13px;height:13px;"></i> Reset demo</button>
+                    </div>
                     <div class="cvc-note">Describe a change, or paste/dictate notes. Nothing is applied until you review the summary and confirm.</div>
                   </div>
 
@@ -9794,10 +9796,30 @@
     const n = ops.length;
     return 'Understood. I found ' + n + ' change' + (n===1?'':'s') + ' to make. Let me confirm the details.';
   }
+  // When the officer names a section/clause without a concrete new value, reply
+  // conversationally and ask for specifics (instead of a dead-end).
+  const SECTION_HINTS = [
+    { re:/\b(boq|bill of quantit|line item|items?|rate|quantit)\b/i, ask:'The BOQ lists the priced line items (descriptions, quantities and rates). What would you like to change — an item’s rate, its quantity, or the description? For example: “change the bitumen rate to ₹52,000” or “the bitumen grade should be VG-30”.' },
+    { re:/\b(scope|deliverable)\b/i,                                  ask:'The Scope of Work describes the work and quantities. What should change — the extent, a specification (e.g. a material grade), or a quantity?' },
+    { re:/\b(timeline|deadline|completion|period|duration|schedule|milestone)\b/i, ask:'The timeline covers the key dates and the completion period. Which date or duration should change, and to what? For example: “make the completion period 8 months”.' },
+    { re:/\b(eligib|turnover|experience|similar work|pq|tq|qualif|registration)\b/i, ask:'Eligibility covers turnover, similar-work experience and registrations. Which threshold or requirement should change?' },
+    { re:/\b(emd|earnest|estimat|cost|fee|financial|budget|value)\b/i, ask:'The financial section covers the estimated cost, fees and EMD. Which value should change, and to what? For example: “set the EMD to 2%” or “change the estimated cost to ₹50,00,000”.' },
+    { re:/\b(condition|gcc|scc|penalt|liquidated|\bld\b|warrant|security|integrity)\b/i, ask:'The Conditions of Contract cover the GCC/SCC clauses (LD, performance security, warranty, integrity pact…). Which clause should change?' }
+  ];
   function handleRequest(text){
     const r = review();
     const ops = parseRequest(text);
     if (!ops.length){
+      const t = text || '';
+      // 1) a recognised section/clause mentioned but no concrete value → ask for the specific change
+      const hint = SECTION_HINTS.find(h => h.re.test(t));
+      if (hint){ r.thread.push({ role:'assistant', text: hint.ask }); persist(); renderThread(); scrollThread(); return; }
+      // 2) a general intent to change something → ask what
+      if (/\b(change|changes|edit|modify|update|amend|revise|adjust|fix|tweak|correct)\b/i.test(t)){
+        r.thread.push({ role:'assistant', text:"Sure — tell me what you'd like to change. You can mention a value (e.g. “EMD to ₹90,000”), a clause, a date, or a whole section, and I'll find it in the document." });
+        persist(); renderThread(); scrollThread(); return;
+      }
+      // 3) genuinely unrecognised
       r.thread.push({ role:'assistant', text:"I couldn’t pin that to a specific change yet. Try naming a value (e.g. “change the estimated cost to ₹50,00,000”), a date, the completion period, or a clause like EMD, EPF/ESIC, scope or timeline." });
       persist(); renderThread(); scrollThread(); return;
     }
@@ -9806,6 +9828,16 @@
     c.queue = (c.queue||[]).concat(ops);
     persist(); renderThread();
     processQueue();
+  }
+  // Clear the conversation and replay the seeded demo (handy after testing / stale state).
+  function resetDemo(){
+    const d = draft();
+    d.cvcReview = { thread:[], pointers:[], okCollapsed:true };
+    try { localStorage.removeItem(LS_CVC); } catch(e){}
+    _pendingFile = null; renderFileChip();
+    try { seedDemoConversation(); } catch(e){}
+    renderThread(); syncSendEnabled();
+    toast('Demo conversation reset');
   }
   function processQueue(){
     const c = convo();
@@ -10144,7 +10176,7 @@
     send, onInput, onKey, attachClick, onFilePick, clearFile, toggleMic, example,
     reply, usePicked, confirmApply, keepEditing,
     toggleSummaryItem, toggleOcc, viewOcc, summarise, oneMore,
-    demoShow6, demoChangeAll, demoJustOne, demoFixAll, demoFixSelected, demoSummarise,
+    demoShow6, demoChangeAll, demoJustOne, demoFixAll, demoFixSelected, demoSummarise, resetDemo,
     fix, toggleOk, resolveBySource,
     regenStart, regenCancel, regenConfirm, restartFlow,
     _mount: mount, _seedV1: seedV1IfNeeded, _renderDoc: renderDoc
