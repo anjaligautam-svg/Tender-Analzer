@@ -516,8 +516,8 @@
     .ta-upload-text-sub  { font-size:11px; color:#9CA3AF; margin-top:2px; }
     .ta-browse-btn { background:#0F5EE8; color:white; border:none; border-radius:6px; padding:6px 14px; font-size:12px; font-weight:600; cursor:pointer; flex-shrink:0; }
     .ta-browse-btn:hover { background:#0B4FCA; }
-    .ta-selected-wrap { max-height:0; overflow:hidden; transition:max-height 200ms ease; }
-    .ta-selected-wrap.open { max-height:280px; }
+    .ta-selected-wrap { max-height:0; overflow:hidden; transition:max-height 280ms ease; }
+    .ta-selected-wrap.open { max-height:1600px; }
     .ta-chips-row { display:flex; flex-wrap:wrap; gap:8px; }
     .ta-chip { background:white; border:1px solid #E5E7EB; border-radius:6px; padding:5px 10px; display:flex; align-items:center; gap:8px; font-size:12px; color:#374151; cursor:grab; transition:transform 200ms ease, border-color 150ms ease, background 150ms ease; }
     .ta-chip:active { cursor:grabbing; }
@@ -540,6 +540,39 @@
     .ta-ai-strip .ta-ai-dismiss:hover { color:#374151; }
     .ta-ai-sparkle { border:1px solid #BFDBFE; border-radius:6px; padding:3px 10px; font-size:11px; color:#0F5EE8; background:white; cursor:pointer; display:inline-flex; align-items:center; gap:4px; font-weight:600; }
     .ta-ai-sparkle:hover { background:#EFF6FF; }
+
+    /* ----- Configured-logos panel (per-logo position / page-occurrence / hierarchy) — Change A ----- */
+    .ta-logocfg { display:flex; flex-direction:column; gap:14px; }
+    .ta-logocfg-empty { font-size:12px; color:#9CA3AF; font-style:italic; padding:8px 2px; }
+    .ta-logocfg-group { border:1px solid #E5E7EB; border-radius:10px; overflow:hidden; background:#fff; }
+    .ta-logocfg-grouphd { display:flex; align-items:center; gap:6px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#6B7280; background:#F9FAFB; border-bottom:1px solid #E5E7EB; padding:7px 12px; }
+    .ta-logocfg-grouphd i { color:#0F5EE8; }
+    .ta-logocfg-count { margin-left:4px; background:#EFF6FF; color:#0F5EE8; border-radius:20px; padding:0 7px; font-size:10px; line-height:16px; }
+    .ta-logocfg-rows { display:flex; flex-direction:column; }
+    .ta-logocfg-row { display:flex; align-items:center; gap:10px; padding:9px 12px; border-top:1px solid #F3F4F6; transition:background .15s ease, box-shadow .15s ease; }
+    .ta-logocfg-row:first-child { border-top:none; }
+    .ta-logocfg-row.dragging { opacity:.5; }
+    .ta-logocfg-row.drag-over { box-shadow: inset 0 2px 0 0 #0F5EE8; background:#F8FBFF; }
+    .ta-logocfg-handle { color:#C4C9D4; cursor:grab; font-size:13px; user-select:none; flex-shrink:0; }
+    .ta-logocfg-handle:active { cursor:grabbing; }
+    .ta-logocfg-num { width:18px; height:18px; flex-shrink:0; border-radius:50%; background:#EEF1F5; color:#6B7280; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+    .ta-logocfg-thumb { width:24px; height:24px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+    .ta-logocfg-name { font-size:12.5px; font-weight:600; color:#111827; min-width:70px; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; }
+    .ta-logocfg-field { display:inline-flex; flex-direction:column; gap:2px; flex-shrink:0; }
+    .ta-logocfg-field > span { font-size:9.5px; text-transform:uppercase; letter-spacing:.04em; color:#9CA3AF; font-weight:700; }
+    .ta-logocfg-select { border:1px solid #D1D5DB; border-radius:6px; padding:4px 6px; font-size:11.5px; background:#fff; color:#111827; cursor:pointer; }
+    .ta-logocfg-select:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 2px rgba(15,94,232,.12); }
+    .ta-logocfg-rm { margin-left:auto; flex-shrink:0; background:transparent; border:none; color:#C4C9D4; cursor:pointer; font-size:14px; line-height:1; padding:2px 4px; border-radius:4px; }
+    .ta-logocfg-rm:hover { color:#EF4444; background:#FEF2F2; }
+    @media (max-width:640px){ .ta-logocfg-row { flex-wrap:wrap; } .ta-logocfg-name { max-width:none; } }
+
+    /* ----- Logo strip in the DPR document (4 corner positions + page-occurrence) ----- */
+    .dpr-draft-doc-body .doc-logo-cluster { display:flex; align-items:flex-start; gap:14px; }
+    .dpr-draft-doc-body .doc-logo-cluster.cluster-right { justify-content:flex-end; }
+    .dpr-draft-doc-body .doc-logo-row-top { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:14px; }
+    .dpr-draft-doc-body .doc-logo-row-bottom { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-top:18px; padding-top:12px; border-top:1px dashed #E5E7EB; }
+    .dpr-draft-doc-body .doc-logo-unit { display:flex; flex-direction:column; align-items:center; gap:2px; }
+    .dpr-draft-doc-body .doc-logo-occ { font-size:8.5px; color:#9CA3AF; text-transform:uppercase; letter-spacing:.03em; font-family:'DM Sans', system-ui, sans-serif; }
   </style>
 </head>
 <body class="min-h-screen">
@@ -2792,8 +2825,22 @@
     { id:'left-aligned', label:'Left-aligned' },
     { id:'centered',     label:'Centered'     },
   ];
+  // Per-logo placement options (Change A) — mirrors tender-creation.
+  const TA_LOGO_POSITIONS = [
+    { id:'top-left',     label:'Top left'     },
+    { id:'top-right',    label:'Top right'    },
+    { id:'bottom-left',  label:'Bottom left'  },
+    { id:'bottom-right', label:'Bottom right' },
+  ];
+  const TA_LOGO_APPEARS = [
+    { id:'every',      label:'Every page'        },
+    { id:'first',      label:'First page only'   },
+    { id:'last',       label:'Last page only'    },
+    { id:'first-last', label:'First & last page' },
+  ];
 
   // State — loaded from sessionStorage so a draft auto-save tick survives nav
+  // perLogo: { [id]: { position, appearsOn, order } } — per-logo placement config.
   let _taLogoState = (function(){
     try {
       const raw = sessionStorage.getItem('ta_doc_lang_logos');
@@ -2801,13 +2848,14 @@
         const s = JSON.parse(raw);
         if (s && typeof s === 'object') return Object.assign({
           language: 'english', selected:[], custom:[], order:[], placement:'side-by-side',
-          aiStripActive:false, aiStripDismissed:false, aiSuggestedIds:[]
+          perLogo:{}, aiStripActive:false, aiStripDismissed:false, aiSuggestedIds:[]
         }, s);
       }
     } catch(e){}
     return { language:'english', selected:[], custom:[], order:[], placement:'side-by-side',
-             aiStripActive:false, aiStripDismissed:false, aiSuggestedIds:[] };
+             perLogo:{}, aiStripActive:false, aiStripDismissed:false, aiSuggestedIds:[] };
   })();
+  if (!_taLogoState.perLogo || typeof _taLogoState.perLogo !== 'object') _taLogoState.perLogo = {};
   // Sync the language with the existing dprPanelLang session key on first read
   try {
     const en = sessionStorage.getItem('dprDraftPanelLang');
@@ -2825,7 +2873,43 @@
     };
   }
 
+  // ----- per-logo placement config (Change A) -----
+  function taEnsurePerLogo(id){
+    if (!_taLogoState.perLogo[id]){
+      const pos = 'top-right';
+      const peers = _taLogoState.selected.filter(s => s !== id && _taLogoState.perLogo[s] && _taLogoState.perLogo[s].position === pos);
+      _taLogoState.perLogo[id] = { position: pos, appearsOn: 'every', order: peers.length };
+    }
+    return _taLogoState.perLogo[id];
+  }
+  function taSyncPerLogo(){
+    _taLogoState.selected.forEach(id => taEnsurePerLogo(id));
+    Object.keys(_taLogoState.perLogo).forEach(id => { if (_taLogoState.selected.indexOf(id) < 0) delete _taLogoState.perLogo[id]; });
+    TA_LOGO_POSITIONS.forEach(p => {
+      const ids = _taLogoState.selected.filter(id => (_taLogoState.perLogo[id]||{}).position === p.id)
+        .sort((a,b) => (_taLogoState.perLogo[a].order||0) - (_taLogoState.perLogo[b].order||0));
+      ids.forEach((id, i) => { _taLogoState.perLogo[id].order = i; });
+    });
+  }
+  function taLogosInPosition(pos){
+    return _taLogoState.selected.filter(id => (_taLogoState.perLogo[id]||{}).position === pos)
+      .sort((a,b) => (_taLogoState.perLogo[a].order||0) - (_taLogoState.perLogo[b].order||0));
+  }
+  function taLogoConfigArray(){
+    taSyncPerLogo();
+    const out = [];
+    TA_LOGO_POSITIONS.forEach(p => {
+      taLogosInPosition(p.id).forEach(id => {
+        const l = taFindLogo(id); if (!l) return;
+        const cfg = _taLogoState.perLogo[id];
+        out.push({ id, name: l.name, source: (l.dataURL ? 'custom' : 'preloaded'), dataUrl: l.dataURL || null,
+                   position: cfg.position, appearsOn: cfg.appearsOn, order: cfg.order });
+      });
+    });
+    return out;
+  }
   function taSaveLogoState(){
+    taSyncPerLogo();
     try { sessionStorage.setItem('ta_doc_lang_logos', JSON.stringify(_taLogoState)); } catch(e){}
     if (typeof FORM_STATE !== 'undefined'){
       FORM_STATE.documentLanguage = _taLogoState.language;
@@ -2834,9 +2918,11 @@
         custom:   _taLogoState.custom.slice(),
         order:    _taLogoState.order.slice(),
         placement:_taLogoState.placement,
+        logos:    taLogoConfigArray(),
       };
     }
   }
+  function taCurrentLogos(){ return (typeof FORM_STATE !== 'undefined' && FORM_STATE.logoConfig && Array.isArray(FORM_STATE.logoConfig.logos)) ? FORM_STATE.logoConfig.logos : []; }
 
   function taEsc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
 
@@ -2864,6 +2950,27 @@
   }
   function taFindLogo(id){
     return TA_LOGO_LIBRARY.find(l => l.id === id) || _taLogoState.custom.find(l => l.id === id) || null;
+  }
+  // Shared document logo-corner renderer (Change A) — mirrors tender-creation.
+  const TA_OCC_LABEL = { every:'Every page', first:'First page', last:'Last page', 'first-last':'First & last' };
+  function taLogoUnitHTML(cfg){
+    const lib = taFindLogo(cfg.id);
+    const l = lib || { name: cfg.name, dataURL: cfg.dataUrl || null, shape:'rounded', shapeBg:'#0F5EE8',
+                       text: String(cfg.name || '?').replace(/[^A-Za-z]/g,'').slice(0,3).toUpperCase() || '★', textColor:'#FFFFFF', textFs:11 };
+    const occ = TA_OCC_LABEL[cfg.appearsOn] || 'Every page';
+    return '<div class="doc-logo-unit" title="' + taEsc(l.name) + ' — ' + occ + '">' + taLogoShapeHTML(l, 44)
+      + '<span class="doc-logo-occ">' + taEsc(occ) + '</span></div>';
+  }
+  function taLogoCornersHTML(logos, which){
+    logos = Array.isArray(logos) ? logos : [];
+    const lp = which === 'top' ? 'top-left'  : 'bottom-left';
+    const rp = which === 'top' ? 'top-right' : 'bottom-right';
+    const byOrder = (a,b) => (a.order||0) - (b.order||0);
+    const left  = logos.filter(l => l.position === lp).sort(byOrder);
+    const right = logos.filter(l => l.position === rp).sort(byOrder);
+    if (!left.length && !right.length) return '';
+    const cluster = (arr, cls) => '<div class="doc-logo-cluster ' + cls + '">' + arr.map(taLogoUnitHTML).join('') + '</div>';
+    return '<div class="doc-logo-row-' + which + '">' + cluster(left, 'cluster-left') + cluster(right, 'cluster-right') + '</div>';
   }
 
   // ========================= HTML BUILDERS ==================================
@@ -2938,20 +3045,35 @@
     })() : '';
 
     const haveSelected = _taLogoState.selected.length > 0;
-    const chipsHTML = _taLogoState.order.map((id, i) => {
-      const l = taFindLogo(id); if (!l) return '';
-      return `<div class="ta-chip" draggable="true" data-chip-index="${i}" data-chip-id="${id}" role="option" aria-grabbed="false"
-        ondragstart="taChipDragStart(event, ${i})" ondragover="taChipDragOver(event, ${i})" ondragleave="taChipDragLeave(event, ${i})" ondrop="taChipDrop(event, ${i})" ondragend="taChipDragEnd(event, ${i})">
-        <span class="ta-chip-handle" aria-hidden="true">⠿</span>
-        <span class="ta-chip-thumb">${taLogoShapeHTML(l, 20)}</span>
-        <span class="ta-chip-name">${taEsc(l.name)}</span>
-        <button type="button" class="ta-chip-rm" aria-label="Remove ${taEsc(l.name)} from selection" onclick="taChipRemove('${id}')">×</button>
+    // ----- Configured-logos panel: group selected logos by position (Change A) -----
+    taSyncPerLogo();
+    const posSelect = (id, cur) => `<select class="ta-logocfg-select" aria-label="Position for ${taEsc((taFindLogo(id)||{}).name||'logo')}" onchange="taSetLogoPosition('${id}', this.value)">`
+      + TA_LOGO_POSITIONS.map(p => `<option value="${p.id}"${cur===p.id?' selected':''}>${taEsc(p.label)}</option>`).join('') + '</select>';
+    const appearsSelect = (id, cur) => `<select class="ta-logocfg-select" aria-label="Appears-on pages for ${taEsc((taFindLogo(id)||{}).name||'logo')}" onchange="taSetLogoAppears('${id}', this.value)">`
+      + TA_LOGO_APPEARS.map(a => `<option value="${a.id}"${cur===a.id?' selected':''}>${taEsc(a.label)}</option>`).join('') + '</select>';
+    const groupsHTML = TA_LOGO_POSITIONS.map(p => {
+      const ids = taLogosInPosition(p.id);
+      if (!ids.length) return '';
+      const rows = ids.map((id, k) => {
+        const l = taFindLogo(id); if (!l) return '';
+        const cfg = _taLogoState.perLogo[id];
+        return `<div class="ta-logocfg-row" draggable="true" data-logo-id="${id}" data-pos="${p.id}" role="listitem" aria-grabbed="false"
+          ondragstart="taLogoRowDragStart(event,'${id}')" ondragover="taLogoRowDragOver(event,'${id}')" ondragleave="taLogoRowDragLeave(event,'${id}')" ondrop="taLogoRowDrop(event,'${id}')" ondragend="taLogoRowDragEnd(event)">
+          <span class="ta-logocfg-handle" aria-hidden="true" title="Drag to reorder within ${taEsc(p.label)}">⠿</span>
+          <span class="ta-logocfg-num" aria-hidden="true">${k+1}</span>
+          <span class="ta-logocfg-thumb">${taLogoShapeHTML(l, 20)}</span>
+          <span class="ta-logocfg-name" title="${taEsc(l.name)}">${taEsc(l.name)}</span>
+          <label class="ta-logocfg-field"><span>Position</span>${posSelect(id, cfg.position)}</label>
+          <label class="ta-logocfg-field"><span>Appears on</span>${appearsSelect(id, cfg.appearsOn)}</label>
+          <button type="button" class="ta-logocfg-rm" aria-label="Remove ${taEsc(l.name)} from selection" onclick="taChipRemove('${id}')">×</button>
+        </div>`;
+      }).join('');
+      return `<div class="ta-logocfg-group" data-pos="${p.id}">
+        <div class="ta-logocfg-grouphd"><i data-lucide="map-pin" style="width:12px;height:12px;"></i> ${taEsc(p.label)} <span class="ta-logocfg-count">${ids.length}</span></div>
+        <div class="ta-logocfg-rows">${rows}</div>
       </div>`;
     }).join('');
-
-    const placementHTML = TA_PLACEMENTS.map(p =>
-      `<label><input type="radio" name="taPlacement" value="${p.id}" ${_taLogoState.placement===p.id?'checked':''} onchange="taSetPlacement('${p.id}')"/> ${taEsc(p.label)}</label>`
-    ).join('');
+    const configHTML = groupsHTML || '<div class="ta-logocfg-empty">No logos selected yet — pick from the library or upload above.</div>';
 
     return `<section class="ta-doc-card" aria-labelledby="ta-doc-logos-h">
       <h3 id="ta-doc-logos-h" class="ta-doc-h">Logos &amp; Government Seals</h3>
@@ -2975,12 +3097,9 @@
         <input id="taLogoFileInput" type="file" accept=".png,.jpg,.jpeg,.svg" multiple style="display:none;" onchange="taOnLogoFileChosen(event)"/>
       </div>
       <div class="ta-selected-wrap ${haveSelected?'open':''}" id="taSelectedWrap" aria-hidden="${haveSelected?'false':'true'}">
-        <div class="ta-section-label" style="margin-top:16px; text-transform:none; letter-spacing:0; color:#374151; font-weight:700; font-size:12px;">Selected logos — drag to reorder</div>
-        <div class="ta-chips-row" role="listbox" aria-label="Selected logos in document order" id="taChipsRow">${chipsHTML}</div>
-        <div class="ta-placement-row" role="radiogroup" aria-label="Logo placement in document">
-          <span class="ta-place-label">Placement:</span>
-          ${placementHTML}
-        </div>
+        <div class="ta-section-label" style="margin-top:16px; text-transform:none; letter-spacing:0; color:#374151; font-weight:700; font-size:12px;">Selected logos — set position, page occurrence &amp; order</div>
+        <p class="ta-doc-sub" style="margin-bottom:10px;">Each logo can sit in a different document corner and appear on specific pages. Where two share a corner, drag to set which renders first.</p>
+        <div class="ta-logocfg" id="taLogoCfg" role="list" aria-label="Configured logos by position">${configHTML}</div>
       </div>
     </section>`;
   }
@@ -3130,6 +3249,56 @@
     document.querySelectorAll('.ta-chip.drag-over').forEach(c => c.classList.remove('drag-over'));
     _taDragIndex = null;
   }
+  // ----- per-logo placement controls (Change A) -----
+  function taFireLogosChanged(){
+    document.dispatchEvent(new CustomEvent('logosChanged', { detail: { logoConfig: (typeof FORM_STATE !== 'undefined' ? FORM_STATE.logoConfig : null) } }));
+  }
+  function taSetLogoPosition(id, pos){
+    const cfg = taEnsurePerLogo(id);
+    if (cfg.position === pos) return;
+    cfg.position = pos;
+    const peers = _taLogoState.selected.filter(s => s !== id && (_taLogoState.perLogo[s]||{}).position === pos);
+    cfg.order = peers.length;
+    taSaveLogoState(); taFireLogosChanged(); taRerenderRoot();
+  }
+  function taSetLogoAppears(id, val){
+    const cfg = taEnsurePerLogo(id);
+    cfg.appearsOn = val;
+    taSaveLogoState(); taFireLogosChanged(); taRerenderRoot();
+  }
+  let _taLogoDragId = null;
+  function taLogoRowDragStart(e, id){
+    _taLogoDragId = id;
+    try { e.dataTransfer.setData('text/plain', id); e.dataTransfer.effectAllowed = 'move'; } catch(err){}
+    e.currentTarget.classList.add('dragging');
+    e.currentTarget.setAttribute('aria-grabbed','true');
+  }
+  function taLogoRowDragOver(e, id){
+    const src = _taLogoDragId; if (!src || src === id) return;
+    if ((_taLogoState.perLogo[src]||{}).position !== (_taLogoState.perLogo[id]||{}).position) return;
+    e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+    e.currentTarget.classList.add('drag-over');
+  }
+  function taLogoRowDragLeave(e){ e.currentTarget.classList.remove('drag-over'); }
+  function taLogoRowDrop(e, targetId){
+    e.preventDefault(); e.currentTarget.classList.remove('drag-over');
+    const src = _taLogoDragId;
+    if (!src || src === targetId) return;
+    const pos = (_taLogoState.perLogo[src]||{}).position;
+    if (pos !== (_taLogoState.perLogo[targetId]||{}).position) return;
+    const ids = taLogosInPosition(pos);
+    const from = ids.indexOf(src), to = ids.indexOf(targetId);
+    if (from < 0 || to < 0) return;
+    ids.splice(from, 1); ids.splice(to, 0, src);
+    ids.forEach((id, i) => { _taLogoState.perLogo[id].order = i; });
+    taSaveLogoState(); taFireLogosChanged(); taRerenderRoot();
+  }
+  function taLogoRowDragEnd(e){
+    _taLogoDragId = null;
+    e.currentTarget.classList.remove('dragging');
+    e.currentTarget.setAttribute('aria-grabbed','false');
+    document.querySelectorAll('.ta-logocfg-row.drag-over').forEach(c => c.classList.remove('drag-over'));
+  }
   // ===== AI suggestion =====
   function taSectorBucketForLogo(){
     const dept = String((typeof FORM_STATE !== 'undefined' ? FORM_STATE.dept : '') || '').toLowerCase();
@@ -3186,6 +3355,13 @@
   window.taChipDragLeave        = taChipDragLeave;
   window.taChipDrop             = taChipDrop;
   window.taChipDragEnd          = taChipDragEnd;
+  window.taSetLogoPosition      = taSetLogoPosition;
+  window.taSetLogoAppears       = taSetLogoAppears;
+  window.taLogoRowDragStart     = taLogoRowDragStart;
+  window.taLogoRowDragOver      = taLogoRowDragOver;
+  window.taLogoRowDragLeave     = taLogoRowDragLeave;
+  window.taLogoRowDrop          = taLogoRowDrop;
+  window.taLogoRowDragEnd       = taLogoRowDragEnd;
   window.taRunAiLogoSuggest     = taRunAiLogoSuggest;
   window.taApplyAiLogoSuggestion= taApplyAiLogoSuggestion;
   window.taDismissAiLogoSuggestion = taDismissAiLogoSuggestion;
@@ -4537,6 +4713,7 @@
 
     document.getElementById('dprDraftDoc').innerHTML = headerHTML + s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + s9 + s10 + footer;
     if (typeof window.dprCsInjectIntoDoc === 'function') window.dprCsInjectIntoDoc(document.getElementById('dprDraftDoc'));
+    renderDprDocLogos();   // Change A: render configured logos at their corners
     const pct = dprComputePct(d);
     document.getElementById('dprDraftPct').textContent = pct;
     document.getElementById('dprDraftPctBar').style.width = pct + '%';
@@ -4546,6 +4723,28 @@
     // amber unmet-required badge in sync with the freshly-rendered draft.
     if (window.bpKit) try { window.bpKit.refreshBadges(); } catch(e){}
   }
+  // ============ LOGO STRIP IN DOC HEADER + FOOTER (Change A) ============
+  function renderDprDocLogos(){
+    const wrap = document.getElementById('dprDocLogoStripWrap');
+    const logos = (typeof taCurrentLogos === 'function') ? taCurrentLogos() : [];
+    const topHTML    = (typeof taLogoCornersHTML === 'function') ? taLogoCornersHTML(logos, 'top')    : '';
+    const bottomHTML = (typeof taLogoCornersHTML === 'function') ? taLogoCornersHTML(logos, 'bottom') : '';
+    if (wrap) wrap.innerHTML = topHTML;
+    const doc = document.getElementById('dprDraftDoc');
+    if (doc){
+      doc.querySelectorAll(':scope .doc-logo-row-bottom').forEach(n => n.remove());
+      if (bottomHTML){
+        const footer = doc.querySelector('.doc-footer');
+        if (footer) footer.insertAdjacentHTML('beforebegin', bottomHTML);
+        else doc.insertAdjacentHTML('beforeend', bottomHTML);
+      }
+    }
+    if (window.lucide) try { lucide.createIcons(); } catch(e){}
+  }
+  // Re-render the DPR document whenever the logo config changes (if it's built).
+  document.addEventListener('logosChanged', function(){
+    try { if (document.getElementById('dprDraftDoc')) renderDprDraftDoc(); } catch(e){}
+  });
   // Exposed so the custom-section module can re-render the document after a save.
   window.renderDprDraftDoc = renderDprDraftDoc;
 
