@@ -97,10 +97,32 @@
     .ab-progress-fill { height:100%; background:#0F5EE8; border-radius:2px; width:0%; transition: width .1s linear; }
     .ab-remove { background:transparent; border:none; cursor:pointer; color:#9CA3AF; font-size:18px; line-height:1; padding:4px; transition: color .15s ease; }
     .ab-remove:hover { color:#EF4444; }
-    .ab-submit { width:100%; padding:11px 24px; border-radius:8px; font-size:14px; font-weight:700; background:#0F5EE8; color:white; border:none; cursor:pointer; margin-top:20px; transition: background .15s ease, opacity .15s ease; }
+    /* Change 3 — Upload Bid CTA: standard sizing, auto width, bottom-left (not full-width) */
+    .ab-submit { display:inline-flex; align-items:center; justify-content:center; width:auto; padding:9px 18px; border-radius:8px; font-size:14px; font-weight:700; background:#0F5EE8; color:white; border:none; cursor:pointer; transition: background .15s ease, opacity .15s ease; }
     .ab-submit:disabled { background:#E5E7EB; color:#9CA3AF; cursor:not-allowed; }
     .ab-submit:not(:disabled):hover { background:#0B4FCB; }
+    /* CTA footer row: button bottom-left, disabled-helper beside it */
+    .ab-cta-row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:20px; }
+    .ab-cta-help { font-size:12px; color:#6B7280; }
     .ab-bid-pill { display:inline-flex; align-items:center; gap:6px; background:#EFF6FF; color:#0C447C; border-radius:6px; padding:8px 14px; font-size:13px; }
+    /* Change 1 — two-column Vendor + Bid type row */
+    .ab-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+    @media (max-width:640px){ .ab-grid2 { grid-template-columns:1fr; } }
+    /* Change 2 — "+ Add new vendor" trigger + inline form */
+    .ab-addvendor-link { display:inline-flex; align-items:center; gap:5px; margin-top:8px; padding:0; background:transparent; border:none; cursor:pointer; color:#0F5EE8; font-size:12px; font-weight:600; font-family:'DM Sans', sans-serif; transition: color .15s ease; }
+    .ab-addvendor-link:hover { color:#0B4FCB; text-decoration:underline; }
+    .ab-newvendor { overflow:hidden; max-height:0; transition: max-height .2s ease; }
+    .ab-newvendor.open { max-height:280px; }
+    .ab-newvendor-inner { background:#F9FAFB; border:1px solid #E5E7EB; border-radius:8px; padding:12px 14px; margin-top:8px; }
+    .ab-nv-input { width:100%; border:1px solid #D1D5DB; border-radius:7px; padding:8px 11px; font-size:13px; background:white; color:#111827; transition: border-color .15s ease, box-shadow .15s ease; }
+    .ab-nv-input:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 3px rgba(15,94,232,0.1); }
+    .ab-nv-row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px; }
+    @media (max-width:640px){ .ab-nv-row2 { grid-template-columns:1fr; } }
+    .ab-nv-actions { display:flex; align-items:center; gap:12px; margin-top:12px; }
+    .ab-nv-add { display:inline-flex; align-items:center; padding:7px 14px; border-radius:7px; font-size:13px; font-weight:600; background:#0F5EE8; color:white; border:none; cursor:pointer; transition: background .15s ease; }
+    .ab-nv-add:hover { background:#0B4FCB; }
+    .ab-nv-cancel { background:transparent; border:none; cursor:pointer; color:#6B7280; font-size:13px; font-family:'DM Sans', sans-serif; transition: color .15s ease; }
+    .ab-nv-cancel:hover { color:#111827; }
 
     /* === Change 7 — vendor pill tabs + criterion table === */
     .vendor-tabs { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
@@ -1214,7 +1236,7 @@
 <div id="cellPopover" class="hidden" style="position:absolute; width:280px; background:white; border:1px solid #E5E7EB; border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.1); padding:14px 16px; z-index:50;"></div>
 
 <!-- Toast -->
-<div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-ink-900 text-white text-[13px] px-4 py-3 rounded-xl shadow-lift inline-flex items-center gap-2.5">
+<div id="toast" role="status" aria-live="polite" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-ink-900 text-white text-[13px] px-4 py-3 rounded-xl shadow-lift inline-flex items-center gap-2.5">
   <i data-lucide="check-circle-2" class="w-4 h-4 text-success"></i>
   <span id="toastMsg">Done</span>
 </div>
@@ -2155,7 +2177,8 @@
       }
     }
     let statusPill;
-    if (key==='s1') statusPill = EVAL.bids.length ? pill(EVAL.bids.length+' uploaded','#F0FDF4','#065F46') : pill('Pending','#F3F4F6','#6B7280');
+    // Change 1 — uploaded-count pill is announced via aria-live (matches financial side)
+    if (key==='s1') statusPill = '<span aria-live="polite">' + (EVAL.bids.length ? pill(EVAL.bids.length+' uploaded','#F0FDF4','#065F46') : pill('Pending','#F3F4F6','#6B7280')) + '</span>';
     else if (key==='s2'){
       // Combined PQ + TQ status
       if (!EVAL.bids.length){
@@ -2201,17 +2224,19 @@
   // Per Change 6: rename "View parsed data →" to "View Technical Bid".
   function s1Body(){
     const usedVendors = EVAL.bids.map(b => b.vendor);
-    const avail = VENDOR_OPTIONS.filter(v => !usedVendors.includes(v));
+    const avail = getVendorOptions().filter(v => !usedVendors.includes(v));
     // pending UI state for the form (held on EVAL so re-renders preserve it)
-    const f = EVAL._addBid = EVAL._addBid || { vendorMode:'select', vendor:'', vendorNew:'', file:'', fileSize:'', uploaded:false, progressing:false };
-    const vendorField = f.vendorMode === 'new'
-      ? `<input id="abVendorNew" type="text" class="ab-input" placeholder="Enter vendor / company name" value="${esc(f.vendorNew)}" oninput="abSetVendorNew(this.value)" autofocus />
-         <a href="#" onclick="abBackToList(); return false;" class="text-[12px] mt-2 inline-block" style="color:#6B7280;">← Back to list</a>`
-      : `<select id="abVendor" class="ab-input" onchange="abVendorChange(this.value)">
+    const f = EVAL._addBid = EVAL._addBid || { vendor:'', file:'', fileSize:'', uploaded:false, progressing:false, nvOpen:false, nvName:'', nvReg:'', nvEmail:'' };
+    // Vendor dropdown (left column). "+ Add new vendor" is a SEPARATE element below it.
+    const vendorSelect = `<select id="abVendor" class="ab-input" onchange="abVendorChange(this.value)">
            <option value="">Select vendor…</option>
            ${avail.map(v => `<option value="${esc(v)}" ${f.vendor===v?'selected':''}>${esc(v)}</option>`).join('')}
-           <option value="__new">+ Add new vendor</option>
          </select>`;
+    const vendorBlock = `${vendorSelect}
+        <button type="button" class="ab-addvendor-link" aria-label="Add a new vendor" aria-expanded="${f.nvOpen?'true':'false'}" onclick="abToggleNewVendor()">
+          <i data-lucide="user-plus" style="width:13px; height:13px;"></i> Add new vendor
+        </button>
+        ${newVendorForm('ab', f)}`;
 
     let fileField;
     if (!f.file){
@@ -2235,28 +2260,30 @@
         </div>`;
     }
 
-    const chosenVendor = f.vendorMode === 'new' ? f.vendorNew.trim() : f.vendor;
-    const canSubmit = !!chosenVendor && !!f.file && f.uploaded;
-    const helper = canSubmit ? '' : '<div class="text-[12px]" style="color:#9CA3AF; margin-top:8px; text-align:center;">Select a vendor and upload a document to continue</div>';
+    const canSubmit = !!f.vendor && !!f.file && f.uploaded;
 
     const addForm = `<div class="ab-card">
         <div class="text-[15px] font-bold" style="color:#111827; margin-bottom:4px;">Add a bid</div>
         <div class="text-[13px]" style="color:#6B7280; margin-bottom:20px;">Upload a technical bid document and assign it to a vendor.</div>
-        <div style="margin-bottom:20px;">
-          <label class="ab-field-label">Vendor</label>
-          ${vendorField}
+        <div class="ab-grid2">
+          <div>
+            <label class="ab-field-label" for="abVendor">Vendor</label>
+            ${vendorBlock}
+          </div>
+          <div>
+            <label class="ab-field-label">Bid type</label>
+            <span class="ab-bid-pill"><i data-lucide="lock" style="width:13px; height:13px;"></i> Technical Bid</span>
+            <div class="text-[11px]" style="color:#6B7280; margin-top:6px;">Financial bids are uploaded separately after technical evaluation</div>
+          </div>
         </div>
-        <div style="margin-bottom:20px;">
+        <div style="margin-bottom:4px;">
           <label class="ab-field-label">Bid document</label>
           ${fileField}
         </div>
-        <div style="margin-bottom:8px;">
-          <label class="ab-field-label">Bid type</label>
-          <span class="ab-bid-pill"><i data-lucide="lock" style="width:13px; height:13px;"></i> Technical Bid</span>
-          <div class="text-[11px]" style="color:#9CA3AF; margin-top:6px;">Financial bids are uploaded separately after technical evaluation</div>
+        <div class="ab-cta-row">
+          <button class="ab-submit" ${canSubmit?'':'disabled'} onclick="abSubmit()">Upload Bid</button>
+          ${canSubmit ? '' : '<span class="ab-cta-help">Select a vendor and upload a document to continue</span>'}
         </div>
-        <button class="ab-submit" ${canSubmit?'':'disabled'} onclick="abSubmit()">Upload Bid</button>
-        ${helper}
       </div>`;
 
     // Opened bids table — BELOW the form
@@ -2288,18 +2315,77 @@
   function thS(){ return 'padding:9px 12px; font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; text-align:left;'; }
   function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
-  // ----- Add-bid form interactions (Change 5) -----
-  function abVendorChange(val){
-    const f = EVAL._addBid;
-    if (val === '__new'){ f.vendorMode = 'new'; f.vendor=''; }
-    else { f.vendorMode = 'select'; f.vendor = val; }
-    renderTechnical();
+  // ===== Vendor list — base options + persisted custom vendors (Change 2) =====
+  // Custom vendors persist in localStorage so they survive reload and appear in
+  // BOTH the technical and financial upload sections. Stored as plain strings; deduped.
+  const CUSTOM_VENDORS_KEY = 'eval_customVendors';
+  function getCustomVendors(){
+    try { const a = JSON.parse(localStorage.getItem(CUSTOM_VENDORS_KEY) || '[]'); return Array.isArray(a) ? a : []; }
+    catch(e){ return []; }
   }
-  function abSetVendorNew(val){ EVAL._addBid.vendorNew = val; renderTechnical(); }
-  function abBackToList(){ const f = EVAL._addBid; f.vendorMode='select'; f.vendorNew=''; renderTechnical(); }
+  function vendorName(v){ return (v && typeof v === 'object') ? (v.name || '') : String(v||''); }
+  // Master vendor list = built-in VENDOR_OPTIONS + persisted custom vendors, deduped (case-insensitive).
+  function getVendorOptions(){
+    const out = []; const seen = new Set();
+    VENDOR_OPTIONS.concat(getCustomVendors()).forEach(v => {
+      const n = vendorName(v).trim();
+      if (!n) return;
+      const k = n.toLowerCase();
+      if (seen.has(k)) return;
+      seen.add(k); out.push(n);
+    });
+    return out;
+  }
+  // Returns true if added, false if it already existed (no duplicates).
+  function addCustomVendor(name){
+    const n = String(name||'').trim();
+    if (!n) return false;
+    const exists = getVendorOptions().some(v => v.toLowerCase() === n.toLowerCase());
+    if (exists) return false;
+    const list = getCustomVendors(); list.push(n);
+    try { localStorage.setItem(CUSTOM_VENDORS_KEY, JSON.stringify(list)); } catch(e){}
+    return true;
+  }
+
+  // Shared "+ Add new vendor" inline form markup (prefix: 'ab' = technical, 'fb' = financial)
+  function newVendorForm(prefix, f){
+    const open = !!f.nvOpen;
+    return `<div class="ab-newvendor ${open?'open':''}" id="${prefix}NewVendor">
+        <div class="ab-newvendor-inner" role="group" aria-label="New vendor details">
+          <input id="${prefix}NvName" class="ab-nv-input" type="text" placeholder="Vendor / firm name" value="${esc(f.nvName||'')}" oninput="nvSet('${prefix}','nvName',this.value)" ${open?'':'tabindex="-1"'} />
+          <div class="ab-nv-row2">
+            <input id="${prefix}NvReg" class="ab-nv-input" type="text" placeholder="Registration no. (optional)" value="${esc(f.nvReg||'')}" oninput="nvSet('${prefix}','nvReg',this.value)" ${open?'':'tabindex="-1"'} />
+            <input id="${prefix}NvEmail" class="ab-nv-input" type="email" placeholder="Contact email (optional)" value="${esc(f.nvEmail||'')}" oninput="nvSet('${prefix}','nvEmail',this.value)" ${open?'':'tabindex="-1"'} />
+          </div>
+          <div class="ab-nv-actions">
+            <button type="button" class="ab-nv-add" onclick="nvAdd('${prefix}')" ${open?'':'tabindex="-1"'}>Add vendor</button>
+            <button type="button" class="ab-nv-cancel" onclick="nvCancel('${prefix}')" ${open?'':'tabindex="-1"'}>Cancel</button>
+          </div>
+        </div>
+      </div>`;
+  }
+  function _addState(prefix){ return prefix === 'fb' ? EVAL._addFinBid : EVAL._addBid; }
+  function _rerender(prefix){ if (prefix === 'fb') renderFinancial(); else renderTechnical(); }
+  function nvSet(prefix, key, val){ const f = _addState(prefix); if (f){ f[key] = val; } }
+  function nvCancel(prefix){ const f = _addState(prefix); if (!f) return; f.nvOpen=false; f.nvName=''; f.nvReg=''; f.nvEmail=''; _rerender(prefix); }
+  function nvAdd(prefix){
+    const f = _addState(prefix); if (!f) return;
+    const name = String(f.nvName||'').trim();
+    if (!name){ showToast('Enter a vendor name'); return; }
+    const added = addCustomVendor(name);
+    if (!added){ showToast('Vendor already exists'); return; }
+    // Auto-select the new vendor in this section's dropdown + collapse the form.
+    f.vendor = name; f.nvOpen=false; f.nvName=''; f.nvReg=''; f.nvEmail='';
+    _rerender(prefix);
+    showToast('Vendor added');
+  }
+
+  // ----- Add-bid form interactions (Change 5) -----
+  function abVendorChange(val){ EVAL._addBid.vendor = val; renderTechnical(); }
+  function abToggleNewVendor(){ const f = EVAL._addBid; f.nvOpen = !f.nvOpen; renderTechnical(); }
   function abPickFile(){
     const f = EVAL._addBid;
-    const v = f.vendorMode==='new' ? (f.vendorNew.trim()||'vendor') : (f.vendor || 'vendor');
+    const v = f.vendor || 'vendor';
     const slug = v.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
     f.file = slug + '_technical_bid.pdf';
     f.fileSize = '2.4 MB';
@@ -2322,13 +2408,13 @@
   function abRemoveFile(){ const f = EVAL._addBid; f.file=''; f.fileSize=''; f.uploaded=false; f.progressing=false; renderTechnical(); }
   function abSubmit(){
     const f = EVAL._addBid;
-    const vendor = f.vendorMode==='new' ? f.vendorNew.trim() : f.vendor;
+    const vendor = f.vendor;
     if (!vendor){ showToast('Select or enter a vendor'); return; }
     if (!f.file || !f.uploaded){ showToast('Upload a document first'); return; }
     const bid = { vendor, file:f.file, status:'processing', parsedEdits:{} };
     EVAL.bids.push(bid);
     if (!EVAL.activeVendor) EVAL.activeVendor = vendor;
-    EVAL._addBid = { vendorMode:'select', vendor:'', vendorNew:'', file:'', fileSize:'', uploaded:false, progressing:false };
+    EVAL._addBid = { vendor:'', file:'', fileSize:'', uploaded:false, progressing:false, nvOpen:false, nvName:'', nvReg:'', nvEmail:'' };
     log('Upload Technical Bids', 'bid_uploaded', `${vendor} · ${bid.file} · ${f.fileSize}`);
     renderTechnical(); saveState();
     setTimeout(() => { bid.status='parsed'; renderTechnical(); saveState(); showToast(vendor+' bid parsed'); }, 1400);
@@ -5128,7 +5214,8 @@ Date: ${esc(fmtDateShort(today))}`;
   function toggleFinSection(key){ EVAL.finExpanded = (EVAL.finExpanded===key)?'':key; renderFinancial(); saveState(); }
   function f1StatusPill(){
     if (EVAL.finRun) return pill('Complete','#F0FDF4','#065F46');
-    if (EVAL.finBids.length) return pill(EVAL.finBids.length+' bids uploaded','#EFF6FF','#0C447C');
+    // Change 1 — green uploaded-count pill, mirrors the technical section
+    if (EVAL.finBids.length) return pill(EVAL.finBids.length+' uploaded','#F0FDF4','#065F46');
     return pill('Pending','#F3F4F6','#6B7280');
   }
   function f2StatusPill(){
@@ -5150,12 +5237,28 @@ Date: ${esc(fmtDateShort(today))}`;
     const reg = EVAL.finOpeningRegister;
 
     // === Add a financial bid form — same card pattern as s1Body ===
-    const f = EVAL._addFinBid = EVAL._addFinBid || { vendor:'', file:'', fileSize:'', uploaded:false, progressing:false };
-    const vendorField = `<select id="fbVendor" class="ab-input" onchange="fbVendorChange(this.value)">
+    const f = EVAL._addFinBid = EVAL._addFinBid || { vendor:'', file:'', fileSize:'', uploaded:false, progressing:false, nvOpen:false, nvName:'', nvReg:'', nvEmail:'' };
+    // Selectable vendors = TQ vendors awaiting a bid PLUS any custom-added vendors not yet uploaded.
+    // (tqVendors / chips / eval math are untouched — this only widens the dropdown so a freshly
+    //  added vendor is selectable here too, per the shared-vendor-list spec.)
+    const baseNames = VENDOR_OPTIONS.map(v => vendorName(v).toLowerCase());
+    const customExtra = getVendorOptions().filter(v =>
+      !baseNames.includes(v.toLowerCase()) &&
+      !uploaded.includes(v) &&
+      !availFin.includes(v) &&
+      !ntqVendors.includes(v)
+    );
+    const selectable = availFin.concat(customExtra);
+    const vendorSelect = `<select id="fbVendor" class="ab-input" onchange="fbVendorChange(this.value)">
         <option value="">Select vendor…</option>
-        ${availFin.map(v => `<option value="${esc(v)}" ${f.vendor===v?'selected':''}>${esc(v)}</option>`).join('')}
+        ${selectable.map(v => `<option value="${esc(v)}" ${f.vendor===v?'selected':''}>${esc(v)}</option>`).join('')}
         ${ntqVendors.map(v => `<option disabled style="color:#9CA3AF;">${esc(v)} — NTQ — not eligible</option>`).join('')}
       </select>`;
+    const vendorBlock = `${vendorSelect}
+        <button type="button" class="ab-addvendor-link" aria-label="Add a new vendor" aria-expanded="${f.nvOpen?'true':'false'}" onclick="fbToggleNewVendor()">
+          <i data-lucide="user-plus" style="width:13px; height:13px;"></i> Add new vendor
+        </button>
+        ${newVendorForm('fb', f)}`;
     let fileField;
     if (!f.file){
       fileField = `<div class="ab-drop" id="fbDrop" onclick="fbPickFile()" role="button" tabindex="0" onkeydown="if(event.key==='Enter')fbPickFile()">
@@ -5178,27 +5281,30 @@ Date: ${esc(fmtDateShort(today))}`;
         </div>`;
     }
     const canSubmit = !!f.vendor && !!f.file && f.uploaded;
-    const helper = canSubmit ? '' : '<div class="text-[12px]" style="color:#9CA3AF; margin-top:8px; text-align:center;">Select a vendor and upload a document to continue</div>';
     const noTQ = tqVendors.length === 0;
     const addForm = `<div class="ab-card">
         <div class="text-[15px] font-bold" style="color:#111827; margin-bottom:4px;">Add a financial bid</div>
         <div class="text-[13px]" style="color:#6B7280; margin-bottom:20px;">Upload a financial bid document and assign it to a vendor. Only Technically Qualified vendors are eligible.</div>
         ${noTQ ? '<div class="text-[12.5px]" style="color:#92400E; background:#FFFBEB; border:1px solid #FDE68A; padding:10px 12px; border-radius:8px; margin-bottom:14px;">No Technically Qualified vendors yet — complete Technical Evaluation first.</div>' : ''}
-        <div style="margin-bottom:20px;">
-          <label class="ab-field-label">Vendor</label>
-          ${vendorField}
+        <div class="ab-grid2">
+          <div>
+            <label class="ab-field-label" for="fbVendor">Vendor</label>
+            ${vendorBlock}
+          </div>
+          <div>
+            <label class="ab-field-label">Bid type</label>
+            <span class="ab-bid-pill"><i data-lucide="lock" style="width:13px; height:13px;"></i> Financial Bid</span>
+            <div class="text-[11px]" style="color:#6B7280; margin-top:6px;">Technical bids were uploaded in the previous section</div>
+          </div>
         </div>
-        <div style="margin-bottom:20px;">
+        <div style="margin-bottom:4px;">
           <label class="ab-field-label">Bid document</label>
           ${fileField}
         </div>
-        <div style="margin-bottom:8px;">
-          <label class="ab-field-label">Bid type</label>
-          <span class="ab-bid-pill"><i data-lucide="lock" style="width:13px; height:13px;"></i> Financial Bid</span>
-          <div class="text-[11px]" style="color:#9CA3AF; margin-top:6px;">Technical bids were uploaded in the previous section</div>
+        <div class="ab-cta-row">
+          <button class="ab-submit" ${canSubmit?'':'disabled'} onclick="fbSubmit()">Upload Bid</button>
+          ${canSubmit ? '' : '<span class="ab-cta-help">Select a vendor and upload a document to continue</span>'}
         </div>
-        <button class="ab-submit" ${canSubmit?'':'disabled'} onclick="fbSubmit()">Upload Bid</button>
-        ${helper}
       </div>`;
 
     // === Opened financial bids table — same layout as opened technical bids ===
@@ -5262,6 +5368,7 @@ Date: ${esc(fmtDateShort(today))}`;
   }
   // === F1 form interactions — mirror of abXxx handlers (Change 1a) ===
   function fbVendorChange(val){ EVAL._addFinBid.vendor = val; renderFinancial(); }
+  function fbToggleNewVendor(){ const f = EVAL._addFinBid; f.nvOpen = !f.nvOpen; renderFinancial(); }
   function fbPickFile(){
     const f = EVAL._addFinBid;
     const v = (f.vendor || 'vendor').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
@@ -5289,7 +5396,7 @@ Date: ${esc(fmtDateShort(today))}`;
     if (!f.file || !f.uploaded){ showToast('Upload a document first'); return; }
     const bid = { vendor:f.vendor, file:f.file, status:'processing' };
     EVAL.finBids.push(bid);
-    EVAL._addFinBid = { vendor:'', file:'', fileSize:'', uploaded:false, progressing:false };
+    EVAL._addFinBid = { vendor:'', file:'', fileSize:'', uploaded:false, progressing:false, nvOpen:false, nvName:'', nvReg:'', nvEmail:'' };
     log('Upload Financial Bids', 'bid_uploaded', `${f.vendor} · ${bid.file}`);
     renderFinancial(); saveState();
     setTimeout(() => { bid.status='parsed'; renderFinancial(); saveState(); showToast(f.vendor+' financial bid parsed'); }, 1400);

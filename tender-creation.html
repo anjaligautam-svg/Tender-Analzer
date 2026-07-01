@@ -443,6 +443,135 @@
       * { transition: none !important; animation: none !important; }
     }
 
+    /* ============================================================= */
+    /* QA EXTRACTION-REVIEW SCREEN (xr-*) — every element here is a   */
+    /* "Recommended change". The teal accent (#0D9488 / #F0FDFA /     */
+    /* #5EEAD4) is the ONLY new colour in the product; everything     */
+    /* else reuses the existing tokens. All borders are FULL borders  */
+    /* (no side-stripes). Motion is covered by the global             */
+    /* prefers-reduced-motion rule above.                             */
+    /* ============================================================= */
+    .xr-screen { --teal:#0D9488; --teal-deep:#0F766E; --teal-tint:#F0FDFA; --teal-line:#5EEAD4; }
+
+    /* ◆ Recommended corner badge */
+    .xr-badge { display:inline-flex; align-items:center; gap:3px; font-size:10px; line-height:1.4; font-weight:700;
+      color:#0F766E; background:#F0FDFA; border:1px solid #99F6E4; border-radius:4px; padding:1px 6px; white-space:nowrap; letter-spacing:.01em; }
+    .xr-badge::before { content:"\25C6"; font-size:8px; color:#0D9488; }
+    .xr-badge-abs { position:absolute; top:10px; right:10px; z-index:1; }
+
+    /* Hide-everything when the global toggle is OFF (drives all new UI). */
+    .xr-off .xr-rec { display:none !important; }
+
+    /* The recommended-changes header toggle */
+    .xr-toggle { display:inline-flex; align-items:center; gap:9px; cursor:pointer; user-select:none;
+      background:#F0FDFA; border:1px solid #5EEAD4; border-radius:10px; padding:7px 12px; transition:background .15s ease; }
+    .xr-toggle:hover { background:#CCFBF1; }
+    .xr-toggle .xr-toggle-txt { font-size:12.5px; font-weight:700; color:#0F766E; }
+    .xr-toggle .xr-toggle-txt::before { content:"\25C6"; font-size:9px; margin-right:4px; color:#0D9488; }
+    .xr-switch { position:relative; width:34px; height:18px; border-radius:999px; background:#5EEAD4; transition:background .15s ease; flex:none; }
+    .xr-switch::after { content:""; position:absolute; top:2px; left:2px; width:14px; height:14px; border-radius:50%; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.25); transition:transform .15s ease; }
+    .xr-toggle[aria-pressed="false"] .xr-switch { background:#CBD5E1; }
+    .xr-toggle[aria-pressed="false"] .xr-switch::after { transform:translateX(16px); }
+
+    /* Summary bar stat cards (full-border teal-tinted) */
+    .xr-stat { background:#F0FDFA; border:1px solid #99F6E4; border-radius:12px; padding:13px 16px; }
+    .xr-stat .xr-stat-n { font-size:24px; font-weight:700; line-height:1; color:#111827; }
+    .xr-stat .xr-stat-l { font-size:11.5px; font-weight:600; color:#374151; margin-top:5px; }
+    .xr-stat .xr-stat-ic { width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex:none; }
+
+    /* Confidence chip */
+    .xr-conf { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; border-radius:999px; padding:2px 9px; white-space:nowrap; border:1px solid transparent; }
+    .xr-conf-high { color:#065F46; background:#ECFDF5; border-color:#A7F3D0; }
+    .xr-conf-med  { color:#92400E; background:#FFFBEB; border-color:#FDE68A; }
+    .xr-conf-low  { color:#991B1B; background:#FEF2F2; border-color:#FECACA; }
+    .xr-conf .xr-dot { width:6px; height:6px; border-radius:50%; }
+    .xr-conf-high .xr-dot { background:#10B981; } .xr-conf-med .xr-dot { background:#F59E0B; } .xr-conf-low .xr-dot { background:#EF4444; }
+
+    /* Origin / mapping meta chips */
+    .xr-meta { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:600; color:#374151; background:#F3F4F6; border:1px solid #E5E7EB; border-radius:6px; padding:2px 8px; white-space:nowrap; }
+    .xr-meta i { width:12px; height:12px; }
+    .xr-meta-map { color:#1E40AF; background:#EFF6FF; border-color:#BFDBFE; }
+    .xr-meta-ai  { color:#5B21B6; background:#F5F3FF; border-color:#DDD6FE; }
+
+    /* Section group */
+    .xr-group { border:1px solid #E5E7EB; border-radius:14px; background:#fff; overflow:hidden; }
+    .xr-group-hd { display:flex; align-items:center; gap:10px; padding:12px 16px; background:#F9FAFB; border-bottom:1px solid #E5E7EB; }
+    .xr-group-hd .xr-group-ic { width:28px; height:28px; border-radius:8px; background:#EFF6FF; color:#0F5EE8; display:flex; align-items:center; justify-content:center; flex:none; }
+    .xr-group-ttl { font-size:13.5px; font-weight:700; color:#111827; }
+    .xr-group-sub { font-size:11.5px; color:#4B5563; }
+
+    /* Field card */
+    .xr-field { border:1px solid #E5E7EB; border-radius:12px; background:#fff; transition:border-color .15s ease, box-shadow .15s ease; position:relative; }
+    .xr-field:hover { border-color:#CBD5E1; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+    .xr-field.xr-attn { border-color:#FCA5A5; background:#FFFCFC; }              /* low-confidence / needs review (full border, not a stripe) */
+    .xr-field.xr-missing { border-color:#FCD34D; background:#FFFDF7; }            /* unidentified / missing */
+    .xr-field.xr-reviewed { border-color:#A7F3D0; background:#FAFFFD; }
+    .xr-field-row { display:flex; align-items:flex-start; gap:12px; padding:13px 15px; cursor:pointer; }
+    .xr-field-row:focus-visible { outline:2px solid #0F5EE8; outline-offset:-2px; border-radius:12px; }
+    .xr-field-status { width:26px; height:26px; border-radius:7px; display:flex; align-items:center; justify-content:center; flex:none; margin-top:1px; }
+    .xr-st-ok   { background:#ECFDF5; color:#059669; }
+    .xr-st-low  { background:#FEF2F2; color:#DC2626; }
+    .xr-st-miss { background:#FFFBEB; color:#D97706; }
+    .xr-field-name { font-size:13px; font-weight:600; color:#111827; }
+    .xr-field-val  { font-size:13.5px; color:#111827; font-weight:600; }
+    .xr-field-val.mono { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12.5px; }
+    .xr-field-val.xr-empty { color:#B45309; font-style:italic; font-weight:500; }
+    .xr-chev { width:16px; height:16px; color:#9CA3AF; transition:transform .25s ease; flex:none; margin-top:5px; }
+    .xr-field.xr-open .xr-chev { transform:rotate(180deg); }
+
+    /* Collapsible body — collapsed by default for confidently-extracted fields.
+       Uses grid-rows so it animates height without ever gating visibility on a
+       class that never fires headless: when open we render it immediately. */
+    .xr-field-body { display:grid; grid-template-rows:0fr; transition:grid-template-rows .25s ease; }
+    .xr-field.xr-open .xr-field-body { grid-template-rows:1fr; }
+    .xr-field-body > .xr-field-body-in { overflow:hidden; min-height:0; }
+    .xr-field-body-pad { padding:0 15px 14px 53px; }
+    @media (prefers-reduced-motion: reduce) { .xr-field-body { transition:none; } }
+
+    /* Inline source snippet */
+    .xr-snip { font-size:12px; line-height:1.6; color:#1F2937; background:#F9FAFB; border:1px solid #E5E7EB; border-radius:8px; padding:9px 12px; }
+    .xr-snip mark { background:#FEF3C7; color:#92400E; padding:0 2px; border-radius:3px; font-weight:600; }
+    .xr-srcref { display:inline-flex; align-items:center; gap:5px; font-size:11.5px; color:#0F766E; font-weight:600; }
+    .xr-srcref i { width:13px; height:13px; }
+
+    .xr-revbtn { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; border-radius:8px; padding:6px 12px; border:1px solid #5EEAD4; color:#0F766E; background:#F0FDFA; transition:background .15s ease, border-color .15s ease; cursor:pointer; }
+    .xr-revbtn:hover { background:#CCFBF1; }
+    .xr-revbtn.is-done { background:#ECFDF5; border-color:#6EE7B7; color:#047857; }
+
+    /* Filter chips — mirrors the product's pill/segment pattern, teal-flagged */
+    .xr-fchip { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600; color:#374151; background:#fff; border:1px solid #D1D5DB; border-radius:999px; padding:6px 13px; cursor:pointer; transition:all .15s ease; white-space:nowrap; }
+    .xr-fchip:hover { border-color:#0D9488; color:#0F766E; }
+    .xr-fchip[aria-pressed="true"] { background:#0D9488; border-color:#0D9488; color:#fff; }
+    .xr-fchip[aria-pressed="true"] .xr-fchip-ct { background:rgba(255,255,255,.25); color:#fff; }
+    .xr-fchip-ct { font-size:10.5px; font-weight:700; background:#F3F4F6; color:#4B5563; border-radius:999px; padding:0 6px; min-width:18px; text-align:center; }
+
+    .xr-search { width:100%; background:#fff; border:1px solid #D1D5DB; border-radius:10px; padding:9px 12px 9px 36px; font-size:13px; transition:border-color .15s ease, box-shadow .15s ease; }
+    .xr-search:focus { outline:none; border-color:#0D9488; box-shadow:0 0 0 3px rgba(13,148,136,.12); }
+
+    /* Side-by-side source-document pane */
+    .xr-srcdoc { font-family:'Times New Roman',Georgia,serif; font-size:13px; line-height:1.95; color:#1a1a1a; }
+    .xr-srcdoc h4 { font-family:'DM Sans',system-ui,sans-serif; font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#111827; border-bottom:1px solid #D1D5DB; padding-bottom:5px; margin:18px 0 10px; }
+    .xr-srcdoc h4:first-child { margin-top:0; }
+    .xr-srcdoc p { margin:0 0 11px; text-align:justify; }
+    .xr-srcdoc .xr-pagebreak { font-family:'DM Sans',system-ui,sans-serif; font-size:10.5px; font-weight:700; letter-spacing:.04em; color:#9CA3AF; text-transform:uppercase; text-align:center; margin:18px 0; position:relative; }
+    .xr-srcdoc .xr-pagebreak::before, .xr-srcdoc .xr-pagebreak::after { content:""; position:absolute; top:50%; width:32%; height:1px; background:#E5E7EB; }
+    .xr-srcdoc .xr-pagebreak::before { left:0; } .xr-srcdoc .xr-pagebreak::after { right:0; }
+    .xr-span { border-radius:3px; padding:0 2px; transition:background .3s ease, box-shadow .3s ease; cursor:pointer; }
+    .xr-span:hover { background:#F0FDFA; box-shadow:inset 0 0 0 1px #99F6E4; }
+    /* 600ms click-to-source highlight pulse */
+    @keyframes xr-srchl { 0% { background:#5EEAD4; box-shadow:0 0 0 3px rgba(13,148,136,.30); } 100% { background:#CCFBF1; box-shadow:0 0 0 0 rgba(13,148,136,0); } }
+    .xr-span.xr-hot { animation:xr-srchl .6s ease-out forwards; }
+    @media (prefers-reduced-motion: reduce) { .xr-span.xr-hot { animation:none; background:#CCFBF1; box-shadow:inset 0 0 0 1px #5EEAD4; } }
+
+    /* Sticky source pane on wide viewports for the side-by-side compare */
+    @media (min-width:1024px){ .xr-srcwrap { position:sticky; top:16px; max-height:calc(100vh - 40px); overflow:auto; } }
+
+    /* "Information Not Identified" + Extraction Summary panels */
+    .xr-panel { border:1px solid #E5E7EB; border-radius:14px; background:#fff; }
+    .xr-panel.xr-panel-warn { border-color:#FDE68A; background:#FFFDF7; }
+    .xr-sumrow { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-radius:10px; }
+    .xr-empty-pill { display:inline-flex; align-items:center; gap:6px; font-size:11.5px; font-weight:600; color:#92400E; background:#FFFBEB; border:1px solid #FDE68A; border-radius:999px; padding:3px 10px; }
+
     /* ============ STEP 5 — AI GENERATION EXPERIENCE ============ */
     /* Skeleton shimmer (disabled under prefers-reduced-motion by the global rule) */
     @keyframes ag-shimmer { 0% { background-position: -480px 0; } 100% { background-position: 480px 0; } }
@@ -1275,6 +1404,22 @@
                 <li class="flex items-center justify-between"><span class="inline-flex items-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4 text-warning"></i> <strong>Deadline</strong></span><span class="text-warning">Not found — enter manually</span></li>
                 <li class="flex items-center justify-between"><span class="inline-flex items-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4 text-warning"></i> <strong>EMD Details</strong></span><span class="text-warning">Not found — enter manually</span></li>
               </ul>
+
+              <!-- QA Recommended: deep-dive extraction review entry point -->
+              <div class="xr-rec relative mt-5 rounded-xl p-4" style="background:#F0FDFA;border:1px solid #5EEAD4;">
+                <span class="xr-badge xr-badge-abs">Recommended</span>
+                <div class="flex items-start gap-3 flex-wrap">
+                  <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background:#CCFBF1;color:#0F766E;"><i data-lucide="scan-search" class="w-5 h-5"></i></div>
+                  <div class="flex-1 min-w-[220px]">
+                    <div class="text-[13.5px] font-bold" style="color:#0F766E;">Review the extraction in detail</div>
+                    <p class="text-[12.5px] mt-0.5" style="color:#115E59;">See every field with a confidence score, the page it came from, an inline source snippet, and where it auto-fills — side-by-side with the source document.</p>
+                  </div>
+                  <button type="button" onclick="xrOpen()" class="px-4 py-2.5 rounded-lg text-white text-[13px] font-semibold inline-flex items-center gap-1.5 shrink-0" style="background:#0D9488;">
+                    Open detailed review <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
+
               <div class="mt-5 pt-5 border-t border-line flex items-center justify-between flex-wrap gap-3">
                 <div class="flex items-center gap-3 text-[12.5px]">
                   <button onclick="resetUpload()" class="text-ink-500 hover:text-ink-900 inline-flex items-center gap-1.5"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Looks wrong? Re-upload</button>
@@ -1285,6 +1430,140 @@
                   Continue with these details <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </a>
               </div>
+            </div>
+          </div>
+
+          <!-- ========================================================= -->
+          <!-- State 4: DETAILED EXTRACTION REVIEW (QA Recommended screen) -->
+          <!-- Every element below is a "Recommended change": teal accent  -->
+          <!-- + ◆ badge, all gated by the #xrToggle visibility switch.    -->
+          <!-- ========================================================= -->
+          <div id="upState4" class="xr-screen hidden mt-2 max-w-[1280px] mx-auto">
+            <!-- Screen header: title + recommended toggle -->
+            <div class="flex items-start justify-between gap-4 flex-wrap mb-4">
+              <div class="min-w-[260px]">
+                <button type="button" onclick="xrClose()" class="text-[13px] text-ink-500 hover:text-ink-900 inline-flex items-center gap-1.5 mb-2"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back to summary</button>
+                <h1 class="text-[20px] font-bold text-ink-900">Extraction Review</h1>
+                <p class="text-[13.5px] text-ink-500 mt-0.5 max-w-[62ch] leading-relaxed">Confidently-extracted fields are collapsed. Fields that need a look — low-confidence or not identified — are opened at the top. Verify each, then continue.</p>
+              </div>
+              <button id="xrToggle" type="button" class="xr-toggle" role="switch" aria-pressed="true" aria-label="Show recommended changes" onclick="xrToggleRec()">
+                <span class="xr-toggle-txt">Show recommended changes</span>
+                <span class="xr-switch" aria-hidden="true"></span>
+              </button>
+            </div>
+
+            <!-- Document context strip -->
+            <div class="bg-white border border-line rounded-xl px-4 py-3 flex items-center gap-3 mb-4">
+              <div class="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center shrink-0"><i data-lucide="file-text" class="w-5 h-5"></i></div>
+              <div class="flex-1 min-w-0">
+                <div class="text-[13.5px] font-semibold text-ink-900 truncate">Tender_Specs_Road_Maintenance.pdf</div>
+                <div class="text-[12px] text-ink-500">3.2 MB · 6 pages · Parsed just now · Tender <span class="font-mono">TND-2026-010</span></div>
+              </div>
+              <button type="button" onclick="resetUpload()" class="text-[12.5px] text-ink-500 hover:text-ink-900 inline-flex items-center gap-1.5 shrink-0"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Re-upload</button>
+            </div>
+
+            <!-- (3) Quick summary bar -->
+            <div id="xrSummaryBar" class="xr-rec relative grid gap-3 mb-4" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));" aria-live="polite" aria-label="Extraction summary counts">
+              <span class="xr-badge xr-badge-abs" style="top:-9px;">Recommended</span>
+              <div class="xr-stat flex items-center gap-3">
+                <div class="xr-stat-ic" style="background:#ECFDF5;color:#059669;"><i data-lucide="check-circle-2" class="w-4 h-4"></i></div>
+                <div><div class="xr-stat-n" id="xrSumIdentified">0</div><div class="xr-stat-l">Fields Identified</div></div>
+              </div>
+              <div class="xr-stat flex items-center gap-3">
+                <div class="xr-stat-ic" style="background:#FFFBEB;color:#D97706;"><i data-lucide="help-circle" class="w-4 h-4"></i></div>
+                <div><div class="xr-stat-n" id="xrSumMissing">0</div><div class="xr-stat-l">Fields Not Identified</div></div>
+              </div>
+              <div class="xr-stat flex items-center gap-3">
+                <div class="xr-stat-ic" style="background:#FEF2F2;color:#DC2626;"><i data-lucide="alert-triangle" class="w-4 h-4"></i></div>
+                <div><div class="xr-stat-n" id="xrSumLow">0</div><div class="xr-stat-l">Low-Confidence Fields</div></div>
+              </div>
+              <div class="xr-stat flex items-center gap-3">
+                <div class="xr-stat-ic" style="background:#F0FDFA;color:#0D9488;"><i data-lucide="badge-check" class="w-4 h-4"></i></div>
+                <div><div class="xr-stat-n" id="xrSumReviewed">0</div><div class="xr-stat-l">Reviewed / Verified</div></div>
+              </div>
+            </div>
+
+            <!-- Filters + search row -->
+            <div class="xr-rec relative bg-white border border-line rounded-xl p-3 mb-4">
+              <span class="xr-badge xr-badge-abs">Recommended</span>
+              <div class="flex items-center gap-3 flex-wrap">
+                <div class="relative flex-1 min-w-[220px]">
+                  <i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                  <input id="xrSearch" type="search" class="xr-search" placeholder="Search field names or extracted values…" oninput="xrRender()" aria-label="Search extracted fields" />
+                </div>
+                <div id="xrFilters" class="flex items-center gap-2 flex-wrap" role="group" aria-label="Filter extracted fields">
+                  <button type="button" class="xr-fchip" data-filter="all" aria-pressed="true" onclick="xrSetFilter('all')">All Fields <span class="xr-fchip-ct" data-ct="all">0</span></button>
+                  <button type="button" class="xr-fchip" data-filter="low" aria-pressed="false" onclick="xrSetFilter('low')"><i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> Low Confidence <span class="xr-fchip-ct" data-ct="low">0</span></button>
+                  <button type="button" class="xr-fchip" data-filter="missing" aria-pressed="false" onclick="xrSetFilter('missing')"><i data-lucide="help-circle" class="w-3.5 h-3.5"></i> Unidentified <span class="xr-fchip-ct" data-ct="missing">0</span></button>
+                  <button type="button" class="xr-fchip" data-filter="reviewed" aria-pressed="false" onclick="xrSetFilter('reviewed')"><i data-lucide="badge-check" class="w-3.5 h-3.5"></i> Reviewed <span class="xr-fchip-ct" data-ct="reviewed">0</span></button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Side-by-side: extracted fields (left) + source document (right) -->
+            <div class="grid gap-5" style="grid-template-columns:minmax(0,1fr);" id="xrSplit">
+              <div class="xr-grid-target grid gap-5" style="grid-template-columns:minmax(0,1fr) minmax(340px,440px);">
+                <!-- LEFT: grouped fields + panels -->
+                <div class="min-w-0">
+                  <!-- (10) Information Not Identified panel -->
+                  <div id="xrMissingPanel" class="xr-rec xr-panel xr-panel-warn relative p-4 mb-4">
+                    <span class="xr-badge xr-badge-abs">Recommended</span>
+                    <div class="flex items-center gap-2.5 mb-1">
+                      <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:#FEF3C7;color:#B45309;"><i data-lucide="search-x" class="w-4 h-4"></i></div>
+                      <div>
+                        <h3 class="text-[13.5px] font-bold text-ink-900">Information Not Identified</h3>
+                        <p class="text-[12px]" style="color:#92400E;">These fields weren't found in the document. Enter them manually in the form.</p>
+                      </div>
+                    </div>
+                    <div id="xrMissingList" class="mt-2 flex flex-wrap gap-2"></div>
+                  </div>
+
+                  <!-- Grouped fields render here -->
+                  <div id="xrGroups" class="space-y-4"></div>
+
+                  <!-- No-results (filter/search) message -->
+                  <div id="xrNoResults" class="hidden text-center py-10 text-ink-500">
+                    <i data-lucide="search-x" class="w-7 h-7 mx-auto text-ink-400 mb-2"></i>
+                    <div class="text-[13.5px] font-medium text-ink-900">No fields match</div>
+                    <div class="text-[12.5px] mt-0.5">Try a different filter or clear your search.</div>
+                  </div>
+
+                  <!-- (11) Extraction Summary block -->
+                  <div id="xrExtractSummary" class="xr-rec xr-panel relative p-4 mt-4">
+                    <span class="xr-badge xr-badge-abs">Recommended</span>
+                    <h3 class="text-[13.5px] font-bold text-ink-900 mb-2.5 inline-flex items-center gap-2"><i data-lucide="clipboard-list" class="w-4 h-4 text-ink-500"></i> Extraction Summary</h3>
+                    <div class="space-y-1.5">
+                      <div class="xr-sumrow" style="background:#ECFDF5;"><span class="text-[12.5px] font-semibold" style="color:#065F46;">Identified</span><span class="text-[13px] font-bold" style="color:#065F46;" id="xrSumIdentified2">0 fields</span></div>
+                      <div class="xr-sumrow" style="background:#FFFBEB;"><span class="text-[12.5px] font-semibold" style="color:#92400E;">Unidentified</span><span class="text-[13px] font-bold" style="color:#92400E;" id="xrSumMissing2">0 fields</span></div>
+                      <div class="xr-sumrow" style="background:#FEF2F2;"><span class="text-[12.5px] font-semibold" style="color:#991B1B;">Low-Confidence</span><span class="text-[13px] font-bold" style="color:#991B1B;" id="xrSumLow2">0 fields</span></div>
+                      <div class="xr-sumrow" style="background:#F0FDFA;"><span class="text-[12.5px] font-semibold" style="color:#0F766E;">Reviewed / Verified</span><span class="text-[13px] font-bold" style="color:#0F766E;" id="xrSumReviewed2">0 fields</span></div>
+                    </div>
+                    <div class="mt-3 pt-3 border-t border-line text-[12px] text-ink-500 leading-relaxed">Confidence, source references, origin and review status are saved for this tender and restored when you return.</div>
+                  </div>
+                </div>
+
+                <!-- RIGHT: (18) side-by-side mock source-document pane -->
+                <div class="min-w-0">
+                  <div class="xr-rec xr-srcwrap relative">
+                    <div class="bg-white border border-line rounded-xl overflow-hidden">
+                      <div class="flex items-center gap-2 px-4 py-3 border-b border-line bg-surface">
+                        <span class="xr-badge">Recommended</span>
+                        <div class="text-[12.5px] font-semibold text-ink-900 inline-flex items-center gap-1.5"><i data-lucide="file-search" class="w-4 h-4 text-ink-500"></i> Source document</div>
+                        <div class="ml-auto text-[11.5px] text-ink-400">Click a field to locate</div>
+                      </div>
+                      <div id="xrSrcDoc" class="xr-srcdoc p-5"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer actions -->
+            <div class="mt-5 flex items-center justify-between flex-wrap gap-3">
+              <a href="#describe" class="text-[12.5px] text-ink-500 hover:text-ink-900 inline-flex items-center gap-1.5"><i data-lucide="message-square-text" class="w-3.5 h-3.5"></i> Or describe it instead</a>
+              <a href="#step1" class="px-4 py-2.5 rounded-lg bg-primary text-white text-[13.5px] font-medium hover:bg-primary/90 inline-flex items-center gap-1.5 shadow-soft">
+                Continue with these details <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </a>
             </div>
           </div>
         </section>
@@ -3281,10 +3560,390 @@
     function resetUpload(){
       document.getElementById('upState3').classList.add('hidden');
       document.getElementById('upState2').classList.add('hidden');
+      var s4 = document.getElementById('upState4'); if (s4) s4.classList.add('hidden');
       document.getElementById('upState1').classList.remove('hidden');
       document.getElementById('upProgress').style.width = '0%';
       refreshIcons();
     }
+
+    /* ===================================================================== */
+    /* QA RECOMMENDED — DETAILED EXTRACTION REVIEW (xr* namespace)            */
+    /* Hosts the 18 enhancements on the upload → extraction-review screen.    */
+    /* All state (confidence, source refs, origin, review status, the        */
+    /* recommended-changes toggle) persists in a per-tender localStorage key. */
+    /* ===================================================================== */
+    (function(){
+      var TND = 'TND-2026-010';
+      var LS_KEY = 'taExtractReview_' + TND;          // per-tender parse-state store
+      var LS_TOGGLE = 'taExtractRecommended_' + TND;  // ◆ Show recommended changes
+
+      // ---- Mock road-works extraction dataset ----------------------------
+      // Each field: { name, value(null=unidentified), confidence:'High'|'Medium'|'Low'|null,
+      //   sourcePage, sourceSection, snippet, origin, targetSection, group, reviewed, spanId }
+      // Groups map 1:1 onto the Tender-Creation sections.
+      var GROUPS = [
+        { id:'basic',     name:'Basic Info',  icon:'file-text',     blurb:'Identity & classification' },
+        { id:'financial', name:'Financial',   icon:'indian-rupee',  blurb:'Costs, EMD & fees' },
+        { id:'dates',     name:'Dates',       icon:'calendar-days', blurb:'Timeline & deadlines' },
+        { id:'eligibility',name:'Eligibility',icon:'shield-check',  blurb:'Qualifying criteria' },
+        { id:'technical', name:'Technical',   icon:'ruler',         blurb:'Scope & specifications' },
+        { id:'documents', name:'Documents',   icon:'paperclip',     blurb:'Required attachments' },
+        { id:'authority', name:'Authority',   icon:'landmark',      blurb:'Issuing office & sanction' },
+      ];
+      var SEED = [
+        // BASIC INFO
+        { name:'Tender Title', value:'Resurfacing & Pothole Repair of Bandra West Internal Roads (Zone 4)', confidence:'High', sourcePage:1, sourceSection:'Cover Page', origin:'Document Extracted', targetSection:'Basic Info → Work Title', group:'basic', spanId:'s-title',
+          snippet:'Name of Work: <b>Resurfacing & Pothole Repair of Bandra West Internal Roads (Zone 4)</b>.' },
+        { name:'AA Number', value:'AA/2025-26/PWD/0892', confidence:'High', sourcePage:1, sourceSection:'§1.2 Sanction', origin:'Document Extracted', targetSection:'Basic Info → AA Number', group:'basic', spanId:'s-aa',
+          snippet:'Administrative Approval vide <b>AA/2025-26/PWD/0892</b> dated 12.03.2025.' },
+        { name:'Tender Type', value:'Works', confidence:'High', sourcePage:1, sourceSection:'§1.1 Nature', origin:'AI Classified', targetSection:'Classification → Tender Type', group:'basic', spanId:'s-type',
+          snippet:'The work pertains to civil <b>road works</b> under the PWD schedule of rates.' },
+        { name:'Sub-Type', value:'Road Works', confidence:'Medium', sourcePage:1, sourceSection:'§1.1 Nature', origin:'AI Classified', targetSection:'Classification → Sub-Type', group:'basic', spanId:'s-subtype',
+          snippet:'…bituminous <b>resurfacing</b> and pothole repair of internal roads…' },
+        { name:'Sector', value:'Infrastructure', confidence:'High', sourcePage:1, sourceSection:'Cover Page', origin:'AI Classified', targetSection:'Classification → Sector', group:'basic', spanId:'s-sector',
+          snippet:'Department: Public Works (Roads) — <b>Infrastructure</b> sector works.' },
+        { name:'Procurement Method', value:'Open Tender', confidence:'Medium', sourcePage:2, sourceSection:'§2.1 Mode', origin:'AI Classified', targetSection:'Classification → Method', group:'basic', spanId:'s-method',
+          snippet:'Sealed percentage-rate tenders are invited through <b>open e-tendering</b>.' },
+        { name:'Reference / NIT No.', value:null, confidence:null, sourcePage:null, sourceSection:null, origin:'Document Extracted', targetSection:'Basic Info → NIT Number', group:'basic', spanId:null,
+          snippet:null },
+
+        // FINANCIAL
+        { name:'Estimated Cost', value:'₹45,00,000', confidence:'High', sourcePage:2, sourceSection:'§2.3 Estimate', origin:'Document Extracted', targetSection:'Financial → Estimated Cost', group:'financial', spanId:'s-est',
+          snippet:'Estimated cost put to tender: <b>Rs. 45,00,000/-</b> (Rupees Forty Five Lakh only).' },
+        { name:'TS Number', value:'TS/CE/2025/4421', confidence:'High', sourcePage:2, sourceSection:'§2.2 Tech. Sanction', origin:'Document Extracted', targetSection:'Financial → TS Number', group:'financial', spanId:'s-ts',
+          snippet:'Technical Sanction accorded vide <b>TS/CE/2025/4421</b> dated 28.03.2025.' },
+        { name:'TS Value', value:'₹45,00,000', confidence:'High', sourcePage:2, sourceSection:'§2.2 Tech. Sanction', origin:'Document Extracted', targetSection:'Financial → TS Value', group:'financial', spanId:'s-tsval',
+          snippet:'…for an amount of <b>Rs. 45,00,000/-</b> as per the sanctioned estimate.' },
+        { name:'EMD Amount', value:'₹90,000 (approx.)', confidence:'Low', sourcePage:3, sourceSection:'§3.1 EMD', origin:'AI Classified', targetSection:'Financial → EMD', group:'financial', spanId:'s-emd',
+          snippet:'Earnest Money @ 2% of the estimated cost shall be furnished by the bidder.' },
+        { name:'Tender Fee', value:'₹1,000', confidence:'Medium', sourcePage:3, sourceSection:'§3.2 Fees', origin:'Document Extracted', targetSection:'Financial → Tender Fee', group:'financial', spanId:'s-fee',
+          snippet:'Non-refundable tender form fee of <b>Rs. 1,000/-</b> payable online.' },
+        { name:'EMD Payment Mode', value:null, confidence:null, sourcePage:null, sourceSection:null, origin:'Document Extracted', targetSection:'Financial → EMD Method', group:'financial', spanId:null,
+          snippet:null },
+
+        // DATES
+        { name:'Completion Period', value:'6 months', confidence:'High', sourcePage:2, sourceSection:'§2.4 Period', origin:'Document Extracted', targetSection:'Dates → Contract Period', group:'dates', spanId:'s-period',
+          snippet:'Time allowed for completion of the work is <b>six (6) months</b> from the work order.' },
+        { name:'Bid Submission Deadline', value:null, confidence:null, sourcePage:null, sourceSection:null, origin:'Document Extracted', targetSection:'Dates → Submission Deadline', group:'dates', spanId:null,
+          snippet:null },
+        { name:'Pre-Bid Meeting Date', value:'10 days after publish (tentative)', confidence:'Low', sourcePage:3, sourceSection:'§3.4 Pre-bid', origin:'AI Classified', targetSection:'Dates → Pre-Bid Meeting', group:'dates', spanId:'s-prebid',
+          snippet:'A pre-bid meeting may be convened, the date of which will be notified separately.' },
+
+        // ELIGIBILITY
+        { name:'Similar-Work Experience', value:'1 work ≥ ₹36,00,000 in last 5 yrs', confidence:'Medium', sourcePage:4, sourceSection:'§4.1 Eligibility', origin:'Document Extracted', targetSection:'Eligibility → PQ Criteria', group:'eligibility', spanId:'s-exp',
+          snippet:'Bidder must have completed one similar work of value not less than <b>80% (Rs. 36.00 Lakh)</b>.' },
+        { name:'Average Annual Turnover', value:'₹45,00,000 / year', confidence:'Medium', sourcePage:4, sourceSection:'§4.2 Financial', origin:'AI Classified', targetSection:'Eligibility → PQ Criteria', group:'eligibility', spanId:'s-turn',
+          snippet:'Average annual financial turnover during the last 3 years should be at least the estimated cost.' },
+        { name:'Class of Contractor', value:null, confidence:null, sourcePage:null, sourceSection:null, origin:'Document Extracted', targetSection:'Eligibility → Registration Class', group:'eligibility', spanId:null,
+          snippet:null },
+
+        // TECHNICAL
+        { name:'Scope of Work', value:'Bituminous resurfacing (BM + SDBC), pothole repair, edge repair', confidence:'High', sourcePage:5, sourceSection:'§5.1 Scope', origin:'Document Extracted', targetSection:'Technical → Scope', group:'technical', spanId:'s-scope',
+          snippet:'Scope includes <b>bituminous macadam, semi-dense bituminous concrete</b>, pothole and edge repair.' },
+        { name:'BOQ Line Items', value:'12 items detected', confidence:'High', sourcePage:6, sourceSection:'Annexure-A BOQ', origin:'Document Extracted', targetSection:'Technical → BOQ', group:'technical', spanId:'s-boq',
+          snippet:'Annexure-A — Bill of Quantities: <b>12 line items</b> across earthwork, base course and surfacing.' },
+        { name:'Key Specification Standard', value:'MoRTH (5th Rev.)', confidence:'Medium', sourcePage:5, sourceSection:'§5.3 Specs', origin:'AI Classified', targetSection:'Technical → Specifications', group:'technical', spanId:'s-spec',
+          snippet:'All works shall conform to the <b>MoRTH Specifications for Road & Bridge Works</b>.' },
+
+        // DOCUMENTS
+        { name:'Required Attachments', value:'GST, PAN, registration, similar-work certs', confidence:'Medium', sourcePage:4, sourceSection:'§4.5 Documents', origin:'AI Classified', targetSection:'Documents → Checklist', group:'documents', spanId:'s-docs',
+          snippet:'Bidders shall upload <b>GST & PAN, registration certificate, and work-completion certificates</b>.' },
+        { name:'Bidder Declaration / Affidavit', value:null, confidence:null, sourcePage:null, sourceSection:null, origin:'Document Extracted', targetSection:'Documents → Affidavits', group:'documents', spanId:null,
+          snippet:null },
+
+        // AUTHORITY
+        { name:'Issuing Authority', value:'Municipal Commissioner (PWD)', confidence:'High', sourcePage:1, sourceSection:'Cover Page', origin:'Document Extracted', targetSection:'Authority → Issuing Office', group:'authority', spanId:'s-auth',
+          snippet:'Issued by the office of the <b>Municipal Commissioner, Public Works Department</b>.' },
+        { name:'Tender Inviting Officer', value:'Executive Engineer, Roads Div. IV', confidence:'Medium', sourcePage:1, sourceSection:'§1.3 TIA', origin:'AI Classified', targetSection:'Authority → Inviting Officer', group:'authority', spanId:'s-tia',
+          snippet:'Tender Inviting Authority: <b>Executive Engineer, Roads Division IV</b>.' },
+      ];
+
+      // Mock source-document text (page-broken). Highlightable spans carry data-span ids.
+      var SRC_DOC_HTML = ''
+        + '<div class="xr-pagebreak">Page 1</div>'
+        + '<h4>Notice Inviting Tender — Cover</h4>'
+        + '<p>Government of Maharashtra · Public Works Department (Roads). Issued by the office of the <span class="xr-span" data-span="s-auth">Municipal Commissioner, Public Works Department</span>.</p>'
+        + '<p>Name of Work: <span class="xr-span" data-span="s-title">Resurfacing &amp; Pothole Repair of Bandra West Internal Roads (Zone 4)</span>. Department: Public Works (Roads) — <span class="xr-span" data-span="s-sector">Infrastructure</span> sector works.</p>'
+        + '<p>1.1 Nature: The work pertains to civil <span class="xr-span" data-span="s-type">road works</span> under the PWD schedule of rates, comprising bituminous <span class="xr-span" data-span="s-subtype">resurfacing</span> and pothole repair of internal roads.</p>'
+        + '<p>1.2 Sanction: Administrative Approval vide <span class="xr-span" data-span="s-aa">AA/2025-26/PWD/0892</span> dated 12.03.2025. 1.3 Tender Inviting Authority: <span class="xr-span" data-span="s-tia">Executive Engineer, Roads Division IV</span>.</p>'
+        + '<div class="xr-pagebreak">Page 2</div>'
+        + '<h4>Section 2 — Mode &amp; Estimate</h4>'
+        + '<p>2.1 Mode: Sealed percentage-rate tenders are invited through <span class="xr-span" data-span="s-method">open e-tendering</span> on the State portal.</p>'
+        + '<p>2.2 Technical Sanction accorded vide <span class="xr-span" data-span="s-ts">TS/CE/2025/4421</span> dated 28.03.2025, for an amount of <span class="xr-span" data-span="s-tsval">Rs. 45,00,000/-</span> as per the sanctioned estimate.</p>'
+        + '<p>2.3 Estimate: Estimated cost put to tender: <span class="xr-span" data-span="s-est">Rs. 45,00,000/-</span> (Rupees Forty Five Lakh only). 2.4 Time allowed for completion of the work is <span class="xr-span" data-span="s-period">six (6) months</span> from the work order.</p>'
+        + '<div class="xr-pagebreak">Page 3</div>'
+        + '<h4>Section 3 — EMD &amp; Fees</h4>'
+        + '<p>3.1 EMD: <span class="xr-span" data-span="s-emd">Earnest Money @ 2% of the estimated cost</span> shall be furnished by the bidder. 3.2 Non-refundable tender form fee of <span class="xr-span" data-span="s-fee">Rs. 1,000/-</span> payable online.</p>'
+        + '<p>3.4 Pre-bid: <span class="xr-span" data-span="s-prebid">A pre-bid meeting may be convened, the date of which will be notified separately.</span> The submission deadline shall be announced in the e-tender notice.</p>'
+        + '<div class="xr-pagebreak">Page 4</div>'
+        + '<h4>Section 4 — Eligibility &amp; Documents</h4>'
+        + '<p>4.1 Bidder must have completed one similar work of value not less than <span class="xr-span" data-span="s-exp">80% (Rs. 36.00 Lakh)</span> in the last five years. 4.2 <span class="xr-span" data-span="s-turn">Average annual financial turnover during the last 3 years</span> should be at least the estimated cost.</p>'
+        + '<p>4.5 Documents: Bidders shall upload <span class="xr-span" data-span="s-docs">GST &amp; PAN, registration certificate, and work-completion certificates</span> with the technical bid.</p>'
+        + '<div class="xr-pagebreak">Page 5</div>'
+        + '<h4>Section 5 — Scope &amp; Specifications</h4>'
+        + '<p>5.1 Scope includes <span class="xr-span" data-span="s-scope">bituminous macadam, semi-dense bituminous concrete</span>, pothole and edge repair. 5.3 All works shall conform to the <span class="xr-span" data-span="s-spec">MoRTH Specifications for Road &amp; Bridge Works</span>.</p>'
+        + '<div class="xr-pagebreak">Page 6</div>'
+        + '<h4>Annexure-A — Bill of Quantities</h4>'
+        + '<p><span class="xr-span" data-span="s-boq">Annexure-A — Bill of Quantities: 12 line items</span> across earthwork, base course and surfacing, priced at the bidder\'s quoted percentage.</p>';
+
+      // ---- persistence ---------------------------------------------------
+      var state = null;   // array mirroring SEED + reviewed flag
+      function load(){
+        try {
+          var raw = localStorage.getItem(LS_KEY);
+          if (raw){
+            var saved = JSON.parse(raw);
+            // Merge by name so code changes to SEED don't lose saved review status.
+            var byName = {}; (saved.fields||[]).forEach(function(f){ byName[f.name]=f; });
+            state = SEED.map(function(s){
+              var prev = byName[s.name] || {};
+              return Object.assign({}, s, { reviewed: !!prev.reviewed });
+            });
+            return;
+          }
+        } catch(e){}
+        state = SEED.map(function(s){ return Object.assign({}, s, { reviewed:false }); });
+      }
+      function persist(){
+        try { localStorage.setItem(LS_KEY, JSON.stringify({ tnd:TND, savedAt:Date.now(),
+          fields: state.map(function(f){ return { name:f.name, reviewed:f.reviewed }; }) })); } catch(e){}
+      }
+
+      // ---- recommended-changes toggle (persisted) ------------------------
+      var recOn = true;
+      function loadToggle(){ try { var v = localStorage.getItem(LS_TOGGLE); recOn = (v === null) ? true : v === '1'; } catch(e){ recOn = true; } }
+      function applyToggle(){
+        var screen = document.getElementById('upState4');
+        if (screen) screen.classList.toggle('xr-off', !recOn);
+        var btn = document.getElementById('xrToggle');
+        if (btn){ btn.setAttribute('aria-pressed', recOn ? 'true' : 'false');
+          btn.querySelector('.xr-toggle-txt').textContent = recOn ? 'Show recommended changes' : 'Recommended changes hidden'; }
+      }
+      window.xrToggleRec = function(){
+        recOn = !recOn;
+        try { localStorage.setItem(LS_TOGGLE, recOn ? '1' : '0'); } catch(e){}
+        applyToggle();
+        if (typeof showToast === 'function') showToast(recOn ? 'Showing recommended changes' : 'Recommended changes hidden');
+      };
+
+      // ---- classification helpers ---------------------------------------
+      function isMissing(f){ return f.value == null; }
+      function isLow(f){ return !isMissing(f) && f.confidence === 'Low'; }
+      function needsAttention(f){ return isMissing(f) || isLow(f); }
+      // sort key: missing(0) → low(1) → medium(2) → high(3); reviewed sinks within band.
+      function rank(f){
+        var base = isMissing(f) ? 0 : (f.confidence==='Low'?1 : f.confidence==='Medium'?2 : 3);
+        return base*10 + (f.reviewed?1:0);
+      }
+
+      // ---- filter / search state ----------------------------------------
+      var filter = 'all';
+      window.xrSetFilter = function(f){
+        filter = f;
+        document.querySelectorAll('#xrFilters .xr-fchip').forEach(function(c){
+          c.setAttribute('aria-pressed', c.dataset.filter === f ? 'true' : 'false');
+        });
+        xrRender();
+      };
+
+      function matchesFilter(f){
+        if (filter === 'low') return isLow(f);
+        if (filter === 'missing') return isMissing(f);
+        if (filter === 'reviewed') return f.reviewed;
+        return true;
+      }
+      function matchesSearch(f, q){
+        if (!q) return true;
+        var hay = (f.name + ' ' + (f.value||'') + ' ' + (f.snippet||'')).toLowerCase();
+        return hay.indexOf(q) >= 0;
+      }
+
+      // ---- confidence chip ----------------------------------------------
+      function confChip(f){
+        if (isMissing(f)) return '<span class="xr-conf xr-conf-low" aria-label="Not identified"><span class="xr-dot"></span>Not identified</span>';
+        var cls = f.confidence==='High'?'xr-conf-high':f.confidence==='Medium'?'xr-conf-med':'xr-conf-low';
+        var pct = f.confidence==='High'?'96%':f.confidence==='Medium'?'78%':'54%';
+        return '<span class="xr-conf '+cls+'" aria-label="Confidence '+f.confidence+'"><span class="xr-dot"></span>'+f.confidence+' · '+pct+'</span>';
+      }
+      function statusIcon(f){
+        if (isMissing(f)) return '<span class="xr-field-status xr-st-miss" aria-label="Not identified"><i data-lucide="help-circle" class="w-4 h-4"></i></span>';
+        if (isLow(f))     return '<span class="xr-field-status xr-st-low" aria-label="Low confidence — needs review"><i data-lucide="alert-triangle" class="w-4 h-4"></i></span>';
+        return '<span class="xr-field-status xr-st-ok" aria-label="Identified"><i data-lucide="check-circle-2" class="w-4 h-4"></i></span>';
+      }
+
+      // ---- field card ----------------------------------------------------
+      function fieldCard(f, idx){
+        var attn = needsAttention(f);
+        var openByDefault = attn;  // (1) extracted fields collapse; (6/12) unidentified+low expand
+        var stateCls = isMissing(f)?'xr-missing':(isLow(f)?'xr-attn':(f.reviewed?'xr-reviewed':''));
+        var openCls = openByDefault ? ' xr-open' : '';
+        var valHtml = isMissing(f)
+          ? '<span class="xr-field-val xr-empty">Not identified — enter manually</span>'
+          : '<span class="xr-field-val'+(/^(AA|TS)\//.test(f.value)?' mono':'')+'">'+f.value+'</span>';
+        var originChip = f.origin === 'AI Classified'
+          ? '<span class="xr-meta xr-meta-ai" title="Inferred by AI classifier"><i data-lucide="sparkles"></i>AI Classified</span>'
+          : '<span class="xr-meta" title="Lifted verbatim from the document"><i data-lucide="file-down"></i>Document Extracted</span>';
+        var srcRef = isMissing(f) ? '<span class="xr-srcref" style="color:#B45309;"><i data-lucide="search-x"></i>No source located</span>'
+          : '<button type="button" class="xr-srcref" onclick="event.stopPropagation();xrGoToSource(\''+f.spanId+'\')" title="Jump to source"><i data-lucide="map-pin"></i>Page '+f.sourcePage+' · '+f.sourceSection+'</button>';
+        var mapChip = '<span class="xr-meta xr-meta-map" title="Auto-fills this section"><i data-lucide="corner-down-right"></i>'+f.targetSection+'</span>';
+        var snip = isMissing(f) ? '<div class="text-[12px] text-ink-500 italic">No matching text was found in the document for this field.</div>'
+          : '<div class="xr-snip">'+f.snippet+'</div>';
+        var revBtn = '<button type="button" class="xr-revbtn'+(f.reviewed?' is-done':'')+'" onclick="event.stopPropagation();xrToggleReviewed('+idx+')" aria-pressed="'+(f.reviewed?'true':'false')+'">'
+          + '<i data-lucide="'+(f.reviewed?'check-circle-2':'circle')+'" class="w-3.5 h-3.5"></i>'+(f.reviewed?'Reviewed':'Mark reviewed')+'</button>';
+
+        return '<div class="xr-field'+(' '+stateCls)+openCls+'" data-idx="'+idx+'" data-span="'+(f.spanId||'')+'">'
+          + '<div class="xr-field-row" role="button" tabindex="0" aria-expanded="'+(openByDefault?'true':'false')+'" onclick="xrToggleCard(this)" onkeydown="xrCardKey(event,this)">'
+            + statusIcon(f)
+            + '<div class="flex-1 min-w-0">'
+              + '<div class="flex items-center justify-between gap-2 flex-wrap">'
+                + '<span class="xr-field-name">'+f.name+'</span>'
+                + '<span class="xr-rec inline-flex">'+confChip(f)+'</span>'
+              + '</div>'
+              + '<div class="mt-1.5">'+valHtml+'</div>'
+            + '</div>'
+            + '<i data-lucide="chevron-down" class="xr-chev xr-rec"></i>'
+          + '</div>'
+          + '<div class="xr-field-body xr-rec"><div class="xr-field-body-in"><div class="xr-field-body-pad">'
+            + '<div class="flex flex-wrap items-center gap-2 mb-2.5">'+originChip+srcRef+mapChip+'</div>'
+            + snip
+            + '<div class="mt-3 flex items-center justify-between flex-wrap gap-2">'
+              + '<span class="text-[11.5px] text-ink-500 inline-flex items-center gap-1.5"><i data-lucide="corner-down-right" class="w-3.5 h-3.5"></i> Auto-fills <span class="font-medium text-ink-900">'+f.targetSection+'</span></span>'
+              + revBtn
+            + '</div>'
+          + '</div></div></div>'
+        + '</div>';
+      }
+
+      // ---- main render ---------------------------------------------------
+      window.xrRender = function(){
+        if (!state) return;
+        var q = (document.getElementById('xrSearch')||{}).value || '';
+        q = q.trim().toLowerCase();
+
+        // counts (full dataset, not filtered)
+        var nIdentified = state.filter(function(f){ return !isMissing(f); }).length;
+        var nMissing = state.filter(isMissing).length;
+        var nLow = state.filter(isLow).length;
+        var nReviewed = state.filter(function(f){ return f.reviewed; }).length;
+        setText('xrSumIdentified', nIdentified); setText('xrSumIdentified2', nIdentified+' fields');
+        setText('xrSumMissing', nMissing);       setText('xrSumMissing2', nMissing+' fields');
+        setText('xrSumLow', nLow);               setText('xrSumLow2', nLow+' fields');
+        setText('xrSumReviewed', nReviewed);     setText('xrSumReviewed2', nReviewed+' fields');
+        // filter counts
+        setText2('[data-ct="all"]', state.length);
+        setText2('[data-ct="low"]', nLow);
+        setText2('[data-ct="missing"]', nMissing);
+        setText2('[data-ct="reviewed"]', nReviewed);
+
+        // Information Not Identified panel (10)
+        var missingList = document.getElementById('xrMissingList');
+        var missing = state.filter(isMissing);
+        if (missingList){
+          missingList.innerHTML = missing.length
+            ? missing.map(function(f){ return '<span class="xr-empty-pill"><i data-lucide="help-circle" class="w-3.5 h-3.5"></i>'+f.name+'</span>'; }).join('')
+            : '<span class="text-[12.5px]" style="color:#065F46;">Everything was identified.</span>';
+        }
+
+        // Build filtered+searched index list, then sort (12), then group (5).
+        var visible = state.map(function(f,i){ return {f:f, idx:i}; })
+          .filter(function(o){ return matchesFilter(o.f) && matchesSearch(o.f, q); });
+        visible.sort(function(a,b){ return rank(a.f) - rank(b.f); });
+
+        var host = document.getElementById('xrGroups');
+        var noRes = document.getElementById('xrNoResults');
+        if (!visible.length){
+          host.innerHTML = '';
+          if (noRes) noRes.classList.remove('hidden');
+        } else {
+          if (noRes) noRes.classList.add('hidden');
+          var html = '';
+          GROUPS.forEach(function(g){
+            var rows = visible.filter(function(o){ return o.f.group === g.id; });
+            if (!rows.length) return;
+            var attnCount = rows.filter(function(o){ return needsAttention(o.f); }).length;
+            html += '<div class="xr-group">'
+              + '<div class="xr-group-hd">'
+                + '<div class="xr-group-ic"><i data-lucide="'+g.icon+'" class="w-4 h-4"></i></div>'
+                + '<div class="flex-1"><div class="xr-group-ttl">'+g.name+'</div><div class="xr-group-sub">'+g.blurb+' · '+rows.length+' field'+(rows.length>1?'s':'')+'</div></div>'
+                + (attnCount ? '<span class="xr-meta" style="color:#92400E;background:#FFFBEB;border-color:#FDE68A;"><i data-lucide="alert-triangle"></i>'+attnCount+' need'+(attnCount>1?'':'s')+' review</span>' : '<span class="xr-meta" style="color:#065F46;background:#ECFDF5;border-color:#A7F3D0;"><i data-lucide="check"></i>All clear</span>')
+              + '</div>'
+              + '<div class="p-3 space-y-2.5">'
+              + rows.map(function(o){ return fieldCard(o.f, o.idx); }).join('')
+              + '</div></div>';
+          });
+          host.innerHTML = html;
+        }
+
+        // (announce filtered count for SR via the live summary bar already updated)
+        if (window.lucide) lucide.createIcons();
+      };
+
+      // ---- card expand / collapse (2) -----------------------------------
+      window.xrToggleCard = function(rowEl){
+        var card = rowEl.closest('.xr-field');
+        var open = card.classList.toggle('xr-open');
+        rowEl.setAttribute('aria-expanded', open ? 'true' : 'false');
+      };
+      window.xrCardKey = function(e, rowEl){
+        if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); window.xrToggleCard(rowEl); }
+      };
+
+      // ---- mark reviewed / verified (14) --------------------------------
+      window.xrToggleReviewed = function(idx){
+        var f = state[idx]; if (!f) return;
+        f.reviewed = !f.reviewed;
+        persist();
+        xrRender();
+        if (typeof showToast === 'function') showToast(f.reviewed ? '“'+f.name+'” marked reviewed' : '“'+f.name+'” review cleared');
+        // keep the just-toggled card open for continuity
+        setTimeout(function(){
+          var card = document.querySelector('.xr-field[data-idx="'+idx+'"]');
+          if (card){ card.classList.add('xr-open'); var r = card.querySelector('.xr-field-row'); if (r) r.setAttribute('aria-expanded','true'); }
+        }, 0);
+      };
+
+      // ---- click-to-source (9) — 600ms highlight in the side pane --------
+      window.xrGoToSource = function(spanId){
+        if (!spanId) return;
+        var span = document.querySelector('#xrSrcDoc .xr-span[data-span="'+spanId+'"]');
+        if (!span) return;
+        span.scrollIntoView({ behavior:'smooth', block:'center' });
+        span.classList.remove('xr-hot');
+        // force reflow so the animation re-triggers on repeat clicks
+        void span.offsetWidth;
+        span.classList.add('xr-hot');
+        setTimeout(function(){ span.classList.remove('xr-hot'); }, 700);
+      };
+
+      // ---- open / close the detailed review screen ----------------------
+      window.xrOpen = function(){
+        load(); loadToggle();
+        document.getElementById('upState3').classList.add('hidden');
+        var s4 = document.getElementById('upState4');
+        s4.classList.remove('hidden');
+        // paint source doc once
+        var doc = document.getElementById('xrSrcDoc');
+        if (doc && !doc.dataset.painted){ doc.innerHTML = SRC_DOC_HTML; doc.dataset.painted = '1';
+          doc.querySelectorAll('.xr-span').forEach(function(sp){ sp.addEventListener('click', function(){ window.xrGoToSource(sp.dataset.span); }); });
+        }
+        applyToggle();
+        xrRender();
+        window.scrollTo({ top:0, behavior:'smooth' });
+        if (window.lucide) lucide.createIcons();
+      };
+      window.xrClose = function(){
+        document.getElementById('upState4').classList.add('hidden');
+        document.getElementById('upState3').classList.remove('hidden');
+        if (window.lucide) lucide.createIcons();
+      };
+
+      // ---- tiny DOM helpers ---------------------------------------------
+      function setText(id, v){ var el = document.getElementById(id); if (el) el.textContent = v; }
+      function setText2(sel, v){ document.querySelectorAll('#xrFilters '+sel).forEach(function(el){ el.textContent = v; }); }
+
+      // expose for the headless test / debugging
+      window.__xr = { get state(){ return state; }, GROUPS:GROUPS, SEED:SEED, LS_KEY:LS_KEY, LS_TOGGLE:LS_TOGGLE, isMissing:isMissing, isLow:isLow };
+    })();
 
     // ================= CLONE =================
     function confirmClone(id, name){
