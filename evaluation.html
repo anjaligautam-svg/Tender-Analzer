@@ -388,18 +388,52 @@
     .pq-popover .pq-card .pq-title { font-size:14px; font-weight:700; color:#111827; line-height:1.3; }
     .pq-popover .pq-card .pq-desc  { font-size:12px; color:#6B7280; margin-top:2px; line-height:1.4; }
     .pq-clar-form { background:#FFFBEB; border-radius:8px; padding:14px; margin-top:12px; max-height:0; opacity:0; overflow:hidden; transition: max-height 200ms ease, opacity 150ms ease; }
-    .pq-clar-form.open { max-height:420px; opacity:1; overflow:visible; }
+    .pq-clar-form.open { max-height:1000px; opacity:1; overflow:visible; }
     .pq-clar-form label { display:block; font-size:12px; font-weight:700; color:#92400E; margin-bottom:4px; }
     .pq-clar-form textarea { width:100%; min-height:72px; border:1px solid #FCD34D; border-radius:6px; padding:8px 10px; font-size:13px; background:white; resize:vertical; transition: border-color .15s ease, box-shadow .15s ease; }
     .pq-clar-form textarea:focus { outline:none; border-color:#F59E0B; box-shadow:0 0 0 3px rgba(245,158,11,0.15); }
     .pq-clar-form input[type="date"] { width:100%; border:1px solid #FCD34D; border-radius:6px; padding:7px 10px; font-size:13px; background:white; }
     .pq-clar-form input[type="date"]:focus { outline:none; border-color:#F59E0B; box-shadow:0 0 0 3px rgba(245,158,11,0.15); }
-    .pq-popover-actions { display:flex; gap:8px; margin-top:12px; }
+    .pq-popover-actions { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; align-items:center; }
     .pq-popover-actions .btn-save { flex:1; background:#0F5EE8; color:white; border:none; border-radius:7px; padding:8px 14px; font-size:13px; font-weight:600; cursor:pointer; transition: background .15s ease; }
     .pq-popover-actions .btn-save:hover { background:#0B4FCB; }
     .pq-popover-actions .btn-save.amber { background:#F59E0B; }
     .pq-popover-actions .btn-save.amber:hover { background:#D97706; }
     .pq-popover-actions .btn-cancel { background:transparent; color:#6B7280; border:none; padding:8px 12px; font-size:13px; cursor:pointer; }
+
+    /* === Clarification email flow (verdict popover) — Change: email draft + AI polish + send/save === */
+    .pq-popover { max-height:min(640px, calc(100vh - 32px)); overflow-y:auto; }
+    .pq-clar-form input[type="email"] { width:100%; border:1px solid #FCD34D; border-radius:6px; padding:7px 10px; font-size:13px; background:white; transition: border-color 150ms ease, box-shadow 150ms ease; }
+    .pq-clar-form input[type="email"]:focus { outline:none; border-color:#F59E0B; box-shadow:0 0 0 3px rgba(245,158,11,0.15); }
+    .pq-clar-form input[type="email"].invalid { border-color:#EF4444; box-shadow:0 0 0 3px rgba(239,68,68,0.12); }
+    .pq-email-err { font-size:11px; color:#DC2626; margin-top:4px; display:none; }
+    .pq-email-err.show { display:block; }
+    .pq-ai-draft-btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; margin-top:12px; width:100%; background:white; border:1.5px solid #0F5EE8; color:#0F5EE8; border-radius:7px; padding:8px 12px; font-size:13px; font-weight:600; cursor:pointer; transition: background 150ms ease, opacity 150ms ease; }
+    .pq-ai-draft-btn:hover:not(:disabled) { background:#EFF6FF; }
+    .pq-ai-draft-btn:disabled { opacity:0.45; cursor:not-allowed; }
+    .pq-spin { width:12px; height:12px; border:2px solid rgba(15,94,232,0.25); border-top-color:#0F5EE8; border-radius:50%; animation: pqspin .7s linear infinite; flex-shrink:0; display:inline-block; }
+    @keyframes pqspin { to { transform: rotate(360deg); } }
+    .pq-email-preview { max-height:0; overflow:hidden; opacity:0; transition: max-height 250ms ease, opacity 200ms ease; margin-top:12px; }
+    .pq-email-preview.open { max-height:520px; opacity:1; overflow:visible; }
+    .pq-email-card { background:#F9FAFB; border:1px solid #E5E7EB; border-radius:10px; padding:14px 16px; }
+    .pq-email-card .pe-row { font-size:12px; color:#374151; margin-bottom:6px; display:flex; align-items:center; gap:6px; }
+    .pq-email-card .pe-row b { color:#6B7280; font-weight:700; flex-shrink:0; }
+    .pq-email-card input.pe-subject { flex:1; border:1px solid #E5E7EB; border-radius:6px; padding:5px 8px; font-size:12px; background:white; min-width:0; transition: border-color 150ms ease, box-shadow 150ms ease; }
+    .pq-email-card input.pe-subject:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 3px rgba(15,94,232,0.12); }
+    .pq-email-body { border:1px solid #E5E7EB; border-radius:8px; background:white; padding:10px 12px; font-size:12.5px; line-height:1.65; color:#111827; margin-top:8px; min-height:120px; max-height:220px; overflow-y:auto; white-space:pre-wrap; transition: border-color 150ms ease, box-shadow 150ms ease; }
+    .pq-email-body:focus { outline:none; border-color:#0F5EE8; box-shadow:0 0 0 3px rgba(15,94,232,0.12); }
+    .pq-polish-link { background:transparent; border:none; padding:0; margin-top:8px; color:#0F5EE8; font-size:12px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; }
+    .pq-polish-link:hover { text-decoration:underline; }
+    .pq-popover-actions .btn-savedraft { background:white; border:1.5px solid #D1D5DB; color:#374151; border-radius:7px; padding:8px 12px; font-size:13px; font-weight:600; cursor:pointer; transition: border-color 150ms ease, background 150ms ease; }
+    .pq-popover-actions .btn-savedraft:hover { border-color:#9CA3AF; background:#F9FAFB; }
+    .pq-popover-actions .btn-send { flex:1; background:#0F5EE8; color:white; border:none; border-radius:7px; padding:8px 14px; font-size:13px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; transition: background 150ms ease, opacity 150ms ease; }
+    .pq-popover-actions .btn-send:hover:not(:disabled) { background:#0B4FCB; }
+    .pq-popover-actions .btn-send:disabled { opacity:0.45; cursor:not-allowed; }
+    .pq-popover-actions .btn-send .pq-spin { border-color:rgba(255,255,255,0.35); border-top-color:white; }
+    .pq-sent-strip { display:flex; align-items:center; gap:8px; background:#F0FDF4; border:1px solid #BBF7D0; color:#065F46; border-radius:8px; padding:10px 12px; font-size:12.5px; font-weight:600; margin-top:12px; }
+    .pq-draft-chip { display:inline-flex; align-items:center; margin-left:6px; background:#F3F4F6; color:#6B7280; border:1px solid #E5E7EB; border-radius:5px; padding:2px 7px; font-size:10.5px; font-weight:700; vertical-align:middle; }
+    .pq-discard-link { background:transparent; border:none; padding:8px 4px; color:#DC2626; font-size:12px; cursor:pointer; }
+    .pq-discard-link:hover { text-decoration:underline; }
 
     /* === Clarification sub-row in criterion table === */
     .clar-subrow td { padding:8px 16px 10px 32px !important; background:#FAFAFA; border-bottom:1px solid #F3F4F6 !important; }
@@ -1368,6 +1402,14 @@
   };
 
   const VENDOR_OPTIONS = ['Rajesh Constructions','Maharashtra Roads Co.','BuildTech Solutions','NCC Infrastructure','Patil & Associates'];
+  // Demo vendor contact emails — pre-fill for the clarification email flow
+  const VENDOR_EMAILS = {
+    'Rajesh Constructions':  'contact@rajeshconstructions.in',
+    'Maharashtra Roads Co.': 'tenders@maharashtraroads.co.in',
+    'BuildTech Solutions':   'bids@buildtechsolutions.in',
+    'NCC Infrastructure':    'procurement@nccinfra.in',
+    'Patil & Associates':    'office@patilassociates.in',
+  };
   const PARSED_TECH = {
     'Rajesh Constructions': { 'Vendor Name':'Rajesh Constructions Pvt Ltd','Document Date':'May 15, 2026','Bid Reference':'BID/RC/2026/001','EMD Amount':'₹90,000','EMD Form':'Demand Draft','Bid Validity':'Aug 20, 2026','Company Type':'Private Limited','CIN':'U72900MH2019PTC123456','GST Number':'27AAACR1234Q1Z5','PAN':'AAACR1234Q','Turnover (Last 3 yr avg)':'₹1,42,00,000','ISO Certifications':'ISO 9001:2015','Similar Work Orders':'3 WOs detected' },
     'Maharashtra Roads Co.': { 'Vendor Name':'Maharashtra Roads Co.','Document Date':'May 15, 2026','Bid Reference':'BID/MR/2026/002','EMD Amount':'₹90,000','EMD Form':'Online Payment','Bid Validity':'Aug 20, 2026','Company Type':'Private Limited','CIN':'U45200MH2017PTC298745','GST Number':'27AABCM5678R1Z2','PAN':'AABCM5678R','Turnover (Last 3 yr avg)':'₹1,08,00,000','ISO Certifications':'ISO 9001:2015, ISO 14001','Similar Work Orders':'2 WOs detected' },
@@ -1664,6 +1706,63 @@
     if (!iso) return '—';
     try { return new Date(iso + (iso.length===10?'T00:00:00':'')).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
     catch(e){ return iso; }
+  }
+  // DD MMM YYYY — used in the clarification email body and confirmations
+  function fmtDateDDMMM(iso){
+    if (!iso) return '—';
+    try { return new Date(iso + (iso.length===10?'T00:00:00':'')).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }
+    catch(e){ return iso; }
+  }
+
+  // ===== Clarification email drafts (verdict popover) — localStorage per tender =====
+  // Key: clarificationDrafts_<TND-ID>, entries keyed <vendorId>_<criterionId>
+  function clarDraftStoreKey(){ return 'clarificationDrafts_' + (EVAL && EVAL.tnd || 'TND'); }
+  function readClarDrafts(){ try { return JSON.parse(localStorage.getItem(clarDraftStoreKey()) || '{}'); } catch(e){ return {}; } }
+  function writeClarDrafts(map){ try { localStorage.setItem(clarDraftStoreKey(), JSON.stringify(map)); } catch(e){} }
+  function getClarDraft(vendor, critId){ return readClarDrafts()[vendor + '_' + critId] || null; }
+  function setClarDraft(vendor, critId, data){ const m = readClarDrafts(); m[vendor + '_' + critId] = data; writeClarDrafts(m); }
+  function removeClarDraft(vendor, critId){ const m = readClarDrafts(); if (m[vendor + '_' + critId] !== undefined){ delete m[vendor + '_' + critId]; writeClarDrafts(m); } }
+
+  function isValidEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test((v || '').trim()); }
+
+  // Rules-based "AI" rewrite of layman clarification text into formal register:
+  // expand shorthand, fix casing/spacing, prefix requirement phrasing. No API.
+  const CLAR_OFFICER = { name:'Mr. Rajesh Kumar', designation:'Evaluation Officer' };
+  const CLAR_ABBR = { docs:'documents', doc:'document', certs:'certificates', cert:'certificate', pls:'please', plz:'please', asap:'at the earliest', info:'information', regn:'registration', govt:'government', dept:'department', amt:'amount', yrs:'years', yr:'year' };
+  function expandClarShorthand(t){
+    return (t || '').replace(/\b(docs|doc|certs|cert|pls|plz|asap|info|regn|govt|dept|amt|yrs|yr)\b/gi, m => CLAR_ABBR[m.toLowerCase()] || m);
+  }
+  function formalizeClarText(raw){
+    let t = expandClarShorthand((raw || '').replace(/\s+/g, ' ').trim());
+    if (!t) return '';
+    t = t.replace(/\bi\b/g, 'I');
+    t = t.replace(/([.!?]\s+)([a-z])/g, (m, p, c) => p + c.toUpperCase());
+    if (!/[.!?]$/.test(t)) t += '.';
+    if (/^(it is observed|the committee|the evaluation)/i.test(t)){
+      return t.charAt(0).toUpperCase() + t.slice(1);
+    }
+    return 'It is observed that ' + t.charAt(0).toLowerCase() + t.slice(1) + ' The Committee requires the same to be clarified with supporting documentation.';
+  }
+  function polishClarBodyText(t){
+    let s = (t || '').replace(/[ \t]+/g, ' ').replace(/ ?\n ?/g, '\n').trim();
+    s = expandClarShorthand(s);
+    s = s.replace(/([.!?]\s+)([a-z])/g, (m, p, c) => p + c.toUpperCase());
+    s = s.replace(/\bi\b/g, 'I');
+    return s;
+  }
+  function composeClarEmailBody(st){
+    const critShort = (PQ_CRITERIA.find(c => c.id === st.critId) || {}).short || st.critId;
+    const tender = EVAL_TENDERS.find(t => t.id === EVAL.tnd) || AWARDED_TENDERS.find(t => t.id === EVAL.tnd) || {};
+    const title = tender.name ? ' (' + tender.name + ')' : '';
+    const deadline = st.deadline ? fmtDateDDMMM(st.deadline) : '[deadline]';
+    return 'Dear Sir/Madam,\n\n'
+      + 'During evaluation of your bid for Tender ' + (EVAL.tnd || 'TND-2026-001') + title
+      + ', the Evaluation Committee requires a clarification regarding ' + critShort + '. '
+      + formalizeClarText(st.text) + '\n\n'
+      + 'You are requested to furnish the above clarification/supporting document on or before ' + deadline + '. '
+      + 'Failure to respond within the stipulated time may result in your bid being evaluated on the basis of available documents.\n\n'
+      + 'This communication is part of the formal evaluation record.\n\n'
+      + 'Regards,\n' + CLAR_OFFICER.name + '\n' + CLAR_OFFICER.designation + '\nAhmedabad Municipal Corporation';
   }
   function saveState(){ try { localStorage.setItem('eval_'+EVAL.tnd, JSON.stringify(EVAL)); } catch(e){} }
   function loadState(tnd){
@@ -3017,7 +3116,8 @@
                    <button class="csr-link muted" onclick="openClarPanel('${esc(vendor)}','${critId}','${section}','edit')">Edit</button>`;
     } else if (rec.status === 'sent'){
       const recipCount = (rec.recipients||[]).length;
-      leftHTML = `<i data-lucide="send" style="width:14px; height:14px; color:#10B981;"></i> <span class="csr-text" style="color:#065F46;">Clarification sent · ${fmtDateShort(rec.sentAt)} · ${recipCount} recipient${recipCount===1?'':'s'}</span>`;
+      const sentVia = rec.emailTo ? esc(rec.emailTo) : (recipCount + ' recipient' + (recipCount===1?'':'s'));
+      leftHTML = `<i data-lucide="send" style="width:14px; height:14px; color:#10B981;"></i> <span class="csr-text" style="color:#065F46;">Clarification sent · ${fmtDateShort(rec.sentAt)} · ${sentVia}</span>`;
       const confirmId = 'csrConfirm-'+esc(vendor).replace(/[^a-zA-Z0-9_-]/g,'_')+'-'+critId;
       rightHTML = `<span id="${confirmId}"></span><button class="csr-link" onclick="askMarkReceived('${esc(vendor)}','${critId}','${confirmId}')">Mark received</button>
                    <button class="csr-link muted" onclick="openClarPanel('${esc(vendor)}','${critId}','${section}','view')">View record</button>`;
@@ -3055,7 +3155,8 @@
         ? `<div><span style="font-size:13px; color:#F59E0B; font-style:italic;">Not found</span> <a href="#" onclick="pqInlineEdit('${esc(vendor)}','${c.id}'); return false;" class="text-[12px] hover:underline" style="color:#0F5EE8;">Enter manually</a></div>`
         : `<div class="crit-sub">${esc(aiVal)}</div>`;
       const verdictAttr = esc(val == null ? '' : val);
-      const trigger = `<span data-verdict="${verdictAttr}" onclick="openPqPopover(event,'${esc(vendor)}','${c.id}')">${verdictTriggerHTML(val)}</span>`;
+      const draftChip = getClarDraft(vendor, c.id) ? '<span class="pq-draft-chip" title="Clarification email draft saved">Draft</span>' : '';
+      const trigger = `<span data-verdict="${verdictAttr}" onclick="openPqPopover(event,'${esc(vendor)}','${c.id}')">${verdictTriggerHTML(val)}</span>${draftChip}`;
       const commentHTML = pqCommentHTML(vendor, c.id);
       const evDoc = evidenceDocFor(vendor, c.id);
       const evidenceCell = evDoc
@@ -3444,12 +3545,18 @@
     const trigger = (e.target.closest && (e.target.closest('.verdict-trigger') || e.target.closest('.verdict-empty-chip'))) || e.currentTarget;
     const cur = (EVAL.matrix[vendor]||{})[critId];
     const existing = findClarRecord(vendor, critId);
+    // Saved clarification email draft (localStorage) — restoring pre-selects Clarification Required
+    const draft = getClarDraft(vendor, critId);
     // C3 — capture the prior verdict at the moment the popover opens (currentVerdict)
-    EVAL._pqPop = { vendor, critId, sel: cur || 'pass',
+    EVAL._pqPop = { vendor, critId,
+      sel: draft ? 'clarif' : (cur || 'pass'),
       currentVerdict: cur || null,    // null | 'pass' | 'fail' | 'clarif' | 'pending'
       changeComment: '',              // textarea contents
-      text: existing && existing.text || '',
-      deadline: existing && existing.deadline || '',
+      text: draft ? (draft.text || '') : (existing && existing.text || ''),
+      deadline: draft ? (draft.deadline || '') : (existing && existing.deadline || ''),
+      email: draft ? (draft.email || '') : ((existing && existing.emailTo) || VENDOR_EMAILS[vendor] || ''),
+      subject: draft ? (draft.subject || '') : ((existing && existing.emailSubject) || ''),
+      body: draft ? (draft.body || '') : '',
       trigger: trigger,        // captured for focus-return on close
     };
     renderPqPopover();
@@ -3492,11 +3599,27 @@
       <input type="radio" name="pqv" value="${val}" ${st.sel===val?'checked':''} onclick="event.stopPropagation();" />
       <div><div class="pq-title">${label}</div><div class="pq-desc">${desc}</div></div></label>`;
     const isClar = st.sel === 'clarif';
+    const canDraftEmail = (st.text || '').trim().length >= 10 && !!st.deadline;
+    const hasBody = !!(st.body || '').trim();
+    const previewOpenCls = hasBody && !st._animatePreview ? 'open' : '';
     const formHTML = `<div class="pq-clar-form ${isClar?'open':''}" id="pqClarForm">
-      <label>Clarification required</label>
-      <textarea id="pqClarText" placeholder="Describe what document or explanation is needed from the vendor..." onclick="event.stopPropagation();">${esc(st.text)}</textarea>
-      <label style="margin-top:10px;">Response deadline</label>
-      <input id="pqClarDeadline" type="date" value="${esc(st.deadline)}" onclick="event.stopPropagation();" />
+      <label for="pqClarText">Clarification required</label>
+      <textarea id="pqClarText" placeholder="Describe in plain words what you need from the vendor — e.g. their incorporation certificate is missing the registration date." oninput="updatePqClarGates()" onclick="event.stopPropagation();">${esc(st.text)}</textarea>
+      <label for="pqClarDeadline" style="margin-top:10px;">Response deadline</label>
+      <input id="pqClarDeadline" type="date" value="${esc(st.deadline)}" onchange="updatePqClarGates()" onclick="event.stopPropagation();" />
+      <label for="pqClarEmail" style="margin-top:10px;">Vendor email</label>
+      <input id="pqClarEmail" type="email" aria-label="Vendor email address" placeholder="vendor@company.com" value="${esc(st.email || '')}" oninput="updatePqClarGates()" onblur="onPqEmailBlur()" onclick="event.stopPropagation();" />
+      <div id="pqEmailErr" class="pq-email-err">Enter a valid email</div>
+      <button id="pqAiDraftBtn" type="button" class="pq-ai-draft-btn" ${canDraftEmail?'':'disabled'} onclick="event.stopPropagation(); draftClarEmail();">✦ Draft email with AI</button>
+      <div id="pqEmailPreview" class="pq-email-preview ${previewOpenCls}" aria-live="polite">
+        ${hasBody ? `<div class="pq-email-card">
+          <div class="pe-row"><b>To:</b> <span id="pqEmailTo">${esc(st.email || '—')}</span></div>
+          <div class="pe-row"><b>Subject:</b> <input id="pqEmailSubject" class="pe-subject" value="${esc(st.subject || '')}" onclick="event.stopPropagation();" /></div>
+          <div id="pqEmailBody" class="pq-email-body" contenteditable="true" spellcheck="false" role="textbox" aria-multiline="true" aria-label="Email body" tabindex="0" onclick="event.stopPropagation();">${esc(st.body || '')}</div>
+          <button type="button" class="pq-polish-link" id="pqPolishLink" onclick="event.stopPropagation(); polishClarEmail();">✦ Polish again</button>
+        </div>` : ''}
+      </div>
+      <div id="pqSentStrip"></div>
     </div>`;
     // C3 — Change-comment box: required when changing a deliberate (pass/fail/clarif) verdict to a *different* verdict.
     // Pending → anything = no comment required (Pending was provisional)
@@ -3516,6 +3639,20 @@
     const blocked = needsChangeComment && wordCount < 3;
     const saveStyle = blocked ? ' style="opacity:0.5; cursor:not-allowed;"' : '';
     const saveAttr  = blocked ? ' aria-disabled="true"' : '';
+    // Clarification footer: Cancel · [Discard draft] · Save Draft · primary.
+    // Primary is "Send email" once a drafted body exists, else the legacy amber save.
+    const savedDraft = getClarDraft(st.vendor, st.critId);
+    const emailOk = isValidEmail(st.email);
+    const clarPrimary = hasBody
+      ? `<button id="pqSendBtn" class="btn-send" ${(emailOk && !blocked)?'':'disabled'} onclick="event.stopPropagation(); sendClarEmail();">Send email</button>`
+      : `<button id="pqSaveBtn" class="${saveBtnClass}"${saveStyle}${saveAttr} onclick="event.stopPropagation(); savePqVerdict();">${saveLabel}</button>`;
+    const clarActionsHTML = `<div class="pq-popover-actions">
+        <button class="btn-cancel" onclick="event.stopPropagation(); closePqPopover();">Cancel</button>
+        ${savedDraft ? `<button type="button" class="pq-discard-link" onclick="event.stopPropagation(); askDiscardClarDraft();">Discard draft</button>` : ''}
+        <button type="button" class="btn-savedraft" onclick="event.stopPropagation(); saveClarPopDraft();">Save Draft</button>
+        ${clarPrimary}
+      </div>
+      <div id="pqDiscardConfirm"></div>`;
     const pop = document.getElementById('pqPopover');
     pop.innerHTML = `<div class="flex items-center justify-between mb-2">
         <div class="text-[12.5px] font-bold text-ink-900">${esc(st.vendor)} — ${esc((PQ_CRITERIA.find(c=>c.id===st.critId)||{}).short||st.critId)}</div>
@@ -3527,18 +3664,33 @@
       ${card('clarif','⏳ Clarification Required','Need supporting document or explanation from vendor','on-clarif')}
       ${formHTML}
       ${commentBox}
-      <div class="pq-popover-actions">
+      ${isClar ? clarActionsHTML : `<div class="pq-popover-actions">
         <button class="btn-cancel" onclick="event.stopPropagation(); closePqPopover();">Cancel</button>
         <button id="pqSaveBtn" class="${saveBtnClass}"${saveStyle}${saveAttr} onclick="event.stopPropagation(); savePqVerdict();">${saveLabel}</button>
-      </div>`;
+      </div>`}`;
+    // Animate the email preview expanding when it was just drafted (250ms max-height).
+    // setTimeout, not rAF — rAF can be suspended in background/headless tabs and the
+    // preview must still end up visible there.
+    if (st._animatePreview){
+      st._animatePreview = false;
+      setTimeout(() => { document.getElementById('pqEmailPreview')?.classList.add('open'); }, 30);
+    }
     refreshIcons();
+  }
+  // Read every clarification field from the DOM back into popover state (survives re-renders)
+  function syncClarPopFields(){
+    const st = EVAL._pqPop; if (!st) return;
+    const t = document.getElementById('pqClarText'); if (t) st.text = t.value;
+    const d = document.getElementById('pqClarDeadline'); if (d) st.deadline = d.value;
+    const cc = document.getElementById('pqChangeComment'); if (cc) st.changeComment = cc.value;
+    const em = document.getElementById('pqClarEmail'); if (em) st.email = em.value;
+    const sub = document.getElementById('pqEmailSubject'); if (sub) st.subject = sub.value;
+    const bd = document.getElementById('pqEmailBody'); if (bd) st.body = bd.innerText;
   }
   function pickPqSel(val){
     if (!EVAL._pqPop) return;
     // Preserve any text already typed before re-render
-    const t = document.getElementById('pqClarText'); if (t) EVAL._pqPop.text = t.value;
-    const d = document.getElementById('pqClarDeadline'); if (d) EVAL._pqPop.deadline = d.value;
-    const cc = document.getElementById('pqChangeComment'); if (cc) EVAL._pqPop.changeComment = cc.value;
+    syncClarPopFields();
     EVAL._pqPop.sel = val;
     renderPqPopover();
   }
@@ -3561,6 +3713,205 @@
       btn.style.cursor  = blocked ? 'not-allowed' : '';
       btn.setAttribute('aria-disabled', blocked ? 'true' : 'false');
     }
+    // The Send email primary (clarification flow) obeys the same comment gate
+    updatePqSendBtnState();
+  }
+
+  // ===== Clarification email flow — gating, drafting, polish, save draft, send =====
+  function updatePqClarGates(){
+    const st = EVAL._pqPop; if (!st) return;
+    syncClarPopFields();
+    const btn = document.getElementById('pqAiDraftBtn');
+    if (btn && !btn.dataset.busy){
+      btn.disabled = !((st.text || '').trim().length >= 10 && st.deadline);
+    }
+    const to = document.getElementById('pqEmailTo');
+    if (to) to.textContent = (st.email || '—');
+    // Clear the invalid marker as soon as the email becomes valid
+    if (isValidEmail(st.email)){
+      document.getElementById('pqClarEmail')?.classList.remove('invalid');
+      document.getElementById('pqEmailErr')?.classList.remove('show');
+    }
+    updatePqSendBtnState();
+  }
+  function onPqEmailBlur(){
+    const st = EVAL._pqPop; if (!st) return;
+    syncClarPopFields();
+    const em = document.getElementById('pqClarEmail');
+    const err = document.getElementById('pqEmailErr');
+    const bad = (st.email || '').trim() !== '' && !isValidEmail(st.email);
+    if (em) em.classList.toggle('invalid', bad);
+    if (err) err.classList.toggle('show', bad);
+  }
+  function updatePqSendBtnState(){
+    const st = EVAL._pqPop; if (!st) return;
+    const sendBtn = document.getElementById('pqSendBtn');
+    if (!sendBtn || sendBtn.dataset.busy) return;
+    const needsChangeComment = !!(st.currentVerdict && st.currentVerdict !== 'pending' && st.currentVerdict !== 'clarif');
+    const wc = (st.changeComment || '').trim().split(/\s+/).filter(w => w.length).length;
+    const blocked = needsChangeComment && wc < 3;
+    sendBtn.disabled = !(isValidEmail(st.email) && (st.body || '').trim() && !blocked);
+  }
+  function draftClarEmail(){
+    const st = EVAL._pqPop; if (!st) return;
+    syncClarPopFields();
+    if ((st.text || '').trim().length < 10 || !st.deadline) return;
+    const btn = document.getElementById('pqAiDraftBtn');
+    if (!btn || btn.dataset.busy) return;
+    btn.dataset.busy = '1'; btn.disabled = true;
+    btn.innerHTML = '<span class="pq-spin" style="border-color:rgba(15,94,232,0.25); border-top-color:#0F5EE8;"></span> Drafting...';
+    setTimeout(() => {
+      const critShort = (PQ_CRITERIA.find(c => c.id === st.critId) || {}).short || st.critId;
+      if (!(st.subject || '').trim()){
+        st.subject = 'Clarification required — ' + critShort + ' — Tender ' + (EVAL.tnd || 'TND-2026-001');
+      }
+      st.body = composeClarEmailBody(st);
+      st._animatePreview = true;
+      renderPqPopover();
+    }, 800);
+  }
+  function polishClarEmail(){
+    const st = EVAL._pqPop; if (!st) return;
+    syncClarPopFields();
+    const link = document.getElementById('pqPolishLink');
+    if (!link || link.dataset.busy) return;
+    link.dataset.busy = '1';
+    link.innerHTML = '<span class="pq-spin"></span> Polishing...';
+    setTimeout(() => {
+      st.body = polishClarBodyText(st.body);
+      const bd = document.getElementById('pqEmailBody');
+      if (bd) bd.innerText = st.body;
+      link.dataset.busy = '';
+      link.innerHTML = '✦ Polish again';
+      updatePqSendBtnState();
+    }, 800);
+  }
+  // C3-equivalent comment persistence shared by the draft/send paths
+  function persistPqChangeComment(st, ccText){
+    EVAL.pqComments = EVAL.pqComments || {};
+    EVAL.pqComments[st.vendor] = EVAL.pqComments[st.vendor] || {};
+    EVAL.pqComments[st.vendor][st.critId] = {
+      text: ccText,
+      author: 'Rajesh Kumar',
+      date: new Date().toISOString(),
+      previousVerdict: st.currentVerdict,
+    };
+    const _critShort = (PQ_CRITERIA.find(c=>c.id===st.critId)||{}).short || st.critId;
+    log('PQ Evaluation', 'verdict_changed', `${_critShort} · ${st.vendor} · ${st.currentVerdict} → clarif · "${ccText.slice(0, 80)}${ccText.length>80?'…':''}"`);
+    logCriticalAction(EVAL.tnd, {
+      touchpointId: 6, action: 'pq_verdict_changed', category: 'evaluation',
+      description: 'PQ verdict changed: ' + _critShort + ' — ' + st.vendor,
+      page: 'evaluation', section: 'PQ Evaluation',
+      vendorName: st.vendor, criterion: _critShort,
+      oldValue: String(st.currentVerdict), newValue: 'clarif',
+      detail: ccText,
+    });
+  }
+  function saveClarPopDraft(){
+    const st = EVAL._pqPop; if (!st) return;
+    syncClarPopFields();
+    if (st.sel !== 'clarif'){ showToast('Select Clarification Required first'); return; }
+    // "Reason for changing verdict" stays required as-is when changing a deliberate verdict
+    const needsChangeComment = !!(st.currentVerdict && st.currentVerdict !== 'pending' && st.currentVerdict !== 'clarif');
+    const ccText = (st.changeComment || '').trim();
+    if (needsChangeComment){
+      const wc = ccText.split(/\s+/).filter(w => w.length).length;
+      if (wc < 3){ showToast('Add a 3+ word reason for changing the verdict'); return; }
+    }
+    EVAL.matrix[st.vendor] = EVAL.matrix[st.vendor] || {};
+    EVAL.matrix[st.vendor][st.critId] = 'clarif';
+    const existing = findClarRecord(st.vendor, st.critId);
+    upsertClarRecord({
+      id: existing?.id || 'clr-'+Date.now(),
+      vendorId: st.vendor, criterionId: st.critId, section: 'PQ',
+      text: st.text, deadline: st.deadline,
+      recipients: existing?.recipients || [],
+      status: (existing && (existing.status === 'sent' || existing.status === 'received')) ? existing.status : 'draft',
+      sentAt: existing?.sentAt || null,
+      receivedAt: existing?.receivedAt || null,
+    });
+    setClarDraft(st.vendor, st.critId, {
+      text: st.text || '', deadline: st.deadline || '',
+      email: st.email || '', subject: st.subject || '', body: st.body || '',
+      verdict: 'clarif', savedAt: new Date().toISOString(),
+    });
+    if (needsChangeComment && ccText) persistPqChangeComment(st, ccText);
+    pqAutosave(); pqShowSavedIndicator();
+    closePqPopover();
+    renderTechnical(); saveState();
+    showToast('Clarification draft saved');
+  }
+  function sendClarEmail(){
+    const st = EVAL._pqPop; if (!st) return;
+    syncClarPopFields();
+    if (!(st.body || '').trim()){ showToast('Draft the email first'); return; }
+    if (!isValidEmail(st.email)){
+      document.getElementById('pqClarEmail')?.classList.add('invalid');
+      document.getElementById('pqEmailErr')?.classList.add('show');
+      showToast('Enter a valid vendor email'); return;
+    }
+    if (!(st.text || '').trim()){ showToast('Describe the clarification needed'); return; }
+    if (!st.deadline){ showToast('Pick a response deadline'); return; }
+    const needsChangeComment = !!(st.currentVerdict && st.currentVerdict !== 'pending' && st.currentVerdict !== 'clarif');
+    const ccText = (st.changeComment || '').trim();
+    if (needsChangeComment){
+      const wc = ccText.split(/\s+/).filter(w => w.length).length;
+      if (wc < 3){ showToast('Add a 3+ word reason for changing the verdict'); return; }
+    }
+    const btn = document.getElementById('pqSendBtn');
+    if (!btn || btn.dataset.busy) return;
+    btn.dataset.busy = '1'; btn.disabled = true;
+    btn.innerHTML = '<span class="pq-spin"></span> Sending...';
+    setTimeout(() => {
+      // In-dialog success strip (1.5s), then commit + close. Simulation — no real email.
+      const strip = document.getElementById('pqSentStrip');
+      if (strip) strip.innerHTML = `<div class="pq-sent-strip" role="status" aria-live="polite">✓ Clarification email sent to ${esc(st.email)} · deadline ${esc(fmtDateDDMMM(st.deadline))}</div>`;
+      setTimeout(() => {
+        const critShort = (PQ_CRITERIA.find(c => c.id === st.critId) || {}).short || st.critId;
+        EVAL.matrix[st.vendor] = EVAL.matrix[st.vendor] || {};
+        EVAL.matrix[st.vendor][st.critId] = 'clarif';
+        const existing = findClarRecord(st.vendor, st.critId);
+        upsertClarRecord({
+          id: existing?.id || 'clr-'+Date.now(),
+          vendorId: st.vendor, criterionId: st.critId, section: 'PQ',
+          text: st.text, deadline: st.deadline,
+          recipients: existing?.recipients || [],
+          status: 'sent', sentAt: todayISO(),
+          receivedAt: null,
+          emailTo: st.email, emailSubject: st.subject || '', emailBody: st.body || '',
+        });
+        removeClarDraft(st.vendor, st.critId);
+        if (needsChangeComment && ccText) persistPqChangeComment(st, ccText);
+        log('PQ Evaluation', 'clarification_sent', `${st.vendor} · ${st.critId} · emailed ${st.email}`);
+        // Touchpoint 8 — clarification request sent (email path)
+        logCriticalAction(EVAL.tnd, {
+          touchpointId: 8, action: 'clarification_sent', category: 'evaluation',
+          description: 'Clarification email sent — ' + critShort + ' for ' + st.vendor,
+          page: 'evaluation', section: 'PQ Evaluation',
+          vendorName: st.vendor, criterion: critShort,
+          detail: 'To: ' + st.email + ' · Deadline: ' + fmtDateDDMMM(st.deadline),
+        });
+        pqAutosave(); pqShowSavedIndicator();
+        closePqPopover();
+        renderTechnical(); saveState();
+        showToast('Clarification sent — ' + st.vendor);
+      }, 1500);
+    }, 800);
+  }
+  function askDiscardClarDraft(){
+    const el = document.getElementById('pqDiscardConfirm'); if (!el) return;
+    el.innerHTML = `<div style="display:flex; align-items:center; gap:8px; margin-top:8px; font-size:12px; color:#374151; flex-wrap:wrap;">Discard this draft?
+      <button type="button" class="pq-discard-link" style="padding:2px 4px; font-weight:700;" onclick="event.stopPropagation(); discardClarDraftConfirm();">Yes, discard</button>
+      <button type="button" class="csr-link muted" style="font-size:12px;" onclick="event.stopPropagation(); this.closest('#pqDiscardConfirm').innerHTML='';">Cancel</button></div>`;
+  }
+  function discardClarDraftConfirm(){
+    const st = EVAL._pqPop; if (!st) return;
+    removeClarDraft(st.vendor, st.critId);
+    st.email = VENDOR_EMAILS[st.vendor] || '';
+    st.subject = ''; st.body = '';
+    renderPqPopover();
+    renderTechnical();
+    showToast('Draft discarded');
   }
   function savePqVerdict(){
     const st = EVAL._pqPop; if (!st) return;
@@ -3597,6 +3948,8 @@
       EVAL.matrix[vendor][critId] = sel;
       // Drop any clar record on this cell
       EVAL.clarifications = (EVAL.clarifications||[]).filter(c => !(c.vendorId === vendor && c.criterionId === critId));
+      // A saved clarification email draft no longer applies once a non-clarif verdict lands
+      removeClarDraft(vendor, critId);
     }
     // C3 — persist the change-comment when present
     if (needsChangeComment && changeCommentText){
